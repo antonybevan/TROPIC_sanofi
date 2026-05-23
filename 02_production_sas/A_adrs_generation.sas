@@ -13,9 +13,80 @@
 
 %include "00_config.sas";
 
+/* 1. RECIST 1.1 Visit-level calculations */
+/* Baseline Target Sum of Diameters */
 proc sql;
-    /* Base dataset merging RS and ADSL */
-    create table work.rs_base as
+    create table work.base_sod as
+    select usubjid, sum(input(lsstresn, best32.)) as base_sod
+    from staging.ls
+    where lscat = 'TARGET' and lstestcd = 'LENGTH' and not missing(lsstresn) and visit = 'BASELINE'
+    group by usubjid;
+quit;
+
+/* Post-Baseline Target Sum of Diameters */
+proc sql;
+    create table work.post_sod as
+    select ls.usubjid, ls.visitnum, ls.visit,
+           input(substr(ls.lsdtc, 1, 10), yymmdd10.) as lsd_dt format=yymmdd10.,
+           sum(input(ls.lsstresn, best32.)) as post_sod
+    from staging.ls as ls
+    where ls.lscat = 'TARGET' and ls.lstestcd = 'LENGTH' and not missing(ls.lsstresn) and ls.visit ne 'BASELINE'
+    group by ls.usubjid, ls.visitnum, ls.visit, ls.lsdtc;
+quit;
+
+/* Join baseline, calculate nadir, and evaluate response */
+proc sql;
+    create table work.cycle_sod_comp as
+    select p.usubjid, p.visitnum, p.visit, p.lsd_dt, p.post_sod, b.base_sod
+    from work.post_sod as p
+    left join work.base_sod as b on p.usubjid = b.usubjid;
+quit;
+
+proc sort data=work.cycle_sod_comp;
+    by usubjid visitnum;
+run;
+
+data work.recist_calc;
+    set work.cycle_sod_comp;
+    by usubjid;
+    
+    retain nadir_sod;
+    
+    if first.usubjid then nadir_sod = post_sod;
+    else nadir_sod = min(nadir_sod, post_sod);
+    
+    pct_chg_base = (post_sod - base_sod) / base_sod * 100;
+    pct_chg_nadir = (post_sod - nadir_sod) / nadir_sod * 100;
+    abs_chg_nadir = post_sod - nadir_sod;
+    
+    length recist_resp $20;
+    if post_sod = 0 then recist_resp = 'CR';
+    else if pct_chg_nadir >= 20 and abs_chg_nadir >= 5 then recist_resp = 'PD';
+    else if pct_chg_base <= -30 then recist_resp = 'PR';
+    else recist_resp = 'SD';
+run;
+
+/* Map derived RECIST overall response records */
+proc sql;
+    create table work.recist_ovrl as
+    select 
+        adsl.studyid,
+        adsl.usubjid,
+        adsl.trt01p,
+        adsl.trtsdt,
+        'Overall Response per RECIST 1.1 + PCWG3' as PARAM length=40,
+        'OVRLRESP' as PARAMCD length=8,
+        r.recist_resp as AVALC length=20,
+        r.lsd_dt as ADT format=yymmdd10.,
+        r.lsd_dt - adsl.trtsdt + 1 as ADY,
+        r.visit length=40
+    from work.recist_calc as r
+    left join adam.adsl as adsl on r.usubjid = adsl.usubjid;
+quit;
+
+/* Map Efficacy Milestones from sdtm.rs */
+proc sql;
+    create table work.rs_disp as
     select 
         adsl.studyid,
         adsl.usubjid,
@@ -32,45 +103,69 @@ proc sql;
     where adsl.saffl = 'Y';
 quit;
 
-/* Calculate Best Overall Response (BOR) per subject */
+/* Union visit-level records */
+data work.rs_base;
+    set work.recist_ovrl work.rs_disp;
+run;
+
+proc sort data=work.rs_base;
+    by usubjid ADT AVALC;
+run;
+
+/* Best Overall Response (BOR) */
 proc sql;
-    create table work.bor_raw as
+    create table work.bor_rank as
     select 
         usubjid,
-        min(case when AVALC = 'PD' then 4.0 else 5.0 end) as bor_val
+        case 
+            when AVALC = 'CR' then 1.0
+            when AVALC = 'PR' then 2.0
+            when AVALC = 'SD' then 3.0
+            when AVALC = 'PD' then 4.0
+            when AVALC = 'DEATH' then 5.0
+            else 6.0
+        end as rank,
+        AVALC
     from work.rs_base
-    where not missing(ADT)
-    group by usubjid;
+    where not missing(ADT);
 quit;
 
+proc sort data=work.bor_rank;
+    by usubjid rank;
+run;
+
 data work.bor_summary;
-    set work.bor_raw;
-    length PARAMCD $8 PARAM $40 AVALC $40 AVISIT $40;
+    set work.bor_rank;
+    by usubjid rank;
+    if first.usubjid;
+    
+    length PARAMCD $8 PARAM $40 AVISIT $40;
     
     PARAMCD = 'BESTRESP';
     PARAM = 'Best Overall Response (BOR)';
     AVISIT = 'ALL CYCLES';
     AVISITN = 99;
     
-    if bor_val = 4.0 then AVALC = 'PD';
-    else AVALC = 'DEATH';
-    
-    AVAL = bor_val;
+    AVAL = rank;
+    drop rank;
 run;
 
-/* Objective Response Parameter (always N/0.0 for control cohort) */
-proc sql;
-    create table work.orr_summary as
-    select 
-        usubjid,
-        'OBJRESP' as PARAMCD length=8,
-        'Objective Response (CR or PR)' as PARAM length=40,
-        'N' as AVALC length=20,
-        0.0 as AVAL,
-        'ALL CYCLES' as AVISIT length=40,
-        99 as AVISITN
-    from work.bor_summary;
-quit;
+/* Objective Response (CR/PR) */
+data work.orr_summary;
+    set work.bor_summary;
+    
+    PARAMCD = 'OBJRESP';
+    PARAM = 'Objective Response (CR or PR)';
+    
+    if AVALC in ('CR', 'PR') then do;
+        AVALC = 'Y';
+        AVAL = 1.0;
+    end;
+    else do;
+        AVALC = 'N';
+        AVAL = 0.0;
+    end;
+run;
 
 /* PSA progression indicator */
 proc sql;

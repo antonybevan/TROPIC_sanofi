@@ -17,8 +17,55 @@ lb <- readRDS("01_raw_source/real_sdtm/staging/lb.rds")
 header <- adsl %>%
   select(STUDYID, USUBJID, SUBJID, TRT01P, TRTSDT, RANDDT)
 
-# Map Overall Response (OVRLRESP) from Disposition Progression and Death Milestones
-df_ovrl <- ds %>%
+# Load raw target lesion dataset in R
+ls_data <- readRDS("01_raw_source/real_sdtm/staging/ls.rds")
+
+# Derive visit-level target lesion SoD and responses
+df_targets <- ls_data %>%
+  filter(LSCAT == "TARGET" & LSTESTCD == "LENGTH" & !is.na(LSSTRESN))
+
+df_baseline_sod <- df_targets %>%
+  filter(VISIT == "BASELINE") %>%
+  group_by(USUBJID) %>%
+  summarise(base_sod = sum(LSSTRESN), .groups = "drop")
+
+df_post_sod <- df_targets %>%
+  filter(VISIT != "BASELINE") %>%
+  group_by(USUBJID, VISITNUM, VISIT, LSDTC) %>%
+  summarise(post_sod = sum(LSSTRESN), .groups = "drop") %>%
+  left_join(df_baseline_sod, by = "USUBJID")
+
+df_recist <- df_post_sod %>%
+  group_by(USUBJID) %>%
+  arrange(VISITNUM) %>%
+  mutate(
+    nadir_sod = cummin(post_sod),
+    pct_chg_base = (post_sod - base_sod) / base_sod * 100,
+    pct_chg_nadir = (post_sod - nadir_sod) / nadir_sod * 100,
+    abs_chg_nadir = post_sod - nadir_sod,
+    
+    recist_resp = case_when(
+      post_sod == 0 ~ "CR",
+      pct_chg_nadir >= 20 & abs_chg_nadir >= 5 ~ "PD",
+      pct_chg_base <= -30 ~ "PR",
+      TRUE ~ "SD"
+    )
+  ) %>%
+  ungroup() %>%
+  inner_join(header, by = "USUBJID") %>%
+  transmute(
+    STUDYID, USUBJID, SUBJID, TRT01P, TRTSDT,
+    PARAMCD = "OVRLRESP",
+    PARAM = "Overall Response per RECIST 1.1 + PCWG3",
+    AVALC = recist_resp,
+    ADT = ymd(substring(LSDTC, 1, 10)),
+    ADY = as.numeric(ADT - TRTSDT + 1),
+    VISIT,
+    ANL01FL = "Y"
+  )
+
+# Disposition milestones fallback
+df_disp_milestones <- ds %>%
   filter(DSDECOD %in% c("DISEASE PROGRESSION", "PROGRESSION", "DEATH", "DEAD")) %>%
   inner_join(header, by = c("USUBJID", "STUDYID", "SUBJID")) %>%
   mutate(
@@ -32,36 +79,45 @@ df_ovrl <- ds %>%
   ) %>%
   select(STUDYID, USUBJID, SUBJID, TRT01P, TRTSDT, PARAMCD, PARAM, AVALC, ADT = adt, ADY = ady, VISIT, ANL01FL)
 
+# Union visit-level response records
+df_ovrl <- bind_rows(df_recist, df_disp_milestones) %>%
+  arrange(USUBJID, ADT, AVALC)
+
 # Best Overall Response (BOR) per subject
+# Ranking: CR (1) -> PR (2) -> SD (3) -> PD (4) -> DEATH (5)
 df_bor_raw <- df_ovrl %>%
   filter(!is.na(ADT)) %>%
   mutate(
-    bor_rank = if_else(AVALC == "PD", 4.0, 5.0)
+    bor_rank = case_when(
+      AVALC == "CR" ~ 1.0,
+      AVALC == "PR" ~ 2.0,
+      AVALC == "SD" ~ 3.0,
+      AVALC == "PD" ~ 4.0,
+      AVALC == "DEATH" ~ 5.0,
+      TRUE ~ 6.0
+    )
   ) %>%
   group_by(USUBJID) %>%
-  summarise(
-    bor_val = min(bor_rank, na.rm = TRUE),
-    .groups = "drop"
-  )
+  arrange(bor_rank) %>%
+  slice(1) %>%
+  ungroup()
 
 df_bor <- df_bor_raw %>%
-  inner_join(header, by = "USUBJID") %>%
   transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRTSDT,
     PARAMCD = "BESTRESP", PARAM = "Best Overall Response (BOR)",
-    AVALC = if_else(bor_val == 4.0, "PD", "DEATH"),
-    AVAL = bor_val,
+    AVALC,
+    AVAL = bor_rank,
     VISIT = "ALL CYCLES",
     ANL01FL = "Y"
   )
 
-# Objective Response (CR/PR) - always N/0 for control arm non-responders
+# Objective Response (CR/PR)
 df_orr <- df_bor %>%
-  transmute(
-    STUDYID, USUBJID, SUBJID, TRT01P, TRTSDT,
+  mutate(
     PARAMCD = "OBJRESP", PARAM = "Objective Response (CR or PR)",
-    AVALC = "N",
-    AVAL = 0.0,
+    AVALC = if_else(AVALC %in% c("CR", "PR"), "Y", "N"),
+    AVAL = if_else(AVALC == "Y", 1.0, 0.0),
     VISIT = "ALL CYCLES",
     ANL01FL = "Y"
   )
