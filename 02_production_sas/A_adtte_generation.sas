@@ -190,9 +190,203 @@ data work.pfs_derived;
     output;
 run;
 
+/* -------------------------------------------------------------------------- */
+/* PARAMETER 4: TIME TO PAIN PROGRESSION (TTPAIN)                             */
+/* -------------------------------------------------------------------------- */
+proc sql;
+    create table work.pn_trt_tte as
+    select pn.usubjid, pn.pntestcd, input(pn.pnstresn, best32.) as pnstresn,
+           input(pn.pndtc, yymmdd10.) as pndt format=yymmdd10.,
+           ex.trtsdt, adsl.randdt
+    from staging.pn as pn
+    inner join work.ex_dates as ex on pn.usubjid = ex.usubjid
+    inner join adam.adsl as adsl on pn.usubjid = adsl.usubjid;
+quit;
+
+proc sql;
+    create table work.pn_base_tte as
+    select usubjid, pntestcd, pnstresn
+    from work.pn_trt_tte
+    where pndt <= trtsdt;
+quit;
+
+proc sort data=work.pn_base_tte;
+    by usubjid pntestcd;
+run;
+
+proc summary data=work.pn_base_tte median;
+    by usubjid pntestcd;
+    var pnstresn;
+    output out=work.pn_base_med(drop=_type_ _freq_) median=base_val;
+run;
+
+proc sort data=work.pn_base_med;
+    by usubjid;
+run;
+
+proc transpose data=work.pn_base_med out=work.pn_base_wide(drop=_name_ _label_);
+    by usubjid;
+    id pntestcd;
+    var base_val;
+run;
+
+data work.pn_base_final;
+    set work.pn_base_wide;
+    base_ppi = coalesce(PAININT, 0);
+    base_an = coalesce(ANSCORE, 0);
+    drop PAININT ANSCORE;
+run;
+
+proc sql;
+    create table work.pn_post_daily as
+    select usubjid, visitnum, visit, pntestcd, pnstresn, pndt
+    from work.pn_trt_tte
+    where pndt > trtsdt;
+quit;
+
+proc sort data=work.pn_post_daily;
+    by usubjid visitnum visit pndt pntestcd;
+run;
+
+proc sql;
+    create table work.pn_first_day as
+    select usubjid, visitnum, visit, pndt, pntestcd, min(pnstresn) as day_val
+    from work.pn_post_daily
+    group by usubjid, visitnum, visit, pndt, pntestcd;
+quit;
+
+proc sort data=work.pn_first_day;
+    by usubjid visitnum visit pntestcd;
+run;
+
+proc summary data=work.pn_first_day median;
+    by usubjid visitnum visit pntestcd;
+    var day_val;
+    output out=work.pn_cycle_med(drop=_type_ _freq_) median=cycle_val;
+run;
+
+proc sql;
+    create table work.pn_cycle_min_date as
+    select usubjid, visitnum, visit, min(pndt) as cycle_date format=yymmdd10.
+    from work.pn_post_daily
+    group by usubjid, visitnum, visit;
+quit;
+
+proc sort data=work.pn_cycle_med;
+    by usubjid visitnum visit;
+run;
+
+proc transpose data=work.pn_cycle_med out=work.pn_cycle_wide(drop=_name_ _label_);
+    by usubjid visitnum visit;
+    id pntestcd;
+    var cycle_val;
+run;
+
+proc sort data=work.pn_cycle_wide; by usubjid visitnum visit; run;
+proc sort data=work.pn_cycle_min_date; by usubjid visitnum visit; run;
+proc sort data=work.pn_base_final; by usubjid; run;
+
+proc sql;
+    create table work.cycle_comp_raw as
+    select w.usubjid, w.visitnum, w.visit, d.cycle_date,
+           w.PAININT as cycle_ppi, w.ANSCORE as cycle_an,
+           b.base_ppi, b.base_an
+    from work.pn_cycle_wide as w
+    left join work.pn_cycle_min_date as d on w.usubjid = d.usubjid and w.visitnum = d.visitnum and w.visit = d.visit
+    left join work.pn_base_final as b on w.usubjid = b.usubjid;
+quit;
+
+proc sort data=work.cycle_comp_raw;
+    by usubjid visitnum;
+run;
+
+data work.cycle_comp;
+    set work.cycle_comp_raw;
+    by usubjid visitnum;
+    
+    _b_ppi = coalesce(base_ppi, 0);
+    _b_an = coalesce(base_an, 0);
+    
+    ppi_diff = cycle_ppi - _b_ppi;
+    an_diff = cycle_an - _b_an;
+    
+    if (not missing(ppi_diff) and ppi_diff >= 2) or (not missing(an_diff) and an_diff >= 10) then prog_trigger = 1;
+    else prog_trigger = 0;
+run;
+
+data work.sustain_check;
+    merge work.cycle_comp(in=a)
+          work.cycle_comp(firstobs=2 keep=usubjid prog_trigger rename=(usubjid=_next_usubjid prog_trigger=next_trigger));
+    
+    if usubjid = _next_usubjid then is_prog = (prog_trigger = 1 and (next_trigger = 1 or missing(next_trigger)));
+    else is_prog = (prog_trigger = 1);
+    
+    drop _next_usubjid;
+run;
+
+proc sql;
+    create table work.prog_dates as
+    select usubjid, min(cycle_date) as prog_date format=yymmdd10.
+    from work.sustain_check
+    where is_prog = 1
+    group by usubjid;
+quit;
+
+proc sql;
+    create table work.censor_dates as
+    select usubjid, max(pndt) as last_pn_dt format=yymmdd10.
+    from work.pn_trt_tte
+    group by usubjid;
+quit;
+
+proc sql;
+    create table work.ttpain_derived as
+    select 
+        adsl.studyid as STUDYID length=20,
+        adsl.usubjid as USUBJID length=40,
+        adsl.subjid as SUBJID length=10,
+        adsl.siteid as SITEID length=10,
+        adsl.trt01p as TRT01P length=20,
+        adsl.trt01pn as TRT01PN,
+        'TTPAIN' as PARAMCD length=8,
+        'Time to Pain Progression' as PARAM length=40,
+        adsl.randdt as STARTDT format=yymmdd10.,
+        
+        case 
+            when not missing(p.prog_date) then p.prog_date
+            when not missing(c.last_pn_dt) then c.last_pn_dt
+            else adsl.randdt + 1
+        end as ADT format=yymmdd10.,
+        
+        case 
+            when not missing(p.prog_date) then 0
+            else 1
+        end as CNSR,
+        
+        case 
+            when not missing(p.prog_date) then 'PAIN PROGRESSION'
+            else ''
+        end as EVNTDESC length=100,
+        
+        case 
+            when not missing(p.prog_date) then ''
+            when not missing(c.last_pn_dt) then 'LAST PAIN ASSESSMENT DATE'
+            else 'NO PAIN ASSESSMENT'
+        end as CNSDTDSC length=100
+    from adam.adsl as adsl
+    left join work.prog_dates as p on adsl.usubjid = p.usubjid
+    left join work.censor_dates as c on adsl.usubjid = c.usubjid
+    where adsl.saffl = 'Y';
+quit;
+
+data work.ttpain_final;
+    set work.ttpain_derived;
+    AVAL = ADT - STARTDT + 1;
+run;
+
 /* Combine TTE parameters */
 data adam.adtte;
-    set work.tte_base work.pfs_derived;
+    set work.tte_base work.pfs_derived work.ttpain_final;
 run;
 
 proc sort data=adam.adtte;

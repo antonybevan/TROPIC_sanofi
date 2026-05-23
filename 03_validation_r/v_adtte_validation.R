@@ -6,6 +6,7 @@ library(jsonlite)
 library(dplyr)
 library(haven)
 library(lubridate)
+library(tidyr)
 
 cat("NOTE: [VALIDATION] Starting ADTTE Validation script...\n")
 
@@ -122,8 +123,94 @@ pfs <- df_adsl %>%
   ungroup() %>%
   select(STUDYID, USUBJID, SUBJID, SITEID, TRT01P, TRT01PN, PARAMCD, PARAM, STARTDT, ADT, CNSR, EVNTDESC, CNSDTDSC, AVAL)
 
+# ------------------------------------------------------------------------------
+# PARAMETER 4: TIME TO PAIN PROGRESSION (TTPAIN)
+# ------------------------------------------------------------------------------
+# Load staging pain data
+pn <- readRDS("01_raw_source/real_sdtm/staging/pn.rds")
+
+# Derive treatment start date per subject
+df_ex_dt <- df_adsl %>%
+  select(USUBJID, TRTSDT, RANDDT, LSTALVDT)
+
+# Baseline pain logs
+pn_trt <- pn %>%
+  inner_join(df_ex_dt, by = "USUBJID") %>%
+  mutate(
+    PNDT = ymd(substring(PNDTC, 1, 10)),
+    PNSTRESN = as.numeric(PNSTRESN)
+  )
+
+baseline_pn <- pn_trt %>% filter(PNDT <= TRTSDT)
+
+baseline_summary <- baseline_pn %>%
+  group_by(USUBJID, PNTESTCD) %>%
+  summarise(base_val = median(PNSTRESN, na.rm = TRUE), .groups = "drop") %>%
+  pivot_wider(id_cols = USUBJID, names_from = PNTESTCD, values_from = base_val) %>%
+  rename(base_ppi = PAININT, base_an = ANSCORE)
+
+# Cycle-level pain logs
+post_pn <- pn_trt %>%
+  filter(PNDT > TRTSDT) %>%
+  group_by(USUBJID, VISITNUM, VISIT, PNDT, PNTESTCD) %>%
+  summarise(day_val = first(PNSTRESN), .groups = "drop") %>%
+  group_by(USUBJID, VISITNUM, VISIT, PNTESTCD) %>%
+  summarise(cycle_val = median(day_val, na.rm = TRUE),
+            cycle_date = min(PNDT, na.rm = TRUE),
+            .groups = "drop")
+
+cycle_wide <- post_pn %>%
+  pivot_wider(id_cols = c(USUBJID, VISITNUM, VISIT, cycle_date), names_from = PNTESTCD, values_from = cycle_val) %>%
+  rename(cycle_ppi = PAININT, cycle_an = ANSCORE) %>%
+  arrange(USUBJID, VISITNUM)
+
+cycle_comp <- cycle_wide %>%
+  left_join(baseline_summary, by = "USUBJID") %>%
+  mutate(
+    base_ppi = coalesce(base_ppi, 0),
+    base_an = coalesce(base_an, 0),
+    ppi_diff = cycle_ppi - base_ppi,
+    an_diff = cycle_an - base_an,
+    prog_trigger = if_else((!is.na(ppi_diff) & ppi_diff >= 2) | (!is.na(an_diff) & an_diff >= 10), 1, 0)
+  )
+
+prog_subjs <- cycle_comp %>%
+  group_by(USUBJID) %>%
+  mutate(
+    next_trigger = lead(prog_trigger),
+    is_prog = if_else(prog_trigger == 1 & (next_trigger == 1 | is.na(next_trigger)), 1, 0)
+  ) %>%
+  filter(is_prog == 1) %>%
+  arrange(USUBJID, VISITNUM) %>%
+  slice(1) %>%
+  select(USUBJID, prog_date = cycle_date)
+
+# Last pain assessment date for censoring
+censor_dates <- pn_trt %>%
+  group_by(USUBJID) %>%
+  summarise(last_pn_dt = max(PNDT, na.rm = TRUE), .groups = "drop")
+
+ttpain <- df_adsl %>%
+  left_join(prog_subjs, by = "USUBJID") %>%
+  left_join(censor_dates, by = "USUBJID") %>%
+  transmute(
+    STUDYID = "TROPIC-NCT00417079", USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
+    PARAMCD = "TTPAIN", PARAM = "Time to Pain Progression", STARTDT = RANDDT,
+    
+    ADT = case_when(
+      !is.na(prog_date) ~ prog_date,
+      !is.na(last_pn_dt) ~ last_pn_dt,
+      TRUE ~ RANDDT + days(1)
+    ),
+    
+    CNSR = if_else(!is.na(prog_date), 0.0, 1.0),
+    EVNTDESC = if_else(!is.na(prog_date), "PAIN PROGRESSION", ""),
+    CNSDTDSC = if_else(!is.na(prog_date), "", if_else(!is.na(last_pn_dt), "LAST PAIN ASSESSMENT DATE", "NO PAIN ASSESSMENT")),
+    AVAL = as.numeric(ADT - STARTDT + 1)
+  )
+
 # Combine and save
-adtte <- bind_rows(os, ttos, pfs) %>% arrange(USUBJID, PARAMCD)
+adtte <- bind_rows(os, ttos, pfs, ttpain) %>% arrange(USUBJID, PARAMCD)
 
 # Force numeric types to double for haven compliance
 adtte <- adtte %>%
