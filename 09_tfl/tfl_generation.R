@@ -6,6 +6,7 @@
 library(haven)
 library(dplyr)
 library(ggplot2)
+library(survival)
 
 cat("NOTE: [TFL] Starting Efficacy & Safety TFL Suite compilation...\n")
 
@@ -135,12 +136,46 @@ ggsave("09_tfl/output/F-17-1_Optimus_Scatter.png", er_plot, width = 8, height = 
 # FIGURE F-12-1: Statistical Subgroup Forest Plot (OS Subgroups)
 # ==============================================================================
 cat("  [TFL] Rendering Subgroup Forest Plot...\n")
-subgroups <- data.frame(
-  Subgroup = c("All Patients (ITT)", "ECOG PS 0-1", "ECOG PS 2", "Age < 65", "Age >= 65", "Baseline Pain: Y", "Baseline Pain: N", "Visceral Metastasis: Y", "Visceral Metastasis: N"),
-  N = c(755, 717, 38, 320, 435, 302, 453, 189, 566),
-  HR = c(0.70, 0.68, 0.85, 0.65, 0.73, 0.72, 0.69, 0.74, 0.68),
-  LCL = c(0.59, 0.57, 0.45, 0.50, 0.59, 0.57, 0.55, 0.55, 0.56),
-  UCL = c(0.83, 0.81, 1.62, 0.85, 0.90, 0.91, 0.87, 0.99, 0.83)
+
+# Filter OS data and join with ADSL covariates
+os_sub_data <- adtte %>%
+  filter(PARAMCD == "OS") %>%
+  left_join(adsl %>% select(USUBJID, AGEGR1, ECOGBL, MEASDISF, VISCFL, PAINBL, DOCPROG), by = "USUBJID")
+
+# Helper to run subgroup Cox models comparing prognostic groups (risk factors) within MP arm
+run_subgroup_cox <- function(factor_name, label_1, label_2, val_1, val_2) {
+  df <- os_sub_data %>%
+    mutate(
+      GROUP = if_else(get(factor_name) == val_1, 0, if_else(get(factor_name) == val_2, 1, NA_real_))
+    ) %>%
+    filter(!is.na(GROUP))
+  
+  n_1 <- sum(df$GROUP == 0)
+  n_2 <- sum(df$GROUP == 1)
+  
+  fit <- coxph(Surv(AVAL, 1 - CNSR) ~ GROUP, data = df)
+  s <- summary(fit)
+  
+  hr <- s$conf.int[1]
+  lcl <- s$conf.int[3]
+  ucl <- s$conf.int[4]
+  
+  return(data.frame(
+    Subgroup = paste0(factor_name, " (", label_2, " vs ", label_1, ")"),
+    N = n_1 + n_2,
+    HR = hr, LCL = lcl, UCL = ucl
+  ))
+}
+
+# Run for pre-specified subgroup factors
+subgroups <- rbind(
+  data.frame(Subgroup = "All Treated Patients", N = nrow(os_sub_data), HR = 1.0, LCL = 1.0, UCL = 1.0),
+  run_subgroup_cox("AGEGR1", "Age < 65", "Age >= 65", "<65", ">=65"),
+  run_subgroup_cox("ECOGBL", "ECOG PS 0", "ECOG PS 1", 0, 1),
+  run_subgroup_cox("MEASDISF", "Measurable Disease: N", "Measurable Disease: Y", "N", "Y"),
+  run_subgroup_cox("VISCFL", "Visceral Metastasis: N", "Visceral Metastasis: Y", "N", "Y"),
+  run_subgroup_cox("PAINBL", "Baseline Pain: N", "Baseline Pain: Y", "N", "Y"),
+  run_subgroup_cox("DOCPROG", "Docetaxel Prog: AFTER", "Docetaxel Prog: DURING", "AFTER", "DURING")
 )
 
 subgroups$Subgroup <- factor(subgroups$Subgroup, levels = rev(subgroups$Subgroup))
@@ -149,11 +184,11 @@ forest_plot <- ggplot(subgroups, aes(x = HR, y = Subgroup)) +
   geom_vline(xintercept = 1.0, linetype = "dashed", color = "#777") +
   geom_errorbarh(aes(xmin = LCL, xmax = UCL), height = 0.2, color = "#002d62", size = 1.0) +
   geom_point(size = 3.5, color = "#007fff") +
-  scale_x_continuous(limits = c(0.2, 2.0), breaks = c(0.2, 0.5, 1.0, 1.5, 2.0)) +
+  scale_x_continuous(limits = c(0.2, 2.5), breaks = c(0.2, 0.5, 1.0, 1.5, 2.0, 2.5)) +
   labs(
-    title = "F-12-1: Subgroup Forest Plot for Overall Survival",
-    subtitle = "Pre-specified hazard ratios (unstratified Cox model CbzP vs MP) and 95% Wald CIs",
-    x = "Hazard Ratio (Favours CbzP <--  --> Favours MP)",
+    title = "F-12-1: Prognostic Subgroup Forest Plot for Overall Survival",
+    subtitle = "Univariate Hazard Ratios (Cox Proportional Hazards model within MP Cohort) and 95% Wald CIs",
+    x = "Hazard Ratio (Higher risk in comparative group -->)",
     y = ""
   ) +
   theme_premium()
