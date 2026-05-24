@@ -44,3 +44,6 @@ __pycache__/
 .venv/
 env/
 venv/
+
+# Node.js specific
+node_modules/
