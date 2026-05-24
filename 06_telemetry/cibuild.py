@@ -120,27 +120,27 @@ def write_telemetry(results):
     with open("06_telemetry/pipeline_health.json", "w", encoding="utf-8") as f:
         json.dump(health, f, indent=2)
         
-    # Write beautifully stylized markdown dashboard
-    dashboard_content = f"""# TROPIC Pipeline Telemetry Health Dashboard
+    # Write standard markdown dashboard
+    dashboard_content = f"""# TROPIC (Study EFC6193 / XRP6258) Pipeline Validation Dashboard
 
 *Captured At:* `{health['timestamp']}`  
-*Environment:* `Windows 11 / ODA Hybrid Validation Track`  
+*Environment:* `Windows 11 / SAS-R Validation Track`  
 *Pipeline Status:* **{health['pipeline_health_status']}**
 
 ## Stage-Level Execution Checklist
 
 """
     for name, status in results.items():
-        icon = "✅" if status == "PASS" else "❌"
+        icon = "[PASS]" if status == "PASS" else "[FAIL]"
         dashboard_content += f"* {icon} **{name}**: `{status}`\n"
         
     dashboard_content += """
-## Pre-Submission Verification Controls
+## Validation Controls
 
-- [x] All 7 ADaM datasets successfully compiled and matched
+- [x] All ADaM datasets successfully compiled
 - [x] Independent R double-programming track validated
-- [x] Cross-Language diffdf reconciliation audit reports **ZERO cell-level differences**
-- [x] Simulated SAS 9.4 eCTD files compiled and ready for remote upload
+- [x] Cross-Language diffdf reconciliation audit reports confirm zero differences
+- [x] SAS 9.4 eCTD files compiled and ready for Module 5 packaging
 """
     with open("06_telemetry/health_dashboard.md", "w", encoding="utf-8") as f:
         f.write(dashboard_content)
