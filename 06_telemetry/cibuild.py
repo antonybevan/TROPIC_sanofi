@@ -50,7 +50,7 @@ def rollback():
         print("No Git-tagged XPT state found or nothing to revert.")
 
 def execute_pipeline(from_stage=0):
-    print("=== EXECUTING TROPIC-CDI-E2E-v2.0 PIPELINE ===")
+    print("=== EXECUTING TROPIC (Study EFC6193 / XRP6258) PIPELINE ===")
     
     stages = [
         {"id": 1, "name": "Real SDTM Staging Ingest", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_staging_ingest.R\')"'},
@@ -146,7 +146,7 @@ def write_telemetry(results):
         f.write(dashboard_content)
 
 def main():
-    parser = argparse.ArgumentParser(description="TROPIC-CDI-E2E-v2.0 Orchestrator")
+    parser = argparse.ArgumentParser(description="TROPIC (Study EFC6193 / XRP6258) Pipeline Orchestrator")
     parser.add_argument("--dry-run", action="store_true", help="dry run check")
     parser.add_argument("--rollback", action="store_true", help="rollback check")
     parser.add_argument("--from-stage", type=int, default=0, help="from stage number")

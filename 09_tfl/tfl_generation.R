@@ -200,7 +200,7 @@ ggsave("09_tfl/output/F-12-1_Subgroup_Forest.png", forest_plot, width = 8, heigh
 # ==============================================================================
 cat("  [TFL] Compiling clinical table summaries...\n")
 table_content <- "
-TROPIC-CDI-E2E-v2.0 Clinical Reporting Tables
+TROPIC (Study EFC6193 / XRP6258) Clinical Reporting Tables
 =============================================
 
 T-17-1: Relative Dose Intensity (RDI) Category Distribution by Arm

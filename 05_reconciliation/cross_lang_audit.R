@@ -77,7 +77,7 @@ html_content <- paste0(
   "h1 { color: #002d62; } .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }",
   "table { width: 100%; border-collapse: collapse; margin-top: 20px; } th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }",
   "th { background-color: #002d62; color: white; } .pass { color: green; font-weight: bold; } .fail { color: red; font-weight: bold; }</style></head>",
-  "<body><div class='card'><h1>TROPIC-CDI-E2E-v2.0 Cross-Language Audit Dashboard</h1>",
+  "<body><div class='card'><h1>TROPIC (Study EFC6193 / XRP6258) Cross-Language Audit Dashboard</h1>",
   "<p>Cell-by-cell validation report comparing SAS 9.4 Production models vs R 4.5.2 Pharmaverse Validation Track.</p>",
   "<table><thead><tr><th>Dataset</th><th>Status</th><th>Audit Details</th></tr></thead><tbody>"
 )

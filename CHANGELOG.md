@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the **TROPIC-CDI-E2E-v2.0** pipeline will be documented in this file. This log serves as a tamper-evident audit trail for 21 CFR Part 11 electronic records compliance.
+All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be documented in this file. This log serves as a tamper-evident audit trail for 21 CFR Part 11 electronic records compliance.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 

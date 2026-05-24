@@ -1,11 +1,11 @@
-# 🎗️ TROPIC End-to-End Clinical Data Infrastructure (TROPIC-CDI-E2E-v2.0)
+# 🎗️ TROPIC (Study EFC6193 / XRP6258) CDISC Analysis and Submission Pipeline
 
 [![CDISC Compliance](https://img.shields.io/badge/CDISC-ADaM%20v1.3%20%7C%20SDTM%20v3.1.1-blue.svg)](https://www.cdisc.org/)
 [![FDA Guidelines](https://img.shields.io/badge/FDA-Project%20Optimus%202026-green.svg)](https://www.fda.gov/about-fda/oncology-center-excellence/project-optimus)
 [![Pipeline Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)]()
 [![Reconciliation](https://img.shields.io/badge/Reconciliation-100%25%20Match-success.svg)]()
 
-Welcome to the **TROPIC-CDI-E2E-v2.0** repository. This pipeline implements a production-grade, end-to-end clinical data transformation and validation framework. It reconstructs and analyzes de-identified patient-level data from the landmark **TROPIC Phase III Trial (NCT00417079)** evaluating Cabazitaxel vs. Mitoxantrone in metastatic castration-resistant prostate cancer (mCRPC).
+Welcome to the official **TROPIC (Study EFC6193 / XRP6258)** repository. This pipeline implements a production-grade, end-to-end clinical data transformation and validation framework. It reconstructs and analyzes de-identified patient-level data from the landmark **TROPIC Phase III Trial (NCT00417079)** evaluating Cabazitaxel vs. Mitoxantrone in metastatic castration-resistant prostate cancer (mCRPC).
 
 Applying modern **2026 regulatory standards**, this pipeline integrates traditional clinical SAS methodologies with modern **Pharmaverse R** environments under a strictly audited dual-language reconciliation framework.
 

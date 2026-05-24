@@ -5,7 +5,7 @@
    Author: Principal Clinical Data Infrastructure Architect
    Date: 2026-05-23
    Standard: CDISC ADaMIG v1.3 / OCCDS v1.1
-   Description: Master execution driver for TROPIC-CDI-E2E-v2.0 pipeline.
+   Description: Master execution driver for TROPIC (Study EFC6193 / XRP6258) pipeline.
    ============================================================================== */
 
 %include "00_config.sas";
