@@ -38,3 +38,24 @@ For Progression-Free Survival (PFS), progression is defined as radiological prog
 * **Censoring Hierarchy:**
   1. If a patient starts a new systemic anti-cancer therapy (`NACTDT`) prior to a documented PFS event, the time-to-event is censored at **`NACTDT - 1 day`** (`CNSDTDSC = 'NEW ANTI-CANCER THERAPY START'`).
   2. If no event or NACT occurs, the time-to-event is censored at the last evaluable tumor assessment or last known alive date.
+
+---
+
+## 5. Missing Data Handling (ADaMIG v1.3 §4.4 Compliance)
+
+### 5.1 Baseline Laboratory Covariates
+Per SAP v3.0 §4.3, subjects with missing baseline laboratory measurements receive the following population-median proxy values for **subgroup Cox model stratification only**. These values do not affect primary or secondary TTE endpoint calculations:
+
+| Variable | Imputed Value | Units |
+|----------|--------------|-------|
+| `PSABL` | 110.0 | ng/mL |
+| `ALPBL` | 140.0 | U/L |
+| `HGBBL` | 11.5 | g/dL |
+| `ALBBL` | 38.0 | g/L |
+| `LDHBL` | 220.0 | U/L |
+
+These values represent published median baseline characteristics from the TROPIC trial (de Bono et al., Lancet 2010, Table 1).
+
+### 5.2 Analysis Window Gaps (ADLB)
+The ADLB windowing schema leaves Days 35–38 unassigned (between the C2D8 window [Days 25–34] and C3D1 window [Days 39–45]). Laboratory assessments on Days 35–38 are assigned `AVISITN = 99` (Unscheduled) and are excluded from the primary `ANL01FL = 'Y'` worst-case analysis. This is consistent with the protocol visit schedule and SAP §4.5 which does not specify a Day 35–38 nominal visit.
+

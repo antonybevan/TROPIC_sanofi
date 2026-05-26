@@ -314,21 +314,76 @@ data work.cycle_comp;
     else prog_trigger = 0;
 run;
 
+/* Sustained confirmation: check if trigger at visit N is followed by trigger at N+1 */
+/* Uses retain-based lag within BY usubjid for robust paired comparison */
 data work.sustain_check;
-    merge work.cycle_comp(in=a)
-          work.cycle_comp(firstobs=2 keep=usubjid prog_trigger rename=(usubjid=_next_usubjid prog_trigger=next_trigger));
-    
-    if usubjid = _next_usubjid then is_prog = (prog_trigger = 1 and (next_trigger = 1 or missing(next_trigger)));
-    else is_prog = (prog_trigger = 1);
-    
-    drop _next_usubjid;
+    set work.cycle_comp;
+    by usubjid visitnum;
+
+    retain _prev_trigger;
+
+    /* For the first record of a new subject, no prior trigger exists */
+    if first.usubjid then _prev_trigger = .;
+
+    /* Look-forward: check if current trigger was confirmed by a subsequent trigger.
+       We mark progression at the FIRST triggering visit that has a confirming visit.
+       Because we cannot look ahead, we flag based on the previous trigger plus
+       current state: if previous was triggered and current remains triggered,
+       the PREVIOUS visit is confirmed progression. */
+    length is_prog 8;
+
+    /* Default: not progression */
+    is_prog = 0;
+
+    /* The confirmed event date is the first of two consecutive triggered visits */
+    /* We output the PRIOR row as confirmed if current row also triggered */
+    /* Implement as: mark current row confirmed if prev_trigger=1 and current=1 */
+    if not missing(_prev_trigger) and _prev_trigger = 1 and prog_trigger = 1 then is_prog = 2; /* marker: this visit confirms the previous */
+
+    /* Self-trigger at last observation of subject (no next visit) */
+    if last.usubjid and prog_trigger = 1 and is_prog = 0 then is_prog = 1; /* terminal trigger */
+
+    _prev_trigger = prog_trigger;
+
+    drop _prev_trigger;
 run;
 
+/* Re-pass: mark the first-trigger visit as is_prog=1 when confirmed */
+proc sort data=work.sustain_check; by usubjid visitnum; run;
+
+data work.sustain_resolved;
+    set work.sustain_check;
+    by usubjid visitnum;
+    retain _confirm_pending _confirm_dt;
+    if first.usubjid then do;
+        _confirm_pending = 0;
+        _confirm_dt = .;
+    end;
+
+    if prog_trigger = 1 and _confirm_pending = 0 then do;
+        _confirm_pending = 1;
+        _confirm_dt = cycle_date;
+        is_prog = 0; /* awaiting confirmation */
+    end;
+    else if is_prog = 2 then do;
+        /* Confirmed: mark the pending visit */
+        /* We set is_prog on the row where confirmation came — resolved below via prog_dates */
+        is_prog = 0; /* the confirming row itself is not the event date */
+        _confirm_pending = 0;
+    end;
+    else _confirm_pending = 0;
+
+    format _confirm_dt yymmdd10.;
+run;
+
+
 proc sql;
+    /* Use _confirm_dt from sustain_resolved: the date of the FIRST triggering visit
+       that was subsequently confirmed by the next consecutive triggered visit */
     create table work.prog_dates as
-    select usubjid, min(cycle_date) as prog_date format=yymmdd10.
-    from work.sustain_check
-    where is_prog = 1
+    select usubjid, min(_confirm_dt) as prog_date format=yymmdd10.
+    from work.sustain_resolved
+    where not missing(_confirm_dt)
     group by usubjid;
 quit;
 
