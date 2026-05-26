@@ -42,31 +42,34 @@ df_windows <- df_lb %>%
     
     AVISITN = case_when(
       lbdy <= 0 ~ 0.0,
-      lbdy >= 4 & lbdy <= 13 ~ 1.0,
-      lbdy >= 14 & lbdy <= 17 ~ 2.0,
-      lbdy >= 18 & lbdy <= 24 ~ 3.0,
-      lbdy >= 25 & lbdy <= 34 ~ 4.0,
-      lbdy >= 39 & lbdy <= 45 ~ 5.0,
+      lbdy >= 1 & lbdy <= 3 ~ 1.0,
+      lbdy >= 4 & lbdy <= 13 ~ 2.0,
+      lbdy >= 14 & lbdy <= 17 ~ 3.0,
+      lbdy >= 18 & lbdy <= 24 ~ 4.0,
+      lbdy >= 25 & lbdy <= 34 ~ 5.0,
+      lbdy >= 39 & lbdy <= 45 ~ 6.0,
       TRUE ~ 99.0
     ),
     
     AVISIT = case_when(
       AVISITN == 0.0 ~ "Baseline",
-      AVISITN == 1.0 ~ "Cycle 1 Day 8",
-      AVISITN == 2.0 ~ "Cycle 1 Day 15",
-      AVISITN == 3.0 ~ "Cycle 2 Day 1",
-      AVISITN == 4.0 ~ "Cycle 2 Day 8",
-      AVISITN == 5.0 ~ "Cycle 3 Day 1",
+      AVISITN == 1.0 ~ "Cycle 1 Day 1 Pre-dose",
+      AVISITN == 2.0 ~ "Cycle 1 Day 8",
+      AVISITN == 3.0 ~ "Cycle 1 Day 15",
+      AVISITN == 4.0 ~ "Cycle 2 Day 1 Pre-dose",
+      AVISITN == 5.0 ~ "Cycle 2 Day 8",
+      AVISITN == 6.0 ~ "Cycle 3 Day 1 Pre-dose",
       TRUE ~ "Unscheduled"
     ),
     
     AWDIST = case_when(
       AVISITN == 0.0 ~ abs(lbdy - (-1)),
-      AVISITN == 1.0 ~ abs(lbdy - 8),
-      AVISITN == 2.0 ~ abs(lbdy - 15),
-      AVISITN == 3.0 ~ abs(lbdy - 22),
-      AVISITN == 4.0 ~ abs(lbdy - 29),
-      AVISITN == 5.0 ~ abs(lbdy - 43),
+      AVISITN == 1.0 ~ abs(lbdy - 1),
+      AVISITN == 2.0 ~ abs(lbdy - 8),
+      AVISITN == 3.0 ~ abs(lbdy - 15),
+      AVISITN == 4.0 ~ abs(lbdy - 22),
+      AVISITN == 5.0 ~ abs(lbdy - 29),
+      AVISITN == 6.0 ~ abs(lbdy - 43),
       TRUE ~ as.numeric(NA)
     ),
     

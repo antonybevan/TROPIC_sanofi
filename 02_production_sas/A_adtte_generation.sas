@@ -384,9 +384,136 @@ data work.ttpain_final;
     AVAL = ADT - STARTDT + 1;
 run;
 
+/* -------------------------------------------------------------------------- */
+/* PARAMETER 5: TIME TO PSA PROGRESSION (TTPSA)                              */
+/* -------------------------------------------------------------------------- */
+proc sql;
+    create table work.psa_prog_dates as
+    select usubjid, ADT as psa_prog_dt
+    from adam.adrs
+    where PARAMCD = 'PSPROG' and AVALC = 'Y';
+quit;
+
+proc sql;
+    create table work.psa_censor_dates as
+    select usubjid, max(lbdt) as last_psa_dt format=yymmdd10.
+    from sdtm.lb
+    where lbtestcd = 'PSA' and not missing(lbstresn)
+    group by usubjid;
+quit;
+
+proc sql;
+    create table work.ttpsa_derived as
+    select 
+        adsl.studyid as STUDYID length=20,
+        adsl.usubjid as USUBJID length=40,
+        adsl.subjid as SUBJID length=10,
+        adsl.siteid as SITEID length=10,
+        adsl.trt01p as TRT01P length=20,
+        adsl.trt01pn as TRT01PN,
+        'TTPSA' as PARAMCD length=8,
+        'Time to PSA Progression' as PARAM length=40,
+        adsl.randdt as STARTDT format=yymmdd10.,
+        
+        case 
+            when not missing(p.psa_prog_dt) then p.psa_prog_dt
+            when not missing(c.last_psa_dt) then min(c.last_psa_dt, '25SEP2009'd)
+            else min(adsl.lstalvdt, '25SEP2009'd)
+        end as ADT format=yymmdd10.,
+        
+        case 
+            when not missing(p.psa_prog_dt) then 0
+            else 1
+        end as CNSR,
+        
+        case 
+            when not missing(p.psa_prog_dt) then 'PSA PROGRESSION'
+            else ''
+        end as EVNTDESC length=100,
+        
+        case 
+            when not missing(p.psa_prog_dt) then ''
+            when not missing(c.last_psa_dt) then 'LAST PSA ASSESSMENT'
+            else 'LAST KNOWN ALIVE DATE'
+        end as CNSDTDSC length=100
+    from adam.adsl as adsl
+    left join work.psa_prog_dates as p on adsl.usubjid = p.usubjid
+    left join work.psa_censor_dates as c on adsl.usubjid = c.usubjid
+    where adsl.saffl = 'Y';
+quit;
+
+data work.ttpsa_final;
+    set work.ttpsa_derived;
+    AVAL = ADT - STARTDT + 1;
+run;
+
+/* -------------------------------------------------------------------------- */
+/* PARAMETER 6: TIME TO TUMOR PROGRESSION (TTUMOR)                           */
+/* -------------------------------------------------------------------------- */
+proc sql;
+    create table work.tumor_prog_dates as
+    select usubjid, min(ADT) as tumor_prog_dt format=yymmdd10.
+    from adam.adrs
+    where PARAMCD = 'OVRLRESP' and AVALC = 'PD'
+    group by usubjid;
+quit;
+
+proc sql;
+    create table work.tumor_censor_dates as
+    select usubjid, max(ADT) as last_tumor_dt format=yymmdd10.
+    from adam.adrs
+    where PARAMCD = 'OVRLRESP' and not missing(ADT)
+    group by usubjid;
+quit;
+
+proc sql;
+    create table work.ttum_derived as
+    select 
+        adsl.studyid as STUDYID length=20,
+        adsl.usubjid as USUBJID length=40,
+        adsl.subjid as SUBJID length=10,
+        adsl.siteid as SITEID length=10,
+        adsl.trt01p as TRT01P length=20,
+        adsl.trt01pn as TRT01PN,
+        'TTUMOR' as PARAMCD length=8,
+        'Time to Tumor Progression' as PARAM length=40,
+        adsl.randdt as STARTDT format=yymmdd10.,
+        
+        case 
+            when not missing(p.tumor_prog_dt) then p.tumor_prog_dt
+            when not missing(c.last_tumor_dt) then min(c.last_tumor_dt, '25SEP2009'd)
+            else min(adsl.lstalvdt, '25SEP2009'd)
+        end as ADT format=yymmdd10.,
+        
+        case 
+            when not missing(p.tumor_prog_dt) then 0
+            else 1
+        end as CNSR,
+        
+        case 
+            when not missing(p.tumor_prog_dt) then 'TUMOR PROGRESSION'
+            else ''
+        end as EVNTDESC length=100,
+        
+        case 
+            when not missing(p.tumor_prog_dt) then ''
+            when not missing(c.last_tumor_dt) then 'LAST TUMOR ASSESSMENT'
+            else 'LAST KNOWN ALIVE DATE'
+        end as CNSDTDSC length=100
+    from adam.adsl as adsl
+    left join work.tumor_prog_dates as p on adsl.usubjid = p.usubjid
+    left join work.tumor_censor_dates as c on adsl.usubjid = c.usubjid
+    where adsl.saffl = 'Y';
+quit;
+
+data work.ttum_final;
+    set work.ttum_derived;
+    AVAL = ADT - STARTDT + 1;
+run;
+
 /* Combine TTE parameters */
 data adam.adtte;
-    set work.tte_base work.pfs_derived work.ttpain_final;
+    set work.tte_base work.pfs_derived work.ttpain_final work.ttpsa_final work.ttum_final;
 run;
 
 proc sort data=adam.adtte;

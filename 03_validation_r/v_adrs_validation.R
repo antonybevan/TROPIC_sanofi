@@ -122,22 +122,76 @@ df_orr <- df_bor %>%
     ANL01FL = "Y"
   )
 
-# PSA progression indicator from real laboratory results
-df_psprog_raw <- lb %>%
-  filter(LBTESTCD == "PSA" & (toupper(LBNRIND) %in% c("HIGH", "H"))) %>%
-  group_by(USUBJID) %>%
-  summarise(
-    cnt = n(),
-    .groups = "drop"
+# Rigorous PCWG3 PSA Progression Logic
+df_lb_psa <- lb %>%
+  filter(LBTESTCD == "PSA" & !is.na(LBSTRESN)) %>%
+  mutate(
+    LBDT = ymd(substring(LBDTC, 1, 10)),
+    LBSTRESN = as.numeric(LBSTRESN)
   )
 
+df_psa_base <- df_lb_psa %>%
+  filter(LBBLFL == "Y") %>%
+  select(USUBJID, PSABL = LBSTRESN, BASE_DT = LBDT)
+
+df_psa_post <- df_lb_psa %>%
+  inner_join(df_psa_base, by = "USUBJID") %>%
+  filter(LBDT > BASE_DT) %>%
+  select(USUBJID, LBDT, LBSTRESN, VISIT, VISITNUM)
+
+df_psa_decline <- df_psa_post %>%
+  inner_join(df_psa_base %>% select(USUBJID, PSABL), by = "USUBJID") %>%
+  mutate(decline = (PSABL - LBSTRESN) / PSABL)
+
+df_psa_resp_cand <- df_psa_decline %>%
+  filter(decline >= 0.5) %>%
+  inner_join(df_psa_decline %>% filter(decline >= 0.5), by = "USUBJID", suffix = c("1", "2")) %>%
+  filter(as.numeric(LBDT2 - LBDT1) >= 21)
+
+df_psa_responders <- df_psa_resp_cand %>%
+  distinct(USUBJID) %>%
+  mutate(psad50 = "Y")
+
+df_psa_all <- bind_rows(
+  df_psa_base %>% rename(LBSTRESN = PSABL, LBDT = BASE_DT) %>% select(USUBJID, LBDT, LBSTRESN),
+  df_psa_post %>% select(USUBJID, LBDT, LBSTRESN, VISIT, VISITNUM)
+) %>%
+  arrange(USUBJID, LBDT)
+
+df_psa_nadir <- df_psa_all %>%
+  group_by(USUBJID) %>%
+  mutate(psanadir = cummin(LBSTRESN)) %>%
+  ungroup()
+
+df_psa_prog_check <- df_psa_nadir %>%
+  filter(!is.na(VISITNUM) & VISITNUM > 0) %>%
+  left_join(df_psa_responders, by = "USUBJID") %>%
+  mutate(psad50 = coalesce(psad50, "N")) %>%
+  mutate(
+    is_trigger = if_else(
+      psad50 == "Y",
+      if_else(LBSTRESN >= 1.5 * psanadir, 1, 0),
+      if_else(LBSTRESN >= 1.25 * psanadir & (LBSTRESN - psanadir) >= 5, 1, 0)
+    )
+  )
+
+df_psa_prog_eval <- df_psa_prog_check %>%
+  filter(is_trigger == 1)
+
+df_psa_prog_conf <- df_psa_prog_eval %>%
+  inner_join(df_psa_prog_eval, by = "USUBJID", suffix = c("1", "2")) %>%
+  filter(as.numeric(LBDT2 - LBDT1) >= 7) %>%
+  group_by(USUBJID) %>%
+  summarise(prog_date = min(LBDT1), .groups = "drop")
+
 df_psprog <- header %>%
-  left_join(df_psprog_raw, by = "USUBJID") %>%
+  left_join(df_psa_prog_conf, by = "USUBJID") %>%
   transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRTSDT,
     PARAMCD = "PSPROG", PARAM = "PSA Progression (PCWG3)",
-    AVALC = if_else(!is.na(cnt) & cnt > 0, "Y", "N"),
+    AVALC = if_else(!is.na(prog_date), "Y", "N"),
     AVAL = if_else(AVALC == "Y", 1.0, 0.0),
+    ADT = prog_date,
     VISIT = "ALL CYCLES",
     ANL01FL = "Y"
   )

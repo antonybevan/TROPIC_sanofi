@@ -209,8 +209,79 @@ ttpain <- df_adsl %>%
     AVAL = as.numeric(ADT - STARTDT + 1)
   )
 
+# ------------------------------------------------------------------------------
+# PARAMETER 5: TIME TO PSA PROGRESSION (TTPSA)
+# ------------------------------------------------------------------------------
+library(lubridate)
+adrs_val <- read_xpt("04_adam/adrs_v.xpt")
+
+psa_prog_subjs <- adrs_val %>%
+  filter(PARAMCD == "PSPROG" & AVALC == "Y") %>%
+  select(USUBJID, psa_prog_dt = ADT)
+
+# Censoring: last available PSA test date
+lb_val <- readRDS("01_raw_source/real_sdtm/staging/lb.rds")
+colnames(lb_val) <- toupper(colnames(lb_val))
+
+psa_censor_dates <- lb_val %>%
+  filter(LBTESTCD == "PSA" & !is.na(LBSTRESN)) %>%
+  mutate(LBDT = ymd(substring(LBDTC, 1, 10))) %>%
+  group_by(USUBJID) %>%
+  summarise(last_psa_dt = max(LBDT, na.rm = TRUE), .groups = "drop")
+
+ttpsa <- df_adsl %>%
+  left_join(psa_prog_subjs, by = "USUBJID") %>%
+  left_join(psa_censor_dates, by = "USUBJID") %>%
+  transmute(
+    STUDYID = "TROPIC-NCT00417079", USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
+    PARAMCD = "TTPSA", PARAM = "Time to PSA Progression", STARTDT = RANDDT,
+    
+    ADT = case_when(
+      !is.na(psa_prog_dt) ~ psa_prog_dt,
+      !is.na(last_psa_dt) ~ pmin(last_psa_dt, ymd("2009-09-25")),
+      TRUE ~ pmin(LSTALVDT, ymd("2009-09-25"))
+    ),
+    
+    CNSR = if_else(!is.na(psa_prog_dt), 0.0, 1.0),
+    EVNTDESC = if_else(!is.na(psa_prog_dt), "PSA PROGRESSION", ""),
+    CNSDTDSC = if_else(!is.na(psa_prog_dt), "", if_else(!is.na(last_psa_dt), "LAST PSA ASSESSMENT", "LAST KNOWN ALIVE DATE")),
+    AVAL = as.numeric(ADT - STARTDT + 1)
+  )
+
+# ------------------------------------------------------------------------------
+# PARAMETER 6: TIME TO TUMOR PROGRESSION (TTUMOR)
+# ------------------------------------------------------------------------------
+tumor_prog_subjs <- adrs_val %>%
+  filter(PARAMCD == "OVRLRESP" & AVALC == "PD") %>%
+  group_by(USUBJID) %>%
+  summarise(tumor_prog_dt = min(ADT), .groups = "drop")
+
+tumor_censor_dates <- adrs_val %>%
+  filter(PARAMCD == "OVRLRESP" & !is.na(ADT)) %>%
+  group_by(USUBJID) %>%
+  summarise(last_tumor_dt = max(ADT), .groups = "drop")
+
+tttumor <- df_adsl %>%
+  left_join(tumor_prog_subjs, by = "USUBJID") %>%
+  left_join(tumor_censor_dates, by = "USUBJID") %>%
+  transmute(
+    STUDYID = "TROPIC-NCT00417079", USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
+    PARAMCD = "TTUMOR", PARAM = "Time to Tumor Progression", STARTDT = RANDDT,
+    
+    ADT = case_when(
+      !is.na(tumor_prog_dt) ~ tumor_prog_dt,
+      !is.na(last_tumor_dt) ~ pmin(last_tumor_dt, ymd("2009-09-25")),
+      TRUE ~ pmin(LSTALVDT, ymd("2009-09-25"))
+    ),
+    
+    CNSR = if_else(!is.na(tumor_prog_dt), 0.0, 1.0),
+    EVNTDESC = if_else(!is.na(tumor_prog_dt), "TUMOR PROGRESSION", ""),
+    CNSDTDSC = if_else(!is.na(tumor_prog_dt), "", if_else(!is.na(last_tumor_dt), "LAST TUMOR ASSESSMENT", "LAST KNOWN ALIVE DATE")),
+    AVAL = as.numeric(ADT - STARTDT + 1)
+  )
+
 # Combine and save
-adtte <- bind_rows(os, ttos, pfs, ttpain) %>% arrange(USUBJID, PARAMCD)
+adtte <- bind_rows(os, ttos, pfs, ttpain, ttpsa, tttumor) %>% arrange(USUBJID, PARAMCD)
 
 # Force numeric types to double for haven compliance
 adtte <- adtte %>%

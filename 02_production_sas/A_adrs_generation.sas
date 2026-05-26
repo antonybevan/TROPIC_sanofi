@@ -167,20 +167,105 @@ data work.orr_summary;
     end;
 run;
 
-/* PSA progression indicator */
+/* Rigorous PCWG3 PSA Progression Logic */
+proc sql;
+    create table work.psa_base as
+    select usubjid, lbstresn as psabl, lbdt as base_dt
+    from sdtm.lb
+    where lbtestcd = 'PSA' and lbblfl = 'Y' and not missing(lbstresn);
+quit;
+
+proc sql;
+    create table work.psa_post as
+    select lb.usubjid, lb.lbdt, lb.lbstresn, lb.visit, lb.visitnum
+    from sdtm.lb as lb
+    inner join work.psa_base as b on lb.usubjid = b.usubjid
+    where lb.lbtestcd = 'PSA' and lb.lbdt > b.base_dt and not missing(lb.lbstresn);
+quit;
+
+proc sql;
+    create table work.psa_decline as
+    select p.*, b.psabl, (b.psabl - p.lbstresn) / b.psabl as decline
+    from work.psa_post as p
+    inner join work.psa_base as b on p.usubjid = b.usubjid;
+quit;
+
+proc sql;
+    create table work.psa_resp_cand as
+    select a.usubjid, a.lbdt as dt1, b.lbdt as dt2
+    from work.psa_decline as a
+    inner join work.psa_decline as b on a.usubjid = b.usubjid
+    where a.decline >= 0.5 and b.decline >= 0.5 and b.lbdt - a.lbdt >= 21;
+quit;
+
+proc sql;
+    create table work.psa_responders as
+    select distinct usubjid, 'Y' as psad50 length=1
+    from work.psa_resp_cand;
+quit;
+
+data work.psa_all;
+    set work.psa_base(keep=usubjid base_dt psabl rename=(psabl=lbstresn base_dt=lbdt))
+        work.psa_post(keep=usubjid lbdt lbstresn visit visitnum);
+run;
+
+proc sort data=work.psa_all;
+    by usubjid lbdt;
+run;
+
+data work.psa_nadir;
+    set work.psa_all;
+    by usubjid;
+    retain psanadir;
+    if first.usubjid then psanadir = lbstresn;
+    else psanadir = min(psanadir, lbstresn);
+run;
+
+proc sql;
+    create table work.psa_prog_check as
+    select n.*, coalesce(r.psad50, 'N') as psad50
+    from work.psa_nadir as n
+    left join work.psa_responders as r on n.usubjid = r.usubjid;
+quit;
+
+data work.psa_prog_eval;
+    set work.psa_prog_check;
+    if not missing(visitnum) and visitnum > 0;
+    length is_trigger 8;
+    if psad50 = 'Y' then do;
+        if lbstresn >= 1.5 * psanadir then is_trigger = 1;
+        else is_trigger = 0;
+    end;
+    else do;
+        if lbstresn >= 1.25 * psanadir and (lbstresn - psanadir) >= 5 then is_trigger = 1;
+        else is_trigger = 0;
+    end;
+run;
+
+proc sql;
+    create table work.psa_prog_conf as
+    select distinct a.usubjid, min(a.lbdt) as prog_date format=yymmdd10.
+    from work.psa_prog_eval as a
+    inner join work.psa_prog_eval as b on a.usubjid = b.usubjid
+    where a.is_trigger = 1 and b.is_trigger = 1 and b.lbdt - a.lbdt >= 7
+    group by a.usubjid;
+quit;
+
+/* Final PSPROG Parameter creation */
 proc sql;
     create table work.psprog as
     select 
-        usubjid,
+        adsl.usubjid,
         'PSPROG' as PARAMCD length=8,
         'PSA Progression (PCWG3)' as PARAM length=40,
-        case when count(lbstresn) > 0 then 'Y' else 'N' end as AVALC length=20,
-        case when count(lbstresn) > 0 then 1.0 else 0.0 end as AVAL,
+        case when not missing(p.prog_date) then 'Y' else 'N' end as AVALC length=20,
+        case when not missing(p.prog_date) then 1.0 else 0.0 end as AVAL,
+        p.prog_date as ADT format=yymmdd10.,
         'ALL CYCLES' as AVISIT length=40,
         99 as AVISITN
-    from sdtm.lb
-    where lbtestcd = 'PSA' and upcase(lbnrind) in ('HIGH', 'H')
-    group by usubjid;
+    from adam.adsl as adsl
+    left join work.psa_prog_conf as p on adsl.usubjid = p.usubjid
+    where adsl.saffl = 'Y';
 quit;
 
 /* Combine all parameters */
