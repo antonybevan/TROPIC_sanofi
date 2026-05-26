@@ -140,7 +140,7 @@ cat("  [TFL] Rendering Subgroup Forest Plot...\n")
 # Filter OS data and join with ADSL covariates
 os_sub_data <- adtte %>%
   filter(PARAMCD == "OS") %>%
-  left_join(adsl %>% select(USUBJID, AGEGR1, ECOGBL, MEASDISFL, VISCFL, PAINBL, DOCPROG), by = "USUBJID")
+  left_join(adsl %>% select(USUBJID, AGEGR1, ECOGBL, MEASDISF, VISCFL, PAINBL, DOCPROG), by = "USUBJID")
 
 # Helper to run subgroup Cox models comparing prognostic groups (risk factors) within MP arm
 run_subgroup_cox <- function(factor_name, label_1, label_2, val_1, val_2) {
