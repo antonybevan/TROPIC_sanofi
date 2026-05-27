@@ -18,7 +18,8 @@ header <- adsl %>%
 
 # Ingest and clean concomitant medications
 df_cm <- cm %>%
-  inner_join(header, by = c("USUBJID", "STUDYID", "SUBJID")) %>%
+  select(-any_of("STUDYID")) %>%
+  inner_join(header, by = c("USUBJID", "SUBJID")) %>%
   mutate(
     cmstdt = ymd(substring(CMSTDTC, 1, 10)),
     cmendt = ymd(substring(CMENDTC, 1, 10)),
@@ -56,6 +57,12 @@ adcm <- df_cm %>%
 # Sort and Save
 adcm <- adcm %>% arrange(USUBJID, CMSTDT, CMDECOD)
 library(xportr)
+
+# Assertions and Error Guards (QC-03)
+if (nrow(adcm) == 0) {
+  stop("ERROR: [VALIDATION] ADCM output dataset is empty!")
+}
+
 xportr_write(adcm, "04_adam/adcm_v.xpt", domain = "ADCM")
 
 cat("NOTE: [VALIDATION] Wrote validation ADCM: 04_adam/adcm_v.xpt\n")

@@ -1,9 +1,9 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: A_adex_generation.sas
-   Version: 2.0
+   Version: 2.2.0
    Author: Principal Clinical Data Infrastructure Architect
-   Date: 2026-05-23
+   Date: 2026-05-27
    Standard: ADaMIG v1.3 BDS
    Input: sdtm.ex, adam.adsl
    Output: adam.adex
@@ -27,17 +27,29 @@ proc sql;
     group by usubjid;
 quit;
 
+/* Sort ADSL safety population by usubjid */
+proc sort data=adam.adsl(keep=studyid usubjid subjid siteid trt01p trt01pn saffl trtsdt trtedt trtdurd where=(saffl = 'Y')) out=work.adsl_sorted;
+    by usubjid;
+run;
+
+/* Sort subj_mods by usubjid */
+proc sort data=work.subj_mods;
+    by usubjid;
+run;
+
+/* Match-merge ADSL and summaries */
+data work.adex_bds_merged;
+    merge work.adsl_sorted(in=a) work.subj_mods(in=b);
+    by usubjid;
+    if a;
+run;
+
 /* Build BDS structure (Summary records) */
 data work.adex_bds;
-    set adam.adsl(keep=studyid usubjid subjid siteid trt01p trt01pn saffl trtsdt trtedt trtdurd);
-    where saffl = 'Y';
+    set work.adex_bds_merged;
     
     length PARAMCD $8 PARAM $40 AVALC $40 PARCAT1 $20 AVALCAT1 $20 AVISIT $40;
     format AVAL 8.2;
-    
-    /* Merge summaries */
-    merge work.subj_mods;
-    by usubjid;
     
     if missing(ncycle) then ncycle = 0;
     if missing(cumdose) then cumdose = 0;
@@ -114,17 +126,24 @@ data work.adex_bds;
     output;
 run;
 
+/* Sort cycle-level EX data by usubjid */
+proc sort data=sdtm.ex(keep=usubjid exdose2 exseq exdsrcm exdelay) out=work.ex_sorted;
+    by usubjid;
+run;
+
+/* Match-merge cycle EX with sorted ADSL */
+data work.adex_cycle_merged;
+    merge work.ex_sorted(in=a) work.adsl_sorted(in=b);
+    by usubjid;
+    if a and b;
+run;
+
 /* Add cycle level performance dose and adjustments */
 data work.adex_cycle;
-    set sdtm.ex(keep=usubjid exdose2 exseq exdsrcm exdelay);
+    set work.adex_cycle_merged;
     
     length PARAMCD $8 PARAM $40 AVALC $40 PARCAT1 $20 AVALCAT1 $20 AVISIT $40;
     format AVAL 8.2;
-    
-    /* Bring in ADSL demographics */
-    merge adam.adsl(keep=studyid usubjid subjid siteid trt01p trt01pn saffl trtsdt trtedt trtdurd);
-    by usubjid;
-    where saffl = 'Y';
     
     AVISIT = catx(' ', 'CYCLE', put(exseq, 2.));
     

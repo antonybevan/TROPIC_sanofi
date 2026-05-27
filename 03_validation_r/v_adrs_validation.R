@@ -64,10 +64,10 @@ df_recist <- df_post_sod %>%
     ANL01FL = "Y"
   )
 
-# Disposition milestones fallback
 df_disp_milestones <- ds %>%
   filter(DSDECOD %in% c("DISEASE PROGRESSION", "PROGRESSION", "DEATH", "DEAD")) %>%
-  inner_join(header, by = c("USUBJID", "STUDYID", "SUBJID")) %>%
+  select(-any_of("STUDYID")) %>%
+  inner_join(header, by = c("USUBJID", "SUBJID")) %>%
   mutate(
     adt = RANDDT + DSSTWK * 7,
     ady = as.numeric(adt - TRTSDT + 1),
@@ -198,9 +198,19 @@ df_psprog <- header %>%
 
 # Combine and Export via xportr
 adrs <- bind_rows(df_ovrl, df_bor, df_orr, df_psprog) %>% 
-  arrange(USUBJID, PARAMCD, VISIT)
+  rename(AVISIT = VISIT) %>%
+  arrange(USUBJID, PARAMCD, AVISIT)
 
 library(xportr)
+
+# Assertions and Error Guards (QC-03)
+if (nrow(adrs) == 0) {
+  stop("ERROR: [VALIDATION] ADRS output dataset is empty!")
+}
+if (nrow(df_disp_milestones) == 0) {
+  stop("ERROR: [VALIDATION] ADRS milestone fallback records are missing!")
+}
+
 xportr_write(adrs, "04_adam/adrs_v.xpt", domain = "ADRS")
 
 cat("NOTE: [VALIDATION] Wrote validation ADRS: 04_adam/adrs_v.xpt\n")

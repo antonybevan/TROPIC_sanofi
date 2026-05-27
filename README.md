@@ -120,6 +120,16 @@ Upon successful execution of the pipeline, the following verification files are 
 * **[Pipeline Status Dashboard](file:///C:/Users/91936/OneDrive/Desktop/TROPIC/06_telemetry/health_dashboard.md):** Run execution log checklist.
 * **[Clinical Figures Output](file:///C:/Users/91936/OneDrive/Desktop/TROPIC/09_tfl/output/):** Generated survival curves, subgroup forest plots, and dose-response figures.
 
-> [!NOTE]
-> **Regulatory Submission Ready:**
-> The outputs in `04_adam/` and `07_define_xml/` are formatted strictly for eCTD Module 5 packaging. Use `08_reviewers_guides/ADRG.md` as the direct template for clinical reviewer communication.
+---
+
+## Dual-Language Validation & SAS Simulation (VAL-01)
+
+To meet FDA regulatory standards, this pipeline is built on an **independent double-programming** foundation:
+* **Production Track (SAS 9.4):** Primary modular SAS programs (`02_production_sas/`) perform standard ADaM derivations.
+* **Validation Track (R 4.5.2):** Independent validation R scripts (`03_validation_r/`) perform double-programming using the standard R/Pharmaverse libraries.
+
+### CI Environment & Simulator Bounds
+In environments without a local SAS 9.4 engine, the Python orchestrator (`cibuild.py`) utilizes a **SAS Simulation Compilation** (Stage 10). The simulator copies the independently validated R XPT datasets to simulated production paths (`*_prod.xpt`), allowing reconciliation and TFL generation to compile.
+
+> [!WARNING]
+> While this setup is highly effective for validating R logic and structural parity in CI/CD pipelines, formal eCTD regulatory package generation **requires actual SAS execution** for the production track. In a production environment, the simulation stage must be replaced with the execution of the actual SAS production suite on a SAS 9.4 engine.

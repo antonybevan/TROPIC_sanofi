@@ -4,6 +4,23 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [2.2.0] - 2026-05-27
+
+### Added
+- **Safety Assertions & Error Guards:** Integrated robust row-count and parameter completeness checks across all R validation scripts (QC-03, VAL-05) to prevent silent empty or partial dataset exports.
+- **Enhanced SDTM Validation:** Upgraded `v_sdtm_validation.R` with advanced checks (VAL-02) including `STUDYID` consistency ("EFC6193"), sequence duplicate checks (USUBJID + SEQ), and ISO 8601 Date compliance checks.
+- **Full-Business-Key Sorting:** Implemented multi-key sorting based on unique business keys in `cross_lang_audit.R` (QC-01) to ensure correct row alignment in multi-record datasets during cell-level comparison.
+
+### Changed
+- **Resolved STUDYID Join Mismatch:** Remediated a systemic study ID mismatch ("EFC6193" in staging vs "TROPIC-NCT00417079" in header) that caused R validation joins to silently produce 0-row datasets.
+- **SAS Match-Merge Pre-sorting:** Fixed DATA step merges in `A_adcm_generation.sas` (DC-01/SQL-01) and `A_adex_generation.sas` (DC-02/SQL-02) by introducing explicit `proc sort` steps before merging.
+- **Demographic Age Group Cohort Derivation:** Corrected demographic age cohort warning in R validation and SAS compilation (DC-04) by explicitly mapping `">=85"` to `85` numeric age in `S_sdtm_mapping.sas` and `v_adsl_validation.R`.
+- **SAS Lab Limit Select Mapping:** Changed `lbnrlo`/`lbnrhi` column selection in `A_adlb_generation.sas` (DC-06) to correct source variables `lbornrlo`/`lbornrhi`.
+- **SQL Death Cause Aggregation:** Fixed non-aggregated `dsterm` column in the survival SQL query in `A_adsl_generation.sas` (SQL-06) using `min(dsterm)`.
+- **Nested SQL Aggregate Refactoring:** Refactored nested SQL aggregates in `A_adlb_generation.sas` (SQL-03) into a robust two-stage subquery join.
+- **CI Build Orchestrator Portability:** Resolved hardcoded `RSCRIPT_PATH` portably using `shutil.which("Rscript")` (AUTO-01) and added args range checks (AUTO-03).
+- **Master Driver Error Checking:** Added `%check_err()` call immediately after configuration inclusion in `00_master_driver.sas` (AUTO-02).
+
 ## [2.1.0] - 2026-05-27
 
 ### Added

@@ -1,9 +1,9 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: A_adcm_generation.sas
-   Version: 2.0
+   Version: 2.2.0
    Author: Principal Clinical Data Infrastructure Architect
-   Date: 2026-05-23
+   Date: 2026-05-27
    Standard: ADaMIG v1.3 OCCDS v1.1
    Input: sdtm.cm, adam.adsl
    Output: adam.adcm
@@ -43,6 +43,15 @@ proc sql;
     where cmcat = 'POST TREATMENT ANTI-CANCER DRUG THERAPY' and not missing(cmstdt)
     group by usubjid;
 quit;
+
+/* Sort datasets by BY-variable before merging */
+proc sort data=work.cm_base;
+    by usubjid;
+run;
+
+proc sort data=work.nact_dates;
+    by usubjid;
+run;
 
 /* Derive CM flags and merge NACTDT */
 data adam.adcm;

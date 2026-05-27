@@ -1,9 +1,9 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: A_adlb_generation.sas
-   Version: 2.0
+   Version: 2.2.0
    Author: Principal Clinical Data Infrastructure Architect
-   Date: 2026-05-23
+   Date: 2026-05-27
    Standard: ADaMIG v1.3 BDS
    Input: sdtm.lb, adam.adsl
    Output: adam.adlb
@@ -39,8 +39,8 @@ proc sql;
         lb.lbdy as ADY,
         lb.lbstresn as AVAL,
         lb.lborres as AVALC length=20,
-        lb.lbnrlo,
-        lb.lbnrhi,
+        lb.lbornrlo as lbnrlo,
+        lb.lbornrhi as lbnrhi,
         lb.lbnrind,
         coalesce(input(lb.lbstoxgr, best32.), input(lb.lbtoxgr, best32.), 0.0) as ATOXGR
     from sdtm.lb as lb
@@ -162,14 +162,25 @@ data work.anc_records;
 run;
 
 proc sql;
-    create table work.anc_nadir_summary as
+    /* Step 1: Compute minimum AVAL per subject/cycle */
+    create table work.anc_nadir_val as
     select 
         usubjid,
         cycle,
-        min(AVAL) as nadir_val,
-        min(case when AVAL = min(AVAL) then ADY else . end) as nadir_dy
+        min(AVAL) as nadir_val
     from work.anc_records
     group by usubjid, cycle;
+
+    /* Step 2: Get the minimum ADY corresponding to the minimum AVAL */
+    create table work.anc_nadir_summary as
+    select 
+        r.usubjid,
+        r.cycle,
+        v.nadir_val,
+        min(r.ADY) as nadir_dy
+    from work.anc_records as r
+    inner join work.anc_nadir_val as v on r.usubjid = v.usubjid and r.cycle = v.cycle and r.AVAL = v.nadir_val
+    group by r.usubjid, r.cycle, v.nadir_val;
 quit;
 
 /* 2. Calculate ANC recovery days per cycle */

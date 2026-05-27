@@ -17,7 +17,8 @@ header <- adsl %>%
   select(STUDYID, USUBJID, SUBJID, TRT01P, TRTSDT)
 
 df_lb <- lb %>%
-  inner_join(header, by = c("USUBJID", "STUDYID", "SUBJID")) %>%
+  select(-any_of("STUDYID")) %>%
+  inner_join(header, by = c("USUBJID", "SUBJID")) %>%
   mutate(
     lbdt = ymd(substring(LBDTC, 1, 10)),
     lbdy = as.numeric(lbdt - TRTSDT + 1),
@@ -169,5 +170,14 @@ adlb_final <- bind_rows(
 
 # Export via xportr
 library(xportr)
+
+# Assertions and Error Guards (QC-03)
+if (nrow(adlb_final) == 0) {
+  stop("ERROR: [VALIDATION] ADLB output dataset is empty!")
+}
+if (nrow(df_optimus_nadir) == 0) {
+  stop("ERROR: [VALIDATION] ADLB Project Optimus nadir records are missing!")
+}
+
 xportr_write(adlb_final, "04_adam/adlb_v.xpt", domain = "ADLB")
 cat("NOTE: [VALIDATION] Wrote validation ADLB: 04_adam/adlb_v.xpt\n")

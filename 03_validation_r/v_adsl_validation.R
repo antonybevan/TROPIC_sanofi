@@ -125,7 +125,7 @@ adsl <- dm %>%
   mutate(
     STUDYID = "TROPIC-NCT00417079",
     SITEID = substring(SUBJID, 1, 3),
-    AGE = as.numeric(AGEGRP),
+    AGE = if_else(AGEGRP == ">=85", 85, as.numeric(AGEGRP)),
     AGEGR1 = if_else(AGE < 65, "<65", ">=65"),
     AGEGR1N = if_else(AGE < 65, 1.0, 2.0),
     ETHNIC = "NOT HISPANIC OR LATINO",
@@ -165,6 +165,12 @@ adsl <- dm %>%
 adsl <- adsl %>% arrange(USUBJID)
 dir.create("04_adam", showWarnings = FALSE)
 library(xportr)
+
+# Assertions and Error Guards (QC-03)
+if (nrow(adsl) < 371) {
+  stop("ERROR: [VALIDATION] ADSL output dataset is incomplete or empty!")
+}
+
 xportr_write(adsl, "04_adam/adsl_v.xpt", domain = "ADSL")
 
 cat("NOTE: [VALIDATION] Wrote validation ADSL: 04_adam/adsl_v.xpt\n")

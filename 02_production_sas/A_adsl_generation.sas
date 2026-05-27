@@ -1,9 +1,9 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: A_adsl_generation.sas
-   Version: 2.0
+   Version: 2.2.0
    Author: Principal Clinical Data Infrastructure Architect
-   Date: 2026-05-23
+   Date: 2026-05-27
    Standard: ADaMIG v1.3
    Input: sdtm.dm, sdtm.ex, sdtm.ds
    Output: adam.adsl
@@ -33,7 +33,7 @@ proc sql;
         usubjid,
         'Y' as dthfl length=1,
         min(dsstdt) as dthdt format=yymmdd10.,
-        dsterm as dthcaus length=100
+        min(dsterm) as dthcaus length=100
     from sdtm.ds
     where dsdecod in ('DEATH', 'DEAD') and not missing(dsstdt)
     group by usubjid;

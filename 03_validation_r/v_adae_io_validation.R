@@ -18,7 +18,8 @@ header <- adsl %>%
 
 # Ingest and clean adverse events
 df_ae <- ae %>%
-  inner_join(header, by = c("USUBJID", "STUDYID", "SUBJID")) %>%
+  select(-any_of("STUDYID")) %>%
+  inner_join(header, by = c("USUBJID", "SUBJID")) %>%
   mutate(
     # AE week conversion to days relative to randomization
     astdt = RANDDT + AESTWK * 7,
@@ -95,6 +96,12 @@ adae_final <- adae_pre %>%
 # Sort and Save
 adae <- adae_final %>% arrange(USUBJID, ASTDT, AEDECOD)
 library(xportr)
+
+# Assertions and Error Guards (QC-03)
+if (nrow(adae) == 0) {
+  stop("ERROR: [VALIDATION] ADAE output dataset is empty!")
+}
+
 xportr_write(adae, "04_adam/adae_v.xpt", domain = "ADAE")
 
 cat("NOTE: [VALIDATION] Wrote validation ADAE: 04_adam/adae_v.xpt\n")

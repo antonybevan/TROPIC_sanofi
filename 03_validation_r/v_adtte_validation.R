@@ -26,7 +26,7 @@ df_pd <- adrs %>%
          (PARAMCD == "PSPROG" & AVALC == "Y")) %>%
   group_by(USUBJID) %>%
   summarise(
-    pd_dt = min(ymd(ADT)),
+    pd_dt = min(as.Date(ADT, origin = "1960-01-01")),
     .groups = "drop"
   )
 
@@ -35,7 +35,7 @@ df_sae <- adae %>%
   filter(AESER == "Y" & TRTEMFL == "Y") %>%
   group_by(USUBJID) %>%
   summarise(
-    sae_dt = min(ymd(ASTDT)),
+    sae_dt = min(as.Date(ASTDT, origin = "1960-01-01")),
     .groups = "drop"
   )
 
@@ -44,7 +44,7 @@ df_nact <- adcm %>%
   filter(!is.na(NACTDT)) %>%
   group_by(USUBJID) %>%
   summarise(
-    nactdt = min(ymd(NACTDT)),
+    nactdt = min(as.Date(NACTDT, origin = "1960-01-01")),
     .groups = "drop"
   )
 
@@ -291,5 +291,17 @@ adtte <- adtte %>%
   )
 
 library(xportr)
+
+# Assertions and Error Guards (QC-03)
+if (nrow(adtte) == 0) {
+  stop("ERROR: [VALIDATION] ADTTE output dataset is empty!")
+}
+# Assert completeness of all 6 parameters (VAL-05)
+expected_params <- c("OS", "PFS", "TTPAIN", "TTPSA", "TTUMOR", "TTOS")
+missing_params <- setdiff(expected_params, unique(adtte$PARAMCD))
+if (length(missing_params) > 0) {
+  stop(paste("ERROR: [VALIDATION] ADTTE is missing mandatory parameters:", paste(missing_params, collapse = ", ")))
+}
+
 xportr_write(adtte, "04_adam/adtte_v.xpt", domain = "ADTTE")
 cat("NOTE: [VALIDATION] Wrote validation ADTTE: 04_adam/adtte_v.xpt\n")

@@ -1,9 +1,9 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: A_adtte_generation.sas
-   Version: 2.0
+   Version: 2.2.0
    Author: Principal Clinical Data Infrastructure Architect
-   Date: 2026-05-23
+   Date: 2026-05-27
    Standard: ADaMIG v1.3 / CDISC BDS TTE v1.0
    Input: adam.adsl, adam.adrs, adam.adcm, adam.adae
    Output: adam.adtte

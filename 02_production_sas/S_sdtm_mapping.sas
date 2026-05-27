@@ -1,9 +1,9 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: S_sdtm_mapping.sas
-   Version: 2.0
+   Version: 2.2.0
    Author: Principal Clinical Data Infrastructure Architect
-   Date: 2026-05-23
+   Date: 2026-05-27
    Standard: SDTM IG v3.4
    Input: staging.*
    Output: sdtm.dm, sdtm.ae, sdtm.ex, sdtm.cm, sdtm.ds, sdtm.vs, sdtm.lb, sdtm.rs
@@ -18,7 +18,7 @@ proc sql;
     create table work.trtsdt_map as
     select usubjid, min(input(substr(exstdtc, 1, 10), yymmdd10.)) as trtsdt format=yymmdd10.
     from staging.ex
-    where not missing(exstdtc)
+    where not missing(exstdtc) and length(compress(exstdtc)) >= 10
     group by usubjid;
 quit;
 
@@ -29,6 +29,10 @@ proc sql;
         dm.studyid length=20,
         dm.subjid length=10,
         dm.usubjid length=40,
+        case 
+            when dm.agegrp = '>=85' then 85
+            else input(dm.agegrp, best32.)
+        end as age,
         dm.agegrp length=10,
         dm.ageu length=10,
         dm.sex length=1,

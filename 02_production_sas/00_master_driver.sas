@@ -1,14 +1,15 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: 00_master_driver.sas
-   Version: 2.0
+   Version: 2.2.0
    Author: Principal Clinical Data Infrastructure Architect
-   Date: 2026-05-23
+   Date: 2026-05-27
    Standard: CDISC ADaMIG v1.3 / OCCDS v1.1
    Description: Master execution driver for TROPIC (Study EFC6193 / XRP6258) pipeline.
    ============================================================================== */
 
 %include "00_config.sas";
+%check_err(00_config);
 
 /* Stage 1: Raw Ingest and Type Normalization */
 %include "L_staging_ingest.sas";

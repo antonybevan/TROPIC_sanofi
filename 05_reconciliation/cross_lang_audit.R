@@ -21,9 +21,46 @@ compare_datasets <- function(ds_name) {
   colnames(prod) <- toupper(colnames(prod))
   colnames(val) <- toupper(colnames(val))
   
-  # Align keys and columns
-  prod <- prod %>% arrange(USUBJID)
-  val <- val %>% arrange(USUBJID)
+  # Column symmetry check (QC-02)
+  prod_cols <- colnames(prod)
+  val_cols <- colnames(val)
+  extra_in_prod <- setdiff(prod_cols, val_cols)
+  extra_in_val <- setdiff(val_cols, prod_cols)
+  
+  if (length(extra_in_prod) > 0 || length(extra_in_val) > 0) {
+    reason_parts <- c()
+    if (length(extra_in_prod) > 0) {
+      reason_parts <- c(reason_parts, paste("Extra in Prod:", paste(extra_in_prod, collapse = ", ")))
+    }
+    if (length(extra_in_val) > 0) {
+      reason_parts <- c(reason_parts, paste("Extra in Val:", paste(extra_in_val, collapse = ", ")))
+    }
+    return(list(status = "FAIL", reason = paste("Column mismatch -", paste(reason_parts, collapse = "; "))))
+  }
+  
+  # Align keys and columns based on dataset name (QC-01)
+  if (ds_name == "adsl") {
+    prod <- prod %>% arrange(USUBJID)
+    val  <- val  %>% arrange(USUBJID)
+  } else if (ds_name == "adex") {
+    prod <- prod %>% arrange(USUBJID, PARAMCD, AVISIT)
+    val  <- val  %>% arrange(USUBJID, PARAMCD, AVISIT)
+  } else if (ds_name == "adcm") {
+    prod <- prod %>% arrange(USUBJID, CMSTDT, CMDECOD)
+    val  <- val  %>% arrange(USUBJID, CMSTDT, CMDECOD)
+  } else if (ds_name == "adae") {
+    prod <- prod %>% arrange(USUBJID, ASTDT, AEDECOD)
+    val  <- val  %>% arrange(USUBJID, ASTDT, AEDECOD)
+  } else if (ds_name == "adlb") {
+    prod <- prod %>% arrange(USUBJID, PARAMCD, AVISITN, LBDY)
+    val  <- val  %>% arrange(USUBJID, PARAMCD, AVISITN, LBDY)
+  } else if (ds_name == "adrs") {
+    prod <- prod %>% arrange(USUBJID, PARAMCD, AVISIT)
+    val  <- val  %>% arrange(USUBJID, PARAMCD, AVISIT)
+  } else if (ds_name == "adtte") {
+    prod <- prod %>% arrange(USUBJID, PARAMCD)
+    val  <- val  %>% arrange(USUBJID, PARAMCD)
+  }
   
   # Cell-by-cell comparison
   diffs <- 0

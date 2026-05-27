@@ -1,9 +1,9 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: 00_config.sas
-   Version: 2.0
+   Version: 2.2.0
    Author: Principal Clinical Data Infrastructure Architect
-   Date: 2026-05-23
+   Date: 2026-05-27
    Standard: CDISC ADaMIG v1.3 / OCCDS v1.1
    Description: Environment configuration, library allocations, and helper macros.
    ============================================================================== */

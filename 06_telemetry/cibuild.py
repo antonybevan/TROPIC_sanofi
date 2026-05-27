@@ -3,9 +3,11 @@ import sys
 import json
 import subprocess
 import argparse
+import shutil
 from datetime import datetime
 
-RSCRIPT_PATH = r"C:\Users\91936\AppData\Local\Programs\R\R-4.5.2\bin\Rscript.exe"
+# Dynamically resolve Rscript via PATH or fallback to hardcoded path (AUTO-01)
+RSCRIPT_PATH = shutil.which("Rscript") or r"C:\Users\91936\AppData\Local\Programs\R\R-4.5.2\bin\Rscript.exe"
 
 def run_command(cmd, cwd=None):
     try:
@@ -159,6 +161,10 @@ def main():
     elif args.rollback:
         rollback()
     else:
+        # Validate that from-stage is within valid range (AUTO-03)
+        if args.from_stage < 0 or args.from_stage > 12:
+            print(f"ERROR: Invalid stage number {args.from_stage}. Stage number must be between 1 and 12.")
+            sys.exit(1)
         execute_pipeline(args.from_stage)
 
 if __name__ == "__main__":

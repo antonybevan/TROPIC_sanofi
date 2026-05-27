@@ -12,8 +12,9 @@ cat("NOTE: [VALIDATION] Starting ADEX Validation script...\n")
 adsl <- read_xpt("04_adam/adsl_v.xpt")
 ex <- readRDS("01_raw_source/real_sdtm/staging/ex.rds")
 
-# Ensure columns are numeric
+# Ensure columns are numeric and exclude staging STUDYID
 ex_clean <- ex %>%
+  select(-any_of("STUDYID")) %>%
   mutate(
     EXSEQ = as.numeric(EXSEQ),
     EXDOSE2 = as.numeric(EXDOSE2),
@@ -93,7 +94,7 @@ summary_bds <- bind_rows(
 
 # Cycle-level performance dose and adjustments
 cycle_bds <- ex_clean %>%
-  inner_join(header, by = c("USUBJID", "STUDYID", "SUBJID")) %>%
+  inner_join(header, by = c("USUBJID", "SUBJID")) %>%
   transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRT01PN, TRTSDT,
     PARAMCD = "PERFDOSE", PARAM = "Actual Dose Administered (mg/m2)", PARCAT1 = "INDIVIDUAL",
@@ -101,7 +102,7 @@ cycle_bds <- ex_clean %>%
   )
 
 cycle_adj <- ex_clean %>%
-  inner_join(header, by = c("USUBJID", "STUDYID", "SUBJID")) %>%
+  inner_join(header, by = c("USUBJID", "SUBJID")) %>%
   transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRT01PN, TRTSDT,
     PARAMCD = "ADJ", PARAM = "Dose Adjusted Flag", PARCAT1 = "INDIVIDUAL",
@@ -111,7 +112,7 @@ cycle_adj <- ex_clean %>%
   )
 
 cycle_adj_ae <- ex_clean %>%
-  inner_join(header, by = c("USUBJID", "STUDYID", "SUBJID")) %>%
+  inner_join(header, by = c("USUBJID", "SUBJID")) %>%
   transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRT01PN, TRTSDT,
     PARAMCD = "ADJAE", PARAM = "Dose Adjusted due to AE Flag", PARCAT1 = "INDIVIDUAL",
@@ -123,6 +124,14 @@ cycle_adj_ae <- ex_clean %>%
 # Combine and Sort
 adex <- bind_rows(summary_bds, cycle_bds, cycle_adj, cycle_adj_ae) %>% 
   arrange(USUBJID, PARAMCD, AVISIT)
+
+# Assertions and Error Guards (QC-03)
+if (nrow(adex) == 0) {
+  stop("ERROR: [VALIDATION] ADEX output dataset is empty!")
+}
+if (nrow(cycle_bds) == 0) {
+  stop("ERROR: [VALIDATION] ADEX cycle-level records are missing!")
+}
 
 # Export via xportr
 library(xportr)
