@@ -129,8 +129,9 @@ os_plot_data <- bind_rows(os_plot_list)
 km_plot <- ggplot(os_plot_data, aes(x = time, y = surv, color = TRT01P)) +
   geom_step(linewidth = 1.0) +
   scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E")) + # NEJM Medical Palette
-  scale_y_continuous(labels = scales::percent, limits = c(0, 1.02), expand = c(0, 0)) +
-  scale_x_continuous(limits = c(0, 24), breaks = seq(0, 24, by = 3), expand = c(0, 0)) +
+  scale_y_continuous(labels = scales::percent, expand = c(0, 0)) +
+  scale_x_continuous(breaks = seq(0, 24, by = 3), expand = c(0, 0)) +
+  coord_cartesian(xlim = c(0, 24), ylim = c(0, 1.02)) +
   labs(
     title = "F-11-1: Kaplan-Meier Overall Survival (OS) Analysis — ITT Population",
     subtitle = "Primary Endpoint: Cabazitaxel + Prednisone (CbzP) vs Mitoxantrone + Prednisone (MP)\nHR = 0.70 (95% CI: 0.59-0.83), Log-Rank p < 0.0001",
@@ -237,7 +238,8 @@ er_plot <- ggplot(er_data, aes(x = RDI, y = ANC, color = TRT01P)) +
     fill = "95% Confidence Interval:"
   ) +
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "#e74c3c", linewidth = 0.8) +
-  annotate("text", x = 45, y = 0.32, label = "Grade 4 Neutropenia Threshold (<0.5)", color = "#e74c3c", size = 3, fontface = "bold", family = "serif") +
+  annotate("text", x = 42, y = 0.75, label = "Grade 4 Neutropenia Threshold (<0.5)", color = "#e74c3c", size = 3.2, fontface = "bold", family = "serif", hjust = 0) +
+  coord_cartesian(ylim = c(0, 6.0)) +
   theme_nejm_custom() +
   theme(
     panel.grid.major.x = element_line(color = "#eaeaea", linewidth = 0.3),
