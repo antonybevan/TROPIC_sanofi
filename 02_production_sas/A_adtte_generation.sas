@@ -105,8 +105,9 @@ run;
 /* Add PFS parameter which has a more complex censoring hierarchy */
 proc sql;
     create table work.nact_mapping as
-    select usubjid, max(nactdt) as nactdt format=yymmdd10.
+    select usubjid, min(nactdt) as nactdt format=yymmdd10.
     from adam.adcm
+    where not missing(nactdt)
     group by usubjid;
 quit;
 
@@ -410,7 +411,7 @@ proc sql;
         case 
             when not missing(p.prog_date) then p.prog_date
             when not missing(c.last_pn_dt) then c.last_pn_dt
-            else adsl.randdt + 1
+            else adsl.randdt
         end as ADT format=yymmdd10.,
         
         case 

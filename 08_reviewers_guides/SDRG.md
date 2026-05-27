@@ -21,6 +21,7 @@ Standard SDTM mapping structures were built in `S_sdtm_mapping.sas` under SDTM-I
 * **AE (Adverse Events):** Coded utilizing MedDRA dictionaries into `AEDECOD`, `AEBODSYS`, and standard CTCAE toxicity grades. **Date Precision Note:** The source PDS dataset contains AE timing as week-offset integers (`AESTWK`, `AEENWK`). AE start/end dates are reconstructed as `RFSTDTC + (AESTWK × 7)` and `RFSTDTC + (AEENWK × 7)`. This reconstruction yields calendar-week accuracy (±3.5 days) rather than exact calendar dates. This precision level was present in the source data and is not a programming artefact. All safety analyses using AE dates (ADAE, ADTTE TTOS) inherit this limitation.
 * **LB (Laboratory):** Mapped continuous Absolute Neutrophil Count (ANC) and Prostate Specific Antigen (PSA) measurements.
 * **DS (Disposition):** Captured study completion reasons, trial exits, and survival follow-up records.
+* **RS (Response / Efficacy Fallback):** Derived from `DS` domain where `DSDECOD` indicates progression or death. Death records are mapped to standard RS structures with `RSSTRESC = 'DEATH'` to capture survival outcomes cleanly as efficacy checkpoints.
 
 ---
 
@@ -47,3 +48,6 @@ Domains `LS` (Lesion) and `PN` (Pain/Numeric) do not have supplemental (`SUPPLS`
 
 ### 4.3 Country and Region Assignment
 The DM domain in the source data does not contain country-of-study-site information. `COUNTRY` is assigned `'IND'` and `REGION` as `'REST OF WORLD'` for all subjects. Geographic subgroup analyses were not pre-specified in SAP v3.0 and are not reported.
+
+### 4.4 Hardcoded Demographic Constant (SEX = 'M')
+The demographics domain (`DM`) contains a hardcoded variable `SEX = 'M'` assigned to all subjects in `A_adsl_generation.sas`. This is a clinical decision consistent with the trial protocol for metastatic castration-resistant prostate cancer (mCRPC), which is an exclusively male patient population. To ensure metadata conformity, the Define-XML codelist references are maintained; however, no female subjects are present in the analysis dataset.

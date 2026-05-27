@@ -81,7 +81,7 @@ adae_final <- adae_pre %>%
   ) %>%
   ungroup() %>%
   mutate(
-    TRTEMFL = coalesce(AETRTEM, if_else(!is.na(astdt) & astdt >= TRTSDT, "Y", "N")),
+    TRTEMFL = if_else(!is.na(AETRTEM) & AETRTEM != "" & AETRTEM != " ", AETRTEM, if_else(!is.na(astdt) & astdt >= TRTSDT, "Y", "N")),
     ADURN = as.numeric(aendt - astdt + 1),
     ADURU = "DAYS"
   ) %>%

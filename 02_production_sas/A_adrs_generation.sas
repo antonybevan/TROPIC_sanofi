@@ -268,14 +268,19 @@ proc sql;
     where adsl.saffl = 'Y';
 quit;
 
-/* Combine all parameters */
-data adam.adrs;
+/* Combine all parameters and sort before merge */
+data work.adrs_union;
     set work.rs_base work.bor_summary work.orr_summary work.psprog;
-    
-    /* Bring in ADSL headers */
-    merge adam.adsl(keep=studyid usubjid subjid siteid trt01p trt01pn saffl trtsdt trtedt trtdurd) ;
+run;
+
+proc sort data=work.adrs_union;
     by usubjid;
-    where saffl = 'Y';
+run;
+
+data adam.adrs;
+    merge work.adrs_union(in=a) adam.adsl(keep=studyid usubjid subjid siteid trt01p trt01pn saffl trtsdt trtedt trtdurd in=b);
+    by usubjid;
+    if a and saffl = 'Y';
     
     length ANL01FL $1;
     ANL01FL = 'Y';

@@ -156,9 +156,9 @@ run;
 data work.anc_records;
     set work.lb_anl01;
     where PARAMCD = 'NEUT' and ADY > 0 and ANL01FL = 'Y';
-    cycle = 1;
-    if 18 <= ADY then cycle = 2;
-    if 39 <= ADY then cycle = 3;
+    if ADY < 18 then cycle = 1;
+    else if 18 <= ADY and ADY < 39 then cycle = 2;
+    else if 39 <= ADY then cycle = 3;
 run;
 
 proc sql;

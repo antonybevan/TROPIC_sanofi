@@ -54,16 +54,17 @@ def execute_pipeline(from_stage=0):
     
     stages = [
         {"id": 1, "name": "Real SDTM Staging Ingest", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_staging_ingest.R\')"'},
-        {"id": 2, "name": "R ADSL Validation", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_adsl_validation.R\')"'},
-        {"id": 3, "name": "R ADEX Validation", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_adex_validation.R\')"'},
-        {"id": 4, "name": "R ADCM Validation", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_adcm_validation.R\')"'},
-        {"id": 5, "name": "R ADAE Validation", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_adae_io_validation.R\')"'},
-        {"id": 6, "name": "R ADLB Validation", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_adlb_validation.R\')"'},
-        {"id": 7, "name": "R ADRS Validation", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_adrs_validation.R\')"'},
-        {"id": 8, "name": "R ADTTE Validation", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_adtte_validation.R\')"'},
-        {"id": 9, "name": "SAS Simulation compilation", "cmd": "SIMULATE"},
-        {"id": 10, "name": "Cross-Language Audit Reconcile", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'05_reconciliation/cross_lang_audit.R\')"'},
-        {"id": 11, "name": "Efficacy & Safety TFL Suite Compilation", "cmd": f'"{RSCRIPT_PATH}" 09_tfl/tfl_generation.R'}
+        {"id": 2, "name": "R SDTM Validation", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_sdtm_validation.R\')"'},
+        {"id": 3, "name": "R ADSL Validation", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_adsl_validation.R\')"'},
+        {"id": 4, "name": "R ADEX Validation", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_adex_validation.R\')"'},
+        {"id": 5, "name": "R ADCM Validation", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_adcm_validation.R\')"'},
+        {"id": 6, "name": "R ADAE Validation", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_adae_io_validation.R\')"'},
+        {"id": 7, "name": "R ADLB Validation", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_adlb_validation.R\')"'},
+        {"id": 8, "name": "R ADRS Validation", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_adrs_validation.R\')"'},
+        {"id": 9, "name": "R ADTTE Validation", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_adtte_validation.R\')"'},
+        {"id": 10, "name": "SAS Simulation compilation", "cmd": "SIMULATE"},
+        {"id": 11, "name": "Cross-Language Audit Reconcile", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'05_reconciliation/cross_lang_audit.R\')"'},
+        {"id": 12, "name": "Efficacy & Safety TFL Suite Compilation", "cmd": f'"{RSCRIPT_PATH}" 09_tfl/tfl_generation.R'}
     ]
     
     results = {}

@@ -133,7 +133,9 @@ data adam.adae;
     
     /* Standard Treatment Emergent Flag */
     length TRTEMFL $1;
-    TRTEMFL = coalesce(aetrtem, case when not missing(astdt) and astdt >= trtsdt then 'Y' else 'N' end);
+    if not missing(aetrtem) and strip(aetrtem) ne '' then TRTEMFL = aetrtem;
+    else if not missing(astdt) and astdt >= trtsdt then TRTEMFL = 'Y';
+    else TRTEMFL = 'N';
     
     /* Non-grouped OCCDS compliance override */
     if missing(cq02nam) or cq02nam = '' then do;

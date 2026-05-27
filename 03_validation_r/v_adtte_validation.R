@@ -200,7 +200,7 @@ ttpain <- df_adsl %>%
     ADT = case_when(
       !is.na(prog_date) ~ prog_date,
       !is.na(last_pn_dt) ~ last_pn_dt,
-      TRUE ~ RANDDT + days(1)
+      TRUE ~ RANDDT
     ),
     
     CNSR = if_else(!is.na(prog_date), 0.0, 1.0),

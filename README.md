@@ -1,6 +1,6 @@
 # TROPIC (Study EFC6193 / XRP6258) CDISC ADaM and SDTM Analysis Pipeline
 
-[![CDISC Compliance](https://img.shields.io/badge/CDISC-ADaM%20v1.3%20%7C%20SDTM%20v3.1.1-blue.svg)](https://www.cdisc.org/)
+[![CDISC Compliance](https://img.shields.io/badge/CDISC-ADaM%20v1.3%20%7C%20SDTM%20IG%20v3.4-blue.svg)](https://www.cdisc.org/)
 [![FDA Guidelines](https://img.shields.io/badge/FDA-Project%20Optimus%202026-green.svg)](https://www.fda.gov/about-fda/oncology-center-excellence/project-optimus)
 [![Pipeline Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)]()
 [![Reconciliation](https://img.shields.io/badge/Reconciliation-100%25%20Match-success.svg)]()

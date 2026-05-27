@@ -4,6 +4,22 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [2.1.0] - 2026-05-27
+
+### Added
+- **R SDTM Structural Validation:** Added `R SDTM Validation` active build stage and upgraded `v_sdtm_validation.R` to check all 9 staging domains for row counts, non-emptiness, and key variable integrity.
+- **Reviewer's Guide Documentation:** Formally documented the `SEX = 'M'` demographics hardcoding decision and the RS domain disposition mappings in SDRG §2/§4.4 and ADRG §5.3.
+
+### Changed
+- **ADRS Final Assembly Join Guard:** Refactored final data step in `A_adrs_generation.sas` from a risky sequential `SET` + `MERGE` combination to a clean, sorted, match-merge by `usubjid` to eliminate variable-overwrite and record-duplication hazards.
+- **TTPAIN Censoring Fallback:** Corrected TTPAIN parameter censoring fallback date from `RANDDT + 1` day (AVAL=2) to `RANDDT` (AVAL=1) for non-evaluable subjects under ICH E9 in both `A_adtte_generation.sas` and `v_adtte_validation.R`.
+- **TRTEMFL Character Handling:** Replaced invalid inline `CASE WHEN` SQL syntax in the SAS adverse event generation script `A_adae_io_respec.sas` with a clean DATA step `if-then-else` block, and aligned R validation track `v_adae_io_validation.R` to correctly coalesce empty character strings.
+- **NACTDT Censoring Selection:** Changed the systemic therapy NACTDT selection query in `A_adtte_generation.sas` from `max(nactdt)` to standard earliest start `min(nactdt)` with a `not missing` filter.
+- **ADLB Cycle Assignment Structure:** Replaced sequential laboratory cycle overwrites with a clean, structured `if-then-else` block in `A_adlb_generation.sas`.
+- **Git Push Portability:** Replaced the user-specific absolute path in `GIT_PUSH.sas` with a dynamic path checking `%sysfunc(sysget(USERPROFILE))`.
+- **Define-XML Metadata Date Stamp:** Updated the `AsOfDateTime` stamp in `define.xml` to `2026-05-27T18:00:00`.
+- **CDISC Compliance Badge:** Corrected the version mismatch badge in `README.md` to reference `SDTM IG v3.4` instead of `SDTM v3.1.1`.
+
 ## [2.0.0] - 2026-05-23
 
 ### Added

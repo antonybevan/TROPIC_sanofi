@@ -17,8 +17,10 @@
     %else %do;
         %let _home = %sysfunc(sysget(HOME));
         %if %length(&_home) = 0 %then %let _home = %sysfunc(sysget(USERPROFILE));
-        %if %upcase(&SYSSCP) = WIN and %sysfunc(fileexist(c:/Users/91936/OneDrive/Desktop/TROPIC/02_production_sas/00_config.sas)) %then
-            %include "c:/Users/91936/OneDrive/Desktop/TROPIC/02_production_sas/00_config.sas";
+        %if %upcase(&SYSSCP) = WIN and %sysfunc(fileexist(&_home/OneDrive/Desktop/TROPIC/02_production_sas/00_config.sas)) %then
+            %include "&_home/OneDrive/Desktop/TROPIC/02_production_sas/00_config.sas";
+        %else %if %upcase(&SYSSCP) = WIN and %sysfunc(fileexist(&_home/Desktop/TROPIC/02_production_sas/00_config.sas)) %then
+            %include "&_home/Desktop/TROPIC/02_production_sas/00_config.sas";
         %else %if %sysfunc(fileexist(&_home/TROPIC/02_production_sas/00_config.sas)) %then
             %include "&_home/TROPIC/02_production_sas/00_config.sas";
         %else %put ERROR: Cannot find 00_config.sas;
