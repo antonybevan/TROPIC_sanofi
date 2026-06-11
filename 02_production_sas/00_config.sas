@@ -20,9 +20,35 @@
     %end;
     
     /* Automatically derive project root if not already defined */
-    %if %symexist(PROJ_ROOT) = 0 or &PROJ_ROOT = %str() %then %do;
-        /* Default to active workspace layout. For ODA, user will pull to remote. */
-        %let PROJ_ROOT = .;
+    %if %symexist(PROJ_ROOT) = 0 or &PROJ_ROOT = %str() or &PROJ_ROOT = . %then %do;
+        %if %symexist(_SASPROGRAMFILE) %then %do;
+            %if %superq(_SASPROGRAMFILE) ne %str() %then %do;
+                %let prog_path = %sysfunc(dequote(&_SASPROGRAMFILE.));
+                
+                /* Detect starting index of the production folder to establish root */
+                %let proj_idx = %sysfunc(find(%upcase(&prog_path.), %str(02_PRODUCTION_SAS)));
+                
+                %if &proj_idx. > 0 %then %do;
+                    %let PROJ_ROOT = %substr(&prog_path., 1, %eval(&proj_idx. - 2));
+                %end;
+                %else %do;
+                    /* Alternative: find last folder separator */
+                    %let last_sep_idx = %sysfunc(find(&prog_path., &PATH_SEP., -999));
+                    %if &last_sep_idx. > 0 %then %do;
+                        %let PROJ_ROOT = %substr(&prog_path., 1, %eval(&last_sep_idx. - 1));
+                    %end;
+                    %else %do;
+                        %let PROJ_ROOT = ..;
+                    %end;
+                %end;
+            %end;
+            %else %do;
+                %let PROJ_ROOT = ..;
+            %end;
+        %end;
+        %else %do;
+            %let PROJ_ROOT = ..;
+        %end;
     %end;
 
     /* Define Libraries */
@@ -36,6 +62,7 @@
     options ls=120 ps=60 validvarname=upcase missing='' mergenoby=WARN;
     
     %put NOTE: [CONFIG] Environment configured successfully on &SYSSCP..;
+    %put NOTE: [CONFIG] Auto-resolved Project Root path: &PROJ_ROOT.;
 %mend load_config;
 
 %load_config;

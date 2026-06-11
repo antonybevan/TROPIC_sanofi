@@ -6,12 +6,44 @@ import argparse
 import shutil
 from datetime import datetime
 
-# Dynamically resolve Rscript via PATH or fallback to hardcoded path (AUTO-01)
-RSCRIPT_PATH = shutil.which("Rscript") or r"C:\Users\91936\AppData\Local\Programs\R\R-4.5.2\bin\Rscript.exe"
+# Dynamically resolve Rscript via PATH or fallback to platform-specific paths (AUTO-01)
+RSCRIPT_PATH = shutil.which("Rscript")
+if not RSCRIPT_PATH:
+    if sys.platform == "win32":
+        RSCRIPT_PATH = r"C:\Users\91936\AppData\Local\Programs\R\R-4.5.2\bin\Rscript.exe"
+    else:
+        for path in ["/usr/local/bin/Rscript", "/opt/homebrew/bin/Rscript", "/Library/Frameworks/R.framework/Resources/bin/Rscript"]:
+            if os.path.exists(path):
+                RSCRIPT_PATH = path
+                break
+        if not RSCRIPT_PATH:
+            RSCRIPT_PATH = "Rscript"
+
+BACKUP_DIR = "04_adam/.backup"
+
+def create_backup():
+    if os.path.exists(BACKUP_DIR):
+        shutil.rmtree(BACKUP_DIR)
+    os.makedirs(BACKUP_DIR, exist_ok=True)
+    if os.path.exists("04_adam"):
+        for f in os.listdir("04_adam"):
+            if f.endswith(".xpt"):
+                shutil.copy(os.path.join("04_adam", f), os.path.join(BACKUP_DIR, f))
+
+def restore_backup():
+    if os.path.exists(BACKUP_DIR):
+        for f in os.listdir(BACKUP_DIR):
+            if f.endswith(".xpt"):
+                shutil.copy(os.path.join(BACKUP_DIR, f), os.path.join("04_adam", f))
+        shutil.rmtree(BACKUP_DIR)
+
+def clean_backup():
+    if os.path.exists(BACKUP_DIR):
+        shutil.rmtree(BACKUP_DIR)
 
 def run_command(cmd, cwd=None):
     try:
-        res = subprocess.run(cmd, shell=True, capture_output=True, text=True, cwd=cwd)
+        res = subprocess.run(cmd, capture_output=True, text=True, cwd=cwd)
         return res.returncode, res.stdout, res.stderr
     except Exception as e:
         return -1, "", str(e)
@@ -33,7 +65,7 @@ def dry_run():
         print(f"  R Compiler: {RSCRIPT_PATH} -> NOT FOUND")
         
     # Check Git
-    rc, stdout, stderr = run_command("git --version")
+    rc, stdout, stderr = run_command(["git", "--version"])
     if rc == 0:
         print(f"  Version Control: Git -> FOUND ({stdout.strip()})")
     else:
@@ -44,29 +76,33 @@ def dry_run():
 
 def rollback():
     print("=== PIPELINE ROLLBACK ===")
-    print("Reverting XPT outputs to last Git-tagged state...")
-    rc, stdout, stderr = run_command("git checkout -- 04_adam/*.xpt")
-    if rc == 0:
+    print("Reverting XPT outputs to backup state...")
+    try:
+        restore_backup()
         print("Rollback executed successfully!")
-    else:
-        print("No Git-tagged XPT state found or nothing to revert.")
+    except Exception as e:
+        print(f"Rollback failed: {e}")
 
-def execute_pipeline(from_stage=0):
+def execute_pipeline(from_stage=0, real_sas=False):
     print("=== EXECUTING TROPIC (Study EFC6193 / XRP6258) PIPELINE ===")
     
+    # Set simulation flag in environment for downstream R/reconciliation scripts (VAL-01)
+    real_sas_used = (shutil.which("sas") is not None) or real_sas
+    os.environ["TROPIC_SAS_SIMULATION"] = "FALSE" if real_sas_used else "TRUE"
+    
     stages = [
-        {"id": 1, "name": "Real SDTM Staging Ingest", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_staging_ingest.R\')"'},
-        {"id": 2, "name": "R SDTM Validation", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_sdtm_validation.R\')"'},
-        {"id": 3, "name": "R ADSL Validation", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_adsl_validation.R\')"'},
-        {"id": 4, "name": "R ADEX Validation", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_adex_validation.R\')"'},
-        {"id": 5, "name": "R ADCM Validation", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_adcm_validation.R\')"'},
-        {"id": 6, "name": "R ADAE Validation", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_adae_io_validation.R\')"'},
-        {"id": 7, "name": "R ADLB Validation", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_adlb_validation.R\')"'},
-        {"id": 8, "name": "R ADRS Validation", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_adrs_validation.R\')"'},
-        {"id": 9, "name": "R ADTTE Validation", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'03_validation_r/v_adtte_validation.R\')"'},
+        {"id": 1, "name": "Real SDTM Staging Ingest", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('03_validation_r/v_staging_ingest.R')"]},
+        {"id": 2, "name": "R SDTM Validation", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('03_validation_r/v_sdtm_validation.R')"]},
+        {"id": 3, "name": "R ADSL Validation", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('03_validation_r/v_adsl_validation.R')"]},
+        {"id": 4, "name": "R ADEX Validation", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('03_validation_r/v_adex_validation.R')"]},
+        {"id": 5, "name": "R ADCM Validation", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('03_validation_r/v_adcm_validation.R')"]},
+        {"id": 6, "name": "R ADAE Validation", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('03_validation_r/v_adae_io_validation.R')"]},
+        {"id": 7, "name": "R ADLB Validation", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('03_validation_r/v_adlb_validation.R')"]},
+        {"id": 8, "name": "R ADRS Validation", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('03_validation_r/v_adrs_validation.R')"]},
+        {"id": 9, "name": "R ADTTE Validation", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('03_validation_r/v_adtte_validation.R')"]},
         {"id": 10, "name": "SAS Simulation compilation", "cmd": "SIMULATE"},
-        {"id": 11, "name": "Cross-Language Audit Reconcile", "cmd": f'"{RSCRIPT_PATH}" -e "logrx::axecute(\'05_reconciliation/cross_lang_audit.R\')"'},
-        {"id": 12, "name": "Efficacy & Safety TFL Suite Compilation", "cmd": f'"{RSCRIPT_PATH}" 09_tfl/tfl_generation.R'}
+        {"id": 11, "name": "Cross-Language Audit Reconcile", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('05_reconciliation/cross_lang_audit.R')"]},
+        {"id": 12, "name": "Efficacy & Safety TFL Suite Compilation", "cmd": [RSCRIPT_PATH, "09_tfl/tfl_generation.R"]}
     ]
     
     results = {}
@@ -78,21 +114,57 @@ def execute_pipeline(from_stage=0):
             
         print(f"Executing Stage {stage['id']}: {stage['name']}...")
         
+        if stage["id"] == 1:
+            create_backup()
+
         if stage["cmd"] == "SIMULATE":
-            # Simulate SAS execution by replicating R validation datasets to production equivalents
-            print("  [SAS SIMULATOR] Copying validated datasets to simulated production targets (*_prod.xpt)...")
-            datasets = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte"]
-            for ds in datasets:
-                val_file = f"04_adam/{ds}_v.xpt"
-                prod_file = f"04_adam/{ds}_prod.xpt"
-                if os.path.exists(val_file):
-                    with open(val_file, "rb") as f_src:
-                        with open(prod_file, "wb") as f_dst:
-                            f_dst.write(f_src.read())
-                    print(f"    Simulated {ds}_prod.xpt generated successfully.")
-            rc = 0
-            stdout = "Simulated SAS 9.4 compilation complete."
-            stderr = ""
+            # Reprogrammed to work with true SAS data and local execution standards
+            sas_exe = shutil.which("sas")
+            
+            if sas_exe is not None:
+                print(f"  [REAL SAS] Located local SAS engine at: {sas_exe}")
+                print("  [REAL SAS] Compiling SAS production master suite (02_production_sas/00_master_driver.sas)...")
+                sas_cmd = [sas_exe, "-sysin", "02_production_sas/00_master_driver.sas", "-log", "02_production_sas/00_master_driver.log", "-print", "02_production_sas/00_master_driver.lst"]
+                rc, stdout, stderr = run_command(sas_cmd)
+                if rc == 0:
+                    print("  [REAL SAS] Master driver executed successfully. Actual SAS XPTs generated.")
+                else:
+                    print("  [REAL SAS FAILED] SAS master execution failed! Check log: 02_production_sas/00_master_driver.log")
+            elif real_sas:
+                print("  [REAL SAS MODE] Skipped file copy simulation. Preserving actual SAS-produced datasets (*_prod.xpt)...")
+                # Verify presence of all 7 required production datasets
+                datasets = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte"]
+                missing_prod = []
+                for ds in datasets:
+                    prod_file = f"04_adam/{ds}_prod.xpt"
+                    if not os.path.exists(prod_file):
+                        missing_prod.append(f"{ds}_prod.xpt")
+                
+                if missing_prod:
+                    print(f"  [ERROR] Missing required SAS production files for Real SAS Mode: {', '.join(missing_prod)}")
+                    rc = -1
+                    stderr = "Missing downloaded SAS production datasets"
+                else:
+                    print("  [REAL SAS MODE] All required SAS production datasets verified in 04_adam/. Proceeding to audit...")
+                    rc = 0
+                    stdout = "Real SAS datasets verified."
+                    stderr = ""
+            else:
+                # Fallback to copy simulation for local development ease without SAS
+                print("  [SAS SIMULATOR] SAS engine not found in system path and --real-sas not specified.")
+                print("  [SAS SIMULATOR] Falling back to R-validated copy simulation...")
+                datasets = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte"]
+                for ds in datasets:
+                    val_file = f"04_adam/{ds}_v.xpt"
+                    prod_file = f"04_adam/{ds}_prod.xpt"
+                    if os.path.exists(val_file):
+                        with open(val_file, "rb") as f_src:
+                            with open(prod_file, "wb") as f_dst:
+                                f_dst.write(f_src.read())
+                        print(f"    Simulated {ds}_prod.xpt generated successfully.")
+                rc = 0
+                stdout = "Simulated SAS 9.4 compilation complete."
+                stderr = ""
         else:
             rc, stdout, stderr = run_command(stage["cmd"])
             
@@ -108,10 +180,12 @@ def execute_pipeline(from_stage=0):
             write_telemetry(results)
             sys.exit(1)
             
+    clean_backup()
     write_telemetry(results)
     print("All clinical pipeline stages compiled successfully!")
 
 def write_telemetry(results):
+    import platform
     health = {
         "timestamp": datetime.now().isoformat(),
         "runner": "Principal Clinical Data Infrastructure Architect",
@@ -123,11 +197,16 @@ def write_telemetry(results):
     with open("06_telemetry/pipeline_health.json", "w", encoding="utf-8") as f:
         json.dump(health, f, indent=2)
         
+    # Determine execution track dynamically
+    real_sas_used = (shutil.which("sas") is not None) or ("--real-sas" in sys.argv)
+    sys_track = "Real SAS-R Validation Track" if real_sas_used else "Simulated SAS-R Track"
+    env_str = f"{platform.system()} {platform.release()} / {sys_track}"
+    
     # Write standard markdown dashboard
     dashboard_content = f"""# TROPIC (Study EFC6193 / XRP6258) Pipeline Validation Dashboard
 
 *Captured At:* `{health['timestamp']}`  
-*Environment:* `Windows 11 / SAS-R Validation Track`  
+*Environment:* `{env_str}`  
 *Pipeline Status:* **{health['pipeline_health_status']}**
 
 ## Stage-Level Execution Checklist
@@ -137,13 +216,18 @@ def write_telemetry(results):
         icon = "[PASS]" if status == "PASS" else "[FAIL]"
         dashboard_content += f"* {icon} **{name}**: `{status}`\n"
         
-    dashboard_content += """
+    sas_compiled_status = "- [x]" if real_sas_used else "- [ ]"
+    sas_compiled_note = "SAS 9.4 eCTD files compiled and ready for Module 5 packaging"
+    if not real_sas_used:
+        sas_compiled_note += " (Simulated compilation used - no actual SAS engine run)"
+        
+    dashboard_content += f"""
 ## Validation Controls
 
 - [x] All ADaM datasets successfully compiled
 - [x] Independent R double-programming track validated
 - [x] Cross-Language diffdf reconciliation audit reports confirm zero differences
-- [x] SAS 9.4 eCTD files compiled and ready for Module 5 packaging
+{sas_compiled_status} {sas_compiled_note}
 """
     with open("06_telemetry/health_dashboard.md", "w", encoding="utf-8") as f:
         f.write(dashboard_content)
@@ -153,6 +237,7 @@ def main():
     parser.add_argument("--dry-run", action="store_true", help="dry run check")
     parser.add_argument("--rollback", action="store_true", help="rollback check")
     parser.add_argument("--from-stage", type=int, default=0, help="from stage number")
+    parser.add_argument("--real-sas", action="store_true", help="Preserve actual SAS-produced datasets and skip simulation")
     
     args = parser.parse_args()
     
@@ -165,7 +250,7 @@ def main():
         if args.from_stage < 0 or args.from_stage > 12:
             print(f"ERROR: Invalid stage number {args.from_stage}. Stage number must be between 1 and 12.")
             sys.exit(1)
-        execute_pipeline(args.from_stage)
+        execute_pipeline(args.from_stage, args.real_sas)
 
 if __name__ == "__main__":
     main()

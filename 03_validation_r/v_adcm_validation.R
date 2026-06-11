@@ -55,6 +55,8 @@ adcm <- df_cm %>%
   )
 
 # Sort and Save
+
+# Sort and Save
 adcm <- adcm %>% arrange(USUBJID, CMSTDT, CMDECOD)
 library(xportr)
 

@@ -32,7 +32,7 @@ df_pd <- adrs %>%
 
 # Calculate first Serious AE dates
 df_sae <- adae %>%
-  filter(AESER == "Y" & TRTEMFL == "Y") %>%
+  filter(AESER == "Y" & TRTEMFL == "Y" & !is.na(ASTDT)) %>%
   group_by(USUBJID) %>%
   summarise(
     sae_dt = min(as.Date(ASTDT, origin = "1960-01-01")),
@@ -52,10 +52,14 @@ df_nact <- adcm %>%
 # PARAMETER 1: OVERALL SURVIVAL
 # ------------------------------------------------------------------------------
 os <- df_adsl %>%
+  mutate(
+    STARTDT = RANDDT,
+    adt_temp = if_else(DTHFL == "Y", DTHDT, LSTALVDT),
+    ADT = pmax(STARTDT, adt_temp)
+  ) %>%
   transmute(
     STUDYID = "TROPIC-NCT00417079", USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
-    PARAMCD = "OS", PARAM = "Overall Survival", STARTDT = RANDDT,
-    ADT = if_else(DTHFL == "Y", DTHDT, LSTALVDT),
+    PARAMCD = "OS", PARAM = "Overall Survival", STARTDT, ADT,
     CNSR = if_else(DTHFL == "Y", 0.0, 1.0),
     EVNTDESC = if_else(DTHFL == "Y", "DEATH", ""),
     CNSDTDSC = if_else(DTHFL == "Y", "", "LAST KNOWN ALIVE DATE"),
@@ -67,10 +71,14 @@ os <- df_adsl %>%
 # ------------------------------------------------------------------------------
 ttos <- df_adsl %>%
   left_join(df_sae, by = "USUBJID") %>%
+  mutate(
+    STARTDT = TRTSDT,
+    adt_temp = if_else(!is.na(sae_dt), sae_dt, LSTALVDT),
+    ADT = pmax(STARTDT, adt_temp)
+  ) %>%
   transmute(
     STUDYID = "TROPIC-NCT00417079", USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
-    PARAMCD = "TTOS", PARAM = "Time to First Serious AE", STARTDT = TRTSDT,
-    ADT = if_else(!is.na(sae_dt), sae_dt, LSTALVDT),
+    PARAMCD = "TTOS", PARAM = "Time to First Serious AE", STARTDT, ADT,
     CNSR = if_else(!is.na(sae_dt), 0.0, 1.0),
     EVNTDESC = if_else(!is.na(sae_dt), "SERIOUS ADVERSE EVENT", ""),
     CNSDTDSC = if_else(!is.na(sae_dt), "", "LAST CONCOMITANT EVALUATION"),
@@ -92,13 +100,14 @@ pfs <- df_adsl %>%
     pd_found = !is.na(pd_dt),
     nact_found = !is.na(nactdt),
     
-    ADT = case_when(
+    adt_temp = case_when(
       pd_found & (!nact_found | nactdt >= pd_dt) ~ pd_dt,
       pd_found & nact_found & nactdt < pd_dt ~ nactdt - days(1),
       !pd_found & DTHFL == "Y" & (!nact_found | nactdt >= DTHDT) ~ DTHDT,
       !pd_found & DTHFL == "Y" & nact_found & nactdt < DTHDT ~ nactdt - days(1),
       TRUE ~ if_else(nact_found, nactdt - days(1), LSTALVDT)
     ),
+    ADT = pmax(STARTDT, adt_temp),
     
     CNSR = case_when(
       pd_found & (!nact_found | nactdt >= pd_dt) ~ 0.0,
@@ -197,11 +206,12 @@ ttpain <- df_adsl %>%
     STUDYID = "TROPIC-NCT00417079", USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
     PARAMCD = "TTPAIN", PARAM = "Time to Pain Progression", STARTDT = RANDDT,
     
-    ADT = case_when(
+    adt_temp = case_when(
       !is.na(prog_date) ~ prog_date,
       !is.na(last_pn_dt) ~ last_pn_dt,
       TRUE ~ RANDDT
     ),
+    ADT = pmax(STARTDT, adt_temp),
     
     CNSR = if_else(!is.na(prog_date), 0.0, 1.0),
     EVNTDESC = if_else(!is.na(prog_date), "PAIN PROGRESSION", ""),
@@ -224,8 +234,9 @@ lb_val <- readRDS("01_raw_source/real_sdtm/staging/lb.rds")
 colnames(lb_val) <- toupper(colnames(lb_val))
 
 psa_censor_dates <- lb_val %>%
-  filter(LBTESTCD == "PSA" & !is.na(LBSTRESN)) %>%
-  mutate(LBDT = ymd(substring(LBDTC, 1, 10))) %>%
+  filter(LBTESTCD == "PSA" & !is.na(LBSTRESN) & !is.na(LBDTC) & LBDTC != "") %>%
+  mutate(LBDT = suppressWarnings(ymd(substring(LBDTC, 1, 10)))) %>%
+  filter(!is.na(LBDT)) %>%
   group_by(USUBJID) %>%
   summarise(last_psa_dt = max(LBDT, na.rm = TRUE), .groups = "drop")
 
@@ -236,11 +247,12 @@ ttpsa <- df_adsl %>%
     STUDYID = "TROPIC-NCT00417079", USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
     PARAMCD = "TTPSA", PARAM = "Time to PSA Progression", STARTDT = RANDDT,
     
-    ADT = case_when(
+    adt_temp = case_when(
       !is.na(psa_prog_dt) ~ psa_prog_dt,
       !is.na(last_psa_dt) ~ pmin(last_psa_dt, ymd("2009-09-25")),
       TRUE ~ pmin(LSTALVDT, ymd("2009-09-25"))
     ),
+    ADT = pmax(STARTDT, adt_temp),
     
     CNSR = if_else(!is.na(psa_prog_dt), 0.0, 1.0),
     EVNTDESC = if_else(!is.na(psa_prog_dt), "PSA PROGRESSION", ""),
@@ -268,11 +280,12 @@ tttumor <- df_adsl %>%
     STUDYID = "TROPIC-NCT00417079", USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
     PARAMCD = "TTUMOR", PARAM = "Time to Tumor Progression", STARTDT = RANDDT,
     
-    ADT = case_when(
+    adt_temp = case_when(
       !is.na(tumor_prog_dt) ~ tumor_prog_dt,
       !is.na(last_tumor_dt) ~ pmin(last_tumor_dt, ymd("2009-09-25")),
       TRUE ~ pmin(LSTALVDT, ymd("2009-09-25"))
     ),
+    ADT = pmax(STARTDT, adt_temp),
     
     CNSR = if_else(!is.na(tumor_prog_dt), 0.0, 1.0),
     EVNTDESC = if_else(!is.na(tumor_prog_dt), "TUMOR PROGRESSION", ""),
@@ -281,7 +294,10 @@ tttumor <- df_adsl %>%
   )
 
 # Combine and save
-adtte <- bind_rows(os, ttos, pfs, ttpain, ttpsa, tttumor) %>% arrange(USUBJID, PARAMCD)
+adtte <- bind_rows(os, ttos, pfs, ttpain, ttpsa, tttumor) %>%
+  select(STUDYID, USUBJID, SUBJID, SITEID, TRT01P, TRT01PN, PARAMCD, PARAM, STARTDT, ADT, CNSR, EVNTDESC, CNSDTDSC, AVAL)
+
+adtte <- adtte %>% arrange(USUBJID, PARAMCD)
 
 # Force numeric types to double for haven compliance
 adtte <- adtte %>%

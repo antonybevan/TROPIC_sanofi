@@ -69,7 +69,7 @@ df_disp_milestones <- ds %>%
   select(-any_of("STUDYID")) %>%
   inner_join(header, by = c("USUBJID", "SUBJID")) %>%
   mutate(
-    adt = RANDDT + DSSTWK * 7,
+    adt = RANDDT + (DSSTWK - 1) * 7,
     ady = as.numeric(adt - TRTSDT + 1),
     PARAMCD = "OVRLRESP",
     PARAM = "Overall Response per RECIST 1.1 + PCWG3",
@@ -196,10 +196,13 @@ df_psprog <- header %>%
     ANL01FL = "Y"
   )
 
-# Combine and Export via xportr
+# Combine and Sort
 adrs <- bind_rows(df_ovrl, df_bor, df_orr, df_psprog) %>% 
-  rename(AVISIT = VISIT) %>%
-  arrange(USUBJID, PARAMCD, AVISIT)
+  rename(AVISIT = VISIT)
+
+# Sort and Save
+
+adrs <- adrs %>% arrange(USUBJID, PARAMCD, AVISIT)
 
 library(xportr)
 

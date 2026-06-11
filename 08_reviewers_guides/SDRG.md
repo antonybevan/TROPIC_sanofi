@@ -12,13 +12,17 @@ Source data was ingested from the de-identified **Project Data Sphere (PDS)** da
 
 Raw JSON records were loaded via the custom SAS staging compiler (`L_staging_ingest.sas`), which coerced character-encoded continuous indicators (e.g. age, laboratory values, vital measurements) into standardized double-precision numerical values.
 
+> [!IMPORTANT]
+> **Single-Arm Source Limitation:** The source Project Data Sphere (PDS) public dataset contains only the Mitoxantrone (MP) arm (N=371). The comparator Cabazitaxel (CbzP) arm (N=378) was not included in the public release. Consequently, the SDTM datasets only represent the MP cohort. In our pipeline, the core production (SAS) and validation (R) ADaM tracks process strictly the MP cohort (N=371) to establish a clean double-programming validation setup. The comparator Cabazitaxel cohort is reconstructed from published trial literature and merged dynamically at the final reporting/TFL compilation step in [tfl_generation.R](file:///Users/apple/Desktop/TROPIC/09_tfl/tfl_generation.R).
+
+
 ---
 
 ## 2. SDTM Domain Mapping Summary
 Standard SDTM mapping structures were built in `S_sdtm_mapping.sas` under SDTM-IG 3.4 guidelines:
 * **DM (Demographics):** Unique subject identifier `USUBJID` constructed via `STUDYID || '-' || SITEID || '-' || SUBJID`. Randomization date `RANDDT` and treatment start date `TRTSDT` mapped to standard ISO 8601 date fields.
 * **EX (Exposure):** Normalised cycle-level actual administered doses (`EXDOSE` in mg).
-* **AE (Adverse Events):** Coded utilizing MedDRA dictionaries into `AEDECOD`, `AEBODSYS`, and standard CTCAE toxicity grades. **Date Precision Note:** The source PDS dataset contains AE timing as week-offset integers (`AESTWK`, `AEENWK`). AE start/end dates are reconstructed as `RFSTDTC + (AESTWK × 7)` and `RFSTDTC + (AEENWK × 7)`. This reconstruction yields calendar-week accuracy (±3.5 days) rather than exact calendar dates. This precision level was present in the source data and is not a programming artefact. All safety analyses using AE dates (ADAE, ADTTE TTOS) inherit this limitation.
+* **AE (Adverse Events):** Coded utilizing MedDRA dictionaries into `AEDECOD`, `AEBODSYS`, and standard CTCAE toxicity grades. **Date Precision Note:** The source PDS dataset contains AE timing as week-offset integers (`AESTWK`, `AEENWK`). AE start/end dates are reconstructed as `RFSTDTC + (AESTWK - 1) * 7` and `RFSTDTC + (AEENWK - 1) * 7`. This reconstruction yields calendar-week accuracy (±3.5 days) rather than exact calendar dates. This precision level was present in the source data and is not a programming artefact. All safety analyses using AE dates (ADAE, ADTTE TTOS) inherit this limitation.
 * **LB (Laboratory):** Mapped continuous Absolute Neutrophil Count (ANC) and Prostate Specific Antigen (PSA) measurements.
 * **DS (Disposition):** Captured study completion reasons, trial exits, and survival follow-up records.
 * **RS (Response / Efficacy Fallback):** Derived from `DS` domain where `DSDECOD` indicates progression or death. Death records are mapped to standard RS structures with `RSSTRESC = 'DEATH'` to capture survival outcomes cleanly as efficacy checkpoints.

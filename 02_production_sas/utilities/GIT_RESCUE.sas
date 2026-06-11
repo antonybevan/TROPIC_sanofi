@@ -51,13 +51,15 @@ options sasautos=(SASAUTOS);
     %if %sysfunc(fileexist(&_sig)) %then %let safe_path = %sysfunc(abspath(.));
     %else %if %sysfunc(fileexist(..&SLSH.&_sig)) %then %let safe_path = %sysfunc(abspath(..));
     %else %if %sysfunc(fileexist(..&SLSH..&SLSH.&_sig)) %then %let safe_path = %sysfunc(abspath(..&SLSH..));
-    %else %if %sysfunc(fileexist(c:/Users/91936/OneDrive/Desktop/TROPIC/02_production_sas/00_config.sas)) %then %let safe_path = c:/Users/91936/OneDrive/Desktop/TROPIC;
     %else %do;
-        /* OS-specific fallback */
+        /* OS-specific fallback checking standard home folder paths dynamically */
         %let _home = %sysfunc(sysget(HOME));
         %if %length(&_home) = 0 %then %let _home = %sysfunc(sysget(USERPROFILE));
         
-        %if %upcase(&SYSSCP) = WIN and %sysfunc(fileexist(c:/)) %then %let safe_path = c:/Users/91936/OneDrive/Desktop/TROPIC;
+        %if %sysfunc(fileexist(&_home/OneDrive/Desktop/TROPIC/02_production_sas/00_config.sas)) %then
+            %let safe_path = &_home/OneDrive/Desktop/TROPIC;
+        %else %if %sysfunc(fileexist(&_home/Desktop/TROPIC/02_production_sas/00_config.sas)) %then
+            %let safe_path = &_home/Desktop/TROPIC;
         %else %let safe_path = &_home/TROPIC;
     %end;
 %mend get_safe_path;

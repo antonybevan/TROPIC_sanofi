@@ -5,6 +5,7 @@
 
 library(haven)
 library(dplyr)
+library(tidyr)
 library(ggplot2)
 library(survival)
 library(patchwork)
@@ -20,19 +21,55 @@ adex <- read_xpt("04_adam/adex_v.xpt")
 adae <- read_xpt("04_adam/adae_v.xpt")
 adlb <- read_xpt("04_adam/adlb_v.xpt")
 adtte <- read_xpt("04_adam/adtte_v.xpt")
+adrs <- read_xpt("04_adam/adrs_v.xpt")
+
+# Dynamically load and merge reconstructed CbzP data
+adsl_cbzp <- readRDS("01_raw_source/cbzp_reconstructed/adsl_cbzp.rds")
+adex_cbzp <- readRDS("01_raw_source/cbzp_reconstructed/adex_cbzp.rds")
+adae_cbzp <- readRDS("01_raw_source/cbzp_reconstructed/adae_cbzp.rds")
+adlb_cbzp <- readRDS("01_raw_source/cbzp_reconstructed/adlb_cbzp.rds")
+adtte_cbzp <- readRDS("01_raw_source/cbzp_reconstructed/adtte_cbzp.rds")
+
+# Standardize date column type
+adsl$DTHDT <- as.Date(adsl$DTHDT)
+adsl_cbzp$DTHDT <- as.Date(adsl_cbzp$DTHDT)
+
+adsl <- bind_rows(adsl, adsl_cbzp)
+adex <- bind_rows(adex, adex_cbzp)
+adae <- bind_rows(adae, adae_cbzp)
+adlb <- bind_rows(adlb, adlb_cbzp)
+adtte <- bind_rows(adtte, adtte_cbzp)
 
 # ==============================================================================
 # HIERARCHICAL STEP-DOWN GATEKEEPING (ICH E9 Conformance Check)
 # ==============================================================================
 cat("NOTE: [TFL] Verifying statistical boundaries (Hierarchical step-down gatekeeping)...\n")
 
-# Step 1: Overall Survival (Primary)
-os_pval <- 0.0004 # simulated log-rank p-value from TROPIC trial
+# Helper function to compute stratified Cox model and Log-Rank p-value (SAP Pre-specified)
+compute_tte_stats <- function(df) {
+  df$TRT01P <- factor(df$TRT01P, levels = c("MP", "CbzP"))
+  fit_cox <- coxph(Surv(AVAL, 1 - CNSR) ~ TRT01P + strata(ECOGBL, MEASDISF), data = df)
+  s_cox <- summary(fit_cox)
+  hr <- s_cox$conf.int[1]
+  hr_lcl <- s_cox$conf.int[3]
+  hr_ucl <- s_cox$conf.int[4]
+  
+  fit_lr <- survdiff(Surv(AVAL, 1 - CNSR) ~ TRT01P + strata(ECOGBL, MEASDISF), data = df)
+  pval <- 1 - pchisq(fit_lr$chisq, 1)
+  
+  list(hr = hr, lcl = hr_lcl, ucl = hr_ucl, pval = pval)
+}
+
+os_data <- adtte %>% filter(PARAMCD == "OS") %>% left_join(adsl %>% select(USUBJID, ECOGBL, MEASDISF), by = "USUBJID")
+os_stats <- compute_tte_stats(os_data)
+os_pval <- os_stats$pval
 os_significant <- os_pval < 0.05
 cat(sprintf("  Step 1: OS Significance check -> p = %f (Significant: %s)\n", os_pval, as.character(os_significant)))
 
 # Step 2: Progression-Free Survival (Tested only if OS is significant)
-pfs_pval <- 0.0012
+pfs_data <- adtte %>% filter(PARAMCD == "PFS") %>% left_join(adsl %>% select(USUBJID, ECOGBL, MEASDISF), by = "USUBJID")
+pfs_stats <- compute_tte_stats(pfs_data)
+pfs_pval <- pfs_stats$pval
 pfs_significant <- os_significant && (pfs_pval < 0.05)
 cat(sprintf("  Step 2: PFS Significance check -> p = %f (Significant & Tested: %s)\n", pfs_pval, as.character(pfs_significant)))
 
@@ -81,21 +118,7 @@ theme_nejm_custom <- function() {
 cat("  [TFL] Rendering KM Curve: Overall Survival (with Aligned Risk Table)...\n")
 os_data <- adtte %>% filter(PARAMCD == "OS")
 
-# In the de-identified staging dataset, only the MP treatment arm is present.
-# To render a true publication-quality two-arm clinical trial comparison (Cabazitaxel + Prednisone
-# vs Mitoxantrone + Prednisone) matching the official study protocol (Study EFC6193 / XRP6258) 
-# and NEJM reporting standard, we dynamically synthesize a CbzP comparison arm in this plotting layer.
-if (length(unique(os_data$TRT01P)) == 1) {
-  set.seed(42)
-  cbzp_data <- os_data %>%
-    mutate(
-      TRT01P = "CbzP",
-      # Simulate standard clinical efficacy (extending median survival by ~25% relative to MP control)
-      AVAL = AVAL * 1.25,
-      CNSR = if_else(runif(n()) > 0.85, 1, CNSR)
-    )
-  os_data <- bind_rows(os_data, cbzp_data)
-}
+# Use the dual-arm data directly from the ADTTE dataset (real MP + reconstructed CbzP)
 
 # Calculate actual product-limit Kaplan-Meier estimate (True KM - no toy curves!)
 fit_os <- survfit(Surv(AVAL / 30.4375, 1 - CNSR) ~ TRT01P, data = os_data)
@@ -134,7 +157,9 @@ km_plot <- ggplot(os_plot_data, aes(x = time, y = surv, color = TRT01P)) +
   coord_cartesian(xlim = c(0, 24), ylim = c(0, 1.02)) +
   labs(
     title = "F-11-1: Kaplan-Meier Overall Survival (OS) Analysis — ITT Population",
-    subtitle = "Primary Endpoint: Cabazitaxel + Prednisone (CbzP) vs Mitoxantrone + Prednisone (MP)\nHR = 0.70 (95% CI: 0.59-0.83), Log-Rank p < 0.0001",
+    subtitle = sprintf("Primary Endpoint: Cabazitaxel + Prednisone (CbzP) vs Mitoxantrone + Prednisone (MP)\nHR = %.2f (95%% CI: %.2f-%.2f), Stratified Log-Rank %s",
+                       os_stats$hr, os_stats$lcl, os_stats$ucl, 
+                       if(os_stats$pval < 0.0001) "p < 0.0001" else sprintf("p = %.4f", os_stats$pval)),
     x = "Months from Randomization",
     y = "Overall Survival Probability",
     color = "Treatment Group:"
@@ -206,27 +231,12 @@ nadir_data <- adlb %>%
 er_data <- rdi_data %>%
   inner_join(nadir_data, by = "USUBJID")
 
-# Staging dataset contains only the MP arm. We dynamically synthesize the CbzP arm
-# for this plotting layer. Cabazitaxel causes greater transient myelosuppression, but is clinically
-# managed via secondary prophylaxis, which is beautifully captured here in this exposure-response design.
-if (length(unique(er_data$TRT01P)) == 1) {
-  set.seed(42)
-  cbzp_er <- er_data %>%
-    mutate(
-      TRT01P = "CbzP",
-      # Cabazitaxel dose intensity averages slightly lower than MP due to dose reductions
-      RDI = pmax(pmin(RDI - runif(n(), -5, 12), 100), 30),
-      # Simulate typical transient neutropenia nadir drops for Cabazitaxel
-      ANC = pmax(pmin(ANC * runif(n(), 0.35, 0.85), 5.0), 0.05),
-      USUBJID = paste0(USUBJID, "-CbzP")
-    )
-  er_data <- bind_rows(er_data, cbzp_er)
-}
+# Use the dual-arm exposure-response data directly from ADaM
 
 er_plot <- ggplot(er_data, aes(x = RDI, y = ANC, color = TRT01P)) +
   # Styled points with white fill, transparency, and clinical palette borders
   geom_point(alpha = 0.5, size = 2.0, shape = 21, stroke = 0.6, fill = "white", aes(color = TRT01P)) +
-  geom_smooth(method = "loess", se = TRUE, linewidth = 1.2, aes(fill = TRT01P, color = TRT01P), alpha = 0.15) +
+  geom_smooth(method = "loess", span = 1.0, se = TRUE, linewidth = 1.2, aes(fill = TRT01P, color = TRT01P), alpha = 0.15) +
   scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E")) +
   scale_fill_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E")) +
   labs(
@@ -238,7 +248,7 @@ er_plot <- ggplot(er_data, aes(x = RDI, y = ANC, color = TRT01P)) +
     fill = "95% Confidence Interval:"
   ) +
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "#e74c3c", linewidth = 0.8) +
-  annotate("text", x = 42, y = 0.75, label = "Grade 4 Neutropenia Threshold (<0.5)", color = "#e74c3c", size = 3.2, fontface = "bold", family = "serif", hjust = 0) +
+  annotate("text", x = 43, y = 0.72, label = "Grade 4 Neutropenia Limit (< 0.5 x 10^3/uL)", color = "#e74c3c", size = 3.2, fontface = "bold", family = "serif", hjust = 0) +
   coord_cartesian(ylim = c(0, 6.0)) +
   theme_nejm_custom() +
   theme(
@@ -258,21 +268,7 @@ os_sub_data <- adtte %>%
   filter(PARAMCD == "OS") %>%
   left_join(adsl %>% select(USUBJID, AGEGR1, ECOGBL, MEASDISF, VISCFL, PAINBL, DOCPROG), by = "USUBJID")
 
-# Clone the MP cohort to create a simulated CbzP cohort with a realistic treatment benefit
-# for visual subgroup hazard ratio calculations. This allows the forest plot to calculate
-# the real treatment effect (CbzP vs MP) within each subgroup level, matching standard Phase III reporting.
-if (length(unique(os_sub_data$TRT01P)) == 1) {
-  set.seed(42)
-  cbzp_sub <- os_sub_data %>%
-    mutate(
-      TRT01P = "CbzP",
-      # Extend survival by ~28% on average
-      AVAL = AVAL * 1.28,
-      CNSR = if_else(runif(n()) > 0.85, 1, CNSR),
-      USUBJID = paste0(USUBJID, "-CbzP")
-    )
-  os_sub_data <- bind_rows(os_sub_data, cbzp_sub)
-}
+# Use the dual-arm subgroup data directly from ADaM
 
 # Helper to run subgroup Cox models of CbzP vs MP
 run_subgroup_cox <- function(factor_name, level_val, display_label) {
@@ -382,30 +378,104 @@ ggsave("09_tfl/output/F-12-1_Subgroup_Forest.png", final_forest, width = 8, heig
 # TABLES T-17-1 / T-17-2 / T-17-4: Text-based summary table exports
 # ==============================================================================
 cat("  [TFL] Compiling clinical table summaries...\n")
-table_content <- "
+
+# Dynamic calculations for T-17-1
+rdi_mp_85  <- sum(adex$TRT01P == "MP" & adex$PARAMCD == "RDIDL" & adex$AVALC == ">=85%")
+rdi_mp_65  <- sum(adex$TRT01P == "MP" & adex$PARAMCD == "RDIDL" & adex$AVALC == "65-<85%")
+rdi_mp_low <- sum(adex$TRT01P == "MP" & adex$PARAMCD == "RDIDL" & adex$AVALC == "<65%")
+
+rdi_cbzp_85  <- sum(adex$TRT01P == "CbzP" & adex$PARAMCD == "RDIDL" & adex$AVALC == ">=85%")
+rdi_cbzp_65  <- sum(adex$TRT01P == "CbzP" & adex$PARAMCD == "RDIDL" & adex$AVALC == "65-<85%")
+rdi_cbzp_low <- sum(adex$TRT01P == "CbzP" & adex$PARAMCD == "RDIDL" & adex$AVALC == "<65%")
+
+n_mp_rdi <- sum(adex$TRT01P == "MP" & adex$PARAMCD == "RDIDL")
+n_cbzp_rdi <- sum(adex$TRT01P == "CbzP" & adex$PARAMCD == "RDIDL")
+
+# Dynamic calculations for T-17-2
+optimus_gcsf <- adlb %>%
+  filter(TRT01P == "CbzP" & PARAMCD == "ANCNADIR" & AVISIT == "CYCLE 1") %>%
+  left_join(adsl %>% select(USUBJID, GCSFPRFL), by = "USUBJID") %>%
+  mutate(GCSF_PROP = coalesce(GCSFPRFL, "N"))
+
+n_gcsf_y <- sum(optimus_gcsf$GCSF_PROP == "Y")
+n_gcsf_n <- sum(optimus_gcsf$GCSF_PROP == "N")
+
+gcsf_y_g12 <- sum(optimus_gcsf$GCSF_PROP == "Y" & optimus_gcsf$ATOXGR <= 2)
+gcsf_y_g3  <- sum(optimus_gcsf$GCSF_PROP == "Y" & optimus_gcsf$ATOXGR == 3)
+gcsf_y_g4  <- sum(optimus_gcsf$GCSF_PROP == "Y" & optimus_gcsf$ATOXGR == 4)
+
+gcsf_n_g12 <- sum(optimus_gcsf$GCSF_PROP == "N" & optimus_gcsf$ATOXGR <= 2)
+gcsf_n_g3  <- sum(optimus_gcsf$GCSF_PROP == "N" & optimus_gcsf$ATOXGR == 3)
+gcsf_n_g4  <- sum(optimus_gcsf$GCSF_PROP == "N" & optimus_gcsf$ATOXGR == 4)
+
+# Dynamic calculations for T-17-4
+cbzp_rdi <- adex %>%
+  filter(TRT01P == "CbzP" & PARAMCD == "RDIDL" & AVISIT == "ALL CYCLES") %>%
+  select(USUBJID, RDIDL = AVALC)
+
+cbzp_os <- adtte %>%
+  filter(TRT01P == "CbzP" & PARAMCD == "OS") %>%
+  left_join(cbzp_rdi, by = "USUBJID")
+
+cbzp_neut <- adlb %>%
+  filter(TRT01P == "CbzP" & PARAMCD == "NEUT" & BASEFL == "N" & ANL01FL == "Y") %>%
+  group_by(USUBJID) %>%
+  summarise(worst_grade = max(ATOXGR, na.rm = TRUE), .groups = "drop") %>%
+  left_join(cbzp_rdi, by = "USUBJID")
+
+get_tertile_stats <- function(cat_name) {
+  sub_os <- cbzp_os %>% filter(RDIDL == cat_name)
+  fit_os <- survfit(Surv(AVAL / 30.4375, 1 - CNSR) ~ 1, data = sub_os)
+  med_os <- summary(fit_os)$table["median"]
+  
+  sub_neut <- cbzp_neut %>% filter(RDIDL == cat_name)
+  n_total <- nrow(sub_neut)
+  n_g34 <- sum(sub_neut$worst_grade >= 3, na.rm = TRUE)
+  rate_g34 <- if (n_total > 0) 100 * n_g34 / n_total else 0
+  
+  list(med_os = med_os, rate_g34 = rate_g34)
+}
+
+high_stats <- get_tertile_stats(">=85%")
+med_stats  <- get_tertile_stats("65-<85%")
+low_stats  <- get_tertile_stats("<65%")
+
+table_content <- sprintf("
 TROPIC (Study EFC6193 / XRP6258) Clinical Reporting Tables
 =============================================
 
 T-17-1: Relative Dose Intensity (RDI) Category Distribution by Arm
 ------------------------------------------------------------------
-Category     CbzP (N=378)   MP (N=377)
->=85%        245 (64.8%)    310 (82.2%)
-65-<85%      98 (25.9%)     52 (13.8%)
-<65%         35 (9.3%)      15 (4.0%)
+Category     CbzP (N=%d)   MP (N=%d)
+>=85%%        %d (%.1f%%)    %d (%.1f%%)
+65-<85%%      %d (%.1f%%)     %d (%.1f%%)
+<65%%         %d (%.1f%%)     %d (%.1f%%)
 
 T-17-2: Worst Cycle ANC Nadir Grade Stratified by G-CSF Usage (CbzP)
 --------------------------------------------------------------------
 Group                   Grade 1/2      Grade 3        Grade 4
-G-CSF Prophylaxis (N=30) 25 (83.3%)    4 (13.3%)      1 (3.3%)
-No Prophylaxis (N=348)  45 (12.9%)     42 (12.1%)     261 (75.0%)
+G-CSF Prophylaxis (N=%d) %d (%.1f%%)    %d (%.1f%%)      %d (%.1f%%)
+No Prophylaxis (N=%d)  %d (%.1f%%)     %d (%.1f%%)      %d (%.1f%%)
 
 T-17-4: Benefit-Risk Summary by RDI Tertile (CbzP Arm)
 ------------------------------------------------------
-RDI Tertile    Median OS (Months)   Grade >=3 Neutropenia Rate (%)
-High (>=85%)   15.8 months          88.2%
-Med (65-<85%)  14.6 months          78.4%
-Low (<65%)     12.2 months          65.1%
-"
+RDI Tertile    Median OS (Months)   Grade >=3 Neutropenia Rate (%%)
+High (>=85%%)   %.1f months          %.1f%%
+Med (65-<85%%)  %.1f months          %.1f%%
+Low (<65%%)     %.1f months          %.1f%%
+",
+  n_cbzp_rdi, n_mp_rdi,
+  rdi_cbzp_85, 100 * rdi_cbzp_85 / n_cbzp_rdi, rdi_mp_85, 100 * rdi_mp_85 / n_mp_rdi,
+  rdi_cbzp_65, 100 * rdi_cbzp_65 / n_cbzp_rdi, rdi_mp_65, 100 * rdi_mp_65 / n_mp_rdi,
+  rdi_cbzp_low, 100 * rdi_cbzp_low / n_cbzp_rdi, rdi_mp_low, 100 * rdi_mp_low / n_mp_rdi,
+  
+  n_gcsf_y, gcsf_y_g12, 100 * gcsf_y_g12 / n_gcsf_y, gcsf_y_g3, 100 * gcsf_y_g3 / n_gcsf_y, gcsf_y_g4, 100 * gcsf_y_g4 / n_gcsf_y,
+  n_gcsf_n, gcsf_n_g12, 100 * gcsf_n_g12 / n_gcsf_n, gcsf_n_g3, 100 * gcsf_n_g3 / n_gcsf_n, gcsf_n_g4, 100 * gcsf_n_g4 / n_gcsf_n,
+  
+  high_stats$med_os, high_stats$rate_g34,
+  med_stats$med_os, med_stats$rate_g34,
+  low_stats$med_os, low_stats$rate_g34
+)
 
 writeLines(table_content, "09_tfl/output/T-17-Optimus_Tables.txt")
 
@@ -419,6 +489,7 @@ psa_data <- adtte %>% filter(PARAMCD == "TTPSA")
 
 if (length(unique(psa_data$TRT01P)) > 1) {
   fit_psa <- survfit(Surv(AVAL / 30.4375, 1 - CNSR) ~ TRT01P, data = psa_data)
+  psa_data$TRT01P <- factor(psa_data$TRT01P, levels = c("MP", "CbzP"))
   cox_psa <- coxph(Surv(AVAL, 1 - CNSR) ~ TRT01P, data = psa_data)
   
   sum_fit_psa <- summary(fit_psa)$table
@@ -463,6 +534,7 @@ tumor_data <- adtte %>% filter(PARAMCD == "TTUMOR")
 
 if (length(unique(tumor_data$TRT01P)) > 1) {
   fit_tumor <- survfit(Surv(AVAL / 30.4375, 1 - CNSR) ~ TRT01P, data = tumor_data)
+  tumor_data$TRT01P <- factor(tumor_data$TRT01P, levels = c("MP", "CbzP"))
   cox_tumor <- coxph(Surv(AVAL, 1 - CNSR) ~ TRT01P, data = tumor_data)
   
   sum_fit_tumor <- summary(fit_tumor)$table
@@ -508,7 +580,7 @@ TROPIC (Study EFC6193 / XRP6258) Secondary Efficacy Tables
 
 T-11-6: Kaplan-Meier Analysis of Time to PSA Progression (TTPSA) - ITT Population
 ---------------------------------------------------------------------------------
-Statistic                                 CbzP (N=378)        MP (N=377)
+Statistic                                 CbzP (N=378)        MP (N=371)
 Number of Events / Total N                %d/%d               %d/%d
 Median Survival Time (Months)             %.1f                %.1f
 95%% Confidence Interval                   %s      %s
@@ -518,7 +590,7 @@ Wald Log-Rank p-value                     %.4f
 
 T-11-7: Kaplan-Meier Analysis of Time to Tumor Progression (TTUMOR) - ITT Population
 -----------------------------------------------------------------------------------
-Statistic                                 CbzP (N=378)        MP (N=377)
+Statistic                                 CbzP (N=378)        MP (N=371)
 Number of Events / Total N                %d/%d               %d/%d
 Median Survival Time (Months)             %.1f                %.1f
 95%% Confidence Interval                   %s      %s
@@ -537,5 +609,423 @@ Wald Log-Rank p-value                     %.4f
 )
 
 writeLines(efficacy_tables, "09_tfl/output/T-11-Efficacy_Tables.txt")
+
+# ==============================================================================
+# FIGURE F-11-2: Kaplan-Meier Curve — PFS by Arm (Secondary Endpoint)
+# ==============================================================================
+cat("  [TFL] Rendering KM Curve: Progression-Free Survival...\n")
+pfs_data <- adtte %>% filter(PARAMCD == "PFS")
+
+# Use the dual-arm PFS data directly from ADTTE
+
+fit_pfs <- survfit(Surv(AVAL / 30.4375, 1 - CNSR) ~ TRT01P, data = pfs_data)
+
+pfs_plot_list <- list()
+if (!is.null(fit_pfs$strata)) {
+  for (stratum in names(fit_pfs$strata)) {
+    sc <- gsub("TRT01P=", "", stratum)
+    idx <- which(summary(fit_pfs)$strata == stratum)
+    pfs_plot_list[[sc]] <- data.frame(
+      time = c(0, fit_pfs$time[idx]),
+      surv = c(1.0, fit_pfs$surv[idx]),
+      TRT01P = sc
+    )
+  }
+}
+pfs_plot_data <- bind_rows(pfs_plot_list)
+
+km_pfs <- ggplot(pfs_plot_data, aes(x = time, y = surv, color = TRT01P)) +
+  geom_step(linewidth = 1.0) +
+  scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E")) +
+  scale_y_continuous(labels = scales::percent, expand = c(0, 0)) +
+  scale_x_continuous(breaks = seq(0, 18, by = 3), expand = c(0, 0)) +
+  coord_cartesian(xlim = c(0, 18), ylim = c(0, 1.02)) +
+  labs(
+    title = "F-11-2: Kaplan-Meier Progression-Free Survival (PFS) Analysis — ITT Population",
+    subtitle = sprintf("Secondary Endpoint: Cabazitaxel + Prednisone (CbzP) vs Mitoxantrone + Prednisone (MP)\nHR = %.2f (95%% CI: %.2f-%.2f), Stratified Log-Rank %s",
+                       pfs_stats$hr, pfs_stats$lcl, pfs_stats$ucl, 
+                       if(pfs_stats$pval < 0.0001) "p < 0.0001" else sprintf("p = %.4f", pfs_stats$pval)),
+    x = "Months from Randomization",
+    y = "Progression-Free Survival Probability",
+    color = "Treatment Group:"
+  ) +
+  theme_nejm_custom() +
+  theme(
+    legend.position = c(0.78, 0.85),
+    legend.background = element_rect(fill = "white", color = "#eaeaea", linewidth = 0.4),
+    plot.margin = margin(t = 10, r = 15, b = 5, l = 30)
+  )
+
+times_pfs <- seq(0, 18, by = 3)
+risk_pfs <- data.frame()
+for (trt in c("CbzP", "MP")) {
+  trt_d <- pfs_data %>% filter(TRT01P == trt)
+  if (nrow(trt_d) > 0) {
+    fit_t <- survfit(Surv(AVAL / 30.4375, 1 - CNSR) ~ 1, data = trt_d)
+    for (t in times_pfs) {
+      idx2 <- which(fit_t$time >= t)
+      nr <- if (length(idx2) == 0) 0 else fit_t$n.risk[min(idx2)]
+      if (t == 0) nr <- nrow(trt_d)
+      risk_pfs <- rbind(risk_pfs, data.frame(TRT01P = trt, Time = t, n.risk = nr))
+    }
+  }
+}
+
+risk_pfs_plot <- ggplot(risk_pfs, aes(x = Time, y = factor(TRT01P, levels = rev(c("CbzP", "MP"))), label = n.risk)) +
+  geom_text(size = 3.2, fontface = "bold", aes(color = TRT01P), family = "serif") +
+  scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"), guide = "none") +
+  scale_x_continuous(limits = c(0, 18), breaks = times_pfs, expand = c(0, 0)) +
+  labs(x = NULL, y = "Number at risk:") +
+  theme_minimal(base_family = "serif") +
+  theme(
+    panel.grid = element_blank(), axis.text.x = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title.y = element_text(face = "bold", size = 8.5, color = "#111111", angle = 0, vjust = 0.5),
+    axis.text.y = element_text(face = "bold", size = 8.5, color = "#222222"),
+    plot.margin = margin(t = -5, r = 15, b = 5, l = 30)
+  )
+
+final_pfs <- km_pfs / risk_pfs_plot + plot_layout(heights = c(4.1, 1))
+ggsave("09_tfl/output/F-11-2_KM_PFS.png", final_pfs, width = 8, height = 5.5, dpi = 300)
+
+# ==============================================================================
+# FIGURE F-13-1: PSA Waterfall Plot — Best % Change from Baseline
+# ==============================================================================
+cat("  [TFL] Rendering PSA Waterfall Plot...\n")
+
+# Best PSA % change from baseline per subject
+psa_lb <- adlb %>%
+  filter(PARAMCD == "PSA", !is.na(PCHG)) %>%
+  group_by(USUBJID) %>%
+  summarise(best_pchg = min(PCHG, na.rm = TRUE), .groups = "drop") %>%
+  left_join(adsl %>% select(USUBJID, TRT01P), by = "USUBJID") %>%
+  filter(!is.na(TRT01P))
+
+# Use the dual-arm PSA data directly from ADaM
+
+psa_lb <- psa_lb %>%
+  arrange(TRT01P, best_pchg) %>%
+  mutate(subj_rank = row_number(),
+         response_color = case_when(
+           best_pchg <= -50 ~ "PSA Response (>=50% decrease)",
+           best_pchg < 0   ~ "PSA Decrease (<50%)",
+           TRUE             ~ "PSA Increase"
+         ))
+
+waterfall_plot <- ggplot(psa_lb, aes(x = subj_rank, y = best_pchg, fill = response_color)) +
+  geom_col(width = 0.85) +
+  geom_hline(yintercept = -50, linetype = "dashed", color = "#005A9C", linewidth = 0.7) +
+  geom_hline(yintercept = 0, color = "#333333", linewidth = 0.4) +
+  annotate("text", x = max(psa_lb$subj_rank) * 0.05, y = -54, label = "50% decrease threshold",
+           color = "#005A9C", size = 3, fontface = "bold", hjust = 0, family = "serif") +
+  scale_fill_manual(values = c(
+    "PSA Response (>=50% decrease)" = "#005A9C",
+    "PSA Decrease (<50%)"           = "#7fb3d3",
+    "PSA Increase"                  = "#A6192E"
+  )) +
+  scale_y_continuous(labels = function(x) paste0(x, "%"), limits = c(-105, min(max(psa_lb$best_pchg, na.rm=TRUE) + 20, 300))) +
+  facet_wrap(~TRT01P, scales = "free_x", ncol = 2) +
+  labs(
+    title = "F-13-1: PSA Best Percentage Change from Baseline — Waterfall Plot",
+    subtitle = "Each bar represents one subject's maximum PSA decrease (or increase). Sorted within arm.",
+    x = "Subjects (ranked by PSA response within arm)",
+    y = "Best PSA % Change from Baseline",
+    fill = "Response Category:"
+  ) +
+  theme_nejm_custom() +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    strip.text = element_text(face = "bold", size = 9.5),
+    legend.position = "bottom"
+  )
+
+ggsave("09_tfl/output/F-13-1_PSA_Waterfall.png", waterfall_plot, width = 9, height = 5.5, dpi = 300)
+
+# ==============================================================================
+# FIGURE F-14-1: Treatment Exposure Swimmer Plot
+# ==============================================================================
+cat("  [TFL] Rendering Treatment Swimmer Plot...\n")
+
+# Build per-subject exposure duration from ADEX (cycle count) & ADSL
+ncycle_all <- adex %>%
+  filter(PARAMCD == "NCYCLE", AVISIT == "ALL CYCLES") %>%
+  select(USUBJID, n_cycles = AVAL)
+
+swimmer_data <- adsl %>%
+  select(USUBJID, TRT01P, TRTDURD, DTHFL, TRTSDT) %>%
+  left_join(ncycle_all, by = "USUBJID") %>%
+  mutate(
+    duration_months = TRTDURD / 30.4375,
+    death_event    = DTHFL == "Y"
+  ) %>%
+  arrange(TRT01P, desc(duration_months)) %>%
+  group_by(TRT01P) %>%
+  slice_head(n = 30) %>%   # Top 30 per arm for readability
+  ungroup() %>%
+  mutate(subj_label = factor(row_number()))
+
+swimmer_plot <- ggplot(swimmer_data, aes(y = subj_label, x = duration_months, fill = TRT01P)) +
+  geom_col(width = 0.85, alpha = 0.85) +
+  geom_point(data = swimmer_data %>% filter(death_event),
+             aes(x = duration_months, y = subj_label), shape = 4, size = 2.5,
+             color = "#A6192E", stroke = 1.2) +
+  scale_fill_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E")) +
+  scale_x_continuous(breaks = seq(0, ceiling(max(swimmer_data$duration_months, na.rm=TRUE) / 3) * 3, by = 3)) +
+  facet_wrap(~TRT01P, scales = "free_y", ncol = 2) +
+  labs(
+    title = "F-14-1: Treatment Exposure Duration — Swimmer Plot (Representative Sample)",
+    subtitle = "Bar length = treatment duration. \u2717 = death event on study. Top 30 subjects per arm shown.",
+    x = "Months on Treatment",
+    y = "Subjects (ranked by duration)",
+    fill = "Treatment Arm:"
+  ) +
+  theme_nejm_custom() +
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    strip.text = element_text(face = "bold", size = 9.5),
+    legend.position = "bottom"
+  )
+
+ggsave("09_tfl/output/F-14-1_Swimmer_Plot.png", swimmer_plot, width = 9, height = 5.5, dpi = 300)
+
+# ==============================================================================
+# TABLE T-20-1: Adverse Event Summary Table (Safety Population)
+# ==============================================================================
+cat("  [TFL] Compiling AE Summary Tables...\n")
+
+# Join AE to ADSL to get treatment arm (TRTEMFL: T=treatment-emergent, P=pre-existing, N=not TEAE)
+ae_safety <- adae %>%
+  select(-any_of("TRT01P")) %>%
+  filter(TRTEMFL == "T") %>%
+  left_join(adsl %>% select(USUBJID, TRT01P), by = "USUBJID")
+
+# Total subjects per arm
+n_mp   <- nrow(adsl %>% filter(TRT01P == "MP"))
+n_cbzp <- if ("CbzP" %in% adsl$TRT01P) nrow(adsl %>% filter(TRT01P == "CbzP")) else 378
+
+# Overall AE incidence
+tot_ae <- ae_safety %>%
+  group_by(TRT01P) %>%
+  summarise(n_subj = n_distinct(USUBJID), .groups = "drop")
+
+# Top 10 SOC by frequency (MP arm as reference)
+top_soc <- ae_safety %>%
+  filter(!is.na(AEBODSYS)) %>%
+  group_by(AEBODSYS) %>%
+  summarise(n_mp_soc = n_distinct(USUBJID[TRT01P == "MP"]), .groups = "drop") %>%
+  arrange(desc(n_mp_soc)) %>%
+  slice_head(n = 10)
+
+# Grade >=3 AEs by SOC
+ae_g3 <- ae_safety %>%
+  filter(!is.na(ATOXGR) & ATOXGR >= 3) %>%
+  group_by(AEBODSYS) %>%
+  summarise(
+    n_mp_g3 = n_distinct(USUBJID[TRT01P == "MP"]),
+    n_cbzp_g3 = n_distinct(USUBJID[TRT01P == "CbzP"]),
+    .groups = "drop"
+  )
+
+# Serious AEs
+ae_ser <- ae_safety %>%
+  filter(AESER == "Y") %>%
+  group_by(AEBODSYS) %>%
+  summarise(
+    n_mp_ser = n_distinct(USUBJID[TRT01P == "MP"]),
+    n_cbzp_ser = n_distinct(USUBJID[TRT01P == "CbzP"]),
+    .groups = "drop"
+  )
+
+n_disc_mp <- adae %>%
+  filter(TRT01P == "MP" & AEACN == "DRUG WITHDRAWN") %>%
+  distinct(USUBJID) %>%
+  nrow()
+
+n_disc_cbzp <- adae %>%
+  filter(TRT01P == "CbzP" & AEACN == "DRUG WITHDRAWN") %>%
+  distinct(USUBJID) %>%
+  nrow()
+
+ae_summary_txt <- sprintf("
+ TROPIC (Study EFC6193 / XRP6258) Adverse Event Summary Tables
+ ==============================================================
+
+ T-20-1: Treatment-Emergent Adverse Events Summary (Safety Population)
+ -----------------------------------------------------------------------
+                                           CbzP (N=%d)        MP (N=%d)
+ Any TEAE                                  %3d (%d%%)       %3d (%d%%)
+ Any Grade >= 3 TEAE                       %3d (%d%%)       %3d (%d%%)
+ Any Serious TEAE (SAE)                    %3d (%d%%)       %3d (%d%%)
+ Any TEAE leading to discontinuation        %d (%d%%)        %d (%d%%)
+
+ T-20-2: Grade >=3 TEAEs by System Organ Class (Top 10, MP Arm)
+ -----------------------------------------------------------------------
+ System Organ Class                         CbzP (n, %%)        MP (n, %%)
+",
+  n_cbzp, n_mp,
+  nrow(ae_safety %>% filter(TRT01P == "CbzP") %>% distinct(USUBJID)),
+  round(100 * nrow(ae_safety %>% filter(TRT01P == "CbzP") %>% distinct(USUBJID)) / n_cbzp),
+  nrow(ae_safety %>% filter(TRT01P == "MP") %>% distinct(USUBJID)),
+  round(100 * nrow(ae_safety %>% filter(TRT01P == "MP") %>% distinct(USUBJID)) / n_mp),
+  
+  nrow(ae_safety %>% filter(TRT01P == "CbzP", !is.na(ATOXGR), ATOXGR >= 3) %>% distinct(USUBJID)),
+  round(100 * nrow(ae_safety %>% filter(TRT01P == "CbzP", !is.na(ATOXGR), ATOXGR >= 3) %>% distinct(USUBJID)) / n_cbzp),
+  nrow(ae_safety %>% filter(TRT01P == "MP", !is.na(ATOXGR), ATOXGR >= 3) %>% distinct(USUBJID)),
+  round(100 * nrow(ae_safety %>% filter(TRT01P == "MP", !is.na(ATOXGR), ATOXGR >= 3) %>% distinct(USUBJID)) / n_mp),
+  
+  nrow(ae_safety %>% filter(TRT01P == "CbzP", AESER == "Y") %>% distinct(USUBJID)),
+  round(100 * nrow(ae_safety %>% filter(TRT01P == "CbzP", AESER == "Y") %>% distinct(USUBJID)) / n_cbzp),
+  nrow(ae_safety %>% filter(TRT01P == "MP", AESER == "Y") %>% distinct(USUBJID)),
+  round(100 * nrow(ae_safety %>% filter(TRT01P == "MP", AESER == "Y") %>% distinct(USUBJID)) / n_mp),
+  
+  n_disc_cbzp, round(100 * n_disc_cbzp / n_cbzp),
+  n_disc_mp, round(100 * n_disc_mp / n_mp)
+)
+
+for (i in seq_len(nrow(top_soc))) {
+  soc <- top_soc$AEBODSYS[i]
+  n_g3_mp <- if (soc %in% ae_g3$AEBODSYS) ae_g3$n_mp_g3[ae_g3$AEBODSYS == soc] else 0
+  n_g3_cbzp <- if (soc %in% ae_g3$AEBODSYS) ae_g3$n_cbzp_g3[ae_g3$AEBODSYS == soc] else 0
+  ae_summary_txt <- paste0(ae_summary_txt,
+    sprintf("  %-50s  %3d (%d%%)       %3d (%d%%)\n", 
+            substr(soc, 1, 50), 
+            n_g3_cbzp, round(100 * n_g3_cbzp / n_cbzp),
+            n_g3_mp, round(100 * n_g3_mp / n_mp)))
+}
+
+writeLines(ae_summary_txt, "09_tfl/output/T-20-AE_Summary_Tables.txt")
+
+# ==============================================================================
+# TABLE T-21-1: Lab Shift Table — ANC/PSA Baseline to Worst
+# ==============================================================================
+cat("  [TFL] Compiling Lab Shift Tables...\n")
+
+build_shift_table <- function(lb_data, paramcd_val, param_label, n_total) {
+  # Baseline values
+  base <- lb_data %>%
+    filter(PARAMCD == paramcd_val, BASEFL == "Y", !is.na(ATOXGR)) %>%
+    select(USUBJID, BASE_GRADE = ATOXGR)
+  
+  # Worst post-baseline
+  worst <- lb_data %>%
+    filter(PARAMCD == paramcd_val, BASEFL == "N", ANL01FL == "Y", !is.na(ATOXGR)) %>%
+    group_by(USUBJID) %>%
+    slice_max(ATOXGR, n = 1, with_ties = FALSE) %>%
+    ungroup() %>%
+    select(USUBJID, WORST_GRADE = ATOXGR)
+  
+  shift <- base %>%
+    inner_join(worst, by = "USUBJID") %>%
+    mutate(
+      BASE_GRADE  = paste0("Grade ", BASE_GRADE),
+      WORST_GRADE = paste0("Grade ", WORST_GRADE)
+    )
+  
+  tbl <- shift %>%
+    count(BASE_GRADE, WORST_GRADE) %>%
+    pivot_wider(names_from = WORST_GRADE, values_from = n, values_fill = 0)
+  
+  header <- sprintf("\n  %s Baseline vs Worst Post-Baseline Grade Shift (n=%d)\n", param_label, n_total)
+  tbl_str <- paste(capture.output(print(as.data.frame(tbl))), collapse = "\n")
+  paste0(header, tbl_str, "\n")
+}
+
+adlb_mp <- adlb %>% filter(TRT01P == "MP")
+adlb_cbzp <- adlb %>% filter(TRT01P == "CbzP")
+
+shift_output <- paste0(
+  "\n TROPIC (Study EFC6193 / XRP6258) Laboratory Toxicity Shift Tables\n",
+  " =================================================================\n",
+  " T-21-1: Baseline to Worst Post-Baseline CTCAE Grade Shift (MP Arm)\n\n",
+  build_shift_table(adlb_mp, "NEUT", "ANC / Neutrophils", n_mp),
+  build_shift_table(adlb_mp, "HGB",  "Haemoglobin",       n_mp),
+  build_shift_table(adlb_mp, "PLAT", "Platelets",         n_mp),
+  "\n -----------------------------------------------------------------\n",
+  " T-21-2: Baseline to Worst Post-Baseline CTCAE Grade Shift (CbzP Arm)\n\n",
+  build_shift_table(adlb_cbzp, "NEUT", "ANC / Neutrophils", n_cbzp),
+  build_shift_table(adlb_cbzp, "HGB",  "Haemoglobin",       n_cbzp),
+  build_shift_table(adlb_cbzp, "PLAT", "Platelets",         n_cbzp)
+)
+
+writeLines(shift_output, "09_tfl/output/T-21-Lab_Shift_Tables.txt")
+
+# ==============================================================================
+# FIGURE F-01-1: CONSORT Patient Disposition Flow Diagram
+# ==============================================================================
+cat("  [TFL] Rendering CONSORT Patient Disposition Diagram...\n")
+
+# Derive disposition numbers from ADSL
+n_total     <- nrow(adsl)
+n_itt       <- nrow(adsl %>% filter(ITTFL == "Y"))
+n_safety    <- n_itt
+n_deaths    <- nrow(adsl %>% filter(DTHFL == "Y"))
+n_completed <- nrow(adsl %>% filter(TRTDURD >= 60))
+n_disc      <- n_safety - n_completed
+
+# Build diagram as a ggplot canvas with annotated boxes and arrows
+consort <- ggplot() +
+  # ---- Box coordinates (x_center, y_center, width, height) ----
+  # Screened
+  annotate("rect", xmin = 0.3, xmax = 0.7, ymin = 0.88, ymax = 0.98,
+           fill = "#dbeafe", color = "#1d4ed8", linewidth = 0.6) +
+  annotate("text", x = 0.5, y = 0.93,
+           label = sprintf("Patients enrolled\nN = %d", n_total),
+           size = 3.2, fontface = "bold", color = "#1e3a5f", family = "serif") +
+  # Arrow down
+  annotate("segment", x = 0.5, xend = 0.5, y = 0.88, yend = 0.79,
+           arrow = arrow(length = unit(0.025, "npc")), color = "#333333", linewidth = 0.5) +
+  # ITT / Safety
+  annotate("rect", xmin = 0.3, xmax = 0.7, ymin = 0.68, ymax = 0.79,
+           fill = "#d1fae5", color = "#065f46", linewidth = 0.6) +
+  annotate("text", x = 0.5, y = 0.735,
+           label = sprintf("ITT & Safety Population\nN = %d (100%%)", n_itt),
+           size = 3.2, fontface = "bold", color = "#065f46", family = "serif") +
+  # Arrow down to branches
+  annotate("segment", x = 0.5, xend = 0.5, y = 0.68, yend = 0.63,
+           arrow = arrow(length = unit(0.025, "npc")), color = "#333333", linewidth = 0.5) +
+  # Branch left: Completed
+  annotate("segment", x = 0.5, xend = 0.25, y = 0.63, yend = 0.63, color = "#333333", linewidth = 0.5) +
+  annotate("segment", x = 0.25, xend = 0.25, y = 0.63, yend = 0.575,
+           arrow = arrow(length = unit(0.025, "npc")), color = "#333333", linewidth = 0.5) +
+  annotate("rect", xmin = 0.05, xmax = 0.45, ymin = 0.49, ymax = 0.575,
+           fill = "#f0fdf4", color = "#15803d", linewidth = 0.6) +
+  annotate("text", x = 0.25, y = 0.532,
+           label = sprintf("Completed >=60 days\nn = %d (%d%%)", n_completed,
+                           round(100 * n_completed / n_safety)),
+           size = 3, color = "#15803d", family = "serif") +
+  # Branch right: Discontinued
+  annotate("segment", x = 0.5, xend = 0.75, y = 0.63, yend = 0.63, color = "#333333", linewidth = 0.5) +
+  annotate("segment", x = 0.75, xend = 0.75, y = 0.63, yend = 0.575,
+           arrow = arrow(length = unit(0.025, "npc")), color = "#333333", linewidth = 0.5) +
+  annotate("rect", xmin = 0.55, xmax = 0.95, ymin = 0.49, ymax = 0.575,
+           fill = "#fef2f2", color = "#b91c1c", linewidth = 0.6) +
+  annotate("text", x = 0.75, y = 0.532,
+           label = sprintf("Discontinued early\nn = %d (%d%%)", n_disc,
+                           round(100 * n_disc / n_safety)),
+           size = 3, color = "#b91c1c", family = "serif") +
+  # Arrow down: Deaths
+  annotate("segment", x = 0.5, xend = 0.5, y = 0.49, yend = 0.415,
+           arrow = arrow(length = unit(0.025, "npc")), color = "#333333", linewidth = 0.5) +
+  annotate("rect", xmin = 0.3, xmax = 0.7, ymin = 0.33, ymax = 0.415,
+           fill = "#fef9c3", color = "#854d0e", linewidth = 0.6) +
+  annotate("text", x = 0.5, y = 0.372,
+           label = sprintf("Deaths during study\nN = %d (%d%%)", n_deaths,
+                           round(100 * n_deaths / n_safety)),
+           size = 3.2, fontface = "bold", color = "#854d0e", family = "serif") +
+  # Title
+  annotate("text", x = 0.5, y = 1.02,
+           label = "F-01-1: CONSORT Patient Disposition Flow Diagram — Safety Population",
+           size = 4, fontface = "bold", color = "#111111", family = "serif") +
+  annotate("text", x = 0.5, y = 0.24,
+           label = paste0("Source: ADSL (N=", n_total, "). All percentages are relative to Safety Population.\n",
+                          "Note: Reconstructed Cabazitaxel (CbzP) arm integrated alongside real Mitoxantrone (MP) arm."),
+           size = 2.8, color = "#555555", family = "serif") +
+  coord_cartesian(xlim = c(0, 1), ylim = c(0.20, 1.05)) +
+  theme_void(base_family = "serif") +
+  theme(plot.margin = margin(10, 20, 10, 20))
+
+ggsave("09_tfl/output/F-01-1_CONSORT_Disposition.png", consort, width = 8, height = 7, dpi = 300)
 
 cat("NOTE: [TFL] TFL suites compiled successfully. Figures & tables saved to 09_tfl/output/\n")

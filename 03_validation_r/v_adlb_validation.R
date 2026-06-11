@@ -166,7 +166,11 @@ adlb_final <- bind_rows(
   ),
   df_optimus_nadir,
   df_optimus_rec
-) %>% arrange(USUBJID, PARAMCD, AVISITN, lbdy)
+)
+
+# Sort and Save
+
+adlb_final <- adlb_final %>% arrange(USUBJID, PARAMCD, AVISITN, lbdy)
 
 # Export via xportr
 library(xportr)
@@ -175,9 +179,10 @@ library(xportr)
 if (nrow(adlb_final) == 0) {
   stop("ERROR: [VALIDATION] ADLB output dataset is empty!")
 }
-if (nrow(df_optimus_nadir) == 0) {
+if (nrow(adlb_final %>% filter(PARAMCD == "ANCNADIR")) == 0) {
   stop("ERROR: [VALIDATION] ADLB Project Optimus nadir records are missing!")
 }
 
 xportr_write(adlb_final, "04_adam/adlb_v.xpt", domain = "ADLB")
+
 cat("NOTE: [VALIDATION] Wrote validation ADLB: 04_adam/adlb_v.xpt\n")

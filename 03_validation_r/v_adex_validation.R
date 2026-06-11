@@ -122,14 +122,17 @@ cycle_adj_ae <- ex_clean %>%
   )
 
 # Combine and Sort
-adex <- bind_rows(summary_bds, cycle_bds, cycle_adj, cycle_adj_ae) %>% 
-  arrange(USUBJID, PARAMCD, AVISIT)
+adex <- bind_rows(summary_bds, cycle_bds, cycle_adj, cycle_adj_ae)
+
+# Sort and Save
+
+adex <- adex %>% arrange(USUBJID, PARAMCD, AVISIT)
 
 # Assertions and Error Guards (QC-03)
 if (nrow(adex) == 0) {
   stop("ERROR: [VALIDATION] ADEX output dataset is empty!")
 }
-if (nrow(cycle_bds) == 0) {
+if (nrow(adex %>% filter(PARAMCD == "PERFDOSE")) == 0) {
   stop("ERROR: [VALIDATION] ADEX cycle-level records are missing!")
 }
 

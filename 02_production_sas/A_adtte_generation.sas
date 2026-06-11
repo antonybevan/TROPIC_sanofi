@@ -75,6 +75,7 @@ data work.tte_base;
         CNSDTDSC = 'LAST KNOWN ALIVE DATE';
     end;
     
+    if ADT < STARTDT then ADT = STARTDT;
     AVAL = ADT - STARTDT + 1;
     output;
     
@@ -98,6 +99,7 @@ data work.tte_base;
         CNSDTDSC = 'LAST CONCOMITANT EVALUATION';
     end;
     
+    if ADT < STARTDT then ADT = STARTDT;
     AVAL = ADT - STARTDT + 1;
     output;
 run;
@@ -187,6 +189,7 @@ data work.pfs_derived;
         end;
     end;
     
+    if ADT < STARTDT then ADT = STARTDT;
     AVAL = ADT - STARTDT + 1;
     output;
 run;
@@ -198,9 +201,8 @@ proc sql;
     create table work.pn_trt_tte as
     select pn.usubjid, pn.pntestcd, input(pn.pnstresn, best32.) as pnstresn,
            input(pn.pndtc, yymmdd10.) as pndt format=yymmdd10.,
-           ex.trtsdt, adsl.randdt
+           adsl.trtsdt, adsl.randdt
     from staging.pn as pn
-    inner join work.ex_dates as ex on pn.usubjid = ex.usubjid
     inner join adam.adsl as adsl on pn.usubjid = adsl.usubjid;
 quit;
 
@@ -437,6 +439,7 @@ quit;
 
 data work.ttpain_final;
     set work.ttpain_derived;
+    if ADT < STARTDT then ADT = STARTDT;
     AVAL = ADT - STARTDT + 1;
 run;
 
@@ -500,6 +503,7 @@ quit;
 
 data work.ttpsa_final;
     set work.ttpsa_derived;
+    if ADT < STARTDT then ADT = STARTDT;
     AVAL = ADT - STARTDT + 1;
 run;
 
@@ -564,6 +568,7 @@ quit;
 
 data work.ttum_final;
     set work.ttum_derived;
+    if ADT < STARTDT then ADT = STARTDT;
     AVAL = ADT - STARTDT + 1;
 run;
 

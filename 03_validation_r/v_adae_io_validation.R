@@ -94,7 +94,8 @@ adae_final <- adae_pre %>%
   )
 
 # Sort and Save
-adae <- adae_final %>% arrange(USUBJID, ASTDT, AEDECOD)
+adae <- adae_final
+adae <- adae %>% arrange(USUBJID, ASTDT, AEDECOD)
 library(xportr)
 
 # Assertions and Error Guards (QC-03)

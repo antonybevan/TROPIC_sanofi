@@ -3,6 +3,7 @@
 
 library(haven)
 library(dplyr)
+library(diffdf)
 
 cat("NOTE: [RECONCILIATION] Starting Cross-Language Audit...\n")
 
@@ -38,63 +39,73 @@ compare_datasets <- function(ds_name) {
     return(list(status = "FAIL", reason = paste("Column mismatch -", paste(reason_parts, collapse = "; "))))
   }
   
-  # Align keys and columns based on dataset name (QC-01)
+  # Align business keys based on dataset name (QC-01)
   if (ds_name == "adsl") {
-    prod <- prod %>% arrange(USUBJID)
-    val  <- val  %>% arrange(USUBJID)
+    sort_keys <- "USUBJID"
   } else if (ds_name == "adex") {
-    prod <- prod %>% arrange(USUBJID, PARAMCD, AVISIT)
-    val  <- val  %>% arrange(USUBJID, PARAMCD, AVISIT)
+    sort_keys <- c("USUBJID", "PARAMCD", "AVISIT")
   } else if (ds_name == "adcm") {
-    prod <- prod %>% arrange(USUBJID, CMSTDT, CMDECOD)
-    val  <- val  %>% arrange(USUBJID, CMSTDT, CMDECOD)
+    sort_keys <- c("USUBJID", "CMSTDT", "CMDECOD")
   } else if (ds_name == "adae") {
-    prod <- prod %>% arrange(USUBJID, ASTDT, AEDECOD)
-    val  <- val  %>% arrange(USUBJID, ASTDT, AEDECOD)
+    sort_keys <- c("USUBJID", "ASTDT", "AEDECOD")
   } else if (ds_name == "adlb") {
-    prod <- prod %>% arrange(USUBJID, PARAMCD, AVISITN, LBDY)
-    val  <- val  %>% arrange(USUBJID, PARAMCD, AVISITN, LBDY)
+    sort_keys <- c("USUBJID", "PARAMCD", "AVISITN", "LBDY")
   } else if (ds_name == "adrs") {
-    prod <- prod %>% arrange(USUBJID, PARAMCD, AVISIT)
-    val  <- val  %>% arrange(USUBJID, PARAMCD, AVISIT)
+    sort_keys <- c("USUBJID", "PARAMCD", "AVISIT")
   } else if (ds_name == "adtte") {
-    prod <- prod %>% arrange(USUBJID, PARAMCD)
-    val  <- val  %>% arrange(USUBJID, PARAMCD)
+    sort_keys <- c("USUBJID", "PARAMCD")
   }
   
-  # Cell-by-cell comparison
-  diffs <- 0
+  # Align column classes & types first to ensure clean sorting
   common_cols <- intersect(colnames(prod), colnames(val))
-  
-  if (nrow(prod) != nrow(val)) {
-    return(list(status = "FAIL", reason = paste("Row count mismatch: Prod =", nrow(prod), ", Val =", nrow(val))))
-  }
-  
   for (col in common_cols) {
     p_col <- prod[[col]]
     v_col <- val[[col]]
     
     # Handle factor/character mismatch
     if (is.character(p_col) || is.factor(p_col)) {
-      p_col <- as.character(p_col)
-      v_col <- as.character(v_col)
+      prod[[col]] <- as.character(p_col)
+      val[[col]]  <- as.character(v_col)
     }
     
-    # Coerce missing representations
-    p_col[is.na(p_col) | p_col == ""] <- NA
-    v_col[is.na(v_col) | v_col == ""] <- NA
-    
-    mismatches <- which(p_col != v_col & !(is.na(p_col) & is.na(v_col)))
-    if (length(mismatches) > 0) {
-      diffs <- diffs + length(mismatches)
-      cat(paste("  [MISMATCH] Column", col, "has", length(mismatches), "cell differences.\n"))
+    # Coerce missing representations (empty strings to NA)
+    if (is.character(prod[[col]])) {
+      prod[[col]][is.na(prod[[col]]) | prod[[col]] == ""] <- NA_character_
+      val[[col]][is.na(val[[col]]) | val[[col]] == ""]   <- NA_character_
     }
   }
   
-  if (diffs == 0) {
+  # Sort by business keys, then by all other columns to guarantee deterministic row order
+  other_cols <- setdiff(common_cols, sort_keys)
+  prod <- prod %>% arrange(across(all_of(c(sort_keys, other_cols))))
+  val  <- val  %>% arrange(across(all_of(c(sort_keys, other_cols))))
+  
+  # Add ROW_ID as the unique key for diffdf cell-by-cell comparison
+  prod$ROW_ID <- 1:nrow(prod)
+  val$ROW_ID  <- 1:nrow(val)
+  keys <- "ROW_ID"
+  
+  # Compare using diffdf package
+  diff_res <- diffdf(prod, val, keys = keys, suppress_warnings = TRUE)
+  
+  if (!diffdf_has_issues(diff_res)) {
     return(list(status = "PASS", reason = "Zero cell-level differences"))
   } else {
-    return(list(status = "FAIL", reason = paste(diffs, "cell differences found")))
+    # Extract details of differences
+    val_diffs <- attr(diff_res, "ValueDiffs")
+    total_diffs <- 0
+    if (!is.null(val_diffs)) {
+      for (col_name in names(val_diffs)) {
+        col_diff <- val_diffs[[col_name]]
+        n_mismatches <- nrow(col_diff)
+        total_diffs <- total_diffs + n_mismatches
+        cat(paste("  [MISMATCH] Column", col_name, "has", n_mismatches, "cell differences (diffdf audit).\n"))
+      }
+    } else {
+      # Fallback if there are row mismatches, class mismatches etc.
+      total_diffs <- 1
+    }
+    return(list(status = "FAIL", reason = paste(total_diffs, "cell differences found")))
   }
 }
 
@@ -107,6 +118,21 @@ for (ds in datasets) {
   cat(paste("NOTE: [RECONCILIATION] Dataset:", toupper(ds), "-", res$status, "-", res$reason, "\n"))
 }
 
+# Determine if simulation mode is active
+is_simulated <- Sys.getenv("TROPIC_SAS_SIMULATION") == "TRUE" || Sys.which("sas") == ""
+
+banner_html <- ""
+if (is_simulated) {
+  banner_html <- paste0(
+    "<div style='background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; ",
+    "padding: 15px; border-radius: 5px; margin-bottom: 20px; font-weight: bold;'>",
+    "⚠️ WARNING: Simulated SAS compilation was used. Production datasets (*_prod.xpt) ",
+    "were generated by copying the R validation datasets rather than executing a real SAS engine. ",
+    "Zero differences are expected and do not guarantee independent double-programming parity on a SAS engine.",
+    "</div>"
+  )
+}
+
 # Generate visual HTML report
 html_content <- paste0(
   "<html><head><title>TROPIC Cross-Language Reconciliation Report</title>",
@@ -115,6 +141,7 @@ html_content <- paste0(
   "table { width: 100%; border-collapse: collapse; margin-top: 20px; } th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }",
   "th { background-color: #002d62; color: white; } .pass { color: green; font-weight: bold; } .fail { color: red; font-weight: bold; }</style></head>",
   "<body><div class='card'><h1>TROPIC (Study EFC6193 / XRP6258) Cross-Language Audit Dashboard</h1>",
+  banner_html,
   "<p>Cell-by-cell validation report comparing SAS 9.4 Production models vs R 4.5.2 Pharmaverse Validation Track.</p>",
   "<table><thead><tr><th>Dataset</th><th>Status</th><th>Audit Details</th></tr></thead><tbody>"
 )

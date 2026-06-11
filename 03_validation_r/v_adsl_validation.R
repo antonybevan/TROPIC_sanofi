@@ -39,7 +39,7 @@ df_death <- ds %>%
   filter(DSDECOD %in% c("DEATH", "DEAD")) %>%
   left_join(dm %>% select(USUBJID, RFSTDTC), by = "USUBJID") %>%
   mutate(
-    dth_dt = ymd(substring(RFSTDTC, 1, 10)) + DSSTWK * 7
+    dth_dt = ymd(substring(RFSTDTC, 1, 10)) + (DSSTWK - 1) * 7
   ) %>%
   group_by(USUBJID) %>%
   summarise(
@@ -52,7 +52,7 @@ df_death <- ds %>%
 df_alive <- ds %>%
   left_join(dm %>% select(USUBJID, RFSTDTC), by = "USUBJID") %>%
   mutate(
-    lstalv_dt = ymd(substring(RFSTDTC, 1, 10)) + DSSTWK * 7
+    lstalv_dt = ymd(substring(RFSTDTC, 1, 10)) + (DSSTWK - 1) * 7
   ) %>%
   group_by(USUBJID) %>%
   summarise(
@@ -66,11 +66,11 @@ df_ecog <- vs %>%
   group_by(USUBJID) %>%
   summarise(ECOGBL = first(VSSTRESN), .groups = "drop")
 
-# 2. MEASDISFL
+# 2. MEASDISF
 df_meas <- ls %>%
   filter(LSCAT == "TARGET" & VISIT == "BASELINE") %>%
   group_by(USUBJID) %>%
-  summarise(MEASDISFL = "Y", .groups = "drop")
+  summarise(MEASDISF = "Y", .groups = "drop")
 
 # 3. VISCFL
 df_visc <- ls %>%
@@ -80,7 +80,7 @@ df_visc <- ls %>%
 
 # 4. PAINBL
 pn_trt <- pn %>%
-  inner_join(df_ex, by = "USUBJID") %>%
+  left_join(df_ex, by = "USUBJID") %>%
   mutate(PNDT = ymd(substring(PNDTC, 1, 10)))
 
 baseline_pn <- pn_trt %>% filter(PNDT <= TRTSDT)
@@ -125,7 +125,7 @@ adsl <- dm %>%
   mutate(
     STUDYID = "TROPIC-NCT00417079",
     SITEID = substring(SUBJID, 1, 3),
-    AGE = if_else(AGEGRP == ">=85", 85, as.numeric(AGEGRP)),
+    AGE = if_else(AGEGRP == ">=85", 85, suppressWarnings(as.numeric(AGEGRP))),
     AGEGR1 = if_else(AGE < 65, "<65", ">=65"),
     AGEGR1N = if_else(AGE < 65, 1.0, 2.0),
     ETHNIC = "NOT HISPANIC OR LATINO",
@@ -142,7 +142,7 @@ adsl <- dm %>%
     
     # Baseline clinical covariates (harmonized with study parameters)
     ECOGBL = coalesce(ECOGBL, 1.0),
-    MEASDISFL = coalesce(MEASDISFL, "N"),
+    MEASDISF = coalesce(MEASDISF, "N"),
     VISCFL = coalesce(VISCFL, "N"),
     PAINBL = if_else(USUBJID %in% pain_subjs, "Y", "N"),
     ALBBL = 38.0,
@@ -158,7 +158,7 @@ adsl <- dm %>%
     AGE, AGEGR1, AGEGR1N, RACE, ETHNIC, SEX,
     TRT01P, TRT01PN, TRT01A, TRT01AN, RANDDT, TRTSDT, TRTEDT, TRTDURD,
     ITTFL, SAFFL, PPROTFL, DTHFL, DTHDT, DTHCAUS, LSTALVDT,
-    ECOGBL, MEASDISFL, VISCFL, PAINBL, PSABL, ALPBL, ALBBL, LDHBL, HGBBL, DOCPROG, DOCRESP
+    ECOGBL, MEASDISF, VISCFL, PAINBL, PSABL, ALPBL, ALBBL, LDHBL, HGBBL, DOCPROG, DOCRESP
   )
 
 # Sort and Save
@@ -168,7 +168,7 @@ library(xportr)
 
 # Assertions and Error Guards (QC-03)
 if (nrow(adsl) < 371) {
-  stop("ERROR: [VALIDATION] ADSL output dataset is incomplete or empty!")
+  stop("ERROR: [VALIDATION] ADSL output dataset is incomplete (expected N=371)!")
 }
 
 xportr_write(adsl, "04_adam/adsl_v.xpt", domain = "ADSL")

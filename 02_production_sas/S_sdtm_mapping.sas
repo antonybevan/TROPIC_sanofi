@@ -202,11 +202,11 @@ proc sql;
         ds.visit length=40,
         ds.dsstwk,
         case 
-            when not missing(dm.rfstdtc) and not missing(ds.dsstwk) then dm.rfstdtc + ds.dsstwk * 7
+            when not missing(dm.rfstdtc) and not missing(ds.dsstwk) then dm.rfstdtc + (ds.dsstwk - 1) * 7
             else .
         end as dsstdt format=yymmdd10.,
         case 
-            when not missing(t.trtsdt) and not missing(ds.dsstwk) then (dm.rfstdtc + ds.dsstwk * 7) - t.trtsdt + 1
+            when not missing(t.trtsdt) and not missing(ds.dsstwk) then (dm.rfstdtc + (ds.dsstwk - 1) * 7) - t.trtsdt + 1
             else .
         end as dsstdy
     from staging.ds as ds
@@ -260,13 +260,13 @@ proc sql;
             else 'DEATH'
         end as rsstresc length=20,
         case 
-            when not missing(dm.rfstdtc) and not missing(ds.dsstwk) then dm.rfstdtc + ds.dsstwk * 7
+            when not missing(dm.rfstdtc) and not missing(ds.dsstwk) then dm.rfstdtc + (ds.dsstwk - 1) * 7
             else .
         end as rsdt format=yymmdd10.,
         ds.visit length=40,
         'SPONSOR' as rseval length=40,
         case 
-            when not missing(t.trtsdt) and not missing(ds.dsstwk) then (dm.rfstdtc + ds.dsstwk * 7) - t.trtsdt + 1
+            when not missing(t.trtsdt) and not missing(ds.dsstwk) then (dm.rfstdtc + (ds.dsstwk - 1) * 7) - t.trtsdt + 1
             else .
         end as rsdy
     from staging.ds as ds

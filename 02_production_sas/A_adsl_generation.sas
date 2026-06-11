@@ -58,10 +58,10 @@ proc sql;
     where vstestcd = 'ECOG' and vsblfl = 'Y';
 quit;
 
-/* 2. MEASDISFL */
+/* 2. MEASDISF */
 proc sql;
     create table work.meas as
-    select distinct usubjid, 'Y' as measdisfl length=1
+    select distinct usubjid, 'Y' as measdisf length=1
     from staging.ls
     where lscat = 'TARGET' and visit = 'BASELINE';
 quit;
@@ -214,7 +214,7 @@ proc sql;
         
         /* Baseline clinical covariates (harmonized with study parameters) */
         coalesce(ecog.ecogbl, 1.0) as ECOGBL,
-        coalesce(meas.measdisfl, 'N') as MEASDISFL length=1,
+        coalesce(meas.measdisf, 'N') as MEASDISF length=1,
         coalesce(visc.viscfl, 'N') as VISCFL length=1,
         coalesce(pain.painbl, 'N') as PAINBL length=1,
         coalesce(labs.PSABL, 110.0) as PSABL,
