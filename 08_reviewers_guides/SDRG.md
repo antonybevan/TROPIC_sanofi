@@ -7,13 +7,19 @@
 
 ---
 
-## 1. Source Data Normalization
+## 1. Source Data Normalization & Integrity Controls
 Source data was ingested from the de-identified **Project Data Sphere (PDS)** data repository for NCT00417079. 
 
-Raw JSON records were loaded via the custom SAS staging compiler (`L_staging_ingest.sas`), which coerced character-encoded continuous indicators (e.g. age, laboratory values, vital measurements) into standardized double-precision numerical values.
+Raw JSON records were loaded via the custom SAS staging compiler ([L_staging_ingest.sas](file:///Users/apple/Desktop/TROPIC/02_production_sas/L_staging_ingest.sas)), which coerced character-encoded continuous indicators (e.g. age, laboratory values, vital measurements) into standardized double-precision numerical values.
 
 > [!IMPORTANT]
 > **Single-Arm Source Limitation:** The source Project Data Sphere (PDS) public dataset contains only the Mitoxantrone (MP) arm (N=371). The comparator Cabazitaxel (CbzP) arm (N=378) was not included in the public release. Consequently, the SDTM datasets only represent the MP cohort. In our pipeline, the core production (SAS) and validation (R) ADaM tracks process strictly the MP cohort (N=371) to establish a clean double-programming validation setup. The comparator Cabazitaxel cohort is reconstructed from published trial literature and merged dynamically at the final reporting/TFL compilation step in [tfl_generation.R](file:///Users/apple/Desktop/TROPIC/09_tfl/tfl_generation.R).
+
+### Database Write-Protection Architecture
+To guarantee database integrity and prevent raw data corruption during pipeline executions:
+- The `realsdtm` SAS libref (pointing to `01_raw_source/real_sdtm/`) is mounted with `access=readonly` in [00_config.sas](file:///Users/apple/Desktop/TROPIC/02_production_sas/00_config.sas), preventing direct writes via that libref.
+- The `staging` SAS libref (same physical directory) is writable, allowing `L_staging_ingest.sas` to write transposed SUPP-merged domain outputs alongside source files during ODA cloud execution.
+- Intermediate mapped SDTM outputs generated during mapping runs are redirected to [sdtm_mapped](file:///Users/apple/Desktop/TROPIC/04_adam/sdtm_mapped/) inside the [04_adam](file:///Users/apple/Desktop/TROPIC/04_adam/) output folder.
 
 
 ---

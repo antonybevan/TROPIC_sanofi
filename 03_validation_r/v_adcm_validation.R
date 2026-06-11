@@ -21,8 +21,12 @@ df_cm <- cm %>%
   select(-any_of("STUDYID")) %>%
   inner_join(header, by = c("USUBJID", "SUBJID")) %>%
   mutate(
-    cmstdt = ymd(substring(CMSTDTC, 1, 10)),
-    cmendt = ymd(substring(CMENDTC, 1, 10)),
+    cmstdtc_clean = trimws(CMSTDTC),
+    cmendtc_clean = trimws(CMENDTC),
+    is_full_stdt = grepl("^\\d{4}-\\d{1,2}-\\d{1,2}", cmstdtc_clean),
+    is_full_endt = grepl("^\\d{4}-\\d{1,2}-\\d{1,2}", cmendtc_clean),
+    cmstdt = if_else(is_full_stdt, ymd(cmstdtc_clean, quiet = TRUE), as.Date(NA)),
+    cmendt = if_else(is_full_endt, ymd(cmendtc_clean, quiet = TRUE), as.Date(NA)),
     cmstdy = as.numeric(cmstdt - TRTSDT + 1)
   )
 

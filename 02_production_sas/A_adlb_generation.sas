@@ -11,7 +11,14 @@
                 Analysis flag (ANL01FL), and Project Optimus parameters.
    ============================================================================= */
 
-%include "00_config.sas";
+/* PGMDIR guard: allows standalone execution (CWD=02_production_sas) and IOM/ODA mode.
+   Wrapped in a macro for portability (open-code %IF requires 9.4M5+). */
+%macro set_pgmdir;
+    %if not %symexist(PGMDIR) %then %global PGMDIR;
+    %if "&PGMDIR." = "" %then %let PGMDIR = .;
+%mend set_pgmdir;
+%set_pgmdir;
+%include "&PGMDIR./00_config.sas";
 
 proc sql;
     /* Create base dataset merging LB and ADSL */
@@ -19,10 +26,12 @@ proc sql;
     select 
         adsl.studyid,
         adsl.usubjid,
+        adsl.subjid as SUBJID length=10,
         adsl.trt01p,
         adsl.trtsdt,
         lb.visit,
         lb.visitnum,
+        lb.lbseq,
         lb.lbtestcd as PARAMCD length=8,
         lb.lbtest as PARAM length=40,
         case 
@@ -42,7 +51,7 @@ proc sql;
         lb.lbornrlo as lbnrlo,
         lb.lbornrhi as lbnrhi,
         lb.lbnrind,
-        coalesce(input(lb.lbstoxgr, best32.), input(lb.lbtoxgr, best32.), 0.0) as ATOXGR
+        coalesce(input(lb.lbtoxgr, best32.), 0.0) as ATOXGR
     from sdtm.lb as lb
     left join adam.adsl as adsl on lb.usubjid = adsl.usubjid
     where adsl.saffl = 'Y' and not missing(lb.lbstresn);
@@ -96,20 +105,21 @@ data work.lb_windows;
     end;
 run;
 
-/* Resolve Baseline values */
-proc sql;
-    create table work.baselines as
-    select 
-        usubjid,
-        PARAMCD,
-        AVAL as BASE,
-        AVALC as BASEC length=20,
-        ATOXGR as BTOXGR
-    from work.lb_windows
-    where AVISITN = 0
-    group by usubjid, PARAMCD
-    having ADT = max(ADT);
-quit;
+/* Resolve Baseline values - stable sorting keeps first baseline record */
+proc sort data=work.lb_windows out=work.lb_base_pre;
+    by usubjid PARAMCD descending ADT lbseq;
+    where AVISITN = 0;
+run;
+
+data work.baselines;
+    set work.lb_base_pre;
+    by usubjid PARAMCD;
+    if first.PARAMCD;
+    BASE = AVAL;
+    BASEC = AVALC;
+    BTOXGR = ATOXGR;
+    keep usubjid PARAMCD BASE BASEC BTOXGR;
+run;
 
 /* Merge Baseline information */
 proc sql;
@@ -127,7 +137,7 @@ quit;
 
 /* Sort to determine ANL01FL Worst-Case / Closest-to-target selection */
 proc sort data=work.lb_base_merged;
-    by usubjid PARAMCD AVISITN AWDIST descending ATOXGR ADT;
+    by usubjid PARAMCD AVISITN AWDIST descending ATOXGR ADT lbseq;
 run;
 
 /* Derive ANL01FL and BASEFL */
@@ -211,7 +221,7 @@ proc sql;
         catx(' ', 'CYCLE', put(n.cycle, 2.)) as AVISIT length=40,
         n.cycle as AVISITN,
         n.nadir_val as AVAL,
-        put(n.nadir_val, 8.2) as AVALC length=20,
+        strip(put(n.nadir_val, 8.2)) as AVALC length=20,
         'Y' as ANL01FL length=1,
         'N' as BASEFL length=1,
         n.nadir_dy as lbdy
@@ -231,7 +241,7 @@ proc sql;
         catx(' ', 'CYCLE', put(r.cycle, 2.)) as AVISIT length=40,
         r.cycle as AVISITN,
         (r.rec_dy - n.nadir_dy) as AVAL,
-        put((r.rec_dy - n.nadir_dy), 8.0) as AVALC length=20,
+        strip(put((r.rec_dy - n.nadir_dy), 8.0)) as AVALC length=20,
         'Y' as ANL01FL length=1,
         'N' as BASEFL length=1,
         r.rec_dy as lbdy
@@ -241,8 +251,8 @@ proc sql;
 quit;
 
 /* Combine base and derived Optimus kinetics */
-data adam.adlb;
-    set work.lb_anl01 work.optimus_nadir work.optimus_rec;
+data adam.adlb(keep=STUDYID USUBJID SUBJID TRT01P TRTSDT PARAMCD PARAM PARAMN PARCAT1 AVAL AVALC LBNRLO LBNRHI LBNRIND AVISIT AVISITN AWDIST ATOXGR BASE BASEC BTOXGR CHG PCHG ANL01FL BASEFL LBDY);
+    set work.lb_anl01(rename=(ADY=LBDY)) work.optimus_nadir work.optimus_rec;
 run;
 
 proc sort data=adam.adlb;

@@ -11,7 +11,14 @@
                 demographics, population flags, baseline covariates, and survival.
    ============================================================================= */
 
-%include "00_config.sas";
+/* PGMDIR guard: allows standalone execution (CWD=02_production_sas) and IOM/ODA mode.
+   Wrapped in a macro for portability (open-code %IF requires 9.4M5+). */
+%macro set_pgmdir;
+    %if not %symexist(PGMDIR) %then %global PGMDIR;
+    %if "&PGMDIR." = "" %then %let PGMDIR = .;
+%mend set_pgmdir;
+%set_pgmdir;
+%include "&PGMDIR./00_config.sas";
 
 /* Retrieve treatment dates, durations and populations */
 proc sql;
@@ -28,16 +35,30 @@ quit;
 
 /* Retrieve survival disposition info from DS */
 proc sql;
-    create table work.survival as
-    select 
-        usubjid,
-        'Y' as dthfl length=1,
-        min(dsstdt) as dthdt format=yymmdd10.,
-        min(dsterm) as dthcaus length=100
+    create table work.survival_ds as
+    select usubjid, dsstdt, dsterm, dsseq
     from sdtm.ds
-    where dsdecod in ('DEATH', 'DEAD') and not missing(dsstdt)
-    group by usubjid;
+    where dsdecod in ('DEATH', 'DEAD') and not missing(dsstdt);
 quit;
+
+proc sort data=work.survival_ds;
+    by usubjid dsseq;
+run;
+
+data work.survival;
+    set work.survival_ds;
+    by usubjid;
+    retain dthdt dthcaus;
+    length dthcaus $100 dthfl $1;
+    if first.usubjid then do;
+        dthdt = dsstdt;
+        dthcaus = dsterm;
+        dthfl = 'Y';
+        output;
+    end;
+    keep usubjid dthfl dthdt dthcaus;
+    format dthdt yymmdd10.;
+run;
 
 /* Retrieve last known alive date */
 proc sql;
@@ -77,7 +98,7 @@ quit;
 /* 4. PAINBL */
 proc sql;
     create table work.pn_trt as
-    select pn.usubjid, pn.pntestcd, input(pn.pnstresn, best32.) as pnstresn,
+    select pn.usubjid, pn.pntestcd, pn.pnstresn,
            input(pn.pndtc, yymmdd10.) as pndt format=yymmdd10.
     from staging.pn as pn;
 quit;
@@ -87,7 +108,7 @@ proc sql;
     select p.usubjid, p.pntestcd, p.pnstresn
     from work.pn_trt as p
     inner join work.ex_dates as ex on p.usubjid = ex.usubjid
-    where p.pndt <= ex.trtsdt;
+    where not missing(p.pndt) and p.pndt <= ex.trtsdt;
 quit;
 
 proc sort data=work.pn_base_daily;
@@ -173,12 +194,10 @@ run;
 proc sql;
     create table adam.adsl as
     select 
-        dm.studyid as STUDYID length=20,
+        'TROPIC-NCT00417079' as STUDYID length=40,
         dm.usubjid as USUBJID length=40,
         dm.subjid as SUBJID length=10,
         substr(dm.subjid, 1, 3) as SITEID length=10,
-        'IND' as COUNTRY length=3,
-        'REST OF WORLD' as REGION length=20,
         
         dm.age as AGE,
         case 
@@ -222,7 +241,7 @@ proc sql;
         38.0 as ALBBL,
         220.0 as LDHBL,
         coalesce(labs.HGBBL, 11.5) as HGBBL,
-        coalesce(doc.docprog, 'DURING') as DOCPROG length=10,
+        coalesce(doc.docprog, 'AFTER') as DOCPROG length=10,
         coalesce(doc.docresp, 'N') as DOCRESP length=1
     from sdtm.dm as dm
     left join work.ex_dates as ex on dm.usubjid = ex.usubjid

@@ -146,7 +146,8 @@ df_ex_dt <- df_adsl %>%
 pn_trt <- pn %>%
   inner_join(df_ex_dt, by = "USUBJID") %>%
   mutate(
-    PNDT = ymd(substring(PNDTC, 1, 10)),
+    pndtc_clean = trimws(PNDTC),
+    PNDT = if_else(grepl("^\\d{4}-\\d{1,2}-\\d{1,2}", pndtc_clean), ymd(pndtc_clean, quiet = TRUE), as.Date(NA)),
     PNSTRESN = as.numeric(PNSTRESN)
   )
 
@@ -190,9 +191,8 @@ prog_subjs <- cycle_comp %>%
     is_prog = if_else(prog_trigger == 1 & (next_trigger == 1 | is.na(next_trigger)), 1, 0)
   ) %>%
   filter(is_prog == 1) %>%
-  arrange(USUBJID, VISITNUM) %>%
-  slice(1) %>%
-  select(USUBJID, prog_date = cycle_date)
+  group_by(USUBJID) %>%
+  summarise(prog_date = min(cycle_date), .groups = "drop")
 
 # Last pain assessment date for censoring
 censor_dates <- pn_trt %>%
@@ -235,7 +235,10 @@ colnames(lb_val) <- toupper(colnames(lb_val))
 
 psa_censor_dates <- lb_val %>%
   filter(LBTESTCD == "PSA" & !is.na(LBSTRESN) & !is.na(LBDTC) & LBDTC != "") %>%
-  mutate(LBDT = suppressWarnings(ymd(substring(LBDTC, 1, 10)))) %>%
+  mutate(
+    lbdtc_clean = trimws(LBDTC),
+    LBDT = suppressWarnings(if_else(grepl("^\\d{4}-\\d{1,2}-\\d{1,2}", lbdtc_clean), ymd(lbdtc_clean, quiet = TRUE), as.Date(NA)))
+  ) %>%
   filter(!is.na(LBDT)) %>%
   group_by(USUBJID) %>%
   summarise(last_psa_dt = max(LBDT, na.rm = TRUE), .groups = "drop")
@@ -245,7 +248,7 @@ ttpsa <- df_adsl %>%
   left_join(psa_censor_dates, by = "USUBJID") %>%
   transmute(
     STUDYID = "TROPIC-NCT00417079", USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
-    PARAMCD = "TTPSA", PARAM = "Time to PSA Progression", STARTDT = RANDDT,
+    PARAMCD = "TTPSA", PARAM = "Time to PSA Progression", STARTDT = TRTSDT,
     
     adt_temp = case_when(
       !is.na(psa_prog_dt) ~ psa_prog_dt,
@@ -274,22 +277,23 @@ tumor_censor_dates <- adrs_val %>%
   summarise(last_tumor_dt = max(ADT), .groups = "drop")
 
 tttumor <- df_adsl %>%
+  filter(MEASDISF == "Y") %>%
   left_join(tumor_prog_subjs, by = "USUBJID") %>%
   left_join(tumor_censor_dates, by = "USUBJID") %>%
   transmute(
     STUDYID = "TROPIC-NCT00417079", USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
-    PARAMCD = "TTUMOR", PARAM = "Time to Tumor Progression", STARTDT = RANDDT,
+    PARAMCD = "TTUMOR", PARAM = "Time to Tumor Progression", STARTDT = TRTSDT,
     
     adt_temp = case_when(
       !is.na(tumor_prog_dt) ~ tumor_prog_dt,
       !is.na(last_tumor_dt) ~ pmin(last_tumor_dt, ymd("2009-09-25")),
-      TRUE ~ pmin(LSTALVDT, ymd("2009-09-25"))
+      TRUE ~ TRTSDT
     ),
     ADT = pmax(STARTDT, adt_temp),
     
     CNSR = if_else(!is.na(tumor_prog_dt), 0.0, 1.0),
     EVNTDESC = if_else(!is.na(tumor_prog_dt), "TUMOR PROGRESSION", ""),
-    CNSDTDSC = if_else(!is.na(tumor_prog_dt), "", if_else(!is.na(last_tumor_dt), "LAST TUMOR ASSESSMENT", "LAST KNOWN ALIVE DATE")),
+    CNSDTDSC = if_else(!is.na(tumor_prog_dt), "", if_else(!is.na(last_tumor_dt), "LAST TUMOR ASSESSMENT", "NO POST-BASELINE ASSESSMENT")),
     AVAL = as.numeric(ADT - STARTDT + 1)
   )
 

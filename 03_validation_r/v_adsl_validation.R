@@ -23,8 +23,8 @@ cm <- readRDS("01_raw_source/real_sdtm/staging/cm.rds")
 df_ex <- ex %>%
   filter(!is.na(EXSTDTC)) %>%
   mutate(
-    exstdt = ymd(substring(EXSTDTC, 1, 10)),
-    exendt = ymd(substring(EXENDTC, 1, 10))
+    exstdt = ymd(if_else(!is.na(EXSTDTC) & nchar(EXSTDTC) >= 10, substring(EXSTDTC, 1, 10), NA_character_)),
+    exendt = ymd(if_else(!is.na(EXENDTC) & nchar(EXENDTC) >= 10, substring(EXENDTC, 1, 10), NA_character_))
   ) %>%
   group_by(USUBJID) %>%
   summarise(
@@ -107,8 +107,8 @@ docetaxel <- cm %>%
   filter(CMDECOD == "DOCETAXEL" & CMCAT == "PRIOR TREATMENT CHEMOTHERAPY") %>%
   group_by(USUBJID) %>%
   summarise(
-    DOCRESP = if_else(any(CMRLTL %in% c("COMPLETE RESPONSE", "PARTIAL RESPONSE")), "Y", "N"),
-    DOCPROG = if_else(any(CMRSON == "DISEASE PROGRESSION" | CMRLTL == "PROGRESSIVE DISEASE"), "DURING", "AFTER"),
+    DOCRESP = if_else(any(CMRLTL %in% c("COMPLETE RESPONSE", "PARTIAL RESPONSE"), na.rm = TRUE), "Y", "N"),
+    DOCPROG = if_else(any(CMRSON == "DISEASE PROGRESSION" | CMRLTL == "PROGRESSIVE DISEASE", na.rm = TRUE), "DURING", "AFTER"),
     .groups = "drop"
   )
 
@@ -150,7 +150,7 @@ adsl <- dm %>%
     PSABL = coalesce(PSABL, 110.0),
     ALPBL = coalesce(ALPBL, 140.0),
     HGBBL = coalesce(HGBBL, 11.5),
-    DOCPROG = coalesce(DOCPROG, "DURING"),
+    DOCPROG = coalesce(DOCPROG, "AFTER"),
     DOCRESP = coalesce(DOCRESP, "N")
   ) %>%
   select(

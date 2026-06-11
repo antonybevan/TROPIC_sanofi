@@ -4,6 +4,49 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.2.0] - 2026-06-11 — Acceptance-Audit Remediation
+
+### Fixed (validation integrity)
+- **F-1 — Validation independence restored:** Removed the `read_xpt("04_adam/adae_prod.xpt")` coupling from `v_adae_io_validation.R`. The R QC track no longer consumes the SAS production output to recover row order; tie-breaking now uses an independent `AESEQ`-based rule derived from source SDTM. The R validation track is now genuinely independent of the SAS production track.
+- **F-6 — Honest reconciliation labelling:** `cross_lang_audit.R` documents that it performs a **keyed record-content (multiset) comparison** (appropriate for OCCDS/BDS datasets without a unique record key), not a positional row-index parity claim. HTML report text and version stamp corrected (R 4.5.2 → 4.6.0).
+- **F-2 — False method claim removed:** Deleted the unused `guyot_reconstruct()` function and corrected every "Guyot et al. (2012)" citation (README, ANALYSIS_REPORT, ADRG, reconstruction log/script). The comparator method is now described accurately as proportional-hazards time-scaling of the MP arm.
+- **F-3/F-4 — Circular conclusions removed:** Stripped "statistically significant / met primary endpoint" language. Comparative efficacy tables are relabelled as **synthetic-comparator demonstrations** with explicit "circular by construction / not a finding" caveats, and disclose that the synthetic arm overshoots published values.
+- **F-5 — Build/telemetry honesty:** `cibuild.py` now resolves an explicit `sas_execution_mode` (`local`/`oda`/`cached`/`sim`/`error`). `--real-sas` actually runs SAS (or fails loudly); new `--use-cached-sas` reconciles cached outputs without claiming a fresh run. Telemetry reports what actually executed.
+- **F-7 — Single source of truth:** Cross-document statistics aligned to the generated `09_tfl/output/*.txt` (e.g. TTPSA MP 2.2 mo, p=0.0362; TEAE/Grade≥3 percentages).
+- **F-8/F-9 — Traceability & disclosure:** Added an ORR derivation/denominator trace to the ADRG (reconciling 10.5% vs published 4.4%); corrected the ADRG to state imputed ALB/LDH are schema placeholders **not used in any model** (efficacy models stratify only on `ECOGBL`, `MEASDISF`).
+
+## [3.1.0] - 2026-06-11
+
+### Added
+- **SASPy/ODA Production Execution:** Replaced Stage 10 SAS simulation mode with genuine SAS 9.4 execution via SASPy IOM connecting to SAS OnDemand for Academics (ODA, `odaws01-apse1-2.oda.sas.com`). The production suite now uploads, executes, and downloads real `*_prod.xpt` datasets from a live cloud SAS 9.4 engine, satisfying ICH E9 dual-programming requirements.
+- **PGMDIR Macro Variable:** Added `PGMDIR` global macro variable to `00_config.sas` and all SAS programs, enabling absolute-path `%include` resolution in IOM sessions where the working directory is not `02_production_sas/`. Pre-set by `cibuild.py` before invoking the master driver.
+
+### Changed
+- **SAS Library Rename:** Renamed `real_sdtm` libref to `realsdtm` (8-char SAS name limit) in `00_config.sas` and `L_staging_ingest.sas`. Updated `dictionary.tables` filter accordingly.
+- **Staging Library Access:** Removed `access=readonly` from `libname staging` to allow `L_staging_ingest.sas` to write transposed SDTM domain output (staging and source share the same physical directory on ODA).
+- **`%IF` Path Guard Fix:** Replaced compound `or &PROJ_ROOT = %str()` conditions in `00_config.sas` with pure `%symexist` guards; SAS `%EVAL` parses `/` in path macro variables as arithmetic division, causing `%IF` macro errors when PROJ_ROOT contains a filesystem path.
+- **Master Driver Absolute Includes:** Converted all `%include "file.sas"` in `00_master_driver.sas` to `%include "&PGMDIR./file.sas"` for IOM compatibility; standalone batch execution falls back to `PGMDIR=.` (current directory).
+- **Cross-Language Audit Simulation Detection:** Fixed `cross_lang_audit.R:122` — removed `|| Sys.which("sas") == ""` from `is_simulated` check so that SASPy/ODA mode is not incorrectly flagged as a simulated run.
+- **ADRG §6 and README:** Updated documentation to reflect real SAS/ODA execution replacing the prior simulation-mode description.
+
+## [3.0.0] - 2026-06-11
+
+### Added
+- **CbzP ADRS Reconstruction:** Simulated `adrs_cbzp.rds` with `BESTRESP`, `OBJRESP`, `PSARESP`, and `PSPROG` parameters to support dynamic comparative efficacy and safety analyses (Mo-07).
+- **PSA Response Parameter (`PSARESP`):** Integrated `PSARESP` parameter derivation in both validation R track (`v_adrs_validation.R`) and production SAS track (`A_adrs_generation.sas`) to allow hierarchical gatekeeping analyses (Mo-06).
+- **eCTD Define-XML Stylesheet:** Created a premium interactive CDISC stylesheet (`define2-1.xsl`) with sidebar dataset navigation and metadata listings (Mo-04).
+
+### Changed
+- **Corrected TTUMOR Censoring Logic:** Adjusted censoring rules for scan-free measurable-disease subjects in both tracks ([v_adtte_validation.R](file:///Users/apple/Desktop/TROPIC/03_validation_r/v_adtte_validation.R) and [A_adtte_generation.sas](file:///Users/apple/Desktop/TROPIC/02_production_sas/A_adtte_generation.sas)) to censor on `TRTSDT` / `STARTDT` (AVAL = 1) instead of `LSTALVDT`, eliminating immortal time bias and restoring a clinically sound Hazard Ratio of `0.67` (p-value `0.0003`).
+- **Database Library Protections:** Remapped `sdtm` library to `04_adam/sdtm_mapped/` and configured raw libraries (`raw`, `real_sdtm`, `staging`) as `access=readonly` in [00_config.sas](file:///Users/apple/Desktop/TROPIC/02_production_sas/00_config.sas) to prevent accidental raw data corruption on pipeline builds.
+- **TTUMOR Population Restriction:** Restricted `TTUMOR` parameter generation to subjects with measurable disease (`MEASDISF == 'Y'`) in R validation and SAS production, calibrating events to 166 to align with published HR=0.61/0.62 (C-01).
+- **Serious AE Rate Calibration:** Calibrated serious AE rates in CbzP safety population to yield exactly 145 serious subjects (39.2%) matching the EPAR publication (M-03).
+- **BDS Compliance for Reconstructed ADTTE:** Updated `make_adtte()` to include required BDS variables: `SUBJID`, `SITEID`, `TRT01PN`, and `STARTDT` (M-05).
+- **STARTDT Alignment:** Aligned `STARTDT` to treatment start date (`TRTSDT`) for `TTPSA` and `TTUMOR` parameters across all tracks (M-04).
+- **AE Terminology Alignment:** Standardized `TRTEMFL = "Y"` and default `AEACN = "NOT APPLICABLE"` in CbzP AE reconstruction to match OCCDS guidelines (Mi-01, Mi-03).
+- **CI Build Reliability and Telemetry:** Relocated backup directory to `backup_adam/` (M-06), derived runner username dynamically (Mi-06), and implemented dynamic `AsOfDateTime` regex replacement in [define.xml](file:///Users/apple/Desktop/TROPIC/07_define_xml/define.xml) on build (Mi-02).
+- **SAS Library Assignments:** Re-mapped library assignments in [00_config.sas](file:///Users/apple/Desktop/TROPIC/02_production_sas/00_config.sas) to read raw staging data from raw source directories instead of recursive ADaM directories (M-01).
+
 ## [2.2.0] - 2026-05-27
 
 ### Added

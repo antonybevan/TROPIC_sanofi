@@ -11,7 +11,14 @@
                 critical safety flags for G-CSF, Prednisone compliance, and NACT.
    ============================================================================= */
 
-%include "00_config.sas";
+/* PGMDIR guard: allows standalone execution (CWD=02_production_sas) and IOM/ODA mode.
+   Wrapped in a macro for portability (open-code %IF requires 9.4M5+). */
+%macro set_pgmdir;
+    %if not %symexist(PGMDIR) %then %global PGMDIR;
+    %if "&PGMDIR." = "" %then %let PGMDIR = .;
+%mend set_pgmdir;
+%set_pgmdir;
+%include "&PGMDIR./00_config.sas";
 
 proc sql;
     /* Create base dataset merging CM and ADSL */
@@ -23,7 +30,7 @@ proc sql;
         adsl.trtsdt,
         cm.cmtrt,
         cm.cmdecod,
-        cm.cmcat,
+        cm.cmcat length=60,
         cm.cmindc,
         cm.cmstdt,
         cm.cmendt,
@@ -54,7 +61,7 @@ proc sort data=work.nact_dates;
 run;
 
 /* Derive CM flags and merge NACTDT */
-data adam.adcm;
+data adam.adcm(keep=STUDYID USUBJID CMDECOD CMCAT CMINDC CMSTDT CMENDT CMTRT CMSTDY GCSFFL GCSFPRFL NACTFL NACTDT PREDNFL TRTEMFL);
     merge work.cm_base work.nact_dates;
     by usubjid;
     

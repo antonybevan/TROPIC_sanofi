@@ -18,6 +18,7 @@ AllProvidedFiles_79.zip
 06_telemetry/reconciliation_report.html
 
 # Logs & Temporary Files
+backup_adam/
 *.log
 *.lst
 *.pdf
@@ -47,3 +48,13 @@ venv/
 
 # Node.js specific
 node_modules/
+
+# SAS Connection & Credentials Profiles
+sascfg_personal.py
+_authinfo
+.authinfo
+
+# Local IDE and temporary exploration folders
+.claude/
+scratch/
+06_telemetry/reconciliation_status.json

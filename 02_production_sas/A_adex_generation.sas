@@ -11,7 +11,14 @@
                 dose adjustments, delays, and relative dose intensity (RDI).
    ============================================================================= */
 
-%include "00_config.sas";
+/* PGMDIR guard: allows standalone execution (CWD=02_production_sas) and IOM/ODA mode.
+   Wrapped in a macro for portability (open-code %IF requires 9.4M5+). */
+%macro set_pgmdir;
+    %if not %symexist(PGMDIR) %then %global PGMDIR;
+    %if "&PGMDIR." = "" %then %let PGMDIR = .;
+%mend set_pgmdir;
+%set_pgmdir;
+%include "&PGMDIR./00_config.sas";
 
 /* Summarize modifications per subject from real SDTM EX */
 proc sql;
@@ -64,7 +71,7 @@ data work.adex_bds;
     PARAM = 'Planned Dose (mg/m2)';
     PARCAT1 = 'INDIVIDUAL';
     AVAL = planned_dose;
-    AVALC = put(AVAL, 8.2);
+    AVALC = strip(put(AVAL, 8.2));
     AVISIT = 'ALL CYCLES';
     output;
     
@@ -73,7 +80,7 @@ data work.adex_bds;
     PARAM = 'Cumulative Actual Dose (mg/m2)';
     PARCAT1 = 'SUMMARY';
     AVAL = cumdose;
-    AVALC = put(AVAL, 8.2);
+    AVALC = strip(put(AVAL, 8.2));
     AVISIT = 'ALL CYCLES';
     output;
     
@@ -82,7 +89,7 @@ data work.adex_bds;
     PARAM = 'Number of Cycles Received';
     PARCAT1 = 'SUMMARY';
     AVAL = ncycle;
-    AVALC = put(AVAL, 8.);
+    AVALC = strip(put(AVAL, 8.));
     AVISIT = 'ALL CYCLES';
     output;
     
@@ -91,7 +98,7 @@ data work.adex_bds;
     PARAM = 'Number of Dose Delays';
     PARCAT1 = 'SUMMARY';
     AVAL = ndeldose;
-    AVALC = put(AVAL, 8.);
+    AVALC = strip(put(AVAL, 8.));
     AVISIT = 'ALL CYCLES';
     output;
     
@@ -100,7 +107,7 @@ data work.adex_bds;
     PARAM = 'Number of Dose Reductions';
     PARCAT1 = 'SUMMARY';
     AVAL = nreddose;
-    AVALC = put(AVAL, 8.);
+    AVALC = strip(put(AVAL, 8.));
     AVISIT = 'ALL CYCLES';
     output;
     
@@ -109,7 +116,7 @@ data work.adex_bds;
     PARAM = 'Relative Dose Intensity (%)';
     PARCAT1 = 'SUMMARY';
     AVAL = rdi;
-    AVALC = put(AVAL, 8.1);
+    AVALC = strip(put(AVAL, 8.1));
     AVISIT = 'ALL CYCLES';
     output;
     
@@ -152,7 +159,7 @@ data work.adex_cycle;
     PARAM = 'Actual Dose Administered (mg/m2)';
     PARCAT1 = 'INDIVIDUAL';
     AVAL = exdose2;
-    AVALC = put(AVAL, 8.2);
+    AVALC = strip(put(AVAL, 8.2));
     output;
     
     /* 9. Dose Adjusted Flag */
@@ -185,7 +192,7 @@ data work.adex_cycle;
 run;
 
 /* Combine all exposure parameters */
-data adam.adex;
+data adam.adex(keep=STUDYID USUBJID SUBJID TRT01P TRT01PN TRTSDT PARAMCD PARAM PARCAT1 AVAL AVALC AVISIT);
     set work.adex_bds work.adex_cycle;
 run;
 

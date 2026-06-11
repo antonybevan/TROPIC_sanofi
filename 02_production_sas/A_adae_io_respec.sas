@@ -12,7 +12,14 @@
                 with corrected AEOCCFL occurrence denominator flags.
    ============================================================================= */
 
-%include "00_config.sas";
+/* PGMDIR guard: allows standalone execution (CWD=02_production_sas) and IOM/ODA mode.
+   Wrapped in a macro for portability (open-code %IF requires 9.4M5+). */
+%macro set_pgmdir;
+    %if not %symexist(PGMDIR) %then %global PGMDIR;
+    %if "&PGMDIR." = "" %then %let PGMDIR = .;
+%mend set_pgmdir;
+%set_pgmdir;
+%include "&PGMDIR./00_config.sas";
 
 proc sql;
     /* Create base dataset merging AE and ADSL */
@@ -22,6 +29,7 @@ proc sql;
         adsl.usubjid,
         adsl.trt01p,
         adsl.trtsdt,
+        ae.aeseq,            /* carried only as a deterministic sort tie-breaker; dropped before output */
         ae.aedecod,
         ae.aebodsys,
         ae.aehlt,
@@ -36,8 +44,8 @@ proc sql;
         ae.aerel,
         ae.aestdt as astdt,
         ae.aeendt as aendt,
-        ae.aestdy as astdy,
-        ae.aeendy as aendy,
+        case when not missing(ae.aestdt) and not missing(adsl.trtsdt) then ae.aestdt - adsl.trtsdt + 1 else . end as astdy,
+        case when not missing(ae.aeendt) and not missing(adsl.trtsdt) then ae.aeendt - adsl.trtsdt + 1 else . end as aendy,
         ae.aeout,
         ae.aeacn,
         ae.aetrtem,
@@ -51,9 +59,12 @@ proc sql;
     where adsl.saffl = 'Y';
 quit;
 
-/* Sort for episode merging algorithm */
+/* Sort for episode merging algorithm.
+   AESEQ is appended as a DETERMINISTIC final tie-breaker (audit F-1) so that the
+   independent R validation track can reproduce this exact order from source SDTM
+   without ever reading the SAS production output. */
 proc sort data=work.ae_base;
-    by usubjid CQ02NAM astdt aendt;
+    by usubjid CQ02NAM astdt aendt aeseq;
 run;
 
 /* Episode Merging and OCCDS v1.1 Occurrence Flagging */
@@ -122,18 +133,22 @@ data work.ae_episodes;
     format CIAESDT CIAEEDT yymmdd10. CIAEDUR 8.2;
 run;
 
-/* Resolve standard OCCDS v1.1 denominator flag for non-grouped AEDECODs */
+/* Resolve standard OCCDS v1.1 denominator flag for non-grouped AEDECODs.
+   AENDT + AESEQ appended as deterministic tie-breakers (audit F-1). */
 proc sort data=work.ae_episodes;
-    by usubjid aedecod astdt;
+    by usubjid aedecod astdt aendt aeseq;
 run;
 
-data adam.adae;
+data adam.adae(keep=STUDYID USUBJID AEDECOD AEBODSYS AEHLT AESEV ATOXGR AESER AEREL ASTDT AENDT ASTDY AENDY AEACN AEOUT CQ02NAM CIAESEQ CIAESDT CIAEEDT CIAEDUR AEOCCFL TRTEMFL ADURN ADURU AESEQ);
     set work.ae_episodes;
     by usubjid aedecod;
     
     /* Standard Treatment Emergent Flag */
     length TRTEMFL $1;
-    if not missing(aetrtem) and strip(aetrtem) ne '' then TRTEMFL = aetrtem;
+    if not missing(aetrtem) and strip(aetrtem) ne '' then do;
+        if aetrtem = 'T' then TRTEMFL = 'Y';
+        else TRTEMFL = 'N';
+    end;
     else if not missing(astdt) and astdt >= trtsdt then TRTEMFL = 'Y';
     else TRTEMFL = 'N';
     
@@ -159,7 +174,14 @@ data adam.adae;
 run;
 
 proc sort data=adam.adae;
-    by usubjid astdt aedecod;
+    by usubjid astdt aedecod aendt aeseq;
+run;
+
+/* Drop the AESEQ tie-breaker so the production schema matches the validation
+   track (which also carries AESEQ only internally). Final delivered order is
+   deterministic: usubjid astdt aedecod aendt aeseq. */
+data adam.adae;
+    set adam.adae(drop=aeseq);
 run;
 
 /* Clean up work library */

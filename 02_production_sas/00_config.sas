@@ -9,8 +9,8 @@
    ============================================================================== */
 
 %macro load_config;
-    %global PROJ_ROOT PATH_SEP;
-    
+    %global PROJ_ROOT PGMDIR PATH_SEP;
+
     /* Detect Host Platform */
     %if %sysevalf(%superq(SYSSCP) = WIN, boolean) or %sysevalf(%superq(SYSSCP) = WINDOWS, boolean) %then %do;
         %let PATH_SEP = \;
@@ -18,16 +18,18 @@
     %else %do;
         %let PATH_SEP = /;
     %end;
-    
-    /* Automatically derive project root if not already defined */
-    %if %symexist(PROJ_ROOT) = 0 or &PROJ_ROOT = %str() or &PROJ_ROOT = . %then %do;
+
+    /* Automatically derive project root if not already defined.
+       Guard uses only %symexist (numeric result); path-containing macro variables
+       cannot appear in OR conditions because %EVAL parses "/" as division. */
+    %if %symexist(PROJ_ROOT) = 0 %then %do;
         %if %symexist(_SASPROGRAMFILE) %then %do;
             %if %superq(_SASPROGRAMFILE) ne %str() %then %do;
                 %let prog_path = %sysfunc(dequote(&_SASPROGRAMFILE.));
-                
+
                 /* Detect starting index of the production folder to establish root */
                 %let proj_idx = %sysfunc(find(%upcase(&prog_path.), %str(02_PRODUCTION_SAS)));
-                
+
                 %if &proj_idx. > 0 %then %do;
                     %let PROJ_ROOT = %substr(&prog_path., 1, %eval(&proj_idx. - 2));
                 %end;
@@ -51,12 +53,22 @@
         %end;
     %end;
 
+    /* PGMDIR: directory containing SAS programs — used for absolute %include in IOM mode.
+       Pre-set by Python/SASPy before invoking master driver; here we set it as a
+       fallback so standalone execution still resolves correctly via relative paths.
+       Use only %symexist (numeric result) — path strings in OR conditions cause %EVAL errors. */
+    %if %symexist(PGMDIR) = 0 %then %do;
+        %global PGMDIR;
+        %let PGMDIR = &PROJ_ROOT.&PATH_SEP.02_production_sas;
+    %end;
+
     /* Define Libraries */
-    libname raw "&PROJ_ROOT.&PATH_SEP.01_raw_source" access=readonly;
-    libname real_sdtm "&PROJ_ROOT.&PATH_SEP.01_raw_source&PATH_SEP.real_sdtm" access=readonly;
-    libname staging "&PROJ_ROOT.&PATH_SEP.04_adam" ;
-    libname sdtm "&PROJ_ROOT.&PATH_SEP.04_adam" ;
-    libname adam "&PROJ_ROOT.&PATH_SEP.04_adam" ;
+    options dlcreatedir;
+    libname raw     "&PROJ_ROOT.&PATH_SEP.01_raw_source" access=readonly;
+    libname realsdtm "&PROJ_ROOT.&PATH_SEP.01_raw_source&PATH_SEP.real_sdtm" access=readonly;
+    libname staging "&PROJ_ROOT.&PATH_SEP.01_raw_source&PATH_SEP.real_sdtm";
+    libname sdtm    "&PROJ_ROOT.&PATH_SEP.04_adam&PATH_SEP.sdtm_mapped";
+    libname adam    "&PROJ_ROOT.&PATH_SEP.04_adam";
     
     /* Global SAS Options */
     options ls=120 ps=60 validvarname=upcase missing='' mergenoby=WARN;
@@ -67,11 +79,23 @@
 
 %load_config;
 
-/* Core Macro: Check error status and exit if failure */
+/* Core Macro: Check error status and exit if failure.
+   Batch mode (-sysin): hard stop via %abort cancel.
+   IOM/SASPy mode: %abort cancel would cancel the remainder of the submitted
+   block INCLUDING the SASPy end-of-submit marker, hanging the client forever.
+   Instead, drain remaining steps in syntax-check mode (obs=0 noreplace) so the
+   full log returns to the client with the ERROR lines intact.
+   Note: getoption(SYSIN) returns a path; wrap in %length (numeric) because
+   bare paths in %IF conditions trip %EVAL's "/" division parsing. */
 %macro check_err(progname);
     %if &syscc. > 4 %then %do;
         %put ERROR: [PIPELINE] Execution failed in program &progname. with SYSCC=&syscc..;
-        %abort cancel;
+        %if %length(%sysfunc(getoption(SYSIN))) > 0 %then %do;
+            %abort cancel;
+        %end;
+        %else %do;
+            options obs=0 syntaxcheck noreplace;
+        %end;
     %end;
     %else %do;
         %put NOTE: [PIPELINE] Program &progname. executed successfully with SYSCC=&syscc..;

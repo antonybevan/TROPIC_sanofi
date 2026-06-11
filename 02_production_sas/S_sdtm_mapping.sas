@@ -11,7 +11,14 @@
                 Derives anchors like treatment start date (TRTSDT) and study days.
    ============================================================================== */
 
-%include "00_config.sas";
+/* PGMDIR guard: allows standalone execution (CWD=02_production_sas) and IOM/ODA mode.
+   Wrapped in a macro for portability (open-code %IF requires 9.4M5+). */
+%macro set_pgmdir;
+    %if not %symexist(PGMDIR) %then %global PGMDIR;
+    %if "&PGMDIR." = "" %then %let PGMDIR = .;
+%mend set_pgmdir;
+%set_pgmdir;
+%include "&PGMDIR./00_config.sas";
 
 /* 1. Calculate TRTSDT (Treatment Start Date) per USUBJID */
 proc sql;
@@ -132,6 +139,7 @@ proc sql;
         dm.studyid,
         dm.usubjid,
         lb.lbseq,
+        lb.lbblfl length=1,
         lb.lbtestcd length=8,
         lb.lbtest length=40,
         lb.lbcat length=40,
@@ -146,6 +154,7 @@ proc sql;
         lb.lbstnrlo,
         lb.lbstnrhi,
         lb.lbnrind length=20,
+        lb.lbtoxgr length=5,
         lb.visit length=40,
         lb.visitnum,
         input(substr(lb.lbdtc, 1, 10), yymmdd10.) as lbdt format=yymmdd10.,
@@ -165,14 +174,13 @@ proc sql;
         dm.studyid,
         dm.usubjid,
         cm.cmseq,
-        cm.cmtrt length=100,
+        cm.cmtrt length=200,
         cm.cmdecod length=100,
-        cm.cmcat length=40,
+        cm.cmcat length=60,
         cm.cmindc length=100,
-        cm.cmdose length=20,
+        cm.cmdose,
         cm.cmdosu length=20,
         cm.cmdosrgm length=20,
-        cm.visitlength length=40,
         cm.visitnum,
         cm.visit length=40,
         case when not missing(cm.cmstdtc) then input(substr(cm.cmstdtc, 1, 10), yymmdd10.) else . end as cmstdt format=yymmdd10.,
@@ -196,7 +204,7 @@ proc sql;
         ds.dsdecod length=40,
         ds.dsterm length=100,
         ds.dscat length=40,
-        ds.sscat length=40,
+        ds.dsscat length=40,
         ds.epoch length=40,
         ds.visitnum,
         ds.visit length=40,

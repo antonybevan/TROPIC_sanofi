@@ -12,7 +12,14 @@
                 and Time to First Serious AE (TTOS).
    ============================================================================= */
 
-%include "00_config.sas";
+/* PGMDIR guard: allows standalone execution (CWD=02_production_sas) and IOM/ODA mode.
+   Wrapped in a macro for portability (open-code %IF requires 9.4M5+). */
+%macro set_pgmdir;
+    %if not %symexist(PGMDIR) %then %global PGMDIR;
+    %if "&PGMDIR." = "" %then %let PGMDIR = .;
+%mend set_pgmdir;
+%set_pgmdir;
+%include "&PGMDIR./00_config.sas";
 
 /* 1. Retrieve first PD date per subject across all source domains */
 proc sql;
@@ -199,8 +206,9 @@ run;
 /* -------------------------------------------------------------------------- */
 proc sql;
     create table work.pn_trt_tte as
-    select pn.usubjid, pn.pntestcd, input(pn.pnstresn, best32.) as pnstresn,
+    select pn.usubjid, pn.pntestcd, pn.pnstresn,
            input(pn.pndtc, yymmdd10.) as pndt format=yymmdd10.,
+           pn.visit, pn.visitnum,
            adsl.trtsdt, adsl.randdt
     from staging.pn as pn
     inner join adam.adsl as adsl on pn.usubjid = adsl.usubjid;
@@ -210,7 +218,7 @@ proc sql;
     create table work.pn_base_tte as
     select usubjid, pntestcd, pnstresn
     from work.pn_trt_tte
-    where pndt <= trtsdt;
+    where not missing(pndt) and pndt <= trtsdt;
 quit;
 
 proc sort data=work.pn_base_tte;
@@ -268,6 +276,11 @@ proc summary data=work.pn_first_day median;
     output out=work.pn_cycle_med(drop=_type_ _freq_) median=cycle_val;
 run;
 
+data work.pn_cycle_med;
+    set work.pn_cycle_med;
+    label cycle_val = 'Cycle Value';
+run;
+
 proc sql;
     create table work.pn_cycle_min_date as
     select usubjid, visitnum, visit, min(pndt) as cycle_date format=yymmdd10.
@@ -317,76 +330,36 @@ data work.cycle_comp;
     else prog_trigger = 0;
 run;
 
-/* Sustained confirmation: check if trigger at visit N is followed by trigger at N+1 */
-/* Uses retain-based lag within BY usubjid for robust paired comparison */
-data work.sustain_check;
-    set work.cycle_comp;
-    by usubjid visitnum;
-
-    retain _prev_trigger;
-
-    /* For the first record of a new subject, no prior trigger exists */
-    if first.usubjid then _prev_trigger = .;
-
-    /* Look-forward: check if current trigger was confirmed by a subsequent trigger.
-       We mark progression at the FIRST triggering visit that has a confirming visit.
-       Because we cannot look ahead, we flag based on the previous trigger plus
-       current state: if previous was triggered and current remains triggered,
-       the PREVIOUS visit is confirmed progression. */
-    length is_prog 8;
-
-    /* Default: not progression */
-    is_prog = 0;
-
-    /* The confirmed event date is the first of two consecutive triggered visits */
-    /* We output the PRIOR row as confirmed if current row also triggered */
-    /* Implement as: mark current row confirmed if prev_trigger=1 and current=1 */
-    if not missing(_prev_trigger) and _prev_trigger = 1 and prog_trigger = 1 then is_prog = 2; /* marker: this visit confirms the previous */
-
-    /* Self-trigger at last observation of subject (no next visit) */
-    if last.usubjid and prog_trigger = 1 and is_prog = 0 then is_prog = 1; /* terminal trigger */
-
-    _prev_trigger = prog_trigger;
-
-    drop _prev_trigger;
-run;
-
-/* Re-pass: mark the first-trigger visit as is_prog=1 when confirmed */
-proc sort data=work.sustain_check; by usubjid visitnum; run;
-
-data work.sustain_resolved;
-    set work.sustain_check;
-    by usubjid visitnum;
-    retain _confirm_pending _confirm_dt;
-    if first.usubjid then do;
-        _confirm_pending = 0;
-        _confirm_dt = .;
-    end;
-
-    if prog_trigger = 1 and _confirm_pending = 0 then do;
-        _confirm_pending = 1;
-        _confirm_dt = cycle_date;
-        is_prog = 0; /* awaiting confirmation */
-    end;
-    else if is_prog = 2 then do;
-        /* Confirmed: mark the pending visit */
-        /* We set is_prog on the row where confirmation came — resolved below via prog_dates */
-        is_prog = 0; /* the confirming row itself is not the event date */
-        _confirm_pending = 0;
-    end;
-    else _confirm_pending = 0;
-
-    format _confirm_dt yymmdd10.;
-run;
-
+/* Sustained confirmation: trigger confirmed if NEXT consecutive visit also triggers,
+   OR if the triggered visit is the last observation for that subject.
+   Uses PROC SQL self-join to emulate R lead()-based look-ahead. */
+proc sql;
+    /* Step 1: Find the minimum visitnum of the next trigger visit per subject */
+    create table work.confirmed_triggers as
+    select a.usubjid, a.visitnum as trig_visitnum, a.cycle_date as trig_date
+    from work.cycle_comp as a
+    where a.prog_trigger = 1
+    and (
+        /* Next consecutive visit also triggers (confirmed pair) */
+        exists (
+            select 1 from work.cycle_comp as b
+            where b.usubjid = a.usubjid
+              and b.prog_trigger = 1
+              and b.visitnum = (select min(c.visitnum)
+                                from work.cycle_comp as c
+                                where c.usubjid = a.usubjid and c.visitnum > a.visitnum)
+        )
+        or
+        /* OR this is the last observation for the subject (terminal trigger) */
+        a.visitnum = (select max(d.visitnum) from work.cycle_comp as d where d.usubjid = a.usubjid)
+    );
+quit;
 
 proc sql;
-    /* Use _confirm_dt from sustain_resolved: the date of the FIRST triggering visit
-       that was subsequently confirmed by the next consecutive triggered visit */
+    /* Step 2: Earliest confirmed trigger date per subject = pain progression date */
     create table work.prog_dates as
-    select usubjid, min(_confirm_dt) as prog_date format=yymmdd10.
-    from work.sustain_resolved
-    where not missing(_confirm_dt)
+    select usubjid, min(trig_date) as prog_date format=yymmdd10.
+    from work.confirmed_triggers
     group by usubjid;
 quit;
 
@@ -472,7 +445,7 @@ proc sql;
         adsl.trt01pn as TRT01PN,
         'TTPSA' as PARAMCD length=8,
         'Time to PSA Progression' as PARAM length=40,
-        adsl.randdt as STARTDT format=yymmdd10.,
+        adsl.trtsdt as STARTDT format=yymmdd10.,
         
         case 
             when not missing(p.psa_prog_dt) then p.psa_prog_dt
@@ -537,12 +510,12 @@ proc sql;
         adsl.trt01pn as TRT01PN,
         'TTUMOR' as PARAMCD length=8,
         'Time to Tumor Progression' as PARAM length=40,
-        adsl.randdt as STARTDT format=yymmdd10.,
+        adsl.trtsdt as STARTDT format=yymmdd10.,
         
         case 
             when not missing(p.tumor_prog_dt) then p.tumor_prog_dt
             when not missing(c.last_tumor_dt) then min(c.last_tumor_dt, '25SEP2009'd)
-            else min(adsl.lstalvdt, '25SEP2009'd)
+            else adsl.trtsdt
         end as ADT format=yymmdd10.,
         
         case 
@@ -558,12 +531,12 @@ proc sql;
         case 
             when not missing(p.tumor_prog_dt) then ''
             when not missing(c.last_tumor_dt) then 'LAST TUMOR ASSESSMENT'
-            else 'LAST KNOWN ALIVE DATE'
+            else 'NO POST-BASELINE ASSESSMENT'
         end as CNSDTDSC length=100
     from adam.adsl as adsl
     left join work.tumor_prog_dates as p on adsl.usubjid = p.usubjid
     left join work.tumor_censor_dates as c on adsl.usubjid = c.usubjid
-    where adsl.saffl = 'Y';
+    where adsl.saffl = 'Y' and adsl.measdisf = 'Y';
 quit;
 
 data work.ttum_final;
@@ -573,7 +546,7 @@ data work.ttum_final;
 run;
 
 /* Combine TTE parameters */
-data adam.adtte;
+data adam.adtte(keep=STUDYID USUBJID SUBJID SITEID TRT01P TRT01PN PARAMCD PARAM STARTDT ADT AVAL CNSR EVNTDESC CNSDTDSC);
     set work.tte_base work.pfs_derived work.ttpain_final work.ttpsa_final work.ttum_final;
 run;
 

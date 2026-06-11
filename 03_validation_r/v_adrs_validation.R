@@ -41,7 +41,7 @@ df_recist <- df_post_sod %>%
   mutate(
     nadir_sod = cummin(post_sod),
     pct_chg_base = (post_sod - base_sod) / base_sod * 100,
-    pct_chg_nadir = (post_sod - nadir_sod) / nadir_sod * 100,
+    pct_chg_nadir = if_else(nadir_sod > 0, (post_sod - nadir_sod) / nadir_sod * 100, NA_real_),
     abs_chg_nadir = post_sod - nadir_sod,
     
     recist_resp = case_when(
@@ -53,13 +53,18 @@ df_recist <- df_post_sod %>%
   ) %>%
   ungroup() %>%
   inner_join(header, by = "USUBJID") %>%
+  mutate(
+    lsdtc_clean = trimws(LSDTC),
+    ADT_val = if_else(grepl("^\\d{4}-\\d{1,2}-\\d{1,2}", lsdtc_clean), ymd(lsdtc_clean, quiet = TRUE), as.Date(NA)),
+    ADY_val = as.numeric(ADT_val - TRTSDT + 1)
+  ) %>%
   transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRTSDT,
     PARAMCD = "OVRLRESP",
     PARAM = "Overall Response per RECIST 1.1 + PCWG3",
     AVALC = recist_resp,
-    ADT = ymd(substring(LSDTC, 1, 10)),
-    ADY = as.numeric(ADT - TRTSDT + 1),
+    ADT = ADT_val,
+    ADY = ADY_val,
     VISIT,
     ANL01FL = "Y"
   )
@@ -126,7 +131,8 @@ df_orr <- df_bor %>%
 df_lb_psa <- lb %>%
   filter(LBTESTCD == "PSA" & !is.na(LBSTRESN)) %>%
   mutate(
-    LBDT = ymd(substring(LBDTC, 1, 10)),
+    lbdtc_clean = trimws(LBDTC),
+    LBDT = if_else(grepl("^\\d{4}-\\d{1,2}-\\d{1,2}", lbdtc_clean), ymd(lbdtc_clean, quiet = TRUE), as.Date(NA)),
     LBSTRESN = as.numeric(LBSTRESN)
   )
 
@@ -196,8 +202,22 @@ df_psprog <- header %>%
     ANL01FL = "Y"
   )
 
+# PSA Response (>= 50% decline)
+df_psaresp <- header %>%
+  left_join(df_psa_responders, by = "USUBJID") %>%
+  mutate(
+    psad50 = coalesce(psad50, "N"),
+    PARAMCD = "PSARESP",
+    PARAM = "PSA Response (>=50% decline)",
+    AVALC = psad50,
+    AVAL = if_else(AVALC == "Y", 1.0, 0.0),
+    VISIT = "ALL CYCLES",
+    ANL01FL = "Y"
+  ) %>%
+  select(STUDYID, USUBJID, SUBJID, TRT01P, TRTSDT, PARAMCD, PARAM, AVALC, AVAL, VISIT, ANL01FL)
+
 # Combine and Sort
-adrs <- bind_rows(df_ovrl, df_bor, df_orr, df_psprog) %>% 
+adrs <- bind_rows(df_ovrl, df_bor, df_orr, df_psprog, df_psaresp) %>% 
   rename(AVISIT = VISIT)
 
 # Sort and Save

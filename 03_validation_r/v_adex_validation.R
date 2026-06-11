@@ -6,6 +6,15 @@ library(dplyr)
 library(haven)
 library(lubridate)
 
+round_half_up <- function(x, digits = 0) {
+  posneg <- sign(x)
+  z <- abs(x) * 10^digits
+  z <- z + 0.5 + 1e-9
+  z <- floor(z)
+  z <- z / 10^digits
+  return(z * posneg)
+}
+
 cat("NOTE: [VALIDATION] Starting ADEX Validation script...\n")
 
 # Load real validation ADSL and staging EX
@@ -56,12 +65,12 @@ summary_bds <- bind_rows(
   summary_records %>% transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRT01PN, TRTSDT,
     PARAMCD = "PLDOSE", PARAM = "Planned Dose (mg/m2)", PARCAT1 = "INDIVIDUAL",
-    AVAL = planned_dose, AVALC = as.character(planned_dose), AVISIT = "ALL CYCLES"
+    AVAL = planned_dose, AVALC = sprintf("%.2f", planned_dose), AVISIT = "ALL CYCLES"
   ),
   summary_records %>% transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRT01PN, TRTSDT,
     PARAMCD = "CUMDOSE", PARAM = "Cumulative Actual Dose (mg/m2)", PARCAT1 = "SUMMARY",
-    AVAL = cumdose, AVALC = as.character(round(cumdose, 2)), AVISIT = "ALL CYCLES"
+    AVAL = cumdose, AVALC = sprintf("%.2f", cumdose), AVISIT = "ALL CYCLES"
   ),
   summary_records %>% transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRT01PN, TRTSDT,
@@ -81,7 +90,7 @@ summary_bds <- bind_rows(
   summary_records %>% transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRT01PN, TRTSDT,
     PARAMCD = "RDI", PARAM = "Relative Dose Intensity (%)", PARCAT1 = "SUMMARY",
-    AVAL = rdi, AVALC = as.character(round(rdi, 1)), AVISIT = "ALL CYCLES"
+    AVAL = rdi, AVALC = sprintf("%.1f", round_half_up(rdi, 1)), AVISIT = "ALL CYCLES"
   ),
   summary_records %>% transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRT01PN, TRTSDT,
@@ -98,7 +107,7 @@ cycle_bds <- ex_clean %>%
   transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRT01PN, TRTSDT,
     PARAMCD = "PERFDOSE", PARAM = "Actual Dose Administered (mg/m2)", PARCAT1 = "INDIVIDUAL",
-    AVAL = EXDOSE2, AVALC = as.character(round(EXDOSE2, 2)), AVISIT = paste("CYCLE", EXSEQ)
+    AVAL = EXDOSE2, AVALC = sprintf("%.2f", EXDOSE2), AVISIT = paste("CYCLE", EXSEQ)
   )
 
 cycle_adj <- ex_clean %>%

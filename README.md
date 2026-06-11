@@ -19,26 +19,29 @@
 
 ## Overview
 
-This repository is a fully reproducible, end-to-end **clinical analysis pipeline** for the TROPIC Phase III trial, built to regulatory standards and structured as an eCTD Module 5 submission package. It demonstrates dual-language double-programming (SAS + R), CDISC compliance, cross-language reconciliation, and publication-quality TFL generation.
+This repository is an end-to-end **clinical analysis pipeline** for the TROPIC Phase III trial, organised to mirror an eCTD Module 5 layout. It demonstrates dual-language double-programming (SAS + R), CDISC-aligned ADaM modelling, genuine cross-language reconciliation, and publication-quality TFL generation.
 
-> **Data provenance:** The MP control arm data (371 patients) is the official, de-identified SDTM dataset released by Sanofi in 2013 — real trial data from the *Lancet* 2010 publication. The CbzP comparator arm (378 patients) is reconstructed at the ADaM layer using published trial parameters, the Guyot et al. (2012) KM algorithm, and Cox proportional hazards survival time scaling.
+> **Scope & reproducibility (read first):** This is a portfolio/demonstration project. The real MP-arm SDTM source and ODA credentials are **not** committed (patient-data protection + secrets hygiene), so a bare clone cannot re-run the *real* pipeline — see **[REPRODUCIBILITY.md](REPRODUCIBILITY.md)** for the data-access path, the pinned environment, and a **self-contained `--demo` smoke test** that runs on a clean clone with no real data, no SAS, and no credentials. The comparator (Cabazitaxel) arm is **synthetic and illustrative** (see *Data provenance*); only the real Mitoxantrone arm is reconciled SAS↔R.
+
+> **Data provenance:** The MP control arm data (371 patients) is the official, de-identified SDTM dataset released by Sanofi in 2013 — real trial data from the *Lancet* 2010 publication. The CbzP comparator arm (378 patients) is a **synthetic, illustrative** cohort generated at the ADaM layer by **proportional-hazards time-scaling of the real MP arm** (real MP event times divided by the published hazard ratio, with censoring calibrated to published event counts) plus fixed-seed sampling from published Table 1/Table 2 marginal distributions for non-survival domains. It is **not real patient data and not an independent reconstruction of the cabazitaxel arm**; it exists only to exercise the comparative-TFL and Project Optimus machinery.
 
 ---
 
-## Key Trial Results
+## Illustrative Pipeline Outputs *(synthetic comparator — not clinical findings)*
 
-The re-analysis pipeline dynamically computes comparative statistics by merging the R-validated MP control arm (N=371) with the reconstructed Cabazitaxel (CbzP, N=378) cohort at the TFL step:
+> [!WARNING]
+> **These numbers are not study results and must not be read as a re-analysis of the TROPIC trial.** The CbzP arm is synthetic (see *Data provenance* above). Because the comparator is built by dividing the real MP arm's event times by an *assumed* hazard ratio, any treatment effect computed from it is **circular by construction** (effect assumed in → effect measured out) and carries **no evidentiary weight**. The procedure also does **not reproduce the published cabazitaxel values** — it overshoots them (e.g. synthetic OS median 21.7 mo vs published 15.1 mo; synthetic HR 0.43 vs published 0.70). The table below shows what the TFL machinery *computes from the synthetic data*, alongside the published values, purely to demonstrate the analysis pipeline.
 
-| Endpoint | Re-analyzed CbzP (N=378)† | Real MP (N=371) | Re-analyzed HR (95% CI) | Re-analyzed p-value | Published HR (de Bono 2010) |
-|---|---|---|---|---|---|
-| **Overall Survival** *(primary)* | **21.7 mo** (95% CI: 19.4-23.0) | 12.7 mo (95% CI: 11.8-14.1) | **0.43 (0.35–0.52)** | **<0.0001** | 0.70 (0.59–0.83) |
-| **Progression-Free Survival** | **1.9 mo** (95% CI: 1.9-2.8) | 1.4 mo (95% CI: 1.2-1.6) | **0.66 (0.56–0.78)** | **<0.0001** | 0.74 (0.64–0.86) |
-| **Time to PSA Progression** | **2.8 mo** (95% CI: 1.9-3.3) | 2.1 mo (95% CI: 1.6-3.3) | **0.84 (0.71–1.00)** | **0.0470** | 0.75 (0.63–0.90) |
-| **Time to Tumor Progression** | **34.7 mo** (95% CI: 30.6-NA) | 2.6 mo (95% CI: 2.1-3.3) | **0.18 (0.14–0.23)** | **<0.0001** | 0.61 (0.49–0.76) |
-| **Any TEAE** | **97%** (367/378) | **88%** (328/371) | — | — | 99% vs 88% |
-| **Grade ≥3 TEAE** | **81%** (306/378) | **40%** (147/371) | — | — | 89% vs 40% |
+| Endpoint | Synthetic CbzP (N=378)† | Real MP (N=371) | Pipeline HR from synthetic data‡ | Published value (de Bono 2010) |
+|---|---|---|---|---|
+| **Overall Survival** | 21.7 mo (synthetic) | 12.7 mo (real) | 0.43 (0.35–0.52)‡ | median 15.1 mo · HR 0.70 (0.59–0.83) |
+| **Progression-Free Survival** | 1.9 mo (synthetic) | 1.4 mo (real) | 0.66 (0.56–0.78)‡ | median 2.8 mo · HR 0.74 (0.64–0.86) |
+| **Time to PSA Progression** | 2.8 mo (synthetic) | 2.2 mo (real) | 0.84 (0.71–0.99)‡ | median 6.4 mo · HR 0.75 (0.63–0.90) |
+| **Time to Tumor Progression** | 3.8 mo (synthetic) | 2.3 mo (real) | 0.67 (0.54–0.83)‡ | median 8.8 mo · HR 0.61 (0.49–0.76) |
+| **Any TEAE** | 96% (364/378, synthetic) | 88% (328/371, real) | — | 98% vs 88% |
+| **Grade ≥3 TEAE** | 82% (310/378, synthetic) | 40% (147/371, real) | — | 57% vs 39% |
 
-†CbzP arm: reconstructed comparator based on published trial parameters.
+†Synthetic, illustrative cohort — not real patient data. ‡Circular by construction; descriptive of the synthetic data only, **not** a measure of treatment effect. All MP-arm figures are real and independently SAS↔R reconciled.
 
 ---
 
@@ -55,7 +58,7 @@ The re-analysis pipeline dynamically computes comparative statistics by merging 
    ┌───────────┐      ┌────────────┐      ┌────────────┐
    │  Stage 1  │      │ Stages 3-9 │      │ Stage 10   │
    │  R Env    │      │ R ADaM     │      │ SAS Prod   │
-   │  Setup    │      │ Validation │      │ (or Sim)   │
+   │  Setup    │      │ Validation │      │  via ODA   │
    └─────┬─────┘      └─────┬──────┘      └─────┬──────┘
          │                  │                    │
          ▼                  ▼                    ▼
@@ -207,7 +210,7 @@ All clinical pipeline stages compiled successfully!
 
 ## ADaM Datasets Produced
 
-The pipeline generates ADaM datasets containing strictly the **real Mitoxantrone (MP) arm (N=371)**. The reconstructed comparator Cabazitaxel (CbzP) arm data is stored as RDS files under `01_raw_source/cbzp_reconstructed/` and merged dynamically at the TFL step:
+The submitted ADaM datasets (`04_adam/*.xpt`) contain strictly the **real Mitoxantrone (MP) arm (N=371)** and are the only datasets reconciled SAS↔R. The **synthetic, illustrative** Cabazitaxel (CbzP) arm is stored separately as RDS files under `01_raw_source/cbzp_reconstructed/` and merged **only** at the TFL step for demonstration figures/tables — it is never written into the reconciled `*_v.xpt`/`*_prod.xpt` deliverables:
 
 | Dataset | Domain | MP-Only Rows (Saved in `04_adam/`) | Combined Rows (Merged in TFLs) | Description |
 |---|---|---|---|---|
@@ -241,23 +244,34 @@ View all rendered figures and tables: **[09_tfl/output/](09_tfl/output/)**
 
 ---
 
-## Regulatory Standards
+## Standards Alignment
 
-| Standard | Compliance |
+This is a **demonstration / portfolio** project, not a regulatory submission. The table below states what the pipeline *implements*, not a certified compliance status. "Pattern demonstrated" means the technique is applied correctly on this (partly synthetic) dataset; it does **not** assert validated, audited conformance.
+
+| Standard | What this repo actually does |
 |---|---|
-| CDISC ADaMIG v1.3 | ✅ All 7 ADaM datasets |
-| CDISC SDTMIG v3.4 | ✅ Source SDTM validated |
-| ICH E9 (Statistical Principles) | ✅ Hierarchical step-down gatekeeping |
-| ICH E3 (TFL Catalogue) | ✅ NEJM/Lancet publication style |
-| FDA Project Optimus 2026 | ✅ E-R dose optimisation analysis |
-| 21 CFR Part 11 | ✅ Audit trail via `.log` files & renv.lock |
+| CDISC ADaMIG v1.3 | ADaM structure/metadata modelled for all 7 datasets (real MP arm) |
+| CDISC SDTMIG v3.4 | Source SDTM consumed and structurally validated |
+| ICH E9 (Statistical Principles) | Hierarchical step-down gatekeeping **pattern implemented** (exercised on a synthetic comparator — not an inferential result) |
+| ICH E3 (TFL Catalogue) | TFL set rendered in NEJM/Lancet style |
+| FDA Project Optimus | Exposure–response dose-optimisation analysis **pattern demonstrated** on synthetic data |
+| Reproducibility | `renv.lock` pins the R toolchain; `.log` files (logrx) capture run provenance. **Note:** this is run traceability, *not* 21 CFR Part 11 compliance (which requires validated access controls, user attribution, and e-signatures — out of scope here). |
 
 ---
 
-## Notes on SAS Simulation Mode
+## SAS Execution via SAS OnDemand for Academics
 
-> [!WARNING]
-> In environments without SAS 9.4, Stage 10 uses a **SAS Simulation Mode**: it copies the independently R-validated XPT datasets to production paths. This enables full pipeline execution and reconciliation testing without a SAS licence. Formal eCTD submission requires actual SAS 9.4 execution for the production track.
+Stage 10 obtains the SAS 9.4 production datasets in one of four **explicitly-labelled** modes (the chosen mode is printed at run start and recorded in `06_telemetry/pipeline_health.json` as `sas_execution_mode`):
+
+| Invocation | Mode | What happens |
+|---|---|---|
+| `--real-sas` (local `sas` on PATH) | `local` | Runs `00_master_driver.sas` on the local SAS 9.4 engine this session. |
+| `--real-sas` (no local SAS, SASPy configured) | `oda` | Uploads programs + SDTM to **SAS OnDemand for Academics**, runs `00_master_driver.sas` via SASPy IOM, downloads the 7 `*_prod.xpt`. |
+| `--real-sas` (no engine at all) | `error` | **Fails loudly** — real SAS was requested but cannot be run. No false "PASS". |
+| `--use-cached-sas` | `cached` | Reconciles against **pre-existing** `*_prod.xpt` from a prior SAS run. **SAS is not re-run this session;** telemetry says so. |
+| *(no flag, no SAS)* | `sim` | Byte-copies `*_v.xpt` → `*_prod.xpt`. Clearly flagged as **NOT** double-programming (zero diffs are tautological). |
+
+> The `cached` and `sim` modes never claim a real SAS run occurred. Only `local` and `oda` are reported as genuine double-programming.
 
 ---
 

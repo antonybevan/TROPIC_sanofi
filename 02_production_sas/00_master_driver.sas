@@ -8,47 +8,65 @@
    Description: Master execution driver for TROPIC (Study EFC6193 / XRP6258) pipeline.
    ============================================================================== */
 
-%include "00_config.sas";
+/* PGMDIR is pre-set by the Python/SASPy caller; fall back to relative "." for
+   standalone batch execution where the CWD is already 02_production_sas/.
+   Wrapped in a macro for portability (open-code %IF requires 9.4M5+). */
+%macro set_pgmdir;
+    %if not %symexist(PGMDIR) %then %global PGMDIR;
+    %if "&PGMDIR." = "" %then %let PGMDIR = .;
+%mend set_pgmdir;
+%set_pgmdir;
+
+%include "&PGMDIR./00_config.sas";
 %check_err(00_config);
 
 /* Stage 1: Raw Ingest and Type Normalization */
-%include "L_staging_ingest.sas";
+%include "&PGMDIR./L_staging_ingest.sas";
 %check_err(L_staging_ingest);
 
 /* Stage 2: SDTM Mapping */
-%include "S_sdtm_mapping.sas";
+%include "&PGMDIR./S_sdtm_mapping.sas";
 %check_err(S_sdtm_mapping);
 
 /* Stage 3: ADSL Subject-Level ADaM */
-%include "A_adsl_generation.sas";
+%include "&PGMDIR./A_adsl_generation.sas";
 %check_err(A_adsl_generation);
 
 /* Stage 4: ADEX Exposure BDS ADaM */
-%include "A_adex_generation.sas";
+%include "&PGMDIR./A_adex_generation.sas";
 %check_err(A_adex_generation);
 
 /* Stage 5: ADCM Concomitant Medications OCCDS ADaM */
-%include "A_adcm_generation.sas";
+%include "&PGMDIR./A_adcm_generation.sas";
 %check_err(A_adcm_generation);
 
 /* Stage 6: ADAE Adverse Events OCCDS ADaM */
-%include "A_adae_io_respec.sas";
+%include "&PGMDIR./A_adae_io_respec.sas";
 %check_err(A_adae_io_respec);
 
 /* Stage 7: ADLB Laboratories BDS ADaM */
-%include "A_adlb_generation.sas";
+%include "&PGMDIR./A_adlb_generation.sas";
 %check_err(A_adlb_generation);
 
 /* Stage 8: ADRS Efficacy Response BDS ADaM */
-%include "A_adrs_generation.sas";
+%include "&PGMDIR./A_adrs_generation.sas";
 %check_err(A_adrs_generation);
 
 /* Stage 9: ADTTE Time-to-Event BDS ADaM */
-%include "A_adtte_generation.sas";
+%include "&PGMDIR./A_adtte_generation.sas";
 %check_err(A_adtte_generation);
 
 /* Stage 10: XPT Export with Constraints */
-%include "U_xpt_export.sas";
+%include "&PGMDIR./U_xpt_export.sas";
 %check_err(U_xpt_export);
 
-%put NOTE: [PIPELINE] COMPLETE. ALL MAPPINGS AND TFL SUITES COMPILED WITH ZERO ERRORS.;
+/* Final status banner — must reflect drained-error runs (IOM syntaxcheck mode) */
+%macro pipeline_done;
+    %if &syscc. > 4 %then %do;
+        %put ERROR: [PIPELINE] FINISHED WITH ERRORS. SYSCC=&syscc.. See log above for the failing program.;
+    %end;
+    %else %do;
+        %put NOTE: [PIPELINE] COMPLETE. ALL MAPPINGS AND TFL SUITES COMPILED WITH ZERO ERRORS.;
+    %end;
+%mend pipeline_done;
+%pipeline_done;

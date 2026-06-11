@@ -8,6 +8,16 @@ library(lubridate)
 
 cat("NOTE: [VALIDATION] Starting ADLB Validation script...\n")
 
+# Helper function for SAS-style half-up rounding to match put(..., 8.2)
+sas_round <- function(x, d) {
+  posneg <- sign(x)
+  z <- abs(x) * 10^d
+  z <- z + 0.5 + 1e-9
+  z <- floor(z)
+  z <- z / 10^d
+  return(z * posneg)
+}
+
 # Load real validation ADSL and staging LB
 adsl <- read_xpt("04_adam/adsl_v.xpt")
 lb <- readRDS("01_raw_source/real_sdtm/staging/lb.rds")
@@ -20,7 +30,8 @@ df_lb <- lb %>%
   select(-any_of("STUDYID")) %>%
   inner_join(header, by = c("USUBJID", "SUBJID")) %>%
   mutate(
-    lbdt = ymd(substring(LBDTC, 1, 10)),
+    lbdtc_clean = trimws(LBDTC),
+    lbdt = if_else(grepl("^\\d{4}-\\d{1,2}-\\d{1,2}", lbdtc_clean), ymd(lbdtc_clean, quiet = TRUE), as.Date(NA)),
     lbdy = as.numeric(lbdt - TRTSDT + 1),
     avals = as.numeric(LBSTRESN)
   ) %>%
@@ -42,7 +53,7 @@ df_windows <- df_lb %>%
     AVALC = LBORRES,
     
     AVISITN = case_when(
-      lbdy <= 0 ~ 0.0,
+      is.na(lbdy) | lbdy <= 0 ~ 0.0,
       lbdy >= 1 & lbdy <= 3 ~ 1.0,
       lbdy >= 4 & lbdy <= 13 ~ 2.0,
       lbdy >= 14 & lbdy <= 17 ~ 3.0,
@@ -77,11 +88,11 @@ df_windows <- df_lb %>%
     ATOXGR = coalesce(as.numeric(LBTOXGR), 0.0)
   )
 
-# Calculate Baselines
+# Calculate Baselines - sort by LBSEQ to break date ties stably matching SAS
 df_baselines <- df_windows %>%
   filter(AVISITN == 0.0) %>%
+  arrange(USUBJID, PARAMCD, is.na(lbdt), desc(lbdt), LBSEQ) %>%
   group_by(USUBJID, PARAMCD) %>%
-  filter(lbdt == max(lbdt)) %>%
   summarise(
     BASE = first(AVAL),
     BASEC = first(AVALC),
@@ -97,9 +108,9 @@ df_base_merged <- df_windows %>%
     PCHG = (CHG / BASE) * 100
   )
 
-# Determine ANL01FL and BASEFL
+# Determine ANL01FL and BASEFL - include LBSEQ as final tiebreaker
 df_anl01 <- df_base_merged %>%
-  arrange(USUBJID, PARAMCD, AVISITN, AWDIST, desc(ATOXGR), lbdt) %>%
+  arrange(USUBJID, PARAMCD, AVISITN, desc(is.na(AWDIST)), AWDIST, desc(ATOXGR), desc(is.na(lbdt)), lbdt, LBSEQ) %>%
   group_by(USUBJID, PARAMCD, AVISITN) %>%
   mutate(
     ANL01FL = if_else(AVISITN != 99.0 & row_number() == 1, "Y", "N"),
@@ -122,8 +133,8 @@ df_anc_records <- df_anl01 %>%
 df_anc_nadir <- df_anc_records %>%
   group_by(USUBJID, cycle) %>%
   summarise(
-    AVAL = min(AVAL),
-    nadir_dy = min(lbdy[AVAL == min(AVAL)]),
+    nadir_val = min(AVAL),
+    nadir_dy = min(lbdy[AVAL == nadir_val]),
     .groups = "drop"
   )
 
@@ -143,7 +154,7 @@ df_optimus_nadir <- df_anc_nadir %>%
   transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRTSDT,
     PARAMCD = "ANCNADIR", PARAM = "ANC Nadir Value (x10^3/uL)", PARCAT1 = "OPTIMUS KINETICS",
-    AVAL, AVALC = as.character(round(AVAL, 2)), AVISIT = paste("CYCLE", cycle), AVISITN = cycle,
+    AVAL = nadir_val, AVALC = sprintf("%.2f", sas_round(nadir_val, 2)), AVISIT = paste("CYCLE", cycle), AVISITN = cycle,
     ANL01FL = "Y", BASEFL = "N", lbdy = nadir_dy
   )
 

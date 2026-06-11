@@ -5,28 +5,30 @@
    Author: Principal Clinical Data Infrastructure Architect
    Date: 2026-05-27
    Standard: ADaMIG v1.3
-   Input: real_sdtm.*.sas7bdat
+   Input: realsdtm.*.sas7bdat
    Output: staging.*
    Description: Ingests real SDTM datasets and performs automated transpositions
                 and merging of supplemental SDTM variables.
    ============================================================================== */
 
-%include "00_config.sas";
+/* PGMDIR guard: allows standalone execution (CWD=02_production_sas) and IOM/ODA mode.
+   Wrapped in a macro for portability (open-code %IF requires 9.4M5+). */
+%macro set_pgmdir;
+    %if not %symexist(PGMDIR) %then %global PGMDIR;
+    %if "&PGMDIR." = "" %then %let PGMDIR = .;
+%mend set_pgmdir;
+%set_pgmdir;
+%include "&PGMDIR./00_config.sas";
 
 %macro transpose_supp(domain);
     %put NOTE: [INGEST] Ingesting and transposing domain: &domain..;
     
-    /* Check if supplemental table exists and is non-empty */
-    %let supp_exists = 0;
-    proc sql noprint;
-        select count(*) into :supp_exists
-        from dictionary.tables
-        where libname="REAL_SDTM" and memname="SUPP&domain.";
-    quit;
+    /* Check if supplemental table exists */
+    %let supp_exists = %sysfunc(exist(realsdtm.supp&domain.));
     
     %if &supp_exists. > 0 %then %do;
         /* Sort supplemental dataset */
-        proc sort data=real_sdtm.supp&domain. out=_supp_sorted;
+        proc sort data=realsdtm.supp&domain. out=_supp_sorted;
             by usubjid idvar idvarval;
         run;
         
@@ -39,7 +41,7 @@
         
         %if %upcase(&domain.) = DM %then %do;
             /* For DM, merge solely by USUBJID */
-            proc sort data=real_sdtm.dm out=_main_sorted;
+            proc sort data=realsdtm.dm out=_main_sorted;
                 by usubjid;
             run;
             proc sort data=_supp_transposed out=_supp_sorted2;
@@ -56,7 +58,7 @@
             %let idvar_name = ;
             proc sql noprint;
                 select distinct idvar into :idvar_name trimmed
-                from real_sdtm.supp&domain.
+                from realsdtm.supp&domain.
                 where not missing(idvar);
             quit;
             
@@ -70,7 +72,7 @@
                     drop idvar idvarval;
                 run;
                 
-                proc sort data=real_sdtm.&domain. out=_main_sorted;
+                proc sort data=realsdtm.&domain. out=_main_sorted;
                     by usubjid &idvar_name.;
                 run;
                 proc sort data=_supp_ready out=_supp_sorted2;
@@ -84,7 +86,7 @@
             %end;
             %else %do;
                 /* Fallback merge by USUBJID only */
-                proc sort data=real_sdtm.&domain. out=_main_sorted;
+                proc sort data=realsdtm.&domain. out=_main_sorted;
                     by usubjid;
                 run;
                 proc sort data=_supp_transposed out=_supp_sorted2;
@@ -101,7 +103,7 @@
     %else %do;
         /* Supplemental table does not exist; copy primary domain directly */
         data staging.&domain.;
-            set real_sdtm.&domain.;
+            set realsdtm.&domain.;
         run;
     %end;
     

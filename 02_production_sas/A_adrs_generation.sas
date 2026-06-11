@@ -11,13 +11,20 @@
                 death milestones with PSA progression metrics.
    ============================================================================= */
 
-%include "00_config.sas";
+/* PGMDIR guard: allows standalone execution (CWD=02_production_sas) and IOM/ODA mode.
+   Wrapped in a macro for portability (open-code %IF requires 9.4M5+). */
+%macro set_pgmdir;
+    %if not %symexist(PGMDIR) %then %global PGMDIR;
+    %if "&PGMDIR." = "" %then %let PGMDIR = .;
+%mend set_pgmdir;
+%set_pgmdir;
+%include "&PGMDIR./00_config.sas";
 
 /* 1. RECIST 1.1 Visit-level calculations */
 /* Baseline Target Sum of Diameters */
 proc sql;
     create table work.base_sod as
-    select usubjid, sum(input(lsstresn, best32.)) as base_sod
+    select usubjid, sum(lsstresn) as base_sod
     from staging.ls
     where lscat = 'TARGET' and lstestcd = 'LENGTH' and not missing(lsstresn) and visit = 'BASELINE'
     group by usubjid;
@@ -28,7 +35,7 @@ proc sql;
     create table work.post_sod as
     select ls.usubjid, ls.visitnum, ls.visit,
            input(substr(ls.lsdtc, 1, 10), yymmdd10.) as lsd_dt format=yymmdd10.,
-           sum(input(ls.lsstresn, best32.)) as post_sod
+           sum(ls.lsstresn) as post_sod
     from staging.ls as ls
     where ls.lscat = 'TARGET' and ls.lstestcd = 'LENGTH' and not missing(ls.lsstresn) and ls.visit ne 'BASELINE'
     group by ls.usubjid, ls.visitnum, ls.visit, ls.lsdtc;
@@ -79,7 +86,7 @@ proc sql;
         r.recist_resp as AVALC length=20,
         r.lsd_dt as ADT format=yymmdd10.,
         r.lsd_dt - adsl.trtsdt + 1 as ADY,
-        r.visit length=40
+        r.visit as AVISIT length=40
     from work.recist_calc as r
     left join adam.adsl as adsl on r.usubjid = adsl.usubjid;
 quit;
@@ -97,7 +104,7 @@ proc sql;
         rs.rsorres as AVALC length=20,
         rs.rsdt as ADT format=yymmdd10.,
         rs.rsdy as ADY,
-        rs.visit length=40
+        rs.visit as AVISIT length=40
     from sdtm.rs as rs
     left join adam.adsl as adsl on rs.usubjid = adsl.usubjid
     where adsl.saffl = 'Y';
@@ -116,7 +123,10 @@ run;
 proc sql;
     create table work.bor_rank as
     select 
+        studyid,
         usubjid,
+        trt01p,
+        trtsdt,
         case 
             when AVALC = 'CR' then 1.0
             when AVALC = 'PR' then 2.0
@@ -268,30 +278,52 @@ proc sql;
     where adsl.saffl = 'Y';
 quit;
 
+/* Final PSARESP Parameter creation */
+proc sql;
+    create table work.psaresp as
+    select 
+        adsl.usubjid,
+        'PSARESP' as PARAMCD length=8,
+        'PSA Response (>=50% decline)' as PARAM length=40,
+        coalesce(r.psad50, 'N') as AVALC length=20,
+        case when r.psad50 = 'Y' then 1.0 else 0.0 end as AVAL,
+        . as ADT format=yymmdd10.,
+        'ALL CYCLES' as AVISIT length=40,
+        99 as AVISITN
+    from adam.adsl as adsl
+    left join work.psa_responders as r on adsl.usubjid = r.usubjid
+    where adsl.saffl = 'Y';
+quit;
+
 /* Combine all parameters and sort before merge */
 data work.adrs_union;
-    set work.rs_base work.bor_summary work.orr_summary work.psprog;
+    set work.rs_base work.bor_summary work.orr_summary work.psprog work.psaresp;
 run;
 
 proc sort data=work.adrs_union;
     by usubjid;
 run;
 
-data adam.adrs;
-    merge work.adrs_union(in=a) adam.adsl(keep=studyid usubjid subjid siteid trt01p trt01pn saffl trtsdt trtedt trtdurd in=b);
-    by usubjid;
-    if a and saffl = 'Y';
-    
-    length ANL01FL $1;
-    ANL01FL = 'Y';
-    
-    label 
-        PARAMCD = 'Parameter Code'
-        PARAM = 'Parameter Description'
-        AVALC = 'Analysis Value (C)'
-        AVAL = 'Analysis Value'
-        ANL01FL = 'Analysis Flag 01';
-run;
+proc sql;
+    create table adam.adrs as
+    select 
+        coalesce(u.studyid, adsl.studyid) as STUDYID length=20,
+        u.usubjid as USUBJID length=40,
+        adsl.subjid as SUBJID length=10,
+        coalesce(u.trt01p, adsl.trt01p) as TRT01P length=20,
+        coalesce(u.trtsdt, adsl.trtsdt) as TRTSDT format=yymmdd10.,
+        u.PARAMCD,
+        u.PARAM,
+        u.AVALC,
+        u.ADT,
+        u.ADY,
+        u.AVISIT,
+        'Y' as ANL01FL length=1,
+        u.AVAL
+    from work.adrs_union as u
+    left join adam.adsl as adsl on u.usubjid = adsl.usubjid
+    where adsl.saffl = 'Y';
+quit;
 
 proc sort data=adam.adrs;
     by usubjid PARAMCD AVISIT;
