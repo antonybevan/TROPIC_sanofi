@@ -11,24 +11,23 @@
                 to output compliant transport files under strict character constraints.
    ============================================================================= */
 
-/* PGMDIR guard: allows standalone execution (CWD=02_production_sas) and IOM/ODA mode.
-   Wrapped in a macro for portability (open-code %IF requires 9.4M5+). */
-%macro set_pgmdir;
-    %if not %symexist(PGMDIR) %then %global PGMDIR;
-    %if "&PGMDIR." = "" %then %let PGMDIR = .;
-%mend set_pgmdir;
+/* PGMDIR guard: define only when running standalone; master driver pre-defines this. */
+%if not %sysmacexist(set_pgmdir) %then %do;
+    %macro set_pgmdir;
+        %if not %symexist(PGMDIR) %then %global PGMDIR;
+        %if "&PGMDIR." = "" %then %let PGMDIR = .;
+    %mend set_pgmdir;
+%end;
 %set_pgmdir;
 %include "&PGMDIR./00_config.sas";
 
 %macro export_xpt(dataset);
-    /* Set up Transport Library path */
+    /* DATA step write to XPORT: avoids SORTEDBY WARNING (not preserved by DATA step)
+       and avoids PROC COPY NOREPLACE ERROR when the XPT already exists. */
     libname _xout xport "&PROJ_ROOT.&PATH_SEP.04_adam&PATH_SEP.&dataset._prod.xpt";
-    
-    /* Programmatically copy with constraint check variables */
-    proc copy in=adam out=_xout memtype=data;
-        select &dataset.;
+    data _xout.&dataset.;
+        set adam.&dataset.;
     run;
-    
     libname _xout clear;
     %put NOTE: [EXPORT] Exported transport file: &dataset._prod.xpt;
 %mend export_xpt;

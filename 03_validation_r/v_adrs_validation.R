@@ -5,6 +5,8 @@
 library(dplyr)
 library(haven)
 library(lubridate)
+library(xportr)
+source("03_validation_r/config_study.R")
 
 cat("NOTE: [VALIDATION] Starting ADRS Validation script...\n")
 
@@ -46,8 +48,8 @@ df_recist <- df_post_sod %>%
     
     recist_resp = case_when(
       post_sod == 0 ~ "CR",
-      pct_chg_nadir >= 20 & abs_chg_nadir >= 5 ~ "PD",
-      pct_chg_base <= -30 ~ "PR",
+      pct_chg_nadir >= RECIST_PD_PCT & abs_chg_nadir >= RECIST_PD_ABS ~ "PD",
+      pct_chg_base <= RECIST_PR_PCT ~ "PR",
       TRUE ~ "SD"
     )
   ) %>%
@@ -61,7 +63,7 @@ df_recist <- df_post_sod %>%
   transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRTSDT,
     PARAMCD = "OVRLRESP",
-    PARAM = "Overall Response per RECIST 1.1 + PCWG3",
+    PARAM = "Overall Response per RECIST v1.0",
     AVALC = recist_resp,
     ADT = ADT_val,
     ADY = ADY_val,
@@ -77,7 +79,7 @@ df_disp_milestones <- ds %>%
     adt = RANDDT + (DSSTWK - 1) * 7,
     ady = as.numeric(adt - TRTSDT + 1),
     PARAMCD = "OVRLRESP",
-    PARAM = "Overall Response per RECIST 1.1 + PCWG3",
+    PARAM = "Overall Response per RECIST v1.0",
     AVALC = if_else(DSDECOD %in% c("DISEASE PROGRESSION", "PROGRESSION"), "PD", "DEATH"),
     VISIT = coalesce(VISIT, "FOLLOW-UP"),
     ANL01FL = "Y"
@@ -150,9 +152,9 @@ df_psa_decline <- df_psa_post %>%
   mutate(decline = (PSABL - LBSTRESN) / PSABL)
 
 df_psa_resp_cand <- df_psa_decline %>%
-  filter(decline >= 0.5) %>%
-  inner_join(df_psa_decline %>% filter(decline >= 0.5), by = "USUBJID", suffix = c("1", "2")) %>%
-  filter(as.numeric(LBDT2 - LBDT1) >= 21)
+  filter(decline >= PSA_RESP_THRESHOLD) %>%
+  inner_join(df_psa_decline %>% filter(decline >= PSA_RESP_THRESHOLD), by = "USUBJID", suffix = c("1", "2"), relationship = "many-to-many") %>%
+  filter(as.numeric(LBDT2 - LBDT1) >= PSA_RESP_CONFIRM)
 
 df_psa_responders <- df_psa_resp_cand %>%
   distinct(USUBJID) %>%
@@ -176,8 +178,8 @@ df_psa_prog_check <- df_psa_nadir %>%
   mutate(
     is_trigger = if_else(
       psad50 == "Y",
-      if_else(LBSTRESN >= 1.5 * psanadir, 1, 0),
-      if_else(LBSTRESN >= 1.25 * psanadir & (LBSTRESN - psanadir) >= 5, 1, 0)
+      if_else(LBSTRESN >= PSA_PROG_MULT_RESP * psanadir, 1, 0),
+      if_else(LBSTRESN >= PSA_PROG_MULT_NORESP * psanadir & (LBSTRESN - psanadir) >= PSA_PROG_ABS, 1, 0)
     )
   )
 
@@ -185,8 +187,8 @@ df_psa_prog_eval <- df_psa_prog_check %>%
   filter(is_trigger == 1)
 
 df_psa_prog_conf <- df_psa_prog_eval %>%
-  inner_join(df_psa_prog_eval, by = "USUBJID", suffix = c("1", "2")) %>%
-  filter(as.numeric(LBDT2 - LBDT1) >= 7) %>%
+  inner_join(df_psa_prog_eval, by = "USUBJID", suffix = c("1", "2"), relationship = "many-to-many") %>%
+  filter(as.numeric(LBDT2 - LBDT1) >= PSA_PROG_CONFIRM) %>%
   group_by(USUBJID) %>%
   summarise(prog_date = min(LBDT1), .groups = "drop")
 
@@ -224,8 +226,6 @@ adrs <- bind_rows(df_ovrl, df_bor, df_orr, df_psprog, df_psaresp) %>%
 
 adrs <- adrs %>% arrange(USUBJID, PARAMCD, AVISIT)
 
-library(xportr)
-
 # Assertions and Error Guards (QC-03)
 if (nrow(adrs) == 0) {
   stop("ERROR: [VALIDATION] ADRS output dataset is empty!")
@@ -234,6 +234,9 @@ if (nrow(df_disp_milestones) == 0) {
   stop("ERROR: [VALIDATION] ADRS milestone fallback records are missing!")
 }
 
+# XPT v5 compliance (clean log): uppercase variable names + SAS date formats
+names(adrs) <- toupper(names(adrs))
+for (.dv in names(adrs)) if (inherits(adrs[[.dv]], "Date")) attr(adrs[[.dv]], "format.sas") <- "DATE9."
 xportr_write(adrs, "04_adam/adrs_v.xpt", domain = "ADRS")
 
 cat("NOTE: [VALIDATION] Wrote validation ADRS: 04_adam/adrs_v.xpt\n")

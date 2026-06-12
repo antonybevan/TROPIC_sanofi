@@ -5,6 +5,8 @@
 library(dplyr)
 library(haven)
 library(lubridate)
+library(xportr)
+source("03_validation_r/config_study.R")
 
 round_half_up <- function(x, digits = 0) {
   posneg <- sign(x)
@@ -57,7 +59,7 @@ header <- adsl %>%
 summary_records <- header %>%
   inner_join(ex_summary, by = "USUBJID") %>%
   mutate(
-    planned_dose = 12.0 # Standard planned dose for MP (mg/m2)
+    planned_dose = PLANNED_DOSE # Mitoxantrone planned dose mg/m2 — see config_study.R
   )
 
 # Build BDS Structure (Summary records)
@@ -145,7 +147,8 @@ if (nrow(adex %>% filter(PARAMCD == "PERFDOSE")) == 0) {
   stop("ERROR: [VALIDATION] ADEX cycle-level records are missing!")
 }
 
-# Export via xportr
-library(xportr)
+# XPT v5 compliance (clean log): uppercase variable names + SAS date formats
+names(adex) <- toupper(names(adex))
+for (.dv in names(adex)) if (inherits(adex[[.dv]], "Date")) attr(adex[[.dv]], "format.sas") <- "DATE9."
 xportr_write(adex, "04_adam/adex_v.xpt", domain = "ADEX")
 cat("NOTE: [VALIDATION] Wrote validation ADEX: 04_adam/adex_v.xpt\n")

@@ -66,7 +66,7 @@
         %put ERROR: [PIPELINE] FINISHED WITH ERRORS. SYSCC=&syscc.. See log above for the failing program.;
     %end;
     %else %do;
-        %put NOTE: [PIPELINE] COMPLETE. ALL MAPPINGS AND TFL SUITES COMPILED WITH ZERO ERRORS.;
+        %put NOTE: [PIPELINE] COMPLETE. SDTM MAPPING, ADaM DERIVATION, AND XPT EXPORT COMPILED WITH ZERO ERRORS.;
     %end;
 %mend pipeline_done;
 %pipeline_done;

@@ -11,12 +11,13 @@
                 demographics, population flags, baseline covariates, and survival.
    ============================================================================= */
 
-/* PGMDIR guard: allows standalone execution (CWD=02_production_sas) and IOM/ODA mode.
-   Wrapped in a macro for portability (open-code %IF requires 9.4M5+). */
-%macro set_pgmdir;
-    %if not %symexist(PGMDIR) %then %global PGMDIR;
-    %if "&PGMDIR." = "" %then %let PGMDIR = .;
-%mend set_pgmdir;
+/* PGMDIR guard: define only when running standalone; master driver pre-defines this. */
+%if not %sysmacexist(set_pgmdir) %then %do;
+    %macro set_pgmdir;
+        %if not %symexist(PGMDIR) %then %global PGMDIR;
+        %if "&PGMDIR." = "" %then %let PGMDIR = .;
+    %mend set_pgmdir;
+%end;
 %set_pgmdir;
 %include "&PGMDIR./00_config.sas";
 
@@ -193,54 +194,54 @@ run;
 /* Assemble ADSL */
 proc sql;
     create table adam.adsl as
-    select 
-        'TROPIC-NCT00417079' as STUDYID length=40,
+    select
+        "&STUDYID." as STUDYID length=40,
         dm.usubjid as USUBJID length=40,
         dm.subjid as SUBJID length=10,
         substr(dm.subjid, 1, 3) as SITEID length=10,
-        
+
         dm.age as AGE,
-        case 
-            when dm.age < 65 then '<65'
+        case
+            when dm.age < &AGE_STRAT_CUT. then '<65'
             else '>=65'
         end as AGEGR1 length=10,
-        case 
-            when dm.age < 65 then 1
+        case
+            when dm.age < &AGE_STRAT_CUT. then 1
             else 2
         end as AGEGR1N,
         dm.race as RACE length=40,
         'NOT HISPANIC OR LATINO' as ETHNIC length=40,
         'M' as SEX length=1,
-        
-        'MP' as TRT01P length=20,
-        2 as TRT01PN,
-        'MP' as TRT01A length=20,
-        2 as TRT01AN,
-        
+
+        "&TRT01P_CODE." as TRT01P length=20,
+        &TRT01PN_CODE. as TRT01PN,
+        "&TRT01P_CODE." as TRT01A length=20,
+        &TRT01PN_CODE. as TRT01AN,
+
         dm.randdt as RANDDT format=yymmdd10.,
         ex.trtsdt as TRTSDT format=yymmdd10.,
         ex.trtedt as TRTEDT format=yymmdd10.,
         ex.trtdurd as TRTDURD,
-        
+
         coalesce(dm.itt, 'N') as ITTFL length=1,
         coalesce(dm.safety, 'N') as SAFFL length=1,
         coalesce(dm.pprot, 'N') as PPROTFL length=1,
-        
+
         coalesce(srv.dthfl, 'N') as DTHFL length=1,
         srv.dthdt as DTHDT format=yymmdd10.,
         srv.dthcaus as DTHCAUS length=100,
         lst.lstalvdt as LSTALVDT format=yymmdd10.,
-        
-        /* Baseline clinical covariates (harmonized with study parameters) */
-        coalesce(ecog.ecogbl, 1.0) as ECOGBL,
+
+        /* Baseline clinical covariates — defaults from config §6.3 */
+        coalesce(ecog.ecogbl, &ECOGBL_DEFAULT.) as ECOGBL,
         coalesce(meas.measdisf, 'N') as MEASDISF length=1,
         coalesce(visc.viscfl, 'N') as VISCFL length=1,
         coalesce(pain.painbl, 'N') as PAINBL length=1,
-        coalesce(labs.PSABL, 110.0) as PSABL,
-        coalesce(labs.ALPBL, 140.0) as ALPBL,
-        38.0 as ALBBL,
-        220.0 as LDHBL,
-        coalesce(labs.HGBBL, 11.5) as HGBBL,
+        coalesce(labs.PSABL, &PSABL_DEFAULT.) as PSABL,
+        coalesce(labs.ALPBL, &ALPBL_DEFAULT.) as ALPBL,
+        &ALBBL_DEFAULT. as ALBBL,
+        &LDHBL_DEFAULT. as LDHBL,
+        coalesce(labs.HGBBL, &HGBBL_DEFAULT.) as HGBBL,
         coalesce(doc.docprog, 'AFTER') as DOCPROG length=10,
         coalesce(doc.docresp, 'N') as DOCRESP length=1
     from sdtm.dm as dm

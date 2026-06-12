@@ -7,7 +7,7 @@
 *Sanofi · de Bono et al., Lancet 2010*
 
 [![Pipeline](https://img.shields.io/badge/Pipeline-12%2F12%20Stages%20Passing-brightgreen?style=flat-square&logo=checkmarx)](06_telemetry/)
-[![CDISC](https://img.shields.io/badge/CDISC-ADaMIG%20v1.3%20%7C%20SDTMIG%20v3.4-005A9C?style=flat-square)](https://www.cdisc.org/)
+[![CDISC](https://img.shields.io/badge/CDISC-ADaMIG%20v1.3%20%7C%20SDTMIG%20v3.1.1-005A9C?style=flat-square)](https://www.cdisc.org/)
 [![FDA](https://img.shields.io/badge/FDA-Project%20Optimus%202026-A6192E?style=flat-square)](https://www.fda.gov/about-fda/oncology-center-excellence/project-optimus)
 [![Reconciliation](https://img.shields.io/badge/Reconciliation-100%25%20diffdf%20Match-success?style=flat-square)](05_reconciliation/)
 [![R](https://img.shields.io/badge/R-4.6.0-276DC3?style=flat-square&logo=r)](https://www.r-project.org/)
@@ -225,22 +225,39 @@ The submitted ADaM datasets (`04_adam/*.xpt`) contain strictly the **real Mitoxa
 
 ---
 
-## TFL Output Gallery
+## Tables, Figures & Listings
 
-View all rendered figures and tables: **[09_tfl/output/](09_tfl/output/)**
+The **R / pharmaverse track is the reporting deliverable**: it generates the complete
+TFL package — figures (ggplot2), efficacy/safety tables, and CTCAE shift tables — from
+the reconciled ADaM and the analysis derivations documented in the ADRG/SAP.
 
-| TFL | Description |
+| Output | Description |
 |---|---|
 | `F-01-1_CONSORT_Disposition.png` | Patient disposition flow (CONSORT) |
-| `F-11-1_KM_OS.png` | Overall Survival KM curve with risk table |
-| `F-11-2_KM_PFS.png` | Progression-Free Survival KM curve |
-| `F-12-1_Subgroup_Forest.png` | OS subgroup forest plot |
-| `F-13-1_PSA_Waterfall.png` | PSA best % change waterfall |
-| `F-14-1_Swimmer_Plot.png` | Treatment exposure swimmer plot |
-| `F-17-1_Optimus_Scatter.png` | FDA Project Optimus E-R scatter |
-| `T-11-Efficacy_Tables.txt` | KM/Cox efficacy summary tables |
-| `T-20-AE_Summary_Tables.txt` | TEAE summary (overall, Grade≥3, SAE) |
-| `T-21-Lab_Shift_Tables.txt` | CTCAE grade shift (ANC, Hgb, Platelets) |
+| `F-11-1_KM_OS.png` / `F-11-2_KM_PFS.png` | OS / PFS Kaplan–Meier with number-at-risk |
+| `F-12-1_Subgroup_Forest.png` | OS subgroup forest (univariate Cox HRs) |
+| `F-13-1_PSA_Waterfall.png` | PSA best % change from baseline |
+| `F-14-1_Swimmer_Plot.png` | Treatment-exposure swimmer |
+| `F-17-1_Optimus_Scatter.png` | Project Optimus exposure–response |
+| `T-11` / `T-20` / `T-21` (`.txt`) | Efficacy (KM/Cox), TEAE summary, CTCAE lab shifts |
+
+Figure QC follows standard practice: the **analysis results behind each figure** —
+survival functions, hazard ratios, subjects-at-risk, and response distributions — are
+the validated objects (driven by the SAS↔R-reconciled ADaM), not the rendered pixels.
+
+### SAS production-track graphics (capability demonstration)
+
+To show the production environment can deliver regulatory-grade graphics natively, the
+core efficacy/safety statistical figures are **also** rendered in SAS 9.4 via ODS
+Graphics (`02_production_sas/T_tfl_generation.sas` — PROC LIFETEST / SGPLOT / SGPANEL),
+output to [`09_tfl/output/sas/`](09_tfl/output/sas/): KM OS & PFS, subgroup forest, PSA
+waterfall, exposure swimmer, and the Optimus exposure–response scatter.
+
+> This is a **breadth demonstration**, not a duplicated deliverable — a study ships its
+> TFLs in a single validated language. It does double as an independent visual check that
+> the SAS production analyses (Cox HR, KM survival, at-risk counts) agree with the R
+> reporting track. CONSORT and the text tables are R-track outputs only. SAS figures are
+> rendered on ODA via `python3 06_telemetry/_oda_render_tfl.py`.
 
 ---
 
@@ -251,7 +268,7 @@ This is a **demonstration / portfolio** project, not a regulatory submission. Th
 | Standard | What this repo actually does |
 |---|---|
 | CDISC ADaMIG v1.3 | ADaM structure/metadata modelled for all 7 datasets (real MP arm) |
-| CDISC SDTMIG v3.4 | Source SDTM consumed and structurally validated |
+| CDISC SDTMIG v3.1.1 | Trial-era source SDTM standard (per SAP v3.0 §1) consumed and structurally validated |
 | ICH E9 (Statistical Principles) | Hierarchical step-down gatekeeping **pattern implemented** (exercised on a synthetic comparator — not an inferential result) |
 | ICH E3 (TFL Catalogue) | TFL set rendered in NEJM/Lancet style |
 | FDA Project Optimus | Exposure–response dose-optimisation analysis **pattern demonstrated** on synthetic data |

@@ -18,8 +18,8 @@ dir.create("09_tfl/output", showWarnings = FALSE, recursive = TRUE)
 # Mandatory on-artifact disclosure (review-board condition CR-1): every comparative
 # figure carries this caption so a detached PNG cannot be mistaken for a real result.
 SYNTH_CAP <- paste0(
-  "Comparator arm (CbzP) is a SYNTHETIC, illustrative cohort (PH-scaled from the real MP arm); ",
-  "between-arm statistics are circular by construction and are NOT clinical findings. MP arm is real."
+  "CbzP is a SYNTHETIC, illustrative comparator (PH-scaled from the real MP arm).\n",
+  "Between-arm statistics are circular by construction — NOT clinical findings; the MP arm is real."
 )
 # Plain-text banner prepended to every text table output for the same reason.
 SYNTH_BANNER <- paste0(
@@ -105,7 +105,10 @@ psa_significant <- pfs_significant && (psa_pval < 0.05)
 cat(sprintf("  Step 3: PSA Response Significance check -> p = %e (Significant & Tested: %s)\n", psa_pval, as.character(psa_significant)))
 
 # Step 4: ORR (Tested only if PSA Response is significant)
-orr_resp_data <- adrs %>% filter(PARAMCD == "OBJRESP")
+# Conformed to SAP measurable-disease ITT population (MEASDISF == 'Y')
+orr_resp_data <- adrs %>% 
+  filter(PARAMCD == "OBJRESP") %>%
+  filter(USUBJID %in% adsl$USUBJID[adsl$MEASDISF == "Y"])
 orr_table <- table(orr_resp_data$TRT01P, orr_resp_data$AVALC)
 orr_test <- fisher.test(orr_table)
 orr_pval <- orr_test$p.value
@@ -181,7 +184,7 @@ os_plot_data <- bind_rows(os_plot_list)
 # Main KM Plot Panel
 km_plot <- ggplot(os_plot_data, aes(x = time, y = surv, color = TRT01P)) +
   geom_step(linewidth = 1.0) +
-  scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E")) + # NEJM Medical Palette
+  scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"), labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) + # NEJM Medical Palette
   scale_y_continuous(labels = scales::percent, expand = c(0, 0)) +
   scale_x_continuous(breaks = seq(0, 24, by = 3), expand = c(0, 0)) +
   coord_cartesian(xlim = c(0, 24), ylim = c(0, 1.02)) +
@@ -224,7 +227,8 @@ for (trt in active_trts) {
 # Number at Risk Table Panel (Text colored dynamically by treatment arm for luxury publication styling)
 risk_table_plot <- ggplot(risk_data, aes(x = Time, y = factor(TRT01P, levels = rev(active_trts)), label = n.risk)) +
   geom_text(size = 3.2, fontface = "bold", aes(color = TRT01P), family = "serif") +
-  scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"), guide = "none") +
+  scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"), labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)"), guide = "none") +
+  scale_y_discrete(labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) +
   scale_x_continuous(limits = c(0, 24), breaks = times, expand = c(0, 0)) +
   labs(
     x = NULL,
@@ -268,8 +272,8 @@ er_plot <- ggplot(er_data, aes(x = RDI, y = ANC, color = TRT01P)) +
   # Styled points with white fill, transparency, and clinical palette borders
   geom_point(alpha = 0.5, size = 2.0, shape = 21, stroke = 0.6, fill = "white", aes(color = TRT01P)) +
   geom_smooth(method = "loess", span = 1.0, se = TRUE, linewidth = 1.2, aes(fill = TRT01P, color = TRT01P), alpha = 0.15) +
-  scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E")) +
-  scale_fill_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E")) +
+  scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"), labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) +
+  scale_fill_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"), labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) +
   labs(
     title = "F-17-1: Project Optimus Exposure-Response Analysis",
     subtitle = "Continuous ANC Nadir (Cycle 1) vs Relative Dose Intensity (RDI) by Arm\nFitted with LOWESS smoothing local regression curves",
@@ -373,8 +377,8 @@ forest_left <- ggplot(subgroups) +
   scale_x_continuous(limits = c(0.1, 2.7), breaks = c(0.2, 0.5, 1.0, 1.5, 2.0, 2.5)) +
   labs(
     title = "F-12-1: Prognostic Subgroup Forest Plot for Overall Survival",
-    subtitle = "Univariate Hazard Ratios (Cox Proportional Hazards model of CbzP vs MP) and 95% Wald CIs",
-    x = "Hazard Ratio (Favors Cabazitaxel <-- | --> Favors Mitoxantrone)",
+    subtitle = "Univariate Hazard Ratios (Cox Proportional Hazards model of CbzP (Synthetic) vs MP (Real)) and 95% Wald CIs",
+    x = "Hazard Ratio (Favors CbzP (Synthetic) <-- | --> Favors MP (Real))",
     y = "",
     caption = SYNTH_CAP
   ) +
@@ -574,12 +578,16 @@ psa_mp_resp <- sum(psa_resp_data$AVALC == "Y" & psa_resp_data$TRT01P == "MP")
 psa_mp_total <- sum(psa_resp_data$TRT01P == "MP")
 psa_mp_pct <- psa_mp_resp / psa_mp_total * 100
 
-orr_resp_data <- adrs %>% filter(PARAMCD == "OBJRESP")
+# Objective Response Rate (ORR) restricted to Measurable-Disease ITT population
+meas_subj <- adsl %>% filter(MEASDISF == "Y") %>% select(USUBJID, TRT01P)
+orr_resp_data <- adrs %>% 
+  filter(PARAMCD == "OBJRESP") %>%
+  filter(USUBJID %in% meas_subj$USUBJID)
 orr_cbzp_resp <- sum(orr_resp_data$AVALC == "Y" & orr_resp_data$TRT01P == "CbzP")
-orr_cbzp_total <- sum(orr_resp_data$TRT01P == "CbzP")
+orr_cbzp_total <- sum(meas_subj$TRT01P == "CbzP")
 orr_cbzp_pct <- orr_cbzp_resp / orr_cbzp_total * 100
 orr_mp_resp <- sum(orr_resp_data$AVALC == "Y" & orr_resp_data$TRT01P == "MP")
-orr_mp_total <- sum(orr_resp_data$TRT01P == "MP")
+orr_mp_total <- sum(meas_subj$TRT01P == "MP")
 orr_mp_pct <- orr_mp_resp / orr_mp_total * 100
 
 efficacy_tables <- sprintf("
@@ -606,16 +614,18 @@ Unstratified Hazard Ratio (CbzP vs MP)     %.2f (95%% CI: %.2f-%.2f)
 Wald Log-Rank p-value                     %.4f
 
 
-T-11-8: Analysis of Best Clinical Response Endpoints - ITT Population
----------------------------------------------------------------------
-Statistic                                 CbzP (N=378)        MP (N=371)
-PSA Response Rate (>=50%% decline)
+T-11-8: Analysis of Best Clinical Response Endpoints
+----------------------------------------------------
+Statistic                                 CbzP                MP
+PSA Response Rate (>=50%% decline) - ITT Population
   Responders / N (%%)                      %d/%d (%.1f%%)      %d/%d (%.1f%%)
   Fisher's Exact p-value                  %.4e
 
-Objective Response Rate (ORR)
+Objective Response Rate (ORR) - Measurable ITT Population†
   Responders / N (%%)                      %d/%d (%.1f%%)      %d/%d (%.1f%%)
   Fisher's Exact p-value                  %.4f
+
+†Restricted to patients with measurable disease at baseline (CbzP N=179, MP N=203).
 ",
   as.integer(events_psa_cbzp), as.integer(total_psa_cbzp),
   as.integer(events_psa_mp), as.integer(total_psa_mp),
@@ -636,28 +646,26 @@ Objective Response Rate (ORR)
   orr_pval
 )
 
-# SAP-conforming ORR with the measurable-disease ITT denominator (review-board SR-1).
-# The T-11-8 block above uses a response-evaluable denominator; the publication
-# (de Bono 2010) uses a measurable-disease ITT denominator. Report BOTH transparently.
-meas_subj   <- adsl %>% filter(MEASDISF == "Y") %>% select(USUBJID, TRT01P)
-orr_y_ids   <- adrs %>% filter(PARAMCD == "OBJRESP", AVALC == "Y") %>% distinct(USUBJID)
-orr_md_cbzp_total <- sum(meas_subj$TRT01P == "CbzP")
-orr_md_mp_total   <- sum(meas_subj$TRT01P == "MP")
-orr_md_cbzp_resp  <- n_distinct(intersect(orr_y_ids$USUBJID, meas_subj$USUBJID[meas_subj$TRT01P == "CbzP"]))
-orr_md_mp_resp    <- n_distinct(intersect(orr_y_ids$USUBJID, meas_subj$USUBJID[meas_subj$TRT01P == "MP"]))
+# Objective Response Rate (ORR) with response-evaluable denominator (review-board SR-1).
+# The T-11-8 block above uses the SAP measurable-disease ITT denominator.
+# Report the response-evaluable denominator version here for full transparency.
+orr_ev_resp_data <- adrs %>% filter(PARAMCD == "OBJRESP")
+orr_ev_cbzp_resp <- sum(orr_ev_resp_data$AVALC == "Y" & orr_ev_resp_data$TRT01P == "CbzP")
+orr_ev_cbzp_total <- sum(orr_ev_resp_data$TRT01P == "CbzP")
+orr_ev_mp_resp <- sum(orr_ev_resp_data$AVALC == "Y" & orr_ev_resp_data$TRT01P == "MP")
+orr_ev_mp_total <- sum(orr_ev_resp_data$TRT01P == "MP")
 orr_md_addendum <- sprintf(paste0(
-  "\nT-11-8b: Objective Response Rate — SAP Measurable-Disease ITT Denominator (review-board SR-1)\n",
-  "---------------------------------------------------------------------------------------------\n",
-  "Denominator basis        CbzP (measurable ITT)     MP (measurable ITT)\n",
+  "\nT-11-8b: Objective Response Rate — Response-Evaluable Denominator (review-board SR-1)\n",
+  "--------------------------------------------------------------------------------------\n",
+  "Denominator basis        CbzP (evaluable)          MP (evaluable)\n",
   "Responders / N (%%)       %d/%d (%.1f%%)             %d/%d (%.1f%%)\n",
-  "Note: T-11-8 above uses the response-evaluable denominator (MP 37/351=10.5%%). The SAP /\n",
-  "de Bono (2010) ORR uses the measurable-disease ITT denominator shown here; published MP ORR\n",
-  "was 4.4%%. The two denominators are reported side-by-side for full traceability.\n"),
-  orr_md_cbzp_resp, orr_md_cbzp_total, 100 * orr_md_cbzp_resp / max(orr_md_cbzp_total, 1),
-  orr_md_mp_resp,   orr_md_mp_total,   100 * orr_md_mp_resp   / max(orr_md_mp_total, 1))
+  "Note: T-11-8 above uses the SAP-specified measurable-disease ITT denominator. The response-\n",
+  "evaluable denominator version is reported here for full traceability.\n"),
+  orr_ev_cbzp_resp, orr_ev_cbzp_total, 100 * orr_ev_cbzp_resp / max(orr_ev_cbzp_total, 1),
+  orr_ev_mp_resp,   orr_ev_mp_total,   100 * orr_ev_mp_resp   / max(orr_ev_mp_total, 1))
 efficacy_tables <- paste0(efficacy_tables, orr_md_addendum)
-cat(sprintf("  [TFL] ORR (measurable-disease ITT): MP %d/%d (%.1f%%) vs published 4.4%%\n",
-            orr_md_mp_resp, orr_md_mp_total, 100 * orr_md_mp_resp / max(orr_md_mp_total, 1)))
+cat(sprintf("  [TFL] ORR (response-evaluable): MP %d/%d (%.1f%%)\n",
+            orr_ev_mp_resp, orr_ev_mp_total, 100 * orr_ev_mp_resp / max(orr_ev_mp_total, 1)))
 
 writeLines(paste0(SYNTH_BANNER, efficacy_tables), "09_tfl/output/T-11-Efficacy_Tables.txt")
 
@@ -687,7 +695,7 @@ pfs_plot_data <- bind_rows(pfs_plot_list)
 
 km_pfs <- ggplot(pfs_plot_data, aes(x = time, y = surv, color = TRT01P)) +
   geom_step(linewidth = 1.0) +
-  scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E")) +
+  scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"), labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) +
   scale_y_continuous(labels = scales::percent, expand = c(0, 0)) +
   scale_x_continuous(breaks = seq(0, 18, by = 3), expand = c(0, 0)) +
   coord_cartesian(xlim = c(0, 18), ylim = c(0, 1.02)) +
@@ -725,7 +733,8 @@ for (trt in c("CbzP", "MP")) {
 
 risk_pfs_plot <- ggplot(risk_pfs, aes(x = Time, y = factor(TRT01P, levels = rev(c("CbzP", "MP"))), label = n.risk)) +
   geom_text(size = 3.2, fontface = "bold", aes(color = TRT01P), family = "serif") +
-  scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"), guide = "none") +
+  scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"), labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)"), guide = "none") +
+  scale_y_discrete(labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) +
   scale_x_continuous(limits = c(0, 18), breaks = times_pfs, expand = c(0, 0)) +
   labs(x = NULL, y = "Number at risk:") +
   theme_minimal(base_family = "serif") +
@@ -758,6 +767,7 @@ psa_lb <- adlb %>%
 psa_lb <- psa_lb %>%
   arrange(TRT01P, best_pchg) %>%
   mutate(subj_rank = row_number(),
+         TRT_LABEL = if_else(TRT01P == "CbzP", "CbzP (Synthetic)", "MP (Real)"),
          response_color = case_when(
            best_pchg <= -50 ~ "PSA Response (>=50% decrease)",
            best_pchg < 0   ~ "PSA Decrease (<50%)",
@@ -776,7 +786,7 @@ waterfall_plot <- ggplot(psa_lb, aes(x = subj_rank, y = best_pchg, fill = respon
     "PSA Increase"                  = "#A6192E"
   )) +
   scale_y_continuous(labels = function(x) paste0(x, "%"), limits = c(-105, min(max(psa_lb$best_pchg, na.rm=TRUE) + 20, 300))) +
-  facet_wrap(~TRT01P, scales = "free_x", ncol = 2) +
+  facet_wrap(~TRT_LABEL, scales = "free_x", ncol = 2) +
   labs(
     title = "F-13-1: PSA Best Percentage Change from Baseline — Waterfall Plot",
     subtitle = "Each bar represents one subject's maximum PSA decrease (or increase). Sorted within arm.",
@@ -810,7 +820,8 @@ swimmer_data <- adsl %>%
   left_join(ncycle_all, by = "USUBJID") %>%
   mutate(
     duration_months = TRTDURD / 30.4375,
-    death_event    = DTHFL == "Y"
+    death_event    = DTHFL == "Y",
+    TRT_LABEL = if_else(TRT01P == "CbzP", "CbzP (Synthetic)", "MP (Real)")
   ) %>%
   arrange(TRT01P, desc(duration_months)) %>%
   group_by(TRT01P) %>%
@@ -823,9 +834,9 @@ swimmer_plot <- ggplot(swimmer_data, aes(y = subj_label, x = duration_months, fi
   geom_point(data = swimmer_data %>% filter(death_event),
              aes(x = duration_months, y = subj_label), shape = 4, size = 2.5,
              color = "#A6192E", stroke = 1.2) +
-  scale_fill_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E")) +
+  scale_fill_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"), labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) +
   scale_x_continuous(breaks = seq(0, ceiling(max(swimmer_data$duration_months, na.rm=TRUE) / 3) * 3, by = 3)) +
-  facet_wrap(~TRT01P, scales = "free_y", ncol = 2) +
+  facet_wrap(~TRT_LABEL, scales = "free_y", ncol = 2) +
   labs(
     title = "F-14-1: Treatment Exposure Duration — Swimmer Plot (Representative Sample)",
     subtitle = "Bar length = treatment duration. \u2717 = death event on study. Top 30 subjects per arm shown.",

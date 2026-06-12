@@ -12,12 +12,13 @@
                 with corrected AEOCCFL occurrence denominator flags.
    ============================================================================= */
 
-/* PGMDIR guard: allows standalone execution (CWD=02_production_sas) and IOM/ODA mode.
-   Wrapped in a macro for portability (open-code %IF requires 9.4M5+). */
-%macro set_pgmdir;
-    %if not %symexist(PGMDIR) %then %global PGMDIR;
-    %if "&PGMDIR." = "" %then %let PGMDIR = .;
-%mend set_pgmdir;
+/* PGMDIR guard: define only when running standalone; master driver pre-defines this. */
+%if not %sysmacexist(set_pgmdir) %then %do;
+    %macro set_pgmdir;
+        %if not %symexist(PGMDIR) %then %global PGMDIR;
+        %if "&PGMDIR." = "" %then %let PGMDIR = .;
+    %mend set_pgmdir;
+%end;
 %set_pgmdir;
 %include "&PGMDIR./00_config.sas";
 
@@ -94,7 +95,7 @@ data work.ae_episodes;
     else do;
         if not missing(cq02nam) and cq02nam ne '' then do;
             /* Gap rule: check if start date is within 3 days of prior end date */
-            if astdt <= (_ciaeedt + 3) then do;
+            if astdt <= (_ciaeedt + &EPISODE_GAP_DAYS.) then do;
                 /* Merge: update end date to running maximum */
                 _ciaeedt = max(_ciaeedt, aendt);
                 AEOCCFL = 'N';
@@ -175,13 +176,6 @@ run;
 
 proc sort data=adam.adae;
     by usubjid astdt aedecod aendt aeseq;
-run;
-
-/* Drop the AESEQ tie-breaker so the production schema matches the validation
-   track (which also carries AESEQ only internally). Final delivered order is
-   deterministic: usubjid astdt aedecod aendt aeseq. */
-data adam.adae;
-    set adam.adae(drop=aeseq);
 run;
 
 /* Clean up work library */

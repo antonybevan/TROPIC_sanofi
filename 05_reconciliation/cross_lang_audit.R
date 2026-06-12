@@ -59,7 +59,7 @@ compare_datasets <- function(ds_name) {
   } else if (ds_name == "adcm") {
     sort_keys <- c("USUBJID", "CMSTDT", "CMDECOD")
   } else if (ds_name == "adae") {
-    sort_keys <- c("USUBJID", "ASTDT", "AEDECOD")
+    sort_keys <- c("USUBJID", "AESEQ")
   } else if (ds_name == "adlb") {
     sort_keys <- c("USUBJID", "PARAMCD", "AVISITN", "LBDY")
   } else if (ds_name == "adrs") {

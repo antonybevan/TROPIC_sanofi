@@ -11,12 +11,13 @@
                 Derives anchors like treatment start date (TRTSDT) and study days.
    ============================================================================== */
 
-/* PGMDIR guard: allows standalone execution (CWD=02_production_sas) and IOM/ODA mode.
-   Wrapped in a macro for portability (open-code %IF requires 9.4M5+). */
-%macro set_pgmdir;
-    %if not %symexist(PGMDIR) %then %global PGMDIR;
-    %if "&PGMDIR." = "" %then %let PGMDIR = .;
-%mend set_pgmdir;
+/* PGMDIR guard: define only when running standalone; master driver pre-defines this. */
+%if not %sysmacexist(set_pgmdir) %then %do;
+    %macro set_pgmdir;
+        %if not %symexist(PGMDIR) %then %global PGMDIR;
+        %if "&PGMDIR." = "" %then %let PGMDIR = .;
+    %mend set_pgmdir;
+%end;
 %set_pgmdir;
 %include "&PGMDIR./00_config.sas";
 

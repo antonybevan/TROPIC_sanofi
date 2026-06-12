@@ -11,12 +11,13 @@
                 dose adjustments, delays, and relative dose intensity (RDI).
    ============================================================================= */
 
-/* PGMDIR guard: allows standalone execution (CWD=02_production_sas) and IOM/ODA mode.
-   Wrapped in a macro for portability (open-code %IF requires 9.4M5+). */
-%macro set_pgmdir;
-    %if not %symexist(PGMDIR) %then %global PGMDIR;
-    %if "&PGMDIR." = "" %then %let PGMDIR = .;
-%mend set_pgmdir;
+/* PGMDIR guard: define only when running standalone; master driver pre-defines this. */
+%if not %sysmacexist(set_pgmdir) %then %do;
+    %macro set_pgmdir;
+        %if not %symexist(PGMDIR) %then %global PGMDIR;
+        %if "&PGMDIR." = "" %then %let PGMDIR = .;
+    %mend set_pgmdir;
+%end;
 %set_pgmdir;
 %include "&PGMDIR./00_config.sas";
 
@@ -55,7 +56,7 @@ run;
 data work.adex_bds;
     set work.adex_bds_merged;
     
-    length PARAMCD $8 PARAM $40 AVALC $40 PARCAT1 $20 AVALCAT1 $20 AVISIT $40;
+    length PARAMCD $8 PARAM $40 AVALC $40 PARCAT1 $20 AVISIT $40;
     format AVAL 8.2;
     
     if missing(ncycle) then ncycle = 0;
@@ -64,7 +65,7 @@ data work.adex_bds;
     if missing(nreddose) then nreddose = 0;
     if missing(rdi) then rdi = 0;
     
-    planned_dose = 12.0; /* planned dose for Mitoxantrone (mg/m2) */
+    planned_dose = &PLANNED_DOSE.; /* Mitoxantrone planned dose mg/m2 — see config */
     
     /* 1. Planned Dose Parameter */
     PARAMCD = 'PLDOSE';
@@ -128,7 +129,6 @@ data work.adex_bds;
     if rdi >= 85 then AVALC = '>=85%';
     else if rdi >= 65 then AVALC = '65-<85%';
     else AVALC = '<65%';
-    AVALCAT1 = AVALC;
     AVISIT = 'ALL CYCLES';
     output;
 run;
@@ -149,7 +149,7 @@ run;
 data work.adex_cycle;
     set work.adex_cycle_merged;
     
-    length PARAMCD $8 PARAM $40 AVALC $40 PARCAT1 $20 AVALCAT1 $20 AVISIT $40;
+    length PARAMCD $8 PARAM $40 AVALC $40 PARCAT1 $20 AVISIT $40;
     format AVAL 8.2;
     
     AVISIT = catx(' ', 'CYCLE', put(exseq, 2.));

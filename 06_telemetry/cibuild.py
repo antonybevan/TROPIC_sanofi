@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import glob
 import subprocess
 import argparse
 import shutil
@@ -8,18 +9,29 @@ import getpass
 import re
 from datetime import datetime
 
-# Dynamically resolve Rscript via PATH or fallback to platform-specific paths (AUTO-01)
-RSCRIPT_PATH = shutil.which("Rscript")
+# Resolve Rscript: prefer PATH, then the TROPIC_RSCRIPT env override, then common
+# install locations. No hard-coded per-user paths (a clone on another machine must
+# not depend on a specific developer's home directory).
+RSCRIPT_PATH = shutil.which("Rscript") or os.environ.get("TROPIC_RSCRIPT")
 if not RSCRIPT_PATH:
     if sys.platform == "win32":
-        RSCRIPT_PATH = r"C:\Users\91936\AppData\Local\Programs\R\R-4.5.2\bin\Rscript.exe"
+        candidates = [
+            os.path.join(os.environ.get("ProgramFiles", r"C:\Program Files"), "R"),
+            os.path.join(os.environ.get("LOCALAPPDATA", ""), r"Programs\R"),
+        ]
+        for base in candidates:
+            hits = glob.glob(os.path.join(base, "R-*", "bin", "Rscript.exe")) if base else []
+            if hits:
+                RSCRIPT_PATH = sorted(hits)[-1]  # newest installed R
+                break
     else:
-        for path in ["/usr/local/bin/Rscript", "/opt/homebrew/bin/Rscript", "/Library/Frameworks/R.framework/Resources/bin/Rscript"]:
+        for path in ["/usr/local/bin/Rscript", "/opt/homebrew/bin/Rscript",
+                     "/Library/Frameworks/R.framework/Resources/bin/Rscript"]:
             if os.path.exists(path):
                 RSCRIPT_PATH = path
                 break
-        if not RSCRIPT_PATH:
-            RSCRIPT_PATH = "Rscript"
+    if not RSCRIPT_PATH:
+        RSCRIPT_PATH = "Rscript"  # last resort: rely on PATH at call time
 
 BACKUP_DIR = "backup_adam"
 
@@ -304,6 +316,9 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False):
     print("All clinical pipeline stages compiled successfully!")
 
 def update_define_timestamp():
+    # NOTE (review-board RR-2): AsOfDateTime is intentionally restamped to the build
+    # time on every successful run so it reflects when the metadata was last produced.
+    # It is a build provenance stamp, NOT evidence that the underlying data changed.
     define_path = "07_define_xml/define.xml"
     if os.path.exists(define_path):
         try:

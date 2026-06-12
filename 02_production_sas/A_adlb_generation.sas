@@ -11,12 +11,13 @@
                 Analysis flag (ANL01FL), and Project Optimus parameters.
    ============================================================================= */
 
-/* PGMDIR guard: allows standalone execution (CWD=02_production_sas) and IOM/ODA mode.
-   Wrapped in a macro for portability (open-code %IF requires 9.4M5+). */
-%macro set_pgmdir;
-    %if not %symexist(PGMDIR) %then %global PGMDIR;
-    %if "&PGMDIR." = "" %then %let PGMDIR = .;
-%mend set_pgmdir;
+/* PGMDIR guard: define only when running standalone; master driver pre-defines this. */
+%if not %sysmacexist(set_pgmdir) %then %do;
+    %macro set_pgmdir;
+        %if not %symexist(PGMDIR) %then %global PGMDIR;
+        %if "&PGMDIR." = "" %then %let PGMDIR = .;
+    %mend set_pgmdir;
+%end;
 %set_pgmdir;
 %include "&PGMDIR./00_config.sas";
 
@@ -63,37 +64,37 @@ data work.lb_windows;
     
     length AVISIT $40;
     
-    if ADY <= 0 then do;
+    if ADY <= &W_BL_HI. then do;
         AVISITN = 0;
         AVISIT = 'Baseline';
         AWDIST = abs(ADY - (-1));
     end;
-    else if 1 <= ADY <= 3 then do;
+    else if &W_C1D1_LO. <= ADY <= &W_C1D1_HI. then do;
         AVISITN = 1;
         AVISIT = 'Cycle 1 Day 1 Pre-dose';
         AWDIST = abs(ADY - 1);
     end;
-    else if 4 <= ADY <= 13 then do;
+    else if &W_C1D8_LO. <= ADY <= &W_C1D8_HI. then do;
         AVISITN = 2;
         AVISIT = 'Cycle 1 Day 8';
         AWDIST = abs(ADY - 8);
     end;
-    else if 14 <= ADY <= 17 then do;
+    else if &W_C1D15_LO. <= ADY <= &W_C1D15_HI. then do;
         AVISITN = 3;
         AVISIT = 'Cycle 1 Day 15';
         AWDIST = abs(ADY - 15);
     end;
-    else if 18 <= ADY <= 24 then do;
+    else if &W_C2D1_LO. <= ADY <= &W_C2D1_HI. then do;
         AVISITN = 4;
         AVISIT = 'Cycle 2 Day 1 Pre-dose';
         AWDIST = abs(ADY - 22);
     end;
-    else if 25 <= ADY <= 34 then do;
+    else if &W_C2D8_LO. <= ADY <= &W_C2D8_HI. then do;
         AVISITN = 5;
         AVISIT = 'Cycle 2 Day 8';
         AWDIST = abs(ADY - 29);
     end;
-    else if 39 <= ADY <= 45 then do;
+    else if &W_C3D1_LO. <= ADY <= &W_C3D1_HI. then do;
         AVISITN = 6;
         AVISIT = 'Cycle 3 Day 1 Pre-dose';
         AWDIST = abs(ADY - 43);
@@ -202,7 +203,7 @@ proc sql;
         min(r.ADY) as rec_dy
     from work.anc_records as r
     inner join work.anc_nadir_summary as n on r.usubjid = n.usubjid and r.cycle = n.cycle
-    where r.ADY > n.nadir_dy and r.AVAL >= 1.5
+    where r.ADY > n.nadir_dy and r.AVAL >= &ANC_RECOVERY_THRESHOLD.
     group by r.usubjid, r.cycle;
 quit;
 

@@ -5,6 +5,8 @@
 library(dplyr)
 library(haven)
 library(lubridate)
+library(xportr)
+source("03_validation_r/config_study.R")
 
 cat("NOTE: [VALIDATION] Starting ADAE Validation script...\n")
 
@@ -77,7 +79,7 @@ df_episodes <- df_sorted %>%
           result[i] <- 1.0
           running_end <- aendt[i]
         } else if (CQ02NAM[i] != "") {
-          if (is.na(running_end) || astdt[i] > (running_end + 3)) {
+          if (is.na(running_end) || astdt[i] > (running_end + EPISODE_GAP_DAYS)) {
             result[i] <- 1.0
             running_end <- aendt[i]
           } else {
@@ -101,7 +103,7 @@ df_episodes <- df_sorted %>%
           running_start <- astdt[i]
           running_end <- aendt[i]
         } else if (CQ02NAM[i] != "") {
-          if (is.na(running_end) || astdt[i] > (running_end + 3)) {
+          if (is.na(running_end) || astdt[i] > (running_end + EPISODE_GAP_DAYS)) {
             running_start <- astdt[i]
             running_end <- aendt[i]
           } else {
@@ -122,7 +124,7 @@ df_episodes <- df_sorted %>%
         if (i == 1 || CQ02NAM[i] == "") {
           running_end <- aendt[i]
         } else if (CQ02NAM[i] != "") {
-          if (is.na(running_end) || astdt[i] > (running_end + 3)) {
+          if (is.na(running_end) || astdt[i] > (running_end + EPISODE_GAP_DAYS)) {
             running_end <- aendt[i]
           } else {
             running_end <- max(running_end, aendt[i], na.rm = TRUE)
@@ -168,17 +170,18 @@ adae_final <- adae_pre %>%
     AEOCCFL, TRTEMFL, ADURN, ADURU, AESEQ
   )
 
-# Sort and Save (AESEQ retained only as deterministic tie-breaker, then dropped)
+# Sort and Save (AESEQ retained for unique-key reconciliation)
 adae <- adae_final %>%
-  arrange(USUBJID, ASTDT, AEDECOD, desc(is.na(AENDT)), AENDT, AESEQ) %>%
-  select(-AESEQ)
-library(xportr)
+  arrange(USUBJID, ASTDT, AEDECOD, desc(is.na(AENDT)), AENDT, AESEQ)
 
 # Assertions and Error Guards (QC-03)
 if (nrow(adae) == 0) {
   stop("ERROR: [VALIDATION] ADAE output dataset is empty!")
 }
 
+# XPT v5 compliance (clean log): uppercase variable names + SAS date formats
+names(adae) <- toupper(names(adae))
+for (.dv in names(adae)) if (inherits(adae[[.dv]], "Date")) attr(adae[[.dv]], "format.sas") <- "DATE9."
 xportr_write(adae, "04_adam/adae_v.xpt", domain = "ADAE")
 
 cat("NOTE: [VALIDATION] Wrote validation ADAE: 04_adam/adae_v.xpt\n")

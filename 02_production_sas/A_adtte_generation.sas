@@ -12,12 +12,13 @@
                 and Time to First Serious AE (TTOS).
    ============================================================================= */
 
-/* PGMDIR guard: allows standalone execution (CWD=02_production_sas) and IOM/ODA mode.
-   Wrapped in a macro for portability (open-code %IF requires 9.4M5+). */
-%macro set_pgmdir;
-    %if not %symexist(PGMDIR) %then %global PGMDIR;
-    %if "&PGMDIR." = "" %then %let PGMDIR = .;
-%mend set_pgmdir;
+/* PGMDIR guard: define only when running standalone; master driver pre-defines this. */
+%if not %sysmacexist(set_pgmdir) %then %do;
+    %macro set_pgmdir;
+        %if not %symexist(PGMDIR) %then %global PGMDIR;
+        %if "&PGMDIR." = "" %then %let PGMDIR = .;
+    %mend set_pgmdir;
+%end;
 %set_pgmdir;
 %include "&PGMDIR./00_config.sas";
 
@@ -449,8 +450,8 @@ proc sql;
         
         case 
             when not missing(p.psa_prog_dt) then p.psa_prog_dt
-            when not missing(c.last_psa_dt) then min(c.last_psa_dt, '25SEP2009'd)
-            else min(adsl.lstalvdt, '25SEP2009'd)
+            when not missing(c.last_psa_dt) then min(c.last_psa_dt, &STUDY_CUTOFF_DT.)
+            else min(adsl.lstalvdt, &STUDY_CUTOFF_DT.)
         end as ADT format=yymmdd10.,
         
         case 
@@ -514,7 +515,7 @@ proc sql;
         
         case 
             when not missing(p.tumor_prog_dt) then p.tumor_prog_dt
-            when not missing(c.last_tumor_dt) then min(c.last_tumor_dt, '25SEP2009'd)
+            when not missing(c.last_tumor_dt) then min(c.last_tumor_dt, &STUDY_CUTOFF_DT.)
             else adsl.trtsdt
         end as ADT format=yymmdd10.,
         

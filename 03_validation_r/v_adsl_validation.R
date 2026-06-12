@@ -6,6 +6,8 @@ library(dplyr)
 library(haven)
 library(lubridate)
 library(tidyr)
+library(xportr)
+source("03_validation_r/config_study.R")
 
 cat("NOTE: [VALIDATION] Starting ADSL Validation script...\n")
 
@@ -39,7 +41,7 @@ df_death <- ds %>%
   filter(DSDECOD %in% c("DEATH", "DEAD")) %>%
   left_join(dm %>% select(USUBJID, RFSTDTC), by = "USUBJID") %>%
   mutate(
-    dth_dt = ymd(substring(RFSTDTC, 1, 10)) + (DSSTWK - 1) * 7
+    dth_dt = ymd(substring(RFSTDTC, 1, 10), quiet = TRUE) + (DSSTWK - 1) * 7
   ) %>%
   group_by(USUBJID) %>%
   summarise(
@@ -52,7 +54,7 @@ df_death <- ds %>%
 df_alive <- ds %>%
   left_join(dm %>% select(USUBJID, RFSTDTC), by = "USUBJID") %>%
   mutate(
-    lstalv_dt = ymd(substring(RFSTDTC, 1, 10)) + (DSSTWK - 1) * 7
+    lstalv_dt = ymd(substring(RFSTDTC, 1, 10), quiet = TRUE) + (DSSTWK - 1) * 7
   ) %>%
   group_by(USUBJID) %>%
   summarise(
@@ -81,7 +83,7 @@ df_visc <- ls %>%
 # 4. PAINBL
 pn_trt <- pn %>%
   left_join(df_ex, by = "USUBJID") %>%
-  mutate(PNDT = ymd(substring(PNDTC, 1, 10)))
+  mutate(PNDT = ymd(substring(PNDTC, 1, 10), quiet = TRUE))
 
 baseline_pn <- pn_trt %>% filter(PNDT <= TRTSDT)
 
@@ -123,33 +125,33 @@ adsl <- dm %>%
   left_join(df_labs, by = "USUBJID") %>%
   left_join(docetaxel, by = "USUBJID") %>%
   mutate(
-    STUDYID = "TROPIC-NCT00417079",
+    STUDYID = .env$STUDYID,
     SITEID = substring(SUBJID, 1, 3),
     AGE = if_else(AGEGRP == ">=85", 85, suppressWarnings(as.numeric(AGEGRP))),
-    AGEGR1 = if_else(AGE < 65, "<65", ">=65"),
-    AGEGR1N = if_else(AGE < 65, 1.0, 2.0),
+    AGEGR1 = if_else(AGE < .env$AGE_STRAT_CUT, "<65", ">=65"),
+    AGEGR1N = if_else(AGE < .env$AGE_STRAT_CUT, 1.0, 2.0),
     ETHNIC = "NOT HISPANIC OR LATINO",
     SEX = "M",
-    TRT01P = "MP",
-    TRT01PN = 2.0,
-    TRT01A = "MP",
-    TRT01AN = 2.0,
-    RANDDT = ymd(substring(RFSTDTC, 1, 10)),
+    TRT01P = .env$TRT01P_CODE,
+    TRT01PN = .env$TRT01PN_CODE,
+    TRT01A = .env$TRT01P_CODE,
+    TRT01AN = .env$TRT01PN_CODE,
+    RANDDT = ymd(substring(RFSTDTC, 1, 10), quiet = TRUE),
     ITTFL = coalesce(ITT, "N"),
     SAFFL = coalesce(SAFETY, "N"),
     PPROTFL = coalesce(PPROT, "N"),
     DTHFL = coalesce(DTHFL, "N"),
-    
-    # Baseline clinical covariates (harmonized with study parameters)
-    ECOGBL = coalesce(ECOGBL, 1.0),
+
+    # Baseline clinical covariates — defaults from config_study.R §6.3
+    ECOGBL = coalesce(ECOGBL, .env$ECOGBL_DEFAULT),
     MEASDISF = coalesce(MEASDISF, "N"),
     VISCFL = coalesce(VISCFL, "N"),
     PAINBL = if_else(USUBJID %in% pain_subjs, "Y", "N"),
-    ALBBL = 38.0,
-    LDHBL = 220.0,
-    PSABL = coalesce(PSABL, 110.0),
-    ALPBL = coalesce(ALPBL, 140.0),
-    HGBBL = coalesce(HGBBL, 11.5),
+    ALBBL = .env$ALBBL_DEFAULT,
+    LDHBL = .env$LDHBL_DEFAULT,
+    PSABL = coalesce(PSABL, .env$PSABL_DEFAULT),
+    ALPBL = coalesce(ALPBL, .env$ALPBL_DEFAULT),
+    HGBBL = coalesce(HGBBL, .env$HGBBL_DEFAULT),
     DOCPROG = coalesce(DOCPROG, "AFTER"),
     DOCRESP = coalesce(DOCRESP, "N")
   ) %>%
@@ -164,13 +166,15 @@ adsl <- dm %>%
 # Sort and Save
 adsl <- adsl %>% arrange(USUBJID)
 dir.create("04_adam", showWarnings = FALSE)
-library(xportr)
 
 # Assertions and Error Guards (QC-03)
 if (nrow(adsl) < 371) {
   stop("ERROR: [VALIDATION] ADSL output dataset is incomplete (expected N=371)!")
 }
 
+# XPT v5 compliance (clean log): uppercase variable names + SAS date formats
+names(adsl) <- toupper(names(adsl))
+for (.dv in names(adsl)) if (inherits(adsl[[.dv]], "Date")) attr(adsl[[.dv]], "format.sas") <- "DATE9."
 xportr_write(adsl, "04_adam/adsl_v.xpt", domain = "ADSL")
 
 cat("NOTE: [VALIDATION] Wrote validation ADSL: 04_adam/adsl_v.xpt\n")

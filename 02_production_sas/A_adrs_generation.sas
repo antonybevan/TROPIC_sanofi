@@ -11,16 +11,17 @@
                 death milestones with PSA progression metrics.
    ============================================================================= */
 
-/* PGMDIR guard: allows standalone execution (CWD=02_production_sas) and IOM/ODA mode.
-   Wrapped in a macro for portability (open-code %IF requires 9.4M5+). */
-%macro set_pgmdir;
-    %if not %symexist(PGMDIR) %then %global PGMDIR;
-    %if "&PGMDIR." = "" %then %let PGMDIR = .;
-%mend set_pgmdir;
+/* PGMDIR guard: define only when running standalone; master driver pre-defines this. */
+%if not %sysmacexist(set_pgmdir) %then %do;
+    %macro set_pgmdir;
+        %if not %symexist(PGMDIR) %then %global PGMDIR;
+        %if "&PGMDIR." = "" %then %let PGMDIR = .;
+    %mend set_pgmdir;
+%end;
 %set_pgmdir;
 %include "&PGMDIR./00_config.sas";
 
-/* 1. RECIST 1.1 Visit-level calculations */
+/* 1. RECIST v1.0 Visit-level calculations (trial-era standard per SAP v3.0 §5.3) */
 /* Baseline Target Sum of Diameters */
 proc sql;
     create table work.base_sod as
@@ -62,14 +63,16 @@ data work.recist_calc;
     if first.usubjid then nadir_sod = post_sod;
     else nadir_sod = min(nadir_sod, post_sod);
     
-    pct_chg_base = (post_sod - base_sod) / base_sod * 100;
-    pct_chg_nadir = (post_sod - nadir_sod) / nadir_sod * 100;
+    if base_sod > 0 then pct_chg_base = (post_sod - base_sod) / base_sod * 100;
+    else pct_chg_base = .;
+    if nadir_sod > 0 then pct_chg_nadir = (post_sod - nadir_sod) / nadir_sod * 100;
+    else pct_chg_nadir = .;
     abs_chg_nadir = post_sod - nadir_sod;
     
     length recist_resp $20;
     if post_sod = 0 then recist_resp = 'CR';
-    else if pct_chg_nadir >= 20 and abs_chg_nadir >= 5 then recist_resp = 'PD';
-    else if pct_chg_base <= -30 then recist_resp = 'PR';
+    else if pct_chg_nadir >= &RECIST_PD_PCT. and abs_chg_nadir >= &RECIST_PD_ABS. then recist_resp = 'PD';
+    else if pct_chg_base <= &RECIST_PR_PCT. then recist_resp = 'PR';
     else recist_resp = 'SD';
 run;
 
@@ -81,7 +84,7 @@ proc sql;
         adsl.usubjid,
         adsl.trt01p,
         adsl.trtsdt,
-        'Overall Response per RECIST 1.1 + PCWG3' as PARAM length=40,
+        'Overall Response per RECIST v1.0' as PARAM length=40,
         'OVRLRESP' as PARAMCD length=8,
         r.recist_resp as AVALC length=20,
         r.lsd_dt as ADT format=yymmdd10.,
@@ -99,7 +102,7 @@ proc sql;
         adsl.usubjid,
         adsl.trt01p,
         adsl.trtsdt,
-        'Overall Response per RECIST 1.1 + PCWG3' as PARAM length=40,
+        'Overall Response per RECIST v1.0' as PARAM length=40,
         'OVRLRESP' as PARAMCD length=8,
         rs.rsorres as AVALC length=20,
         rs.rsdt as ADT format=yymmdd10.,
@@ -205,7 +208,7 @@ proc sql;
     select a.usubjid, a.lbdt as dt1, b.lbdt as dt2
     from work.psa_decline as a
     inner join work.psa_decline as b on a.usubjid = b.usubjid
-    where a.decline >= 0.5 and b.decline >= 0.5 and b.lbdt - a.lbdt >= 21;
+    where a.decline >= &PSA_RESP_THRESHOLD. and b.decline >= &PSA_RESP_THRESHOLD. and b.lbdt - a.lbdt >= &PSA_RESP_CONFIRM.;
 quit;
 
 proc sql;
@@ -243,11 +246,11 @@ data work.psa_prog_eval;
     if not missing(visitnum) and visitnum > 0;
     length is_trigger 8;
     if psad50 = 'Y' then do;
-        if lbstresn >= 1.5 * psanadir then is_trigger = 1;
+        if lbstresn >= &PSA_PROG_MULT_RESP. * psanadir then is_trigger = 1;
         else is_trigger = 0;
     end;
     else do;
-        if lbstresn >= 1.25 * psanadir and (lbstresn - psanadir) >= 5 then is_trigger = 1;
+        if lbstresn >= &PSA_PROG_MULT_NORESP. * psanadir and (lbstresn - psanadir) >= &PSA_PROG_ABS. then is_trigger = 1;
         else is_trigger = 0;
     end;
 run;
@@ -257,7 +260,7 @@ proc sql;
     select distinct a.usubjid, min(a.lbdt) as prog_date format=yymmdd10.
     from work.psa_prog_eval as a
     inner join work.psa_prog_eval as b on a.usubjid = b.usubjid
-    where a.is_trigger = 1 and b.is_trigger = 1 and b.lbdt - a.lbdt >= 7
+    where a.is_trigger = 1 and b.is_trigger = 1 and b.lbdt - a.lbdt >= &PSA_PROG_CONFIRM.
     group by a.usubjid;
 quit;
 

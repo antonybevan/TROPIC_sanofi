@@ -25,7 +25,7 @@ To guarantee database integrity and prevent raw data corruption during pipeline 
 ---
 
 ## 2. SDTM Domain Mapping Summary
-Standard SDTM mapping structures were built in `S_sdtm_mapping.sas` under SDTM-IG 3.4 guidelines:
+Standard SDTM mapping structures were built in `S_sdtm_mapping.sas` under the trial-era **SDTM-IG 3.1.1** standard (per SAP v3.0 §1; the source data predates later IG versions):
 * **DM (Demographics):** Unique subject identifier `USUBJID` constructed via `STUDYID || '-' || SITEID || '-' || SUBJID`. Randomization date `RANDDT` and treatment start date `TRTSDT` mapped to standard ISO 8601 date fields.
 * **EX (Exposure):** Normalised cycle-level actual administered doses (`EXDOSE` in mg).
 * **AE (Adverse Events):** Coded utilizing MedDRA dictionaries into `AEDECOD`, `AEBODSYS`, and standard CTCAE toxicity grades. **Date Precision Note:** The source PDS dataset contains AE timing as week-offset integers (`AESTWK`, `AEENWK`). AE start/end dates are reconstructed as `RFSTDTC + (AESTWK - 1) * 7` and `RFSTDTC + (AEENWK - 1) * 7`. This reconstruction yields calendar-week accuracy (±3.5 days) rather than exact calendar dates. This precision level was present in the source data and is not a programming artefact. All safety analyses using AE dates (ADAE, ADTTE TTOS) inherit this limitation.

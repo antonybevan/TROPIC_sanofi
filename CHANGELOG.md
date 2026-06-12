@@ -4,6 +4,28 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.3.0] - 2026-06-12 — SAS Production-Track Graphics
+
+### Added
+- **SAS production-track statistical figures (`02_production_sas/T_tfl_generation.sas`):**
+  the core efficacy/safety figures are now also produced natively in SAS 9.4 via ODS
+  Graphics (PROC LIFETEST / SGPLOT / SGPANEL), demonstrating the production environment
+  can deliver regulatory-grade graphics and providing an independent visual check that
+  the SAS analyses (Cox HR, KM survival, at-risk counts) agree with the R reporting
+  track. Six figures at 300 dpi: KM OS & PFS (number-at-risk, HR, censoring), OS subgroup
+  forest, PSA waterfall, exposure swimmer, Project Optimus E-R scatter → `09_tfl/output/sas/`.
+  *(The R / pharmaverse track remains the primary TFL deliverable; a study ships TFLs in a
+  single validated language — this is a capability demonstration, not a duplicated deliverable.)*
+- **CbzP→SAS bridge (`01_raw_source/export_cbzp_xpt.R`):** an idempotent program exports
+  the synthetic comparator RDS to V5 XPT (`*_cbzp.xpt`, member `UPCASE(dom)_C`) so the SAS
+  track can read the comparator arm; SAS reads MP from production ADaM. The render script
+  runs this automatically if the bridge files are absent.
+- **`06_telemetry/_oda_render_tfl.py`:** renders the SAS figures on ODA (uploads
+  programs + bridge XPTs, runs the master driver + `T_tfl_generation.sas`, downloads
+  the PNGs). `--tfl-only` re-renders figures against the existing ODA `adam.*`.
+- Every SAS figure carries the same on-artifact synthetic-comparator disclosure as the
+  R figures (legend "CbzP (synthetic)/MP (real)" + red footnote).
+
 ## [3.2.0] - 2026-06-11 — Acceptance-Audit Remediation
 
 ### Fixed (validation integrity)

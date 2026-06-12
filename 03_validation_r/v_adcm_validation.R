@@ -5,6 +5,8 @@
 library(dplyr)
 library(haven)
 library(lubridate)
+library(xportr)
+source("03_validation_r/config_study.R")
 
 cat("NOTE: [VALIDATION] Starting ADCM Validation script...\n")
 
@@ -62,13 +64,15 @@ adcm <- df_cm %>%
 
 # Sort and Save
 adcm <- adcm %>% arrange(USUBJID, CMSTDT, CMDECOD)
-library(xportr)
 
 # Assertions and Error Guards (QC-03)
 if (nrow(adcm) == 0) {
   stop("ERROR: [VALIDATION] ADCM output dataset is empty!")
 }
 
+# XPT v5 compliance (clean log): uppercase variable names + SAS date formats
+names(adcm) <- toupper(names(adcm))
+for (.dv in names(adcm)) if (inherits(adcm[[.dv]], "Date")) attr(adcm[[.dv]], "format.sas") <- "DATE9."
 xportr_write(adcm, "04_adam/adcm_v.xpt", domain = "ADCM")
 
 cat("NOTE: [VALIDATION] Wrote validation ADCM: 04_adam/adcm_v.xpt\n")

@@ -53,7 +53,7 @@ The gatekeeping logic is exercised on these endpoints; the CbzP column is **synt
 | Time to PSA Progression | 2.8 mo (synthetic) | 2.2 mo (real, 95% CI 1.7–3.3) | 0.84 (0.71–0.99) | 0.0362 | median 6.4 mo, HR 0.75 |
 | Time to Tumour Progression | 3.8 mo (synthetic)§ | 2.3 mo (real)§ | 0.67 (0.54–0.83) | 0.0003 | median 8.8 mo, HR 0.61 |
 | PSA Response (≥50% decrease) | 39.2% (148/378, synthetic) | 18.6% (69/371, real) | Fisher's exact | <0.0001 | 39% vs 24% (p = 0.0002) |
-| Overall Response Rate (ORR) | 14.3% (54/378, synthetic) | 10.5% (37/351, real) | Fisher's exact | 0.1450 | 14.4% vs 4.4% (p = 0.005) |
+| Overall Response Rate (ORR) | 12.8% (23/179, synthetic)§ | 18.2% (37/203, real)§ | Fisher's exact | 0.1594 | 14.4% vs 4.4% (p = 0.005) |
 
 †Synthetic, illustrative — not real patient data. ‡Circular by construction; descriptive of synthetic data only, not a treatment-effect estimate. §Restricted to Measurable Disease Subpopulation (N=179 synthetic CbzP, N=203 real MP). The synthetic CbzP medians **do not match** the published cabazitaxel medians (the reconstruction overshoots; see §8).
 
@@ -120,7 +120,7 @@ FDA Project Optimus alignment: RDI in Cycle 1 was used as the E-R exposure proxy
 
 | Layer | Technology | Standard |
 |---|---|---|
-| Source Data | SAS7BDAT (Sanofi 2013) | CDISC SDTMIG v3.4 |
+| Source Data | SAS7BDAT (Sanofi / Project Data Sphere) | CDISC SDTMIG v3.1.1 (trial-era) |
 | ADaM Production | SAS 9.4 | ADaMIG v1.3 |
 | Independent Validation | R 4.6.0 / Pharmaverse | ADaMIG v1.3 |
 | Reconciliation | `diffdf` package | 100% cell-by-cell match |

@@ -3,17 +3,17 @@ One-shot: download the 7 *_prod.xpt files from ODA to 04_adam/.
 Run after the master driver has executed on ODA.
 """
 import os, sys
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+# Anchor paths to the project root (parent of this file), independent of cwd.
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, PROJECT_ROOT)
 import saspy
 
 ADAM_ODA  = "/home/u64235016/TROPIC/04_adam"
-LOCAL_DIR = "04_adam"
+LOCAL_DIR = os.path.join(PROJECT_ROOT, "04_adam")
 DATASETS  = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte"]
+CFG_FILE  = os.path.join(PROJECT_ROOT, "sascfg_personal.py")
 
-sas = saspy.SASsession(
-    cfgname="oda",
-    cfgfile=os.path.abspath("sascfg_personal.py")
-)
+sas = saspy.SASsession(cfgname="oda", cfgfile=CFG_FILE)
 
 try:
     # Verify files exist on ODA first

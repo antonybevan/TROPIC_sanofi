@@ -5,6 +5,8 @@
 library(dplyr)
 library(haven)
 library(lubridate)
+library(xportr)
+source("03_validation_r/config_study.R")
 
 cat("NOTE: [VALIDATION] Starting ADLB Validation script...\n")
 
@@ -53,13 +55,13 @@ df_windows <- df_lb %>%
     AVALC = LBORRES,
     
     AVISITN = case_when(
-      is.na(lbdy) | lbdy <= 0 ~ 0.0,
-      lbdy >= 1 & lbdy <= 3 ~ 1.0,
-      lbdy >= 4 & lbdy <= 13 ~ 2.0,
-      lbdy >= 14 & lbdy <= 17 ~ 3.0,
-      lbdy >= 18 & lbdy <= 24 ~ 4.0,
-      lbdy >= 25 & lbdy <= 34 ~ 5.0,
-      lbdy >= 39 & lbdy <= 45 ~ 6.0,
+      is.na(lbdy) | lbdy <= W_BL_HI ~ 0.0,
+      lbdy >= W_C1D1_LO  & lbdy <= W_C1D1_HI  ~ 1.0,
+      lbdy >= W_C1D8_LO  & lbdy <= W_C1D8_HI  ~ 2.0,
+      lbdy >= W_C1D15_LO & lbdy <= W_C1D15_HI ~ 3.0,
+      lbdy >= W_C2D1_LO  & lbdy <= W_C2D1_HI  ~ 4.0,
+      lbdy >= W_C2D8_LO  & lbdy <= W_C2D8_HI  ~ 5.0,
+      lbdy >= W_C3D1_LO  & lbdy <= W_C3D1_HI  ~ 6.0,
       TRUE ~ 99.0
     ),
     
@@ -141,7 +143,7 @@ df_anc_nadir <- df_anc_records %>%
 # ANC Recovery latencies per cycle
 df_anc_rec <- df_anc_records %>%
   inner_join(df_anc_nadir %>% select(USUBJID, cycle, nadir_dy), by = c("USUBJID", "cycle")) %>%
-  filter(lbdy > nadir_dy & AVAL >= 1.5) %>%
+  filter(lbdy > nadir_dy & AVAL >= ANC_RECOVERY_THRESHOLD) %>%
   group_by(USUBJID, cycle) %>%
   summarise(
     rec_dy = min(lbdy),
@@ -183,9 +185,6 @@ adlb_final <- bind_rows(
 
 adlb_final <- adlb_final %>% arrange(USUBJID, PARAMCD, AVISITN, lbdy)
 
-# Export via xportr
-library(xportr)
-
 # Assertions and Error Guards (QC-03)
 if (nrow(adlb_final) == 0) {
   stop("ERROR: [VALIDATION] ADLB output dataset is empty!")
@@ -194,6 +193,9 @@ if (nrow(adlb_final %>% filter(PARAMCD == "ANCNADIR")) == 0) {
   stop("ERROR: [VALIDATION] ADLB Project Optimus nadir records are missing!")
 }
 
+# XPT v5 compliance (clean log): uppercase variable names + SAS date formats (lbdy -> LBDY)
+names(adlb_final) <- toupper(names(adlb_final))
+for (.dv in names(adlb_final)) if (inherits(adlb_final[[.dv]], "Date")) attr(adlb_final[[.dv]], "format.sas") <- "DATE9."
 xportr_write(adlb_final, "04_adam/adlb_v.xpt", domain = "ADLB")
 
 cat("NOTE: [VALIDATION] Wrote validation ADLB: 04_adam/adlb_v.xpt\n")

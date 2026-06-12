@@ -7,6 +7,8 @@ library(dplyr)
 library(haven)
 library(lubridate)
 library(tidyr)
+library(xportr)
+source("03_validation_r/config_study.R")
 
 cat("NOTE: [VALIDATION] Starting ADTTE Validation script...\n")
 
@@ -58,7 +60,7 @@ os <- df_adsl %>%
     ADT = pmax(STARTDT, adt_temp)
   ) %>%
   transmute(
-    STUDYID = "TROPIC-NCT00417079", USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
+    STUDYID = .env$STUDYID, USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
     PARAMCD = "OS", PARAM = "Overall Survival", STARTDT, ADT,
     CNSR = if_else(DTHFL == "Y", 0.0, 1.0),
     EVNTDESC = if_else(DTHFL == "Y", "DEATH", ""),
@@ -77,7 +79,7 @@ ttos <- df_adsl %>%
     ADT = pmax(STARTDT, adt_temp)
   ) %>%
   transmute(
-    STUDYID = "TROPIC-NCT00417079", USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
+    STUDYID = .env$STUDYID, USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
     PARAMCD = "TTOS", PARAM = "Time to First Serious AE", STARTDT, ADT,
     CNSR = if_else(!is.na(sae_dt), 0.0, 1.0),
     EVNTDESC = if_else(!is.na(sae_dt), "SERIOUS ADVERSE EVENT", ""),
@@ -203,7 +205,7 @@ ttpain <- df_adsl %>%
   left_join(prog_subjs, by = "USUBJID") %>%
   left_join(censor_dates, by = "USUBJID") %>%
   transmute(
-    STUDYID = "TROPIC-NCT00417079", USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
+    STUDYID = .env$STUDYID, USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
     PARAMCD = "TTPAIN", PARAM = "Time to Pain Progression", STARTDT = RANDDT,
     
     adt_temp = case_when(
@@ -222,7 +224,6 @@ ttpain <- df_adsl %>%
 # ------------------------------------------------------------------------------
 # PARAMETER 5: TIME TO PSA PROGRESSION (TTPSA)
 # ------------------------------------------------------------------------------
-library(lubridate)
 adrs_val <- read_xpt("04_adam/adrs_v.xpt")
 
 psa_prog_subjs <- adrs_val %>%
@@ -247,13 +248,13 @@ ttpsa <- df_adsl %>%
   left_join(psa_prog_subjs, by = "USUBJID") %>%
   left_join(psa_censor_dates, by = "USUBJID") %>%
   transmute(
-    STUDYID = "TROPIC-NCT00417079", USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
+    STUDYID = .env$STUDYID, USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
     PARAMCD = "TTPSA", PARAM = "Time to PSA Progression", STARTDT = TRTSDT,
     
     adt_temp = case_when(
       !is.na(psa_prog_dt) ~ psa_prog_dt,
-      !is.na(last_psa_dt) ~ pmin(last_psa_dt, ymd("2009-09-25")),
-      TRUE ~ pmin(LSTALVDT, ymd("2009-09-25"))
+      !is.na(last_psa_dt) ~ pmin(last_psa_dt, STUDY_CUTOFF_DT),
+      TRUE ~ pmin(LSTALVDT, STUDY_CUTOFF_DT)
     ),
     ADT = pmax(STARTDT, adt_temp),
     
@@ -281,12 +282,12 @@ tttumor <- df_adsl %>%
   left_join(tumor_prog_subjs, by = "USUBJID") %>%
   left_join(tumor_censor_dates, by = "USUBJID") %>%
   transmute(
-    STUDYID = "TROPIC-NCT00417079", USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
+    STUDYID = .env$STUDYID, USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
     PARAMCD = "TTUMOR", PARAM = "Time to Tumor Progression", STARTDT = TRTSDT,
     
     adt_temp = case_when(
       !is.na(tumor_prog_dt) ~ tumor_prog_dt,
-      !is.na(last_tumor_dt) ~ pmin(last_tumor_dt, ymd("2009-09-25")),
+      !is.na(last_tumor_dt) ~ pmin(last_tumor_dt, STUDY_CUTOFF_DT),
       TRUE ~ TRTSDT
     ),
     ADT = pmax(STARTDT, adt_temp),
@@ -310,8 +311,6 @@ adtte <- adtte %>%
     CNSR = as.numeric(CNSR)
   )
 
-library(xportr)
-
 # Assertions and Error Guards (QC-03)
 if (nrow(adtte) == 0) {
   stop("ERROR: [VALIDATION] ADTTE output dataset is empty!")
@@ -323,5 +322,8 @@ if (length(missing_params) > 0) {
   stop(paste("ERROR: [VALIDATION] ADTTE is missing mandatory parameters:", paste(missing_params, collapse = ", ")))
 }
 
+# XPT v5 compliance (clean log): uppercase variable names + SAS date formats
+names(adtte) <- toupper(names(adtte))
+for (.dv in names(adtte)) if (inherits(adtte[[.dv]], "Date")) attr(adtte[[.dv]], "format.sas") <- "DATE9."
 xportr_write(adtte, "04_adam/adtte_v.xpt", domain = "ADTTE")
 cat("NOTE: [VALIDATION] Wrote validation ADTTE: 04_adam/adtte_v.xpt\n")
