@@ -1,15 +1,15 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: A_adtte_generation.sas
-   Version: 2.2.0
+   Version: 2.3.0
    Author: Principal Clinical Data Infrastructure Architect
-   Date: 2026-05-27
+   Date: 2026-06-12
    Standard: ADaMIG v1.3 / CDISC BDS TTE v1.0
    Input: adam.adsl, adam.adrs, adam.adcm, adam.adae
    Output: adam.adtte
    Description: Time-to-Event ADaM (ADTTE) with standard censoring (CNSR=0/1) for
                 Overall Survival (OS), Progression-Free Survival (PFS),
-                and Time to First Serious AE (TTOS).
+                and Time to First Serious AE (TTSAE).
    ============================================================================= */
 
 /* PGMDIR guard: define only when running standalone; master driver pre-defines this. */
@@ -46,7 +46,7 @@ proc sql;
     group by usubjid;
 quit;
 
-/* Assemble OS and TTOS Parameters */
+/* Assemble OS and TTSAE Parameters */
 proc sql;
     create table work.os_ttos_raw as
     select 
@@ -88,12 +88,12 @@ data work.tte_base;
     output;
     
     /* -------------------------------------------------------------------------- */
-    /* PARAMETER 2: TIME TO FIRST SERIOUS AE (TTOS)                              */
+    /* PARAMETER 2: TIME TO FIRST SERIOUS AE (TTSAE)                             */
     /* -------------------------------------------------------------------------- */
-    PARAMCD = 'TTOS';
+    PARAMCD = 'TTSAE';
     PARAM = 'Time to First Serious AE';
     STARTDT = TRTSDT;
-    
+
     if not missing(sae_dt) then do;
         ADT = sae_dt;
         CNSR = 0;
@@ -104,7 +104,7 @@ data work.tte_base;
         ADT = lstalvdt;
         CNSR = 1;
         EVNTDESC = '';
-        CNSDTDSC = 'LAST CONCOMITANT EVALUATION';
+        CNSDTDSC = 'LAST KNOWN ALIVE DATE';
     end;
     
     if ADT < STARTDT then ADT = STARTDT;

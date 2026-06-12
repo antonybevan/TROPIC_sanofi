@@ -105,68 +105,111 @@ def _saspy_available():
         return False
 
 
+# Outcome of the most recent ODA Stage-10 attempt, merged into pipeline_health.json (brief §6).
+_ODA_OUTCOME = {}
+PROJ_ROOT_ODA = "/home/u64235016/TROPIC"
+ODA_DATASETS = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte"]
+
+
+def _sim_byte_copy(datasets):
+    """Byte-copy *_v.xpt -> *_prod.xpt (the labeled, tautological simulation)."""
+    for ds in datasets:
+        val_file, prod_file = f"04_adam/{ds}_v.xpt", f"04_adam/{ds}_prod.xpt"
+        if os.path.exists(val_file):
+            with open(val_file, "rb") as fs, open(prod_file, "wb") as fd:
+                fd.write(fs.read())
+            print(f"    Simulated {ds}_prod.xpt generated.")
+
+
+def _oda_max_wait():
+    """Connection budget (seconds). TROPIC_ODA_RETRIES is a back-compat alias mapped onto a
+    wall-clock budget (~60 s expected/attempt); TROPIC_ODA_MAX_WAIT sets it directly."""
+    if os.environ.get("TROPIC_ODA_RETRIES"):
+        return max(60, int(os.environ["TROPIC_ODA_RETRIES"]) * 60)
+    return int(os.environ.get("TROPIC_ODA_MAX_WAIT", 3600))
+
+
 def _run_saspy_stage10():
-    """Execute SAS production suite on ODA via SASPy, return (rc, stdout, stderr)."""
-    import saspy
+    """Job B: run the SAS production suite on ODA against a VERIFIED-resident SDTM library.
+    Returns (rc, stdout, stderr, meta). 'oda' mode is earned only via the broker's live probe
+    AND a verified SDTM manifest. Seeding is NOT done inline (that is seed_sdtm.py / Job A)
+    unless TROPIC_ODA_FORCE_SDTM=TRUE. Connection-budget exhaustion -> honest sim fallback;
+    AUTH/encryption or an unverified library -> hard fail (never a silent sim)."""
     import glob as _glob
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import oda_broker
+    import seed_sdtm
 
-    PROJ_ROOT_ODA = "/home/u64235016/TROPIC"
-    PGMDIR_ODA    = f"{PROJ_ROOT_ODA}/02_production_sas"
-    SDTM_ODA      = f"{PROJ_ROOT_ODA}/01_raw_source/real_sdtm"
-    ADAM_ODA      = f"{PROJ_ROOT_ODA}/04_adam"
-    CFG_FILE      = os.path.join(os.path.dirname(__file__), "..", "sascfg_personal.py")
+    PGMDIR_ODA = f"{PROJ_ROOT_ODA}/02_production_sas"
+    ADAM_ODA = f"{PROJ_ROOT_ODA}/04_adam"
 
-    sas = saspy.SASsession(
-        cfgname="oda",
-        cfgfile=os.path.abspath(CFG_FILE)
-    )
-
+    # ---- Resilient, probe-verified connect (broker rides spawner timeouts) ----
     try:
-        # ---- Upload SAS programs ----
-        print("  [ODA] Uploading SAS programs to ODA...")
+        conn = oda_broker.connect(max_wait_s=_oda_max_wait())
+    except oda_broker.OdaFatal as e:
+        return 1, "", f"ODA fatal ({e.error_class}): {e}", {
+            "oda_last_error_class": e.error_class, "reconciliation": "none"}
+    except oda_broker.OdaExhausted as e:
+        return 0, "ODA exhausted; honest sim fallback", "", {
+            "fell_back_to_sim": True, "oda_last_error_class": e.last_class,
+            "oda_attempts": e.attempts,
+            "next_recommended_window": oda_broker.recommend_window(),
+            "reconciliation": "sim_only"}
+
+    sas = conn.sas
+    try:
+        # ---- Guarantee the SDTM library on ODA is the verified-correct one ----
+        if os.environ.get("TROPIC_ODA_FORCE_SDTM") == "TRUE":
+            res = seed_sdtm.seed(sas, force=True)
+            if res["status"] not in ("seeded", "already-resident"):
+                return 2, "", f"SDTM seed/verify failed: {res}", {"reconciliation": "none"}
+            manifest_sha = res["manifest_sha"]
+        else:
+            ok, manifest_sha, reason = seed_sdtm.verify_resident(sas)
+            if not ok:
+                return 2, "", (f"SDTM not verified-resident on ODA ({reason}). "
+                               f"Seed it first: python3 06_telemetry/seed_sdtm.py"), {
+                    "reconciliation": "none"}
+            print(f"  [ODA] SDTM verified resident (manifest {manifest_sha[:12]}).")
+
+        # ---- Upload SAS programs (tiny; always ship the latest code) ----
+        print("  [ODA] Uploading SAS programs...")
         for f in sorted(_glob.glob("02_production_sas/*.sas")):
             sas.upload(f, f"{PGMDIR_ODA}/{os.path.basename(f)}")
-        print(f"  [ODA] SAS programs uploaded.")
-
-        # ---- Upload SDTM source data (skip if already present) ----
-        sdtm_files = sorted(_glob.glob("01_raw_source/real_sdtm/*.sas7bdat"))
-        total_mb = sum(os.path.getsize(f) for f in sdtm_files) / 1_048_576
-        print(f"  [ODA] Uploading {len(sdtm_files)} SDTM files ({total_mb:.0f} MB) — this may take several minutes...")
-        for f in sdtm_files:
-            sas.upload(f, f"{SDTM_ODA}/{os.path.basename(f)}")
-        print(f"  [ODA] SDTM data uploaded.")
 
         # ---- Execute master driver ----
         print("  [ODA] Submitting 00_master_driver.sas via SAS IOM...")
-        r = sas.submit(f"""
+        log = sas.submit(f"""
 options notes source;
 %global PROJ_ROOT PGMDIR;
 %let PROJ_ROOT = {PROJ_ROOT_ODA};
 %let PGMDIR    = {PGMDIR_ODA};
 filename drv "{PGMDIR_ODA}/00_master_driver.sas";
 %include drv;
-""")
-        log = r.get("LOG", "")
+""").get("LOG", "")
+        try:
+            with open("02_production_sas/oda_master_driver.log", "w", encoding="utf-8") as _lf:
+                _lf.write(log)
+        except OSError:
+            pass
+        warn = [l for l in log.splitlines() if l.strip().startswith("WARNING:")]
+        if warn:
+            print(f"  [ODA] SAS log has {len(warn)} WARNING line(s) (see oda_master_driver.log).")
+        err = [l.strip() for l in log.splitlines() if l.strip().startswith("ERROR:")]
+        if err:
+            return 1, "", "\n".join(err), {"oda_endpoint": conn.endpoint, "reconciliation": "none"}
 
-        # Capture errors
-        error_lines = [l.strip() for l in log.split("\n")
-                       if l.strip().startswith("ERROR:")]
-        if error_lines:
-            return 1, "", "\n".join(error_lines)
+        # ---- Download the 7 *_prod.xpt ----
+        print("  [ODA] Downloading *_prod.xpt...")
+        for ds in ODA_DATASETS:
+            sas.download(f"04_adam/{ds}_prod.xpt", f"{ADAM_ODA}/{ds}_prod.xpt")
 
-        # ---- Download *_prod.xpt files ----
-        datasets = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte"]
-        print("  [ODA] Downloading *_prod.xpt files from ODA...")
-        for ds in datasets:
-            remote = f"{ADAM_ODA}/{ds}_prod.xpt"
-            local  = f"04_adam/{ds}_prod.xpt"
-            sas.download(local, remote)   # SASPy: download(localfile, remotefile)
-            print(f"    Downloaded {ds}_prod.xpt")
-
-        return 0, "SASPy/ODA execution complete.", ""
-
+        return 0, "SASPy/ODA execution complete.", "", {
+            "oda_endpoint": conn.endpoint, "oda_attempts": conn.attempts,
+            "oda_total_wait_s": conn.total_wait_s, "sdtm_manifest_sha": manifest_sha,
+            "reconciliation": "SAS_vs_R", "probe_nonce_echoed": conn.probe_nonce_echoed}
     finally:
-        sas.endsas()
+        oda_broker.teardown(sas)
 
 
 def _resolve_sas_mode(real_sas, use_cached_sas):
@@ -192,8 +235,119 @@ def _resolve_sas_mode(real_sas, use_cached_sas):
     return "sim"
 
 
-def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False):
+def run_stage_parallel_worker(stage):
+    rc, stdout, stderr = run_command(stage["cmd"])
+    return stage, rc, stdout, stderr
+
+def run_stage_execution(stage, sas_mode):
+    if stage["cmd"] == "SIMULATE":
+        datasets = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte"]
+
+        if sas_mode == "oda":
+            print("  [ODA] Stage 10 via resilient broker (probe-verified, manifest-checked)...")
+            rc, stdout, stderr, meta = _run_saspy_stage10()
+            _ODA_OUTCOME.clear()
+            _ODA_OUTCOME.update(meta or {})
+            if meta and meta.get("fell_back_to_sim"):
+                print("  [ODA] Connection budget exhausted -> labeled sim fallback "
+                      "(NOT double-programming; honestly recorded in telemetry).")
+                _sim_byte_copy(datasets)
+                return 0, "sim fallback (ODA unreachable this window)", ""
+            if rc == 0:
+                print("  [ODA] Real SAS executed against verified-resident SDTM; XPTs downloaded.")
+            else:
+                print(f"  [ODA FAILED] {stderr.strip()[:200]}")
+            return rc, stdout, stderr
+        elif sas_mode == "local":
+            sas_exe = shutil.which("sas")
+            print(f"  [REAL SAS] Located local SAS engine at: {sas_exe}")
+            print("  [REAL SAS] Compiling SAS production master suite (02_production_sas/00_master_driver.sas)...")
+            sas_cmd = [sas_exe, "-sysin", "02_production_sas/00_master_driver.sas", "-log", "02_production_sas/00_master_driver.log", "-print", "02_production_sas/00_master_driver.lst"]
+            rc, stdout, stderr = run_command(sas_cmd)
+            if rc == 0:
+                print("  [REAL SAS] Master driver executed successfully. Actual SAS XPTs generated.")
+            else:
+                print("  [REAL SAS FAILED] SAS master execution failed! Check log: 02_production_sas/00_master_driver.log")
+            return rc, stdout, stderr
+        elif sas_mode == "cached":
+            print("  [CACHED SAS] Reconciling against PRE-EXISTING *_prod.xpt (SAS not re-run this session).")
+            missing_prod = [f"{ds}_prod.xpt" for ds in datasets
+                            if not os.path.exists(f"04_adam/{ds}_prod.xpt")]
+            if missing_prod:
+                print(f"  [ERROR] --use-cached-sas requires existing SAS outputs, but missing: {', '.join(missing_prod)}")
+                print("          Run with --real-sas (SASPy/ODA or local SAS engine) to generate them first.")
+                rc = -1
+                stderr = "Missing cached SAS production datasets"
+            else:
+                print("  [CACHED SAS] All 7 cached *_prod.xpt verified. Proceeding to reconciliation.")
+                print("  [CACHED SAS] NOTE: parity reflects the cached SAS run, not a fresh compilation.")
+                rc, stdout, stderr = 0, "Cached SAS datasets verified (not regenerated).", ""
+            return rc, stdout, stderr
+        elif sas_mode == "error":
+            print("  [ERROR] --real-sas was requested but no SAS engine is available:")
+            print("          no local 'sas' on PATH and SASPy is not importable.")
+            print("          Install SASPy + configure ODA, or use --use-cached-sas to reconcile existing outputs.")
+            rc, stdout, stderr = -1, "", "Real SAS requested but no SAS engine available"
+            return rc, stdout, stderr
+        else:  # sas_mode == "sim"
+            print("  [SAS SIMULATOR] No SAS engine and --real-sas not specified.")
+            print("  [SAS SIMULATOR] Copying *_v.xpt -> *_prod.xpt (byte-copy simulation).")
+            print("  [SAS SIMULATOR] WARNING: this is NOT independent double-programming; zero diffs are tautological.")
+            _sim_byte_copy(datasets)
+            rc, stdout, stderr = 0, "Simulated SAS compilation (byte-copy) complete.", ""
+            return rc, stdout, stderr
+    else:
+        return run_command(stage["cmd"])
+
+def run_single_stage(stage, from_stage, sas_mode, results):
+    if stage["id"] < from_stage:
+        print(f"Skipping Stage {stage['id']}: {stage['name']}")
+        return True
+
+    print(f"Executing Stage {stage['id']}: {stage['name']}...")
+    
+    if stage["id"] == 1:
+        create_backup()
+
+    rc, stdout, stderr = run_stage_execution(stage, sas_mode)
+
+    if stage["id"] == 11 and rc == 0:
+        status_path = "06_telemetry/reconciliation_status.json"
+        try:
+            with open(status_path) as sf:
+                recon = json.load(sf)
+            if recon.get("overall") != "PASS":
+                failed = [k for k, v in recon.get("domains", {}).items() if v != "PASS"]
+                rc = 1
+                stderr = f"Reconciliation reported cell-level differences in: {', '.join(failed)}"
+        except FileNotFoundError:
+            rc = 1
+            stderr = "Reconciliation status file missing; cannot confirm zero differences."
+
+    if rc == 0:
+        print(f"  [SUCCESS] Stage {stage['id']} completed.")
+        results[stage["name"]] = "PASS"
+        return True
+    else:
+        print(f"  [FAILED] Stage {stage['id']} failed. Reason: {stderr.strip()}")
+        results[stage["name"]] = "FAIL"
+        print("  [ERROR] Validation or execution error detected! Automated rollback initiated...")
+        rollback()
+        write_telemetry(results, sas_mode)
+        sys.exit(1)
+
+def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=False, force_upload_sdtm=False):
     print("=== EXECUTING TROPIC (Study EFC6193 / XRP6258) PIPELINE ===")
+    # Force a full SDTM re-upload on ODA this run (default: upload only the delta).
+    os.environ["TROPIC_ODA_FORCE_SDTM"] = "TRUE" if force_upload_sdtm else "FALSE"
+
+    # Run the configuration generator
+    print("  [CONFIG] Generating configuration from study_config.yaml...")
+    rc, stdout, stderr = run_command([sys.executable, "06_telemetry/generate_config.py"])
+    if rc != 0:
+        print(f"  [CONFIG FAILED] Failed to generate configuration: {stderr}")
+        sys.exit(1)
+    print("  [CONFIG] Configuration successfully generated.")
 
     # Detect, and honestly label, how the SAS production track will be obtained.
     sas_mode = _resolve_sas_mode(real_sas, use_cached_sas)
@@ -217,99 +371,62 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False):
     ]
     
     results = {}
-    
-    for stage in stages:
-        if stage["id"] < from_stage:
-            print(f"Skipping Stage {stage['id']}: {stage['name']}")
-            continue
-            
-        print(f"Executing Stage {stage['id']}: {stage['name']}...")
-        
-        if stage["id"] == 1:
-            create_backup()
 
-        if stage["cmd"] == "SIMULATE":
-            datasets = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte"]
+    if serial:
+        for stage in stages:
+            run_single_stage(stage, from_stage, sas_mode, results)
+    else:
+        # Run Stages 1-3 sequentially
+        for stage in stages[:3]:
+            run_single_stage(stage, from_stage, sas_mode, results)
 
-            if sas_mode == "oda":
-                print("  [ODA] Executing real SAS 9.4 via SAS OnDemand for Academics (SASPy IOM)...")
-                rc, stdout, stderr = _run_saspy_stage10()
-                if rc == 0:
-                    print("  [ODA] Master driver executed successfully. Real SAS XPTs generated and downloaded.")
-                else:
-                    print("  [ODA FAILED] SASPy/ODA execution failed!")
-            elif sas_mode == "local":
-                sas_exe = shutil.which("sas")
-                print(f"  [REAL SAS] Located local SAS engine at: {sas_exe}")
-                print("  [REAL SAS] Compiling SAS production master suite (02_production_sas/00_master_driver.sas)...")
-                sas_cmd = [sas_exe, "-sysin", "02_production_sas/00_master_driver.sas", "-log", "02_production_sas/00_master_driver.log", "-print", "02_production_sas/00_master_driver.lst"]
-                rc, stdout, stderr = run_command(sas_cmd)
-                if rc == 0:
-                    print("  [REAL SAS] Master driver executed successfully. Actual SAS XPTs generated.")
-                else:
-                    print("  [REAL SAS FAILED] SAS master execution failed! Check log: 02_production_sas/00_master_driver.log")
-            elif sas_mode == "cached":
-                # --use-cached-sas: reconcile against pre-existing *_prod.xpt. This does
-                # NOT run SAS this session; it re-verifies previously generated artifacts.
-                print("  [CACHED SAS] Reconciling against PRE-EXISTING *_prod.xpt (SAS not re-run this session).")
-                missing_prod = [f"{ds}_prod.xpt" for ds in datasets
-                                if not os.path.exists(f"04_adam/{ds}_prod.xpt")]
-                if missing_prod:
-                    print(f"  [ERROR] --use-cached-sas requires existing SAS outputs, but missing: {', '.join(missing_prod)}")
-                    print("          Run with --real-sas (SASPy/ODA or local SAS engine) to generate them first.")
-                    rc = -1
-                    stderr = "Missing cached SAS production datasets"
-                else:
-                    print("  [CACHED SAS] All 7 cached *_prod.xpt verified. Proceeding to reconciliation.")
-                    print("  [CACHED SAS] NOTE: parity reflects the cached SAS run, not a fresh compilation.")
-                    rc, stdout, stderr = 0, "Cached SAS datasets verified (not regenerated).", ""
-            elif sas_mode == "error":
-                print("  [ERROR] --real-sas was requested but no SAS engine is available:")
-                print("          no local 'sas' on PATH and SASPy is not importable.")
-                print("          Install SASPy + configure ODA, or use --use-cached-sas to reconcile existing outputs.")
-                rc, stdout, stderr = -1, "", "Real SAS requested but no SAS engine available"
-            else:  # sas_mode == "sim"
-                print("  [SAS SIMULATOR] No SAS engine and --real-sas not specified.")
-                print("  [SAS SIMULATOR] Copying *_v.xpt -> *_prod.xpt (byte-copy simulation).")
-                print("  [SAS SIMULATOR] WARNING: this is NOT independent double-programming; zero diffs are tautological.")
-                for ds in datasets:
-                    val_file = f"04_adam/{ds}_v.xpt"
-                    prod_file = f"04_adam/{ds}_prod.xpt"
-                    if os.path.exists(val_file):
-                        with open(val_file, "rb") as f_src, open(prod_file, "wb") as f_dst:
-                            f_dst.write(f_src.read())
-                        print(f"    Simulated {ds}_prod.xpt generated.")
-                rc, stdout, stderr = 0, "Simulated SAS compilation (byte-copy) complete.", ""
-        else:
-            rc, stdout, stderr = run_command(stage["cmd"])
+        # Run Stages 4-8 in parallel (filtering by from_stage)
+        parallel_stages = [s for s in stages[3:8] if s["id"] >= from_stage]
+        skipped_parallel_stages = [s for s in stages[3:8] if s["id"] < from_stage]
 
-        # Build honesty (audit F-6): the reconciliation R script logs FAILs but
-        # exits 0. Gate Stage 11 on its machine-readable status so the build can
-        # never go GREEN while a domain has cell-level differences.
-        if stage["id"] == 11 and rc == 0:
-            status_path = "06_telemetry/reconciliation_status.json"
-            try:
-                with open(status_path) as sf:
-                    recon = json.load(sf)
-                if recon.get("overall") != "PASS":
-                    failed = [k for k, v in recon.get("domains", {}).items() if v != "PASS"]
-                    rc = 1
-                    stderr = f"Reconciliation reported cell-level differences in: {', '.join(failed)}"
-            except FileNotFoundError:
-                rc = 1
-                stderr = "Reconciliation status file missing; cannot confirm zero differences."
+        for s in skipped_parallel_stages:
+            print(f"Skipping Stage {s['id']}: {s['name']}")
 
-        if rc == 0:
-            print(f"  [SUCCESS] Stage {stage['id']} completed.")
-            results[stage["name"]] = "PASS"
-        else:
-            print(f"  [FAILED] Stage {stage['id']} failed. Reason: {stderr.strip()}")
-            results[stage["name"]] = "FAIL"
-            # Auto-rollback to maintain environmental state integrity on validation failures (Rule 7)
-            print("  [ERROR] Validation or execution error detected! Automated rollback initiated...")
-            rollback()
-            write_telemetry(results, sas_mode)
-            sys.exit(1)
+        if parallel_stages:
+            import concurrent.futures
+            print(f"Fanning out Stage(s) {', '.join(str(s['id']) for s in parallel_stages)} in parallel...")
+            for s in parallel_stages:
+                print(f"Executing Stage {s['id']}: {s['name']} (parallel)...")
+
+            with concurrent.futures.ProcessPoolExecutor() as executor:
+                futures = {executor.submit(run_stage_parallel_worker, s): s for s in parallel_stages}
+                
+                failed_any = False
+                temp_results = {}
+                for future in concurrent.futures.as_completed(futures):
+                    s = futures[future]
+                    try:
+                        stage, rc, stdout, stderr = future.result()
+                        if rc == 0:
+                            print(f"  [SUCCESS] Stage {stage['id']} completed.")
+                            temp_results[stage["name"]] = ("PASS", rc, stderr)
+                        else:
+                            print(f"  [FAILED] Stage {stage['id']} failed. Reason: {stderr.strip()}")
+                            temp_results[stage["name"]] = ("FAIL", rc, stderr)
+                            failed_any = True
+                    except Exception as exc:
+                        print(f"  [FAILED] Stage {s['id']} threw an exception: {exc}")
+                        temp_results[s["name"]] = ("FAIL", -1, str(exc))
+                        failed_any = True
+
+                for s in parallel_stages:
+                    status, rc, stderr = temp_results.get(s["name"], ("FAIL", -1, "Unknown execution error"))
+                    results[s["name"]] = status
+
+                if failed_any:
+                    print("  [ERROR] Validation or execution error detected in parallel stages! Automated rollback initiated...")
+                    rollback()
+                    write_telemetry(results, sas_mode)
+                    sys.exit(1)
+
+        # Run Stages 9-12 sequentially
+        for stage in stages[8:]:
+            run_single_stage(stage, from_stage, sas_mode, results)
 
     clean_backup()
     write_telemetry(results, sas_mode)
@@ -347,6 +464,22 @@ def write_telemetry(results, sas_mode="sim"):
         "sas_execution_mode": sas_mode,
         "stages": results
     }
+
+    # Merge the ODA Stage-10 outcome (brief §6): on a connection-budget exhaustion the mode is
+    # honestly downgraded to 'sim'; on success we record endpoint/attempts/manifest/probe.
+    if _ODA_OUTCOME:
+        if _ODA_OUTCOME.get("fell_back_to_sim"):
+            sas_mode = "sim"
+            health["sas_execution_mode"] = "sim"
+        for k, v in _ODA_OUTCOME.items():
+            if k != "fell_back_to_sim":
+                health[k] = v
+    # Attach the cross-language reconciliation verdict if Stage 11 wrote one.
+    try:
+        with open("06_telemetry/reconciliation_status.json") as _rf:
+            health["reconciliation_status"] = json.load(_rf).get("overall")
+    except (OSError, json.JSONDecodeError):
+        pass
 
     os.makedirs("06_telemetry", exist_ok=True)
     with open("06_telemetry/pipeline_health.json", "w", encoding="utf-8") as f:
@@ -418,6 +551,8 @@ def main():
     parser.add_argument("--real-sas", action="store_true", help="Run REAL SAS 9.4 this session (local engine if present, else ODA via SASPy). Errors if no engine is available.")
     parser.add_argument("--use-cached-sas", action="store_true", help="Reconcile against pre-existing *_prod.xpt WITHOUT re-running SAS (re-verifies a prior SAS run).")
     parser.add_argument("--demo", action="store_true", help="Run self-contained demo smoke test (tests/smoke_test.R).")
+    parser.add_argument("--serial", action="store_true", help="Run stages serially rather than parallelizing Stages 4-8.")
+    parser.add_argument("--force-upload-sdtm", action="store_true", help="ODA only: force a full re-upload of the ~200 MB SDTM source (default uploads only missing/changed files). Use after a source-data refresh.")
 
     args = parser.parse_args()
 
@@ -442,7 +577,7 @@ def main():
         if args.real_sas and args.use_cached_sas:
             print("ERROR: --real-sas and --use-cached-sas are mutually exclusive.")
             sys.exit(1)
-        execute_pipeline(args.from_stage, args.real_sas, args.use_cached_sas)
+        execute_pipeline(args.from_stage, args.real_sas, args.use_cached_sas, args.serial, args.force_upload_sdtm)
 
 if __name__ == "__main__":
     main()

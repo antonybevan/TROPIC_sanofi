@@ -1,4 +1,4 @@
-# Program: tfl_generation.R | Version: 2.2.1 | Author: Principal Clinical TFL Design Architect | Date: 2026-05-27
+# Program: tfl_generation.R | Version: 3.5.0 | Author: Principal Clinical TFL Design Architect | Date: 2026-06-12
 # Standard: ICH E3 TFL Catalogue / NEJM & Lancet Style Guides | renv.lock hash: locked
 # Description: Compiles all efficacy, safety, and Project Optimus clinical reports,
 #              rendering publication-quality tables and premium, peer-review-ready figures.
@@ -97,7 +97,12 @@ pfs_significant <- os_significant && (pfs_pval < 0.05)
 cat(sprintf("  Step 2: PFS Significance check -> p = %f (Significant & Tested: %s)\n", pfs_pval, as.character(pfs_significant)))
 
 # Step 3: PSA Response (Tested only if PFS is significant)
-psa_resp_data <- adrs %>% filter(PARAMCD == "PSARESP")
+psa_resp_data <- adrs %>% 
+  filter(PARAMCD == "PSARESP") %>%
+  mutate(
+    TRT01P = factor(TRT01P, levels = c("MP", "CbzP")),
+    AVALC = factor(AVALC, levels = c("N", "Y"))
+  )
 psa_table <- table(psa_resp_data$TRT01P, psa_resp_data$AVALC)
 psa_test <- fisher.test(psa_table)
 psa_pval <- psa_test$p.value
@@ -108,7 +113,11 @@ cat(sprintf("  Step 3: PSA Response Significance check -> p = %e (Significant & 
 # Conformed to SAP measurable-disease ITT population (MEASDISF == 'Y')
 orr_resp_data <- adrs %>% 
   filter(PARAMCD == "OBJRESP") %>%
-  filter(USUBJID %in% adsl$USUBJID[adsl$MEASDISF == "Y"])
+  filter(USUBJID %in% adsl$USUBJID[adsl$MEASDISF == "Y"]) %>%
+  mutate(
+    TRT01P = factor(TRT01P, levels = c("MP", "CbzP")),
+    AVALC = factor(AVALC, levels = c("N", "Y"))
+  )
 orr_table <- table(orr_resp_data$TRT01P, orr_resp_data$AVALC)
 orr_test <- fisher.test(orr_table)
 orr_pval <- orr_test$p.value
@@ -146,108 +155,114 @@ theme_nejm_custom <- function() {
 }
 
 # ==============================================================================
+# KAPLAN-MEIER PLOT GENERATION HELPER (Deduplicated, fits once, vectorized risk table)
+# ==============================================================================
+render_km <- function(data, stats, x_max, title, subtitle_endpoint, y_lab, outfile) {
+  # Fit survfit once (Issue 5)
+  fit <- survfit(Surv(AVAL / 30.4375, 1 - CNSR) ~ TRT01P, data = data)
+  
+  # Extract true KM step-plot data
+  plot_list <- list()
+  if (!is.null(fit$strata)) {
+    for (stratum in names(fit$strata)) {
+      stratum_clean <- gsub("TRT01P=", "", stratum)
+      idx <- which(summary(fit)$strata == stratum)
+      
+      # Ensure curves start at time 0 with 100% survival
+      plot_list[[stratum_clean]] <- data.frame(
+        time = c(0, fit$time[idx]),
+        surv = c(1.0, fit$surv[idx]),
+        TRT01P = stratum_clean
+      )
+    }
+  } else {
+    single_trt <- unique(data$TRT01P)
+    plot_list[[single_trt]] <- data.frame(
+      time = c(0, fit$time),
+      surv = c(1.0, fit$surv),
+      TRT01P = single_trt
+    )
+  }
+  plot_data <- bind_rows(plot_list)
+  
+  # Main KM Plot Panel
+  km_plot <- ggplot(plot_data, aes(x = time, y = surv, color = TRT01P)) +
+    geom_step(linewidth = 1.0) +
+    scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"), 
+                       labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) +
+    scale_y_continuous(labels = scales::percent, expand = c(0, 0)) +
+    scale_x_continuous(breaks = seq(0, x_max, by = 3), expand = c(0, 0)) +
+    coord_cartesian(xlim = c(0, x_max), ylim = c(0, 1.02)) +
+    labs(
+      title = title,
+      subtitle = subtitle_endpoint,
+      x = "Months from Randomization",
+      y = y_lab,
+      color = "Treatment Group:",
+      caption = SYNTH_CAP
+    ) +
+    theme_nejm_custom() +
+    theme(
+      legend.position = c(0.78, 0.85),
+      legend.background = element_rect(fill = "white", color = "#eaeaea", linewidth = 0.4),
+      legend.key = element_blank(),
+      plot.margin = margin(t = 10, r = 15, b = 5, l = 30)
+    )
+  
+  # Vectorized risk table counts query (Issue 4 & 5)
+  times <- seq(0, x_max, by = 3)
+  sum_fit <- summary(fit, times = times, extend = TRUE)
+  risk_data <- data.frame(
+    TRT01P = gsub("TRT01P=", "", as.character(sum_fit$strata)),
+    Time = sum_fit$time,
+    n.risk = sum_fit$n.risk
+  )
+  
+  active_trts <- c("CbzP", "MP")
+  risk_data$TRT01P <- factor(risk_data$TRT01P, levels = active_trts)
+  
+  risk_table_plot <- ggplot(risk_data, aes(x = Time, y = factor(TRT01P, levels = rev(active_trts)), label = n.risk)) +
+    geom_text(size = 3.2, fontface = "bold", aes(color = TRT01P), family = "serif") +
+    scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"), 
+                       labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)"), 
+                       guide = "none") +
+    scale_y_discrete(labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) +
+    scale_x_continuous(limits = c(0, x_max), breaks = times, expand = c(0, 0)) +
+    labs(
+      x = NULL,
+      y = "Number at risk:"
+    ) +
+    theme_minimal(base_family = "serif") +
+    theme(
+      panel.grid = element_blank(),
+      axis.text.x = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title.y = element_text(face = "bold", size = 8.5, color = "#111111", angle = 0, vjust = 0.5),
+      axis.text.y = element_text(face = "bold", size = 8.5, color = "#222222"),
+      plot.margin = margin(t = -5, r = 15, b = 5, l = 30)
+    )
+  
+  final_km_plot <- km_plot / risk_table_plot + plot_layout(heights = c(4.1, 1))
+  ggsave(outfile, final_km_plot, width = 8, height = 5.5, dpi = 300)
+}
+
+# ==============================================================================
 # FIGURE F-11-1: Kaplan-Meier Curve — OS by Arm (Primary Endpoint)
 # ==============================================================================
 cat("  [TFL] Rendering KM Curve: Overall Survival (with Aligned Risk Table)...\n")
 os_data <- adtte %>% filter(PARAMCD == "OS")
 
-# Use the dual-arm data directly from the ADTTE dataset (real MP + reconstructed CbzP)
-
-# Calculate actual product-limit Kaplan-Meier estimate (True KM - no toy curves!)
-fit_os <- survfit(Surv(AVAL / 30.4375, 1 - CNSR) ~ TRT01P, data = os_data)
-
-# Extract true KM step-plot data
-os_plot_list <- list()
-if (!is.null(fit_os$strata)) {
-  for (stratum in names(fit_os$strata)) {
-    stratum_clean <- gsub("TRT01P=", "", stratum)
-    idx <- which(summary(fit_os)$strata == stratum)
-    
-    # Ensure curves start at time 0 with 100% survival
-    os_plot_list[[stratum_clean]] <- data.frame(
-      time = c(0, fit_os$time[idx]),
-      surv = c(1.0, fit_os$surv[idx]),
-      TRT01P = stratum_clean
-    )
-  }
-} else {
-  # Single arm fallback
-  single_trt <- unique(os_data$TRT01P)
-  os_plot_list[[single_trt]] <- data.frame(
-    time = c(0, fit_os$time),
-    surv = c(1.0, fit_os$surv),
-    TRT01P = single_trt
-  )
-}
-os_plot_data <- bind_rows(os_plot_list)
-
-# Main KM Plot Panel
-km_plot <- ggplot(os_plot_data, aes(x = time, y = surv, color = TRT01P)) +
-  geom_step(linewidth = 1.0) +
-  scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"), labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) + # NEJM Medical Palette
-  scale_y_continuous(labels = scales::percent, expand = c(0, 0)) +
-  scale_x_continuous(breaks = seq(0, 24, by = 3), expand = c(0, 0)) +
-  coord_cartesian(xlim = c(0, 24), ylim = c(0, 1.02)) +
-  labs(
-    title = "F-11-1: Kaplan-Meier Overall Survival (OS) Analysis — ITT Population",
-    subtitle = sprintf("Primary Endpoint: Cabazitaxel + Prednisone (CbzP) vs Mitoxantrone + Prednisone (MP)\nHR = %.2f (95%% CI: %.2f-%.2f), Stratified Log-Rank %s",
-                       os_stats$hr, os_stats$lcl, os_stats$ucl, 
-                       if(os_stats$pval < 0.0001) "p < 0.0001" else sprintf("p = %.4f", os_stats$pval)),
-    x = "Months from Randomization",
-    y = "Overall Survival Probability",
-    color = "Treatment Group:",
-    caption = SYNTH_CAP
-  ) +
-  theme_nejm_custom() +
-  theme(
-    legend.position = c(0.78, 0.85),
-    legend.background = element_rect(fill = "white", color = "#eaeaea", linewidth = 0.4),
-    legend.key = element_blank(),
-    plot.margin = margin(t = 10, r = 15, b = 5, l = 30)
-  )
-
-# Calculate dynamic Number at Risk at key clinical intervals (handles single-arm dynamically)
-times <- seq(0, 24, by = 3)
-risk_data <- data.frame()
-active_trts <- c("CbzP", "MP") # Maintain order in clinical standards
-
-for (trt in active_trts) {
-  trt_data <- os_data %>% filter(TRT01P == trt)
-  if (nrow(trt_data) > 0) {
-    fit_trt <- survfit(Surv(AVAL / 30.4375, 1 - CNSR) ~ 1, data = trt_data)
-    for (t in times) {
-      idx <- which(fit_trt$time >= t)
-      n_risk <- if (length(idx) == 0) 0 else fit_trt$n.risk[min(idx)]
-      if (t == 0) n_risk <- nrow(trt_data) # baseline population
-      risk_data <- rbind(risk_data, data.frame(TRT01P = trt, Time = t, n.risk = n_risk))
-    }
-  }
-}
-
-# Number at Risk Table Panel (Text colored dynamically by treatment arm for luxury publication styling)
-risk_table_plot <- ggplot(risk_data, aes(x = Time, y = factor(TRT01P, levels = rev(active_trts)), label = n.risk)) +
-  geom_text(size = 3.2, fontface = "bold", aes(color = TRT01P), family = "serif") +
-  scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"), labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)"), guide = "none") +
-  scale_y_discrete(labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) +
-  scale_x_continuous(limits = c(0, 24), breaks = times, expand = c(0, 0)) +
-  labs(
-    x = NULL,
-    y = "Number at risk:"
-  ) +
-  theme_minimal(base_family = "serif") +
-  theme(
-    panel.grid = element_blank(),
-    axis.text.x = element_blank(),
-    axis.ticks = element_blank(),
-    axis.title.y = element_text(face = "bold", size = 8.5, color = "#111111", angle = 0, vjust = 0.5),
-    axis.text.y = element_text(face = "bold", size = 8.5, color = "#222222"),
-    plot.margin = margin(t = -5, r = 15, b = 5, l = 30)
-  )
-
-# Stack KM Curve and Aligned Risk Table using patchwork
-final_km_plot <- km_plot / risk_table_plot + plot_layout(heights = c(4.1, 1))
-
-ggsave("09_tfl/output/F-11-1_KM_OS.png", final_km_plot, width = 8, height = 5.5, dpi = 300)
+render_km(
+  data = os_data,
+  stats = os_stats,
+  x_max = 24,
+  title = "F-11-1: Kaplan-Meier Overall Survival (OS) Analysis — ITT Population",
+  subtitle_endpoint = sprintf("Primary Endpoint: Cabazitaxel + Prednisone (CbzP) vs Mitoxantrone + Prednisone (MP)\nHR = %.2f (95%% CI: %.2f-%.2f), Stratified Log-Rank %s",
+                              os_stats$hr, os_stats$lcl, os_stats$ucl, 
+                              if(os_stats$pval < 0.0001) "p < 0.0001" else sprintf("p = %.4f", os_stats$pval)),
+  y_lab = "Overall Survival Probability",
+  outfile = "09_tfl/output/F-11-1_KM_OS.png"
+)
 
 # ==============================================================================
 # FIGURE F-17-1: Exposure-Response Scatter: RDI vs ANC Nadir (Optimus)
@@ -590,13 +605,16 @@ orr_mp_resp <- sum(orr_resp_data$AVALC == "Y" & orr_resp_data$TRT01P == "MP")
 orr_mp_total <- sum(meas_subj$TRT01P == "MP")
 orr_mp_pct <- orr_mp_resp / orr_mp_total * 100
 
+n_cbzp_itt <- sum(adsl$TRT01P == "CbzP")
+n_mp_itt   <- sum(adsl$TRT01P == "MP")
+
 efficacy_tables <- sprintf("
 TROPIC (Study EFC6193 / XRP6258) Secondary Efficacy Tables
 ==========================================================
 
 T-11-6: Kaplan-Meier Analysis of Time to PSA Progression (TTPSA) - ITT Population
 ---------------------------------------------------------------------------------
-Statistic                                 CbzP (N=378)        MP (N=371)
+Statistic                                 CbzP (N=%d)        MP (N=%d)
 Number of Events / Total N                %d/%d               %d/%d
 Median Survival Time (Months)             %.1f                %.1f
 95%% Confidence Interval                   %s      %s
@@ -606,7 +624,7 @@ Wald Log-Rank p-value                     %.4f
 
 T-11-7: Kaplan-Meier Analysis of Time to Tumor Progression (TTUMOR) - Measurable Subpopulation
 ------------------------------------------------------------------------------------------------
-Statistic                                 CbzP (N=179)        MP (N=203)
+Statistic                                 CbzP (N=%d)        MP (N=%d)
 Number of Events / Total N                %d/%d               %d/%d
 Median Survival Time (Months)             %.1f                %.1f
 95%% Confidence Interval                   %s      %s
@@ -625,13 +643,15 @@ Objective Response Rate (ORR) - Measurable ITT Population†
   Responders / N (%%)                      %d/%d (%.1f%%)      %d/%d (%.1f%%)
   Fisher's Exact p-value                  %.4f
 
-†Restricted to patients with measurable disease at baseline (CbzP N=179, MP N=203).
+†Restricted to patients with measurable disease at baseline (CbzP N=%d, MP N=%d).
 ",
+  n_cbzp_itt, n_mp_itt,
   as.integer(events_psa_cbzp), as.integer(total_psa_cbzp),
   as.integer(events_psa_mp), as.integer(total_psa_mp),
   med_psa_cbzp, med_psa_mp, ci_psa_cbzp, ci_psa_mp,
   hr_psa, hr_psa_lcl, hr_psa_ucl, p_psa,
   
+  total_tumor_cbzp, total_tumor_mp,
   as.integer(events_tumor_cbzp), as.integer(total_tumor_cbzp),
   as.integer(events_tumor_mp), as.integer(total_tumor_mp),
   med_tumor_cbzp, med_tumor_mp, ci_tumor_cbzp, ci_tumor_mp,
@@ -643,7 +663,9 @@ Objective Response Rate (ORR) - Measurable ITT Population†
   
   as.integer(orr_cbzp_resp), as.integer(orr_cbzp_total), orr_cbzp_pct,
   as.integer(orr_mp_resp), as.integer(orr_mp_total), orr_mp_pct,
-  orr_pval
+  orr_pval,
+  
+  total_tumor_cbzp, total_tumor_mp
 )
 
 # Objective Response Rate (ORR) with response-evaluable denominator (review-board SR-1).
@@ -675,79 +697,17 @@ writeLines(paste0(SYNTH_BANNER, efficacy_tables), "09_tfl/output/T-11-Efficacy_T
 cat("  [TFL] Rendering KM Curve: Progression-Free Survival...\n")
 pfs_data <- adtte %>% filter(PARAMCD == "PFS")
 
-# Use the dual-arm PFS data directly from ADTTE
-
-fit_pfs <- survfit(Surv(AVAL / 30.4375, 1 - CNSR) ~ TRT01P, data = pfs_data)
-
-pfs_plot_list <- list()
-if (!is.null(fit_pfs$strata)) {
-  for (stratum in names(fit_pfs$strata)) {
-    sc <- gsub("TRT01P=", "", stratum)
-    idx <- which(summary(fit_pfs)$strata == stratum)
-    pfs_plot_list[[sc]] <- data.frame(
-      time = c(0, fit_pfs$time[idx]),
-      surv = c(1.0, fit_pfs$surv[idx]),
-      TRT01P = sc
-    )
-  }
-}
-pfs_plot_data <- bind_rows(pfs_plot_list)
-
-km_pfs <- ggplot(pfs_plot_data, aes(x = time, y = surv, color = TRT01P)) +
-  geom_step(linewidth = 1.0) +
-  scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"), labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) +
-  scale_y_continuous(labels = scales::percent, expand = c(0, 0)) +
-  scale_x_continuous(breaks = seq(0, 18, by = 3), expand = c(0, 0)) +
-  coord_cartesian(xlim = c(0, 18), ylim = c(0, 1.02)) +
-  labs(
-    title = "F-11-2: Kaplan-Meier Progression-Free Survival (PFS) Analysis — ITT Population",
-    subtitle = sprintf("Secondary Endpoint: Cabazitaxel + Prednisone (CbzP) vs Mitoxantrone + Prednisone (MP)\nHR = %.2f (95%% CI: %.2f-%.2f), Stratified Log-Rank %s",
-                       pfs_stats$hr, pfs_stats$lcl, pfs_stats$ucl, 
-                       if(pfs_stats$pval < 0.0001) "p < 0.0001" else sprintf("p = %.4f", pfs_stats$pval)),
-    x = "Months from Randomization",
-    y = "Progression-Free Survival Probability",
-    color = "Treatment Group:",
-    caption = SYNTH_CAP
-  ) +
-  theme_nejm_custom() +
-  theme(
-    legend.position = c(0.78, 0.85),
-    legend.background = element_rect(fill = "white", color = "#eaeaea", linewidth = 0.4),
-    plot.margin = margin(t = 10, r = 15, b = 5, l = 30)
-  )
-
-times_pfs <- seq(0, 18, by = 3)
-risk_pfs <- data.frame()
-for (trt in c("CbzP", "MP")) {
-  trt_d <- pfs_data %>% filter(TRT01P == trt)
-  if (nrow(trt_d) > 0) {
-    fit_t <- survfit(Surv(AVAL / 30.4375, 1 - CNSR) ~ 1, data = trt_d)
-    for (t in times_pfs) {
-      idx2 <- which(fit_t$time >= t)
-      nr <- if (length(idx2) == 0) 0 else fit_t$n.risk[min(idx2)]
-      if (t == 0) nr <- nrow(trt_d)
-      risk_pfs <- rbind(risk_pfs, data.frame(TRT01P = trt, Time = t, n.risk = nr))
-    }
-  }
-}
-
-risk_pfs_plot <- ggplot(risk_pfs, aes(x = Time, y = factor(TRT01P, levels = rev(c("CbzP", "MP"))), label = n.risk)) +
-  geom_text(size = 3.2, fontface = "bold", aes(color = TRT01P), family = "serif") +
-  scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"), labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)"), guide = "none") +
-  scale_y_discrete(labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) +
-  scale_x_continuous(limits = c(0, 18), breaks = times_pfs, expand = c(0, 0)) +
-  labs(x = NULL, y = "Number at risk:") +
-  theme_minimal(base_family = "serif") +
-  theme(
-    panel.grid = element_blank(), axis.text.x = element_blank(),
-    axis.ticks = element_blank(),
-    axis.title.y = element_text(face = "bold", size = 8.5, color = "#111111", angle = 0, vjust = 0.5),
-    axis.text.y = element_text(face = "bold", size = 8.5, color = "#222222"),
-    plot.margin = margin(t = -5, r = 15, b = 5, l = 30)
-  )
-
-final_pfs <- km_pfs / risk_pfs_plot + plot_layout(heights = c(4.1, 1))
-ggsave("09_tfl/output/F-11-2_KM_PFS.png", final_pfs, width = 8, height = 5.5, dpi = 300)
+render_km(
+  data = pfs_data,
+  stats = pfs_stats,
+  x_max = 18,
+  title = "F-11-2: Kaplan-Meier Progression-Free Survival (PFS) Analysis — ITT Population",
+  subtitle_endpoint = sprintf("Secondary Endpoint: Cabazitaxel + Prednisone (CbzP) vs Mitoxantrone + Prednisone (MP)\nHR = %.2f (95%% CI: %.2f-%.2f), Stratified Log-Rank %s",
+                              pfs_stats$hr, pfs_stats$lcl, pfs_stats$ucl, 
+                              if(pfs_stats$pval < 0.0001) "p < 0.0001" else sprintf("p = %.4f", pfs_stats$pval)),
+  y_lab = "Progression-Free Survival Probability",
+  outfile = "09_tfl/output/F-11-2_KM_PFS.png"
+)
 
 # ==============================================================================
 # FIGURE F-13-1: PSA Waterfall Plot — Best % Change from Baseline
@@ -866,9 +826,28 @@ ae_safety <- adae %>%
   filter(TRTEMFL == "Y") %>%
   left_join(adsl %>% select(USUBJID, TRT01P), by = "USUBJID")
 
-# Total subjects per arm
-n_mp   <- nrow(adsl %>% filter(TRT01P == "MP"))
-n_cbzp <- if ("CbzP" %in% adsl$TRT01P) nrow(adsl %>% filter(TRT01P == "CbzP")) else 378
+# Total subjects per arm derived dynamically from ADSL (Issue 3 / 2.5)
+n_mp   <- sum(adsl$TRT01P == "MP")
+n_cbzp <- sum(adsl$TRT01P == "CbzP")
+
+# Precompute AE summary counts once (Issue 6 / 2.4)
+ae_counts <- ae_safety %>%
+  group_by(TRT01P) %>%
+  summarise(
+    any_teae = n_distinct(USUBJID),
+    g3 = n_distinct(USUBJID[!is.na(ATOXGR) & ATOXGR >= 3]),
+    sae = n_distinct(USUBJID[AESER == "Y"]),
+    .groups = "drop"
+  )
+
+n_any_cbzp <- if ("CbzP" %in% ae_counts$TRT01P) ae_counts$any_teae[ae_counts$TRT01P == "CbzP"] else 0
+n_any_mp   <- if ("MP" %in% ae_counts$TRT01P) ae_counts$any_teae[ae_counts$TRT01P == "MP"] else 0
+
+n_g3_cbzp_tot <- if ("CbzP" %in% ae_counts$TRT01P) ae_counts$g3[ae_counts$TRT01P == "CbzP"] else 0
+n_g3_mp_tot   <- if ("MP" %in% ae_counts$TRT01P) ae_counts$g3[ae_counts$TRT01P == "MP"] else 0
+
+n_sae_cbzp <- if ("CbzP" %in% ae_counts$TRT01P) ae_counts$sae[ae_counts$TRT01P == "CbzP"] else 0
+n_sae_mp   <- if ("MP" %in% ae_counts$TRT01P) ae_counts$sae[ae_counts$TRT01P == "MP"] else 0
 
 # Overall AE incidence
 tot_ae <- ae_safety %>%
@@ -930,20 +909,14 @@ ae_summary_txt <- sprintf("
  System Organ Class                         CbzP (n, %%)        MP (n, %%)
 ",
   n_cbzp, n_mp,
-  nrow(ae_safety %>% filter(TRT01P == "CbzP") %>% distinct(USUBJID)),
-  round(100 * nrow(ae_safety %>% filter(TRT01P == "CbzP") %>% distinct(USUBJID)) / n_cbzp),
-  nrow(ae_safety %>% filter(TRT01P == "MP") %>% distinct(USUBJID)),
-  round(100 * nrow(ae_safety %>% filter(TRT01P == "MP") %>% distinct(USUBJID)) / n_mp),
+  n_any_cbzp, round(100 * n_any_cbzp / n_cbzp),
+  n_any_mp, round(100 * n_any_mp / n_mp),
   
-  nrow(ae_safety %>% filter(TRT01P == "CbzP", !is.na(ATOXGR), ATOXGR >= 3) %>% distinct(USUBJID)),
-  round(100 * nrow(ae_safety %>% filter(TRT01P == "CbzP", !is.na(ATOXGR), ATOXGR >= 3) %>% distinct(USUBJID)) / n_cbzp),
-  nrow(ae_safety %>% filter(TRT01P == "MP", !is.na(ATOXGR), ATOXGR >= 3) %>% distinct(USUBJID)),
-  round(100 * nrow(ae_safety %>% filter(TRT01P == "MP", !is.na(ATOXGR), ATOXGR >= 3) %>% distinct(USUBJID)) / n_mp),
+  n_g3_cbzp_tot, round(100 * n_g3_cbzp_tot / n_cbzp),
+  n_g3_mp_tot, round(100 * n_g3_mp_tot / n_mp),
   
-  nrow(ae_safety %>% filter(TRT01P == "CbzP", AESER == "Y") %>% distinct(USUBJID)),
-  round(100 * nrow(ae_safety %>% filter(TRT01P == "CbzP", AESER == "Y") %>% distinct(USUBJID)) / n_cbzp),
-  nrow(ae_safety %>% filter(TRT01P == "MP", AESER == "Y") %>% distinct(USUBJID)),
-  round(100 * nrow(ae_safety %>% filter(TRT01P == "MP", AESER == "Y") %>% distinct(USUBJID)) / n_mp),
+  n_sae_cbzp, round(100 * n_sae_cbzp / n_cbzp),
+  n_sae_mp, round(100 * n_sae_mp / n_mp),
   
   n_disc_cbzp, round(100 * n_disc_cbzp / n_cbzp),
   n_disc_mp, round(100 * n_disc_mp / n_mp)

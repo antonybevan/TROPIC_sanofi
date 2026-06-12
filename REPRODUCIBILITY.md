@@ -82,3 +82,13 @@ The synthetic comparator arm is regenerated (deterministically, fixed seeds) by
   **not real data**, does not reproduce published cabazitaxel efficacy, and is used only to
   exercise comparative TFLs. See [ANALYSIS_REPORT.md](ANALYSIS_REPORT.md) §8 and
   [08_reviewers_guides/ADRG.md](08_reviewers_guides/ADRG.md) §7.
+
+## 6. Known limitations & deferred items
+
+The following items are explicitly deferred or represent documented limitations of the current repository:
+
+- **Pinnacle 21 Conformance Report:** A formal Pinnacle 21 validation report requires the proprietary Pinnacle 21 Community/Enterprise client and access to the complete patient dataset. Running P21 validation is a required pre-submission step before any regulatory filing.
+- **Real ODA SAS Run Evidence:** Local execution default is simulated (`sim`) mode. Executing a genuine SAS run requires a SAS engine license or SAS OnDemand for Academics (ODA) credentials (which cannot be shared in a public repository).
+- **Guyot (2012) KM Reconstruction of CbzP:** The synthetic arm is honestly labeled as illustrative and constructed by time-scaling. Using the Guyot (2012) KM reconstruction method for the comparator arm is deferred and recommended as a future upgrade if a true two-arm comparison is desired, as the current divide-by-HR method is circular.
+- **Week-Precision Event Dates:** Week-precision dates (±3.5 days) are inherent to the source data and are disclosed as a dataset limitation.
+

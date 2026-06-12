@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <?xml-stylesheet type="text/xsl" href="define2-1.xsl"?>
-<Define xmlns="http://www.cdisc.org/ns/def/v2.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.cdisc.org/ns/def/v2.1 http://schema.cdisc.org/define/v2.1/define2-1-0.xsd" FileOID="TROPIC_ADAM_Metadata_v2.1" AsOfDateTime="2026-06-12T18:57:01" DefineVersion="2.1.0" Originator="Principal Clinical Data Infrastructure Architect">
+<Define xmlns="http://www.cdisc.org/ns/def/v2.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.cdisc.org/ns/def/v2.1 http://schema.cdisc.org/define/v2.1/define2-1-0.xsd" FileOID="TROPIC_ADAM_Metadata_v2.1" AsOfDateTime="2026-06-12T21:52:12" DefineVersion="2.1.0" Originator="Principal Clinical Data Infrastructure Architect">
 
   <MetaDataVersion OID="MDV.TROPIC_NCT00417079.ADAM.1.3" Name="TROPIC Trial ADaM Metadata Specification" Description="Metadata specification for TROPIC Phase III re-analysis ADaM datasets" CDISCLibraryID="ADaMIG.1.3" CDISCLibraryVersion="1.3">
 
@@ -43,6 +43,12 @@
       <ItemRef ItemOID="IT.ADSL.HGBBL" Order="34" Mandatory="No" />
       <ItemRef ItemOID="IT.ADSL.DOCPROG" Order="35" Mandatory="No" />
       <ItemRef ItemOID="IT.ADSL.DOCRESP" Order="36" Mandatory="No" />
+      <ItemRef ItemOID="IT.ADSL.ECOGBLIF" Order="37" Mandatory="No" />
+      <ItemRef ItemOID="IT.ADSL.PSABLIF" Order="38" Mandatory="No" />
+      <ItemRef ItemOID="IT.ADSL.ALPBLIF" Order="39" Mandatory="No" />
+      <ItemRef ItemOID="IT.ADSL.HGBBLIF" Order="40" Mandatory="No" />
+      <ItemRef ItemOID="IT.ADSL.ALBBLIF" Order="41" Mandatory="No" />
+      <ItemRef ItemOID="IT.ADSL.LDHBLIF" Order="42" Mandatory="No" />
     </ItemGroupDef>
 
     <ItemGroupDef OID="IG.ADEX" Name="ADEX" Repeating="Yes" IsReferenceData="No" Purpose="Analysis" Role="BDS" Structure="One record per subject per parameter per visit" Label="Exposure Analysis Dataset">
@@ -232,13 +238,31 @@
     <Origin Type="Derived" Source="Sponsor" /></ItemDef>
     <ItemDef OID="IT.ADSL.PSABL" Name="PSABL" DataType="float" Length="8" Label="Baseline PSA (ug/L)"><Origin Type="Collected" Source="Sponsor" /></ItemDef>
     <ItemDef OID="IT.ADSL.ALPBL" Name="ALPBL" DataType="float" Length="8" Label="Baseline Alkaline Phosphatase (U/L)"><Origin Type="Collected" Source="Sponsor" /></ItemDef>
-    <ItemDef OID="IT.ADSL.ALBBL" Name="ALBBL" DataType="float" Length="8" Label="Baseline Albumin (g/L)"><Origin Type="Collected" Source="Sponsor" /></ItemDef>
-    <ItemDef OID="IT.ADSL.LDHBL" Name="LDHBL" DataType="float" Length="8" Label="Baseline Lactate Dehydrogenase (U/L)"><Origin Type="Collected" Source="Sponsor" /></ItemDef>
+    <ItemDef OID="IT.ADSL.ALBBL" Name="ALBBL" DataType="float" Length="8" Label="Baseline Albumin (g/L)"><Origin Type="Assigned" Source="Sponsor"><Description><TranslatedText xml:lang="en">Not collected in the public MP SDTM release; single population-reference constant for all subjects (placeholder; see ADRG 5.1). ALBBLIF='Y' for all records.</TranslatedText></Description></Origin></ItemDef>
+    <ItemDef OID="IT.ADSL.LDHBL" Name="LDHBL" DataType="float" Length="8" Label="Baseline Lactate Dehydrogenase (U/L)"><Origin Type="Assigned" Source="Sponsor"><Description><TranslatedText xml:lang="en">Not collected in the public MP SDTM release; single population-reference constant for all subjects (placeholder; see ADRG 5.1). LDHBLIF='Y' for all records.</TranslatedText></Description></Origin></ItemDef>
     <ItemDef OID="IT.ADSL.HGBBL" Name="HGBBL" DataType="float" Length="8" Label="Baseline Hemoglobin (g/dL)"><Origin Type="Collected" Source="Sponsor" /></ItemDef>
     <ItemDef OID="IT.ADSL.DOCPROG" Name="DOCPROG" DataType="text" Length="20" Label="Docetaxel Prior Progression Classification"><Origin Type="Collected" Source="Sponsor" /></ItemDef>
     <ItemDef OID="IT.ADSL.DOCRESP" Name="DOCRESP" DataType="text" Length="1" Label="Docetaxel Prior Response Flag">
       <CodeListRef CodeListOID="CL.NY" />
     <Origin Type="Collected" Source="Sponsor" /></ItemDef>
+    <ItemDef OID="IT.ADSL.ECOGBLIF" Name="ECOGBLIF" DataType="text" Length="1" Label="Baseline ECOG Imputed Flag">
+      <CodeListRef CodeListOID="CL.NY" />
+    <Origin Type="Derived" Source="Sponsor"><Description><TranslatedText xml:lang="en">'Y' if ECOGBL was imputed to the protocol default (no baseline ECOG on file), else 'N'.</TranslatedText></Description></Origin></ItemDef>
+    <ItemDef OID="IT.ADSL.PSABLIF" Name="PSABLIF" DataType="text" Length="1" Label="Baseline PSA Imputed Flag">
+      <CodeListRef CodeListOID="CL.NY" />
+    <Origin Type="Derived" Source="Sponsor"><Description><TranslatedText xml:lang="en">'Y' if PSABL was imputed to the population-median fallback (no baseline PSA on file), else 'N'.</TranslatedText></Description></Origin></ItemDef>
+    <ItemDef OID="IT.ADSL.ALPBLIF" Name="ALPBLIF" DataType="text" Length="1" Label="Baseline ALP Imputed Flag">
+      <CodeListRef CodeListOID="CL.NY" />
+    <Origin Type="Derived" Source="Sponsor"><Description><TranslatedText xml:lang="en">'Y' if ALPBL was imputed to the population-median fallback (no baseline ALP on file), else 'N'.</TranslatedText></Description></Origin></ItemDef>
+    <ItemDef OID="IT.ADSL.HGBBLIF" Name="HGBBLIF" DataType="text" Length="1" Label="Baseline Hemoglobin Imputed Flag">
+      <CodeListRef CodeListOID="CL.NY" />
+    <Origin Type="Derived" Source="Sponsor"><Description><TranslatedText xml:lang="en">'Y' if HGBBL was imputed to the population-median fallback (no baseline hemoglobin on file), else 'N'.</TranslatedText></Description></Origin></ItemDef>
+    <ItemDef OID="IT.ADSL.ALBBLIF" Name="ALBBLIF" DataType="text" Length="1" Label="Baseline Albumin Imputed Flag">
+      <CodeListRef CodeListOID="CL.NY" />
+    <Origin Type="Derived" Source="Sponsor"><Description><TranslatedText xml:lang="en">Constant 'Y' — ALBBL is a non-collected placeholder constant for all subjects.</TranslatedText></Description></Origin></ItemDef>
+    <ItemDef OID="IT.ADSL.LDHBLIF" Name="LDHBLIF" DataType="text" Length="1" Label="Baseline LDH Imputed Flag">
+      <CodeListRef CodeListOID="CL.NY" />
+    <Origin Type="Derived" Source="Sponsor"><Description><TranslatedText xml:lang="en">Constant 'Y' — LDHBL is a non-collected placeholder constant for all subjects.</TranslatedText></Description></Origin></ItemDef>
 
     
     <ItemDef OID="IT.ADEX.STUDYID" Name="STUDYID" DataType="text" Length="40" Label="Study Identifier"><Origin Type="Protocol" Source="Sponsor" /></ItemDef>
@@ -503,8 +527,8 @@
       <CodeListItem CodedValue="TTPAIN">
         <Decode><TranslatedText xml:lang="en">Time to Pain Progression</TranslatedText></Decode>
       </CodeListItem>
-      <CodeListItem CodedValue="TTOS">
-        <Decode><TranslatedText xml:lang="en">Time to Serious Adverse Event</TranslatedText></Decode>
+      <CodeListItem CodedValue="TTSAE">
+        <Decode><TranslatedText xml:lang="en">Time to First Serious Adverse Event</TranslatedText></Decode>
       </CodeListItem>
     </CodeList>
 

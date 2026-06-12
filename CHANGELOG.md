@@ -4,6 +4,124 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.5.2] - 2026-06-12 — Resilient ODA Execution (Broker + Idempotent Seed)
+
+### Added
+- **`06_telemetry/oda_broker.py` — connection broker** (single source of truth for connecting to
+  ODA). Replaces blind retries with: status-gated **full-jitter exponential backoff** within a
+  wall-clock budget; an **error taxonomy** that fails fast on `AUTH`/`CONFIG_ENCRYPTION` and only
+  retries transient classes; **slot hygiene** (single-flight lock + orphan sweep + guaranteed
+  teardown) to stop orphaned ODA workspace sessions; a **live nonce probe** so
+  `sas_execution_mode='oda'` is *earned*, never asserted from a bare connection; and an attempt
+  **ledger** (`oda_status.json`) feeding `recommend_window()`.
+- **`06_telemetry/seed_sdtm.py` — idempotent, integrity-checked SDTM seeding (Job A).** Computes a
+  per-dataset `sha256`/`nrows` manifest; uploads only on mismatch; re-reads ODA row counts to
+  detect a half-upload; writes the manifest sentinel **last** (transactional). `--force` overrides.
+- **`06_telemetry/test_oda_broker.py`** — 10 unit tests (injected fakes; no Java/network) covering
+  earned-mode-via-probe, teardown on failed spawn, fail-fast classes, jittered backoff, the error
+  taxonomy, idempotent seed, and unverified-library detection.
+- **Extended `pipeline_health.json` contract:** on genuine ODA success records `oda_endpoint`,
+  `oda_attempts`, `oda_total_wait_s`, `sdtm_manifest_sha`, `probe_nonce_echoed`,
+  `reconciliation='SAS_vs_R'`, `reconciliation_status`; on give-up records `oda_last_error_class`,
+  `next_recommended_window`, `reconciliation='sim_only'`.
+
+### Changed
+- **`cibuild.py` Stage 10 is now reconcile-only (Job B).** It connects via the broker and
+  **verifies the SDTM manifest before running** — if the library is missing/stale it fails with a
+  clear "run seed_sdtm.py" message instead of silently simulating. On connection-budget exhaustion
+  it falls back to sim **honestly labeled** (mode downgraded to `sim` in telemetry). Superseded the
+  inline `_oda_connect`/`_sync_sdtm` helpers. `TROPIC_ODA_RETRIES` retained as a back-compat alias
+  onto the broker's `max_wait_s`.
+
+## [3.5.1] - 2026-06-12 — ODA Efficiency & Reproducibility Hardening
+
+### Added
+- **Incremental SDTM upload to ODA (`06_telemetry/cibuild.py`).** Stage 10 now uploads only
+  the SDTM files that are **missing or changed on ODA** (compared by byte size against the
+  persistent ODA `$HOME`), instead of re-pushing the full ~200 MB every run. On an unchanged
+  run this skips the entire upload, cutting a genuine real-SAS run from ~6–16 min to ~1–2 min.
+  The sync is **fail-safe**: any listing/size uncertainty falls back to uploading the file, so
+  SAS never executes against stale or missing data.
+- **Resilient ODA connect (`_oda_connect`).** ODA's load-balancing object spawner times out
+  under load; the connection now retries with backoff (default 5×/20 s, tunable via
+  `TROPIC_ODA_RETRIES`/`TROPIC_ODA_BACKOFF`) and only proceeds once a workspace has actually
+  spawned, so a transient ODA timeout no longer fails the whole pipeline.
+- **`--force-upload-sdtm`** flag to force a full SDTM re-upload after a source-data refresh.
+- **ODA SAS log capture:** the full IOM log is written to
+  `02_production_sas/oda_master_driver.log`; `WARNING:` lines are surfaced and `ERROR:` lines
+  fail the build.
+- **`06_telemetry/ODA_GUIDE.md`:** operator guide for the optimized real-SAS workflow — Java
+  (JRE) prerequisite, the upload cost model, run commands, and how to confirm
+  `sas_execution_mode == 'oda'` (genuine double-programming) vs `sim` (tautological).
+
+### Fixed
+- **`yaml` now pinned in `renv.lock`** (v2.3.12). `config_study.R` reads `study_config.yaml`
+  via `yaml::read_yaml()`, but the package was absent from the lockfile, so a clean clone
+  running `renv::restore()` would fail at config load. Reproducibility path restored.
+- **Generated SAS config untracked.** `02_production_sas/00_config_generated.sas` is produced
+  on every run from `study_config.yaml`; it is now `.gitignore`d so it no longer shows as a
+  spurious working-tree change after each pipeline execution.
+
+## [3.5.0] - 2026-06-12 — Comprehensive Remediation & Optimization
+
+### Added
+- **Dynamic Configuration Generation:** Introduced `study_config.yaml` as the single source of truth for all study-level constants (imputation defaults, windows, thresholds, treatment codes, study IDs). Created `06_telemetry/generate_config.py` to auto-generate SAS `%let` variables in `02_production_sas/00_config_generated.sas`, and modified `03_validation_r/config_study.R` to load the constants dynamically using R `yaml`.
+- **Parallel Orchestration:** Parallelized independent validation stages (Stages 4 to 8) in `06_telemetry/cibuild.py` using `concurrent.futures.ProcessPoolExecutor` with a `--serial` fallback option.
+- **SDTM Define-XML:** Authored `07_define_xml/define_sdtm.xml` (Define-XML 2.1) describing the consumed SDTM domains (DM, AE, EX, CM, LB, DS, VS, LS, PN) and their supplemental datasets.
+- **Reproducibility Disclosures:** Added a "Known limitations & deferred items" section to `REPRODUCIBILITY.md` detailing Pinnacle 21, ODA SAS credentials, circular Guyot KM reconstruction checks, and week-precision event dates.
+
+### Changed
+- **TFL Graphic & Count Refactoring:** Extracted a unified, vectorized `render_km()` helper in `09_tfl/tfl_generation.R` to deduplicate KM curve plotting. Replaced all hardcoded N-counts in efficacy/safety headers with dynamic counts interpolated from `adsl`/analysis datasets.
+- **Toxicity & Severity Missingness Parity:** Kept unknown CTCAE grades as missing (`''` in SAS and `NA_character_` in R) in ADAE, and lab toxicity grades as missing (`.` in SAS and `NA` in R) in ADLB.
+- **Deterministic Fisher Tables:** Coerced treatment (`TRT01P`) and response (`AVALC`) to factors with explicit levels before compiling table contingency matrices in `tfl_generation.R`.
+
+### Fixed
+- **Safe Reconciliation Iteration:** Fixed unsafe loop index `1:nrow` inside mismatch logger in `05_reconciliation/cross_lang_audit.R` with `seq_len()`.
+
+## [3.4.0] - 2026-06-12 — Submission-Seriousness Hardening (Audit Remediation)
+
+### Added
+- **Baseline-covariate imputation flags (`ADSL`).** Six companion flags
+  (`ECOGBLIF`, `PSABLIF`, `ALPBLIF`, `HGBBLIF`, `ALBBLIF`, `LDHBLIF`) now mark whether each
+  baseline covariate was imputed (`'Y'`) or observed (`'N'`), closing the ADaMIG
+  traceability gap of silent constant imputation. Computed **identically** in the SAS
+  production (`case when missing(...)`) and R validation (`if_else(is.na(...))`, pre-coalesce)
+  tracks so they reconcile. `ALBBL`/`LDHBL` are non-collected placeholder constants → flags
+  constant `'Y'`. Added to `07_define_xml/define.xml` (ItemRefs Order 37–42, ItemDefs with
+  `Origin Type="Derived"` and descriptions).
+- **Traceability matrix** (`08_reviewers_guides/TRACEABILITY_MATRIX.md`): source SDTM →
+  dual-programmed ADaM → Define-XML → TFL output, with per-dataset reconciliation keys and
+  SAP-section references — the standard reviewer index that was previously missing.
+- **Keyless-path smoke test** (`tests/smoke_test.R`): new Cases C/D exercise the
+  **multiset reconciliation branch** actually used for ADCM/ADLB/ADRS/ADEX (non-unique
+  business key + within-key SEQ), demonstrating it both PASSES on identical tracks and
+  DETECTS a within-group cell perturbation. Previously only the unique-key path was tested.
+
+### Changed
+- **Renamed ADTTE PARAMCD `TTOS` → `TTSAE`** ("Time to First Serious AE") across both tracks,
+  Define-XML codelist, ADRG, and SDRG. The old mnemonic was confusable with `OS`; the
+  parameter logic is unchanged. Corrected its censor descriptor from the inaccurate
+  `'LAST CONCOMITANT EVALUATION'` to `'LAST KNOWN ALIVE DATE'` (the actual censor date,
+  `LSTALVDT`) in both tracks.
+- **Define-XML origins corrected:** `ALBBL`/`LDHBL` changed from `Origin Type="Collected"`
+  (false — they are not collected) to `Origin Type="Assigned"` with a placeholder-constant
+  description.
+
+### Fixed (documentation integrity)
+- **Honest execution-mode framing.** ADRG §6 and the README scope note no longer assert a
+  real ODA SAS run as an unconditional fact; they now state that only `sas_execution_mode`
+  `oda`/`local` (in `pipeline_health.json`) constitutes genuine double-programming and that
+  the default no-engine run is `sim` (tautological). Status badges are qualified accordingly.
+- **Provenance unified.** SDRG §1 no longer claims "raw JSON" input (the staging compiler
+  reads `realsdtm.*.sas7bdat`); all of README, REPRODUCIBILITY, and SDRG now state the same
+  source: official **Sanofi** de-identified SDTM `*.sas7bdat` (2013), accessed via **Project
+  Data Sphere**.
+- **Imputed-lab usage contradiction resolved.** SDRG §4.1 corrected to match ADRG §5.1: the
+  imputed baseline-lab constants are schema placeholders, **not** covariates/stratification
+  factors in any efficacy model (models stratify only on `ECOGBL`, `MEASDISF`).
+- **SDTM IG version corrected** in the SDRG header (`v3.4` → `v3.1.1`), matching its own body
+  and every other document.
+
 ## [3.3.0] - 2026-06-12 — SAS Production-Track Graphics
 
 ### Added

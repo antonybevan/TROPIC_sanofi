@@ -38,7 +38,7 @@ proc sql;
             when ae.aetoxgrn = 1 then 'MILD'
             when ae.aetoxgrn = 2 then 'MODERATE'
             when ae.aetoxgrn >= 3 then 'SEVERE'
-            else 'MILD'
+            else ''
         end as aesev length=10,
         ae.aetoxgrn as atoxgr,
         ae.aeser,

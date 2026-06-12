@@ -41,7 +41,7 @@ For Progression-Free Survival (PFS), progression is defined as radiological prog
 
 * **Other Time-to-Event Parameters Censoring Rules (VAL-06):**
   * **Overall Survival (OS) (PARAMCD: OS):** Start date is `RANDDT`. Event is death (`DTHFL = 'Y'`). Censored at last known alive date (`LSTALVDT`).
-  * **Time to First Serious AE (TTOS) (PARAMCD: TTOS):** Start date is `TRTSDT`. Event is first treatment-emergent Serious AE. Censored at last concomitant safety evaluation (`LSTALVDT`).
+  * **Time to First Serious AE (TTSAE) (PARAMCD: TTSAE):** Start date is `TRTSDT`. Event is first treatment-emergent Serious AE. Censored at last known alive date (`LSTALVDT`, `CNSDTDSC = 'LAST KNOWN ALIVE DATE'`). *(Renamed from the prior `TTOS` mnemonic, which was confusable with `OS`; the parameter is unchanged.)*
   * **Time to PSA Progression (TTPSA) (PARAMCD: TTPSA):** Start date is `TRTSDT`. Event is PSA progression (`PARAMCD = 'PSPROG' & AVAL = 1.0`). Censored at last PSA assessment date or last known alive date.
   * **Time to Tumor Progression (TTUMOR) (PARAMCD: TTUMOR):** Start date is `TRTSDT`. Event is RECIST v1.0 overall response of `'PD'`. Censored at last tumor assessment date (`last_tumor_dt`) or last known alive date. **Note: Restrictive analysis population is the measurable disease subpopulation (MEASDISF = 'Y'); SAP v3.0 §3.4 cites 204 MP / 201 CbzP measurable at baseline. The real MP arm yields N=203 here; the synthetic CbzP arm carries N=179 by reconstruction.**
 
@@ -89,9 +89,12 @@ To ensure the absolute integrity of this submission, the entire ADaM pipeline ha
 2. **Validation Track (R 4.6.0):** Independently re-implemented in R (`03_validation_r/`) utilizing the tidyverse (`dplyr`, `tidyr`, `lubridate`) and CDISC Pharmaverse standard libraries (`xportr`).
 
 ### SAS Execution via SAS OnDemand for Academics (ODA)
-The SAS 9.4 production track (Stage 10 of the orchestrator, `cibuild.py`) is executed on **SAS OnDemand for Academics** (ODA) via **SASPy 5.x IOM** — a live, cloud-hosted SAS 9.4 engine (Version 9.04.01M8P02222023, LIN X64, Asia Pacific region). This is genuine, independent SAS 9.4 compilation; the SAS programs are not copied from or influenced by the R validation outputs.
+The SAS 9.4 production track (Stage 10 of the orchestrator, `cibuild.py`) is *designed to* execute on **SAS OnDemand for Academics** (ODA) via **SASPy IOM** — a live, cloud-hosted SAS 9.4 engine (Version 9.04.01M8P02222023, LIN X64) — **when the pipeline is invoked with `--real-sas`** (ODA), or when a `local` SAS engine is on `PATH`. In those modes the SAS programs are uploaded/compiled independently and are not copied from or influenced by the R validation outputs.
 
-The execution sequence is:
+> [!IMPORTANT]
+> **Execution mode is explicit and recorded — do not over-read the status badges.** Stage 10 resolves to exactly one of `local` / `oda` / `cached` / `sim` / `error` (`cibuild.py` → `_resolve_sas_mode`) and writes the chosen mode to `06_telemetry/pipeline_health.json` as `sas_execution_mode`. **Only `local` and `oda` constitute genuine, independent SAS↔R double-programming.** The *default* invocation (`python3 06_telemetry/cibuild.py` with no SAS engine present) runs in **`sim` mode** — a byte-copy of `*_v.xpt` → `*_prod.xpt` — for which a zero-difference reconciliation is **tautological** and is *not* evidence of independent parity. Any "100% diffdf Match" / "12/12 stages" status (including the README badges) is meaningful as double-programming evidence **only** for a run whose recorded `sas_execution_mode` is `oda` or `local`; a reviewer should confirm that field before citing the reconciliation.
+
+The execution sequence (in `oda` mode) is:
 1. All 12 SAS programs in `02_production_sas/` and all 34 SDTM SAS7BDAT source files are uploaded from the local repository to the ODA workspace via the SASPy `sas.upload()` API.
 2. The master driver (`00_master_driver.sas`) is submitted to ODA via `%include` fileref. SAS processes the full SDTM → Staging → SDTM Mapping → ADaM → XPT chain independently.
 3. The 7 production `*_prod.xpt` files are downloaded from ODA to `04_adam/` via `sas.download()`.
@@ -134,7 +137,7 @@ All 5 primary and secondary time-to-event efficacy parameters were reconstructed
 > - **Time to PSA Progression (TTPSA):** CbzP median of **2.8 months** vs. MP median of **2.1 months**; Unstratified Hazard Ratio = **0.84 (95% CI: 0.71–1.00)** (Target published: CbzP median 6.4 mo, HR 0.75).
 > - **Time to Tumor Progression (TTUMOR):** CbzP median of **3.8 months** vs. MP median of **2.3 months**; Unstratified Hazard Ratio = **0.67 (95% CI: 0.54–0.83)** (Target published: CbzP median 5.7 mo, HR 0.61).
 > - **Time to Pain Progression (TTPAIN):** Reconstructed with HR = 0.80 (CbzP median ~5.0 mo, 130/378 events).
-> - **Time to Serious AE (TTOS):** Derived dynamically from the first Serious AE occurrence date in ADAE, or censored at `LSTALVDT` if no SAE occurred.
+> - **Time to Serious AE (TTSAE):** Derived dynamically from the first Serious AE occurrence date in ADAE, or censored at `LSTALVDT` if no SAE occurred.
 
 ### 7.5 Adverse Events (ADAE) & Exposure (ADEX)
 * **Adverse Events**: Simulated based on published Table 2 rates, including 82% neutropenia, 8% febrile neutropenia, 31% anemia, and 47% diarrhea. CTCAE toxicity grades and OCCDS v1.1 variables (including continuous episode merging fields `CIAESDT`, `CIAEEDT`, `CIAEDUR`, and occurrence flag `AEOCCFL`) were applied. The Serious AE (SAE) rate is calibrated to match the EPAR safety profile of exactly 39.2% (145/371 safety-evaluable subjects).

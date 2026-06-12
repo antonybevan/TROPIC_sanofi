@@ -1,0 +1,53 @@
+STUDYID: "TROPIC-NCT00417079"
+TRT01P_CODE: "MP"
+TRT01PN_CODE: 2
+
+STUDY_CUTOFF_DT: "2009-09-25"
+
+PLANNED_DOSE: 12.0
+AGE_STRAT_CUT: 65
+
+# Missing data imputation defaults (SAP §6.3)
+ECOGBL_DEFAULT: 1.0
+PSABL_DEFAULT: 110.0
+ALPBL_DEFAULT: 140.0
+HGBBL_DEFAULT: 11.5
+ALBBL_DEFAULT: 38.0
+LDHBL_DEFAULT: 220.0
+
+# RECIST v1.0 response thresholds (SAP §5.3)
+RECIST_PD_PCT: 20.0
+RECIST_PD_ABS: 5.0
+RECIST_PR_PCT: -30.0
+
+# PCWG3 PSA thresholds (SAP §5.4)
+PSA_RESP_THRESHOLD: 0.5
+PSA_RESP_CONFIRM: 21
+PSA_PROG_MULT_RESP: 1.5
+PSA_PROG_MULT_NORESP: 1.25
+PSA_PROG_ABS: 5.0
+PSA_PROG_CONFIRM: 7
+
+# OCCDS v1.1 continuous episode merging (SAP §5.2, Custom Query 02)
+EPISODE_GAP_DAYS: 3
+
+# Project Optimus ANC kinetics (SAP §5.5)
+ANC_RECOVERY_THRESHOLD: 1.5
+
+# LB analysis windows — study days from TRTSDT (SAP §5.6)
+W_BL_HI: 0
+W_C1D1_LO: 1
+W_C1D1_HI: 3
+W_C1D8_LO: 4
+W_C1D8_HI: 13
+W_C1D15_LO: 14
+W_C1D15_HI: 17
+W_C2D1_LO: 18
+W_C2D1_HI: 24
+W_C2D8_LO: 25
+W_C2D8_HI: 34
+W_C3D1_LO: 39
+W_C3D1_HI: 45
+
+# Staging data path (relative to project root)
+STAGING_PATH: "01_raw_source/real_sdtm/staging"

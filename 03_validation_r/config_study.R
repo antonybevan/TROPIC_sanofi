@@ -1,51 +1,64 @@
-# config_study.R — single source of truth for study parameters
+# config_study.R — read from single source of truth study_config.yaml
+# Version: 3.5.0
+# Date: 2026-06-12
 # Reference: TROPIC SAP v3.0 (EFC6193 / XRP6258)
-# Sourced at the top of every validation script; mirrors 00_config.sas constants.
 
-STUDYID           <- "TROPIC-NCT00417079"
-TRT01P_CODE       <- "MP"
-TRT01PN_CODE      <- 2L
+config_file <- "study_config.yaml"
+if (!file.exists(config_file)) {
+  if (file.exists(file.path("..", "study_config.yaml"))) {
+    config_file <- file.path("..", "study_config.yaml")
+  } else {
+    stop("study_config.yaml not found in . or ..")
+  }
+}
 
-STUDY_CUTOFF_DT   <- as.Date("2009-09-25")  # DSMB follow-up cutoff
+cfg <- yaml::read_yaml(config_file)
 
-PLANNED_DOSE      <- 12.0   # Mitoxantrone mg/m2 per cycle
-AGE_STRAT_CUT     <- 65L    # Stratification age cutoff (years)
+STUDYID           <- as.character(cfg$STUDYID)
+TRT01P_CODE       <- as.character(cfg$TRT01P_CODE)
+TRT01PN_CODE      <- as.integer(cfg$TRT01PN_CODE)
+
+STUDY_CUTOFF_DT   <- as.Date(cfg$STUDY_CUTOFF_DT)
+
+PLANNED_DOSE      <- as.numeric(cfg$PLANNED_DOSE)
+AGE_STRAT_CUT     <- as.integer(cfg$AGE_STRAT_CUT)
 
 # Missing data imputation defaults (SAP §6.3)
-ECOGBL_DEFAULT    <- 1.0
-PSABL_DEFAULT     <- 110.0
-ALPBL_DEFAULT     <- 140.0
-HGBBL_DEFAULT     <- 11.5
-ALBBL_DEFAULT     <- 38.0   # g/dL — population reference mean
-LDHBL_DEFAULT     <- 220.0  # U/L  — population reference mean
+ECOGBL_DEFAULT    <- as.numeric(cfg$ECOGBL_DEFAULT)
+PSABL_DEFAULT     <- as.numeric(cfg$PSABL_DEFAULT)
+ALPBL_DEFAULT     <- as.numeric(cfg$ALPBL_DEFAULT)
+HGBBL_DEFAULT     <- as.numeric(cfg$HGBBL_DEFAULT)
+ALBBL_DEFAULT     <- as.numeric(cfg$ALBBL_DEFAULT)
+LDHBL_DEFAULT     <- as.numeric(cfg$LDHBL_DEFAULT)
 
 # RECIST v1.0 response thresholds (SAP §5.3)
-RECIST_PD_PCT     <- 20.0   # % increase from nadir = PD
-RECIST_PD_ABS     <- 5.0    # mm absolute minimum = PD
-RECIST_PR_PCT     <- -30.0  # % decrease from baseline = PR
+RECIST_PD_PCT     <- as.numeric(cfg$RECIST_PD_PCT)
+RECIST_PD_ABS     <- as.numeric(cfg$RECIST_PD_ABS)
+RECIST_PR_PCT     <- as.numeric(cfg$RECIST_PR_PCT)
 
 # PCWG3 PSA thresholds (SAP §5.4)
-PSA_RESP_THRESHOLD   <- 0.5   # >= 50% decline from baseline
-PSA_RESP_CONFIRM     <- 21L   # days between confirming measurements
-PSA_PROG_MULT_RESP   <- 1.5   # PSA responder: >= 1.5x nadir
-PSA_PROG_MULT_NORESP <- 1.25  # Non-responder: >= 1.25x nadir
-PSA_PROG_ABS         <- 5.0   # Absolute increment >= 5 ng/mL
-PSA_PROG_CONFIRM     <- 7L    # Confirmation within 7 days
+PSA_RESP_THRESHOLD   <- as.numeric(cfg$PSA_RESP_THRESHOLD)
+PSA_RESP_CONFIRM     <- as.integer(cfg$PSA_RESP_CONFIRM)
+PSA_PROG_MULT_RESP   <- as.numeric(cfg$PSA_PROG_MULT_RESP)
+PSA_PROG_MULT_NORESP <- as.numeric(cfg$PSA_PROG_MULT_NORESP)
+PSA_PROG_ABS         <- as.numeric(cfg$PSA_PROG_ABS)
+PSA_PROG_CONFIRM     <- as.integer(cfg$PSA_PROG_CONFIRM)
 
 # OCCDS v1.1 continuous episode merging (SAP §5.2, Custom Query 02)
-EPISODE_GAP_DAYS  <- 3L     # <= 3-day gap = same episode
+EPISODE_GAP_DAYS  <- as.integer(cfg$EPISODE_GAP_DAYS)
 
 # Project Optimus ANC kinetics (SAP §5.5)
-ANC_RECOVERY_THRESHOLD <- 1.5  # x10^3/uL
+ANC_RECOVERY_THRESHOLD <- as.numeric(cfg$ANC_RECOVERY_THRESHOLD)
 
 # LB analysis windows — study days from TRTSDT (SAP §5.6)
-W_BL_HI    <- 0L
-W_C1D1_LO  <- 1L;  W_C1D1_HI  <- 3L
-W_C1D8_LO  <- 4L;  W_C1D8_HI  <- 13L
-W_C1D15_LO <- 14L; W_C1D15_HI <- 17L
-W_C2D1_LO  <- 18L; W_C2D1_HI  <- 24L
-W_C2D8_LO  <- 25L; W_C2D8_HI  <- 34L
-W_C3D1_LO  <- 39L; W_C3D1_HI  <- 45L
+W_BL_HI    <- as.integer(cfg$W_BL_HI)
+W_C1D1_LO  <- as.integer(cfg$W_C1D1_LO);  W_C1D1_HI  <- as.integer(cfg$W_C1D1_HI)
+W_C1D8_LO  <- as.integer(cfg$W_C1D8_LO);  W_C1D8_HI  <- as.integer(cfg$W_C1D8_HI)
+W_C1D15_LO <- as.integer(cfg$W_C1D15_LO); W_C1D15_HI <- as.integer(cfg$W_C1D15_HI)
+W_C2D1_LO  <- as.integer(cfg$W_C2D1_LO);  W_C2D1_HI  <- as.integer(cfg$W_C2D1_HI)
+W_C2D8_LO  <- as.integer(cfg$W_C2D8_LO);  W_C2D8_HI  <- as.integer(cfg$W_C2D8_HI)
+W_C3D1_LO  <- as.integer(cfg$W_C3D1_LO);  W_C3D1_HI  <- as.integer(cfg$W_C3D1_HI)
 
 # Staging data path (relative to project root)
-STAGING_PATH <- file.path("01_raw_source", "real_sdtm", "staging")
+STAGING_PATH <- do.call(file.path, as.list(strsplit(cfg$STAGING_PATH, "/")[[1]]))
+

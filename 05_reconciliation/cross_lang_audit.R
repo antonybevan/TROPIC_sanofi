@@ -1,4 +1,4 @@
-# Program: cross_lang_audit.R | Version: 2.1 | Author: Clinical Data Architect | Date: 2026-06-11
+# Program: cross_lang_audit.R | Version: 3.5.0 | Author: Clinical Data Architect | Date: 2026-06-12
 # Description: Cross-Language reconciliation comparing the SAS production track
 #   (*_prod.xpt) against the independent R validation track (*_v.xpt).
 #
@@ -122,7 +122,7 @@ compare_datasets <- function(ds_name) {
     total_diffs <- 0
     if ("NumDiff" %in% names(diff_res)) {
       num_diff <- diff_res$NumDiff
-      for (i in 1:nrow(num_diff)) {
+      for (i in seq_len(nrow(num_diff))) {
         var_name <- num_diff$Variable[i]
         n_mismatches <- num_diff[["No of Differences"]][i]
         total_diffs <- total_diffs + n_mismatches
