@@ -61,3 +61,6 @@ scratch/
 
 # Generated from study_config.yaml by 06_telemetry/generate_config.py (do not edit/commit)
 02_production_sas/00_config_generated.sas
+06_telemetry/oda_status.json
+06_telemetry/.oda_singleflight.lock
+06_telemetry/.oda_session.json

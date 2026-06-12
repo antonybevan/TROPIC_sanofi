@@ -105,174 +105,111 @@ def _saspy_available():
         return False
 
 
-def _oda_connect(cfg_file, retries=5, backoff=20):
-    """Open an ODA SASsession, retrying transient 'object spawner timed out' failures.
-
-    ODA's load-balancing object spawner frequently times out under load (it is a free,
-    heavily oversubscribed service), so a single connection attempt is unreliable. This
-    retries with a short backoff and only returns a session whose workspace actually
-    spawned (verified by a trivial %put). Raises after `retries` exhausted. Tunable via
-    TROPIC_ODA_RETRIES / TROPIC_ODA_BACKOFF env vars."""
-    import saspy
-    import time as _time
-    retries = int(os.environ.get("TROPIC_ODA_RETRIES", retries))
-    backoff = int(os.environ.get("TROPIC_ODA_BACKOFF", backoff))
-    last = None
-    for i in range(1, retries + 1):
-        print(f"  [ODA] Connecting (attempt {i}/{retries})...")
-        try:
-            sas = saspy.SASsession(cfgname="oda", cfgfile=cfg_file)
-            if "ODA_OK" in sas.submit("%put NOTE: ODA_OK;").get("LOG", ""):
-                print(f"  [ODA] Connected and workspace spawned (attempt {i}/{retries}).")
-                return sas
-            try:
-                sas.endsas()
-            except Exception:
-                pass
-            last = "workspace did not spawn (no ODA_OK marker)"
-        except Exception as e:
-            last = (str(e).splitlines() or ["?"])[0]
-            print(f"  [ODA] attempt {i}/{retries} failed: {last[:110]}")
-        if i < retries:
-            print(f"  [ODA] retrying in {backoff}s (spawner is transiently unavailable)...")
-            _time.sleep(backoff)
-    raise RuntimeError(
-        f"ODA connection failed after {retries} attempts — the object spawner is "
-        f"unavailable right now (server-side load, not a config error). Last: {last}")
+# Outcome of the most recent ODA Stage-10 attempt, merged into pipeline_health.json (brief §6).
+_ODA_OUTCOME = {}
+PROJ_ROOT_ODA = "/home/u64235016/TROPIC"
+ODA_DATASETS = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte"]
 
 
-def _oda_remote_size(sas, remote_path):
-    """Return the remote file's size in bytes, or None if unknown/absent.
-    Never raises — any failure yields None so the caller re-uploads (fail-safe)."""
-    try:
-        info = sas.file_info(remote_path, quiet=True)
-    except Exception:
-        return None
-    if not info:
-        return None
-    for k, v in info.items():
-        if "size" in str(k).lower():
-            digits = "".join(ch for ch in str(v) if ch.isdigit())
-            return int(digits) if digits else None
-    return None
+def _sim_byte_copy(datasets):
+    """Byte-copy *_v.xpt -> *_prod.xpt (the labeled, tautological simulation)."""
+    for ds in datasets:
+        val_file, prod_file = f"04_adam/{ds}_v.xpt", f"04_adam/{ds}_prod.xpt"
+        if os.path.exists(val_file):
+            with open(val_file, "rb") as fs, open(prod_file, "wb") as fd:
+                fd.write(fs.read())
+            print(f"    Simulated {ds}_prod.xpt generated.")
 
 
-def _sync_sdtm(sas, sdtm_files, sdtm_oda, force=False):
-    """Upload only SDTM files missing on ODA or whose byte-size differs.
-
-    ODA $HOME is persistent across sessions, so the ~200 MB SDTM source only needs
-    (re)uploading on the first run or after a data refresh — not every run. IOM
-    upload is ~1-5 MB/s, so skipping unchanged files saves 5-15 minutes per run.
-
-    FAIL-SAFE: if the remote directory cannot be listed, or a remote size cannot be
-    read, the file IS uploaded. The function never skips on uncertainty, so a SAS
-    run can never execute against stale/missing data. force=True re-uploads all."""
-    total_mb = sum(os.path.getsize(f) for f in sdtm_files) / 1_048_576
-
-    if force:
-        to_upload = list(sdtm_files)
-        print(f"  [ODA] --force-upload-sdtm: re-uploading all {len(sdtm_files)} SDTM files ({total_mb:.0f} MB).")
-    else:
-        try:
-            present = set(sas.dirlist(sdtm_oda) or [])
-        except Exception:
-            present = None  # listing failed -> upload everything (safe)
-        to_upload = []
-        for f in sdtm_files:
-            base = os.path.basename(f)
-            if present is None or base not in present:
-                to_upload.append(f)
-                continue
-            rsize = _oda_remote_size(sas, f"{sdtm_oda}/{base}")
-            if rsize is None or rsize != os.path.getsize(f):
-                to_upload.append(f)
-        skipped = len(sdtm_files) - len(to_upload)
-        reused_mb = sum(os.path.getsize(f) for f in sdtm_files if f not in to_upload) / 1_048_576
-        print(f"  [ODA] SDTM sync: {len(to_upload)} to upload, {skipped} already current "
-              f"(~{reused_mb:.0f} MB reused on ODA).")
-
-    if not to_upload:
-        print("  [ODA] SDTM already current on ODA — upload skipped (saved minutes).")
-        return
-
-    up_mb = sum(os.path.getsize(f) for f in to_upload) / 1_048_576
-    print(f"  [ODA] Uploading {len(to_upload)} SDTM file(s) ({up_mb:.0f} MB) — IOM ~1-5 MB/s...")
-    for f in to_upload:
-        sas.upload(f, f"{sdtm_oda}/{os.path.basename(f)}")
-    print("  [ODA] SDTM upload complete.")
+def _oda_max_wait():
+    """Connection budget (seconds). TROPIC_ODA_RETRIES is a back-compat alias mapped onto a
+    wall-clock budget (~60 s expected/attempt); TROPIC_ODA_MAX_WAIT sets it directly."""
+    if os.environ.get("TROPIC_ODA_RETRIES"):
+        return max(60, int(os.environ["TROPIC_ODA_RETRIES"]) * 60)
+    return int(os.environ.get("TROPIC_ODA_MAX_WAIT", 3600))
 
 
 def _run_saspy_stage10():
-    """Execute SAS production suite on ODA via SASPy, return (rc, stdout, stderr)."""
-    import saspy
+    """Job B: run the SAS production suite on ODA against a VERIFIED-resident SDTM library.
+    Returns (rc, stdout, stderr, meta). 'oda' mode is earned only via the broker's live probe
+    AND a verified SDTM manifest. Seeding is NOT done inline (that is seed_sdtm.py / Job A)
+    unless TROPIC_ODA_FORCE_SDTM=TRUE. Connection-budget exhaustion -> honest sim fallback;
+    AUTH/encryption or an unverified library -> hard fail (never a silent sim)."""
     import glob as _glob
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import oda_broker
+    import seed_sdtm
 
-    PROJ_ROOT_ODA = "/home/u64235016/TROPIC"
-    PGMDIR_ODA    = f"{PROJ_ROOT_ODA}/02_production_sas"
-    SDTM_ODA      = f"{PROJ_ROOT_ODA}/01_raw_source/real_sdtm"
-    ADAM_ODA      = f"{PROJ_ROOT_ODA}/04_adam"
-    CFG_FILE      = os.path.join(os.path.dirname(__file__), "..", "sascfg_personal.py")
+    PGMDIR_ODA = f"{PROJ_ROOT_ODA}/02_production_sas"
+    ADAM_ODA = f"{PROJ_ROOT_ODA}/04_adam"
 
-    # Resilient connect: ODA's spawner times out under load, so retry with backoff
-    # rather than failing the whole pipeline on a single transient timeout.
-    sas = _oda_connect(os.path.abspath(CFG_FILE))
-
+    # ---- Resilient, probe-verified connect (broker rides spawner timeouts) ----
     try:
-        # ---- Upload SAS programs ----
-        print("  [ODA] Uploading SAS programs to ODA...")
+        conn = oda_broker.connect(max_wait_s=_oda_max_wait())
+    except oda_broker.OdaFatal as e:
+        return 1, "", f"ODA fatal ({e.error_class}): {e}", {
+            "oda_last_error_class": e.error_class, "reconciliation": "none"}
+    except oda_broker.OdaExhausted as e:
+        return 0, "ODA exhausted; honest sim fallback", "", {
+            "fell_back_to_sim": True, "oda_last_error_class": e.last_class,
+            "oda_attempts": e.attempts,
+            "next_recommended_window": oda_broker.recommend_window(),
+            "reconciliation": "sim_only"}
+
+    sas = conn.sas
+    try:
+        # ---- Guarantee the SDTM library on ODA is the verified-correct one ----
+        if os.environ.get("TROPIC_ODA_FORCE_SDTM") == "TRUE":
+            res = seed_sdtm.seed(sas, force=True)
+            if res["status"] not in ("seeded", "already-resident"):
+                return 2, "", f"SDTM seed/verify failed: {res}", {"reconciliation": "none"}
+            manifest_sha = res["manifest_sha"]
+        else:
+            ok, manifest_sha, reason = seed_sdtm.verify_resident(sas)
+            if not ok:
+                return 2, "", (f"SDTM not verified-resident on ODA ({reason}). "
+                               f"Seed it first: python3 06_telemetry/seed_sdtm.py"), {
+                    "reconciliation": "none"}
+            print(f"  [ODA] SDTM verified resident (manifest {manifest_sha[:12]}).")
+
+        # ---- Upload SAS programs (tiny; always ship the latest code) ----
+        print("  [ODA] Uploading SAS programs...")
         for f in sorted(_glob.glob("02_production_sas/*.sas")):
             sas.upload(f, f"{PGMDIR_ODA}/{os.path.basename(f)}")
-        print(f"  [ODA] SAS programs uploaded.")
-
-        # ---- Sync SDTM source data: upload only the missing/changed delta ----
-        # (ODA $HOME is persistent; _sync_sdtm falls back to a full upload on any
-        #  uncertainty, so SAS never runs against stale data. See _sync_sdtm.)
-        sdtm_files = sorted(_glob.glob("01_raw_source/real_sdtm/*.sas7bdat"))
-        force_sdtm = os.environ.get("TROPIC_ODA_FORCE_SDTM") == "TRUE"
-        _sync_sdtm(sas, sdtm_files, SDTM_ODA, force=force_sdtm)
 
         # ---- Execute master driver ----
         print("  [ODA] Submitting 00_master_driver.sas via SAS IOM...")
-        r = sas.submit(f"""
+        log = sas.submit(f"""
 options notes source;
 %global PROJ_ROOT PGMDIR;
 %let PROJ_ROOT = {PROJ_ROOT_ODA};
 %let PGMDIR    = {PGMDIR_ODA};
 filename drv "{PGMDIR_ODA}/00_master_driver.sas";
 %include drv;
-""")
-        log = r.get("LOG", "")
-
-        # Persist the full ODA SAS log to disk for audit/traceability.
+""").get("LOG", "")
         try:
             with open("02_production_sas/oda_master_driver.log", "w", encoding="utf-8") as _lf:
                 _lf.write(log)
         except OSError:
             pass
+        warn = [l for l in log.splitlines() if l.strip().startswith("WARNING:")]
+        if warn:
+            print(f"  [ODA] SAS log has {len(warn)} WARNING line(s) (see oda_master_driver.log).")
+        err = [l.strip() for l in log.splitlines() if l.strip().startswith("ERROR:")]
+        if err:
+            return 1, "", "\n".join(err), {"oda_endpoint": conn.endpoint, "reconciliation": "none"}
 
-        # Surface WARNINGs (informational); fail hard on ERRORs.
-        warn_lines = [l.strip() for l in log.split("\n") if l.strip().startswith("WARNING:")]
-        if warn_lines:
-            print(f"  [ODA] SAS log has {len(warn_lines)} WARNING line(s) "
-                  f"(see 02_production_sas/oda_master_driver.log).")
-        error_lines = [l.strip() for l in log.split("\n")
-                       if l.strip().startswith("ERROR:")]
-        if error_lines:
-            return 1, "", "\n".join(error_lines)
+        # ---- Download the 7 *_prod.xpt ----
+        print("  [ODA] Downloading *_prod.xpt...")
+        for ds in ODA_DATASETS:
+            sas.download(f"04_adam/{ds}_prod.xpt", f"{ADAM_ODA}/{ds}_prod.xpt")
 
-        # ---- Download *_prod.xpt files ----
-        datasets = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte"]
-        print("  [ODA] Downloading *_prod.xpt files from ODA...")
-        for ds in datasets:
-            remote = f"{ADAM_ODA}/{ds}_prod.xpt"
-            local  = f"04_adam/{ds}_prod.xpt"
-            sas.download(local, remote)   # SASPy: download(localfile, remotefile)
-            print(f"    Downloaded {ds}_prod.xpt")
-
-        return 0, "SASPy/ODA execution complete.", ""
-
+        return 0, "SASPy/ODA execution complete.", "", {
+            "oda_endpoint": conn.endpoint, "oda_attempts": conn.attempts,
+            "oda_total_wait_s": conn.total_wait_s, "sdtm_manifest_sha": manifest_sha,
+            "reconciliation": "SAS_vs_R", "probe_nonce_echoed": conn.probe_nonce_echoed}
     finally:
-        sas.endsas()
+        oda_broker.teardown(sas)
 
 
 def _resolve_sas_mode(real_sas, use_cached_sas):
@@ -307,12 +244,19 @@ def run_stage_execution(stage, sas_mode):
         datasets = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte"]
 
         if sas_mode == "oda":
-            print("  [ODA] Executing real SAS 9.4 via SAS OnDemand for Academics (SASPy IOM)...")
-            rc, stdout, stderr = _run_saspy_stage10()
+            print("  [ODA] Stage 10 via resilient broker (probe-verified, manifest-checked)...")
+            rc, stdout, stderr, meta = _run_saspy_stage10()
+            _ODA_OUTCOME.clear()
+            _ODA_OUTCOME.update(meta or {})
+            if meta and meta.get("fell_back_to_sim"):
+                print("  [ODA] Connection budget exhausted -> labeled sim fallback "
+                      "(NOT double-programming; honestly recorded in telemetry).")
+                _sim_byte_copy(datasets)
+                return 0, "sim fallback (ODA unreachable this window)", ""
             if rc == 0:
-                print("  [ODA] Master driver executed successfully. Real SAS XPTs generated and downloaded.")
+                print("  [ODA] Real SAS executed against verified-resident SDTM; XPTs downloaded.")
             else:
-                print("  [ODA FAILED] SASPy/ODA execution failed!")
+                print(f"  [ODA FAILED] {stderr.strip()[:200]}")
             return rc, stdout, stderr
         elif sas_mode == "local":
             sas_exe = shutil.which("sas")
@@ -349,13 +293,7 @@ def run_stage_execution(stage, sas_mode):
             print("  [SAS SIMULATOR] No SAS engine and --real-sas not specified.")
             print("  [SAS SIMULATOR] Copying *_v.xpt -> *_prod.xpt (byte-copy simulation).")
             print("  [SAS SIMULATOR] WARNING: this is NOT independent double-programming; zero diffs are tautological.")
-            for ds in datasets:
-                val_file = f"04_adam/{ds}_v.xpt"
-                prod_file = f"04_adam/{ds}_prod.xpt"
-                if os.path.exists(val_file):
-                    with open(val_file, "rb") as f_src, open(prod_file, "wb") as f_dst:
-                        f_dst.write(f_src.read())
-                    print(f"    Simulated {ds}_prod.xpt generated.")
+            _sim_byte_copy(datasets)
             rc, stdout, stderr = 0, "Simulated SAS compilation (byte-copy) complete.", ""
             return rc, stdout, stderr
     else:
@@ -526,6 +464,22 @@ def write_telemetry(results, sas_mode="sim"):
         "sas_execution_mode": sas_mode,
         "stages": results
     }
+
+    # Merge the ODA Stage-10 outcome (brief §6): on a connection-budget exhaustion the mode is
+    # honestly downgraded to 'sim'; on success we record endpoint/attempts/manifest/probe.
+    if _ODA_OUTCOME:
+        if _ODA_OUTCOME.get("fell_back_to_sim"):
+            sas_mode = "sim"
+            health["sas_execution_mode"] = "sim"
+        for k, v in _ODA_OUTCOME.items():
+            if k != "fell_back_to_sim":
+                health[k] = v
+    # Attach the cross-language reconciliation verdict if Stage 11 wrote one.
+    try:
+        with open("06_telemetry/reconciliation_status.json") as _rf:
+            health["reconciliation_status"] = json.load(_rf).get("overall")
+    except (OSError, json.JSONDecodeError):
+        pass
 
     os.makedirs("06_telemetry", exist_ok=True)
     with open("06_telemetry/pipeline_health.json", "w", encoding="utf-8") as f:

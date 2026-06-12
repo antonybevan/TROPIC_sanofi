@@ -4,6 +4,35 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.5.2] - 2026-06-12 — Resilient ODA Execution (Broker + Idempotent Seed)
+
+### Added
+- **`06_telemetry/oda_broker.py` — connection broker** (single source of truth for connecting to
+  ODA). Replaces blind retries with: status-gated **full-jitter exponential backoff** within a
+  wall-clock budget; an **error taxonomy** that fails fast on `AUTH`/`CONFIG_ENCRYPTION` and only
+  retries transient classes; **slot hygiene** (single-flight lock + orphan sweep + guaranteed
+  teardown) to stop orphaned ODA workspace sessions; a **live nonce probe** so
+  `sas_execution_mode='oda'` is *earned*, never asserted from a bare connection; and an attempt
+  **ledger** (`oda_status.json`) feeding `recommend_window()`.
+- **`06_telemetry/seed_sdtm.py` — idempotent, integrity-checked SDTM seeding (Job A).** Computes a
+  per-dataset `sha256`/`nrows` manifest; uploads only on mismatch; re-reads ODA row counts to
+  detect a half-upload; writes the manifest sentinel **last** (transactional). `--force` overrides.
+- **`06_telemetry/test_oda_broker.py`** — 10 unit tests (injected fakes; no Java/network) covering
+  earned-mode-via-probe, teardown on failed spawn, fail-fast classes, jittered backoff, the error
+  taxonomy, idempotent seed, and unverified-library detection.
+- **Extended `pipeline_health.json` contract:** on genuine ODA success records `oda_endpoint`,
+  `oda_attempts`, `oda_total_wait_s`, `sdtm_manifest_sha`, `probe_nonce_echoed`,
+  `reconciliation='SAS_vs_R'`, `reconciliation_status`; on give-up records `oda_last_error_class`,
+  `next_recommended_window`, `reconciliation='sim_only'`.
+
+### Changed
+- **`cibuild.py` Stage 10 is now reconcile-only (Job B).** It connects via the broker and
+  **verifies the SDTM manifest before running** — if the library is missing/stale it fails with a
+  clear "run seed_sdtm.py" message instead of silently simulating. On connection-budget exhaustion
+  it falls back to sim **honestly labeled** (mode downgraded to `sim` in telemetry). Superseded the
+  inline `_oda_connect`/`_sync_sdtm` helpers. `TROPIC_ODA_RETRIES` retained as a back-compat alias
+  onto the broker's `max_wait_s`.
+
 ## [3.5.1] - 2026-06-12 — ODA Efficiency & Reproducibility Hardening
 
 ### Added
