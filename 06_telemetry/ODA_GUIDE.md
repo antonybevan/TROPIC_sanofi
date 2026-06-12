@@ -38,7 +38,14 @@ python3 06_telemetry/cibuild.py --real-sas --force-upload-sdtm
 python3 06_telemetry/cibuild.py --real-sas
 ```
 
-`cibuild.py` Stage 10 (`_run_saspy_stage10` → `_sync_sdtm`) now:
+`cibuild.py` Stage 10 (`_run_saspy_stage10`) now:
+0. **Connects with auto-retry** (`_oda_connect`): ODA's load-balancing object spawner
+   frequently times out under load (`The load balancing object spawner timed out`). The
+   connection retries with backoff (default 5 attempts, 20 s apart; tune with
+   `TROPIC_ODA_RETRIES` / `TROPIC_ODA_BACKOFF`) and only proceeds once a workspace has
+   actually spawned — so a transient ODA hiccup no longer fails the whole run.
+   > If all retries fail, ODA itself is unavailable (peak load / maintenance); wait and
+   > re-run. This is server-side, not a config or Java problem.
 1. **Uploads SAS programs** every run (tiny — always ships your latest code).
 2. **Syncs SDTM by delta:** lists the ODA SDTM dir and compares each file's **byte size**;
    uploads only files that are **missing or changed**. On an unchanged run this skips the

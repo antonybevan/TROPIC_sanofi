@@ -105,6 +105,42 @@ def _saspy_available():
         return False
 
 
+def _oda_connect(cfg_file, retries=5, backoff=20):
+    """Open an ODA SASsession, retrying transient 'object spawner timed out' failures.
+
+    ODA's load-balancing object spawner frequently times out under load (it is a free,
+    heavily oversubscribed service), so a single connection attempt is unreliable. This
+    retries with a short backoff and only returns a session whose workspace actually
+    spawned (verified by a trivial %put). Raises after `retries` exhausted. Tunable via
+    TROPIC_ODA_RETRIES / TROPIC_ODA_BACKOFF env vars."""
+    import saspy
+    import time as _time
+    retries = int(os.environ.get("TROPIC_ODA_RETRIES", retries))
+    backoff = int(os.environ.get("TROPIC_ODA_BACKOFF", backoff))
+    last = None
+    for i in range(1, retries + 1):
+        print(f"  [ODA] Connecting (attempt {i}/{retries})...")
+        try:
+            sas = saspy.SASsession(cfgname="oda", cfgfile=cfg_file)
+            if "ODA_OK" in sas.submit("%put NOTE: ODA_OK;").get("LOG", ""):
+                print(f"  [ODA] Connected and workspace spawned (attempt {i}/{retries}).")
+                return sas
+            try:
+                sas.endsas()
+            except Exception:
+                pass
+            last = "workspace did not spawn (no ODA_OK marker)"
+        except Exception as e:
+            last = (str(e).splitlines() or ["?"])[0]
+            print(f"  [ODA] attempt {i}/{retries} failed: {last[:110]}")
+        if i < retries:
+            print(f"  [ODA] retrying in {backoff}s (spawner is transiently unavailable)...")
+            _time.sleep(backoff)
+    raise RuntimeError(
+        f"ODA connection failed after {retries} attempts — the object spawner is "
+        f"unavailable right now (server-side load, not a config error). Last: {last}")
+
+
 def _oda_remote_size(sas, remote_path):
     """Return the remote file's size in bytes, or None if unknown/absent.
     Never raises — any failure yields None so the caller re-uploads (fail-safe)."""
@@ -177,10 +213,9 @@ def _run_saspy_stage10():
     ADAM_ODA      = f"{PROJ_ROOT_ODA}/04_adam"
     CFG_FILE      = os.path.join(os.path.dirname(__file__), "..", "sascfg_personal.py")
 
-    sas = saspy.SASsession(
-        cfgname="oda",
-        cfgfile=os.path.abspath(CFG_FILE)
-    )
+    # Resilient connect: ODA's spawner times out under load, so retry with backoff
+    # rather than failing the whole pipeline on a single transient timeout.
+    sas = _oda_connect(os.path.abspath(CFG_FILE))
 
     try:
         # ---- Upload SAS programs ----

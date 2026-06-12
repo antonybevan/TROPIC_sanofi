@@ -13,6 +13,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   run this skips the entire upload, cutting a genuine real-SAS run from ~6–16 min to ~1–2 min.
   The sync is **fail-safe**: any listing/size uncertainty falls back to uploading the file, so
   SAS never executes against stale or missing data.
+- **Resilient ODA connect (`_oda_connect`).** ODA's load-balancing object spawner times out
+  under load; the connection now retries with backoff (default 5×/20 s, tunable via
+  `TROPIC_ODA_RETRIES`/`TROPIC_ODA_BACKOFF`) and only proceeds once a workspace has actually
+  spawned, so a transient ODA timeout no longer fails the whole pipeline.
 - **`--force-upload-sdtm`** flag to force a full SDTM re-upload after a source-data refresh.
 - **ODA SAS log capture:** the full IOM log is written to
   `02_production_sas/oda_master_driver.log`; `WARNING:` lines are surfaced and `ERROR:` lines
