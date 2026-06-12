@@ -4,6 +4,31 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.5.1] - 2026-06-12 — ODA Efficiency & Reproducibility Hardening
+
+### Added
+- **Incremental SDTM upload to ODA (`06_telemetry/cibuild.py`).** Stage 10 now uploads only
+  the SDTM files that are **missing or changed on ODA** (compared by byte size against the
+  persistent ODA `$HOME`), instead of re-pushing the full ~200 MB every run. On an unchanged
+  run this skips the entire upload, cutting a genuine real-SAS run from ~6–16 min to ~1–2 min.
+  The sync is **fail-safe**: any listing/size uncertainty falls back to uploading the file, so
+  SAS never executes against stale or missing data.
+- **`--force-upload-sdtm`** flag to force a full SDTM re-upload after a source-data refresh.
+- **ODA SAS log capture:** the full IOM log is written to
+  `02_production_sas/oda_master_driver.log`; `WARNING:` lines are surfaced and `ERROR:` lines
+  fail the build.
+- **`06_telemetry/ODA_GUIDE.md`:** operator guide for the optimized real-SAS workflow — Java
+  (JRE) prerequisite, the upload cost model, run commands, and how to confirm
+  `sas_execution_mode == 'oda'` (genuine double-programming) vs `sim` (tautological).
+
+### Fixed
+- **`yaml` now pinned in `renv.lock`** (v2.3.12). `config_study.R` reads `study_config.yaml`
+  via `yaml::read_yaml()`, but the package was absent from the lockfile, so a clean clone
+  running `renv::restore()` would fail at config load. Reproducibility path restored.
+- **Generated SAS config untracked.** `02_production_sas/00_config_generated.sas` is produced
+  on every run from `study_config.yaml`; it is now `.gitignore`d so it no longer shows as a
+  spurious working-tree change after each pipeline execution.
+
 ## [3.5.0] - 2026-06-12 — Comprehensive Remediation & Optimization
 
 ### Added

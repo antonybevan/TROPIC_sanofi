@@ -105,6 +105,67 @@ def _saspy_available():
         return False
 
 
+def _oda_remote_size(sas, remote_path):
+    """Return the remote file's size in bytes, or None if unknown/absent.
+    Never raises — any failure yields None so the caller re-uploads (fail-safe)."""
+    try:
+        info = sas.file_info(remote_path, quiet=True)
+    except Exception:
+        return None
+    if not info:
+        return None
+    for k, v in info.items():
+        if "size" in str(k).lower():
+            digits = "".join(ch for ch in str(v) if ch.isdigit())
+            return int(digits) if digits else None
+    return None
+
+
+def _sync_sdtm(sas, sdtm_files, sdtm_oda, force=False):
+    """Upload only SDTM files missing on ODA or whose byte-size differs.
+
+    ODA $HOME is persistent across sessions, so the ~200 MB SDTM source only needs
+    (re)uploading on the first run or after a data refresh — not every run. IOM
+    upload is ~1-5 MB/s, so skipping unchanged files saves 5-15 minutes per run.
+
+    FAIL-SAFE: if the remote directory cannot be listed, or a remote size cannot be
+    read, the file IS uploaded. The function never skips on uncertainty, so a SAS
+    run can never execute against stale/missing data. force=True re-uploads all."""
+    total_mb = sum(os.path.getsize(f) for f in sdtm_files) / 1_048_576
+
+    if force:
+        to_upload = list(sdtm_files)
+        print(f"  [ODA] --force-upload-sdtm: re-uploading all {len(sdtm_files)} SDTM files ({total_mb:.0f} MB).")
+    else:
+        try:
+            present = set(sas.dirlist(sdtm_oda) or [])
+        except Exception:
+            present = None  # listing failed -> upload everything (safe)
+        to_upload = []
+        for f in sdtm_files:
+            base = os.path.basename(f)
+            if present is None or base not in present:
+                to_upload.append(f)
+                continue
+            rsize = _oda_remote_size(sas, f"{sdtm_oda}/{base}")
+            if rsize is None or rsize != os.path.getsize(f):
+                to_upload.append(f)
+        skipped = len(sdtm_files) - len(to_upload)
+        reused_mb = sum(os.path.getsize(f) for f in sdtm_files if f not in to_upload) / 1_048_576
+        print(f"  [ODA] SDTM sync: {len(to_upload)} to upload, {skipped} already current "
+              f"(~{reused_mb:.0f} MB reused on ODA).")
+
+    if not to_upload:
+        print("  [ODA] SDTM already current on ODA — upload skipped (saved minutes).")
+        return
+
+    up_mb = sum(os.path.getsize(f) for f in to_upload) / 1_048_576
+    print(f"  [ODA] Uploading {len(to_upload)} SDTM file(s) ({up_mb:.0f} MB) — IOM ~1-5 MB/s...")
+    for f in to_upload:
+        sas.upload(f, f"{sdtm_oda}/{os.path.basename(f)}")
+    print("  [ODA] SDTM upload complete.")
+
+
 def _run_saspy_stage10():
     """Execute SAS production suite on ODA via SASPy, return (rc, stdout, stderr)."""
     import saspy
@@ -128,13 +189,12 @@ def _run_saspy_stage10():
             sas.upload(f, f"{PGMDIR_ODA}/{os.path.basename(f)}")
         print(f"  [ODA] SAS programs uploaded.")
 
-        # ---- Upload SDTM source data (skip if already present) ----
+        # ---- Sync SDTM source data: upload only the missing/changed delta ----
+        # (ODA $HOME is persistent; _sync_sdtm falls back to a full upload on any
+        #  uncertainty, so SAS never runs against stale data. See _sync_sdtm.)
         sdtm_files = sorted(_glob.glob("01_raw_source/real_sdtm/*.sas7bdat"))
-        total_mb = sum(os.path.getsize(f) for f in sdtm_files) / 1_048_576
-        print(f"  [ODA] Uploading {len(sdtm_files)} SDTM files ({total_mb:.0f} MB) — this may take several minutes...")
-        for f in sdtm_files:
-            sas.upload(f, f"{SDTM_ODA}/{os.path.basename(f)}")
-        print(f"  [ODA] SDTM data uploaded.")
+        force_sdtm = os.environ.get("TROPIC_ODA_FORCE_SDTM") == "TRUE"
+        _sync_sdtm(sas, sdtm_files, SDTM_ODA, force=force_sdtm)
 
         # ---- Execute master driver ----
         print("  [ODA] Submitting 00_master_driver.sas via SAS IOM...")
@@ -148,7 +208,18 @@ filename drv "{PGMDIR_ODA}/00_master_driver.sas";
 """)
         log = r.get("LOG", "")
 
-        # Capture errors
+        # Persist the full ODA SAS log to disk for audit/traceability.
+        try:
+            with open("02_production_sas/oda_master_driver.log", "w", encoding="utf-8") as _lf:
+                _lf.write(log)
+        except OSError:
+            pass
+
+        # Surface WARNINGs (informational); fail hard on ERRORs.
+        warn_lines = [l.strip() for l in log.split("\n") if l.strip().startswith("WARNING:")]
+        if warn_lines:
+            print(f"  [ODA] SAS log has {len(warn_lines)} WARNING line(s) "
+                  f"(see 02_production_sas/oda_master_driver.log).")
         error_lines = [l.strip() for l in log.split("\n")
                        if l.strip().startswith("ERROR:")]
         if error_lines:
@@ -292,8 +363,10 @@ def run_single_stage(stage, from_stage, sas_mode, results):
         write_telemetry(results, sas_mode)
         sys.exit(1)
 
-def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=False):
+def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=False, force_upload_sdtm=False):
     print("=== EXECUTING TROPIC (Study EFC6193 / XRP6258) PIPELINE ===")
+    # Force a full SDTM re-upload on ODA this run (default: upload only the delta).
+    os.environ["TROPIC_ODA_FORCE_SDTM"] = "TRUE" if force_upload_sdtm else "FALSE"
 
     # Run the configuration generator
     print("  [CONFIG] Generating configuration from study_config.yaml...")
@@ -490,6 +563,7 @@ def main():
     parser.add_argument("--use-cached-sas", action="store_true", help="Reconcile against pre-existing *_prod.xpt WITHOUT re-running SAS (re-verifies a prior SAS run).")
     parser.add_argument("--demo", action="store_true", help="Run self-contained demo smoke test (tests/smoke_test.R).")
     parser.add_argument("--serial", action="store_true", help="Run stages serially rather than parallelizing Stages 4-8.")
+    parser.add_argument("--force-upload-sdtm", action="store_true", help="ODA only: force a full re-upload of the ~200 MB SDTM source (default uploads only missing/changed files). Use after a source-data refresh.")
 
     args = parser.parse_args()
 
@@ -514,7 +588,7 @@ def main():
         if args.real_sas and args.use_cached_sas:
             print("ERROR: --real-sas and --use-cached-sas are mutually exclusive.")
             sys.exit(1)
-        execute_pipeline(args.from_stage, args.real_sas, args.use_cached_sas, args.serial)
+        execute_pipeline(args.from_stage, args.real_sas, args.use_cached_sas, args.serial, args.force_upload_sdtm)
 
 if __name__ == "__main__":
     main()
