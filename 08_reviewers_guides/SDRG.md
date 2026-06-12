@@ -2,15 +2,15 @@
 
 **Study Name:** TROPIC Re-Analysis  
 **Compound:** Cabazitaxel (CbzP) vs. Mitoxantrone (MP)  
-**Standard:** CDISC SDTM IG v3.4  
+**Standard:** CDISC SDTMIG v3.1.1  
 **Created:** 2026-05-23  
 
 ---
 
 ## 1. Source Data Normalization & Integrity Controls
-Source data was ingested from the de-identified **Project Data Sphere (PDS)** data repository for NCT00417079. 
+Source data are the official **Sanofi de-identified SDTM datasets** for NCT00417079, released in 2013 and accessed via the **Project Data Sphere (PDS)** repository. The files are SAS transport datasets (`*.sas7bdat`); no other source format is used (this matches `README.md` *Data provenance* and `REPRODUCIBILITY.md` §5).
 
-Raw JSON records were loaded via the custom SAS staging compiler ([L_staging_ingest.sas](file:///Users/apple/Desktop/TROPIC/02_production_sas/L_staging_ingest.sas)), which coerced character-encoded continuous indicators (e.g. age, laboratory values, vital measurements) into standardized double-precision numerical values.
+The custom SAS staging compiler ([L_staging_ingest.sas](file:///Users/apple/Desktop/TROPIC/02_production_sas/L_staging_ingest.sas)) ingests these SDTM `*.sas7bdat` files (`set realsdtm.<domain>`) and performs automated supplemental-qualifier (SUPP--) transposition and merge, coercing character-encoded continuous indicators (e.g. age, laboratory values, vital measurements) into standardized double-precision numeric values.
 
 > [!IMPORTANT]
 > **Single-Arm Source Limitation:** The source Project Data Sphere (PDS) public dataset contains only the Mitoxantrone (MP) arm (N=371). The comparator Cabazitaxel (CbzP) arm (N=378) was not included in the public release. Consequently, the SDTM datasets only represent the MP cohort. In our pipeline, the core production (SAS) and validation (R) ADaM tracks process strictly the MP cohort (N=371) to establish a clean double-programming validation setup. The comparator Cabazitaxel cohort is reconstructed from published trial literature and merged dynamically at the final reporting/TFL compilation step in [tfl_generation.R](file:///Users/apple/Desktop/TROPIC/09_tfl/tfl_generation.R).
@@ -51,7 +51,7 @@ For subjects with missing baseline laboratory values (PSABL, ALPBL, HGBBL), popu
 - `ALBBL` fixed: 38.0 g/L (no subject-level source available)
 - `LDHBL` fixed: 220.0 U/L (no subject-level source available)
 
-This imputation strategy is specified in SAP v3.0 §4.3. These imputed values are used **only** for baseline covariate stratification in subgroup Cox models. Primary endpoint analyses (OS, PFS) do not use these baseline lab variables as time-varying inputs.
+This imputation strategy is specified in SAP v3.0 §4.3. **These imputed baseline laboratory constants are schema placeholders and are NOT used as covariates or stratification factors in any efficacy model**, consistent with [ADRG](file:///Users/apple/Desktop/TROPIC/08_reviewers_guides/ADRG.md) §5.1. The primary and secondary Cox / log-rank analyses stratify **only** on `ECOGBL` and `MEASDISF` (see `09_tfl/tfl_generation.R`, `compute_tte_stats()` → `strata(ECOGBL, MEASDISF)`). `ALBBL` and `LDHBL` in particular are single constants for all subjects (no subject-level source available) and therefore carry no subject-level information; they are retained purely to satisfy the ADaM schema and should be read as "not available," not as analysis inputs.
 
 ### 4.2 Supplemental Domain Ingestion
 Domains `LS` (Lesion) and `PN` (Pain/Numeric) do not have supplemental (`SUPPLS`, `SUPPPN`) datasets in the PDS source data. The `%transpose_supp()` macro gracefully handles this via the `supp_exists = 0` guard path, copying the primary domain directly without SUPP merge.

@@ -74,8 +74,9 @@ The synthetic comparator arm is regenerated (deterministically, fixed seeds) by
   resolves `Rscript` from `PATH`; ODA paths are configurable (no hard-coded user paths).
 
 ## 5. Data provenance
-- **Real (MP arm, N=371):** official Sanofi de-identified SDTM public release (2013) for
-  TROPIC / de Bono et al., *Lancet* 2010;376:1147–1154.
+- **Real (MP arm, N=371):** official Sanofi de-identified SDTM public release (2013),
+  SAS transport (`*.sas7bdat`) datasets accessed via the Project Data Sphere (PDS)
+  repository, for TROPIC / de Bono et al., *Lancet* 2010;376:1147–1154.
 - **Synthetic (CbzP arm, N=378):** generated in-repo by proportional-hazards time-scaling
   of the real MP arm + fixed-seed sampling from published Table 1/Table 2 marginals. It is
   **not real data**, does not reproduce published cabazitaxel efficacy, and is used only to

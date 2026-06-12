@@ -31,7 +31,8 @@ df_ae <- ae %>%
   inner_join(header, by = c("USUBJID", "SUBJID")) %>%
   mutate(
     # AE week conversion to days relative to randomization
-    astdt = RANDDT + AESTWK * 7,
+    # Worst-case rule: if onset is week 1 (AESTWK = 1) and calculated date is prior to TRTSDT, impute to TRTSDT
+    astdt = if_else(AESTWK == 1 & (RANDDT + AESTWK * 7) < TRTSDT & !is.na(TRTSDT), TRTSDT, RANDDT + AESTWK * 7),
     aendt = if_else(!is.na(AEENWK), RANDDT + AEENWK * 7, as.Date(NA)),
     
     astdy = as.numeric(astdt - TRTSDT + 1),

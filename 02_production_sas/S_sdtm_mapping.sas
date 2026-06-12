@@ -122,7 +122,11 @@ proc sql;
         ae.aehlt length=100,
         ae.aellt length=100,
         case 
-            when not missing(dm.rfstdtc) and not missing(ae.aestwk) then dm.rfstdtc + ae.aestwk * 7
+            when not missing(dm.rfstdtc) and not missing(ae.aestwk) then 
+                case 
+                    when ae.aestwk = 1 and (dm.rfstdtc + ae.aestwk * 7) < dm.trtsdt and not missing(dm.trtsdt) then dm.trtsdt
+                    else dm.rfstdtc + ae.aestwk * 7
+                end
             else .
         end as aestdt format=yymmdd10.,
         case 
