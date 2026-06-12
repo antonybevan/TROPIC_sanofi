@@ -52,7 +52,7 @@ proc sql;
         lb.lbornrlo as lbnrlo,
         lb.lbornrhi as lbnrhi,
         lb.lbnrind,
-        coalesce(input(lb.lbtoxgr, best32.), 0.0) as ATOXGR
+        input(lb.lbtoxgr, best32.) as ATOXGR
     from sdtm.lb as lb
     left join adam.adsl as adsl on lb.usubjid = adsl.usubjid
     where adsl.saffl = 'Y' and not missing(lb.lbstresn);

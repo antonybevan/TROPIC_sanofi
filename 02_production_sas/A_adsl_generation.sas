@@ -1,9 +1,9 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: A_adsl_generation.sas
-   Version: 2.2.0
+   Version: 2.3.0
    Author: Principal Clinical Data Infrastructure Architect
-   Date: 2026-05-27
+   Date: 2026-06-12
    Standard: ADaMIG v1.3
    Input: sdtm.dm, sdtm.ex, sdtm.ds
    Output: adam.adsl
@@ -232,16 +232,26 @@ proc sql;
         srv.dthcaus as DTHCAUS length=100,
         lst.lstalvdt as LSTALVDT format=yymmdd10.,
 
-        /* Baseline clinical covariates — defaults from config §6.3 */
+        /* Baseline clinical covariates — defaults from config §6.3.
+           Each imputed covariate carries a companion *IF flag ('Y' = value was
+           imputed because none was on file; 'N' = observed). ALBBL/LDHBL are
+           non-collected placeholder constants, so their flags are constant 'Y'.
+           The R validation track derives these flags identically (pre-coalesce). */
         coalesce(ecog.ecogbl, &ECOGBL_DEFAULT.) as ECOGBL,
+        case when missing(ecog.ecogbl) then 'Y' else 'N' end as ECOGBLIF length=1,
         coalesce(meas.measdisf, 'N') as MEASDISF length=1,
         coalesce(visc.viscfl, 'N') as VISCFL length=1,
         coalesce(pain.painbl, 'N') as PAINBL length=1,
         coalesce(labs.PSABL, &PSABL_DEFAULT.) as PSABL,
+        case when missing(labs.PSABL) then 'Y' else 'N' end as PSABLIF length=1,
         coalesce(labs.ALPBL, &ALPBL_DEFAULT.) as ALPBL,
+        case when missing(labs.ALPBL) then 'Y' else 'N' end as ALPBLIF length=1,
         &ALBBL_DEFAULT. as ALBBL,
+        'Y' as ALBBLIF length=1,
         &LDHBL_DEFAULT. as LDHBL,
+        'Y' as LDHBLIF length=1,
         coalesce(labs.HGBBL, &HGBBL_DEFAULT.) as HGBBL,
+        case when missing(labs.HGBBL) then 'Y' else 'N' end as HGBBLIF length=1,
         coalesce(doc.docprog, 'AFTER') as DOCPROG length=10,
         coalesce(doc.docresp, 'N') as DOCRESP length=1
     from sdtm.dm as dm

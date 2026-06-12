@@ -12,8 +12,11 @@
 #            1. The pinned R environment loads (haven, dplyr, diffdf).
 #            2. Every pipeline R script parses (no syntax errors on a clean clone).
 #            3. The cross-language reconciliation METHODOLOGY works end-to-end on
-#               synthetic fixtures: it PASSES on identical independent outputs and
-#               correctly FAILS (and localises the column) on an injected difference.
+#               synthetic fixtures, on BOTH branches it uses in production:
+#               (a) the unique-key path (USUBJID+AESEQ), and (b) the keyless
+#               multiset path used for ADCM/ADLB/ADRS/ADEX (non-unique business
+#               key + within-key SEQ). Each PASSES on identical independent
+#               outputs and correctly DETECTS an injected cell difference.
 #
 #          This is a fixture/unit demonstration of the reconciliation engine — the
 #          heart of the validation claim — not the full 7-domain clinical run
@@ -96,6 +99,47 @@ issues_b <- reconcile(file.path(tdir, "demo_prod.xpt"), file.path(tdir, "demo_v_
                       keys = c("USUBJID", "AESEQ"))
 if (length(issues_b) > 0) pass(sprintf("injected 1-cell difference correctly DETECTED (%s)", paste(issues_b, collapse = ", "))) else
   fail("injected difference was NOT detected — reconciliation engine is not sensitive!")
+
+# ---- Keyless multiset path (the branch used for ADCM/ADLB/ADRS/ADEX) ----------
+# The four BDS/OCCDS domains above carry NO unique within-subject record id, so
+# 05_reconciliation/cross_lang_audit.R aligns them by business keys + within-key
+# row_number() over content-sorted rows. Cases A/B only exercised the unique-key
+# path; this helper mirrors the keyless methodology verbatim so the demo covers it.
+reconcile_multiset <- function(prod, val, sort_keys) {
+  names(prod) <- toupper(names(prod)); names(val) <- toupper(names(val))
+  common <- intersect(names(prod), names(val))
+  other  <- setdiff(common, sort_keys)
+  seqd <- function(df) df %>%
+    arrange(across(all_of(c(sort_keys, other)))) %>%
+    group_by(across(all_of(sort_keys))) %>% mutate(SEQ = row_number()) %>% ungroup()
+  d <- diffdf(seqd(prod), seqd(val), keys = c(sort_keys, "SEQ"), suppress_warnings = TRUE)
+  setdiff(names(d), c("DataSummary", "AttribDiffs"))
+}
+
+# Build a BDS-style fixture whose business key (USUBJID + PARAMCD) is NON-unique
+# (multiple visit rows per key) — the exact shape the keyless branch must handle.
+set.seed(23)
+make_bds <- function() data.frame(
+  STUDYID = "DEMO",
+  USUBJID = sprintf("DEMO-%03d", rep(1:10, each = 4)),
+  PARAMCD = rep(c("ANC", "PSA"), times = 20),
+  AVISITN = rep(1:2, each = 2, times = 10),
+  AVAL    = round(rnorm(40, 100, 15), 1),
+  stringsAsFactors = FALSE
+)
+bds_prod <- make_bds(); bds_val <- bds_prod   # independent track, identical spec
+
+# Case C: identical multiset on a non-unique key -> expect PASS (zero differences)
+issues_c <- reconcile_multiset(bds_prod, bds_val, sort_keys = c("USUBJID", "PARAMCD"))
+if (length(issues_c) == 0) pass("keyless multiset path: identical non-unique-key tracks reconcile with ZERO differences") else
+  fail(sprintf("keyless path expected zero differences, got: %s", paste(issues_c, collapse = ", ")))
+
+# Case D: perturb ONE AVAL cell inside a multi-row key group -> MUST be detected
+bds_bad <- bds_val
+bds_bad$AVAL[3] <- bds_bad$AVAL[3] + 7.5
+issues_d <- reconcile_multiset(bds_prod, bds_bad, sort_keys = c("USUBJID", "PARAMCD"))
+if (length(issues_d) > 0) pass(sprintf("keyless multiset path: within-group 1-cell difference correctly DETECTED (%s)", paste(issues_d, collapse = ", "))) else
+  fail("keyless path: within-group difference was NOT detected — multiset reconciliation is not sensitive!")
 
 unlink(tdir, recursive = TRUE)
 

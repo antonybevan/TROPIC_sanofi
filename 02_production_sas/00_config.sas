@@ -1,9 +1,9 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: 00_config.sas
-   Version: 2.2.0
+   Version: 3.5.0
    Author: Principal Clinical Data Infrastructure Architect
-   Date: 2026-05-27
+   Date: 2026-06-12
    Standard: CDISC ADaMIG v1.3 / OCCDS v1.1
    Description: Environment configuration, library allocations, and helper macros.
    ============================================================================== */
@@ -78,63 +78,7 @@
        Reference: TROPIC SAP v3.0 (EFC6193 / XRP6258)
        ============================================================ */
 
-    /* Study identifiers */
-    %global STUDYID TRT01P_CODE TRT01PN_CODE;
-    %let STUDYID          = TROPIC-NCT00417079;
-    %let TRT01P_CODE      = MP;           /* Mitoxantrone + Prednisone */
-    %let TRT01PN_CODE     = 2;
-
-    /* Study follow-up cutoff per DSMB decision (SAP §5.1) */
-    %global STUDY_CUTOFF_DT;
-    %let STUDY_CUTOFF_DT  = '25SEP2009'd;
-
-    /* Drug exposure and stratification */
-    %global PLANNED_DOSE AGE_STRAT_CUT;
-    %let PLANNED_DOSE     = 12;           /* Mitoxantrone mg/m2 per cycle */
-    %let AGE_STRAT_CUT    = 65;           /* Stratification age cutoff (years) */
-
-    /* Missing data imputation defaults (SAP §6.3) */
-    %global ECOGBL_DEFAULT PSABL_DEFAULT ALPBL_DEFAULT HGBBL_DEFAULT ALBBL_DEFAULT LDHBL_DEFAULT;
-    %let ECOGBL_DEFAULT   = 1.0;          /* ECOG PS 1 = restricted light activity */
-    %let PSABL_DEFAULT    = 110.0;        /* ng/mL */
-    %let ALPBL_DEFAULT    = 140.0;        /* U/L   */
-    %let HGBBL_DEFAULT    = 11.5;         /* g/dL  */
-    %let ALBBL_DEFAULT    = 38.0;         /* g/dL — population reference mean      */
-    %let LDHBL_DEFAULT    = 220.0;        /* U/L  — population reference mean      */
-
-    /* RECIST v1.0 response thresholds (SAP §5.3) */
-    %global RECIST_PD_PCT RECIST_PD_ABS RECIST_PR_PCT;
-    %let RECIST_PD_PCT    = 20;           /* % increase from nadir = PD  */
-    %let RECIST_PD_ABS    = 5;            /* mm absolute minimum = PD    */
-    %let RECIST_PR_PCT    = -30;          /* % decrease from baseline = PR */
-
-    /* PCWG3 PSA thresholds (SAP §5.4) */
-    %global PSA_RESP_THRESHOLD PSA_RESP_CONFIRM PSA_PROG_MULT_RESP PSA_PROG_MULT_NORESP PSA_PROG_ABS PSA_PROG_CONFIRM;
-    %let PSA_RESP_THRESHOLD   = 0.5;      /* >= 50% decline from baseline */
-    %let PSA_RESP_CONFIRM     = 21;       /* days between confirming measurements */
-    %let PSA_PROG_MULT_RESP   = 1.5;      /* PSA responder: >= 1.5x nadir */
-    %let PSA_PROG_MULT_NORESP = 1.25;     /* Non-responder: >= 1.25x nadir */
-    %let PSA_PROG_ABS         = 5;        /* Absolute increment >= 5 ng/mL */
-    %let PSA_PROG_CONFIRM     = 7;        /* Confirmation within 7 days */
-
-    /* OCCDS v1.1 continuous episode merging (SAP §5.2, Custom Query 02) */
-    %global EPISODE_GAP_DAYS;
-    %let EPISODE_GAP_DAYS     = 3;        /* <= 3-day gap = same episode */
-
-    /* Project Optimus ANC kinetics (SAP §5.5) */
-    %global ANC_RECOVERY_THRESHOLD;
-    %let ANC_RECOVERY_THRESHOLD = 1.5;   /* x10^3/uL recovery target */
-
-    /* LB analysis windows — study days from TRTSDT (SAP §5.6) */
-    %global W_BL_HI W_C1D1_LO W_C1D1_HI W_C1D8_LO W_C1D8_HI;
-    %global W_C1D15_LO W_C1D15_HI W_C2D1_LO W_C2D1_HI W_C2D8_LO W_C2D8_HI W_C3D1_LO W_C3D1_HI;
-    %let W_BL_HI      = 0;
-    %let W_C1D1_LO    = 1;   %let W_C1D1_HI    = 3;
-    %let W_C1D8_LO    = 4;   %let W_C1D8_HI    = 13;
-    %let W_C1D15_LO   = 14;  %let W_C1D15_HI   = 17;
-    %let W_C2D1_LO    = 18;  %let W_C2D1_HI    = 24;
-    %let W_C2D8_LO    = 25;  %let W_C2D8_HI    = 34;
-    %let W_C3D1_LO    = 39;  %let W_C3D1_HI    = 45;
+    %include "&PGMDIR.&PATH_SEP.00_config_generated.sas";
 
     %put NOTE: [CONFIG] Environment configured successfully on &SYSSCP..;
     %put NOTE: [CONFIG] Auto-resolved Project Root path: &PROJ_ROOT.;

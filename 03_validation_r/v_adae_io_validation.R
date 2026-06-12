@@ -1,4 +1,4 @@
-# Program: v_adae_io_validation.R | Version: 2.0 | Author: Clinical Data Architect | Date: 2026-05-23
+# Program: v_adae_io_validation.R | Version: 3.5.0 | Author: Clinical Data Architect | Date: 2026-06-12
 # Standard: ADaMIG v1.3 OCCDS v1.1 | renv.lock hash: locked
 # Description: R Independent Validation double-programming for TROPIC ADAE.
 
@@ -43,7 +43,7 @@ df_ae <- ae %>%
       atoxgr == 1.0 ~ "MILD",
       atoxgr == 2.0 ~ "MODERATE",
       atoxgr >= 3.0 ~ "SEVERE",
-      TRUE ~ "MILD"
+      TRUE ~ NA_character_
     ),
     CQ02NAM = if_else(AEDECOD %in% c("NEUTROPENIA", "FEBRILE NEUTROPENIA", "LEUKOPENIA"), "HEMATOLOGIC IRAE", ""),
     aetrtem_clean = if_else(is.na(AETRTEM) | trimws(AETRTEM) == "", NA_character_, trimws(AETRTEM))

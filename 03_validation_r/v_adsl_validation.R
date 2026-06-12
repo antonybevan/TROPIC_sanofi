@@ -1,4 +1,4 @@
-# Program: v_adsl_validation.R | Version: 2.0 | Author: Clinical Data Architect | Date: 2026-05-23
+# Program: v_adsl_validation.R | Version: 3.5.0 | Author: Clinical Data Architect | Date: 2026-06-12
 # Standard: ADaMIG v1.3 | renv.lock hash: locked
 # Description: R Independent Validation double-programming for TROPIC ADSL.
 
@@ -142,15 +142,25 @@ adsl <- dm %>%
     PPROTFL = coalesce(PPROT, "N"),
     DTHFL = coalesce(DTHFL, "N"),
 
-    # Baseline clinical covariates — defaults from config_study.R §6.3
+    # Baseline clinical covariates — defaults from config_study.R §6.3.
+    # Each imputation flag (*IF) is computed BEFORE its coalesce so it captures
+    # whether the on-file value was missing — mirroring A_adsl_generation.sas
+    # `case when missing(...)`. ALBBL/LDHBL are non-collected placeholder
+    # constants, so their flags are constant "Y".
+    ECOGBLIF = if_else(is.na(ECOGBL), "Y", "N"),
     ECOGBL = coalesce(ECOGBL, .env$ECOGBL_DEFAULT),
     MEASDISF = coalesce(MEASDISF, "N"),
     VISCFL = coalesce(VISCFL, "N"),
     PAINBL = if_else(USUBJID %in% pain_subjs, "Y", "N"),
+    ALBBLIF = "Y",
     ALBBL = .env$ALBBL_DEFAULT,
+    LDHBLIF = "Y",
     LDHBL = .env$LDHBL_DEFAULT,
+    PSABLIF = if_else(is.na(PSABL), "Y", "N"),
     PSABL = coalesce(PSABL, .env$PSABL_DEFAULT),
+    ALPBLIF = if_else(is.na(ALPBL), "Y", "N"),
     ALPBL = coalesce(ALPBL, .env$ALPBL_DEFAULT),
+    HGBBLIF = if_else(is.na(HGBBL), "Y", "N"),
     HGBBL = coalesce(HGBBL, .env$HGBBL_DEFAULT),
     DOCPROG = coalesce(DOCPROG, "AFTER"),
     DOCRESP = coalesce(DOCRESP, "N")
@@ -160,7 +170,8 @@ adsl <- dm %>%
     AGE, AGEGR1, AGEGR1N, RACE, ETHNIC, SEX,
     TRT01P, TRT01PN, TRT01A, TRT01AN, RANDDT, TRTSDT, TRTEDT, TRTDURD,
     ITTFL, SAFFL, PPROTFL, DTHFL, DTHDT, DTHCAUS, LSTALVDT,
-    ECOGBL, MEASDISF, VISCFL, PAINBL, PSABL, ALPBL, ALBBL, LDHBL, HGBBL, DOCPROG, DOCRESP
+    ECOGBL, MEASDISF, VISCFL, PAINBL, PSABL, ALPBL, ALBBL, LDHBL, HGBBL, DOCPROG, DOCRESP,
+    ECOGBLIF, PSABLIF, ALPBLIF, HGBBLIF, ALBBLIF, LDHBLIF
   )
 
 # Sort and Save

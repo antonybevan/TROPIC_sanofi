@@ -1,4 +1,4 @@
-# Program: v_adlb_validation.R | Version: 2.0 | Author: Clinical Data Architect | Date: 2026-05-23
+# Program: v_adlb_validation.R | Version: 3.5.0 | Author: Clinical Data Architect | Date: 2026-06-12
 # Standard: ADaMIG v1.3 BDS | renv.lock hash: locked
 # Description: R Independent Validation double-programming for TROPIC ADLB.
 
@@ -87,7 +87,7 @@ df_windows <- df_lb %>%
       TRUE ~ as.numeric(NA)
     ),
     
-    ATOXGR = coalesce(as.numeric(LBTOXGR), 0.0)
+    ATOXGR = as.numeric(LBTOXGR)
   )
 
 # Calculate Baselines - sort by LBSEQ to break date ties stably matching SAS

@@ -1,4 +1,4 @@
-# Program: v_adtte_validation.R | Version: 2.0 | Author: Clinical Data Architect | Date: 2026-05-23
+# Program: v_adtte_validation.R | Version: 3.5.0 | Author: Clinical Data Architect | Date: 2026-06-12
 # Standard: ADaMIG v1.3 BDS-TTE | renv.lock hash: locked
 # Description: R Independent Validation double-programming for TROPIC ADTTE.
 
@@ -69,7 +69,7 @@ os <- df_adsl %>%
   )
 
 # ------------------------------------------------------------------------------
-# PARAMETER 2: TIME TO FIRST SERIOUS AE (TTOS)
+# PARAMETER 2: TIME TO FIRST SERIOUS AE (TTSAE)
 # ------------------------------------------------------------------------------
 ttos <- df_adsl %>%
   left_join(df_sae, by = "USUBJID") %>%
@@ -80,10 +80,10 @@ ttos <- df_adsl %>%
   ) %>%
   transmute(
     STUDYID = .env$STUDYID, USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
-    PARAMCD = "TTOS", PARAM = "Time to First Serious AE", STARTDT, ADT,
+    PARAMCD = "TTSAE", PARAM = "Time to First Serious AE", STARTDT, ADT,
     CNSR = if_else(!is.na(sae_dt), 0.0, 1.0),
     EVNTDESC = if_else(!is.na(sae_dt), "SERIOUS ADVERSE EVENT", ""),
-    CNSDTDSC = if_else(!is.na(sae_dt), "", "LAST CONCOMITANT EVALUATION"),
+    CNSDTDSC = if_else(!is.na(sae_dt), "", "LAST KNOWN ALIVE DATE"),
     AVAL = as.numeric(ADT - STARTDT + 1)
   )
 
@@ -316,7 +316,7 @@ if (nrow(adtte) == 0) {
   stop("ERROR: [VALIDATION] ADTTE output dataset is empty!")
 }
 # Assert completeness of all 6 parameters (VAL-05)
-expected_params <- c("OS", "PFS", "TTPAIN", "TTPSA", "TTUMOR", "TTOS")
+expected_params <- c("OS", "PFS", "TTPAIN", "TTPSA", "TTUMOR", "TTSAE")
 missing_params <- setdiff(expected_params, unique(adtte$PARAMCD))
 if (length(missing_params) > 0) {
   stop(paste("ERROR: [VALIDATION] ADTTE is missing mandatory parameters:", paste(missing_params, collapse = ", ")))
