@@ -2,7 +2,7 @@
 /* ==============================================================================
    Program: A_adae_io_respec.sas
    Version: 2.2.0
-   Author: Principal Clinical Data Infrastructure Architect
+   Author: Clinical Programming
    Date: 2026-05-27
    Standard: ADaMIG v1.3 OCCDS v1.1
    Input: sdtm.ae, adam.adsl

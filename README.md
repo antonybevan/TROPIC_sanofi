@@ -6,10 +6,8 @@
 **Cabazitaxel vs Mitoxantrone in mCRPC — Phase III RCT**
 *Sanofi · de Bono et al., Lancet 2010*
 
-[![Pipeline](https://img.shields.io/badge/Pipeline-12%2F12%20Stages%20Passing-brightgreen?style=flat-square&logo=checkmarx)](06_telemetry/)
 [![CDISC](https://img.shields.io/badge/CDISC-ADaMIG%20v1.3%20%7C%20SDTMIG%20v3.1.1-005A9C?style=flat-square)](https://www.cdisc.org/)
-[![FDA](https://img.shields.io/badge/FDA-Project%20Optimus%202026-A6192E?style=flat-square)](https://www.fda.gov/about-fda/oncology-center-excellence/project-optimus)
-[![Reconciliation](https://img.shields.io/badge/Reconciliation-100%25%20diffdf%20Match-success?style=flat-square)](05_reconciliation/)
+[![Define-XML](https://img.shields.io/badge/Define--XML-2.1%20%2B%20ARM%20%28XSD%20validated%29-005A9C?style=flat-square)](07_define_xml/)
 [![R](https://img.shields.io/badge/R-4.6.0-276DC3?style=flat-square&logo=r)](https://www.r-project.org/)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python)](06_telemetry/cibuild.py)
 

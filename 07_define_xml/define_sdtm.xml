@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <?xml-stylesheet type="text/xsl" href="define2-1.xsl"?>
-<Define xmlns="http://www.cdisc.org/ns/def/v2.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.cdisc.org/ns/def/v2.1 http://schema.cdisc.org/define/v2.1/define2-1-0.xsd" FileOID="TROPIC_SDTM_Metadata_v2.1" AsOfDateTime="2026-06-12T21:49:25" DefineVersion="2.1.0" Originator="Principal Clinical Data Infrastructure Architect">
+<Define xmlns="http://www.cdisc.org/ns/def/v2.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.cdisc.org/ns/def/v2.1 http://schema.cdisc.org/define/v2.1/define2-1-0.xsd" FileOID="TROPIC_SDTM_Metadata_v2.1" AsOfDateTime="2026-06-12T21:49:25" DefineVersion="2.1.0" Originator="Sponsor">
 
   <MetaDataVersion OID="MDV.TROPIC_NCT00417079.SDTM.3.1.1" Name="TROPIC Trial SDTM Metadata Specification" Description="Metadata specification for TROPIC Phase III re-analysis SDTM datasets" CDISCLibraryID="SDTMIG.3.1.1" CDISCLibraryVersion="3.1.1">
 

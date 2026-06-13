@@ -1,4 +1,4 @@
-# Program: v_adrs_validation.R | Version: 2.0 | Author: Clinical Data Architect | Date: 2026-05-23
+# Program: v_adrs_validation.R | Version: 2.0 | Author: Clinical Programming | Date: 2026-05-23
 # Standard: CDISC ADaMIG v1.3 BDS | renv.lock hash: locked
 # Description: R Independent Validation double-programming for TROPIC ADRS.
 

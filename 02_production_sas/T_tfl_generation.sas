@@ -2,7 +2,7 @@
 /* ==============================================================================
    Program: T_tfl_generation.sas
    Version: 1.1.0
-   Author:  Principal Clinical TFL Design Architect
+   Author:  Clinical Programming
    Standard: ICH E3 TFL Catalogue / NEJM & Lancet publication style
    Description: SAS production-track statistical figures, rendered natively via ODS
                 Graphics. The R / pharmaverse track (09_tfl/tfl_generation.R) is the

@@ -1,4 +1,4 @@
-# Program: cross_lang_audit.R | Version: 3.5.0 | Author: Clinical Data Architect | Date: 2026-06-12
+# Program: cross_lang_audit.R | Version: 3.5.0 | Author: Clinical Programming | Date: 2026-06-12
 # Description: Cross-Language reconciliation comparing the SAS production track
 #   (*_prod.xpt) against the independent R validation track (*_v.xpt).
 #

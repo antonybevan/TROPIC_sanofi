@@ -2,7 +2,7 @@
 /* ==============================================================================
    Program: U_xpt_export.sas
    Version: 2.2.0
-   Author: Principal Clinical Data Infrastructure Architect
+   Author: Clinical Programming
    Date: 2026-05-27
    Standard: CDISC compliant transport v5 (XPT)
    Input: adam.*

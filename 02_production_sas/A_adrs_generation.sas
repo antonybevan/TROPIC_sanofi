@@ -2,7 +2,7 @@
 /* ==============================================================================
    Program: A_adrs_generation.sas
    Version: 2.0
-   Author: Principal Clinical Data Infrastructure Architect
+   Author: Clinical Programming
    Date: 2026-05-23
    Standard: CDISC ADaMIG v1.3 BDS
    Input: sdtm.rs, sdtm.lb, adam.adsl
