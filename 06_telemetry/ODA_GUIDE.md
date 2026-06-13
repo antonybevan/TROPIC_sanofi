@@ -19,8 +19,19 @@ real SAS↔R double-programming. This guide explains the resilience architecture
 | **Network to ODA** | IOM on port **8591** to your region's `odaws*.oda.sas.com`. | reachable (VPN/firewall may block). |
 | **`sascfg_personal.py`** + **`~/.authinfo` (key `oda`, perm 600)** | connection + credentials. | present, not committed. |
 
-The broker **auto-detects your ODA region** from `sascfg_personal.py` and fails over across the
-full workspace-server set for that region (e.g. US Home Region 1 has 4 spawners) — no hardcoding.
+**Spawner failover (important).** saspy ignores `iomhost`/`iomport` passed at `SASsession()`
+call time for an ODA config ("ignored due to configuration restriction"), so failover across a
+region's workspace servers must be set as an **iomhost list in `sascfg_personal.py`**:
+
+```python
+'iomhost': ['odaws01-apse1.oda.sas.com', 'odaws02-apse1.oda.sas.com'],  # your region's servers
+```
+
+saspy then fails over across them itself. The broker reads the region from the cfg for telemetry
+labelling; it does not (and cannot) inject the host list at call time. Region server sets are
+listed in `oda_broker.py` (`REGION_HOSTS`). If *all* servers in your region time out across many
+attempts (as distinct from one server), that indicates an ODA-side capacity/throttle condition,
+not a config problem — wait for an off-peak window rather than continuing to retry.
 
 ---
 
