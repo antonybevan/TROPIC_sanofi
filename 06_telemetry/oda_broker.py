@@ -285,12 +285,19 @@ def _default_status_poller(_cache={"t": 0.0, "v": "unknown"}):
 
 
 def _default_session_factory(timeout):
-    """Build a saspy SASsession across the full regional spawner set. Imported lazily so this
-    module loads without saspy/Java present (e.g. on CI / for unit tests)."""
+    """Build a saspy SASsession for ODA. Imported lazily so this module loads without
+    saspy/Java present (e.g. on CI / for unit tests).
+
+    NOTE: saspy IGNORES `iomhost`/`iomport` passed as SASsession kwargs for an ODA config
+    ("Parameter ... ignored due to configuration restriction"). **Multi-server spawner
+    failover must therefore be set as an iomhost LIST in `sascfg_personal.py`**, e.g.
+    `'iomhost': ['odaws01-apse1.oda.sas.com', 'odaws02-apse1.oda.sas.com']`, so saspy itself
+    fails over across the region's workspace servers. We rely on the cfg file and only derive
+    a region label here for telemetry; `detect_region_hosts()` reports the configured set."""
     import saspy
     region, hosts = detect_region_hosts()
-    return saspy.SASsession(cfgname="oda", cfgfile=CFG_FILE, iomhost=hosts,
-                            iomport=8591, timeout=timeout), (hosts[0] if hosts else "unknown")
+    sas = saspy.SASsession(cfgname="oda", cfgfile=CFG_FILE, timeout=timeout)
+    return sas, (hosts[0] if hosts else "oda")
 
 
 def _default_prober(sas, nonce):
