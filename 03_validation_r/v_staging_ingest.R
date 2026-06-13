@@ -1,4 +1,4 @@
-# Program: v_staging_ingest.R | Version: 2.0 | Author: Clinical Data Architect | Date: 2026-05-23
+# Program: v_staging_ingest.R | Version: 2.0 | Author: Clinical Programming | Date: 2026-05-23
 # Description: Standard ingestion and supplemental transposition for real SDTM SAS datasets.
 
 library(haven)

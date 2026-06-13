@@ -2,7 +2,7 @@
 /* ==============================================================================
    Program: S_sdtm_mapping.sas
    Version: 2.2.0
-   Author: Principal Clinical Data Infrastructure Architect
+   Author: Clinical Programming
    Date: 2026-05-27
    Standard: SDTM IG v3.4
    Input: staging.*

@@ -1,4 +1,4 @@
-# Program: v_adlb_validation.R | Version: 3.5.0 | Author: Clinical Data Architect | Date: 2026-06-12
+# Program: v_adlb_validation.R | Version: 3.5.0 | Author: Clinical Programming | Date: 2026-06-12
 # Standard: ADaMIG v1.3 BDS | renv.lock hash: locked
 # Description: R Independent Validation double-programming for TROPIC ADLB.
 

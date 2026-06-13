@@ -2,7 +2,7 @@
 /* ==============================================================================
    Program: A_adex_generation.sas
    Version: 2.2.0
-   Author: Principal Clinical Data Infrastructure Architect
+   Author: Clinical Programming
    Date: 2026-05-27
    Standard: ADaMIG v1.3 BDS
    Input: sdtm.ex, adam.adsl

@@ -2,7 +2,7 @@
 /* ==============================================================================
    Program: L_staging_ingest.sas
    Version: 2.2.0
-   Author: Principal Clinical Data Infrastructure Architect
+   Author: Clinical Programming
    Date: 2026-05-27
    Standard: ADaMIG v1.3
    Input: realsdtm.*.sas7bdat

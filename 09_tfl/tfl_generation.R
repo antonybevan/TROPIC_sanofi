@@ -1,4 +1,4 @@
-# Program: tfl_generation.R | Version: 3.5.0 | Author: Principal Clinical TFL Design Architect | Date: 2026-06-12
+# Program: tfl_generation.R | Version: 3.5.0 | Author: Clinical Programming | Date: 2026-06-12
 # Standard: ICH E3 TFL Catalogue / NEJM & Lancet Style Guides | renv.lock hash: locked
 # Description: Compiles all efficacy, safety, and Project Optimus clinical reports,
 #              rendering the efficacy/safety tables and figures.

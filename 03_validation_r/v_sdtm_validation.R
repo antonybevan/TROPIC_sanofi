@@ -1,4 +1,4 @@
-# Program: v_sdtm_validation.R | Version: 2.1 | Author: Clinical Data Architect | Date: 2026-05-27
+# Program: v_sdtm_validation.R | Version: 2.1 | Author: Clinical Programming | Date: 2026-05-27
 # Description: Independent validation of SDTM mapped staging datasets.
 # Validates presence, row counts, and structural completeness of core SDTM staging data.
 
