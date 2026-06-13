@@ -336,11 +336,12 @@
           }
         </style>
         <script>
+          <![CDATA[
           function showDataset(dsName) {
             // Hide welcome panel
             var welcome = document.getElementById('welcome-panel');
             if (welcome) welcome.style.display = 'none';
-            
+
             // Deactivate all panels and menu items
             var panels = document.getElementsByClassName('dataset-panel');
             for (var i = 0; i < panels.length; i++) {
@@ -350,14 +351,15 @@
             for (var i = 0; i < items.length; i++) {
               items[i].classList.remove('active');
             }
-            
+
             // Activate target panel and menu item
             var targetPanel = document.getElementById('panel-' + dsName);
             if (targetPanel) targetPanel.classList.add('active');
-            
+
             var targetItem = document.getElementById('menu-' + dsName);
             if (targetItem) targetItem.classList.add('active');
           }
+          ]]>
         </script>
       </head>
       <body>
