@@ -94,11 +94,11 @@ The SAS 9.4 production track (Stage 10 of the orchestrator, `cibuild.py`) is *de
 > [!IMPORTANT]
 > **Execution mode is explicit and recorded — do not over-read the status badges.** Stage 10 resolves to exactly one of `local` / `oda` / `cached` / `sim` / `error` (`cibuild.py` → `_resolve_sas_mode`) and writes the chosen mode to `06_telemetry/pipeline_health.json` as `sas_execution_mode`. **Only `local` and `oda` constitute genuine, independent SAS↔R double-programming.** The *default* invocation (`python3 06_telemetry/cibuild.py` with no SAS engine present) runs in **`sim` mode** — a byte-copy of `*_v.xpt` → `*_prod.xpt` — for which a zero-difference reconciliation is **tautological** and is *not* evidence of independent parity. Any "100% diffdf Match" / "12/12 stages" status (including the README badges) is meaningful as double-programming evidence **only** for a run whose recorded `sas_execution_mode` is `oda` or `local`; a reviewer should confirm that field before citing the reconciliation.
 
-The execution sequence (in `oda` mode) is:
-1. All 12 SAS programs in `02_production_sas/` and all 34 SDTM SAS7BDAT source files are uploaded from the local repository to the ODA workspace via the SASPy `sas.upload()` API.
-2. The master driver (`00_master_driver.sas`) is submitted to ODA via `%include` fileref. SAS processes the full SDTM → Staging → SDTM Mapping → ADaM → XPT chain independently.
-3. The 7 production `*_prod.xpt` files are downloaded from ODA to `04_adam/` via `sas.download()`.
-4. The SAS IOM log is captured and inspected for `ERROR:` markers before the pipeline continues to Stage 11.
+The execution sequence (in `oda` mode) is split into two jobs through a resilient connection broker (`06_telemetry/oda_broker.py`); see [`06_telemetry/ODA_GUIDE.md`](file:///Users/apple/Desktop/TROPIC/06_telemetry/ODA_GUIDE.md):
+1. **Job A — seed (`seed_sdtm.py`, idempotent):** the 34 SDTM SAS7BDAT files are uploaded to the ODA workspace **once**, guarded by a per-dataset `sha256`/`nrows` manifest (zero upload when the resident library already matches; row counts are re-read from ODA to reject a half-upload; the manifest sentinel is written last, transactionally).
+2. **Connect:** the broker opens an IOM session with status-gated, full-jitter backoff (ODA's spawner times out under load) and **earns** the session via a live nonce probe — `sas_execution_mode='oda'` is recorded only after the workspace echoes a runtime token.
+3. **Job B — reconcile (`cibuild.py --real-sas`):** Stage 10 verifies the SDTM manifest is resident (else it fails with an instruction to run Job A — it does not silently simulate), uploads the 12 SAS programs, and submits `00_master_driver.sas` via `%include`. SAS processes the full SDTM → Staging → SDTM Mapping → ADaM → XPT chain independently.
+4. The IOM log is captured to `02_production_sas/oda_master_driver.log` (WARNINGs surfaced, `ERROR:` fails the build), the 7 `*_prod.xpt` are downloaded to `04_adam/`, and `pipeline_health.json` records `oda_endpoint`, `oda_attempts`, `sdtm_manifest_sha`, `probe_nonce_echoed`, and `reconciliation='SAS_vs_R'`.
 
 The cross-language reconciliation audit (Stage 11, `cross_lang_audit.R`) then performs a `diffdf` comparison between the independently SAS-generated `*_prod.xpt` and the R-generated `*_v.xpt` datasets.
 

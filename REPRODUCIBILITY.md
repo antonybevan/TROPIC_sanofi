@@ -51,15 +51,23 @@ the validation claim — and it requires nothing but R.
 - The **real MP SDTM** (`*.sas7bdat`) placed in `01_raw_source/real_sdtm/`. This is the
   official Sanofi de-identified TROPIC (EFC6193) public release; see §5.
 - **For genuine double-programming:** a SAS 9.4 engine — either a local `sas` on `PATH`
-  or SAS OnDemand for Academics (ODA) with `saspy` + `sascfg_personal.py` + `_authinfo`.
+  or SAS OnDemand for Academics (ODA) with a **Java runtime (JRE 8+)** + `saspy` +
+  `sascfg_personal.py` + `~/.authinfo` (key `oda`, perm 600). For ODA the SDTM is seeded
+  once via Job A; see [`06_telemetry/ODA_GUIDE.md`](06_telemetry/ODA_GUIDE.md).
 
-### Run matrix (Stage 10 mode is printed at start and saved to `pipeline_health.json`)
+### Run matrix (Stage 10 mode is resolved at runtime and saved to `pipeline_health.json`)
 | Command | SAS source | Reconciliation meaning |
 |---|---|---|
-| `cibuild.py --real-sas` (local SAS) | local engine, this run | **genuine** SAS↔R double programming |
-| `cibuild.py --real-sas` (ODA) | SAS 9.4 on ODA, this run | **genuine** SAS↔R double programming |
+| `seed_sdtm.py` then `cibuild.py --real-sas` (ODA) | SAS 9.4 on ODA, this run | **genuine** SAS↔R double programming (mode `oda`, earned via live probe + verified manifest) |
+| `cibuild.py --real-sas` (local SAS) | local engine, this run | **genuine** SAS↔R double programming (mode `local`) |
+| `cibuild.py --real-sas` (ODA unreachable after budget) | `*_v.xpt` byte-copied | honest sim fallback — `sim_only`, records `oda_last_error_class` |
 | `cibuild.py --use-cached-sas` | previously generated `*_prod.xpt` | R↔cached-SAS (SAS not re-run) |
 | `cibuild.py` (no SAS available) | `*_v.xpt` byte-copied → `*_prod.xpt` | **simulation only** — tautological, clearly flagged |
+
+> ODA connections route through the resilient broker (`oda_broker.py`): status-gated jittered
+> backoff within `TROPIC_ODA_MAX_WAIT`, fail-fast on auth/encryption, slot hygiene, and a live
+> nonce probe so `oda` mode is earned, never asserted. Job B refuses to run against an unseeded /
+> stale SDTM library (it tells you to run Job A) rather than silently dropping to sim.
 
 The synthetic comparator arm is regenerated (deterministically, fixed seeds) by
 [`01_raw_source/reconstruct_cbzp_arm.R`](01_raw_source/reconstruct_cbzp_arm.R).

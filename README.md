@@ -143,7 +143,11 @@ TROPIC/
 │   └── cross_lang_audit.R          # diffdf cell-by-cell reconciliation engine
 │
 ├── 06_telemetry/                   # Pipeline Orchestration & Telemetry
-│   ├── cibuild.py                  # Python execution driver (12 stages)
+│   ├── cibuild.py                  # Python execution driver (12 stages; Job B reconcile)
+│   ├── oda_broker.py               # Resilient ODA connection broker (probe-earned 'oda' mode)
+│   ├── seed_sdtm.py                # Job A: idempotent, manifest-checked SDTM seeding
+│   ├── test_oda_broker.py          # Unit tests for the broker + seed (no Java/network)
+│   ├── ODA_GUIDE.md                # Operator guide for the resilient real-SAS workflow
 │   ├── health_dashboard.md         # Live pipeline status dashboard
 │   └── reconciliation_report.html  # diffdf audit HTML report
 │
@@ -278,17 +282,37 @@ This is a **demonstration / portfolio** project, not a regulatory submission. Th
 
 ## SAS Execution via SAS OnDemand for Academics
 
-Stage 10 obtains the SAS 9.4 production datasets in one of four **explicitly-labelled** modes (the chosen mode is printed at run start and recorded in `06_telemetry/pipeline_health.json` as `sas_execution_mode`):
+Stage 10 obtains the SAS 9.4 production datasets in one of several **explicitly-labelled** modes (the chosen mode is resolved at runtime and recorded in `06_telemetry/pipeline_health.json` as `sas_execution_mode`):
 
 | Invocation | Mode | What happens |
 |---|---|---|
 | `--real-sas` (local `sas` on PATH) | `local` | Runs `00_master_driver.sas` on the local SAS 9.4 engine this session. |
-| `--real-sas` (no local SAS, SASPy configured) | `oda` | Uploads programs + SDTM to **SAS OnDemand for Academics**, runs `00_master_driver.sas` via SASPy IOM, downloads the 7 `*_prod.xpt`. |
+| `--real-sas` (no local SAS, SASPy configured) | `oda` | Connects to **SAS OnDemand for Academics** via the resilient broker, verifies the resident SDTM manifest, runs `00_master_driver.sas` via SASPy IOM, downloads the 7 `*_prod.xpt`. |
+| `--real-sas` (ODA unreachable after the budget) | `sim` | Honest fallback: byte-copy, telemetry records `oda_last_error_class` + `next_recommended_window`. Never relabeled `oda`. |
 | `--real-sas` (no engine at all) | `error` | **Fails loudly** — real SAS was requested but cannot be run. No false "PASS". |
 | `--use-cached-sas` | `cached` | Reconciles against **pre-existing** `*_prod.xpt` from a prior SAS run. **SAS is not re-run this session;** telemetry says so. |
 | *(no flag, no SAS)* | `sim` | Byte-copies `*_v.xpt` → `*_prod.xpt`. Clearly flagged as **NOT** double-programming (zero diffs are tautological). |
 
-> The `cached` and `sim` modes never claim a real SAS run occurred. Only `local` and `oda` are reported as genuine double-programming.
+> The `cached` and `sim` modes never claim a real SAS run occurred. `oda` mode is **earned** — it is recorded only after a live workspace probe and a verified SDTM manifest (see below); only `local` and `oda` are reported as genuine double-programming.
+
+### Two-job ODA workflow (Job A seed · Job B reconcile)
+
+ODA's ~200 MB SDTM upload and its flaky load-balancing spawner are handled by splitting the work
+and routing every connection through a resilient broker (`06_telemetry/oda_broker.py`). Full
+operator guide: **[`06_telemetry/ODA_GUIDE.md`](06_telemetry/ODA_GUIDE.md)**.
+
+```bash
+# Job A — seed the SDTM once (idempotent; sha256/nrows manifest; zero upload if already resident)
+python3 06_telemetry/seed_sdtm.py
+
+# Job B — reconcile on demand (broker rides spawner timeouts; verifies the manifest before running)
+python3 06_telemetry/cibuild.py --real-sas
+```
+
+The broker uses status-gated full-jitter backoff within a wall-clock budget (`TROPIC_ODA_MAX_WAIT`),
+fails fast on auth/encryption errors, keeps slot hygiene (single-flight lock + teardown), and
+**earns** `oda` mode via a live nonce probe. Confirm a genuine run with
+`sas_execution_mode == "oda"` **and** `reconciliation == "SAS_vs_R"` in `pipeline_health.json`.
 
 ---
 
