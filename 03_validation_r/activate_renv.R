@@ -1,6 +1,6 @@
 # activate_renv.R
 # Version: 2.0
-# Author: Clinical Programming
+# Author: Antony Bevan, Clinical Programming
 # Date: 2026-05-23
 # Description: Environmental manager for R validation packages, ensuring automated
 #              self-healing installation of CRAN/Pharmaverse packages.

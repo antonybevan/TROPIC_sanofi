@@ -2,7 +2,7 @@
 /* ==============================================================================
    Program: S_sdtm_mapping.sas
    Version: 2.2.0
-   Author: Clinical Programming
+   Author: Antony Bevan, Clinical Programming
    Date: 2026-05-27
    Standard: SDTM IG v3.4
    Input: staging.*

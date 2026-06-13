@@ -2,7 +2,7 @@
 /* ==============================================================================
    Program: 00_master_driver.sas
    Version: 2.2.0
-   Author: Clinical Programming
+   Author: Antony Bevan, Clinical Programming
    Date: 2026-05-27
    Standard: CDISC ADaMIG v1.3 / OCCDS v1.1
    Description: Master execution driver for TROPIC (Study EFC6193 / XRP6258) pipeline.

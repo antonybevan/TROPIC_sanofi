@@ -2,7 +2,7 @@
 /* ==============================================================================
    Program: 00_config.sas
    Version: 3.5.0
-   Author: Clinical Programming
+   Author: Antony Bevan, Clinical Programming
    Date: 2026-06-12
    Standard: CDISC ADaMIG v1.3 / OCCDS v1.1
    Description: Environment configuration, library allocations, and helper macros.
