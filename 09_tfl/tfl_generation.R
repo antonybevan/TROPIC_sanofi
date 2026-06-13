@@ -1,7 +1,7 @@
 # Program: tfl_generation.R | Version: 3.5.0 | Author: Principal Clinical TFL Design Architect | Date: 2026-06-12
 # Standard: ICH E3 TFL Catalogue / NEJM & Lancet Style Guides | renv.lock hash: locked
 # Description: Compiles all efficacy, safety, and Project Optimus clinical reports,
-#              rendering publication-quality tables and premium, peer-review-ready figures.
+#              rendering the efficacy/safety tables and figures.
 
 library(haven)
 library(dplyr)
@@ -129,7 +129,7 @@ if (!os_significant) {
 }
 
 # ==============================================================================
-# DEFINE PEER-REVIEW PUBLICATION THEMES (NEJM & Lancet Compliant)
+# FIGURE THEME (NEJM/Lancet style)
 # ==============================================================================
 theme_nejm_custom <- function() {
   theme_minimal(base_family = "serif") +
@@ -312,7 +312,7 @@ ggsave("09_tfl/output/F-17-1_Optimus_Scatter.png", er_plot, width = 8, height = 
 # ==============================================================================
 # FIGURE F-12-1: Statistical Subgroup Forest Plot (OS Subgroups)
 # ==============================================================================
-cat("  [TFL] Rendering Publication-Quality Subgroup Forest Plot...\n")
+cat("  [TFL] Rendering Subgroup Forest Plot...\n")
 
 # Filter OS data and join with ADSL covariates
 os_sub_data <- adtte %>%
@@ -384,7 +384,7 @@ bg_rects <- data.frame(
 
 # Left Panel: Forest Plot Graphical curves
 forest_left <- ggplot(subgroups) +
-  # Alternating publication-quality row bands
+  # Alternating row bands
   geom_rect(data = bg_rects, aes(xmin = 0.1, xmax = 2.7, ymin = ymin, ymax = ymax), fill = "#f5f7f8", alpha = 0.8, inherit.aes = FALSE) +
   geom_vline(xintercept = 1.0, linetype = "dashed", color = "#7f8c8d", linewidth = 0.5) +
   geom_errorbarh(aes(y = Subgroup, xmin = LCL, xmax = UCL), height = 0.15, color = "#1a5276", linewidth = 0.8) +

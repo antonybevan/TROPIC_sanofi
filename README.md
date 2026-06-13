@@ -19,7 +19,7 @@
 
 ## Overview
 
-This repository is an end-to-end **clinical analysis pipeline** for the TROPIC Phase III trial, organised to mirror an eCTD Module 5 layout. It demonstrates dual-language double-programming (SAS + R), CDISC-aligned ADaM modelling, genuine cross-language reconciliation, and publication-quality TFL generation.
+This repository is a clinical analysis pipeline for the TROPIC Phase III trial, organised to mirror an eCTD Module 5 layout. It implements dual-language double programming (SAS and R), CDISC-aligned ADaM datasets, cross-language reconciliation, and TFL generation.
 
 > **Scope & reproducibility (read first):** This is a portfolio/demonstration project. The real MP-arm SDTM source and ODA credentials are **not** committed (patient-data protection + secrets hygiene), so a bare clone cannot re-run the *real* pipeline — see **[REPRODUCIBILITY.md](REPRODUCIBILITY.md)** for the data-access path, the pinned environment, and a **self-contained `--demo` smoke test** that runs on a clean clone with no real data, no SAS, and no credentials. The comparator (Cabazitaxel) arm is **synthetic and illustrative** (see *Data provenance*); only the real Mitoxantrone arm is reconciled SAS↔R. The status badges above (e.g. "12/12 Stages", "100% diffdf Match") describe a run executed against a **real** SAS engine (`--real-sas`, recorded `sas_execution_mode` = `oda`/`local`); the **default** no-engine invocation runs in **`sim`** mode, where a zero-difference reconciliation is tautological — always check `sas_execution_mode` in `06_telemetry/pipeline_health.json` before reading the badges as double-programming evidence.
 
@@ -84,7 +84,7 @@ Real SDTM (SAS7BDAT)
         │
         ├──▶  SAS 9.4 Production  ──▶  adsl_prod.xpt  ──┐
         │     02_production_sas/                         │
-        │                                                ├──▶  diffdf  ──▶  100% Match ✓
+        │                                                ├──▶  diffdf  ──▶  Reconciled
         └──▶  R Independent QC    ──▶  adsl_v.xpt    ──┘
               03_validation_r/              │
                                            ▼

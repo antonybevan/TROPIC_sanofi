@@ -84,7 +84,7 @@ All subjects are assigned `SEX = 'M'` in `A_adsl_generation.sas`. This demograph
 ---
 
 ## 6. Quality Control & SAS/R Parity (VAL-01)
-To ensure the absolute integrity of this submission, the entire ADaM pipeline has been double-programmed independently:
+Each ADaM dataset is produced by two independent implementations (double programming):
 1. **Production Track (SAS 9.4):** Implemented in modular SAS programs (`02_production_sas/`) utilizing standard SAS DATA steps, PROC SQL, and MACRO facilities.
 2. **Validation Track (R 4.6.0):** Independently re-implemented in R (`03_validation_r/`) utilizing the tidyverse (`dplyr`, `tidyr`, `lubridate`) and CDISC Pharmaverse standard libraries (`xportr`).
 
@@ -120,7 +120,7 @@ To exercise the comparative-efficacy/safety TFLs (total N=749: 371 real MP + 378
 To prevent circular validation dependencies, the reconstruction program [reconstruct_cbzp_arm.R](file:///Users/apple/Desktop/TROPIC/01_raw_source/reconstruct_cbzp_arm.R) operates independently. It loads the validated MP ADaM datasets (`04_adam/adtte_v.xpt` etc.) to extract patient timelines, performs Proportional Hazards (PH) survival scaling and Table 1/2 baseline simulations, and writes CbzP demographic, exposure, laboratory, and time-to-event profiles as isolated RDS files to `01_raw_source/cbzp_reconstructed/`.
 
 ### 7.2 Analysis-Step Merging
-In the final reporting step ([tfl_generation.R](file:///Users/apple/Desktop/TROPIC/09_tfl/tfl_generation.R)), the validated MP-only ADaMs are loaded from `04_adam/` and dynamically merged with the reconstructed CbzP RDS files. This unified dataset (N=749: 371 MP + 378 CbzP) is used to generate publication-quality TFLs and dose-optimization models.
+In the final reporting step ([tfl_generation.R](file:///Users/apple/Desktop/TROPIC/09_tfl/tfl_generation.R)), the validated MP-only ADaMs are loaded from `04_adam/` and dynamically merged with the reconstructed CbzP RDS files. This combined dataset (N=749: 371 MP + 378 CbzP) is used to generate the TFLs and the exposure-response analysis.
 
 ### 7.3 Demographic Reconstitution (ADSL)
 Subject-level demographics for the CbzP cohort (N=378) were simulated using a fixed random seed to match baseline trial characteristics reported in Lancet 2010 Table 1:
