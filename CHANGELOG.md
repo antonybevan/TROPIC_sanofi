@@ -16,8 +16,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   This is the honest local conformance check; full Pinnacle 21 / CDISC CORE remains the offline step.
 - **Analysis Results Metadata (ARM v1.0)** for the headline efficacy analyses — `arm:ResultDisplay`
   with `arm:AnalysisResult` for OS and PFS (stratified Cox / log-rank, CbzP vs MP), referencing the
-  real ADTTE WhereClauses/variables and the R derivation code. Added via the auditable
-  `07_define_xml/add_arm_metadata.py`; passes the conformance gate.
+  real ADTTE WhereClauses/variables and the R derivation code. Applied by a one-shot transform
+  (recorded in git history); passes the conformance gate.
 
 ### Changed
 - **Reconciliation methodology documented precisely (`05_reconciliation/cross_lang_audit.R`).**
@@ -54,7 +54,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
     prior file (154 ItemDefs, 7 groups, 7 codelists, 14 methods, 26 codelist items — none lost).
     Full XSD validation against `define2-1-0.xsd` is to be run offline (schema host unreachable in CI):
     `xmllint --noout --schema define2-1-0.xsd 07_define_xml/define.xml`.
-  - The transform is committed as the auditable `07_define_xml/remediate_define_namespace.py`.
+  - The re-architecture was applied by a one-shot transform (recorded in git history); the reusable
+    `07_define_xml/validate_define.py` conformance gate remains in the repo for ongoing checks.
 
 ### Known (separate, pre-existing)
 - `07_define_xml/define2-1.xsl` now parses (CDATA fix above) but renders blank against the conformant
