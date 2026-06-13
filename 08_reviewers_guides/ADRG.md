@@ -88,6 +88,8 @@ To ensure the absolute integrity of this submission, the entire ADaM pipeline ha
 1. **Production Track (SAS 9.4):** Implemented in modular SAS programs (`02_production_sas/`) utilizing standard SAS DATA steps, PROC SQL, and MACRO facilities.
 2. **Validation Track (R 4.6.0):** Independently re-implemented in R (`03_validation_r/`) utilizing the tidyverse (`dplyr`, `tidyr`, `lubridate`) and CDISC Pharmaverse standard libraries (`xportr`).
 
+**Define-XML conformance.** The analysis metadata (`07_define_xml/define.xml`) **passes full XSD validation** against the official CDISC Define-XML 2.1 + ARM v1.0 schema — run `07_define_xml/validate_xsd.sh` (wraps `xmllint` against the vendored `07_define_xml/schema/` bundle) → *"XSD: VALID."* This covers the schema layer (structure, namespaces, required attributes, enumerations, element ordering) and includes Analysis Results Metadata (ARM) for the OS and PFS analyses. The deeper FDA/CDISC business-rule layer (Pinnacle 21 / CDISC CORE) remains a pre-submission step; `validate_define.py` covers the core referential-integrity rules offline.
+
 ### SAS Execution via SAS OnDemand for Academics (ODA)
 The SAS 9.4 production track (Stage 10 of the orchestrator, `cibuild.py`) is *designed to* execute on **SAS OnDemand for Academics** (ODA) via **SASPy IOM** — a live, cloud-hosted SAS 9.4 engine (Version 9.04.01M8P02222023, LIN X64) — **when the pipeline is invoked with `--real-sas`** (ODA), or when a `local` SAS engine is on `PATH`. In those modes the SAS programs are uploaded/compiled independently and are not copied from or influenced by the R validation outputs.
 

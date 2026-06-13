@@ -152,8 +152,11 @@ TROPIC/
 │   └── reconciliation_report.html  # diffdf audit HTML report
 │
 ├── 07_define_xml/                  # CDISC Metadata
-│   ├── define.xml                  # Define-XML v2.1 (ADaM metadata)
-│   └── define2-1.xsl               # Browser stylesheet
+│   ├── define.xml                  # Define-XML 2.1 + ARM (XSD-validated)
+│   ├── define2-1.xsl               # Browser stylesheet
+│   ├── schema/                     # Vendored CDISC Define-XML 2.1 + ARM + ODM XSD bundle
+│   ├── validate_xsd.sh             # Authoritative XSD validation (xmllint vs vendored schema)
+│   └── validate_define.py          # Fast no-deps structural + referential-integrity gate
 │
 ├── 08_reviewers_guides/            # Submission Documentation
 │   ├── ADRG.md                     # Analysis Data Reviewer's Guide
@@ -272,6 +275,7 @@ This is a **demonstration / portfolio** project, not a regulatory submission. Th
 | Standard | What this repo actually does |
 |---|---|
 | CDISC ADaMIG v1.3 | ADaM structure/metadata modelled for all 7 datasets (real MP arm) |
+| CDISC Define-XML 2.1 + ARM v1.0 | `07_define_xml/define.xml` **passes full XSD validation** against the official CDISC schema (vendored under `07_define_xml/schema/`): `07_define_xml/validate_xsd.sh` → *validates*. Schema-layer conformance; the Pinnacle 21 / CDISC CORE business-rule layer remains a pre-submission step. |
 | CDISC SDTMIG v3.1.1 | Trial-era source SDTM standard (per SAP v3.0 §1) consumed and structurally validated |
 | ICH E9 (Statistical Principles) | Hierarchical step-down gatekeeping **pattern implemented** (exercised on a synthetic comparator — not an inferential result) |
 | ICH E3 (TFL Catalogue) | TFL set rendered in NEJM/Lancet style |

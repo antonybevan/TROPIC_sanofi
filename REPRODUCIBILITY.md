@@ -95,7 +95,16 @@ The synthetic comparator arm is regenerated (deterministically, fixed seeds) by
 
 The following items are explicitly deferred or represent documented limitations of the current repository:
 
-- **Pinnacle 21 Conformance Report:** A formal Pinnacle 21 validation report requires the proprietary Pinnacle 21 Community/Enterprise client and access to the complete patient dataset. Running P21 validation is a required pre-submission step before any regulatory filing.
+- **Define-XML XSD validation — DONE & reproducible in-repo.** `07_define_xml/define.xml` passes full
+  schema validation against the official CDISC Define-XML 2.1 + ARM v1.0 schema (vendored under
+  `07_define_xml/schema/`): run `07_define_xml/validate_xsd.sh` → *"XSD: VALID — conforms to Define-XML
+  2.1 + ARM v1.0."* This certifies the **schema layer** (structure, namespaces, required attributes,
+  enumerations, element ordering).
+- **Pinnacle 21 business-rule report — still deferred.** XSD validation (above) is the schema layer;
+  the **business-rule layer** (FDA/CDISC rule packs: e.g. metadata-vs-data consistency, value-level
+  completeness) needs the proprietary Pinnacle 21 / open CDISC CORE engine plus the full dataset, and
+  remains a required pre-submission step. The repo's `07_define_xml/validate_define.py` already covers
+  the core referential-integrity rules offline.
 - **Real ODA SAS Run Evidence:** Local execution default is simulated (`sim`) mode. Executing a genuine SAS run requires a SAS engine license or SAS OnDemand for Academics (ODA) credentials (which cannot be shared in a public repository).
 - **Guyot (2012) KM Reconstruction of CbzP:** The synthetic arm is honestly labeled as illustrative and constructed by time-scaling. Using the Guyot (2012) KM reconstruction method for the comparator arm is deferred and recommended as a future upgrade if a true two-arm comparison is desired, as the current divide-by-HR method is circular.
 - **Week-Precision Event Dates:** Week-precision dates (±3.5 days) are inherent to the source data and are disclosed as a dataset limitation.
