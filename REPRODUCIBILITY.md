@@ -40,8 +40,8 @@ python3 06_telemetry/cibuild.py --demo
    fixtures — showing it (a) reports **zero differences** on identical independent
    outputs and (b) **detects and localises** an injected one-cell difference.
 
-This is a genuine, non-tautological test of the reconciliation engine — the heart of
-the validation claim — and it requires nothing but R.
+This test exercises the reconciliation methodology directly (it is not tautological) and
+requires only R.
 
 ## 3. Reproducing the REAL pipeline (given data access)
 
