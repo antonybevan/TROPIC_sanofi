@@ -3,8 +3,10 @@
 #   (*_prod.xpt) against the independent R validation track (*_v.xpt).
 #
 # METHODOLOGY (audit F-6): This is a KEYED RECORD-CONTENT (multiset) comparison.
-#   The ADaM OCCDS/BDS datasets reconciled here do not all carry a unique record
-#   identifier (e.g. ADAE has no AESEQ/ASEQ key in the final structure). When no
+#   Some reconciled ADaM datasets carry a unique within-subject record identifier and
+#   some do not: ADAE retains AESEQ end-to-end in BOTH tracks, so it is compared on the
+#   unique key USUBJID+AESEQ (positional parity). The BDS/OCCDS datasets that have no
+#   unique record id (ADCM, ADLB, ADRS, ADEX) get the multiset test below. When no
 #   unique key exists, the only well-defined parity test is whether both tracks
 #   contain the SAME MULTISET of records within each business-key group. Records
 #   are therefore aligned by business keys and, within tie groups, by full record
@@ -12,6 +14,11 @@
 #   A PASS means "both engines produced identical record content" -- it does NOT
 #   assert that an independent unique-key row index was reproduced. Neither track
 #   reads the other's output (the R track was decoupled from *_prod.xpt per F-1).
+#   RESIDUAL LIMITATION (documented, not a defect of the multiset test): like ALL
+#   double-programming, reconciliation cannot detect a CORRELATED error -- if both
+#   independent tracks compute the SAME wrong value, the comparison passes. This is
+#   inherent to dual-programming, not specific to the keyless path; the multiset test
+#   detects every single-track content difference (see tests/smoke_test.R Cases C-E).
 
 library(haven)
 library(dplyr)

@@ -141,6 +141,19 @@ issues_d <- reconcile_multiset(bds_prod, bds_bad, sort_keys = c("USUBJID", "PARA
 if (length(issues_d) > 0) pass(sprintf("keyless multiset path: within-group 1-cell difference correctly DETECTED (%s)", paste(issues_d, collapse = ", "))) else
   fail("keyless path: within-group difference was NOT detected — multiset reconciliation is not sensitive!")
 
+# Case E: robustness under TIES. The multiset path verifies record CONTENT, so it must still
+# catch a single changed cell even when a key group contains duplicate rows. (The one thing NO
+# double-programming method can catch is a *correlated* error — both independent tracks
+# producing the SAME wrong value; that residual limitation is inherent to double-programming,
+# not specific to the multiset test, and is documented in cross_lang_audit.R / ADRG.)
+tie_prod <- data.frame(
+  STUDYID = "DEMO", USUBJID = "DEMO-001", PARAMCD = "ANC",
+  AVISITN = c(1L, 1L, 2L), AVAL = c(5.0, 5.0, 9.0), stringsAsFactors = FALSE)  # duplicate baseline rows
+tie_val <- tie_prod; tie_val$AVAL[3] <- 9.5                                     # one post-baseline cell differs
+issues_e <- reconcile_multiset(tie_prod, tie_val, sort_keys = c("USUBJID", "PARAMCD"))
+if (length(issues_e) > 0) pass(sprintf("keyless multiset path: detects a changed cell amid DUPLICATE rows (%s)", paste(issues_e, collapse = ", "))) else
+  fail("keyless path: missed a changed cell in a tied key group — multiset test is unsound")
+
 unlink(tdir, recursive = TRUE)
 
 # ---- Verdict -----------------------------------------------------------------

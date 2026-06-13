@@ -4,6 +4,65 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.5.3] - 2026-06-13 — Define-XML Conformance, ARM, Conformance Gate & Reconciliation Hardening
+
+### Added
+- **Runnable Define-XML conformance gate (`07_define_xml/validate_define.py`).** Self-contained
+  (no network) check of the structural + referential-integrity rules a validator enforces: ODM
+  root/namespaces, required Study/GlobalVariables/MetaDataVersion/def:Standards/def:DefineVersion,
+  every ItemRef/Method/CodeList/WhereClause/ValueList/Comment/ARM reference resolves, leaf↔
+  ArchiveLocationID, and Description↔TranslatedText. PASS on the remediated file (244 checks);
+  correctly FAILs the pre-remediation file (6 violations) — it is a real gate, not a rubber stamp.
+  This is the honest local conformance check; full Pinnacle 21 / CDISC CORE remains the offline step.
+- **Analysis Results Metadata (ARM v1.0)** for the headline efficacy analyses — `arm:ResultDisplay`
+  with `arm:AnalysisResult` for OS and PFS (stratified Cox / log-rank, CbzP vs MP), referencing the
+  real ADTTE WhereClauses/variables and the R derivation code. Applied by a one-shot transform
+  (recorded in git history); passes the conformance gate.
+
+### Changed
+- **Reconciliation methodology documented precisely (`05_reconciliation/cross_lang_audit.R`).**
+  Corrected the stale comment that claimed "ADAE has no AESEQ key" — ADAE retains AESEQ end-to-end
+  and is reconciled on the unique key `USUBJID+AESEQ`; only the genuinely keyless domains
+  (ADCM/ADLB/ADRS/ADEX) use the multiset test. Documented the **residual limitation** explicitly:
+  like all double-programming, reconciliation cannot catch a *correlated* error (both tracks
+  identical-wrong) — inherent, not specific to the multiset path.
+- **`tests/smoke_test.R`** gains Case E (multiset detects a changed cell amid duplicate/tied rows),
+  hardening the keyless-path coverage. Full smoke test passes.
+
+### Fixed
+- Pre-existing `define2-1.xsl` parse bug fixed: the embedded JavaScript's unescaped `<` is now
+  wrapped in `CDATA`, so the stylesheet parses. (It still renders blank against the now-conformant
+  ODM-namespaced define because its XPath is not namespace-aware — see Known below.)
+
+### Fixed (Define-XML namespace re-architecture)
+- **Re-architected `07_define_xml/define.xml` to conformant Define-XML 2.1.** The document
+  previously used a non-spec `<Define>` root with the **def/v2.1 namespace as default**, placing the
+  entire structural backbone (`ItemGroupDef`/`ItemDef`/`ItemRef`/`CodeList`/`MethodDef`) in the wrong
+  namespace — it parsed as XML but **any Define-XML validator / Pinnacle 21 / CDISC CORE would reject
+  it**, undercutting the project's regulatory claim. Now:
+  - root is `<ODM ODMVersion="1.3.2" FileType="Snapshot">` in the ODM 1.3.2 namespace, with
+    `def:`/`xlink:`/`xsi:` prefixes bound and `schemaLocation` pointing at the ODM+define schema;
+  - the ODM backbone is unprefixed; define extensions take `def:` (`def:Origin` ×154,
+    `def:ValueListDef`, `def:WhereClauseDef`, `def:WhereClauseRef`, `def:CommentDef`, `def:leaf`,
+    `def:Standards`);
+  - added the required `Study`/`GlobalVariables`, `def:Standards` (ADaMIG 1.3) + `def:DefineVersion`,
+    a `def:leaf` archive location per dataset, wrapped bare `Description` text in `TranslatedText`,
+    dropped the non-standard `Role` attribute on `ItemGroupDef`, converted `CommentRef` elements to
+    `def:CommentOID` attributes, and wired the base AVAL ItemDefs to their `def:ValueListRef`.
+  - **Verified locally:** referential integrity fully resolves (every ItemRef/Method/CodeList/
+    WhereClause/ValueList/Comment reference + leaf/ArchiveLocationID); exact content parity vs. the
+    prior file (154 ItemDefs, 7 groups, 7 codelists, 14 methods, 26 codelist items — none lost).
+    Full XSD validation against `define2-1-0.xsd` is to be run offline (schema host unreachable in CI):
+    `xmllint --noout --schema define2-1-0.xsd 07_define_xml/define.xml`.
+  - The re-architecture was applied by a one-shot transform (recorded in git history); the reusable
+    `07_define_xml/validate_define.py` conformance gate remains in the repo for ongoing checks.
+
+### Known (separate, pre-existing)
+- `07_define_xml/define2-1.xsl` now parses (CDATA fix above) but renders blank against the conformant
+  define because its XPath is not ODM-namespace-aware. The bundled custom stylesheet should be replaced
+  with the official CDISC `define2-1.xsl`, which is namespace-aware and pairs with the ODM structure;
+  rewriting the custom one's XPath is not worthwhile for an artifact slated for replacement.
+
 ## [3.5.2] - 2026-06-12 — Resilient ODA Execution (Broker + Idempotent Seed)
 
 ### Added
