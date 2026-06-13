@@ -4,6 +4,35 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.5.3] - 2026-06-13 — Define-XML 2.1 Namespace Conformance
+
+### Fixed
+- **Re-architected `07_define_xml/define.xml` to conformant Define-XML 2.1.** The document
+  previously used a non-spec `<Define>` root with the **def/v2.1 namespace as default**, placing the
+  entire structural backbone (`ItemGroupDef`/`ItemDef`/`ItemRef`/`CodeList`/`MethodDef`) in the wrong
+  namespace — it parsed as XML but **any Define-XML validator / Pinnacle 21 / CDISC CORE would reject
+  it**, undercutting the project's regulatory claim. Now:
+  - root is `<ODM ODMVersion="1.3.2" FileType="Snapshot">` in the ODM 1.3.2 namespace, with
+    `def:`/`xlink:`/`xsi:` prefixes bound and `schemaLocation` pointing at the ODM+define schema;
+  - the ODM backbone is unprefixed; define extensions take `def:` (`def:Origin` ×154,
+    `def:ValueListDef`, `def:WhereClauseDef`, `def:WhereClauseRef`, `def:CommentDef`, `def:leaf`,
+    `def:Standards`);
+  - added the required `Study`/`GlobalVariables`, `def:Standards` (ADaMIG 1.3) + `def:DefineVersion`,
+    a `def:leaf` archive location per dataset, wrapped bare `Description` text in `TranslatedText`,
+    dropped the non-standard `Role` attribute on `ItemGroupDef`, converted `CommentRef` elements to
+    `def:CommentOID` attributes, and wired the base AVAL ItemDefs to their `def:ValueListRef`.
+  - **Verified locally:** referential integrity fully resolves (every ItemRef/Method/CodeList/
+    WhereClause/ValueList/Comment reference + leaf/ArchiveLocationID); exact content parity vs. the
+    prior file (154 ItemDefs, 7 groups, 7 codelists, 14 methods, 26 codelist items — none lost).
+    Full XSD validation against `define2-1-0.xsd` is to be run offline (schema host unreachable in CI):
+    `xmllint --noout --schema define2-1-0.xsd 07_define_xml/define.xml`.
+  - The transform is committed as the auditable `07_define_xml/remediate_define_namespace.py`.
+
+### Known (separate, pre-existing — not introduced here)
+- `07_define_xml/define2-1.xsl` is itself malformed (unescaped `<` in embedded JavaScript, line ~346)
+  and fails XSLT parsing against any input. Recommend replacing the bundled custom stylesheet with the
+  official CDISC `define2-1.xsl` (namespace-aware; pairs with the now-conformant ODM structure).
+
 ## [3.5.2] - 2026-06-12 — Resilient ODA Execution (Broker + Idempotent Seed)
 
 ### Added
