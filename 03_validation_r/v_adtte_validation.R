@@ -1,4 +1,4 @@
-# Program: v_adtte_validation.R | Version: 3.5.0 | Author: Clinical Programming | Date: 2026-06-12
+# Program: v_adtte_validation.R | Version: 3.5.0 | Author: Antony Bevan, Clinical Programming | Date: 2026-06-12
 # Standard: ADaMIG v1.3 BDS-TTE | renv.lock hash: locked
 # Description: R Independent Validation double-programming for TROPIC ADTTE.
 

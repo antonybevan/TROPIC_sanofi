@@ -2,7 +2,7 @@
 /* ==============================================================================
    Program: A_adtte_generation.sas
    Version: 2.3.0
-   Author: Clinical Programming
+   Author: Antony Bevan, Clinical Programming
    Date: 2026-06-12
    Standard: ADaMIG v1.3 / CDISC BDS TTE v1.0
    Input: adam.adsl, adam.adrs, adam.adcm, adam.adae

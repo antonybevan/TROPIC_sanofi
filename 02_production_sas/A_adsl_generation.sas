@@ -2,7 +2,7 @@
 /* ==============================================================================
    Program: A_adsl_generation.sas
    Version: 2.3.0
-   Author: Clinical Programming
+   Author: Antony Bevan, Clinical Programming
    Date: 2026-06-12
    Standard: ADaMIG v1.3
    Input: sdtm.dm, sdtm.ex, sdtm.ds

@@ -2,7 +2,7 @@
 /* ==============================================================================
    Program: U_xpt_export.sas
    Version: 2.2.0
-   Author: Clinical Programming
+   Author: Antony Bevan, Clinical Programming
    Date: 2026-05-27
    Standard: CDISC compliant transport v5 (XPT)
    Input: adam.*
