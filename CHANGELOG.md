@@ -4,6 +4,27 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.5.4] - 2026-06-13 — Define-XML FULLY XSD-validated (offline, reproducible)
+
+### Added
+- **`define.xml` now passes full XSD validation** against the official CDISC Define-XML 2.1 + ARM
+  v1.0 schema (`xmllint --noout --schema … define.xml` → *validates*). The previously "offline-only"
+  certification step is now **done and reproducible in-repo**: the freely-distributable CDISC schema
+  bundle is vendored under `07_define_xml/schema/` (240 KB, 12 XSDs; ARM entry schema
+  `cdisc-arm-1.0/arm-extension.xsd`), with `07_define_xml/validate_xsd.sh` as the one-command wrapper
+  and `07_define_xml/schema/NOTICE.md` documenting provenance.
+
+### Fixed (conformance issues the real validator surfaced that the structural gate could not)
+- `<ODM>` was missing the **required `def:Context`** attribute → added (`Submission`).
+- `MetaDataVersion` was a sibling of `<Study>` → **nested inside `<Study>`** per ODM 1.3.2.
+- `ItemRef/@Order` → **`@OrderNumber`** (147); `Label` attribute (not allowed on `ItemGroupDef`/
+  `ItemDef`) → moved to `Description/TranslatedText` (154 ItemDefs) / dropped on 7 ItemGroupDefs.
+- Stale `ItemDef/@ValueListOID` (3) removed — superseded by the `def:ValueListRef` child.
+- `MetaDataVersion` children **reordered into the schema-mandated sequence** (Standards →
+  ValueListDef/WhereClauseDef → ItemGroupDef/ItemDef/CodeList/MethodDef → CommentDef → ARM).
+- `RangeCheck` given the required **`def:ItemOID`** + **`SoftHard`** (was plain `ItemOID`).
+- ARM `AnalysisProgrammingCode` → correct **`arm:ProgrammingCode`**.
+
 ## [3.5.3] - 2026-06-13 — Define-XML Conformance, ARM, Conformance Gate & Reconciliation Hardening
 
 ### Added
