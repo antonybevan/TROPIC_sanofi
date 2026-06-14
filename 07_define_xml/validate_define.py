@@ -76,6 +76,12 @@ def validate(path):
     check_refs(o("CodeListRef"), "CodeListOID", codelists, "CodeListRef")
     check_refs(d("WhereClauseRef"), "WhereClauseOID", wcs, "def:WhereClauseRef")
     check_refs(d("ValueListRef"), "ValueListOID", vlds, "def:ValueListRef")
+
+    # ---- standards ----
+    standards = oids(d("Standard"))
+    check_refs(o("ItemGroupDef"), d("StandardOID"), standards, "ItemGroupDef.def:StandardOID")
+    check_refs(o("CodeList"), d("StandardOID"), standards, "CodeList.def:StandardOID")
+
     for e in root.iter():
         c = e.get(d("CommentOID"))
         if c:
