@@ -27,7 +27,7 @@ This repository is a clinical analysis pipeline for the TROPIC Phase III trial, 
 
 ## Illustrative Pipeline Outputs *(synthetic comparator — not clinical findings)*
 
-> [!WARNING]
+> [!NOTE]
 > **These numbers are not study results and must not be read as a re-analysis of the TROPIC trial.** The CbzP arm is synthetic (see *Data provenance* above). Because the comparator is built by dividing the real MP arm's event times by an *assumed* hazard ratio, any treatment effect computed from it is **circular by construction** (effect assumed in → effect measured out) and carries **no evidentiary weight**. The procedure also does **not reproduce the published cabazitaxel values** — it overshoots them (e.g. synthetic OS median 21.7 mo vs published 15.1 mo; synthetic HR 0.43 vs published 0.70). The table below shows what the TFL machinery *computes from the synthetic data*, alongside the published values, purely to demonstrate the analysis pipeline.
 
 | Endpoint | Synthetic CbzP (N=378)† | Real MP (N=371) | Pipeline HR from synthetic data‡ | Published value (de Bono 2010) |
