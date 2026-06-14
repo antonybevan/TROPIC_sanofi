@@ -31,7 +31,7 @@ CFG_FILE      = os.path.join(PROJECT_ROOT, "sascfg_personal.py")
 
 def _oda_paths(root):
     return (f"{root}/02_production_sas", f"{root}/01_raw_source/cbzp_reconstructed",
-            f"{root}/04_adam", f"{root}/09_tfl/output/sas")
+            f"{root}/04_adam", f"{root}/09_tfl/output/figures/sas")
 
 
 PGMDIR_ODA, CBZ_ODA, ADAM_ODA, SASFIG_ODA = _oda_paths(PROJ_ROOT_ODA)
@@ -147,7 +147,7 @@ filename tfl "{PGMDIR_ODA}/T_tfl_generation.sas";
 
     # 4. Download prod XPT + SAS figures
     os.makedirs(os.path.join(PROJECT_ROOT, "04_adam"), exist_ok=True)
-    os.makedirs(os.path.join(PROJECT_ROOT, "09_tfl", "output", "sas"), exist_ok=True)
+    os.makedirs(os.path.join(PROJECT_ROOT, "09_tfl", "output", "figures", "sas"), exist_ok=True)
     if not TFL_ONLY:
         print("\nDownloading *_prod.xpt...", flush=True)
         for ds in DATASETS:
@@ -156,7 +156,7 @@ filename tfl "{PGMDIR_ODA}/T_tfl_generation.sas";
     print("Downloading SAS figures...", flush=True)
     fig_fail = []
     for fig in FIGURES:
-        local = os.path.join(PROJECT_ROOT, "09_tfl", "output", "sas", f"{fig}.png")
+        local = os.path.join(PROJECT_ROOT, "09_tfl", "output", "figures", "sas", f"{fig}.png")
         try:
             res = sas.download(local, f"{SASFIG_ODA}/{fig}.png")
         except Exception as e:
@@ -170,6 +170,6 @@ filename tfl "{PGMDIR_ODA}/T_tfl_generation.sas";
     if errs2 or fig_fail:
         print(f"\nRESULT: PARTIAL — fig errors={bool(errs2)}, missing figs={fig_fail}", flush=True)
         sys.exit(2)
-    print("\nSAS TFL RENDER COMPLETE — all figures downloaded to 09_tfl/output/sas/.", flush=True)
+    print("\nSAS TFL RENDER COMPLETE — all figures downloaded to 09_tfl/output/figures/sas/.", flush=True)
 finally:
     sas.endsas()

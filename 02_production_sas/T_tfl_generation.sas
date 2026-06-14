@@ -23,7 +23,7 @@
 %include "&PGMDIR./00_config.sas";
 
 %let CBZDIR = &PROJ_ROOT.&PATH_SEP.01_raw_source&PATH_SEP.cbzp_reconstructed;
-%let SASFIG = &PROJ_ROOT.&PATH_SEP.09_tfl&PATH_SEP.output&PATH_SEP.sas;
+%let SASFIG = &PROJ_ROOT.&PATH_SEP.09_tfl&PATH_SEP.output&PATH_SEP.figures&PATH_SEP.sas;
 
 /* Ensure the SAS figure output directory tree exists on the host (no XCMD needed) */
 data _null_;
@@ -31,8 +31,10 @@ data _null_;
         then rc1 = dcreate('09_tfl', "&PROJ_ROOT.");
     if fileexist("&PROJ_ROOT.&PATH_SEP.09_tfl&PATH_SEP.output") = 0
         then rc2 = dcreate('output', "&PROJ_ROOT.&PATH_SEP.09_tfl");
+    if fileexist("&PROJ_ROOT.&PATH_SEP.09_tfl&PATH_SEP.output&PATH_SEP.figures") = 0
+        then rc3 = dcreate('figures', "&PROJ_ROOT.&PATH_SEP.09_tfl&PATH_SEP.output");
     if fileexist("&SASFIG.") = 0
-        then rc3 = dcreate('sas', "&PROJ_ROOT.&PATH_SEP.09_tfl&PATH_SEP.output");
+        then rc4 = dcreate('sas', "&PROJ_ROOT.&PATH_SEP.09_tfl&PATH_SEP.output&PATH_SEP.figures");
 run;
 
 /* Publication style: the SAS built-in JOURNAL3 (clean, journal-grade). Each plot

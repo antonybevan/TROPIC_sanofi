@@ -256,7 +256,7 @@ the validated objects (driven by the SAS↔R-reconciled ADaM), not the rendered 
 To show the production environment can deliver regulatory-grade graphics natively, the
 core efficacy/safety statistical figures are **also** rendered in SAS 9.4 via ODS
 Graphics (`02_production_sas/T_tfl_generation.sas` — PROC LIFETEST / SGPLOT / SGPANEL),
-output to [`09_tfl/output/sas/`](09_tfl/output/sas/): KM OS & PFS, subgroup forest, PSA
+output to [`09_tfl/output/figures/sas/`](09_tfl/output/figures/sas/): KM OS & PFS, subgroup forest, PSA
 waterfall, exposure swimmer, and the Optimus exposure–response scatter.
 
 > This is a **breadth demonstration**, not a duplicated deliverable — a study ships its

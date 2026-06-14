@@ -52,7 +52,7 @@ unique-key, Cases C/D keyless).
 All TFLs are produced by `09_tfl/tfl_generation.R` (R / pharmaverse track, the reporting
 deliverable). The numbers are the single source of truth; `ANALYSIS_REPORT.md` transcribes
 them. SAS production-track copies of the statistical figures are rendered separately by
-`02_production_sas/T_tfl_generation.sas` → `09_tfl/output/sas/` (capability demo / visual QC).
+`02_production_sas/T_tfl_generation.sas` → `09_tfl/output/figures/sas/` (capability demo / visual QC).
 
 | Output | SAP § | Generator function (`tfl_generation.R`) | Primary ADaM input(s) |
 |---|---|---|---|
@@ -79,7 +79,7 @@ SAS↔R-reconciled ADaM — not the rendered pixels.
 | 1–9 (staging + R ADaM validation) | `06_telemetry/cibuild.py` → `logrx::axecute(...)` | `03_validation_r/*.log` |
 | 10 (SAS production) | `cibuild.py` Stage 10 (`local`/`oda`/`cached`/`sim`/`error`) | `pipeline_health.json` `sas_execution_mode` |
 | 11 (reconciliation) | `cross_lang_audit.R` | `reconciliation_status.json`, `reconciliation_report.html` |
-| 12 (TFL) | `tfl_generation.R` | `09_tfl/output/*` |
+| 12 (TFL) | `tfl_generation.R` | `09_tfl/output/tables/*`, `09_tfl/output/figures/*` |
 
 Run reproducibility: R toolchain pinned by `renv.lock`; self-contained demo
 (`python3 06_telemetry/cibuild.py --demo`) runs `tests/smoke_test.R` with no real data,

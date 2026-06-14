@@ -13,7 +13,9 @@ library(scales)
 
 cat("NOTE: [TFL] Starting Efficacy & Safety TFL Suite compilation...\n")
 
-dir.create("09_tfl/output", showWarnings = FALSE, recursive = TRUE)
+dir.create("09_tfl/output/tables", showWarnings = FALSE, recursive = TRUE)
+dir.create("09_tfl/output/figures", showWarnings = FALSE, recursive = TRUE)
+dir.create("09_tfl/output/listings", showWarnings = FALSE, recursive = TRUE)
 
 # Mandatory on-artifact disclosure (review-board condition CR-1): every comparative
 # figure carries this caption so a detached PNG cannot be mistaken for a real result.
@@ -250,7 +252,7 @@ render_km(
                               os_stats$hr, os_stats$lcl, os_stats$ucl, 
                               if(os_stats$pval < 0.0001) "p < 0.0001" else sprintf("p = %.4f", os_stats$pval)),
   y_lab = "Overall Survival Probability",
-  outfile = "09_tfl/output/F-11-1_KM_OS.png"
+  outfile = "09_tfl/output/figures/F-11-1_KM_OS.png"
 )
 
 # ==============================================================================
@@ -296,7 +298,7 @@ er_plot <- ggplot(er_data, aes(x = RDI, y = ANC, color = TRT01P)) +
     plot.margin = margin(t = 10, r = 15, b = 10, l = 15)
   )
 
-ggsave("09_tfl/output/F-17-1_Optimus_Scatter.png", er_plot, width = 8, height = 5.5, dpi = 300)
+ggsave("09_tfl/output/figures/F-17-1_Optimus_Scatter.png", er_plot, width = 8, height = 5.5, dpi = 300)
 
 # ==============================================================================
 # FIGURE F-12-1: Statistical Subgroup Forest Plot (OS Subgroups)
@@ -413,7 +415,7 @@ table_right <- ggplot(subgroups, aes(y = Subgroup)) +
 # Combine Left Graphical & Right Text panels horizontally
 final_forest <- forest_left + table_right + plot_layout(widths = c(3.5, 2))
 
-ggsave("09_tfl/output/F-12-1_Subgroup_Forest.png", final_forest, width = 8, height = 5.5, dpi = 300)
+ggsave("09_tfl/output/figures/F-12-1_Subgroup_Forest.png", final_forest, width = 8, height = 5.5, dpi = 300)
 
 # ==============================================================================
 # TABLES T-17-1 / T-17-2 / T-17-4: Text-based summary table exports
@@ -518,7 +520,7 @@ Low (<65%%)     %.1f months          %.1f%%
   low_stats$med_os, low_stats$rate_g34
 )
 
-writeLines(paste0(SYNTH_BANNER, table_content), "09_tfl/output/T-17-Optimus_Tables.txt")
+writeLines(paste0(SYNTH_BANNER, table_content), "09_tfl/output/tables/T-17-Optimus_Tables.txt")
 
 # ==============================================================================
 # TABLES T-11-6 / T-11-7: Dynamic Efficacy Summaries for Secondary Endpoints
@@ -678,7 +680,7 @@ efficacy_tables <- paste0(efficacy_tables, orr_md_addendum)
 cat(sprintf("  [TFL] ORR (response-evaluable): MP %d/%d (%.1f%%)\n",
             orr_ev_mp_resp, orr_ev_mp_total, 100 * orr_ev_mp_resp / max(orr_ev_mp_total, 1)))
 
-writeLines(paste0(SYNTH_BANNER, efficacy_tables), "09_tfl/output/T-11-Efficacy_Tables.txt")
+writeLines(paste0(SYNTH_BANNER, efficacy_tables), "09_tfl/output/tables/T-11-Efficacy_Tables.txt")
 
 # ==============================================================================
 # FIGURE F-11-2: Kaplan-Meier Curve — PFS by Arm (Secondary Endpoint)
@@ -695,7 +697,7 @@ render_km(
                               pfs_stats$hr, pfs_stats$lcl, pfs_stats$ucl, 
                               if(pfs_stats$pval < 0.0001) "p < 0.0001" else sprintf("p = %.4f", pfs_stats$pval)),
   y_lab = "Progression-Free Survival Probability",
-  outfile = "09_tfl/output/F-11-2_KM_PFS.png"
+  outfile = "09_tfl/output/figures/F-11-2_KM_PFS.png"
 )
 
 # ==============================================================================
@@ -752,7 +754,7 @@ waterfall_plot <- ggplot(psa_lb, aes(x = subj_rank, y = best_pchg, fill = respon
     legend.position = "bottom"
   )
 
-ggsave("09_tfl/output/F-13-1_PSA_Waterfall.png", waterfall_plot, width = 9, height = 5.5, dpi = 300)
+ggsave("09_tfl/output/figures/F-13-1_PSA_Waterfall.png", waterfall_plot, width = 9, height = 5.5, dpi = 300)
 
 # ==============================================================================
 # FIGURE F-14-1: Treatment Exposure Swimmer Plot
@@ -802,7 +804,7 @@ swimmer_plot <- ggplot(swimmer_data, aes(y = subj_label, x = duration_months, fi
     legend.position = "bottom"
   )
 
-ggsave("09_tfl/output/F-14-1_Swimmer_Plot.png", swimmer_plot, width = 9, height = 5.5, dpi = 300)
+ggsave("09_tfl/output/figures/F-14-1_Swimmer_Plot.png", swimmer_plot, width = 9, height = 5.5, dpi = 300)
 
 # ==============================================================================
 # TABLE T-20-1: Adverse Event Summary Table (Safety Population)
@@ -922,7 +924,7 @@ for (i in seq_len(nrow(top_soc))) {
             n_g3_mp, round(100 * n_g3_mp / n_mp)))
 }
 
-writeLines(paste0(SYNTH_BANNER, ae_summary_txt), "09_tfl/output/T-20-AE_Summary_Tables.txt")
+writeLines(paste0(SYNTH_BANNER, ae_summary_txt), "09_tfl/output/tables/T-20-AE_Summary_Tables.txt")
 
 # ==============================================================================
 # TABLE T-21-1: Lab Shift Table — ANC/PSA Baseline to Worst
@@ -976,7 +978,7 @@ shift_output <- paste0(
   build_shift_table(adlb_cbzp, "PLAT", "Platelets",         n_cbzp)
 )
 
-writeLines(paste0(SYNTH_BANNER, shift_output), "09_tfl/output/T-21-Lab_Shift_Tables.txt")
+writeLines(paste0(SYNTH_BANNER, shift_output), "09_tfl/output/tables/T-21-Lab_Shift_Tables.txt")
 
 # ==============================================================================
 # FIGURE F-01-1: CONSORT Patient Disposition Flow Diagram
@@ -1053,6 +1055,6 @@ consort <- ggplot() +
   theme_void(base_family = "serif") +
   theme(plot.margin = margin(10, 20, 10, 20))
 
-ggsave("09_tfl/output/F-01-1_CONSORT_Disposition.png", consort, width = 8, height = 7, dpi = 300)
+ggsave("09_tfl/output/figures/F-01-1_CONSORT_Disposition.png", consort, width = 8, height = 7, dpi = 300)
 
-cat("NOTE: [TFL] TFL suites compiled successfully. Figures & tables saved to 09_tfl/output/\n")
+cat("NOTE: [TFL] TFL suites compiled successfully. Figures & tables saved to 09_tfl/output/figures/ & tables/\n")

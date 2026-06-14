@@ -10,7 +10,7 @@
 ## 1. Study & Re-Analysis Overview
 The **TROPIC Phase III Trial (NCT00417079)** evaluated the efficacy and safety of cabazitaxel (25 mg/m² IV q3w) + prednisone against mitoxantrone (12 mg/m² IV q3w) + prednisone in metastatic castration-resistant prostate cancer (mCRPC) previously treated with docetaxel. 
 
-In the **published** trial, cabazitaxel carried a profound safety burden: ~82% Grade 3/4 neutropenia and ~8% febrile neutropenia (de Bono et al., Lancet 2010). *(Note: the synthetic CbzP arm in this repository realises ~86.5% (321/371) Grade 3/4 ANC nadir per the generated lab data — see `09_tfl/output/T-21-Lab_Shift_Tables.txt`; it approximates, but does not exactly reproduce, the published rate.)*
+In the **published** trial, cabazitaxel carried a profound safety burden: ~82% Grade 3/4 neutropenia and ~8% febrile neutropenia (de Bono et al., Lancet 2010). *(Note: the synthetic CbzP arm in this repository realises ~86.5% (321/371) Grade 3/4 ANC nadir per the generated lab data — see `09_tfl/output/tables/T-21-Lab_Shift_Tables.txt`; it approximates, but does not exactly reproduce, the published rate.)*
 
 This **demonstration** rebuilds a synthetic comparator to retrospectively exercise modeling of the relationship between relative dose intensity (RDI), G-CSF prophylaxis, and absolute neutrophil count (ANC) nadir. This characterization supports the **FDA Project Optimus dose-optimization framework** by analyzing recovery kinetics and safety margins.
 
@@ -55,7 +55,7 @@ To pre-empt reviewer challenge on the response rates, the exact derivation of th
   * **Reconciliation to the publication:** The published MP ORR was **4.4%**. The remaining difference (18.2% vs 4.4%) is due to the lack of response confirmation requirements in the simplified pipeline derivations (which evaluates the best of any post-baseline assessments without requiring a consecutive confirmed scan at least 4 weeks later). This is a confirmation-rule difference, not a calculation error.
 * **PSA Response (`PARAMCD = PSARESP`):** Responder = ≥50% confirmed decline in PSA from baseline (PCWG3) (`AVALC = 'Y'`); denominator = subjects with a baseline and ≥1 post-baseline PSA. MP arm: **69/371 = 18.6%**.
 
-All response counts/percentages are emitted by `09_tfl/tfl_generation.R` to `09_tfl/output/T-11-Efficacy_Tables.txt` (single source of truth).
+All response counts/percentages are emitted by `09_tfl/tfl_generation.R` to `09_tfl/output/tables/T-11-Efficacy_Tables.txt` (single source of truth).
 
 ---
 

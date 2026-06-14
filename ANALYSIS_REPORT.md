@@ -45,7 +45,7 @@ The OS analysis exercises the stratified Cox / log-rank machinery and the hierar
 
 ## 3. Secondary Endpoints — Pipeline Demonstration *(synthetic comparator)*
 
-The gatekeeping logic is exercised on these endpoints; the CbzP column is **synthetic** and the HRs/p-values are **circular by construction** (non-inferential). Values are the live output of `09_tfl/tfl_generation.R` (see `09_tfl/output/T-11-Efficacy_Tables.txt`).
+The gatekeeping logic is exercised on these endpoints; the CbzP column is **synthetic** and the HRs/p-values are **circular by construction** (non-inferential). Values are the live output of `09_tfl/tfl_generation.R` (see `09_tfl/output/tables/T-11-Efficacy_Tables.txt`).
 
 | Endpoint | Synthetic CbzP† | Real MP | Pipeline HR (95% CI)‡ | Pipeline p‡ | Published (de Bono 2010) |
 |---|---|---|---|---|---|
@@ -138,7 +138,7 @@ FDA Project Optimus alignment: RDI in Cycle 1 was used as the E-R exposure proxy
 > **Synthetic comparator (CbzP arm):** The Cabazitaxel arm was not included in the Sanofi public data release. The CbzP arm used in figures and comparative tables is **synthetic**, generated at the ADaM layer by **proportional-hazards time-scaling of the real MP arm** (real MP event times divided by the published hazard ratio, with censoring calibrated to published event counts) and fixed-seed sampling from published Lancet 2010 Table 1/Table 2 marginal distributions. **This is not the Guyot et al. (2012) KM-digitisation algorithm**, and the synthetic arm does **not** reproduce the published cabazitaxel efficacy (it overshoots — synthetic OS median 21.7 mo / HR 0.43 vs published 15.1 mo / HR 0.70). All CbzP-vs-MP comparisons are circular by construction and are illustrative only.
 
 > [!NOTE]
-> **Single source of truth.** Every count, percentage, median, HR and p-value in this report is produced by `09_tfl/tfl_generation.R` and written to `09_tfl/output/*.txt`. Narrative numbers are transcribed from those files; the generated tables govern in case of any discrepancy.
+> **Single source of truth.** Every count, percentage, median, HR and p-value in this report is produced by `09_tfl/tfl_generation.R` and written to `09_tfl/output/tables/*.txt`. Narrative numbers are transcribed from those files; the generated tables govern in case of any discrepancy.
 
 ---
 
