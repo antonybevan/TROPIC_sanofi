@@ -1,0 +1,156 @@
+dataset,variable,label
+ADSL,STUDYID,Study Identifier
+ADSL,USUBJID,Unique Subject Identifier
+ADSL,SUBJID,Subject Identifier for the Study
+ADSL,SITEID,Study Site Identifier
+ADSL,AGE,Age
+ADSL,AGEGR1,Pooled Age Group 1
+ADSL,AGEGR1N,Pooled Age Group 1 (N)
+ADSL,RACE,Race
+ADSL,ETHNIC,Ethnicity
+ADSL,SEX,Sex
+ADSL,TRT01P,Planned Treatment for Period 01
+ADSL,TRT01PN,Planned Treatment for Period 01 (N)
+ADSL,TRT01A,Actual Treatment for Period 01
+ADSL,TRT01AN,Actual Treatment for Period 01 (N)
+ADSL,RANDDT,Randomization Date
+ADSL,TRTSDT,Date of First Exposure to Treatment
+ADSL,TRTEDT,Date of Last Exposure to Treatment
+ADSL,TRTDURD,Total Treatment Duration (Days)
+ADSL,ITTFL,Intent-to-Treat Population Flag
+ADSL,SAFFL,Safety Population Flag
+ADSL,PPROTFL,Per-Protocol Population Flag
+ADSL,DTHFL,Subject Death Flag
+ADSL,DTHDT,Date of Death
+ADSL,DTHCAUS,Primary Cause of Death
+ADSL,LSTALVDT,Date Last Known Alive
+ADSL,ECOGBL,Baseline ECOG Performance Status
+ADSL,MEASDISF,Baseline Measurable Disease Flag
+ADSL,VISCFL,Baseline Visceral Metastasis Flag
+ADSL,PAINBL,Baseline Pain Assessment Flag
+ADSL,PSABL,Baseline PSA (ug/L)
+ADSL,ALPBL,Baseline Alkaline Phosphatase (U/L)
+ADSL,ALBBL,Baseline Albumin (g/L)
+ADSL,LDHBL,Baseline Lactate Dehydrogenase (U/L)
+ADSL,HGBBL,Baseline Hemoglobin (g/dL)
+ADSL,DOCPROG,Docetaxel Prior Progression Class
+ADSL,DOCRESP,Docetaxel Prior Response Flag
+ADSL,ECOGBLIF,Baseline ECOG Imputed Flag
+ADSL,PSABLIF,Baseline PSA Imputed Flag
+ADSL,ALPBLIF,Baseline ALP Imputed Flag
+ADSL,HGBBLIF,Baseline Hemoglobin Imputed Flag
+ADSL,ALBBLIF,Baseline Albumin Imputed Flag
+ADSL,LDHBLIF,Baseline LDH Imputed Flag
+ADEX,STUDYID,Study Identifier
+ADEX,USUBJID,Unique Subject Identifier
+ADEX,SUBJID,Subject Identifier for the Study
+ADEX,TRT01P,Planned Treatment for Period 01
+ADEX,TRT01PN,Planned Treatment for Period 01 (N)
+ADEX,TRTSDT,Date of First Exposure to Treatment
+ADEX,PARAMCD,Parameter Code
+ADEX,PARAM,Parameter
+ADEX,PARCAT1,Parameter Category 1
+ADEX,AVAL,Analysis Value
+ADEX,AVALC,Analysis Value (C)
+ADEX,AVISIT,Analysis Visit
+ADCM,STUDYID,Study Identifier
+ADCM,USUBJID,Unique Subject Identifier
+ADCM,CMDECOD,Standardized Medication Name
+ADCM,CMCAT,Category for Medication
+ADCM,CMINDC,Indication
+ADCM,CMSTDT,Analysis Start Date
+ADCM,CMENDT,Analysis End Date
+ADCM,CMTRT,"Reported Name of Drug, Med, or Therapy"
+ADCM,CMSTDY,Analysis Start Day
+ADCM,GCSFFL,G-CSF Concomitant Med Flag
+ADCM,GCSFPRFL,G-CSF Prophylactic Med Flag
+ADCM,NACTFL,New Anti-Cancer Therapy Flag
+ADCM,NACTDT,First Date of New Anti-Cancer Therapy
+ADCM,PREDNFL,Prednisone Co-Medication Flag
+ADCM,TRTEMFL,Treatment Emergent Med Flag
+ADAE,STUDYID,Study Identifier
+ADAE,USUBJID,Unique Subject Identifier
+ADAE,AEDECOD,Dictionary-Derived Term
+ADAE,AEBODSYS,Body System or Organ Class
+ADAE,AEHLT,High Level Term
+ADAE,AESEV,Severity/Intensity
+ADAE,ATOXGR,Analysis Toxicity Grade
+ADAE,AESER,Serious Event
+ADAE,AEREL,Causality
+ADAE,ASTDT,Analysis Start Date
+ADAE,AENDT,Analysis End Date
+ADAE,ASTDY,Analysis Start Day
+ADAE,AENDY,Analysis End Day
+ADAE,AEACN,Action Taken with Study Treatment
+ADAE,AEOUT,Outcome of Adverse Event
+ADAE,CQ02NAM,Custom Query 02 Name
+ADAE,CIAESEQ,Custom Episode Sequence Number
+ADAE,CIAESDT,Custom Episode Start Date
+ADAE,CIAEEDT,Custom Episode End Date
+ADAE,CIAEDUR,Custom Episode Duration (Months)
+ADAE,AEOCCFL,Adverse Event Occurrence Flag
+ADAE,TRTEMFL,Treatment Emergent AE Flag
+ADAE,ADURN,AE Duration (Numeric)
+ADAE,ADURU,AE Duration Units
+ADAE,AESEQ,Adverse Event Sequence Number
+ADAE,TRTA,Actual Treatment
+ADAE,TRTAN,Actual Treatment (N)
+ADLB,STUDYID,Study Identifier
+ADLB,USUBJID,Unique Subject Identifier
+ADLB,SUBJID,Subject Identifier for the Study
+ADLB,TRT01P,Planned Treatment for Period 01
+ADLB,TRTSDT,Date of First Exposure to Treatment
+ADLB,PARAMCD,Parameter Code
+ADLB,PARAM,Parameter
+ADLB,PARAMN,Parameter (N)
+ADLB,PARCAT1,Parameter Category 1
+ADLB,AVAL,Analysis Value
+ADLB,AVALC,Analysis Value (C)
+ADLB,LBNRLO,Reference Range Lower Limit in Orig Unit
+ADLB,LBNRHI,Reference Range Upper Limit in Orig Unit
+ADLB,LBNRIND,Reference Range Indicator
+ADLB,AVISIT,Analysis Visit
+ADLB,AVISITN,Analysis Visit (N)
+ADLB,AWDIST,Analysis Window Distance
+ADLB,ATOXGR,Analysis Toxicity Grade
+ADLB,BASE,Baseline Value
+ADLB,BASEC,Result or Finding in Original Units
+ADLB,BTOXGR,Baseline Toxicity Grade
+ADLB,CHG,Change from Baseline
+ADLB,PCHG,Percent Change from Baseline
+ADLB,ANL01FL,Analysis Record Flag 01
+ADLB,BASEFL,Baseline Record Flag
+ADLB,LBDY,Analysis Day
+ADLB,ADT,Analysis Date
+ADRS,STUDYID,Study Identifier
+ADRS,USUBJID,Unique Subject Identifier
+ADRS,SUBJID,Subject Identifier for the Study
+ADRS,TRT01P,Planned Treatment for Period 01
+ADRS,TRTSDT,Date of First Exposure to Treatment
+ADRS,PARAMCD,Parameter Code
+ADRS,PARAM,Parameter
+ADRS,AVALC,Analysis Value (C)
+ADRS,ADT,Analysis Date
+ADRS,ADY,Analysis Day
+ADRS,AVISIT,Analysis Visit
+ADRS,ANL01FL,Analysis Record Flag 01
+ADRS,AVAL,Analysis Value
+ADTTE,STUDYID,Study Identifier
+ADTTE,USUBJID,Unique Subject Identifier
+ADTTE,SUBJID,Subject Identifier for the Study
+ADTTE,SITEID,Study Site Identifier
+ADTTE,TRT01P,Planned Treatment for Period 01
+ADTTE,TRT01PN,Planned Treatment for Period 01 (N)
+ADTTE,ITTFL,Intent-To-Treat Population Flag
+ADTTE,SAFFL,Safety Population Flag
+ADTTE,PARAMCD,Parameter Code
+ADTTE,PARAM,Parameter
+ADTTE,PARAMN,Parameter (N)
+ADTTE,PARCAT1,Parameter Category 1
+ADTTE,STARTDT,Time-to-Event Start Date
+ADTTE,ADT,Analysis Date
+ADTTE,CNSR,Censor Flag
+ADTTE,EVNTDESC,Event Description
+ADTTE,CNSDTDSC,Censoring Description
+ADTTE,AVAL,Analysis Value (Days)
+ADTTE,AVALU,Analysis Value Unit

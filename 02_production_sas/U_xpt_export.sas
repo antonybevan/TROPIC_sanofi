@@ -20,6 +20,9 @@
 %end;
 %set_pgmdir;
 %include "&PGMDIR./00_config.sas";
+/* define.xml-sourced variable labels (GENERATED: 06_telemetry/gen_adam_labels.py).
+   Applies %lbl_<ds> so every ADaM variable carries its define.xml label (ADaMIG conformance). */
+%include "&PGMDIR./_adam_labels.sas";
 
 %macro export_xpt(dataset);
     /* DATA step write to XPORT: avoids SORTEDBY WARNING (not preserved by DATA step)
@@ -27,6 +30,7 @@
     libname _xout xport "&PROJ_ROOT.&PATH_SEP.04_adam&PATH_SEP.&dataset._prod.xpt";
     data _xout.&dataset.;
         set adam.&dataset.;
+        %lbl_&dataset.;
     run;
     libname _xout clear;
     %put NOTE: [EXPORT] Exported transport file: &dataset._prod.xpt;

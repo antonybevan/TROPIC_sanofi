@@ -49,6 +49,19 @@ venv/
 # Node.js specific
 node_modules/
 
+# CDISC CORE conformance engine + isolated venv (large, re-downloadable per P21_RUNBOOK; never commit)
+.core_engine/
+.core_venv/
+# Pinnacle 21 Community + Java 8 runtime (large, re-downloadable per p21_adam_runrecord.md; never commit)
+.p21/
+06_telemetry/p21_out/
+# Staged domain-named ADaM XPT copies fed to the conformance engine (patient-derived — never commit)
+06_telemetry/_p21_datasets/
+# CORE conformance engine output (may reference dataset paths)
+06_telemetry/p21_report.*
+# Regenerable define.xml metadata flattening (intermediate for the ADaM conformance gate)
+06_telemetry/adam_conf_define_meta.json
+
 # SAS Connection & Credentials Profiles
 sascfg_personal.py
 _authinfo

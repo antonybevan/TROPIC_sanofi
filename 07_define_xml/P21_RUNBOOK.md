@@ -25,6 +25,13 @@ report is the pre-submission gate and is intentionally not faked here.
 
 ## Option A — CDISC CORE (open-source, scriptable)
 
+> **⚠️ CORE does not yet cover ADaM (verified 2026-06-14, CORE v0.16.0).** The engine's bundled
+> rules ship SDTMIG / SENDIG / TIG / USDM only — **0 executable ADaM rules** (the ADaM pack is on the
+> CORE 2026 roadmap). A CORE ADaM run today reads the datasets but executes **0 rules** — inconclusive,
+> not a pass. **Use Option B (Pinnacle 21) for ADaM.** CORE is still valid for the **SDTM** layer
+> (export SDTM to v5 XPT first — CORE does not read `.sas7bdat`). See
+> [`../06_telemetry/p21_conformance_runrecord.md`](../06_telemetry/p21_conformance_runrecord.md).
+
 ```bash
 # Install the open-source CDISC Rules Engine
 pip install cdisc-rules-engine
@@ -41,6 +48,13 @@ core validate \
 ```
 
 ## Option B — Pinnacle 21 Community (GUI/CLI)
+
+> **Run status (2026-06-14):** the full P21 Community 4.1.0 CLI toolchain was provisioned and the
+> ADaM validation launched, but it is **blocked by P21's engine self-expiry** (`expirationDate
+> 2025-03-31` vs the environment clock 2026-06-14; no newer Community build exists). The exact,
+> ready-to-run command and the legitimate paths to complete it are in
+> [`../06_telemetry/p21_adam_runrecord.md`](../06_telemetry/p21_adam_runrecord.md). For ADaM on an
+> environment with a future-dated clock, **Pinnacle 21 Enterprise** (no self-expiry) is the path.
 
 1. Open Pinnacle 21 Community → **Define.xml + Data** validation.
 2. Engine = FDA or CDISC; Standard = **ADaM 1.3**; CT = matching package.

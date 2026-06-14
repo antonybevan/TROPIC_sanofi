@@ -76,7 +76,19 @@ STAGING_PATH <- do.call(file.path, as.list(strsplit(cfg$STAGING_PATH, "/")[[1]])
 # validation logs and a clean Errors/Warnings section. Muffle ONLY that exact
 # message; every other xportr warning (real label/type/length violations) still
 # surfaces in the log untouched.
+# define.xml-sourced variable labels (GENERATED: 06_telemetry/gen_adam_labels.py). Applied so the R
+# validation-track datasets carry the same labels as the SAS production track — closes the missing-
+# label ADaM conformance findings (06_telemetry/adam_conformance_report.md) symmetrically.
+.adam_label_spec <- local({
+  p <- Filter(file.exists, c("03_validation_r/adam_var_labels.csv", "adam_var_labels.csv"))
+  if (length(p)) utils::read.csv(p[[1]], stringsAsFactors = FALSE, colClasses = "character")
+  else data.frame(dataset = character(), variable = character(), label = character())
+})
+
 write_xpt_v <- function(.df, path, domain) {
+  sp <- .adam_label_spec[.adam_label_spec$dataset == toupper(domain), ]
+  for (i in seq_len(nrow(sp)))
+    if (sp$variable[i] %in% names(.df)) attr(.df[[sp$variable[i]]], "label") <- sp$label[i]
   withCallingHandlers(
     xportr::xportr_write(.df, path, domain = domain),
     warning = function(w) {

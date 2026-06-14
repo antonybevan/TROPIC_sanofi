@@ -1,0 +1,10 @@
+{
+  "files.exclude": {
+    "**/.core_engine": true,
+    "**/.core_venv": true
+  },
+  "search.exclude": {
+    "**/.core_engine": true,
+    "**/.core_venv": true
+  }
+}

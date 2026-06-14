@@ -4,6 +4,35 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.6.2] - 2026-06-14 — ADaM conformance remediation (129 findings → 0)
+
+> **Context.** With CORE shipping no ADaM rules and Pinnacle 21 Community 4.1.0 engine-expired under
+> this environment's clock (`06_telemetry/p21_adam_runrecord.md`), a transparent **ADaMIG v1.3-aligned
+> conformance gate** (`06_telemetry/run_adam_conformance.sh`) was built to run in-environment. Its
+> first pass returned **129 findings (116 Error, 13 Warning)** — real metadata-conformance gaps that
+> value-level `diffdf` reconciliation cannot see. This release fixes **all** of them.
+
+### Fixed — define.xml (`07_define_xml/define.xml`, still XSD-valid + 273 referential checks)
+- **Variable-name mismatches vs data:** ADLB `lbdy` → **`LBDY`**, ADRS `VISIT` → **`AVISIT`**.
+- **`CL.PARAMCD` completed:** added the **33** missing PARAMCD coded values (ADEX/ADLB/ADRS) with
+  real PARAM decodes — 14 → **47** terms; clears all "value not in codelist" errors.
+- **Lengths corrected:** ADCM `CMTRT` 100 → **200**, ADAE `AESEV` 2 → **10** (data no longer overflows).
+- **Metadata accuracy:** ADAE `CIAEDUR` label units **(Days) → (Months)** (matches the `/30.4375`
+  derivation); ADSL `DOCPROG` label shortened to ≤ 40 chars.
+
+### Fixed — variable labels applied symmetrically in **both** tracks (was the bulk: 109 findings)
+- ADaM datasets previously shipped almost unlabelled (ADSL 3/42 labelled). A single label spec is now
+  **generated from define.xml** (`06_telemetry/gen_adam_labels.py`) and applied in both tracks:
+  - **SAS production:** `%lbl_<ds>` macros (`02_production_sas/_adam_labels.sas`) applied in
+    `U_xpt_export.sas` before XPT export.
+  - **R validation:** `config_study.R::write_xpt_v` applies the same labels (`03_validation_r/adam_var_labels.csv`).
+  - Result: **155/155 variables labelled** in every `*_prod.xpt` and `*_v.xpt`.
+
+### Verified (real `oda` run)
+- **ADaM conformance gate: PASS — 0 Error / 0 Warning** (was 116/13); `06_telemetry/adam_conformance_report.md`.
+- Labels changed no values: **reconciliation still zero-diff** across all 7 domains; SAS log remains
+  **0 ERROR / 0 WARNING** (the label statements reference only existing variables); pipeline **GREEN**.
+
 ## [3.6.1] - 2026-06-14 — First verified real-ODA execution + literally-clean logs
 
 > **Verification scope (read first).** Unlike 3.6.0, this entry was produced by an **actual

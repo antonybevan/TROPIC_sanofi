@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <?xml-stylesheet type="text/xsl" href="define2-1.xsl"?>
-<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:def="http://www.cdisc.org/ns/def/v2.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:arm="http://www.cdisc.org/ns/arm/v1.0" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 http://schema.cdisc.org/define/v2.1/define2-1-0.xsd" ODMVersion="1.3.2" FileType="Snapshot" FileOID="TROPIC_ADAM_Metadata_v2.1" CreationDateTime="2026-06-12T21:52:12" AsOfDateTime="2026-06-14T10:04:20" Originator="Antony Bevan, Clinical Programming" def:Context="Submission"><Study OID="STDY.TROPIC">
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:def="http://www.cdisc.org/ns/def/v2.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:arm="http://www.cdisc.org/ns/arm/v1.0" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 http://schema.cdisc.org/define/v2.1/define2-1-0.xsd" ODMVersion="1.3.2" FileType="Snapshot" FileOID="TROPIC_ADAM_Metadata_v2.1" CreationDateTime="2026-06-12T21:52:12" AsOfDateTime="2026-06-14T14:56:29" Originator="Antony Bevan, Clinical Programming" def:Context="Submission"><Study OID="STDY.TROPIC">
     <GlobalVariables>
       <StudyName>TROPIC (EFC6193 / XRP6258)</StudyName>
       <StudyDescription>Cabazitaxel vs Mitoxantrone in mCRPC progressing after docetaxel (NCT00417079).</StudyDescription>
@@ -422,7 +422,7 @@
       <Description><TranslatedText xml:lang="en">Baseline Hemoglobin (g/dL)</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADSL.DOCPROG" Name="DOCPROG" DataType="text" Length="20">
-      <Description><TranslatedText xml:lang="en">Docetaxel Prior Progression Classification</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
+      <Description><TranslatedText xml:lang="en">Docetaxel Prior Progression Class</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADSL.DOCRESP" Name="DOCRESP" DataType="text" Length="1">
       <Description><TranslatedText xml:lang="en">Docetaxel Prior Response Flag</TranslatedText></Description><CodeListRef CodeListOID="CL.NY"/>
@@ -537,7 +537,7 @@
     <ItemDef OID="IT.ADCM.CMENDT" Name="CMENDT" DataType="date" Length="10">
       <Description><TranslatedText xml:lang="en">Analysis End Date</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
     </ItemDef>
-    <ItemDef OID="IT.ADCM.CMTRT" Name="CMTRT" DataType="text" Length="100">
+    <ItemDef OID="IT.ADCM.CMTRT" Name="CMTRT" DataType="text" Length="200">
       <Description><TranslatedText xml:lang="en">Reported Name of Drug, Med, or Therapy</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADCM.CMSTDY" Name="CMSTDY" DataType="float" Length="8">
@@ -589,7 +589,7 @@
     <ItemDef OID="IT.ADAE.AEHLT" Name="AEHLT" DataType="text" Length="100">
       <Description><TranslatedText xml:lang="en">High Level Term</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
     </ItemDef>
-    <ItemDef OID="IT.ADAE.AESEV" Name="AESEV" DataType="text" Length="2">
+    <ItemDef OID="IT.ADAE.AESEV" Name="AESEV" DataType="text" Length="10">
       <Description><TranslatedText xml:lang="en">Severity/Intensity</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADAE.ATOXGR" Name="ATOXGR" DataType="float" Length="8">
@@ -633,7 +633,7 @@
       <Description><TranslatedText xml:lang="en">Custom Episode End Date</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADAE.CIAEDUR" Name="CIAEDUR" DataType="float" Length="8">
-      <Description><TranslatedText xml:lang="en">Custom Episode Duration (Days)</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
+      <Description><TranslatedText xml:lang="en">Custom Episode Duration (Months)</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADAE.AEOCCFL" Name="AEOCCFL" DataType="text" Length="1">
       <Description><TranslatedText xml:lang="en">Adverse Event Occurrence Flag</TranslatedText></Description><CodeListRef CodeListOID="CL.NY"/>
@@ -735,7 +735,7 @@
       <Description><TranslatedText xml:lang="en">Baseline Record Flag</TranslatedText></Description><CodeListRef CodeListOID="CL.NY"/>
       <def:Origin Type="Derived" Source="Sponsor"/>
     </ItemDef>
-    <ItemDef OID="IT.ADLB.LBDY" Name="lbdy" DataType="float" Length="8">
+    <ItemDef OID="IT.ADLB.LBDY" Name="LBDY" DataType="float" Length="8">
       <Description><TranslatedText xml:lang="en">Analysis Day</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADRS.STUDYID" Name="STUDYID" DataType="text" Length="40">
@@ -770,7 +770,7 @@
     <ItemDef OID="IT.ADRS.ADY" Name="ADY" DataType="float" Length="8">
       <Description><TranslatedText xml:lang="en">Analysis Day</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
     </ItemDef>
-    <ItemDef OID="IT.ADRS.VISIT" Name="VISIT" DataType="text" Length="40">
+    <ItemDef OID="IT.ADRS.VISIT" Name="AVISIT" DataType="text" Length="40">
       <Description><TranslatedText xml:lang="en">Analysis Visit</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADRS.ANL01FL" Name="ANL01FL" DataType="text" Length="1">
@@ -1008,7 +1008,172 @@
           <TranslatedText xml:lang="en">Time to First Serious Adverse Event</TranslatedText>
         </Decode>
       </CodeListItem>
-    </CodeList>
+          <CodeListItem CodedValue="ALP">
+        <Decode>
+          <TranslatedText xml:lang="en">ALKALINE PHOSPHATASE</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="ALT">
+        <Decode>
+          <TranslatedText xml:lang="en">ALANINE AMINOTRANSFERASE</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="AST">
+        <Decode>
+          <TranslatedText xml:lang="en">ASPARTATE AMINOTRANSFERASE</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="BASO">
+        <Decode>
+          <TranslatedText xml:lang="en">BASOPHILS</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="BESTRESP">
+        <Decode>
+          <TranslatedText xml:lang="en">Best Overall Response (BOR)</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="BICARB">
+        <Decode>
+          <TranslatedText xml:lang="en">BICARBONATE</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="BILI">
+        <Decode>
+          <TranslatedText xml:lang="en">BILIRUBIN</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="BUN">
+        <Decode>
+          <TranslatedText xml:lang="en">BLOOD UREA NITROGEN</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="CL">
+        <Decode>
+          <TranslatedText xml:lang="en">CHLORIDE</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="CREAT">
+        <Decode>
+          <TranslatedText xml:lang="en">CREATININE</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="CUMDOSE">
+        <Decode>
+          <TranslatedText xml:lang="en">Cumulative Actual Dose (mg/m2)</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="EOS">
+        <Decode>
+          <TranslatedText xml:lang="en">EOSINOPHILS</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="GLUC">
+        <Decode>
+          <TranslatedText xml:lang="en">GLUCOSE</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="HGB">
+        <Decode>
+          <TranslatedText xml:lang="en">HEMOGLOBIN</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="K">
+        <Decode>
+          <TranslatedText xml:lang="en">POTASSIUM</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="LYM">
+        <Decode>
+          <TranslatedText xml:lang="en">LYMPHOCYTES</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="MONO">
+        <Decode>
+          <TranslatedText xml:lang="en">MONOCYTES</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="NCYCLE">
+        <Decode>
+          <TranslatedText xml:lang="en">Number of Cycles Received</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="NDELDOSE">
+        <Decode>
+          <TranslatedText xml:lang="en">Number of Dose Delays</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="NEUT">
+        <Decode>
+          <TranslatedText xml:lang="en">NEUTROPHILS</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="OBJRESP">
+        <Decode>
+          <TranslatedText xml:lang="en">Objective Response (CR or PR)</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="OVRLRESP">
+        <Decode>
+          <TranslatedText xml:lang="en">Overall Response per RECIST v1.0</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="PLAT">
+        <Decode>
+          <TranslatedText xml:lang="en">PLATELETS</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="PLDOSE">
+        <Decode>
+          <TranslatedText xml:lang="en">Planned Dose (mg/m2)</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="PSA">
+        <Decode>
+          <TranslatedText xml:lang="en">PROSTATE SPECIFIC ANTIGEN</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="PSARESP">
+        <Decode>
+          <TranslatedText xml:lang="en">PSA Response (>=50% decline)</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="PSPROG">
+        <Decode>
+          <TranslatedText xml:lang="en">PSA Progression (PCWG3)</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="RBC">
+        <Decode>
+          <TranslatedText xml:lang="en">ERYTHROCYTES</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="SODIUM">
+        <Decode>
+          <TranslatedText xml:lang="en">SODIUM</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="TESTO">
+        <Decode>
+          <TranslatedText xml:lang="en">TESTOSTERONE</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="TESTOFR">
+        <Decode>
+          <TranslatedText xml:lang="en">TESTOSTERONE, FREE</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="UREA">
+        <Decode>
+          <TranslatedText xml:lang="en">UREA</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="WBC">
+        <Decode>
+          <TranslatedText xml:lang="en">LEUKOCYTES</TranslatedText>
+        </Decode>
+      </CodeListItem>
+</CodeList>
     <MethodDef OID="MT.TRTSDT" Name="Method for TRTSDT" Type="Computation">
       <Description>
         <TranslatedText xml:lang="en">Date of first exposure to treatment, derived as the minimum of EXSTDTC from the EX SDTM dataset.</TranslatedText>
