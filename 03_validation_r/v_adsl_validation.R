@@ -145,8 +145,8 @@ adsl <- dm %>%
     # Baseline clinical covariates — defaults from config_study.R §6.3.
     # Each imputation flag (*IF) is computed BEFORE its coalesce so it captures
     # whether the on-file value was missing — mirroring A_adsl_generation.sas
-    # `case when missing(...)`. ALBBL/LDHBL are non-collected placeholder
-    # constants, so their flags are constant "Y".
+    # `case when missing(...)`. ALBBL/LDHBL are not collected in this trial and
+    # are set to missing (imputation flags are blank).
     ECOGBLIF = if_else(is.na(ECOGBL), "Y", "N"),
     ECOGBL = coalesce(ECOGBL, .env$ECOGBL_DEFAULT),
     MEASDISF = coalesce(MEASDISF, "N"),

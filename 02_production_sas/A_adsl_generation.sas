@@ -235,8 +235,7 @@ proc sql;
         /* Baseline clinical covariates — defaults from config §6.3.
            Each imputed covariate carries a companion *IF flag ('Y' = value was
            imputed because none was on file; 'N' = observed). ALBBL/LDHBL are
-           non-collected placeholder constants, so their flags are constant 'Y'.
-           The R validation track derives these flags identically (pre-coalesce). */
+           not collected in this trial and are set to missing (imputation flags are blank). */
         coalesce(ecog.ecogbl, &ECOGBL_DEFAULT.) as ECOGBL,
         case when missing(ecog.ecogbl) then 'Y' else 'N' end as ECOGBLIF length=1,
         coalesce(meas.measdisf, 'N') as MEASDISF length=1,

@@ -162,17 +162,19 @@ TROPIC/
 │
 └── 09_tfl/                         # Tables, Figures & Listings
     ├── tfl_generation.R            # Full TFL compilation script
-    └── output/                     # 10 rendered outputs (7 figures, 3 tables)
-        ├── F-01-1_CONSORT_Disposition.png
-        ├── F-11-1_KM_OS.png
-        ├── F-11-2_KM_PFS.png
-        ├── F-12-1_Subgroup_Forest.png
-        ├── F-13-1_PSA_Waterfall.png
-        ├── F-14-1_Swimmer_Plot.png
-        ├── F-17-1_Optimus_Scatter.png
-        ├── T-11-Efficacy_Tables.txt
-        ├── T-20-AE_Summary_Tables.txt
-        └── T-21-Lab_Shift_Tables.txt
+    └── output/                     # Organized TFL outputs
+        ├── figures/                # Figures (R and SAS)
+        │   ├── F-01-1_CONSORT_Disposition.png
+        │   ├── F-11-1_KM_OS.png
+        │   ├── F-11-2_KM_PFS.png
+        │   ├── F-12-1_Subgroup_Forest.png
+        │   ├── F-13-1_PSA_Waterfall.png
+        │   ├── F-14-1_Swimmer_Plot.png
+        │   ├── F-17-1_Optimus_Scatter.png
+        │   └── sas/                # SAS-generated figures (OS/PFS/subgroup/Optimus)
+        ├── tables/                 # Efficacy/safety text tables (T-11, T-20, T-21)
+        └── listings/               # Subject listings (L-01-1)
+
 ```
 
 ---
