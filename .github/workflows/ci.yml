@@ -59,3 +59,10 @@ jobs:
     - name: Run ADaM conformance check gate
       run: |
         bash 06_telemetry/run_adam_conformance.sh
+
+    - name: Validate Define-XML Metadata (ADaM & SDTM)
+      run: |
+        bash 07_define_xml/validate_xsd.sh 07_define_xml/define.xml
+        bash 07_define_xml/validate_xsd.sh 07_define_xml/define_sdtm.xml
+        python3 07_define_xml/validate_define.py 07_define_xml/define.xml
+        python3 07_define_xml/validate_define.py 07_define_xml/define_sdtm.xml

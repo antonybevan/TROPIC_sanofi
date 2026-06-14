@@ -1,1272 +1,2209 @@
-<?xml version='1.0' encoding='utf-8'?>
-<?xml-stylesheet type="text/xsl" href="define2-1.xsl"?>
-<Define xmlns="http://www.cdisc.org/ns/def/v2.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.cdisc.org/ns/def/v2.1 http://schema.cdisc.org/define/v2.1/define2-1-0.xsd" FileOID="TROPIC_SDTM_Metadata_v2.1" AsOfDateTime="2026-06-12T21:49:25" DefineVersion="2.1.0" Originator="Antony Bevan, Clinical Programming">
-
-  <MetaDataVersion OID="MDV.TROPIC_NCT00417079.SDTM.3.1.1" Name="TROPIC Trial SDTM Metadata Specification" Description="Metadata specification for TROPIC Phase III re-analysis SDTM datasets" CDISCLibraryID="SDTMIG.3.1.1" CDISCLibraryVersion="3.1.1">
-
-    <ItemGroupDef OID="IG.DM" Name="DM" Repeating="No" IsReferenceData="No" Purpose="Tabulation" Role="Demographics" Structure="One record per subject" Label="Demographics">
-      <Description>Demographics domain for the TROPIC trial datasets.</Description>
-      <ItemRef ItemOID="IT.DM.AGEGRP" Order="1" Mandatory="No" />
-      <ItemRef ItemOID="IT.DM.STUDYID" Order="2" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.DM.DOMAIN" Order="3" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.DM.USUBJID" Order="4" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.DM.SUBJID" Order="5" Mandatory="No" />
-      <ItemRef ItemOID="IT.DM.RFSTDTC" Order="6" Mandatory="No" />
-      <ItemRef ItemOID="IT.DM.RFENDTC" Order="7" Mandatory="No" />
-      <ItemRef ItemOID="IT.DM.AGEU" Order="8" Mandatory="No" />
-      <ItemRef ItemOID="IT.DM.SEX" Order="9" Mandatory="No" />
-      <ItemRef ItemOID="IT.DM.RACE" Order="10" Mandatory="No" />
-      <ItemRef ItemOID="IT.DM.ARM" Order="11" Mandatory="No" />
-      <ItemRef ItemOID="IT.DM.ARMCD" Order="12" Mandatory="No" />
-      <ItemRef ItemOID="IT.DM.ARM2" Order="13" Mandatory="No" />
-      <ItemRef ItemOID="IT.DM.ARMA" Order="14" Mandatory="No" />
-      <ItemRef ItemOID="IT.DM.ARMCD2" Order="15" Mandatory="No" />
-      <ItemRef ItemOID="IT.DM.BSABL" Order="16" Mandatory="No" />
-      <ItemRef ItemOID="IT.DM.ITT" Order="17" Mandatory="No" />
-      <ItemRef ItemOID="IT.DM.PPROT" Order="18" Mandatory="No" />
-      <ItemRef ItemOID="IT.DM.SAFETY" Order="19" Mandatory="No" />
-    </ItemGroupDef>
-
-    <ItemGroupDef OID="IG.AE" Name="AE" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Adverse Events" Structure="One record per subject per adverse event" Label="Adverse Events">
-      <Description>Adverse Events domain for the TROPIC trial datasets.</Description>
-      <ItemRef ItemOID="IT.AE.AESTWKF" Order="1" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AEENWKF" Order="2" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.USUBJID" Order="3" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.AE.STUDYID" Order="4" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.AE.DOMAIN" Order="5" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.AE.AESEQ" Order="6" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AESPID" Order="7" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AEREFID" Order="8" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AETERM" Order="9" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AEDECOD" Order="10" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AEBODSYS" Order="11" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AESER" Order="12" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AEACN" Order="13" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AECONTRT" Order="14" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AEREL" Order="15" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AEPATT" Order="16" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AEOUT" Order="17" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AESCONG" Order="18" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AESDISAB" Order="19" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AESDTH" Order="20" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AESHOSP" Order="21" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AESLIFE" Order="22" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AESMIE" Order="23" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AETOXGR" Order="24" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.VISITNUM" Order="25" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.VISIT" Order="26" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AESTWK" Order="27" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AEENWK" Order="28" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.SUBJID" Order="29" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AECOLGR" Order="30" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AECOLGRN" Order="31" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AEDICTVS" Order="32" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AEHLGT" Order="33" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AEHLT" Order="34" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AELLT" Order="35" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AEOVISIT" Order="36" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AETOXGRN" Order="37" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AETRTEM" Order="38" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AEREFER" Order="39" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AEDTHDTC" Order="40" Mandatory="No" />
-      <ItemRef ItemOID="IT.AE.AESEQUCM" Order="41" Mandatory="No" />
-    </ItemGroupDef>
-
-    <ItemGroupDef OID="IG.EX" Name="EX" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Exposure" Structure="One record per subject per constant exposure cycle" Label="Exposure">
-      <Description>Exposure domain for the TROPIC trial datasets.</Description>
-      <ItemRef ItemOID="IT.EX.STUDYID" Order="1" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.EX.DOMAIN" Order="2" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.EX.USUBJID" Order="3" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.EX.EXSEQ" Order="4" Mandatory="No" />
-      <ItemRef ItemOID="IT.EX.EXTRT" Order="5" Mandatory="No" />
-      <ItemRef ItemOID="IT.EX.EXLOT" Order="6" Mandatory="No" />
-      <ItemRef ItemOID="IT.EX.EXDOSE" Order="7" Mandatory="No" />
-      <ItemRef ItemOID="IT.EX.EXDOSU" Order="8" Mandatory="No" />
-      <ItemRef ItemOID="IT.EX.EXDOSFRM" Order="9" Mandatory="No" />
-      <ItemRef ItemOID="IT.EX.EXROUTE" Order="10" Mandatory="No" />
-      <ItemRef ItemOID="IT.EX.VISITNUM" Order="11" Mandatory="No" />
-      <ItemRef ItemOID="IT.EX.VISIT" Order="12" Mandatory="No" />
-      <ItemRef ItemOID="IT.EX.EXSTDTC" Order="13" Mandatory="No" />
-      <ItemRef ItemOID="IT.EX.EXSTDY" Order="14" Mandatory="No" />
-      <ItemRef ItemOID="IT.EX.EXENDTC" Order="15" Mandatory="No" />
-      <ItemRef ItemOID="IT.EX.SUBJID" Order="16" Mandatory="No" />
-      <ItemRef ItemOID="IT.EX.EXPDOSE" Order="17" Mandatory="No" />
-      <ItemRef ItemOID="IT.EX.EXPDOSU" Order="18" Mandatory="No" />
-      <ItemRef ItemOID="IT.EX.EXCUMD" Order="19" Mandatory="No" />
-      <ItemRef ItemOID="IT.EX.EXCUMD2" Order="20" Mandatory="No" />
-      <ItemRef ItemOID="IT.EX.EXDOSE2" Order="21" Mandatory="No" />
-      <ItemRef ItemOID="IT.EX.EXPDOSE2" Order="22" Mandatory="No" />
-      <ItemRef ItemOID="IT.EX.EXTINT" Order="23" Mandatory="No" />
-      <ItemRef ItemOID="IT.EX.EXTRINT" Order="24" Mandatory="No" />
-      <ItemRef ItemOID="IT.EX.EXDSREA" Order="25" Mandatory="No" />
-      <ItemRef ItemOID="IT.EX.EXDELAY" Order="26" Mandatory="No" />
-      <ItemRef ItemOID="IT.EX.EXDSRCM" Order="27" Mandatory="No" />
-      <ItemRef ItemOID="IT.EX.ENDTCOL" Order="28" Mandatory="No" />
-    </ItemGroupDef>
-
-    <ItemGroupDef OID="IG.CM" Name="CM" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Concomitant Medications" Structure="One record per subject per medication" Label="Concomitant Medications">
-      <Description>Concomitant Medications domain for the TROPIC trial datasets.</Description>
-      <ItemRef ItemOID="IT.CM.STUDYID" Order="1" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.CM.DOMAIN" Order="2" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.CM.USUBJID" Order="3" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.CM.CMSEQ" Order="4" Mandatory="No" />
-      <ItemRef ItemOID="IT.CM.CMTRT" Order="5" Mandatory="No" />
-      <ItemRef ItemOID="IT.CM.CMDECOD" Order="6" Mandatory="No" />
-      <ItemRef ItemOID="IT.CM.CMCAT" Order="7" Mandatory="No" />
-      <ItemRef ItemOID="IT.CM.CMINDC" Order="8" Mandatory="No" />
-      <ItemRef ItemOID="IT.CM.CMDOSE" Order="9" Mandatory="No" />
-      <ItemRef ItemOID="IT.CM.CMDOSU" Order="10" Mandatory="No" />
-      <ItemRef ItemOID="IT.CM.CMDOSRGM" Order="11" Mandatory="No" />
-      <ItemRef ItemOID="IT.CM.VISITNUM" Order="12" Mandatory="No" />
-      <ItemRef ItemOID="IT.CM.VISIT" Order="13" Mandatory="No" />
-      <ItemRef ItemOID="IT.CM.CMSTDTC" Order="14" Mandatory="No" />
-      <ItemRef ItemOID="IT.CM.CMSTDY" Order="15" Mandatory="No" />
-      <ItemRef ItemOID="IT.CM.CMENDTC" Order="16" Mandatory="No" />
-      <ItemRef ItemOID="IT.CM.CMENDY" Order="17" Mandatory="No" />
-      <ItemRef ItemOID="IT.CM.SUBJID" Order="18" Mandatory="No" />
-      <ItemRef ItemOID="IT.CM.CMATCL1" Order="19" Mandatory="No" />
-      <ItemRef ItemOID="IT.CM.CMATCL2" Order="20" Mandatory="No" />
-      <ItemRef ItemOID="IT.CM.CMATCSEL" Order="21" Mandatory="No" />
-      <ItemRef ItemOID="IT.CM.CMONGB" Order="22" Mandatory="No" />
-      <ItemRef ItemOID="IT.CM.CMONGO" Order="23" Mandatory="No" />
-      <ItemRef ItemOID="IT.CM.CMLOC" Order="24" Mandatory="No" />
-      <ItemRef ItemOID="IT.CM.CMENDRCM" Order="25" Mandatory="No" />
-      <ItemRef ItemOID="IT.CM.CMRLTL" Order="26" Mandatory="No" />
-      <ItemRef ItemOID="IT.CM.CMRSON" Order="27" Mandatory="No" />
-      <ItemRef ItemOID="IT.CM.CMPRGDTC" Order="28" Mandatory="No" />
-    </ItemGroupDef>
-
-    <ItemGroupDef OID="IG.LB" Name="LB" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Laboratory Test Results" Structure="One record per subject per laboratory test per visit" Label="Laboratory Test Results">
-      <Description>Laboratory Test Results domain for the TROPIC trial datasets.</Description>
-      <ItemRef ItemOID="IT.LB.STUDYID" Order="1" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.LB.DOMAIN" Order="2" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.LB.USUBJID" Order="3" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.LB.LBSEQ" Order="4" Mandatory="No" />
-      <ItemRef ItemOID="IT.LB.LBTESTCD" Order="5" Mandatory="No" />
-      <ItemRef ItemOID="IT.LB.LBTEST" Order="6" Mandatory="No" />
-      <ItemRef ItemOID="IT.LB.LBCAT" Order="7" Mandatory="No" />
-      <ItemRef ItemOID="IT.LB.LBSCAT" Order="8" Mandatory="No" />
-      <ItemRef ItemOID="IT.LB.LBORRES" Order="9" Mandatory="No" />
-      <ItemRef ItemOID="IT.LB.LBORRESU" Order="10" Mandatory="No" />
-      <ItemRef ItemOID="IT.LB.LBORNRLO" Order="11" Mandatory="No" />
-      <ItemRef ItemOID="IT.LB.LBORNRHI" Order="12" Mandatory="No" />
-      <ItemRef ItemOID="IT.LB.LBSTRESC" Order="13" Mandatory="No" />
-      <ItemRef ItemOID="IT.LB.LBSTRESN" Order="14" Mandatory="No" />
-      <ItemRef ItemOID="IT.LB.LBSTRESU" Order="15" Mandatory="No" />
-      <ItemRef ItemOID="IT.LB.LBSTNRLO" Order="16" Mandatory="No" />
-      <ItemRef ItemOID="IT.LB.LBSTNRHI" Order="17" Mandatory="No" />
-      <ItemRef ItemOID="IT.LB.LBNRIND" Order="18" Mandatory="No" />
-      <ItemRef ItemOID="IT.LB.LBSTAT" Order="19" Mandatory="No" />
-      <ItemRef ItemOID="IT.LB.LBTOX" Order="20" Mandatory="No" />
-      <ItemRef ItemOID="IT.LB.LBTOXGR" Order="21" Mandatory="No" />
-      <ItemRef ItemOID="IT.LB.LBBLFL" Order="22" Mandatory="No" />
-      <ItemRef ItemOID="IT.LB.VISITNUM" Order="23" Mandatory="No" />
-      <ItemRef ItemOID="IT.LB.VISIT" Order="24" Mandatory="No" />
-      <ItemRef ItemOID="IT.LB.LBDTC" Order="25" Mandatory="No" />
-      <ItemRef ItemOID="IT.LB.LBDY" Order="26" Mandatory="No" />
-      <ItemRef ItemOID="IT.LB.SUBJID" Order="27" Mandatory="No" />
-      <ItemRef ItemOID="IT.LB.LBOVISIT" Order="28" Mandatory="No" />
-    </ItemGroupDef>
-
-    <ItemGroupDef OID="IG.DS" Name="DS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Disposition" Structure="One record per subject per disposition event" Label="Disposition">
-      <Description>Disposition domain for the TROPIC trial datasets.</Description>
-      <ItemRef ItemOID="IT.DS.DSSTWKF" Order="1" Mandatory="No" />
-      <ItemRef ItemOID="IT.DS.USUBJID" Order="2" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.DS.STUDYID" Order="3" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.DS.DOMAIN" Order="4" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.DS.DSSEQ" Order="5" Mandatory="No" />
-      <ItemRef ItemOID="IT.DS.DSTERM" Order="6" Mandatory="No" />
-      <ItemRef ItemOID="IT.DS.DSDECOD" Order="7" Mandatory="No" />
-      <ItemRef ItemOID="IT.DS.DSCAT" Order="8" Mandatory="No" />
-      <ItemRef ItemOID="IT.DS.DSSCAT" Order="9" Mandatory="No" />
-      <ItemRef ItemOID="IT.DS.EPOCH" Order="10" Mandatory="No" />
-      <ItemRef ItemOID="IT.DS.VISITNUM" Order="11" Mandatory="No" />
-      <ItemRef ItemOID="IT.DS.VISIT" Order="12" Mandatory="No" />
-      <ItemRef ItemOID="IT.DS.DSSTWK" Order="13" Mandatory="No" />
-      <ItemRef ItemOID="IT.DS.SUBJID" Order="14" Mandatory="No" />
-      <ItemRef ItemOID="IT.DS.DSPROG" Order="15" Mandatory="No" />
-    </ItemGroupDef>
-
-    <ItemGroupDef OID="IG.VS" Name="VS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Vital Signs" Structure="One record per subject per vital sign measurement per visit" Label="Vital Signs">
-      <Description>Vital Signs domain for the TROPIC trial datasets.</Description>
-      <ItemRef ItemOID="IT.VS.STUDYID" Order="1" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.VS.DOMAIN" Order="2" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.VS.USUBJID" Order="3" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.VS.VSSEQ" Order="4" Mandatory="No" />
-      <ItemRef ItemOID="IT.VS.VSTESTCD" Order="5" Mandatory="No" />
-      <ItemRef ItemOID="IT.VS.VSTEST" Order="6" Mandatory="No" />
-      <ItemRef ItemOID="IT.VS.VSORRES" Order="7" Mandatory="No" />
-      <ItemRef ItemOID="IT.VS.VSORRESU" Order="8" Mandatory="No" />
-      <ItemRef ItemOID="IT.VS.VSSTRESC" Order="9" Mandatory="No" />
-      <ItemRef ItemOID="IT.VS.VSSTRESN" Order="10" Mandatory="No" />
-      <ItemRef ItemOID="IT.VS.VSSTRESU" Order="11" Mandatory="No" />
-      <ItemRef ItemOID="IT.VS.VSMETHOD" Order="12" Mandatory="No" />
-      <ItemRef ItemOID="IT.VS.VSBLFL" Order="13" Mandatory="No" />
-      <ItemRef ItemOID="IT.VS.VSDRVFL" Order="14" Mandatory="No" />
-      <ItemRef ItemOID="IT.VS.VISITNUM" Order="15" Mandatory="No" />
-      <ItemRef ItemOID="IT.VS.VISIT" Order="16" Mandatory="No" />
-      <ItemRef ItemOID="IT.VS.VSDTC" Order="17" Mandatory="No" />
-      <ItemRef ItemOID="IT.VS.VSDY" Order="18" Mandatory="No" />
-      <ItemRef ItemOID="IT.VS.SUBJID" Order="19" Mandatory="No" />
-    </ItemGroupDef>
-
-    <ItemGroupDef OID="IG.LS" Name="LS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Lesion Assessment" Structure="One record per subject per lesion per assessment visit" Label="Lesion Assessment">
-      <Description>Lesion Assessment domain for the TROPIC trial datasets.</Description>
-      <ItemRef ItemOID="IT.LS.STUDYID" Order="1" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.LS.DOMAIN" Order="2" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.LS.USUBJID" Order="3" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.LS.LSSEQ" Order="4" Mandatory="No" />
-      <ItemRef ItemOID="IT.LS.LSSPID" Order="5" Mandatory="No" />
-      <ItemRef ItemOID="IT.LS.LSTESTCD" Order="6" Mandatory="No" />
-      <ItemRef ItemOID="IT.LS.LSTEST" Order="7" Mandatory="No" />
-      <ItemRef ItemOID="IT.LS.LSCAT" Order="8" Mandatory="No" />
-      <ItemRef ItemOID="IT.LS.LSLOC" Order="9" Mandatory="No" />
-      <ItemRef ItemOID="IT.LS.LSORRES" Order="10" Mandatory="No" />
-      <ItemRef ItemOID="IT.LS.LSORRESU" Order="11" Mandatory="No" />
-      <ItemRef ItemOID="IT.LS.LSSTRESC" Order="12" Mandatory="No" />
-      <ItemRef ItemOID="IT.LS.LSSTRESN" Order="13" Mandatory="No" />
-      <ItemRef ItemOID="IT.LS.LSSTRESU" Order="14" Mandatory="No" />
-      <ItemRef ItemOID="IT.LS.LSMETHOD" Order="15" Mandatory="No" />
-      <ItemRef ItemOID="IT.LS.LSSTAT" Order="16" Mandatory="No" />
-      <ItemRef ItemOID="IT.LS.LSBLFL" Order="17" Mandatory="No" />
-      <ItemRef ItemOID="IT.LS.VISITNUM" Order="18" Mandatory="No" />
-      <ItemRef ItemOID="IT.LS.VISIT" Order="19" Mandatory="No" />
-      <ItemRef ItemOID="IT.LS.LSDTC" Order="20" Mandatory="No" />
-      <ItemRef ItemOID="IT.LS.SUBJID" Order="21" Mandatory="No" />
-      <ItemRef ItemOID="IT.LS.LSSLOC" Order="22" Mandatory="No" />
-    </ItemGroupDef>
-
-    <ItemGroupDef OID="IG.PN" Name="PN" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Pain Assessment" Structure="One record per subject per pain assessment per visit" Label="Pain Assessment">
-      <Description>Pain Assessment domain for the TROPIC trial datasets.</Description>
-      <ItemRef ItemOID="IT.PN.STUDYID" Order="1" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.PN.DOMAIN" Order="2" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.PN.USUBJID" Order="3" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.PN.PNSEQ" Order="4" Mandatory="No" />
-      <ItemRef ItemOID="IT.PN.PNSPID" Order="5" Mandatory="No" />
-      <ItemRef ItemOID="IT.PN.PNTESTCD" Order="6" Mandatory="No" />
-      <ItemRef ItemOID="IT.PN.PNTEST" Order="7" Mandatory="No" />
-      <ItemRef ItemOID="IT.PN.PNCAT" Order="8" Mandatory="No" />
-      <ItemRef ItemOID="IT.PN.PNORRES" Order="9" Mandatory="No" />
-      <ItemRef ItemOID="IT.PN.PNORRESU" Order="10" Mandatory="No" />
-      <ItemRef ItemOID="IT.PN.PNSTRESC" Order="11" Mandatory="No" />
-      <ItemRef ItemOID="IT.PN.PNSTRESN" Order="12" Mandatory="No" />
-      <ItemRef ItemOID="IT.PN.PNSTRESU" Order="13" Mandatory="No" />
-      <ItemRef ItemOID="IT.PN.PNSTAT" Order="14" Mandatory="No" />
-      <ItemRef ItemOID="IT.PN.VISITNUM" Order="15" Mandatory="No" />
-      <ItemRef ItemOID="IT.PN.VISIT" Order="16" Mandatory="No" />
-      <ItemRef ItemOID="IT.PN.PNDTC" Order="17" Mandatory="No" />
-      <ItemRef ItemOID="IT.PN.SUBJID" Order="18" Mandatory="No" />
-    </ItemGroupDef>
-
-    <ItemGroupDef OID="IG.SUPPDM" Name="SUPPDM" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Relationship" Structure="One record per subject per supplemental qualifier" Label="Supplemental Demographics">
-      <Description>Supplemental Demographics domain for the TROPIC trial datasets.</Description>
-      <ItemRef ItemOID="IT.SUPPDM.STUDYID" Order="1" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.SUPPDM.RDOMAIN" Order="2" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPDM.USUBJID" Order="3" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.SUPPDM.IDVAR" Order="4" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPDM.IDVARVAL" Order="5" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPDM.QNAM" Order="6" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPDM.QLABEL" Order="7" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPDM.QVAL" Order="8" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPDM.QORIG" Order="9" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPDM.QEVAL" Order="10" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPDM.SUBJID" Order="11" Mandatory="No" />
-    </ItemGroupDef>
-
-    <ItemGroupDef OID="IG.SUPPAE" Name="SUPPAE" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Relationship" Structure="One record per subject per adverse event per supplemental qualifier" Label="Supplemental Adverse Events">
-      <Description>Supplemental Adverse Events domain for the TROPIC trial datasets.</Description>
-      <ItemRef ItemOID="IT.SUPPAE.STUDYID" Order="1" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.SUPPAE.RDOMAIN" Order="2" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPAE.USUBJID" Order="3" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.SUPPAE.IDVAR" Order="4" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPAE.IDVARVAL" Order="5" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPAE.QNAM" Order="6" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPAE.QLABEL" Order="7" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPAE.QVAL" Order="8" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPAE.QORIG" Order="9" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPAE.QEVAL" Order="10" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPAE.SUBJID" Order="11" Mandatory="No" />
-    </ItemGroupDef>
-
-    <ItemGroupDef OID="IG.SUPPEX" Name="SUPPEX" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Relationship" Structure="One record per subject per exposure cycle per supplemental qualifier" Label="Supplemental Exposure">
-      <Description>Supplemental Exposure domain for the TROPIC trial datasets.</Description>
-      <ItemRef ItemOID="IT.SUPPEX.STUDYID" Order="1" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.SUPPEX.RDOMAIN" Order="2" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPEX.USUBJID" Order="3" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.SUPPEX.IDVAR" Order="4" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPEX.IDVARVAL" Order="5" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPEX.QNAM" Order="6" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPEX.QLABEL" Order="7" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPEX.QVAL" Order="8" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPEX.QORIG" Order="9" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPEX.QEVAL" Order="10" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPEX.SUBJID" Order="11" Mandatory="No" />
-    </ItemGroupDef>
-
-    <ItemGroupDef OID="IG.SUPPCM" Name="SUPPCM" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Relationship" Structure="One record per subject per medication per supplemental qualifier" Label="Supplemental Concomitant Medications">
-      <Description>Supplemental Concomitant Medications domain for the TROPIC trial datasets.</Description>
-      <ItemRef ItemOID="IT.SUPPCM.STUDYID" Order="1" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.SUPPCM.RDOMAIN" Order="2" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPCM.USUBJID" Order="3" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.SUPPCM.IDVAR" Order="4" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPCM.IDVARVAL" Order="5" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPCM.QNAM" Order="6" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPCM.QLABEL" Order="7" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPCM.QVAL" Order="8" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPCM.QORIG" Order="9" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPCM.QEVAL" Order="10" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPCM.SUBJID" Order="11" Mandatory="No" />
-    </ItemGroupDef>
-
-    <ItemGroupDef OID="IG.SUPPLB" Name="SUPPLB" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Relationship" Structure="One record per subject per laboratory test per supplemental qualifier" Label="Supplemental Laboratory Test Results">
-      <Description>Supplemental Laboratory Test Results domain for the TROPIC trial datasets.</Description>
-      <ItemRef ItemOID="IT.SUPPLB.STUDYID" Order="1" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.SUPPLB.RDOMAIN" Order="2" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPLB.USUBJID" Order="3" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.SUPPLB.IDVAR" Order="4" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPLB.IDVARVAL" Order="5" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPLB.QNAM" Order="6" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPLB.QLABEL" Order="7" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPLB.QVAL" Order="8" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPLB.QORIG" Order="9" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPLB.QEVAL" Order="10" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPLB.SUBJID" Order="11" Mandatory="No" />
-    </ItemGroupDef>
-
-    <ItemGroupDef OID="IG.SUPPDS" Name="SUPPDS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Relationship" Structure="One record per subject per disposition event per supplemental qualifier" Label="Supplemental Disposition">
-      <Description>Supplemental Disposition domain for the TROPIC trial datasets.</Description>
-      <ItemRef ItemOID="IT.SUPPDS.STUDYID" Order="1" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.SUPPDS.RDOMAIN" Order="2" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPDS.USUBJID" Order="3" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.SUPPDS.IDVAR" Order="4" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPDS.IDVARVAL" Order="5" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPDS.QNAM" Order="6" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPDS.QLABEL" Order="7" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPDS.QVAL" Order="8" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPDS.QORIG" Order="9" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPDS.QEVAL" Order="10" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPDS.SUBJID" Order="11" Mandatory="No" />
-    </ItemGroupDef>
-
-    <ItemGroupDef OID="IG.SUPPLS" Name="SUPPLS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Relationship" Structure="One record per subject per lesion per supplemental qualifier" Label="Supplemental Lesion Assessment">
-      <Description>Supplemental Lesion Assessment domain for the TROPIC trial datasets.</Description>
-      <ItemRef ItemOID="IT.SUPPLS.STUDYID" Order="1" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.SUPPLS.RDOMAIN" Order="2" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPLS.USUBJID" Order="3" Mandatory="Yes" />
-      <ItemRef ItemOID="IT.SUPPLS.IDVAR" Order="4" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPLS.IDVARVAL" Order="5" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPLS.QNAM" Order="6" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPLS.QLABEL" Order="7" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPLS.QVAL" Order="8" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPLS.QORIG" Order="9" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPLS.QEVAL" Order="10" Mandatory="No" />
-      <ItemRef ItemOID="IT.SUPPLS.SUBJID" Order="11" Mandatory="No" />
-    </ItemGroupDef>
-
-    <!-- ========================================================================= -->
-    <!-- Item Definitions                                                          -->
-    <!-- ========================================================================= -->
-
-    <ItemDef OID="IT.DM.AGEGRP" Name="AGEGRP" DataType="text" Length="100" Label="AGEGRP Variable for domain DM">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DM.STUDYID" Name="STUDYID" DataType="text" Length="40" Label="Study Identifier">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DM.DOMAIN" Name="DOMAIN" DataType="text" Length="4" Label="Domain Abbreviation">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DM.USUBJID" Name="USUBJID" DataType="text" Length="40" Label="Unique Subject Identifier">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DM.SUBJID" Name="SUBJID" DataType="text" Length="20" Label="Subject Identifier for the Study">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DM.RFSTDTC" Name="RFSTDTC" DataType="text" Length="20" Label="Subject Reference Start Date/Time">
-      <Origin Type="Derived" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DM.RFENDTC" Name="RFENDTC" DataType="text" Length="20" Label="Subject Reference End Date/Time">
-      <Origin Type="Derived" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DM.AGEU" Name="AGEU" DataType="text" Length="10" Label="Age Units">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DM.SEX" Name="SEX" DataType="text" Length="2" Label="Sex">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DM.RACE" Name="RACE" DataType="text" Length="40" Label="Race">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DM.ARM" Name="ARM" DataType="text" Length="40" Label="Description of Planned Arm">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DM.ARMCD" Name="ARMCD" DataType="text" Length="20" Label="Planned Arm Code">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DM.ARM2" Name="ARM2" DataType="text" Length="100" Label="ARM2 Variable for domain DM">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DM.ARMA" Name="ARMA" DataType="text" Length="100" Label="ARMA Variable for domain DM">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DM.ARMCD2" Name="ARMCD2" DataType="text" Length="100" Label="ARMCD2 Variable for domain DM">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DM.BSABL" Name="BSABL" DataType="text" Length="100" Label="BSABL Variable for domain DM">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DM.ITT" Name="ITT" DataType="text" Length="100" Label="ITT Variable for domain DM">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DM.PPROT" Name="PPROT" DataType="text" Length="100" Label="PPROT Variable for domain DM">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DM.SAFETY" Name="SAFETY" DataType="text" Length="100" Label="SAFETY Variable for domain DM">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-
-    <ItemDef OID="IT.AE.AESTWKF" Name="AESTWKF" DataType="text" Length="100" Label="AESTWKF Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AEENWKF" Name="AEENWKF" DataType="text" Length="100" Label="AEENWKF Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.USUBJID" Name="USUBJID" DataType="text" Length="40" Label="Unique Subject Identifier">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.STUDYID" Name="STUDYID" DataType="text" Length="40" Label="Study Identifier">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.DOMAIN" Name="DOMAIN" DataType="text" Length="4" Label="Domain Abbreviation">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AESEQ" Name="AESEQ" DataType="integer" Length="8" Label="Adverse Event Sequence Number">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AESPID" Name="AESPID" DataType="text" Length="100" Label="AESPID Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AEREFID" Name="AEREFID" DataType="text" Length="100" Label="AEREFID Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AETERM" Name="AETERM" DataType="text" Length="200" Label="Reported Term for the Adverse Event">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AEDECOD" Name="AEDECOD" DataType="text" Length="100" Label="Dictionary-Derived Term">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AEBODSYS" Name="AEBODSYS" DataType="text" Length="100" Label="Body System or Organ Class">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AESER" Name="AESER" DataType="text" Length="2" Label="Serious Event">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AEACN" Name="AEACN" DataType="text" Length="100" Label="Action Taken with Study Treatment">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AECONTRT" Name="AECONTRT" DataType="text" Length="100" Label="AECONTRT Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AEREL" Name="AEREL" DataType="text" Length="40" Label="Causality">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AEPATT" Name="AEPATT" DataType="text" Length="100" Label="AEPATT Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AEOUT" Name="AEOUT" DataType="text" Length="100" Label="Outcome of Adverse Event">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AESCONG" Name="AESCONG" DataType="text" Length="100" Label="AESCONG Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AESDISAB" Name="AESDISAB" DataType="text" Length="100" Label="AESDISAB Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AESDTH" Name="AESDTH" DataType="text" Length="100" Label="AESDTH Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AESHOSP" Name="AESHOSP" DataType="text" Length="100" Label="AESHOSP Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AESLIFE" Name="AESLIFE" DataType="text" Length="100" Label="AESLIFE Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AESMIE" Name="AESMIE" DataType="text" Length="100" Label="AESMIE Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AETOXGR" Name="AETOXGR" DataType="text" Length="10" Label="Toxicity Grade">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.VISITNUM" Name="VISITNUM" DataType="float" Length="8" Label="Visit Number">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.VISIT" Name="VISIT" DataType="text" Length="40" Label="Visit Name">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AESTWK" Name="AESTWK" DataType="text" Length="100" Label="AESTWK Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AEENWK" Name="AEENWK" DataType="text" Length="100" Label="AEENWK Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.SUBJID" Name="SUBJID" DataType="text" Length="20" Label="Subject Identifier for the Study">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AECOLGR" Name="AECOLGR" DataType="text" Length="100" Label="AECOLGR Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AECOLGRN" Name="AECOLGRN" DataType="text" Length="100" Label="AECOLGRN Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AEDICTVS" Name="AEDICTVS" DataType="text" Length="100" Label="AEDICTVS Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AEHLGT" Name="AEHLGT" DataType="text" Length="100" Label="AEHLGT Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AEHLT" Name="AEHLT" DataType="text" Length="100" Label="AEHLT Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AELLT" Name="AELLT" DataType="text" Length="100" Label="AELLT Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AEOVISIT" Name="AEOVISIT" DataType="text" Length="100" Label="AEOVISIT Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AETOXGRN" Name="AETOXGRN" DataType="text" Length="100" Label="AETOXGRN Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AETRTEM" Name="AETRTEM" DataType="text" Length="100" Label="AETRTEM Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AEREFER" Name="AEREFER" DataType="text" Length="100" Label="AEREFER Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AEDTHDTC" Name="AEDTHDTC" DataType="text" Length="20" Label="Date/Time of AEDTH">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.AE.AESEQUCM" Name="AESEQUCM" DataType="text" Length="100" Label="AESEQUCM Variable for domain AE">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-
-    <ItemDef OID="IT.EX.STUDYID" Name="STUDYID" DataType="text" Length="40" Label="Study Identifier">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.DOMAIN" Name="DOMAIN" DataType="text" Length="4" Label="Domain Abbreviation">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.USUBJID" Name="USUBJID" DataType="text" Length="40" Label="Unique Subject Identifier">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.EXSEQ" Name="EXSEQ" DataType="integer" Length="8" Label="Sequence Number">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.EXTRT" Name="EXTRT" DataType="text" Length="40" Label="Name of Treatment">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.EXLOT" Name="EXLOT" DataType="text" Length="100" Label="EXLOT Variable for domain EX">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.EXDOSE" Name="EXDOSE" DataType="float" Length="8" Label="Dose">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.EXDOSU" Name="EXDOSU" DataType="text" Length="20" Label="Dose Units">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.EXDOSFRM" Name="EXDOSFRM" DataType="text" Length="40" Label="Dose Form">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.EXROUTE" Name="EXROUTE" DataType="text" Length="40" Label="Route of Administration">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.VISITNUM" Name="VISITNUM" DataType="float" Length="8" Label="Visit Number">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.VISIT" Name="VISIT" DataType="text" Length="40" Label="Visit Name">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.EXSTDTC" Name="EXSTDTC" DataType="text" Length="20" Label="Start Date/Time of Treatment">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.EXSTDY" Name="EXSTDY" DataType="integer" Length="8" Label="Study Day of EXST">
-      <Origin Type="Derived" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.EXENDTC" Name="EXENDTC" DataType="text" Length="20" Label="End Date/Time of Treatment">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.SUBJID" Name="SUBJID" DataType="text" Length="20" Label="Subject Identifier for the Study">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.EXPDOSE" Name="EXPDOSE" DataType="text" Length="100" Label="EXPDOSE Variable for domain EX">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.EXPDOSU" Name="EXPDOSU" DataType="text" Length="100" Label="EXPDOSU Variable for domain EX">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.EXCUMD" Name="EXCUMD" DataType="text" Length="100" Label="EXCUMD Variable for domain EX">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.EXCUMD2" Name="EXCUMD2" DataType="text" Length="100" Label="EXCUMD2 Variable for domain EX">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.EXDOSE2" Name="EXDOSE2" DataType="text" Length="100" Label="EXDOSE2 Variable for domain EX">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.EXPDOSE2" Name="EXPDOSE2" DataType="text" Length="100" Label="EXPDOSE2 Variable for domain EX">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.EXTINT" Name="EXTINT" DataType="text" Length="100" Label="EXTINT Variable for domain EX">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.EXTRINT" Name="EXTRINT" DataType="text" Length="100" Label="EXTRINT Variable for domain EX">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.EXDSREA" Name="EXDSREA" DataType="text" Length="100" Label="EXDSREA Variable for domain EX">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.EXDELAY" Name="EXDELAY" DataType="text" Length="100" Label="EXDELAY Variable for domain EX">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.EXDSRCM" Name="EXDSRCM" DataType="text" Length="100" Label="EXDSRCM Variable for domain EX">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.EX.ENDTCOL" Name="ENDTCOL" DataType="text" Length="100" Label="ENDTCOL Variable for domain EX">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-
-    <ItemDef OID="IT.CM.STUDYID" Name="STUDYID" DataType="text" Length="40" Label="Study Identifier">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.DOMAIN" Name="DOMAIN" DataType="text" Length="4" Label="Domain Abbreviation">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.USUBJID" Name="USUBJID" DataType="text" Length="40" Label="Unique Subject Identifier">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.CMSEQ" Name="CMSEQ" DataType="integer" Length="8" Label="Sequence Number">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.CMTRT" Name="CMTRT" DataType="text" Length="100" Label="Reported Name of Drug, Med, or Therapy">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.CMDECOD" Name="CMDECOD" DataType="text" Length="100" Label="Standardized Medication Name">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.CMCAT" Name="CMCAT" DataType="text" Length="100" Label="Category for Medication">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.CMINDC" Name="CMINDC" DataType="text" Length="200" Label="Indication">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.CMDOSE" Name="CMDOSE" DataType="text" Length="100" Label="CMDOSE Variable for domain CM">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.CMDOSU" Name="CMDOSU" DataType="text" Length="100" Label="CMDOSU Variable for domain CM">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.CMDOSRGM" Name="CMDOSRGM" DataType="text" Length="100" Label="CMDOSRGM Variable for domain CM">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.VISITNUM" Name="VISITNUM" DataType="float" Length="8" Label="Visit Number">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.VISIT" Name="VISIT" DataType="text" Length="40" Label="Visit Name">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.CMSTDTC" Name="CMSTDTC" DataType="text" Length="20" Label="Start Date/Time of Medication">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.CMSTDY" Name="CMSTDY" DataType="integer" Length="8" Label="Study Day of CMST">
-      <Origin Type="Derived" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.CMENDTC" Name="CMENDTC" DataType="text" Length="20" Label="End Date/Time of Medication">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.CMENDY" Name="CMENDY" DataType="integer" Length="8" Label="Study Day of CMEN">
-      <Origin Type="Derived" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.SUBJID" Name="SUBJID" DataType="text" Length="20" Label="Subject Identifier for the Study">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.CMATCL1" Name="CMATCL1" DataType="text" Length="100" Label="CMATCL1 Variable for domain CM">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.CMATCL2" Name="CMATCL2" DataType="text" Length="100" Label="CMATCL2 Variable for domain CM">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.CMATCSEL" Name="CMATCSEL" DataType="text" Length="100" Label="CMATCSEL Variable for domain CM">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.CMONGB" Name="CMONGB" DataType="text" Length="100" Label="CMONGB Variable for domain CM">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.CMONGO" Name="CMONGO" DataType="text" Length="100" Label="CMONGO Variable for domain CM">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.CMLOC" Name="CMLOC" DataType="text" Length="100" Label="CMLOC Variable for domain CM">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.CMENDRCM" Name="CMENDRCM" DataType="text" Length="100" Label="CMENDRCM Variable for domain CM">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.CMRLTL" Name="CMRLTL" DataType="text" Length="100" Label="CMRLTL Variable for domain CM">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.CMRSON" Name="CMRSON" DataType="text" Length="100" Label="CMRSON Variable for domain CM">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.CM.CMPRGDTC" Name="CMPRGDTC" DataType="text" Length="20" Label="Date/Time of CMPRG">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-
-    <ItemDef OID="IT.LB.STUDYID" Name="STUDYID" DataType="text" Length="40" Label="Study Identifier">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.DOMAIN" Name="DOMAIN" DataType="text" Length="4" Label="Domain Abbreviation">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.USUBJID" Name="USUBJID" DataType="text" Length="40" Label="Unique Subject Identifier">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.LBSEQ" Name="LBSEQ" DataType="integer" Length="8" Label="Sequence Number">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.LBTESTCD" Name="LBTESTCD" DataType="text" Length="20" Label="Lab Test Short Name">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.LBTEST" Name="LBTEST" DataType="text" Length="100" Label="Lab Test Name">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.LBCAT" Name="LBCAT" DataType="text" Length="100" Label="Category for Lab Test">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.LBSCAT" Name="LBSCAT" DataType="text" Length="100" Label="Subcategory for Lab Test">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.LBORRES" Name="LBORRES" DataType="text" Length="40" Label="Result or Finding in Original Units">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.LBORRESU" Name="LBORRESU" DataType="text" Length="20" Label="Original Units">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.LBORNRLO" Name="LBORNRLO" DataType="text" Length="100" Label="LBORNRLO Variable for domain LB">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.LBORNRHI" Name="LBORNRHI" DataType="text" Length="100" Label="LBORNRHI Variable for domain LB">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.LBSTRESC" Name="LBSTRESC" DataType="text" Length="100" Label="LBSTRESC Variable for domain LB">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.LBSTRESN" Name="LBSTRESN" DataType="float" Length="8" Label="Numeric Result/Finding in Standard Units">
-      <Origin Type="Derived" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.LBSTRESU" Name="LBSTRESU" DataType="text" Length="20" Label="Standard Units">
-      <Origin Type="Derived" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.LBSTNRLO" Name="LBSTNRLO" DataType="text" Length="100" Label="LBSTNRLO Variable for domain LB">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.LBSTNRHI" Name="LBSTNRHI" DataType="text" Length="100" Label="LBSTNRHI Variable for domain LB">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.LBNRIND" Name="LBNRIND" DataType="text" Length="100" Label="LBNRIND Variable for domain LB">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.LBSTAT" Name="LBSTAT" DataType="text" Length="100" Label="LBSTAT Variable for domain LB">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.LBTOX" Name="LBTOX" DataType="text" Length="100" Label="LBTOX Variable for domain LB">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.LBTOXGR" Name="LBTOXGR" DataType="text" Length="100" Label="LBTOXGR Variable for domain LB">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.LBBLFL" Name="LBBLFL" DataType="text" Length="1" Label="Flag">
-      <Origin Type="Derived" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.VISITNUM" Name="VISITNUM" DataType="float" Length="8" Label="Visit Number">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.VISIT" Name="VISIT" DataType="text" Length="40" Label="Visit Name">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.LBDTC" Name="LBDTC" DataType="text" Length="20" Label="Date/Time of Specimen Collection">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.LBDY" Name="LBDY" DataType="integer" Length="8" Label="Analysis Day of Specimen Collection">
-      <Origin Type="Derived" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.SUBJID" Name="SUBJID" DataType="text" Length="20" Label="Subject Identifier for the Study">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LB.LBOVISIT" Name="LBOVISIT" DataType="text" Length="100" Label="LBOVISIT Variable for domain LB">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-
-    <ItemDef OID="IT.DS.DSSTWKF" Name="DSSTWKF" DataType="text" Length="100" Label="DSSTWKF Variable for domain DS">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DS.USUBJID" Name="USUBJID" DataType="text" Length="40" Label="Unique Subject Identifier">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DS.STUDYID" Name="STUDYID" DataType="text" Length="40" Label="Study Identifier">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DS.DOMAIN" Name="DOMAIN" DataType="text" Length="4" Label="Domain Abbreviation">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DS.DSSEQ" Name="DSSEQ" DataType="integer" Length="8" Label="Sequence Number">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DS.DSTERM" Name="DSTERM" DataType="text" Length="200" Label="Reported Term for the Disposition Event">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DS.DSDECOD" Name="DSDECOD" DataType="text" Length="100" Label="Standardized Disposition Term">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DS.DSCAT" Name="DSCAT" DataType="text" Length="100" Label="Category for Disposition Event">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DS.DSSCAT" Name="DSSCAT" DataType="text" Length="100" Label="Subcategory for Disposition Event">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DS.EPOCH" Name="EPOCH" DataType="text" Length="20" Label="Epoch">
-      <Origin Type="Derived" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DS.VISITNUM" Name="VISITNUM" DataType="float" Length="8" Label="Visit Number">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DS.VISIT" Name="VISIT" DataType="text" Length="40" Label="Visit Name">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DS.DSSTWK" Name="DSSTWK" DataType="text" Length="100" Label="DSSTWK Variable for domain DS">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DS.SUBJID" Name="SUBJID" DataType="text" Length="20" Label="Subject Identifier for the Study">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.DS.DSPROG" Name="DSPROG" DataType="text" Length="100" Label="DSPROG Variable for domain DS">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-
-    <ItemDef OID="IT.VS.STUDYID" Name="STUDYID" DataType="text" Length="40" Label="Study Identifier">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.VS.DOMAIN" Name="DOMAIN" DataType="text" Length="4" Label="Domain Abbreviation">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.VS.USUBJID" Name="USUBJID" DataType="text" Length="40" Label="Unique Subject Identifier">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.VS.VSSEQ" Name="VSSEQ" DataType="integer" Length="8" Label="Sequence Number">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.VS.VSTESTCD" Name="VSTESTCD" DataType="text" Length="20" Label="Vital Signs Test Short Name">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.VS.VSTEST" Name="VSTEST" DataType="text" Length="100" Label="Vital Signs Test Name">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.VS.VSORRES" Name="VSORRES" DataType="text" Length="40" Label="Result or Finding in Original Units">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.VS.VSORRESU" Name="VSORRESU" DataType="text" Length="100" Label="VSORRESU Variable for domain VS">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.VS.VSSTRESC" Name="VSSTRESC" DataType="text" Length="100" Label="VSSTRESC Variable for domain VS">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.VS.VSSTRESN" Name="VSSTRESN" DataType="text" Length="100" Label="VSSTRESN Variable for domain VS">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.VS.VSSTRESU" Name="VSSTRESU" DataType="text" Length="100" Label="VSSTRESU Variable for domain VS">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.VS.VSMETHOD" Name="VSMETHOD" DataType="text" Length="100" Label="VSMETHOD Variable for domain VS">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.VS.VSBLFL" Name="VSBLFL" DataType="text" Length="1" Label="Flag">
-      <Origin Type="Derived" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.VS.VSDRVFL" Name="VSDRVFL" DataType="text" Length="1" Label="Flag">
-      <Origin Type="Derived" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.VS.VISITNUM" Name="VISITNUM" DataType="float" Length="8" Label="Visit Number">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.VS.VISIT" Name="VISIT" DataType="text" Length="40" Label="Visit Name">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.VS.VSDTC" Name="VSDTC" DataType="text" Length="20" Label="Date/Time of Specimen Collection">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.VS.VSDY" Name="VSDY" DataType="integer" Length="8" Label="Study Day of VS">
-      <Origin Type="Derived" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.VS.SUBJID" Name="SUBJID" DataType="text" Length="20" Label="Subject Identifier for the Study">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-
-    <ItemDef OID="IT.LS.STUDYID" Name="STUDYID" DataType="text" Length="40" Label="Study Identifier">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LS.DOMAIN" Name="DOMAIN" DataType="text" Length="4" Label="Domain Abbreviation">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LS.USUBJID" Name="USUBJID" DataType="text" Length="40" Label="Unique Subject Identifier">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LS.LSSEQ" Name="LSSEQ" DataType="integer" Length="8" Label="Sequence Number">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LS.LSSPID" Name="LSSPID" DataType="text" Length="100" Label="LSSPID Variable for domain LS">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LS.LSTESTCD" Name="LSTESTCD" DataType="text" Length="20" Label="Lesion Assessment Test Short Name">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LS.LSTEST" Name="LSTEST" DataType="text" Length="100" Label="Lesion Assessment Test Name">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LS.LSCAT" Name="LSCAT" DataType="text" Length="100" Label="Category for Lesion Assessment">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LS.LSLOC" Name="LSLOC" DataType="text" Length="100" Label="Location for Lesion Assessment">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LS.LSORRES" Name="LSORRES" DataType="text" Length="40" Label="Result or Finding in Original Units">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LS.LSORRESU" Name="LSORRESU" DataType="text" Length="100" Label="LSORRESU Variable for domain LS">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LS.LSSTRESC" Name="LSSTRESC" DataType="text" Length="100" Label="LSSTRESC Variable for domain LS">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LS.LSSTRESN" Name="LSSTRESN" DataType="text" Length="100" Label="LSSTRESN Variable for domain LS">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LS.LSSTRESU" Name="LSSTRESU" DataType="text" Length="100" Label="LSSTRESU Variable for domain LS">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LS.LSMETHOD" Name="LSMETHOD" DataType="text" Length="100" Label="LSMETHOD Variable for domain LS">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LS.LSSTAT" Name="LSSTAT" DataType="text" Length="100" Label="LSSTAT Variable for domain LS">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LS.LSBLFL" Name="LSBLFL" DataType="text" Length="1" Label="Flag">
-      <Origin Type="Derived" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LS.VISITNUM" Name="VISITNUM" DataType="float" Length="8" Label="Visit Number">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LS.VISIT" Name="VISIT" DataType="text" Length="40" Label="Visit Name">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LS.LSDTC" Name="LSDTC" DataType="text" Length="20" Label="Date/Time of LS">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LS.SUBJID" Name="SUBJID" DataType="text" Length="20" Label="Subject Identifier for the Study">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.LS.LSSLOC" Name="LSSLOC" DataType="text" Length="100" Label="LSSLOC Variable for domain LS">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-
-    <ItemDef OID="IT.PN.STUDYID" Name="STUDYID" DataType="text" Length="40" Label="Study Identifier">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.PN.DOMAIN" Name="DOMAIN" DataType="text" Length="4" Label="Domain Abbreviation">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.PN.USUBJID" Name="USUBJID" DataType="text" Length="40" Label="Unique Subject Identifier">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.PN.PNSEQ" Name="PNSEQ" DataType="integer" Length="8" Label="Sequence Number">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.PN.PNSPID" Name="PNSPID" DataType="text" Length="100" Label="PNSPID Variable for domain PN">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.PN.PNTESTCD" Name="PNTESTCD" DataType="text" Length="20" Label="Pain Assessment Test Short Name">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.PN.PNTEST" Name="PNTEST" DataType="text" Length="100" Label="Pain Assessment Test Name">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.PN.PNCAT" Name="PNCAT" DataType="text" Length="100" Label="Category for Pain Assessment">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.PN.PNORRES" Name="PNORRES" DataType="text" Length="40" Label="Result or Finding in Original Units">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.PN.PNORRESU" Name="PNORRESU" DataType="text" Length="100" Label="PNORRESU Variable for domain PN">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.PN.PNSTRESC" Name="PNSTRESC" DataType="text" Length="100" Label="PNSTRESC Variable for domain PN">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.PN.PNSTRESN" Name="PNSTRESN" DataType="text" Length="100" Label="PNSTRESN Variable for domain PN">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.PN.PNSTRESU" Name="PNSTRESU" DataType="text" Length="100" Label="PNSTRESU Variable for domain PN">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.PN.PNSTAT" Name="PNSTAT" DataType="text" Length="100" Label="PNSTAT Variable for domain PN">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.PN.VISITNUM" Name="VISITNUM" DataType="float" Length="8" Label="Visit Number">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.PN.VISIT" Name="VISIT" DataType="text" Length="40" Label="Visit Name">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.PN.PNDTC" Name="PNDTC" DataType="text" Length="20" Label="Date/Time of PN">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.PN.SUBJID" Name="SUBJID" DataType="text" Length="20" Label="Subject Identifier for the Study">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-
-    <ItemDef OID="IT.SUPPDM.STUDYID" Name="STUDYID" DataType="text" Length="40" Label="Study Identifier">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPDM.RDOMAIN" Name="RDOMAIN" DataType="text" Length="4" Label="Related Domain">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPDM.USUBJID" Name="USUBJID" DataType="text" Length="40" Label="Unique Subject Identifier">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPDM.IDVAR" Name="IDVAR" DataType="text" Length="8" Label="Identifying Variable">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPDM.IDVARVAL" Name="IDVARVAL" DataType="text" Length="40" Label="Identifying Variable Value">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPDM.QNAM" Name="QNAM" DataType="text" Length="8" Label="Qualifier Variable Name">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPDM.QLABEL" Name="QLABEL" DataType="text" Length="40" Label="Qualifier Variable Label">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPDM.QVAL" Name="QVAL" DataType="text" Length="200" Label="Qualifier Variable Value">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPDM.QORIG" Name="QORIG" DataType="text" Length="10" Label="Origin">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPDM.QEVAL" Name="QEVAL" DataType="text" Length="40" Label="Evaluator">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPDM.SUBJID" Name="SUBJID" DataType="text" Length="20" Label="Subject Identifier for the Study">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-
-    <ItemDef OID="IT.SUPPAE.STUDYID" Name="STUDYID" DataType="text" Length="40" Label="Study Identifier">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPAE.RDOMAIN" Name="RDOMAIN" DataType="text" Length="4" Label="Related Domain">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPAE.USUBJID" Name="USUBJID" DataType="text" Length="40" Label="Unique Subject Identifier">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPAE.IDVAR" Name="IDVAR" DataType="text" Length="8" Label="Identifying Variable">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPAE.IDVARVAL" Name="IDVARVAL" DataType="text" Length="40" Label="Identifying Variable Value">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPAE.QNAM" Name="QNAM" DataType="text" Length="8" Label="Qualifier Variable Name">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPAE.QLABEL" Name="QLABEL" DataType="text" Length="40" Label="Qualifier Variable Label">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPAE.QVAL" Name="QVAL" DataType="text" Length="200" Label="Qualifier Variable Value">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPAE.QORIG" Name="QORIG" DataType="text" Length="10" Label="Origin">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPAE.QEVAL" Name="QEVAL" DataType="text" Length="40" Label="Evaluator">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPAE.SUBJID" Name="SUBJID" DataType="text" Length="20" Label="Subject Identifier for the Study">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-
-    <ItemDef OID="IT.SUPPEX.STUDYID" Name="STUDYID" DataType="text" Length="40" Label="Study Identifier">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPEX.RDOMAIN" Name="RDOMAIN" DataType="text" Length="4" Label="Related Domain">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPEX.USUBJID" Name="USUBJID" DataType="text" Length="40" Label="Unique Subject Identifier">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPEX.IDVAR" Name="IDVAR" DataType="text" Length="8" Label="Identifying Variable">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPEX.IDVARVAL" Name="IDVARVAL" DataType="text" Length="40" Label="Identifying Variable Value">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPEX.QNAM" Name="QNAM" DataType="text" Length="8" Label="Qualifier Variable Name">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPEX.QLABEL" Name="QLABEL" DataType="text" Length="40" Label="Qualifier Variable Label">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPEX.QVAL" Name="QVAL" DataType="text" Length="200" Label="Qualifier Variable Value">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPEX.QORIG" Name="QORIG" DataType="text" Length="10" Label="Origin">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPEX.QEVAL" Name="QEVAL" DataType="text" Length="40" Label="Evaluator">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPEX.SUBJID" Name="SUBJID" DataType="text" Length="20" Label="Subject Identifier for the Study">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-
-    <ItemDef OID="IT.SUPPCM.STUDYID" Name="STUDYID" DataType="text" Length="40" Label="Study Identifier">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPCM.RDOMAIN" Name="RDOMAIN" DataType="text" Length="4" Label="Related Domain">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPCM.USUBJID" Name="USUBJID" DataType="text" Length="40" Label="Unique Subject Identifier">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPCM.IDVAR" Name="IDVAR" DataType="text" Length="8" Label="Identifying Variable">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPCM.IDVARVAL" Name="IDVARVAL" DataType="text" Length="40" Label="Identifying Variable Value">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPCM.QNAM" Name="QNAM" DataType="text" Length="8" Label="Qualifier Variable Name">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPCM.QLABEL" Name="QLABEL" DataType="text" Length="40" Label="Qualifier Variable Label">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPCM.QVAL" Name="QVAL" DataType="text" Length="200" Label="Qualifier Variable Value">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPCM.QORIG" Name="QORIG" DataType="text" Length="10" Label="Origin">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPCM.QEVAL" Name="QEVAL" DataType="text" Length="40" Label="Evaluator">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPCM.SUBJID" Name="SUBJID" DataType="text" Length="20" Label="Subject Identifier for the Study">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-
-    <ItemDef OID="IT.SUPPLB.STUDYID" Name="STUDYID" DataType="text" Length="40" Label="Study Identifier">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPLB.RDOMAIN" Name="RDOMAIN" DataType="text" Length="4" Label="Related Domain">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPLB.USUBJID" Name="USUBJID" DataType="text" Length="40" Label="Unique Subject Identifier">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPLB.IDVAR" Name="IDVAR" DataType="text" Length="8" Label="Identifying Variable">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPLB.IDVARVAL" Name="IDVARVAL" DataType="text" Length="40" Label="Identifying Variable Value">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPLB.QNAM" Name="QNAM" DataType="text" Length="8" Label="Qualifier Variable Name">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPLB.QLABEL" Name="QLABEL" DataType="text" Length="40" Label="Qualifier Variable Label">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPLB.QVAL" Name="QVAL" DataType="text" Length="200" Label="Qualifier Variable Value">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPLB.QORIG" Name="QORIG" DataType="text" Length="10" Label="Origin">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPLB.QEVAL" Name="QEVAL" DataType="text" Length="40" Label="Evaluator">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPLB.SUBJID" Name="SUBJID" DataType="text" Length="20" Label="Subject Identifier for the Study">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-
-    <ItemDef OID="IT.SUPPDS.STUDYID" Name="STUDYID" DataType="text" Length="40" Label="Study Identifier">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPDS.RDOMAIN" Name="RDOMAIN" DataType="text" Length="4" Label="Related Domain">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPDS.USUBJID" Name="USUBJID" DataType="text" Length="40" Label="Unique Subject Identifier">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPDS.IDVAR" Name="IDVAR" DataType="text" Length="8" Label="Identifying Variable">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPDS.IDVARVAL" Name="IDVARVAL" DataType="text" Length="40" Label="Identifying Variable Value">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPDS.QNAM" Name="QNAM" DataType="text" Length="8" Label="Qualifier Variable Name">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPDS.QLABEL" Name="QLABEL" DataType="text" Length="40" Label="Qualifier Variable Label">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPDS.QVAL" Name="QVAL" DataType="text" Length="200" Label="Qualifier Variable Value">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPDS.QORIG" Name="QORIG" DataType="text" Length="10" Label="Origin">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPDS.QEVAL" Name="QEVAL" DataType="text" Length="40" Label="Evaluator">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPDS.SUBJID" Name="SUBJID" DataType="text" Length="20" Label="Subject Identifier for the Study">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-
-    <ItemDef OID="IT.SUPPLS.STUDYID" Name="STUDYID" DataType="text" Length="40" Label="Study Identifier">
-      <Origin Type="Protocol" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPLS.RDOMAIN" Name="RDOMAIN" DataType="text" Length="4" Label="Related Domain">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPLS.USUBJID" Name="USUBJID" DataType="text" Length="40" Label="Unique Subject Identifier">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPLS.IDVAR" Name="IDVAR" DataType="text" Length="8" Label="Identifying Variable">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPLS.IDVARVAL" Name="IDVARVAL" DataType="text" Length="40" Label="Identifying Variable Value">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPLS.QNAM" Name="QNAM" DataType="text" Length="8" Label="Qualifier Variable Name">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPLS.QLABEL" Name="QLABEL" DataType="text" Length="40" Label="Qualifier Variable Label">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPLS.QVAL" Name="QVAL" DataType="text" Length="200" Label="Qualifier Variable Value">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPLS.QORIG" Name="QORIG" DataType="text" Length="10" Label="Origin">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPLS.QEVAL" Name="QEVAL" DataType="text" Length="40" Label="Evaluator">
-      <Origin Type="Assigned" Source="Sponsor" />
-    </ItemDef>
-    <ItemDef OID="IT.SUPPLS.SUBJID" Name="SUBJID" DataType="text" Length="20" Label="Subject Identifier for the Study">
-      <Origin Type="Collected" Source="Sponsor" />
-    </ItemDef>
-
-  </MetaDataVersion>
-</Define>
+<?xml version='1.0' encoding='UTF-8'?>
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:def="http://www.cdisc.org/ns/def/v2.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ODMVersion="1.3.2" FileType="Snapshot" FileOID="TROPIC_SDTM_Metadata_v2.1" CreationDateTime="2026-06-12T21:49:25" AsOfDateTime="2026-06-12T21:49:25" Originator="Antony Bevan, Clinical Programming" def:Context="Submission" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 http://schema.cdisc.org/define/v2.1/define2-1-0.xsd">
+  <Study OID="STDY.TROPIC">
+    <GlobalVariables>
+      <StudyName>TROPIC (EFC6193 / XRP6258)</StudyName>
+      <StudyDescription>Cabazitaxel vs Mitoxantrone in mCRPC progressing after docetaxel (NCT00417079).</StudyDescription>
+      <ProtocolName>EFC6193</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.TROPIC_NCT00417079.SDTM.3.1.1" Name="TROPIC Trial SDTM Metadata Specification" Description="Metadata specification for TROPIC Phase III re-analysis SDTM datasets" def:DefineVersion="2.1.0">
+      <def:Standards>
+        <def:Standard OID="STD.SDTMIG.3.1.1" Name="SDTMIG" Type="IG" Version="3.1.1" Status="Final"/>
+        <def:Standard OID="STD.SDTMCT.2024-03-29" Name="CDISC/NCI" Type="CT" PublishingSet="SDTM" Version="2024-03-29" Status="Final"/>
+      </def:Standards>
+      <ItemGroupDef OID="IG.DM" Name="DM" Repeating="No" IsReferenceData="No" Purpose="Tabulation" Role="Demographics" def:Structure="One record per subject" def:ArchiveLocationID="LF.DM" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">Demographics domain for the TROPIC trial datasets.</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.DM.AGEGRP" Mandatory="No" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.DM.STUDYID" Mandatory="Yes" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.DM.DOMAIN" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.DM.USUBJID" Mandatory="Yes" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.DM.SUBJID" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.DM.RFSTDTC" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.DM.RFENDTC" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.DM.AGEU" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.DM.SEX" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.DM.RACE" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.DM.ARM" Mandatory="No" OrderNumber="11"/>
+        <ItemRef ItemOID="IT.DM.ARMCD" Mandatory="No" OrderNumber="12"/>
+        <ItemRef ItemOID="IT.DM.ARM2" Mandatory="No" OrderNumber="13"/>
+        <ItemRef ItemOID="IT.DM.ARMA" Mandatory="No" OrderNumber="14"/>
+        <ItemRef ItemOID="IT.DM.ARMCD2" Mandatory="No" OrderNumber="15"/>
+        <ItemRef ItemOID="IT.DM.BSABL" Mandatory="No" OrderNumber="16"/>
+        <ItemRef ItemOID="IT.DM.ITT" Mandatory="No" OrderNumber="17"/>
+        <ItemRef ItemOID="IT.DM.PPROT" Mandatory="No" OrderNumber="18"/>
+        <ItemRef ItemOID="IT.DM.SAFETY" Mandatory="No" OrderNumber="19"/>
+        <def:leaf ID="LF.DM" xlink:href="dm.xpt">
+          <def:title>dm.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.AE" Name="AE" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Adverse Events" def:Structure="One record per subject per adverse event" def:ArchiveLocationID="LF.AE" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">Adverse Events domain for the TROPIC trial datasets.</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.AE.AESTWKF" Mandatory="No" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.AE.AEENWKF" Mandatory="No" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.AE.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.AE.STUDYID" Mandatory="Yes" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.AE.DOMAIN" Mandatory="Yes" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.AE.AESEQ" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.AE.AESPID" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.AE.AEREFID" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.AE.AETERM" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.AE.AEDECOD" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.AE.AEBODSYS" Mandatory="No" OrderNumber="11"/>
+        <ItemRef ItemOID="IT.AE.AESER" Mandatory="No" OrderNumber="12"/>
+        <ItemRef ItemOID="IT.AE.AEACN" Mandatory="No" OrderNumber="13"/>
+        <ItemRef ItemOID="IT.AE.AECONTRT" Mandatory="No" OrderNumber="14"/>
+        <ItemRef ItemOID="IT.AE.AEREL" Mandatory="No" OrderNumber="15"/>
+        <ItemRef ItemOID="IT.AE.AEPATT" Mandatory="No" OrderNumber="16"/>
+        <ItemRef ItemOID="IT.AE.AEOUT" Mandatory="No" OrderNumber="17"/>
+        <ItemRef ItemOID="IT.AE.AESCONG" Mandatory="No" OrderNumber="18"/>
+        <ItemRef ItemOID="IT.AE.AESDISAB" Mandatory="No" OrderNumber="19"/>
+        <ItemRef ItemOID="IT.AE.AESDTH" Mandatory="No" OrderNumber="20"/>
+        <ItemRef ItemOID="IT.AE.AESHOSP" Mandatory="No" OrderNumber="21"/>
+        <ItemRef ItemOID="IT.AE.AESLIFE" Mandatory="No" OrderNumber="22"/>
+        <ItemRef ItemOID="IT.AE.AESMIE" Mandatory="No" OrderNumber="23"/>
+        <ItemRef ItemOID="IT.AE.AETOXGR" Mandatory="No" OrderNumber="24"/>
+        <ItemRef ItemOID="IT.AE.VISITNUM" Mandatory="No" OrderNumber="25"/>
+        <ItemRef ItemOID="IT.AE.VISIT" Mandatory="No" OrderNumber="26"/>
+        <ItemRef ItemOID="IT.AE.AESTWK" Mandatory="No" OrderNumber="27"/>
+        <ItemRef ItemOID="IT.AE.AEENWK" Mandatory="No" OrderNumber="28"/>
+        <ItemRef ItemOID="IT.AE.SUBJID" Mandatory="No" OrderNumber="29"/>
+        <ItemRef ItemOID="IT.AE.AECOLGR" Mandatory="No" OrderNumber="30"/>
+        <ItemRef ItemOID="IT.AE.AECOLGRN" Mandatory="No" OrderNumber="31"/>
+        <ItemRef ItemOID="IT.AE.AEDICTVS" Mandatory="No" OrderNumber="32"/>
+        <ItemRef ItemOID="IT.AE.AEHLGT" Mandatory="No" OrderNumber="33"/>
+        <ItemRef ItemOID="IT.AE.AEHLT" Mandatory="No" OrderNumber="34"/>
+        <ItemRef ItemOID="IT.AE.AELLT" Mandatory="No" OrderNumber="35"/>
+        <ItemRef ItemOID="IT.AE.AEOVISIT" Mandatory="No" OrderNumber="36"/>
+        <ItemRef ItemOID="IT.AE.AETOXGRN" Mandatory="No" OrderNumber="37"/>
+        <ItemRef ItemOID="IT.AE.AETRTEM" Mandatory="No" OrderNumber="38"/>
+        <ItemRef ItemOID="IT.AE.AEREFER" Mandatory="No" OrderNumber="39"/>
+        <ItemRef ItemOID="IT.AE.AEDTHDTC" Mandatory="No" OrderNumber="40"/>
+        <ItemRef ItemOID="IT.AE.AESEQUCM" Mandatory="No" OrderNumber="41"/>
+        <def:leaf ID="LF.AE" xlink:href="ae.xpt">
+          <def:title>ae.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.EX" Name="EX" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Exposure" def:Structure="One record per subject per constant exposure cycle" def:ArchiveLocationID="LF.EX" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">Exposure domain for the TROPIC trial datasets.</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.EX.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.EX.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.EX.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.EX.EXSEQ" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.EX.EXTRT" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.EX.EXLOT" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.EX.EXDOSE" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.EX.EXDOSU" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.EX.EXDOSFRM" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.EX.EXROUTE" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.EX.VISITNUM" Mandatory="No" OrderNumber="11"/>
+        <ItemRef ItemOID="IT.EX.VISIT" Mandatory="No" OrderNumber="12"/>
+        <ItemRef ItemOID="IT.EX.EXSTDTC" Mandatory="No" OrderNumber="13"/>
+        <ItemRef ItemOID="IT.EX.EXSTDY" Mandatory="No" OrderNumber="14"/>
+        <ItemRef ItemOID="IT.EX.EXENDTC" Mandatory="No" OrderNumber="15"/>
+        <ItemRef ItemOID="IT.EX.SUBJID" Mandatory="No" OrderNumber="16"/>
+        <ItemRef ItemOID="IT.EX.EXPDOSE" Mandatory="No" OrderNumber="17"/>
+        <ItemRef ItemOID="IT.EX.EXPDOSU" Mandatory="No" OrderNumber="18"/>
+        <ItemRef ItemOID="IT.EX.EXCUMD" Mandatory="No" OrderNumber="19"/>
+        <ItemRef ItemOID="IT.EX.EXCUMD2" Mandatory="No" OrderNumber="20"/>
+        <ItemRef ItemOID="IT.EX.EXDOSE2" Mandatory="No" OrderNumber="21"/>
+        <ItemRef ItemOID="IT.EX.EXPDOSE2" Mandatory="No" OrderNumber="22"/>
+        <ItemRef ItemOID="IT.EX.EXTINT" Mandatory="No" OrderNumber="23"/>
+        <ItemRef ItemOID="IT.EX.EXTRINT" Mandatory="No" OrderNumber="24"/>
+        <ItemRef ItemOID="IT.EX.EXDSREA" Mandatory="No" OrderNumber="25"/>
+        <ItemRef ItemOID="IT.EX.EXDELAY" Mandatory="No" OrderNumber="26"/>
+        <ItemRef ItemOID="IT.EX.EXDSRCM" Mandatory="No" OrderNumber="27"/>
+        <ItemRef ItemOID="IT.EX.ENDTCOL" Mandatory="No" OrderNumber="28"/>
+        <def:leaf ID="LF.EX" xlink:href="ex.xpt">
+          <def:title>ex.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.CM" Name="CM" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Concomitant Medications" def:Structure="One record per subject per medication" def:ArchiveLocationID="LF.CM" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">Concomitant Medications domain for the TROPIC trial datasets.</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.CM.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.CM.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.CM.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.CM.CMSEQ" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.CM.CMTRT" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.CM.CMDECOD" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.CM.CMCAT" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.CM.CMINDC" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.CM.CMDOSE" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.CM.CMDOSU" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.CM.CMDOSRGM" Mandatory="No" OrderNumber="11"/>
+        <ItemRef ItemOID="IT.CM.VISITNUM" Mandatory="No" OrderNumber="12"/>
+        <ItemRef ItemOID="IT.CM.VISIT" Mandatory="No" OrderNumber="13"/>
+        <ItemRef ItemOID="IT.CM.CMSTDTC" Mandatory="No" OrderNumber="14"/>
+        <ItemRef ItemOID="IT.CM.CMSTDY" Mandatory="No" OrderNumber="15"/>
+        <ItemRef ItemOID="IT.CM.CMENDTC" Mandatory="No" OrderNumber="16"/>
+        <ItemRef ItemOID="IT.CM.CMENDY" Mandatory="No" OrderNumber="17"/>
+        <ItemRef ItemOID="IT.CM.SUBJID" Mandatory="No" OrderNumber="18"/>
+        <ItemRef ItemOID="IT.CM.CMATCL1" Mandatory="No" OrderNumber="19"/>
+        <ItemRef ItemOID="IT.CM.CMATCL2" Mandatory="No" OrderNumber="20"/>
+        <ItemRef ItemOID="IT.CM.CMATCSEL" Mandatory="No" OrderNumber="21"/>
+        <ItemRef ItemOID="IT.CM.CMONGB" Mandatory="No" OrderNumber="22"/>
+        <ItemRef ItemOID="IT.CM.CMONGO" Mandatory="No" OrderNumber="23"/>
+        <ItemRef ItemOID="IT.CM.CMLOC" Mandatory="No" OrderNumber="24"/>
+        <ItemRef ItemOID="IT.CM.CMENDRCM" Mandatory="No" OrderNumber="25"/>
+        <ItemRef ItemOID="IT.CM.CMRLTL" Mandatory="No" OrderNumber="26"/>
+        <ItemRef ItemOID="IT.CM.CMRSON" Mandatory="No" OrderNumber="27"/>
+        <ItemRef ItemOID="IT.CM.CMPRGDTC" Mandatory="No" OrderNumber="28"/>
+        <def:leaf ID="LF.CM" xlink:href="cm.xpt">
+          <def:title>cm.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.LB" Name="LB" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Laboratory Test Results" def:Structure="One record per subject per laboratory test per visit" def:ArchiveLocationID="LF.LB" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">Laboratory Test Results domain for the TROPIC trial datasets.</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.LB.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.LB.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.LB.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.LB.LBSEQ" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.LB.LBTESTCD" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.LB.LBTEST" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.LB.LBCAT" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.LB.LBSCAT" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.LB.LBORRES" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.LB.LBORRESU" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.LB.LBORNRLO" Mandatory="No" OrderNumber="11"/>
+        <ItemRef ItemOID="IT.LB.LBORNRHI" Mandatory="No" OrderNumber="12"/>
+        <ItemRef ItemOID="IT.LB.LBSTRESC" Mandatory="No" OrderNumber="13"/>
+        <ItemRef ItemOID="IT.LB.LBSTRESN" Mandatory="No" OrderNumber="14"/>
+        <ItemRef ItemOID="IT.LB.LBSTRESU" Mandatory="No" OrderNumber="15"/>
+        <ItemRef ItemOID="IT.LB.LBSTNRLO" Mandatory="No" OrderNumber="16"/>
+        <ItemRef ItemOID="IT.LB.LBSTNRHI" Mandatory="No" OrderNumber="17"/>
+        <ItemRef ItemOID="IT.LB.LBNRIND" Mandatory="No" OrderNumber="18"/>
+        <ItemRef ItemOID="IT.LB.LBSTAT" Mandatory="No" OrderNumber="19"/>
+        <ItemRef ItemOID="IT.LB.LBTOX" Mandatory="No" OrderNumber="20"/>
+        <ItemRef ItemOID="IT.LB.LBTOXGR" Mandatory="No" OrderNumber="21"/>
+        <ItemRef ItemOID="IT.LB.LBBLFL" Mandatory="No" OrderNumber="22"/>
+        <ItemRef ItemOID="IT.LB.VISITNUM" Mandatory="No" OrderNumber="23"/>
+        <ItemRef ItemOID="IT.LB.VISIT" Mandatory="No" OrderNumber="24"/>
+        <ItemRef ItemOID="IT.LB.LBDTC" Mandatory="No" OrderNumber="25"/>
+        <ItemRef ItemOID="IT.LB.LBDY" Mandatory="No" OrderNumber="26"/>
+        <ItemRef ItemOID="IT.LB.SUBJID" Mandatory="No" OrderNumber="27"/>
+        <ItemRef ItemOID="IT.LB.LBOVISIT" Mandatory="No" OrderNumber="28"/>
+        <def:leaf ID="LF.LB" xlink:href="lb.xpt">
+          <def:title>lb.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.DS" Name="DS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Disposition" def:Structure="One record per subject per disposition event" def:ArchiveLocationID="LF.DS" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">Disposition domain for the TROPIC trial datasets.</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.DS.DSSTWKF" Mandatory="No" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.DS.USUBJID" Mandatory="Yes" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.DS.STUDYID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.DS.DOMAIN" Mandatory="Yes" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.DS.DSSEQ" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.DS.DSTERM" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.DS.DSDECOD" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.DS.DSCAT" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.DS.DSSCAT" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.DS.EPOCH" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.DS.VISITNUM" Mandatory="No" OrderNumber="11"/>
+        <ItemRef ItemOID="IT.DS.VISIT" Mandatory="No" OrderNumber="12"/>
+        <ItemRef ItemOID="IT.DS.DSSTWK" Mandatory="No" OrderNumber="13"/>
+        <ItemRef ItemOID="IT.DS.SUBJID" Mandatory="No" OrderNumber="14"/>
+        <ItemRef ItemOID="IT.DS.DSPROG" Mandatory="No" OrderNumber="15"/>
+        <def:leaf ID="LF.DS" xlink:href="ds.xpt">
+          <def:title>ds.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.VS" Name="VS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Vital Signs" def:Structure="One record per subject per vital sign measurement per visit" def:ArchiveLocationID="LF.VS" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">Vital Signs domain for the TROPIC trial datasets.</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.VS.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.VS.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.VS.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.VS.VSSEQ" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.VS.VSTESTCD" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.VS.VSTEST" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.VS.VSORRES" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.VS.VSORRESU" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.VS.VSSTRESC" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.VS.VSSTRESN" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.VS.VSSTRESU" Mandatory="No" OrderNumber="11"/>
+        <ItemRef ItemOID="IT.VS.VSMETHOD" Mandatory="No" OrderNumber="12"/>
+        <ItemRef ItemOID="IT.VS.VSBLFL" Mandatory="No" OrderNumber="13"/>
+        <ItemRef ItemOID="IT.VS.VSDRVFL" Mandatory="No" OrderNumber="14"/>
+        <ItemRef ItemOID="IT.VS.VISITNUM" Mandatory="No" OrderNumber="15"/>
+        <ItemRef ItemOID="IT.VS.VISIT" Mandatory="No" OrderNumber="16"/>
+        <ItemRef ItemOID="IT.VS.VSDTC" Mandatory="No" OrderNumber="17"/>
+        <ItemRef ItemOID="IT.VS.VSDY" Mandatory="No" OrderNumber="18"/>
+        <ItemRef ItemOID="IT.VS.SUBJID" Mandatory="No" OrderNumber="19"/>
+        <def:leaf ID="LF.VS" xlink:href="vs.xpt">
+          <def:title>vs.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.LS" Name="LS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Lesion Assessment" def:Structure="One record per subject per lesion per assessment visit" def:ArchiveLocationID="LF.LS" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">Lesion Assessment domain for the TROPIC trial datasets.</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.LS.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.LS.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.LS.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.LS.LSSEQ" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.LS.LSSPID" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.LS.LSTESTCD" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.LS.LSTEST" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.LS.LSCAT" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.LS.LSLOC" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.LS.LSORRES" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.LS.LSORRESU" Mandatory="No" OrderNumber="11"/>
+        <ItemRef ItemOID="IT.LS.LSSTRESC" Mandatory="No" OrderNumber="12"/>
+        <ItemRef ItemOID="IT.LS.LSSTRESN" Mandatory="No" OrderNumber="13"/>
+        <ItemRef ItemOID="IT.LS.LSSTRESU" Mandatory="No" OrderNumber="14"/>
+        <ItemRef ItemOID="IT.LS.LSMETHOD" Mandatory="No" OrderNumber="15"/>
+        <ItemRef ItemOID="IT.LS.LSSTAT" Mandatory="No" OrderNumber="16"/>
+        <ItemRef ItemOID="IT.LS.LSBLFL" Mandatory="No" OrderNumber="17"/>
+        <ItemRef ItemOID="IT.LS.VISITNUM" Mandatory="No" OrderNumber="18"/>
+        <ItemRef ItemOID="IT.LS.VISIT" Mandatory="No" OrderNumber="19"/>
+        <ItemRef ItemOID="IT.LS.LSDTC" Mandatory="No" OrderNumber="20"/>
+        <ItemRef ItemOID="IT.LS.SUBJID" Mandatory="No" OrderNumber="21"/>
+        <ItemRef ItemOID="IT.LS.LSSLOC" Mandatory="No" OrderNumber="22"/>
+        <def:leaf ID="LF.LS" xlink:href="ls.xpt">
+          <def:title>ls.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.PN" Name="PN" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Pain Assessment" def:Structure="One record per subject per pain assessment per visit" def:ArchiveLocationID="LF.PN" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">Pain Assessment domain for the TROPIC trial datasets.</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.PN.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.PN.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.PN.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.PN.PNSEQ" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.PN.PNSPID" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.PN.PNTESTCD" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.PN.PNTEST" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.PN.PNCAT" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.PN.PNORRES" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.PN.PNORRESU" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.PN.PNSTRESC" Mandatory="No" OrderNumber="11"/>
+        <ItemRef ItemOID="IT.PN.PNSTRESN" Mandatory="No" OrderNumber="12"/>
+        <ItemRef ItemOID="IT.PN.PNSTRESU" Mandatory="No" OrderNumber="13"/>
+        <ItemRef ItemOID="IT.PN.PNSTAT" Mandatory="No" OrderNumber="14"/>
+        <ItemRef ItemOID="IT.PN.VISITNUM" Mandatory="No" OrderNumber="15"/>
+        <ItemRef ItemOID="IT.PN.VISIT" Mandatory="No" OrderNumber="16"/>
+        <ItemRef ItemOID="IT.PN.PNDTC" Mandatory="No" OrderNumber="17"/>
+        <ItemRef ItemOID="IT.PN.SUBJID" Mandatory="No" OrderNumber="18"/>
+        <def:leaf ID="LF.PN" xlink:href="pn.xpt">
+          <def:title>pn.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.SUPPDM" Name="SUPPDM" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Relationship" def:Structure="One record per subject per supplemental qualifier" def:ArchiveLocationID="LF.SUPPDM" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">Supplemental Demographics domain for the TROPIC trial datasets.</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.SUPPDM.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.SUPPDM.RDOMAIN" Mandatory="No" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.SUPPDM.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.SUPPDM.IDVAR" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.SUPPDM.IDVARVAL" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.SUPPDM.QNAM" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.SUPPDM.QLABEL" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.SUPPDM.QVAL" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.SUPPDM.QORIG" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.SUPPDM.QEVAL" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.SUPPDM.SUBJID" Mandatory="No" OrderNumber="11"/>
+        <def:leaf ID="LF.SUPPDM" xlink:href="suppdm.xpt">
+          <def:title>suppdm.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.SUPPAE" Name="SUPPAE" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Relationship" def:Structure="One record per subject per adverse event per supplemental qualifier" def:ArchiveLocationID="LF.SUPPAE" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">Supplemental Adverse Events domain for the TROPIC trial datasets.</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.SUPPAE.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.SUPPAE.RDOMAIN" Mandatory="No" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.SUPPAE.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.SUPPAE.IDVAR" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.SUPPAE.IDVARVAL" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.SUPPAE.QNAM" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.SUPPAE.QLABEL" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.SUPPAE.QVAL" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.SUPPAE.QORIG" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.SUPPAE.QEVAL" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.SUPPAE.SUBJID" Mandatory="No" OrderNumber="11"/>
+        <def:leaf ID="LF.SUPPAE" xlink:href="suppae.xpt">
+          <def:title>suppae.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.SUPPEX" Name="SUPPEX" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Relationship" def:Structure="One record per subject per exposure cycle per supplemental qualifier" def:ArchiveLocationID="LF.SUPPEX" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">Supplemental Exposure domain for the TROPIC trial datasets.</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.SUPPEX.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.SUPPEX.RDOMAIN" Mandatory="No" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.SUPPEX.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.SUPPEX.IDVAR" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.SUPPEX.IDVARVAL" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.SUPPEX.QNAM" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.SUPPEX.QLABEL" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.SUPPEX.QVAL" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.SUPPEX.QORIG" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.SUPPEX.QEVAL" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.SUPPEX.SUBJID" Mandatory="No" OrderNumber="11"/>
+        <def:leaf ID="LF.SUPPEX" xlink:href="suppex.xpt">
+          <def:title>suppex.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.SUPPCM" Name="SUPPCM" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Relationship" def:Structure="One record per subject per medication per supplemental qualifier" def:ArchiveLocationID="LF.SUPPCM" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">Supplemental Concomitant Medications domain for the TROPIC trial datasets.</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.SUPPCM.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.SUPPCM.RDOMAIN" Mandatory="No" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.SUPPCM.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.SUPPCM.IDVAR" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.SUPPCM.IDVARVAL" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.SUPPCM.QNAM" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.SUPPCM.QLABEL" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.SUPPCM.QVAL" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.SUPPCM.QORIG" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.SUPPCM.QEVAL" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.SUPPCM.SUBJID" Mandatory="No" OrderNumber="11"/>
+        <def:leaf ID="LF.SUPPCM" xlink:href="suppcm.xpt">
+          <def:title>suppcm.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.SUPPLB" Name="SUPPLB" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Relationship" def:Structure="One record per subject per laboratory test per supplemental qualifier" def:ArchiveLocationID="LF.SUPPLB" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">Supplemental Laboratory Test Results domain for the TROPIC trial datasets.</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.SUPPLB.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.SUPPLB.RDOMAIN" Mandatory="No" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.SUPPLB.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.SUPPLB.IDVAR" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.SUPPLB.IDVARVAL" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.SUPPLB.QNAM" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.SUPPLB.QLABEL" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.SUPPLB.QVAL" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.SUPPLB.QORIG" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.SUPPLB.QEVAL" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.SUPPLB.SUBJID" Mandatory="No" OrderNumber="11"/>
+        <def:leaf ID="LF.SUPPLB" xlink:href="supplb.xpt">
+          <def:title>supplb.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.SUPPDS" Name="SUPPDS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Relationship" def:Structure="One record per subject per disposition event per supplemental qualifier" def:ArchiveLocationID="LF.SUPPDS" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">Supplemental Disposition domain for the TROPIC trial datasets.</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.SUPPDS.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.SUPPDS.RDOMAIN" Mandatory="No" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.SUPPDS.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.SUPPDS.IDVAR" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.SUPPDS.IDVARVAL" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.SUPPDS.QNAM" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.SUPPDS.QLABEL" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.SUPPDS.QVAL" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.SUPPDS.QORIG" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.SUPPDS.QEVAL" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.SUPPDS.SUBJID" Mandatory="No" OrderNumber="11"/>
+        <def:leaf ID="LF.SUPPDS" xlink:href="suppds.xpt">
+          <def:title>suppds.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.SUPPLS" Name="SUPPLS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Relationship" def:Structure="One record per subject per lesion per supplemental qualifier" def:ArchiveLocationID="LF.SUPPLS" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">Supplemental Lesion Assessment domain for the TROPIC trial datasets.</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.SUPPLS.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.SUPPLS.RDOMAIN" Mandatory="No" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.SUPPLS.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.SUPPLS.IDVAR" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.SUPPLS.IDVARVAL" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.SUPPLS.QNAM" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.SUPPLS.QLABEL" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.SUPPLS.QVAL" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.SUPPLS.QORIG" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.SUPPLS.QEVAL" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.SUPPLS.SUBJID" Mandatory="No" OrderNumber="11"/>
+        <def:leaf ID="LF.SUPPLS" xlink:href="suppls.xpt">
+          <def:title>suppls.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemDef OID="IT.DM.AGEGRP" Name="AGEGRP" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AGEGRP Variable for domain DM</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Study Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.DOMAIN" Name="DOMAIN" DataType="text" Length="4">
+        <Description>
+          <TranslatedText xml:lang="en">Domain Abbreviation</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Subject Identifier for the Study</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.RFSTDTC" Name="RFSTDTC" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Subject Reference Start Date/Time</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.RFENDTC" Name="RFENDTC" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Subject Reference End Date/Time</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.AGEU" Name="AGEU" DataType="text" Length="10">
+        <Description>
+          <TranslatedText xml:lang="en">Age Units</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.SEX" Name="SEX" DataType="text" Length="2">
+        <Description>
+          <TranslatedText xml:lang="en">Sex</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.RACE" Name="RACE" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Race</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.ARM" Name="ARM" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Description of Planned Arm</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.ARMCD" Name="ARMCD" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Planned Arm Code</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.ARM2" Name="ARM2" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">ARM2 Variable for domain DM</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.ARMA" Name="ARMA" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">ARMA Variable for domain DM</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.ARMCD2" Name="ARMCD2" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">ARMCD2 Variable for domain DM</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.BSABL" Name="BSABL" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">BSABL Variable for domain DM</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.ITT" Name="ITT" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">ITT Variable for domain DM</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.PPROT" Name="PPROT" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">PPROT Variable for domain DM</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.SAFETY" Name="SAFETY" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">SAFETY Variable for domain DM</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AESTWKF" Name="AESTWKF" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AESTWKF Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEENWKF" Name="AEENWKF" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AEENWKF Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Study Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.DOMAIN" Name="DOMAIN" DataType="text" Length="4">
+        <Description>
+          <TranslatedText xml:lang="en">Domain Abbreviation</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AESEQ" Name="AESEQ" DataType="integer" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Adverse Event Sequence Number</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AESPID" Name="AESPID" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AESPID Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEREFID" Name="AEREFID" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AEREFID Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AETERM" Name="AETERM" DataType="text" Length="200">
+        <Description>
+          <TranslatedText xml:lang="en">Reported Term for the Adverse Event</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEDECOD" Name="AEDECOD" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">Dictionary-Derived Term</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEBODSYS" Name="AEBODSYS" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">Body System or Organ Class</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AESER" Name="AESER" DataType="text" Length="2">
+        <Description>
+          <TranslatedText xml:lang="en">Serious Event</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEACN" Name="AEACN" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">Action Taken with Study Treatment</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AECONTRT" Name="AECONTRT" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AECONTRT Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEREL" Name="AEREL" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Causality</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEPATT" Name="AEPATT" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AEPATT Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEOUT" Name="AEOUT" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">Outcome of Adverse Event</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AESCONG" Name="AESCONG" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AESCONG Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AESDISAB" Name="AESDISAB" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AESDISAB Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AESDTH" Name="AESDTH" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AESDTH Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AESHOSP" Name="AESHOSP" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AESHOSP Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AESLIFE" Name="AESLIFE" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AESLIFE Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AESMIE" Name="AESMIE" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AESMIE Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AETOXGR" Name="AETOXGR" DataType="text" Length="10">
+        <Description>
+          <TranslatedText xml:lang="en">Toxicity Grade</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.VISITNUM" Name="VISITNUM" DataType="float" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Visit Number</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.VISIT" Name="VISIT" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Visit Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AESTWK" Name="AESTWK" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AESTWK Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEENWK" Name="AEENWK" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AEENWK Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Subject Identifier for the Study</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AECOLGR" Name="AECOLGR" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AECOLGR Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AECOLGRN" Name="AECOLGRN" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AECOLGRN Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEDICTVS" Name="AEDICTVS" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AEDICTVS Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEHLGT" Name="AEHLGT" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AEHLGT Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEHLT" Name="AEHLT" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AEHLT Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AELLT" Name="AELLT" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AELLT Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEOVISIT" Name="AEOVISIT" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AEOVISIT Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AETOXGRN" Name="AETOXGRN" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AETOXGRN Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AETRTEM" Name="AETRTEM" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AETRTEM Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEREFER" Name="AEREFER" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AEREFER Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEDTHDTC" Name="AEDTHDTC" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Date/Time of AEDTH</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AESEQUCM" Name="AESEQUCM" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">AESEQUCM Variable for domain AE</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Study Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.DOMAIN" Name="DOMAIN" DataType="text" Length="4">
+        <Description>
+          <TranslatedText xml:lang="en">Domain Abbreviation</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXSEQ" Name="EXSEQ" DataType="integer" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Sequence Number</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXTRT" Name="EXTRT" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Name of Treatment</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXLOT" Name="EXLOT" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">EXLOT Variable for domain EX</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXDOSE" Name="EXDOSE" DataType="float" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Dose</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXDOSU" Name="EXDOSU" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Dose Units</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXDOSFRM" Name="EXDOSFRM" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Dose Form</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXROUTE" Name="EXROUTE" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Route of Administration</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.VISITNUM" Name="VISITNUM" DataType="float" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Visit Number</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.VISIT" Name="VISIT" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Visit Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXSTDTC" Name="EXSTDTC" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Start Date/Time of Treatment</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXSTDY" Name="EXSTDY" DataType="integer" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Study Day of EXST</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXENDTC" Name="EXENDTC" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">End Date/Time of Treatment</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Subject Identifier for the Study</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXPDOSE" Name="EXPDOSE" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">EXPDOSE Variable for domain EX</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXPDOSU" Name="EXPDOSU" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">EXPDOSU Variable for domain EX</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXCUMD" Name="EXCUMD" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">EXCUMD Variable for domain EX</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXCUMD2" Name="EXCUMD2" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">EXCUMD2 Variable for domain EX</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXDOSE2" Name="EXDOSE2" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">EXDOSE2 Variable for domain EX</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXPDOSE2" Name="EXPDOSE2" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">EXPDOSE2 Variable for domain EX</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXTINT" Name="EXTINT" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">EXTINT Variable for domain EX</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXTRINT" Name="EXTRINT" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">EXTRINT Variable for domain EX</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXDSREA" Name="EXDSREA" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">EXDSREA Variable for domain EX</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXDELAY" Name="EXDELAY" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">EXDELAY Variable for domain EX</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXDSRCM" Name="EXDSRCM" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">EXDSRCM Variable for domain EX</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.ENDTCOL" Name="ENDTCOL" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">ENDTCOL Variable for domain EX</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Study Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.DOMAIN" Name="DOMAIN" DataType="text" Length="4">
+        <Description>
+          <TranslatedText xml:lang="en">Domain Abbreviation</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMSEQ" Name="CMSEQ" DataType="integer" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Sequence Number</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMTRT" Name="CMTRT" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">Reported Name of Drug, Med, or Therapy</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMDECOD" Name="CMDECOD" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">Standardized Medication Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMCAT" Name="CMCAT" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">Category for Medication</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMINDC" Name="CMINDC" DataType="text" Length="200">
+        <Description>
+          <TranslatedText xml:lang="en">Indication</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMDOSE" Name="CMDOSE" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">CMDOSE Variable for domain CM</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMDOSU" Name="CMDOSU" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">CMDOSU Variable for domain CM</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMDOSRGM" Name="CMDOSRGM" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">CMDOSRGM Variable for domain CM</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.VISITNUM" Name="VISITNUM" DataType="float" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Visit Number</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.VISIT" Name="VISIT" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Visit Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMSTDTC" Name="CMSTDTC" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Start Date/Time of Medication</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMSTDY" Name="CMSTDY" DataType="integer" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Study Day of CMST</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMENDTC" Name="CMENDTC" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">End Date/Time of Medication</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMENDY" Name="CMENDY" DataType="integer" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Study Day of CMEN</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Subject Identifier for the Study</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMATCL1" Name="CMATCL1" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">CMATCL1 Variable for domain CM</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMATCL2" Name="CMATCL2" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">CMATCL2 Variable for domain CM</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMATCSEL" Name="CMATCSEL" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">CMATCSEL Variable for domain CM</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMONGB" Name="CMONGB" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">CMONGB Variable for domain CM</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMONGO" Name="CMONGO" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">CMONGO Variable for domain CM</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMLOC" Name="CMLOC" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">CMLOC Variable for domain CM</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMENDRCM" Name="CMENDRCM" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">CMENDRCM Variable for domain CM</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMRLTL" Name="CMRLTL" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">CMRLTL Variable for domain CM</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMRSON" Name="CMRSON" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">CMRSON Variable for domain CM</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMPRGDTC" Name="CMPRGDTC" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Date/Time of CMPRG</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Study Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.DOMAIN" Name="DOMAIN" DataType="text" Length="4">
+        <Description>
+          <TranslatedText xml:lang="en">Domain Abbreviation</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBSEQ" Name="LBSEQ" DataType="integer" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Sequence Number</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBTESTCD" Name="LBTESTCD" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Lab Test Short Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBTEST" Name="LBTEST" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">Lab Test Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBCAT" Name="LBCAT" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">Category for Lab Test</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBSCAT" Name="LBSCAT" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">Subcategory for Lab Test</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBORRES" Name="LBORRES" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Result or Finding in Original Units</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBORRESU" Name="LBORRESU" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Original Units</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBORNRLO" Name="LBORNRLO" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">LBORNRLO Variable for domain LB</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBORNRHI" Name="LBORNRHI" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">LBORNRHI Variable for domain LB</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBSTRESC" Name="LBSTRESC" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">LBSTRESC Variable for domain LB</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBSTRESN" Name="LBSTRESN" DataType="float" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Numeric Result/Finding in Standard Units</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBSTRESU" Name="LBSTRESU" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Standard Units</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBSTNRLO" Name="LBSTNRLO" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">LBSTNRLO Variable for domain LB</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBSTNRHI" Name="LBSTNRHI" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">LBSTNRHI Variable for domain LB</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBNRIND" Name="LBNRIND" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">LBNRIND Variable for domain LB</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBSTAT" Name="LBSTAT" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">LBSTAT Variable for domain LB</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBTOX" Name="LBTOX" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">LBTOX Variable for domain LB</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBTOXGR" Name="LBTOXGR" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">LBTOXGR Variable for domain LB</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBBLFL" Name="LBBLFL" DataType="text" Length="1">
+        <Description>
+          <TranslatedText xml:lang="en">Flag</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.VISITNUM" Name="VISITNUM" DataType="float" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Visit Number</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.VISIT" Name="VISIT" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Visit Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBDTC" Name="LBDTC" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Date/Time of Specimen Collection</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBDY" Name="LBDY" DataType="integer" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Analysis Day of Specimen Collection</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Subject Identifier for the Study</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBOVISIT" Name="LBOVISIT" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">LBOVISIT Variable for domain LB</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.DSSTWKF" Name="DSSTWKF" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">DSSTWKF Variable for domain DS</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Study Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.DOMAIN" Name="DOMAIN" DataType="text" Length="4">
+        <Description>
+          <TranslatedText xml:lang="en">Domain Abbreviation</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.DSSEQ" Name="DSSEQ" DataType="integer" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Sequence Number</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.DSTERM" Name="DSTERM" DataType="text" Length="200">
+        <Description>
+          <TranslatedText xml:lang="en">Reported Term for the Disposition Event</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.DSDECOD" Name="DSDECOD" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">Standardized Disposition Term</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.DSCAT" Name="DSCAT" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">Category for Disposition Event</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.DSSCAT" Name="DSSCAT" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">Subcategory for Disposition Event</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.EPOCH" Name="EPOCH" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Epoch</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.VISITNUM" Name="VISITNUM" DataType="float" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Visit Number</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.VISIT" Name="VISIT" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Visit Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.DSSTWK" Name="DSSTWK" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">DSSTWK Variable for domain DS</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Subject Identifier for the Study</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.DSPROG" Name="DSPROG" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">DSPROG Variable for domain DS</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Study Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.DOMAIN" Name="DOMAIN" DataType="text" Length="4">
+        <Description>
+          <TranslatedText xml:lang="en">Domain Abbreviation</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSSEQ" Name="VSSEQ" DataType="integer" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Sequence Number</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSTESTCD" Name="VSTESTCD" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Vital Signs Test Short Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSTEST" Name="VSTEST" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">Vital Signs Test Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSORRES" Name="VSORRES" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Result or Finding in Original Units</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSORRESU" Name="VSORRESU" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">VSORRESU Variable for domain VS</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSSTRESC" Name="VSSTRESC" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">VSSTRESC Variable for domain VS</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSSTRESN" Name="VSSTRESN" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">VSSTRESN Variable for domain VS</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSSTRESU" Name="VSSTRESU" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">VSSTRESU Variable for domain VS</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSMETHOD" Name="VSMETHOD" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">VSMETHOD Variable for domain VS</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSBLFL" Name="VSBLFL" DataType="text" Length="1">
+        <Description>
+          <TranslatedText xml:lang="en">Flag</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSDRVFL" Name="VSDRVFL" DataType="text" Length="1">
+        <Description>
+          <TranslatedText xml:lang="en">Flag</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VISITNUM" Name="VISITNUM" DataType="float" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Visit Number</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VISIT" Name="VISIT" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Visit Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSDTC" Name="VSDTC" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Date/Time of Specimen Collection</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSDY" Name="VSDY" DataType="integer" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Study Day of VS</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Subject Identifier for the Study</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Study Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.DOMAIN" Name="DOMAIN" DataType="text" Length="4">
+        <Description>
+          <TranslatedText xml:lang="en">Domain Abbreviation</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSSEQ" Name="LSSEQ" DataType="integer" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Sequence Number</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSSPID" Name="LSSPID" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">LSSPID Variable for domain LS</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSTESTCD" Name="LSTESTCD" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Lesion Assessment Test Short Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSTEST" Name="LSTEST" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">Lesion Assessment Test Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSCAT" Name="LSCAT" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">Category for Lesion Assessment</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSLOC" Name="LSLOC" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">Location for Lesion Assessment</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSORRES" Name="LSORRES" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Result or Finding in Original Units</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSORRESU" Name="LSORRESU" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">LSORRESU Variable for domain LS</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSSTRESC" Name="LSSTRESC" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">LSSTRESC Variable for domain LS</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSSTRESN" Name="LSSTRESN" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">LSSTRESN Variable for domain LS</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSSTRESU" Name="LSSTRESU" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">LSSTRESU Variable for domain LS</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSMETHOD" Name="LSMETHOD" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">LSMETHOD Variable for domain LS</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSSTAT" Name="LSSTAT" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">LSSTAT Variable for domain LS</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSBLFL" Name="LSBLFL" DataType="text" Length="1">
+        <Description>
+          <TranslatedText xml:lang="en">Flag</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.VISITNUM" Name="VISITNUM" DataType="float" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Visit Number</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.VISIT" Name="VISIT" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Visit Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSDTC" Name="LSDTC" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Date/Time of LS</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Subject Identifier for the Study</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSSLOC" Name="LSSLOC" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">LSSLOC Variable for domain LS</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Study Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.DOMAIN" Name="DOMAIN" DataType="text" Length="4">
+        <Description>
+          <TranslatedText xml:lang="en">Domain Abbreviation</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.PNSEQ" Name="PNSEQ" DataType="integer" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Sequence Number</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.PNSPID" Name="PNSPID" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">PNSPID Variable for domain PN</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.PNTESTCD" Name="PNTESTCD" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Pain Assessment Test Short Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.PNTEST" Name="PNTEST" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">Pain Assessment Test Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.PNCAT" Name="PNCAT" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">Category for Pain Assessment</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.PNORRES" Name="PNORRES" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Result or Finding in Original Units</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.PNORRESU" Name="PNORRESU" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">PNORRESU Variable for domain PN</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.PNSTRESC" Name="PNSTRESC" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">PNSTRESC Variable for domain PN</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.PNSTRESN" Name="PNSTRESN" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">PNSTRESN Variable for domain PN</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.PNSTRESU" Name="PNSTRESU" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">PNSTRESU Variable for domain PN</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.PNSTAT" Name="PNSTAT" DataType="text" Length="100">
+        <Description>
+          <TranslatedText xml:lang="en">PNSTAT Variable for domain PN</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.VISITNUM" Name="VISITNUM" DataType="float" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Visit Number</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.VISIT" Name="VISIT" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Visit Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.PNDTC" Name="PNDTC" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Date/Time of PN</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Subject Identifier for the Study</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDM.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Study Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDM.RDOMAIN" Name="RDOMAIN" DataType="text" Length="4">
+        <Description>
+          <TranslatedText xml:lang="en">Related Domain</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDM.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDM.IDVAR" Name="IDVAR" DataType="text" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Identifying Variable</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDM.IDVARVAL" Name="IDVARVAL" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Identifying Variable Value</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDM.QNAM" Name="QNAM" DataType="text" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Qualifier Variable Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDM.QLABEL" Name="QLABEL" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Qualifier Variable Label</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDM.QVAL" Name="QVAL" DataType="text" Length="200">
+        <Description>
+          <TranslatedText xml:lang="en">Qualifier Variable Value</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDM.QORIG" Name="QORIG" DataType="text" Length="10">
+        <Description>
+          <TranslatedText xml:lang="en">Origin</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDM.QEVAL" Name="QEVAL" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Evaluator</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDM.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Subject Identifier for the Study</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPAE.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Study Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPAE.RDOMAIN" Name="RDOMAIN" DataType="text" Length="4">
+        <Description>
+          <TranslatedText xml:lang="en">Related Domain</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPAE.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPAE.IDVAR" Name="IDVAR" DataType="text" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Identifying Variable</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPAE.IDVARVAL" Name="IDVARVAL" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Identifying Variable Value</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPAE.QNAM" Name="QNAM" DataType="text" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Qualifier Variable Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPAE.QLABEL" Name="QLABEL" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Qualifier Variable Label</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPAE.QVAL" Name="QVAL" DataType="text" Length="200">
+        <Description>
+          <TranslatedText xml:lang="en">Qualifier Variable Value</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPAE.QORIG" Name="QORIG" DataType="text" Length="10">
+        <Description>
+          <TranslatedText xml:lang="en">Origin</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPAE.QEVAL" Name="QEVAL" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Evaluator</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPAE.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Subject Identifier for the Study</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPEX.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Study Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPEX.RDOMAIN" Name="RDOMAIN" DataType="text" Length="4">
+        <Description>
+          <TranslatedText xml:lang="en">Related Domain</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPEX.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPEX.IDVAR" Name="IDVAR" DataType="text" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Identifying Variable</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPEX.IDVARVAL" Name="IDVARVAL" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Identifying Variable Value</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPEX.QNAM" Name="QNAM" DataType="text" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Qualifier Variable Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPEX.QLABEL" Name="QLABEL" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Qualifier Variable Label</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPEX.QVAL" Name="QVAL" DataType="text" Length="200">
+        <Description>
+          <TranslatedText xml:lang="en">Qualifier Variable Value</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPEX.QORIG" Name="QORIG" DataType="text" Length="10">
+        <Description>
+          <TranslatedText xml:lang="en">Origin</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPEX.QEVAL" Name="QEVAL" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Evaluator</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPEX.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Subject Identifier for the Study</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPCM.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Study Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPCM.RDOMAIN" Name="RDOMAIN" DataType="text" Length="4">
+        <Description>
+          <TranslatedText xml:lang="en">Related Domain</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPCM.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPCM.IDVAR" Name="IDVAR" DataType="text" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Identifying Variable</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPCM.IDVARVAL" Name="IDVARVAL" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Identifying Variable Value</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPCM.QNAM" Name="QNAM" DataType="text" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Qualifier Variable Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPCM.QLABEL" Name="QLABEL" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Qualifier Variable Label</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPCM.QVAL" Name="QVAL" DataType="text" Length="200">
+        <Description>
+          <TranslatedText xml:lang="en">Qualifier Variable Value</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPCM.QORIG" Name="QORIG" DataType="text" Length="10">
+        <Description>
+          <TranslatedText xml:lang="en">Origin</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPCM.QEVAL" Name="QEVAL" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Evaluator</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPCM.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Subject Identifier for the Study</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Study Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.RDOMAIN" Name="RDOMAIN" DataType="text" Length="4">
+        <Description>
+          <TranslatedText xml:lang="en">Related Domain</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.IDVAR" Name="IDVAR" DataType="text" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Identifying Variable</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.IDVARVAL" Name="IDVARVAL" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Identifying Variable Value</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.QNAM" Name="QNAM" DataType="text" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Qualifier Variable Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.QLABEL" Name="QLABEL" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Qualifier Variable Label</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.QVAL" Name="QVAL" DataType="text" Length="200">
+        <Description>
+          <TranslatedText xml:lang="en">Qualifier Variable Value</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.QORIG" Name="QORIG" DataType="text" Length="10">
+        <Description>
+          <TranslatedText xml:lang="en">Origin</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.QEVAL" Name="QEVAL" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Evaluator</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Subject Identifier for the Study</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDS.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Study Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDS.RDOMAIN" Name="RDOMAIN" DataType="text" Length="4">
+        <Description>
+          <TranslatedText xml:lang="en">Related Domain</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDS.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDS.IDVAR" Name="IDVAR" DataType="text" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Identifying Variable</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDS.IDVARVAL" Name="IDVARVAL" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Identifying Variable Value</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDS.QNAM" Name="QNAM" DataType="text" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Qualifier Variable Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDS.QLABEL" Name="QLABEL" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Qualifier Variable Label</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDS.QVAL" Name="QVAL" DataType="text" Length="200">
+        <Description>
+          <TranslatedText xml:lang="en">Qualifier Variable Value</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDS.QORIG" Name="QORIG" DataType="text" Length="10">
+        <Description>
+          <TranslatedText xml:lang="en">Origin</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDS.QEVAL" Name="QEVAL" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Evaluator</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDS.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Subject Identifier for the Study</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLS.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Study Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLS.RDOMAIN" Name="RDOMAIN" DataType="text" Length="4">
+        <Description>
+          <TranslatedText xml:lang="en">Related Domain</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLS.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLS.IDVAR" Name="IDVAR" DataType="text" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Identifying Variable</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLS.IDVARVAL" Name="IDVARVAL" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Identifying Variable Value</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLS.QNAM" Name="QNAM" DataType="text" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Qualifier Variable Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLS.QLABEL" Name="QLABEL" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Qualifier Variable Label</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLS.QVAL" Name="QVAL" DataType="text" Length="200">
+        <Description>
+          <TranslatedText xml:lang="en">Qualifier Variable Value</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLS.QORIG" Name="QORIG" DataType="text" Length="10">
+        <Description>
+          <TranslatedText xml:lang="en">Origin</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLS.QEVAL" Name="QEVAL" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Evaluator</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLS.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Subject Identifier for the Study</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+    </MetaDataVersion>
+  </Study>
+</ODM>
