@@ -1,0 +1,61 @@
+name: TROPIC Clinical Pipeline CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    name: Run Tests & Conformance Gates
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up R
+      uses: r-lib/actions/setup-r@v2
+      with:
+        r-version: 'release'
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libxml2-dev libssl-dev libcurl4-openssl-dev
+
+    - name: Cache renv packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/R/renv
+        key: ${{ runner.os }}-renv-${{ hashFiles('**/renv.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-renv-
+
+    - name: Restore renv environment
+      run: |
+        Rscript -e "install.packages('renv', repos='https://cloud.r-project.org')"
+        Rscript -e "renv::restore()"
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install pyreadstat lxml saspy
+
+    - name: Run unit tests (Broker + Seeder)
+      run: |
+        python3 06_telemetry/test_oda_broker.py
+
+    - name: Run clinical pipeline smoke test (Demo)
+      run: |
+        python3 06_telemetry/cibuild.py --demo
+
+    - name: Run ADaM conformance check gate
+      run: |
+        bash 06_telemetry/run_adam_conformance.sh
