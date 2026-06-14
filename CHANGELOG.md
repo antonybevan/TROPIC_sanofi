@@ -4,6 +4,110 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.6.1] - 2026-06-14 — First verified real-ODA execution + literally-clean logs
+
+> **Verification scope (read first).** Unlike 3.6.0, this entry was produced by an **actual
+> `--real-sas` run on SAS OnDemand for Academics (ODA)** — endpoint `odaws01-apse1-2.oda.sas.com`,
+> live nonce-probe verified, against the verified-resident SDTM (manifest `329430f6…`). Recorded
+> `sas_execution_mode` is **`oda`**. The SAS↔R reconciliation therefore ran on **real SAS 9.4
+> output** (not the sim byte-copy): all **7 ADaM domains report zero cell-level differences**
+> (`diffdf`). That single run does two things at once — it **resolves the 3.6.0 verification-scope
+> caveat** (the two-track equivalence asserted there is now executed and confirmed), and it **proves
+> the log-hygiene edits below changed no values** (a value change would have broken the zero-diff).
+> ADaM record counts are unchanged: ADSL 371, ADEX 13052, ADCM 24534, ADAE 5428, ADLB 78619,
+> ADRS 2904, ADTTE 2058.
+
+### Fixed — SAS 9.4 log hygiene (master log now **0 ERROR · 0 WARNING · 0 flagged NOTE**)
+- **Uninitialized-variable bug (`A_adtte_generation.sas`).** A duplicated keyword in the TTE
+  `format ADT STARTDT format yymmdd10. …` statement made SAS create a phantom, never-set variable
+  `FORMAT` → *"NOTE: Variable FORMAT is uninitialized."* Removed the stray `format`. The phantom var
+  was intermediate (excluded by the final `keep=`), so output is unchanged.
+- **Partial-date `INPUT` notes (`S_sdtm_mapping.sas` ×14, `A_adsl`/`A_adtte` PAINBL).** Imprecise
+  SDTM `--DTC` values (e.g. `2007-02`, `----07`, single-digit days) hit `input(substr(…),yymmdd10.)`
+  → *"Invalid date value"* + *"Invalid argument to function INPUT."* Added the single **`?` informat
+  modifier**. Confirmed on ODA to be **value-identical** to the bare informat (partial → missing,
+  `2008-02-5` → `2008-02-05` preserved) while suppressing both notes. *(The DATA-step `??` modifier
+  is rejected by the PROC SQL `INPUT` function — `ERROR 22-322` — so the SQL-compatible single `?`
+  is used.)*
+- **"Operation on missing values" notes (×3), output-preserving guards.** ADAE episode duration
+  `CIAEDUR` and the gap-window comparison (`A_adae_io_respec.sas`), the ADLB baseline analysis-window
+  distance (`A_adlb_generation.sas`), and the ADTTE cycle baseline-diff (`A_adtte_generation.sas`)
+  each performed arithmetic on legitimately-missing dates. Guarded so the result (missing) is
+  identical; the episode gap-window uses a temp-variable form that preserves the **exact**
+  missing-comparison semantics rather than a guard that could shift episode-merge control flow.
+
+### Fixed — R validation log hygiene (now **0 warnings** across all 9 `logrx` logs)
+- **`xportr_write` underscore false-positive.** `xportr` flagged the underscore in the deliberate
+  `<domain>_v.xpt` validation member name (a check stricter than the SAS v5 transport spec). Added a
+  centralized **`write_xpt_v()`** wrapper in `config_study.R` that muffles **only** that exact
+  message (`grepl("non-ASCII, symbol or underscore")`); every other xportr warning still surfaces.
+  Updated the 7 validation call sites.
+
+### Verified
+- 12/12 stages **PASS**; `pipeline_health.json` **GREEN** (`sas_execution_mode: oda`,
+  `probe_nonce_echoed: true`); `reconciliation_status.json` **PASS** (7/7 domains zero-diff).
+- SAS master log audit: 0 `ERROR`, 0 `WARNING`, 0 `Invalid date value`, 0 `Invalid argument to
+  function INPUT`, 0 `uninitialized`, 0 `operation on missing values`, 0 type-conversion notes.
+- All 7 `*_prod.xpt` are byte-distinct from the R `*_v.xpt` (genuine independent SAS output, not a
+  sim byte-copy) yet agree cell-for-cell under `diffdf`.
+
+## [3.6.0] - 2026-06-13 — Validation-core correctness remediation (portfolio audit roadmap #2–#10)
+
+> **Verification scope (read first).** Every change below is symmetric across the SAS production
+> and R validation tracks and was statically verified locally: all pipeline R scripts parse
+> (`tests/smoke_test.R`), `define.xml` still passes full XSD validation + the referential gate
+> (273 checks), the broker/seed unit tests (10) pass, and the new TFL-stats snapshot test passes.
+> The SAS track and the SAS↔R reconciliation were **not executed against a SAS engine** (none is
+> available in this environment); the two-track equivalence of these edits is confirmable only on a
+> real `--real-sas` (`oda`/`local`) run. Recorded `sas_execution_mode` is still `sim`.
+>
+> **[Resolved in 3.6.1, 2026-06-14]** — that real `oda` run has since been executed: all 7 ADaM
+> domains reconcile zero-diff against real SAS 9.4 output. See the 3.6.1 entry above.
+
+### Fixed — two-track equivalence defects (were masked by sim-mode reconciliation)
+- **ADTTE population filter parity.** The R validation track applied **no** analysis-population
+  filter while the SAS track filtered `SAFFL='Y'` on every parameter. The tracks were not logically
+  equivalent; a real reconciliation would have diverged on any `SAFFL='N'` subject. Both tracks now
+  apply identical, explicit population rules per parameter (see *Changed → ITT*).
+- **Same-day pain aggregation parity.** SAS used `min()`, R used `first()` for multiple same-day
+  pain scores. Standardised on **`min()`** (order-independent, deterministic) in both tracks.
+
+### Changed — ADTTE derivation (`A_adtte_generation.sas` + `v_adtte_validation.R`)
+- **ITT vs Safety population, made explicit and carried on-record (#4).** OS & PFS now analysed on
+  **ITT** (`ITTFL='Y'`, randomisation anchor) instead of Safety; TTSAE/TTPAIN/TTPSA on Safety;
+  TTUMOR on Safety ∩ measurable-disease. `ITTFL` and `SAFFL` are now carried on every ADTTE record.
+- **PSA-progression censoring re-sourced from ADaM (#3).** Censor date now comes from **ADLB**
+  (`PARAMCD='PSA'`), the same ADaM source in both tracks — previously SAS read raw `sdtm.lb` while
+  R read staging `lb.rds` (a built-in mismatch and a break of ADaM-from-ADaM traceability).
+- **Data cutoff applied consistently (#10).** `&STUDY_CUTOFF_DT.` now caps the censoring branch of
+  **every** TTE parameter (was TTPSA/TTUMOR only).
+- **R track de-transliterated (#5).** ADTTE QC restructured around an ordered branch label +
+  a single `finalize_tte()` contract rather than mirroring the SAS `if/else` line-for-line. Output
+  remains identical by design (the reconciliation target); single-author independence limits noted
+  in ADRG §6.
+
+### Added
+- **BDS/OCCDS metadata (#7):** ADTTE gains `PARAMN`, `PARCAT1`, `AVALU` (+ the population flags
+  above); **ADLB** now carries `ADT` (analysis date); **ADAE** now carries `TRTA`/`TRTAN`. All added
+  symmetrically in SAS + R + `define.xml` (XSD-valid).
+- **ARM expanded (#7):** from 1 result display to **3** (added *Secondary Time-to-Event Analyses*
+  for TTPSA/TTUMOR and *TEAE Summary* for ADAE), 5 `AnalysisResult`s, with the backing WhereClauses.
+- **TFL survival-stats snapshot test (#8):** `tests/test_tfl_stats.R` locks the stratified Cox /
+  log-rank recipe (extracted to `09_tfl/tfl_stats.R`, shared with `tfl_generation.R`) against
+  deterministic fixtures; wired into `cibuild.py --demo`.
+- **Pinnacle 21 / CDISC CORE runbook (#9):** `07_define_xml/P21_RUNBOOK.md` (turn-key commands;
+  the business-rule layer remains data-gated and is not faked).
+- **Portfolio visibility (#6):** the rendered TFL gallery (`09_tfl/output/`) and the execution
+  evidence (`pipeline_health.json`, `reconciliation_status.json`) are no longer git-ignored, so a
+  reviewer sees the figures/tables and the honest `sas_execution_mode` without a local run.
+
+### Changed — orchestration / portability (#10)
+- **Hard-coded ODA account path removed** from `cibuild.py`, `seed_sdtm.py`, `_oda_render_tfl.py`
+  (leaked a developer account id and contradicted the "no hard-coded paths" claim). Now env-driven
+  (`TROPIC_ODA_PROJ_ROOT`, default `~/TROPIC`) and resolved against the connected account's `$HOME`.
+- **`--real-sas` now required for `local` mode.** A bare `sas` on `PATH` no longer silently
+  overrides the default; without `--real-sas` the run is honestly labelled `sim`.
+
 ## [3.5.4] - 2026-06-13 — Define-XML FULLY XSD-validated (offline, reproducible)
 
 ### Added

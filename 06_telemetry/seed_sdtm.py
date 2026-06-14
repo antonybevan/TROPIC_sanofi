@@ -27,8 +27,54 @@ import tempfile
 HERE = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(HERE, ".."))
 SDTM_LOCAL = os.path.join(PROJECT_ROOT, "01_raw_source", "real_sdtm")
-SDTM_ODA = "/home/u64235016/TROPIC/01_raw_source/real_sdtm"
+# ODA-side SDTM directory. No developer account id is hard-coded (roadmap #10): defaults to a
+# ~/TROPIC layout resolved against the connecting account's $HOME; override via env if needed.
+SDTM_ODA = os.environ.get(
+    "TROPIC_ODA_SDTM_DIR",
+    os.environ.get("TROPIC_ODA_PROJ_ROOT", "~/TROPIC") + "/01_raw_source/real_sdtm")
 MANIFEST_NAME = "_tropic_sdtm_manifest.json"
+
+
+def _resolve_oda_home(sas, path):
+    """Expand a leading '~' against the connected ODA account's $HOME so no per-user absolute
+    path is committed. Returns path unchanged if already absolute or $HOME cannot be read."""
+    if "~" not in path:
+        return path
+    try:
+        log = sas.submit("%put TROPIC_ODA_HOME=%sysget(HOME);").get("LOG", "")
+        for line in log.splitlines():
+            if "TROPIC_ODA_HOME=" in line and "%put" not in line and "%sysget" not in line:
+                home = line.split("TROPIC_ODA_HOME=", 1)[1].strip()
+                if home:
+                    return path.replace("~", home, 1)
+    except Exception:
+        pass
+    return path
+
+
+def _ensure_remote_dir(sas, remote_dir):
+    """mkdir -p the ODA target tree before any upload. SASPy's IOM upload to a NONEXISTENT
+    remote directory spins on CPU indefinitely instead of erroring — and the dir genuinely is
+    absent on a fresh account / after an ODA home-region change. ODA blocks the shell (X / CALL
+    SYSTEM), so we build the tree level-by-level with the DCREATE function. Returns True on done."""
+    segs = [s for s in remote_dir.split("/") if s]
+    lines = ["options notes source;", "data _null_;"]
+    parent = ""
+    for s in segs:
+        full = f"{parent}/{s}"
+        lines.append(f'  if fileexist("{full}")=0 then _rc=dcreate("{s}","{parent}/");')
+        parent = full
+    lines.append(f'  _exist = fileexist("{remote_dir}");')
+    lines.append(f'  put "TROPIC_MKDIR|" "{remote_dir}|" _exist;')
+    lines.append("run;")
+    log = sas.submit("\n".join(lines)).get("LOG", "")
+    ok = any(l.strip().startswith("TROPIC_MKDIR|") and l.strip().endswith("|1")
+               for l in log.splitlines())
+    if not ok:
+        print("--- MKDIR LOG START ---")
+        print(log)
+        print("--- MKDIR LOG END ---")
+    return ok
 
 
 def _sha256(path, _buf=1024 * 1024):
@@ -75,6 +121,7 @@ def manifests_match(local, remote):
 
 def read_remote_manifest(sas, remote_dir=SDTM_ODA):
     """Download the ODA manifest sentinel and parse it. None if absent/unreadable."""
+    remote_dir = _resolve_oda_home(sas, remote_dir)
     remote = f"{remote_dir}/{MANIFEST_NAME}"
     tmp = os.path.join(tempfile.gettempdir(), MANIFEST_NAME)
     try:
@@ -105,6 +152,7 @@ def verify_resident(sas, sdtm_dir=SDTM_LOCAL, remote_dir=SDTM_ODA, local=None):
 
 def _remote_nobs(sas, remote_dir=SDTM_ODA):
     """Re-read observation counts per member from ODA (post-upload integrity). {name: nobs}."""
+    remote_dir = _resolve_oda_home(sas, remote_dir)
     code = f"""
 libname _seed "{remote_dir}";
 proc sql noprint;
@@ -126,29 +174,51 @@ data _null_; set _nobs; put "SEEDNOBS|" memname "|" nobs; run;
     return out
 
 
+def stale_members(local, remote, force=False):
+    """Members whose sha256 differs from the ODA manifest (force / absent manifest => all).
+    The ~200 MB IOM transfer is the pipeline's dominant cost, so a partial source refresh must
+    ship only the changed datasets, not the whole library."""
+    remote_sha = {} if (force or not remote) else {
+        n: d.get("sha256") for n, d in remote.get("datasets", {}).items()}
+    return sorted(n for n, d in local["datasets"].items() if remote_sha.get(n) != d["sha256"])
+
+
 def seed(sas, sdtm_dir=SDTM_LOCAL, remote_dir=SDTM_ODA, force=False):
-    """Idempotently ensure the SDTM library on ODA matches local. Returns a result dict."""
+    """Idempotently ensure the SDTM library on ODA matches local, uploading ONLY the members
+    whose sha256 differs from the ODA manifest (force => all). Returns a result dict."""
+    remote_dir = _resolve_oda_home(sas, remote_dir)
     local = compute_local_manifest(sdtm_dir)
-    if not force:
-        ok, _, reason = verify_resident(sas, sdtm_dir, remote_dir, local=local)
-        if ok:
-            return {"uploaded": 0, "skipped": len(local["datasets"]),
-                    "manifest_sha": local["manifest_sha"], "status": "already-resident"}
+    if not local["datasets"]:
+        return {"uploaded": 0, "skipped": 0,
+                "manifest_sha": local["manifest_sha"], "status": "no-local-sdtm"}
 
-    files = sorted(glob.glob(os.path.join(sdtm_dir, "*.sas7bdat")))
-    up_mb = sum(os.path.getsize(f) for f in files) / 1_048_576
-    print(f"  [SEED] Uploading {len(files)} SDTM files ({up_mb:.0f} MB) to ODA — IOM ~1-5 MB/s...")
-    for f in files:
-        sas.upload(f, f"{remote_dir}/{os.path.basename(f)}")
+    remote = None if force else read_remote_manifest(sas, remote_dir)
+    if not force and manifests_match(local, remote):
+        return {"uploaded": 0, "skipped": len(local["datasets"]),
+                "manifest_sha": local["manifest_sha"], "status": "already-resident"}
 
-    # Integrity re-read: confirm row counts where we know them locally.
+    stale = stale_members(local, remote, force=force)
+    if not _ensure_remote_dir(sas, remote_dir):
+        return {"uploaded": 0, "status": "MKDIR_FAILED", "remote_dir": remote_dir,
+                "manifest_sha": local["manifest_sha"]}
+    up_mb = sum(os.path.getsize(os.path.join(sdtm_dir, n)) for n in stale) / 1_048_576
+    print(f"  [SEED] Uploading {len(stale)}/{len(local['datasets'])} changed SDTM file(s) "
+          f"({up_mb:.0f} MB) to ODA — IOM ~0.4 MB/s...", flush=True)
+    for i, name in enumerate(stale, 1):
+        f = os.path.join(sdtm_dir, name)
+        print(f"  [SEED]   ({i}/{len(stale)}) {name} ({os.path.getsize(f)/1_048_576:.1f} MB)...",
+              flush=True)
+        sas.upload(f, f"{remote_dir}/{name}")
+
+    # Integrity re-read: confirm row counts across the FULL library where known locally
+    # (covers resident members too, not just this run's delta).
     nobs = _remote_nobs(sas, remote_dir)
     mismatches = []
     for name, d in local["datasets"].items():
         if d.get("nrows") is not None and name in nobs and nobs[name] != d["nrows"]:
             mismatches.append(f"{name}: local {d['nrows']} != ODA {nobs[name]}")
     if mismatches:
-        return {"uploaded": len(files), "status": "VERIFY_FAILED",
+        return {"uploaded": len(stale), "status": "VERIFY_FAILED",
                 "manifest_sha": local["manifest_sha"], "mismatches": mismatches}
 
     # Write the manifest sentinel LAST (transactional completeness marker).
@@ -160,7 +230,7 @@ def seed(sas, sdtm_dir=SDTM_LOCAL, remote_dir=SDTM_ODA, force=False):
         os.remove(tmp)
     except OSError:
         pass
-    return {"uploaded": len(files), "skipped": 0,
+    return {"uploaded": len(stale), "skipped": len(local["datasets"]) - len(stale),
             "manifest_sha": local["manifest_sha"], "status": "seeded"}
 
 

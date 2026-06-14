@@ -73,6 +73,6 @@ if (nrow(adcm) == 0) {
 # XPT v5 compliance (clean log): uppercase variable names + SAS date formats
 names(adcm) <- toupper(names(adcm))
 for (.dv in names(adcm)) if (inherits(adcm[[.dv]], "Date")) attr(adcm[[.dv]], "format.sas") <- "DATE9."
-xportr_write(adcm, "04_adam/adcm_v.xpt", domain = "ADCM")
+write_xpt_v(adcm, "04_adam/adcm_v.xpt", domain = "ADCM")
 
 cat("NOTE: [VALIDATION] Wrote validation ADCM: 04_adam/adcm_v.xpt\n")

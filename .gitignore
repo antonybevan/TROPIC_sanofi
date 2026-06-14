@@ -64,3 +64,15 @@ scratch/
 06_telemetry/oda_status.json
 06_telemetry/.oda_singleflight.lock
 06_telemetry/.oda_session.json
+
+# --- Roadmap #6: surface portfolio deliverables + honest execution evidence on GitHub ---
+# Re-include the rendered TFL gallery (figures + text tables) and the pipeline-health /
+# reconciliation evidence so a reviewer browsing the repo sees them without a local run.
+# pipeline_health.json is committed as-is and transparently shows the current
+# sas_execution_mode (e.g. "sim" until a real oda/local run is recorded). Negations must
+# follow the broad *.png / output-dir ignores above; the directory is re-included first so
+# its contents can be re-included.
+!09_tfl/output/
+!09_tfl/output/**
+!06_telemetry/pipeline_health.json
+!06_telemetry/reconciliation_status.json

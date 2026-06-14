@@ -24,7 +24,7 @@
 /* 1. Calculate TRTSDT (Treatment Start Date) per USUBJID */
 proc sql;
     create table work.trtsdt_map as
-    select usubjid, min(input(substr(exstdtc, 1, 10), yymmdd10.)) as trtsdt format=yymmdd10.
+    select usubjid, min(input(substr(exstdtc, 1, 10), ? yymmdd10.)) as trtsdt format=yymmdd10.
     from staging.ex
     where not missing(exstdtc) and length(compress(exstdtc)) >= 10
     group by usubjid;
@@ -55,9 +55,9 @@ proc sql;
         dm.pprot length=1,
         dm.safety length=1,
         t.trtsdt as trtsdt format=yymmdd10.,
-        input(substr(dm.rfstdtc, 1, 10), yymmdd10.) as randdt format=yymmdd10.,
-        input(substr(dm.rfstdtc, 1, 10), yymmdd10.) as rfstdtc format=yymmdd10.,
-        input(substr(dm.rfendtc, 1, 10), yymmdd10.) as rfendtc format=yymmdd10.
+        input(substr(dm.rfstdtc, 1, 10), ? yymmdd10.) as randdt format=yymmdd10.,
+        input(substr(dm.rfstdtc, 1, 10), ? yymmdd10.) as rfstdtc format=yymmdd10.,
+        input(substr(dm.rfendtc, 1, 10), ? yymmdd10.) as rfendtc format=yymmdd10.
     from staging.dm as dm
     left join work.trtsdt_map as t on dm.usubjid = t.usubjid;
 quit;
@@ -77,8 +77,8 @@ proc sql;
         ex.exseq,
         ex.visit length=40,
         ex.visitnum,
-        input(substr(ex.exstdtc, 1, 10), yymmdd10.) as exstdt format=yymmdd10.,
-        input(substr(ex.exendtc, 1, 10), yymmdd10.) as exendt format=yymmdd10.,
+        input(substr(ex.exstdtc, 1, 10), ? yymmdd10.) as exstdt format=yymmdd10.,
+        input(substr(ex.exendtc, 1, 10), ? yymmdd10.) as exendt format=yymmdd10.,
         ex.exdelay length=10,
         input(ex.excumd, best32.) as excumd,
         input(ex.excumd2, best32.) as excumd2,
@@ -89,7 +89,7 @@ proc sql;
         ex.exdsrcm length=100,
         ex.exdsrea length=100,
         case 
-            when not missing(t.trtsdt) and not missing(ex.exstdtc) then input(substr(ex.exstdtc, 1, 10), yymmdd10.) - t.trtsdt + 1
+            when not missing(t.trtsdt) and not missing(ex.exstdtc) then input(substr(ex.exstdtc, 1, 10), ? yymmdd10.) - t.trtsdt + 1
             else .
         end as exstdy
     from staging.ex as ex
@@ -162,9 +162,9 @@ proc sql;
         lb.lbtoxgr length=5,
         lb.visit length=40,
         lb.visitnum,
-        input(substr(lb.lbdtc, 1, 10), yymmdd10.) as lbdt format=yymmdd10.,
+        input(substr(lb.lbdtc, 1, 10), ? yymmdd10.) as lbdt format=yymmdd10.,
         case 
-            when not missing(t.trtsdt) and not missing(lb.lbdtc) then input(substr(lb.lbdtc, 1, 10), yymmdd10.) - t.trtsdt + 1
+            when not missing(t.trtsdt) and not missing(lb.lbdtc) then input(substr(lb.lbdtc, 1, 10), ? yymmdd10.) - t.trtsdt + 1
             else .
         end as lbdy
     from staging.lb as lb
@@ -188,10 +188,10 @@ proc sql;
         cm.cmdosrgm length=20,
         cm.visitnum,
         cm.visit length=40,
-        case when not missing(cm.cmstdtc) then input(substr(cm.cmstdtc, 1, 10), yymmdd10.) else . end as cmstdt format=yymmdd10.,
-        case when not missing(cm.cmendtc) then input(substr(cm.cmendtc, 1, 10), yymmdd10.) else . end as cmendt format=yymmdd10.,
+        case when not missing(cm.cmstdtc) then input(substr(cm.cmstdtc, 1, 10), ? yymmdd10.) else . end as cmstdt format=yymmdd10.,
+        case when not missing(cm.cmendtc) then input(substr(cm.cmendtc, 1, 10), ? yymmdd10.) else . end as cmendt format=yymmdd10.,
         case 
-            when not missing(t.trtsdt) and not missing(cm.cmstdtc) then input(substr(cm.cmstdtc, 1, 10), yymmdd10.) - t.trtsdt + 1
+            when not missing(t.trtsdt) and not missing(cm.cmstdtc) then input(substr(cm.cmstdtc, 1, 10), ? yymmdd10.) - t.trtsdt + 1
             else .
         end as cmstdy
     from staging.cm as cm
@@ -244,9 +244,9 @@ proc sql;
         vs.vsblfl length=1,
         vs.visitnum,
         vs.visit length=40,
-        input(substr(vs.vsdtc, 1, 10), yymmdd10.) as vsdt format=yymmdd10.,
+        input(substr(vs.vsdtc, 1, 10), ? yymmdd10.) as vsdt format=yymmdd10.,
         case 
-            when not missing(t.trtsdt) and not missing(vs.vsdtc) then input(substr(vs.vsdtc, 1, 10), yymmdd10.) - t.trtsdt + 1
+            when not missing(t.trtsdt) and not missing(vs.vsdtc) then input(substr(vs.vsdtc, 1, 10), ? yymmdd10.) - t.trtsdt + 1
             else .
         end as vsdy
     from staging.vs as vs

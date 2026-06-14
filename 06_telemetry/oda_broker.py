@@ -303,11 +303,17 @@ def _default_session_factory(timeout):
 def _default_prober(sas, nonce):
     """Live round-trip: submit a runtime nonce and confirm BOTH it echoes back AND the workspace
     macro vars resolve. A cached/dead session cannot echo a fresh nonce, so 'oda' is earned."""
+    import re
     try:
         log = sas.submit(f"%put ODA_LIVE=&sysjobid.|{nonce}|&sysscp.;").get("LOG", "")
     except Exception:
         return False
-    return (nonce in log) and ("ODA_LIVE=" in log) and ("&sysjobid" not in log)
+    # Match the RESOLVED %put output (e.g. 'ODA_LIVE=96545|<nonce>|LIN X64'), NOT an
+    # "&sysjobid absent" check: SAS echoes the SOURCE line too when SOURCE is on (the ODA
+    # default for an saspy submit), and that echo always contains the literal '&sysjobid.',
+    # which defeats an absence test and falsely fails every live session. A '&'-free segment
+    # flanking the fresh nonce can only come from resolved output, never from echoed source.
+    return bool(re.search(rf"ODA_LIVE=[^&|\n]*\|{re.escape(nonce)}\|[^&\n]*", log))
 
 
 def _jittered(base, cap, n):

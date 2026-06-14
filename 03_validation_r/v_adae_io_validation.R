@@ -23,7 +23,7 @@ ae <- readRDS("01_raw_source/real_sdtm/staging/ae.rds")
 
 # Standardize header variables
 header <- adsl %>%
-  select(STUDYID, USUBJID, SUBJID, TRT01P, TRTSDT, RANDDT)
+  select(STUDYID, USUBJID, SUBJID, TRT01P, TRT01A, TRT01AN, TRTSDT, RANDDT)
 
 # Ingest and clean adverse events
 df_ae <- ae %>%
@@ -165,8 +165,9 @@ adae_final <- adae_pre %>%
     ADURU = "DAYS"
   ) %>%
   select(
-    STUDYID, USUBJID, AEDECOD, AEBODSYS, AEHLT, AESEV, ATOXGR = atoxgr, AESER, AEREL, 
-    ASTDT = astdt, AENDT = aendt, ASTDY = astdy, AENDY = aendy, AEACN, AEOUT, 
+    STUDYID, USUBJID, TRTA = TRT01A, TRTAN = TRT01AN,
+    AEDECOD, AEBODSYS, AEHLT, AESEV, ATOXGR = atoxgr, AESER, AEREL,
+    ASTDT = astdt, AENDT = aendt, ASTDY = astdy, AENDY = aendy, AEACN, AEOUT,
     CQ02NAM, CIAESEQ = ciaeseq, CIAESDT = ciaesdt, CIAEEDT = ciaeedt, CIAEDUR = ciaedur,
     AEOCCFL, TRTEMFL, ADURN, ADURU, AESEQ
   )
@@ -183,6 +184,6 @@ if (nrow(adae) == 0) {
 # XPT v5 compliance (clean log): uppercase variable names + SAS date formats
 names(adae) <- toupper(names(adae))
 for (.dv in names(adae)) if (inherits(adae[[.dv]], "Date")) attr(adae[[.dv]], "format.sas") <- "DATE9."
-xportr_write(adae, "04_adam/adae_v.xpt", domain = "ADAE")
+write_xpt_v(adae, "04_adam/adae_v.xpt", domain = "ADAE")
 
 cat("NOTE: [VALIDATION] Wrote validation ADAE: 04_adam/adae_v.xpt\n")

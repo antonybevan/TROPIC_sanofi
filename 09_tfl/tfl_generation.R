@@ -68,20 +68,9 @@ if (length(unique(adsl$TRT01P)) < 2) {
 # ==============================================================================
 cat("NOTE: [TFL] Verifying statistical boundaries (Hierarchical step-down gatekeeping)...\n")
 
-# Helper function to compute stratified Cox model and Log-Rank p-value (SAP Pre-specified)
-compute_tte_stats <- function(df) {
-  df$TRT01P <- factor(df$TRT01P, levels = c("MP", "CbzP"))
-  fit_cox <- coxph(Surv(AVAL, 1 - CNSR) ~ TRT01P + strata(ECOGBL, MEASDISF), data = df)
-  s_cox <- summary(fit_cox)
-  hr <- s_cox$conf.int[1]
-  hr_lcl <- s_cox$conf.int[3]
-  hr_ucl <- s_cox$conf.int[4]
-  
-  fit_lr <- survdiff(Surv(AVAL, 1 - CNSR) ~ TRT01P + strata(ECOGBL, MEASDISF), data = df)
-  pval <- 1 - pchisq(fit_lr$chisq, 1)
-  
-  list(hr = hr, lcl = hr_lcl, ucl = hr_ucl, pval = pval)
-}
+# Stratified Cox / log-rank helper (SAP pre-specified). Extracted to 09_tfl/tfl_stats.R so the
+# same recipe is regression-tested on a deterministic fixture (tests/test_tfl_stats.R, roadmap #8).
+source("09_tfl/tfl_stats.R")
 
 os_data <- adtte %>% filter(PARAMCD == "OS") %>% left_join(adsl %>% select(USUBJID, ECOGBL, MEASDISF), by = "USUBJID")
 os_stats <- compute_tte_stats(os_data)

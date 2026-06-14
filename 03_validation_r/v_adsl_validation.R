@@ -186,6 +186,6 @@ if (nrow(adsl) < 371) {
 # XPT v5 compliance (clean log): uppercase variable names + SAS date formats
 names(adsl) <- toupper(names(adsl))
 for (.dv in names(adsl)) if (inherits(adsl[[.dv]], "Date")) attr(adsl[[.dv]], "format.sas") <- "DATE9."
-xportr_write(adsl, "04_adam/adsl_v.xpt", domain = "ADSL")
+write_xpt_v(adsl, "04_adam/adsl_v.xpt", domain = "ADSL")
 
 cat("NOTE: [VALIDATION] Wrote validation ADSL: 04_adam/adsl_v.xpt\n")

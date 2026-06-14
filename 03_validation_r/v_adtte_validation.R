@@ -1,6 +1,23 @@
-# Program: v_adtte_validation.R | Version: 3.5.0 | Author: Antony Bevan, Clinical Programming | Date: 2026-06-12
+# Program: v_adtte_validation.R | Version: 2.4.0 | Author: Antony Bevan, Clinical Programming | Date: 2026-06-13
 # Standard: ADaMIG v1.3 BDS-TTE | renv.lock hash: locked
 # Description: R Independent Validation double-programming for TROPIC ADTTE.
+#
+# Remediation v2.4.0 (roadmap #2/#3/#4/#5/#7/#10). This track is structured around an
+# explicit branch enumeration + a single finalize_tte() contract rather than mirroring
+# the SAS control flow statement-for-statement (#5). Output content is identical to the
+# SAS production track by design (that is the point of the reconciliation); true
+# clean-room independence is bounded here by single authorship and is disclosed as such
+# in ADRG §6. Rules implemented (must match A_adtte_generation.sas exactly):
+#   #4  Population per parameter, carried on-record (ITTFL + SAFFL):
+#         OS, PFS        -> ITT  (ITTFL == "Y")
+#         TTSAE, TTPAIN,
+#         TTPSA          -> Safety (SAFFL == "Y")
+#         TTUMOR         -> Safety & MEASDISF == "Y"
+#   #3  PSA-progression censoring date read from ADLB (adlb_v.xpt, PARAMCD == "PSA"),
+#       an ADaM input -- not raw staging LB.
+#   #2  Same-day pain scores aggregated with min() (order-independent; matches SAS).
+#   #7  PARAMN / PARCAT1 / AVALU carried.
+#   #10 Administrative cutoff applied to every censoring branch.
 
 library(jsonlite)
 library(dplyr)
@@ -12,310 +29,277 @@ source("03_validation_r/config_study.R")
 
 cat("NOTE: [VALIDATION] Starting ADTTE Validation script...\n")
 
-# Load validation datasets (previously generated or subjects source)
-adsl_subj <- read_xpt("04_adam/adsl_v.xpt")
-adrs <- read_xpt("04_adam/adrs_v.xpt")
-adcm <- read_xpt("04_adam/adcm_v.xpt")
-adae <- read_xpt("04_adam/adae_v.xpt")
+# Load ADaM inputs (validation track reads ONLY *_v.xpt + staging — never *_prod.xpt)
+df_adsl <- read_xpt("04_adam/adsl_v.xpt")
+adrs    <- read_xpt("04_adam/adrs_v.xpt")
+adcm    <- read_xpt("04_adam/adcm_v.xpt")
+adae    <- read_xpt("04_adam/adae_v.xpt")
+adlb    <- read_xpt("04_adam/adlb_v.xpt")
 
-# Base demographics and survival hooks
-df_adsl <- adsl_subj
+# ------------------------------------------------------------------------------
+# Standard BDS-TTE output contract: one finalize step shared by every parameter,
+# so each derivation only has to produce the raw event/censor decision.
+# ------------------------------------------------------------------------------
+ADTTE_COLS <- c("STUDYID", "USUBJID", "SUBJID", "SITEID", "TRT01P", "TRT01PN",
+                "ITTFL", "SAFFL", "PARAMCD", "PARAM", "PARAMN", "PARCAT1",
+                "STARTDT", "ADT", "AVAL", "AVALU", "CNSR", "EVNTDESC", "CNSDTDSC")
 
-# Calculate first PD dates
-df_pd <- adrs %>%
+finalize_tte <- function(d) {
+  d %>%
+    mutate(
+      STUDYID = .env$STUDYID,
+      ADT     = pmax(STARTDT, ADT),
+      AVAL    = as.numeric(ADT - STARTDT + 1),
+      AVALU   = "DAYS"
+    ) %>%
+    select(all_of(ADTTE_COLS))
+}
+
+# First event dates per subject, pulled once from the relevant ADaM domains.
+first_pd <- adrs %>%
   filter((PARAMCD == "OVRLRESP" & AVALC == "PD") |
-         (PARAMCD == "BSGRESP" & AVALC == "PROGRESSION") |
-         (PARAMCD == "PSPROG" & AVALC == "Y")) %>%
+         (PARAMCD == "BSGRESP"  & AVALC == "PROGRESSION") |
+         (PARAMCD == "PSPROG"   & AVALC == "Y")) %>%
   group_by(USUBJID) %>%
-  summarise(
-    pd_dt = min(as.Date(ADT, origin = "1960-01-01")),
-    .groups = "drop"
-  )
+  summarise(pd_dt = min(as.Date(ADT, origin = "1960-01-01")), .groups = "drop")
 
-# Calculate first Serious AE dates
-df_sae <- adae %>%
+first_sae <- adae %>%
   filter(AESER == "Y" & TRTEMFL == "Y" & !is.na(ASTDT)) %>%
   group_by(USUBJID) %>%
-  summarise(
-    sae_dt = min(as.Date(ASTDT, origin = "1960-01-01")),
-    .groups = "drop"
-  )
+  summarise(sae_dt = min(as.Date(ASTDT, origin = "1960-01-01")), .groups = "drop")
 
-# Calculate NACTDT dates
-df_nact <- adcm %>%
+first_nact <- adcm %>%
   filter(!is.na(NACTDT)) %>%
   group_by(USUBJID) %>%
-  summarise(
-    nactdt = min(as.Date(NACTDT, origin = "1960-01-01")),
-    .groups = "drop"
-  )
+  summarise(nactdt = min(as.Date(NACTDT, origin = "1960-01-01")), .groups = "drop")
 
 # ------------------------------------------------------------------------------
-# PARAMETER 1: OVERALL SURVIVAL
+# OS — Overall Survival (ITT, anchored at randomisation)
 # ------------------------------------------------------------------------------
 os <- df_adsl %>%
+  filter(ITTFL == "Y") %>%
   mutate(
-    STARTDT = RANDDT,
-    adt_temp = if_else(DTHFL == "Y", DTHDT, LSTALVDT),
-    ADT = pmax(STARTDT, adt_temp)
+    PARAMCD = "OS", PARAM = "Overall Survival", PARAMN = 1, PARCAT1 = "EFFICACY",
+    STARTDT  = RANDDT,
+    died     = DTHFL == "Y",
+    ADT      = if_else(died, DTHDT, pmin(LSTALVDT, STUDY_CUTOFF_DT)),
+    CNSR     = if_else(died, 0, 1),
+    EVNTDESC = if_else(died, "DEATH", ""),
+    CNSDTDSC = if_else(died, "", "LAST KNOWN ALIVE DATE")
   ) %>%
-  transmute(
-    STUDYID = .env$STUDYID, USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
-    PARAMCD = "OS", PARAM = "Overall Survival", STARTDT, ADT,
-    CNSR = if_else(DTHFL == "Y", 0.0, 1.0),
-    EVNTDESC = if_else(DTHFL == "Y", "DEATH", ""),
-    CNSDTDSC = if_else(DTHFL == "Y", "", "LAST KNOWN ALIVE DATE"),
-    AVAL = as.numeric(ADT - STARTDT + 1)
-  )
+  finalize_tte()
 
 # ------------------------------------------------------------------------------
-# PARAMETER 2: TIME TO FIRST SERIOUS AE (TTSAE)
+# TTSAE — Time to First Serious AE (Safety, anchored at first dose)
 # ------------------------------------------------------------------------------
-ttos <- df_adsl %>%
-  left_join(df_sae, by = "USUBJID") %>%
+ttsae <- df_adsl %>%
+  filter(SAFFL == "Y") %>%
+  left_join(first_sae, by = "USUBJID") %>%
   mutate(
-    STARTDT = TRTSDT,
-    adt_temp = if_else(!is.na(sae_dt), sae_dt, LSTALVDT),
-    ADT = pmax(STARTDT, adt_temp)
+    PARAMCD = "TTSAE", PARAM = "Time to First Serious AE", PARAMN = 6, PARCAT1 = "SAFETY",
+    STARTDT  = TRTSDT,
+    had_sae  = !is.na(sae_dt),
+    ADT      = if_else(had_sae, sae_dt, pmin(LSTALVDT, STUDY_CUTOFF_DT)),
+    CNSR     = if_else(had_sae, 0, 1),
+    EVNTDESC = if_else(had_sae, "SERIOUS ADVERSE EVENT", ""),
+    CNSDTDSC = if_else(had_sae, "", "LAST KNOWN ALIVE DATE")
   ) %>%
-  transmute(
-    STUDYID = .env$STUDYID, USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
-    PARAMCD = "TTSAE", PARAM = "Time to First Serious AE", STARTDT, ADT,
-    CNSR = if_else(!is.na(sae_dt), 0.0, 1.0),
-    EVNTDESC = if_else(!is.na(sae_dt), "SERIOUS ADVERSE EVENT", ""),
-    CNSDTDSC = if_else(!is.na(sae_dt), "", "LAST KNOWN ALIVE DATE"),
-    AVAL = as.numeric(ADT - STARTDT + 1)
-  )
+  finalize_tte()
 
 # ------------------------------------------------------------------------------
-# PARAMETER 3: PROGRESSION-FREE SURVIVAL (PFS)
+# PFS — Progression-Free Survival (ITT). NACT-censoring hierarchy expressed as a
+# single ordered branch label, then mapped to ADT/CNSR/EVNTDESC/CNSDTDSC.
 # ------------------------------------------------------------------------------
 pfs <- df_adsl %>%
-  left_join(df_pd, by = "USUBJID") %>%
-  left_join(df_nact, by = "USUBJID") %>%
-  rowwise() %>%
+  filter(ITTFL == "Y") %>%
+  left_join(first_pd, by = "USUBJID") %>%
+  left_join(first_nact, by = "USUBJID") %>%
   mutate(
+    PARAMCD = "PFS", PARAM = "Progression Free Survival", PARAMN = 2, PARCAT1 = "EFFICACY",
     STARTDT = RANDDT,
-    PARAMCD = "PFS",
-    PARAM = "Progression Free Survival",
-    # Hierarchy checking
-    pd_found = !is.na(pd_dt),
+    pd_found   = !is.na(pd_dt),
     nact_found = !is.na(nactdt),
-    
-    adt_temp = case_when(
-      pd_found & (!nact_found | nactdt >= pd_dt) ~ pd_dt,
-      pd_found & nact_found & nactdt < pd_dt ~ nactdt - days(1),
-      !pd_found & DTHFL == "Y" & (!nact_found | nactdt >= DTHDT) ~ DTHDT,
-      !pd_found & DTHFL == "Y" & nact_found & nactdt < DTHDT ~ nactdt - days(1),
-      TRUE ~ if_else(nact_found, nactdt - days(1), LSTALVDT)
+    branch = case_when(
+      pd_found & nact_found & nactdt < pd_dt            ~ "NACT_PRE_PD",
+      pd_found                                          ~ "PD",
+      DTHFL == "Y" & nact_found & nactdt < DTHDT        ~ "NACT_PRE_DEATH",
+      DTHFL == "Y"                                      ~ "DEATH",
+      nact_found                                        ~ "NACT_ONLY",
+      TRUE                                              ~ "CENSOR_LASTEVAL"
     ),
-    ADT = pmax(STARTDT, adt_temp),
-    
-    CNSR = case_when(
-      pd_found & (!nact_found | nactdt >= pd_dt) ~ 0.0,
-      !pd_found & DTHFL == "Y" & (!nact_found | nactdt >= DTHDT) ~ 0.0,
-      TRUE ~ 1.0
+    ADT = case_when(
+      branch == "PD"    ~ pd_dt,
+      branch == "DEATH" ~ DTHDT,
+      branch %in% c("NACT_PRE_PD", "NACT_PRE_DEATH", "NACT_ONLY") ~ nactdt - days(1),
+      TRUE ~ pmin(LSTALVDT, STUDY_CUTOFF_DT)
     ),
-    
+    CNSR     = if_else(branch %in% c("PD", "DEATH"), 0, 1),
     EVNTDESC = case_when(
-      CNSR == 0.0 & pd_found ~ "TUMOR OR PSA PROGRESSION",
-      CNSR == 0.0 & !pd_found ~ "DEATH",
+      branch == "PD"    ~ "TUMOR OR PSA PROGRESSION",
+      branch == "DEATH" ~ "DEATH",
       TRUE ~ ""
     ),
-    
     CNSDTDSC = case_when(
-      CNSR == 1.0 & nact_found ~ "NEW ANTI-CANCER THERAPY START",
-      CNSR == 1.0 & !nact_found & !pd_found & DTHFL != "Y" ~ "LAST EVALUABLE TUMOR ASSESSMENT",
+      branch %in% c("NACT_PRE_PD", "NACT_PRE_DEATH", "NACT_ONLY") ~ "NEW ANTI-CANCER THERAPY START",
+      branch == "CENSOR_LASTEVAL" ~ "LAST EVALUABLE TUMOR ASSESSMENT",
       TRUE ~ ""
-    ),
-    
-    AVAL = as.numeric(ADT - STARTDT + 1)
+    )
   ) %>%
-  ungroup() %>%
-  select(STUDYID, USUBJID, SUBJID, SITEID, TRT01P, TRT01PN, PARAMCD, PARAM, STARTDT, ADT, CNSR, EVNTDESC, CNSDTDSC, AVAL)
+  finalize_tte()
 
 # ------------------------------------------------------------------------------
-# PARAMETER 4: TIME TO PAIN PROGRESSION (TTPAIN)
+# TTPAIN — Time to Pain Progression (Safety). PN has no ADaM intermediate; both
+# tracks derive from the same reconciled staging PN (documented in ADRG/SDRG).
+# Same-day scores aggregated with min() (#2).
 # ------------------------------------------------------------------------------
-# Load staging pain data
 pn <- readRDS("01_raw_source/real_sdtm/staging/pn.rds")
 
-# Derive treatment start date per subject
-df_ex_dt <- df_adsl %>%
-  select(USUBJID, TRTSDT, RANDDT, LSTALVDT)
-
-# Baseline pain logs
-pn_trt <- pn %>%
-  inner_join(df_ex_dt, by = "USUBJID") %>%
+pn_anchored <- pn %>%
+  inner_join(df_adsl %>% select(USUBJID, TRTSDT, RANDDT, LSTALVDT, SAFFL), by = "USUBJID") %>%
+  filter(SAFFL == "Y") %>%
   mutate(
-    pndtc_clean = trimws(PNDTC),
-    PNDT = if_else(grepl("^\\d{4}-\\d{1,2}-\\d{1,2}", pndtc_clean), ymd(pndtc_clean, quiet = TRUE), as.Date(NA)),
+    PNDT     = if_else(grepl("^\\d{4}-\\d{1,2}-\\d{1,2}", trimws(PNDTC)), ymd(trimws(PNDTC), quiet = TRUE), as.Date(NA)),
     PNSTRESN = as.numeric(PNSTRESN)
   )
 
-baseline_pn <- pn_trt %>% filter(PNDT <= TRTSDT)
-
-baseline_summary <- baseline_pn %>%
+pain_baseline <- pn_anchored %>%
+  filter(PNDT <= TRTSDT & !is.na(PNSTRESN)) %>%
   group_by(USUBJID, PNTESTCD) %>%
   summarise(base_val = median(PNSTRESN, na.rm = TRUE), .groups = "drop") %>%
   pivot_wider(id_cols = USUBJID, names_from = PNTESTCD, values_from = base_val) %>%
   rename(base_ppi = PAININT, base_an = ANSCORE)
 
-# Cycle-level pain logs
-post_pn <- pn_trt %>%
-  filter(PNDT > TRTSDT) %>%
+pain_days <- pn_anchored %>%
+  filter(PNDT > TRTSDT & !is.na(PNSTRESN)) %>%
   group_by(USUBJID, VISITNUM, VISIT, PNDT, PNTESTCD) %>%
-  summarise(day_val = first(PNSTRESN), .groups = "drop") %>%
-  group_by(USUBJID, VISITNUM, VISIT, PNTESTCD) %>%
-  summarise(cycle_val = median(day_val, na.rm = TRUE),
-            cycle_date = min(PNDT, na.rm = TRUE),
-            .groups = "drop")
+  summarise(day_val = min(PNSTRESN, na.rm = TRUE), .groups = "drop")
 
-cycle_wide <- post_pn %>%
-  pivot_wider(id_cols = c(USUBJID, VISITNUM, VISIT, cycle_date), names_from = PNTESTCD, values_from = cycle_val) %>%
-  rename(cycle_ppi = PAININT, cycle_an = ANSCORE) %>%
+cycle_dates <- pain_days %>%
+  group_by(USUBJID, VISITNUM, VISIT) %>%
+  summarise(cycle_date = min(PNDT, na.rm = TRUE), .groups = "drop")
+
+cycle_vals <- pain_days %>%
+  group_by(USUBJID, VISITNUM, VISIT, PNTESTCD) %>%
+  summarise(cycle_val = median(day_val, na.rm = TRUE), .groups = "drop") %>%
+  pivot_wider(id_cols = c(USUBJID, VISITNUM, VISIT), names_from = PNTESTCD, values_from = cycle_val) %>%
+  rename(cycle_ppi = PAININT, cycle_an = ANSCORE)
+
+pain_cycles <- cycle_vals %>%
+  left_join(cycle_dates, by = c("USUBJID", "VISITNUM", "VISIT")) %>%
   arrange(USUBJID, VISITNUM)
 
-cycle_comp <- cycle_wide %>%
-  left_join(baseline_summary, by = "USUBJID") %>%
+pain_triggers <- pain_cycles %>%
+  left_join(pain_baseline, by = "USUBJID") %>%
   mutate(
     base_ppi = coalesce(base_ppi, 0),
-    base_an = coalesce(base_an, 0),
-    ppi_diff = cycle_ppi - base_ppi,
-    an_diff = cycle_an - base_an,
-    prog_trigger = if_else((!is.na(ppi_diff) & ppi_diff >= 2) | (!is.na(an_diff) & an_diff >= 10), 1, 0)
+    base_an  = coalesce(base_an, 0),
+    trig = if_else((!is.na(cycle_ppi - base_ppi) & (cycle_ppi - base_ppi) >= 2) |
+                   (!is.na(cycle_an  - base_an)  & (cycle_an  - base_an)  >= 10), 1, 0)
   )
 
-prog_subjs <- cycle_comp %>%
+# Sustained confirmation: a trigger counts if the next consecutive cycle also
+# triggers, or if it is the subject's last observed cycle (terminal trigger).
+pain_prog <- pain_triggers %>%
   group_by(USUBJID) %>%
-  mutate(
-    next_trigger = lead(prog_trigger),
-    is_prog = if_else(prog_trigger == 1 & (next_trigger == 1 | is.na(next_trigger)), 1, 0)
-  ) %>%
-  filter(is_prog == 1) %>%
-  group_by(USUBJID) %>%
+  mutate(confirmed = if_else(trig == 1 & (coalesce(lead(trig), 0) == 1 | row_number() == n()), 1, 0)) %>%
+  filter(confirmed == 1) %>%
   summarise(prog_date = min(cycle_date), .groups = "drop")
 
-# Last pain assessment date for censoring
-censor_dates <- pn_trt %>%
+pain_lastassess <- pn_anchored %>%
   group_by(USUBJID) %>%
   summarise(last_pn_dt = max(PNDT, na.rm = TRUE), .groups = "drop")
 
 ttpain <- df_adsl %>%
-  left_join(prog_subjs, by = "USUBJID") %>%
-  left_join(censor_dates, by = "USUBJID") %>%
-  transmute(
-    STUDYID = .env$STUDYID, USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
-    PARAMCD = "TTPAIN", PARAM = "Time to Pain Progression", STARTDT = RANDDT,
-    
-    adt_temp = case_when(
-      !is.na(prog_date) ~ prog_date,
-      !is.na(last_pn_dt) ~ last_pn_dt,
-      TRUE ~ RANDDT
-    ),
-    ADT = pmax(STARTDT, adt_temp),
-    
-    CNSR = if_else(!is.na(prog_date), 0.0, 1.0),
-    EVNTDESC = if_else(!is.na(prog_date), "PAIN PROGRESSION", ""),
-    CNSDTDSC = if_else(!is.na(prog_date), "", if_else(!is.na(last_pn_dt), "LAST PAIN ASSESSMENT DATE", "NO PAIN ASSESSMENT")),
-    AVAL = as.numeric(ADT - STARTDT + 1)
-  )
-
-# ------------------------------------------------------------------------------
-# PARAMETER 5: TIME TO PSA PROGRESSION (TTPSA)
-# ------------------------------------------------------------------------------
-adrs_val <- read_xpt("04_adam/adrs_v.xpt")
-
-psa_prog_subjs <- adrs_val %>%
-  filter(PARAMCD == "PSPROG" & AVALC == "Y") %>%
-  select(USUBJID, psa_prog_dt = ADT)
-
-# Censoring: last available PSA test date
-lb_val <- readRDS("01_raw_source/real_sdtm/staging/lb.rds")
-colnames(lb_val) <- toupper(colnames(lb_val))
-
-psa_censor_dates <- lb_val %>%
-  filter(LBTESTCD == "PSA" & !is.na(LBSTRESN) & !is.na(LBDTC) & LBDTC != "") %>%
+  filter(SAFFL == "Y") %>%
+  left_join(pain_prog, by = "USUBJID") %>%
+  left_join(pain_lastassess, by = "USUBJID") %>%
   mutate(
-    lbdtc_clean = trimws(LBDTC),
-    LBDT = suppressWarnings(if_else(grepl("^\\d{4}-\\d{1,2}-\\d{1,2}", lbdtc_clean), ymd(lbdtc_clean, quiet = TRUE), as.Date(NA)))
+    PARAMCD = "TTPAIN", PARAM = "Time to Pain Progression", PARAMN = 5, PARCAT1 = "EFFICACY",
+    STARTDT  = RANDDT,
+    progressed = !is.na(prog_date),
+    ADT = case_when(
+      progressed          ~ prog_date,
+      !is.na(last_pn_dt)  ~ pmin(last_pn_dt, STUDY_CUTOFF_DT),
+      TRUE                ~ RANDDT
+    ),
+    CNSR     = if_else(progressed, 0, 1),
+    EVNTDESC = if_else(progressed, "PAIN PROGRESSION", ""),
+    CNSDTDSC = if_else(progressed, "", if_else(!is.na(last_pn_dt), "LAST PAIN ASSESSMENT DATE", "NO PAIN ASSESSMENT"))
   ) %>%
-  filter(!is.na(LBDT)) %>%
+  finalize_tte()
+
+# ------------------------------------------------------------------------------
+# TTPSA — Time to PSA Progression (Safety). Censor date from ADLB (#3).
+# ------------------------------------------------------------------------------
+psa_event <- adrs %>%
+  filter(PARAMCD == "PSPROG" & AVALC == "Y") %>%
+  transmute(USUBJID, psa_prog_dt = as.Date(ADT, origin = "1960-01-01"))
+
+psa_lastassess <- adlb %>%
+  filter(PARAMCD == "PSA" & !is.na(AVAL) & !is.na(ADT)) %>%
   group_by(USUBJID) %>%
-  summarise(last_psa_dt = max(LBDT, na.rm = TRUE), .groups = "drop")
+  summarise(last_psa_dt = max(as.Date(ADT, origin = "1960-01-01")), .groups = "drop")
 
 ttpsa <- df_adsl %>%
-  left_join(psa_prog_subjs, by = "USUBJID") %>%
-  left_join(psa_censor_dates, by = "USUBJID") %>%
-  transmute(
-    STUDYID = .env$STUDYID, USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
-    PARAMCD = "TTPSA", PARAM = "Time to PSA Progression", STARTDT = TRTSDT,
-    
-    adt_temp = case_when(
-      !is.na(psa_prog_dt) ~ psa_prog_dt,
-      !is.na(last_psa_dt) ~ pmin(last_psa_dt, STUDY_CUTOFF_DT),
-      TRUE ~ pmin(LSTALVDT, STUDY_CUTOFF_DT)
+  filter(SAFFL == "Y") %>%
+  left_join(psa_event, by = "USUBJID") %>%
+  left_join(psa_lastassess, by = "USUBJID") %>%
+  mutate(
+    PARAMCD = "TTPSA", PARAM = "Time to PSA Progression", PARAMN = 3, PARCAT1 = "EFFICACY",
+    STARTDT  = TRTSDT,
+    progressed = !is.na(psa_prog_dt),
+    ADT = case_when(
+      progressed           ~ psa_prog_dt,
+      !is.na(last_psa_dt)  ~ pmin(last_psa_dt, STUDY_CUTOFF_DT),
+      TRUE                 ~ pmin(LSTALVDT, STUDY_CUTOFF_DT)
     ),
-    ADT = pmax(STARTDT, adt_temp),
-    
-    CNSR = if_else(!is.na(psa_prog_dt), 0.0, 1.0),
-    EVNTDESC = if_else(!is.na(psa_prog_dt), "PSA PROGRESSION", ""),
-    CNSDTDSC = if_else(!is.na(psa_prog_dt), "", if_else(!is.na(last_psa_dt), "LAST PSA ASSESSMENT", "LAST KNOWN ALIVE DATE")),
-    AVAL = as.numeric(ADT - STARTDT + 1)
-  )
+    CNSR     = if_else(progressed, 0, 1),
+    EVNTDESC = if_else(progressed, "PSA PROGRESSION", ""),
+    CNSDTDSC = if_else(progressed, "", if_else(!is.na(last_psa_dt), "LAST PSA ASSESSMENT", "LAST KNOWN ALIVE DATE"))
+  ) %>%
+  finalize_tte()
 
 # ------------------------------------------------------------------------------
-# PARAMETER 6: TIME TO TUMOR PROGRESSION (TTUMOR)
+# TTUMOR — Time to Tumor Progression (Safety & measurable-disease subpopulation)
 # ------------------------------------------------------------------------------
-tumor_prog_subjs <- adrs_val %>%
+tumor_event <- adrs %>%
   filter(PARAMCD == "OVRLRESP" & AVALC == "PD") %>%
   group_by(USUBJID) %>%
-  summarise(tumor_prog_dt = min(ADT), .groups = "drop")
+  summarise(tumor_prog_dt = min(as.Date(ADT, origin = "1960-01-01")), .groups = "drop")
 
-tumor_censor_dates <- adrs_val %>%
+tumor_lastassess <- adrs %>%
   filter(PARAMCD == "OVRLRESP" & !is.na(ADT)) %>%
   group_by(USUBJID) %>%
-  summarise(last_tumor_dt = max(ADT), .groups = "drop")
+  summarise(last_tumor_dt = max(as.Date(ADT, origin = "1960-01-01")), .groups = "drop")
 
-tttumor <- df_adsl %>%
-  filter(MEASDISF == "Y") %>%
-  left_join(tumor_prog_subjs, by = "USUBJID") %>%
-  left_join(tumor_censor_dates, by = "USUBJID") %>%
-  transmute(
-    STUDYID = .env$STUDYID, USUBJID, SUBJID, SITEID, TRT01P, TRT01PN,
-    PARAMCD = "TTUMOR", PARAM = "Time to Tumor Progression", STARTDT = TRTSDT,
-    
-    adt_temp = case_when(
-      !is.na(tumor_prog_dt) ~ tumor_prog_dt,
-      !is.na(last_tumor_dt) ~ pmin(last_tumor_dt, STUDY_CUTOFF_DT),
-      TRUE ~ TRTSDT
+ttumor <- df_adsl %>%
+  filter(SAFFL == "Y" & MEASDISF == "Y") %>%
+  left_join(tumor_event, by = "USUBJID") %>%
+  left_join(tumor_lastassess, by = "USUBJID") %>%
+  mutate(
+    PARAMCD = "TTUMOR", PARAM = "Time to Tumor Progression", PARAMN = 4, PARCAT1 = "EFFICACY",
+    STARTDT  = TRTSDT,
+    progressed = !is.na(tumor_prog_dt),
+    ADT = case_when(
+      progressed             ~ tumor_prog_dt,
+      !is.na(last_tumor_dt)  ~ pmin(last_tumor_dt, STUDY_CUTOFF_DT),
+      TRUE                   ~ TRTSDT
     ),
-    ADT = pmax(STARTDT, adt_temp),
-    
-    CNSR = if_else(!is.na(tumor_prog_dt), 0.0, 1.0),
-    EVNTDESC = if_else(!is.na(tumor_prog_dt), "TUMOR PROGRESSION", ""),
-    CNSDTDSC = if_else(!is.na(tumor_prog_dt), "", if_else(!is.na(last_tumor_dt), "LAST TUMOR ASSESSMENT", "NO POST-BASELINE ASSESSMENT")),
-    AVAL = as.numeric(ADT - STARTDT + 1)
-  )
+    CNSR     = if_else(progressed, 0, 1),
+    EVNTDESC = if_else(progressed, "TUMOR PROGRESSION", ""),
+    CNSDTDSC = if_else(progressed, "", if_else(!is.na(last_tumor_dt), "LAST TUMOR ASSESSMENT", "NO POST-BASELINE ASSESSMENT"))
+  ) %>%
+  finalize_tte()
 
 # Combine and save
-adtte <- bind_rows(os, ttos, pfs, ttpain, ttpsa, tttumor) %>%
-  select(STUDYID, USUBJID, SUBJID, SITEID, TRT01P, TRT01PN, PARAMCD, PARAM, STARTDT, ADT, CNSR, EVNTDESC, CNSDTDSC, AVAL)
-
-adtte <- adtte %>% arrange(USUBJID, PARAMCD)
-
-# Force numeric types to double for haven compliance
-adtte <- adtte %>%
-  mutate(
-    AVAL = as.numeric(AVAL),
-    CNSR = as.numeric(CNSR)
-  )
+adtte <- bind_rows(os, ttsae, pfs, ttpain, ttpsa, ttumor) %>%
+  arrange(USUBJID, PARAMCD) %>%
+  mutate(AVAL = as.numeric(AVAL), CNSR = as.numeric(CNSR))
 
 # Assertions and Error Guards (QC-03)
 if (nrow(adtte) == 0) {
   stop("ERROR: [VALIDATION] ADTTE output dataset is empty!")
 }
-# Assert completeness of all 6 parameters (VAL-05)
 expected_params <- c("OS", "PFS", "TTPAIN", "TTPSA", "TTUMOR", "TTSAE")
 missing_params <- setdiff(expected_params, unique(adtte$PARAMCD))
 if (length(missing_params) > 0) {
@@ -325,5 +309,5 @@ if (length(missing_params) > 0) {
 # XPT v5 compliance (clean log): uppercase variable names + SAS date formats
 names(adtte) <- toupper(names(adtte))
 for (.dv in names(adtte)) if (inherits(adtte[[.dv]], "Date")) attr(adtte[[.dv]], "format.sas") <- "DATE9."
-xportr_write(adtte, "04_adam/adtte_v.xpt", domain = "ADTTE")
+write_xpt_v(adtte, "04_adam/adtte_v.xpt", domain = "ADTTE")
 cat("NOTE: [VALIDATION] Wrote validation ADTTE: 04_adam/adtte_v.xpt\n")

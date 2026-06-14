@@ -34,7 +34,12 @@ class FakeSas:
             raise RuntimeError("file not found on ODA")
         with open(local, "w") as f:
             json.dump(self.remote_manifest, f)
-    def submit(self, code): return {"LOG": self.nobs_log}
+    def submit(self, code):
+        # _ensure_remote_dir issues an mkdir-tree step and checks for a success marker; report
+        # the tree as present. Every other submit (nobs integrity re-read) returns nobs_log.
+        if "TROPIC_MKDIR" in code:
+            return {"LOG": "TROPIC_MKDIR|/x|1\n"}
+        return {"LOG": self.nobs_log}
     def endsas(self): self.ended = True
 
 
@@ -130,6 +135,38 @@ class TestBroker(unittest.TestCase):
         self.assertRegex(win, r"\d{2}:00-\d{2}:00")
 
 
+class TestProber(unittest.TestCase):
+    """Regression: the live probe must read the RESOLVED %put output, not assert that
+    '&sysjobid' is absent. ODA echoes the SOURCE line (which contains the literal
+    '&sysjobid.') by default, which previously failed every live session as SPAWN_FAILED."""
+    NONCE = "12345-9999999"
+
+    def _sas(self, log):
+        return type("S", (), {"submit": lambda self, code, _log=log: {"LOG": _log}})()
+
+    def test_resolved_output_with_echoed_source_passes(self):
+        # Real ODA log: line 26 echoes the source (literal &sysjobid.), then the resolved output.
+        n = self.NONCE
+        log = (f"26   %put ODA_LIVE=&sysjobid.|{n}|&sysscp.;\n"
+               f"ODA_LIVE=97614|{n}|LIN X64\n")
+        self.assertTrue(B._default_prober(self._sas(log), n))
+
+    def test_stale_log_without_nonce_fails(self):
+        log = "ODA_LIVE=97614|some-OTHER-nonce|LIN X64\n"
+        self.assertFalse(B._default_prober(self._sas(log), self.NONCE))
+
+    def test_unresolved_macro_fails(self):
+        # Workspace not really live: macro never resolved, only the echoed source carries the nonce.
+        n = self.NONCE
+        log = (f"26   %put ODA_LIVE=&sysjobid.|{n}|&sysscp.;\n"
+               "WARNING: Apparent symbolic reference SYSJOBID not resolved.\n")
+        self.assertFalse(B._default_prober(self._sas(log), n))
+
+    def test_submit_exception_fails(self):
+        sas = type("S", (), {"submit": lambda self, code: (_ for _ in ()).throw(RuntimeError("dead"))})()
+        self.assertFalse(B._default_prober(sas, self.NONCE))
+
+
 class TestSeedIdempotent(unittest.TestCase):
     def setUp(self):
         self.d = tempfile.mkdtemp()
@@ -165,6 +202,28 @@ class TestSeedIdempotent(unittest.TestCase):
         res = S.seed(sas, sdtm_dir=self.d, remote_dir="/x", force=True)
         self.assertEqual(res["status"], "seeded")
         self.assertGreater(len(sas.uploaded), 0)
+
+    def test_stale_members_selects_only_changed(self):
+        # Pure diff: a single changed member; absent/forced manifest -> the whole library.
+        remote = json.loads(json.dumps(self.local))
+        remote["datasets"]["dm.sas7bdat"]["sha256"] = "changed"
+        self.assertEqual(S.stale_members(self.local, remote), ["dm.sas7bdat"])
+        self.assertEqual(S.stale_members(self.local, None), ["ae.sas7bdat", "dm.sas7bdat"])
+        self.assertEqual(S.stale_members(self.local, self.local, force=True),
+                         ["ae.sas7bdat", "dm.sas7bdat"])
+
+    def test_partial_change_uploads_only_delta(self):
+        # ODA has a matching dm but a STALE ae -> only ae (+ the manifest) must upload; the
+        # ~200 MB cost should track the delta, not the whole library.
+        remote = json.loads(json.dumps(self.local))
+        remote["datasets"]["ae.sas7bdat"]["sha256"] = "stale-ae-hash"
+        sas = FakeSas(remote_manifest=remote)
+        res = S.seed(sas, sdtm_dir=self.d, remote_dir="/x", force=False)
+        self.assertEqual(res["status"], "seeded")
+        self.assertEqual((res["uploaded"], res["skipped"]), (1, 1))
+        self.assertIn("ae.sas7bdat", sas.uploaded)
+        self.assertNotIn("dm.sas7bdat", sas.uploaded)       # unchanged member NOT re-uploaded
+        self.assertEqual(sas.uploaded[-1], S.MANIFEST_NAME)  # manifest still written LAST
 
 
 if __name__ == "__main__":

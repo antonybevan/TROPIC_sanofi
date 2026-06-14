@@ -1,0 +1,13 @@
+{
+  "overall": "PASS",
+  "domains": {
+    "ADSL": "PASS",
+    "ADEX": "PASS",
+    "ADCM": "PASS",
+    "ADAE": "PASS",
+    "ADLB": "PASS",
+    "ADRS": "PASS",
+    "ADTTE": "PASS"
+  }
+}
+

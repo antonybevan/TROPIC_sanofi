@@ -237,6 +237,6 @@ if (nrow(df_disp_milestones) == 0) {
 # XPT v5 compliance (clean log): uppercase variable names + SAS date formats
 names(adrs) <- toupper(names(adrs))
 for (.dv in names(adrs)) if (inherits(adrs[[.dv]], "Date")) attr(adrs[[.dv]], "format.sas") <- "DATE9."
-xportr_write(adrs, "04_adam/adrs_v.xpt", domain = "ADRS")
+write_xpt_v(adrs, "04_adam/adrs_v.xpt", domain = "ADRS")
 
 cat("NOTE: [VALIDATION] Wrote validation ADRS: 04_adam/adrs_v.xpt\n")

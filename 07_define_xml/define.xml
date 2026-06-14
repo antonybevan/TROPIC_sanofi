@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <?xml-stylesheet type="text/xsl" href="define2-1.xsl"?>
-<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:def="http://www.cdisc.org/ns/def/v2.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:arm="http://www.cdisc.org/ns/arm/v1.0" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 http://schema.cdisc.org/define/v2.1/define2-1-0.xsd" ODMVersion="1.3.2" FileType="Snapshot" FileOID="TROPIC_ADAM_Metadata_v2.1" CreationDateTime="2026-06-12T21:52:12" AsOfDateTime="2026-06-12T21:52:12" Originator="Antony Bevan, Clinical Programming" def:Context="Submission"><Study OID="STDY.TROPIC">
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:def="http://www.cdisc.org/ns/def/v2.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:arm="http://www.cdisc.org/ns/arm/v1.0" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 http://schema.cdisc.org/define/v2.1/define2-1-0.xsd" ODMVersion="1.3.2" FileType="Snapshot" FileOID="TROPIC_ADAM_Metadata_v2.1" CreationDateTime="2026-06-12T21:52:12" AsOfDateTime="2026-06-14T10:04:20" Originator="Antony Bevan, Clinical Programming" def:Context="Submission"><Study OID="STDY.TROPIC">
     <GlobalVariables>
       <StudyName>TROPIC (EFC6193 / XRP6258)</StudyName>
       <StudyDescription>Cabazitaxel vs Mitoxantrone in mCRPC progressing after docetaxel (NCT00417079).</StudyDescription>
@@ -70,6 +70,21 @@
     <def:WhereClauseDef OID="WC.ADTTE.PARAMCD.EQ.PFS">
       <RangeCheck Comparator="EQ" def:ItemOID="IT.ADTTE.PARAMCD" SoftHard="Soft">
         <CheckValue>PFS</CheckValue>
+      </RangeCheck>
+    </def:WhereClauseDef>
+    <def:WhereClauseDef OID="WC.ADTTE.PARAMCD.EQ.TTPSA">
+      <RangeCheck Comparator="EQ" def:ItemOID="IT.ADTTE.PARAMCD" SoftHard="Soft">
+        <CheckValue>TTPSA</CheckValue>
+      </RangeCheck>
+    </def:WhereClauseDef>
+    <def:WhereClauseDef OID="WC.ADTTE.PARAMCD.EQ.TTUMOR">
+      <RangeCheck Comparator="EQ" def:ItemOID="IT.ADTTE.PARAMCD" SoftHard="Soft">
+        <CheckValue>TTUMOR</CheckValue>
+      </RangeCheck>
+    </def:WhereClauseDef>
+    <def:WhereClauseDef OID="WC.ADAE.TRTEMFL.EQ.Y">
+      <RangeCheck Comparator="EQ" def:ItemOID="IT.ADAE.TRTEMFL" SoftHard="Soft">
+        <CheckValue>Y</CheckValue>
       </RangeCheck>
     </def:WhereClauseDef>
     <ItemGroupDef OID="IG.ADSL" Name="ADSL" Repeating="No" IsReferenceData="No" Purpose="Analysis" def:Structure="One record per subject" def:ArchiveLocationID="LF.ADSL">
@@ -194,6 +209,8 @@
       <ItemRef ItemOID="IT.ADAE.ADURN" Mandatory="No" OrderNumber="23"/>
       <ItemRef ItemOID="IT.ADAE.ADURU" Mandatory="No" OrderNumber="24"/>
       <ItemRef ItemOID="IT.ADAE.AESEQ" Mandatory="No" OrderNumber="25"/>
+      <ItemRef ItemOID="IT.ADAE.TRTA" Mandatory="Yes" OrderNumber="26"/>
+      <ItemRef ItemOID="IT.ADAE.TRTAN" Mandatory="Yes" OrderNumber="27"/>
       <def:leaf ID="LF.ADAE" xlink:href="adae.xpt">
         <def:title>adae.xpt</def:title>
       </def:leaf>
@@ -228,6 +245,7 @@
       <ItemRef ItemOID="IT.ADLB.ANL01FL" Mandatory="No" OrderNumber="24"/>
       <ItemRef ItemOID="IT.ADLB.BASEFL" Mandatory="No" OrderNumber="25"/>
       <ItemRef ItemOID="IT.ADLB.LBDY" Mandatory="No" OrderNumber="26"/>
+      <ItemRef ItemOID="IT.ADLB.ADT" Mandatory="No" OrderNumber="27"/>
       <def:leaf ID="LF.ADLB" xlink:href="adlb.xpt">
         <def:title>adlb.xpt</def:title>
       </def:leaf>
@@ -263,14 +281,19 @@
       <ItemRef ItemOID="IT.ADTTE.SITEID" Mandatory="Yes" OrderNumber="4"/>
       <ItemRef ItemOID="IT.ADTTE.TRT01P" Mandatory="Yes" OrderNumber="5"/>
       <ItemRef ItemOID="IT.ADTTE.TRT01PN" Mandatory="Yes" OrderNumber="6"/>
-      <ItemRef ItemOID="IT.ADTTE.PARAMCD" Mandatory="Yes" OrderNumber="7"/>
-      <ItemRef ItemOID="IT.ADTTE.PARAM" Mandatory="Yes" OrderNumber="8"/>
-      <ItemRef ItemOID="IT.ADTTE.STARTDT" Mandatory="Yes" OrderNumber="9"/>
-      <ItemRef ItemOID="IT.ADTTE.ADT" Mandatory="Yes" OrderNumber="10"/>
-      <ItemRef ItemOID="IT.ADTTE.CNSR" Mandatory="Yes" MethodOID="MT.CNSR_TTE" OrderNumber="11"/>
-      <ItemRef ItemOID="IT.ADTTE.EVNTDESC" Mandatory="No" OrderNumber="12"/>
-      <ItemRef ItemOID="IT.ADTTE.CNSDTDSC" Mandatory="No" OrderNumber="13"/>
-      <ItemRef ItemOID="IT.ADTTE.AVAL" Mandatory="Yes" MethodOID="MT.AVAL_TTE" OrderNumber="14"/>
+      <ItemRef ItemOID="IT.ADTTE.ITTFL" Mandatory="Yes" OrderNumber="7"/>
+      <ItemRef ItemOID="IT.ADTTE.SAFFL" Mandatory="Yes" OrderNumber="8"/>
+      <ItemRef ItemOID="IT.ADTTE.PARAMCD" Mandatory="Yes" OrderNumber="9"/>
+      <ItemRef ItemOID="IT.ADTTE.PARAM" Mandatory="Yes" OrderNumber="10"/>
+      <ItemRef ItemOID="IT.ADTTE.PARAMN" Mandatory="No" OrderNumber="11"/>
+      <ItemRef ItemOID="IT.ADTTE.PARCAT1" Mandatory="No" OrderNumber="12"/>
+      <ItemRef ItemOID="IT.ADTTE.STARTDT" Mandatory="Yes" OrderNumber="13"/>
+      <ItemRef ItemOID="IT.ADTTE.ADT" Mandatory="Yes" OrderNumber="14"/>
+      <ItemRef ItemOID="IT.ADTTE.CNSR" Mandatory="Yes" MethodOID="MT.CNSR_TTE" OrderNumber="15"/>
+      <ItemRef ItemOID="IT.ADTTE.EVNTDESC" Mandatory="No" OrderNumber="16"/>
+      <ItemRef ItemOID="IT.ADTTE.CNSDTDSC" Mandatory="No" OrderNumber="17"/>
+      <ItemRef ItemOID="IT.ADTTE.AVAL" Mandatory="Yes" MethodOID="MT.AVAL_TTE" OrderNumber="18"/>
+      <ItemRef ItemOID="IT.ADTTE.AVALU" Mandatory="No" OrderNumber="19"/>
       <def:leaf ID="LF.ADTTE" xlink:href="adtte.xpt">
         <def:title>adtte.xpt</def:title>
       </def:leaf>
@@ -543,6 +566,14 @@
       <Description><TranslatedText xml:lang="en">Treatment Emergent Med Flag</TranslatedText></Description><CodeListRef CodeListOID="CL.NY"/>
       <def:Origin Type="Assigned" Source="Sponsor"/>
     </ItemDef>
+    <ItemDef OID="IT.ADAE.TRTA" Name="TRTA" DataType="text" Length="20">
+      <Description><TranslatedText xml:lang="en">Actual Treatment</TranslatedText></Description><CodeListRef CodeListOID="CL.TRT"/>
+      <def:Origin Type="Assigned" Source="Sponsor"/>
+    </ItemDef>
+    <ItemDef OID="IT.ADAE.TRTAN" Name="TRTAN" DataType="float" Length="8">
+      <Description><TranslatedText xml:lang="en">Actual Treatment (N)</TranslatedText></Description><CodeListRef CodeListOID="CL.TRT01PN"/>
+      <def:Origin Type="Assigned" Source="Sponsor"/>
+    </ItemDef>
     <ItemDef OID="IT.ADAE.STUDYID" Name="STUDYID" DataType="text" Length="40">
       <Description><TranslatedText xml:lang="en">Study Identifier</TranslatedText></Description><def:Origin Type="Protocol" Source="Sponsor"/>
     </ItemDef>
@@ -649,6 +680,9 @@
     </ItemDef>
     <ItemDef OID="IT.ADLB.PARCAT1" Name="PARCAT1" DataType="text" Length="20">
       <Description><TranslatedText xml:lang="en">Parameter Category 1</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
+    </ItemDef>
+    <ItemDef OID="IT.ADLB.ADT" Name="ADT" DataType="date" Length="10">
+      <Description><TranslatedText xml:lang="en">Analysis Date</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADLB.AVAL" Name="AVAL" DataType="float" Length="8">
       <Description><TranslatedText xml:lang="en">Analysis Value</TranslatedText></Description><def:ValueListRef ValueListOID="VL.ADLB.AVAL"/>
@@ -792,6 +826,23 @@
     <ItemDef OID="IT.ADTTE.AVAL" Name="AVAL" DataType="float" Length="8">
       <Description><TranslatedText xml:lang="en">Analysis Value (Days)</TranslatedText></Description><def:ValueListRef ValueListOID="VL.ADTTE.AVAL"/>
       <def:Origin Type="Derived" Source="Sponsor"/>
+    </ItemDef>
+    <ItemDef OID="IT.ADTTE.ITTFL" Name="ITTFL" DataType="text" Length="1">
+      <Description><TranslatedText xml:lang="en">Intent-To-Treat Population Flag</TranslatedText></Description><CodeListRef CodeListOID="CL.NY"/>
+      <def:Origin Type="Derived" Source="Sponsor"/>
+    </ItemDef>
+    <ItemDef OID="IT.ADTTE.SAFFL" Name="SAFFL" DataType="text" Length="1">
+      <Description><TranslatedText xml:lang="en">Safety Population Flag</TranslatedText></Description><CodeListRef CodeListOID="CL.NY"/>
+      <def:Origin Type="Derived" Source="Sponsor"/>
+    </ItemDef>
+    <ItemDef OID="IT.ADTTE.PARAMN" Name="PARAMN" DataType="float" Length="8">
+      <Description><TranslatedText xml:lang="en">Parameter (N)</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
+    </ItemDef>
+    <ItemDef OID="IT.ADTTE.PARCAT1" Name="PARCAT1" DataType="text" Length="20">
+      <Description><TranslatedText xml:lang="en">Parameter Category 1</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
+    </ItemDef>
+    <ItemDef OID="IT.ADTTE.AVALU" Name="AVALU" DataType="text" Length="8">
+      <Description><TranslatedText xml:lang="en">Analysis Value Unit</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADLB.AVAL.NEUT" Name="AVAL" DataType="float" Length="8">
       <Description><TranslatedText xml:lang="en">Absolute Neutrophil Count (x10^3/uL)</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
@@ -1043,6 +1094,6 @@
         <TranslatedText xml:lang="en">Identifies the start date of any post-baseline systemic anti-cancer therapy, acting as the primary censor-date boundary for PFS calculations.</TranslatedText>
       </Description>
     </def:CommentDef>
-    <arm:AnalysisResultDisplays><arm:ResultDisplay OID="RD.EFFICACY.SURVIVAL" Name="Primary &amp; Secondary Survival Analyses"><Description><TranslatedText xml:lang="en">Stratified Cox proportional-hazards and log-rank analyses of OS and PFS (CbzP vs MP), stratified by ECOGBL and MEASDISF, per SAP v3.0 §5.1.</TranslatedText></Description><arm:AnalysisResult OID="AR.OS.COX" ParameterOID="IT.ADTTE.PARAMCD" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="PRIMARY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">Overall Survival — stratified Cox HR and stratified log-rank p-value, CbzP vs MP.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADTTE"><def:WhereClauseRef WhereClauseOID="WC.ADTTE.PARAMCD.EQ.OS"/><arm:AnalysisVariable ItemOID="IT.ADTTE.AVAL"/><arm:AnalysisVariable ItemOID="IT.ADTTE.CNSR"/><arm:AnalysisVariable ItemOID="IT.ADTTE.TRT01P"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (survival::coxph / survdiff)"><arm:Code>coxph(Surv(AVAL, 1 - CNSR) ~ TRT01P + strata(ECOGBL, MEASDISF), data = adtte[PARAMCD=='OS'])</arm:Code></arm:ProgrammingCode></arm:AnalysisResult><arm:AnalysisResult OID="AR.PFS.COX" ParameterOID="IT.ADTTE.PARAMCD" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="SECONDARY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">Progression-Free Survival — stratified Cox HR and stratified log-rank p-value, CbzP vs MP.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADTTE"><def:WhereClauseRef WhereClauseOID="WC.ADTTE.PARAMCD.EQ.PFS"/><arm:AnalysisVariable ItemOID="IT.ADTTE.AVAL"/><arm:AnalysisVariable ItemOID="IT.ADTTE.CNSR"/><arm:AnalysisVariable ItemOID="IT.ADTTE.TRT01P"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (survival::coxph / survdiff)"><arm:Code>coxph(Surv(AVAL, 1 - CNSR) ~ TRT01P + strata(ECOGBL, MEASDISF), data = adtte[PARAMCD=='PFS'])</arm:Code></arm:ProgrammingCode></arm:AnalysisResult></arm:ResultDisplay></arm:AnalysisResultDisplays></MetaDataVersion>
+    <arm:AnalysisResultDisplays><arm:ResultDisplay OID="RD.EFFICACY.SURVIVAL" Name="Primary &amp; Secondary Survival Analyses"><Description><TranslatedText xml:lang="en">Stratified Cox proportional-hazards and log-rank analyses of OS and PFS (CbzP vs MP), stratified by ECOGBL and MEASDISF, per SAP v3.0 §5.1.</TranslatedText></Description><arm:AnalysisResult OID="AR.OS.COX" ParameterOID="IT.ADTTE.PARAMCD" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="PRIMARY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">Overall Survival — stratified Cox HR and stratified log-rank p-value, CbzP vs MP.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADTTE"><def:WhereClauseRef WhereClauseOID="WC.ADTTE.PARAMCD.EQ.OS"/><arm:AnalysisVariable ItemOID="IT.ADTTE.AVAL"/><arm:AnalysisVariable ItemOID="IT.ADTTE.CNSR"/><arm:AnalysisVariable ItemOID="IT.ADTTE.TRT01P"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (survival::coxph / survdiff)"><arm:Code>coxph(Surv(AVAL, 1 - CNSR) ~ TRT01P + strata(ECOGBL, MEASDISF), data = adtte[PARAMCD=='OS'])</arm:Code></arm:ProgrammingCode></arm:AnalysisResult><arm:AnalysisResult OID="AR.PFS.COX" ParameterOID="IT.ADTTE.PARAMCD" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="SECONDARY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">Progression-Free Survival — stratified Cox HR and stratified log-rank p-value, CbzP vs MP.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADTTE"><def:WhereClauseRef WhereClauseOID="WC.ADTTE.PARAMCD.EQ.PFS"/><arm:AnalysisVariable ItemOID="IT.ADTTE.AVAL"/><arm:AnalysisVariable ItemOID="IT.ADTTE.CNSR"/><arm:AnalysisVariable ItemOID="IT.ADTTE.TRT01P"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (survival::coxph / survdiff)"><arm:Code>coxph(Surv(AVAL, 1 - CNSR) ~ TRT01P + strata(ECOGBL, MEASDISF), data = adtte[PARAMCD=='PFS'])</arm:Code></arm:ProgrammingCode></arm:AnalysisResult></arm:ResultDisplay><arm:ResultDisplay OID="RD.EFFICACY.SECONDARY" Name="Secondary Time-to-Event Analyses"><Description><TranslatedText xml:lang="en">Unstratified Cox proportional-hazards analyses of the secondary time-to-event endpoints (Time to PSA Progression; Time to Tumor Progression, measurable-disease subpopulation), CbzP vs MP, per SAP v3.0 sections 5.3-5.4.</TranslatedText></Description><arm:AnalysisResult OID="AR.TTPSA.COX" ParameterOID="IT.ADTTE.PARAMCD" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="SECONDARY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">Time to PSA Progression - Cox HR and log-rank p-value, CbzP vs MP.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADTTE"><def:WhereClauseRef WhereClauseOID="WC.ADTTE.PARAMCD.EQ.TTPSA"/><arm:AnalysisVariable ItemOID="IT.ADTTE.AVAL"/><arm:AnalysisVariable ItemOID="IT.ADTTE.CNSR"/><arm:AnalysisVariable ItemOID="IT.ADTTE.TRT01P"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (survival::coxph / survdiff)"><arm:Code>coxph(Surv(AVAL, 1 - CNSR) ~ TRT01P, data = adtte[PARAMCD=='TTPSA'])</arm:Code></arm:ProgrammingCode></arm:AnalysisResult><arm:AnalysisResult OID="AR.TTUMOR.COX" ParameterOID="IT.ADTTE.PARAMCD" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="SECONDARY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">Time to Tumor Progression (measurable-disease subpopulation) - Cox HR and log-rank p-value, CbzP vs MP.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADTTE"><def:WhereClauseRef WhereClauseOID="WC.ADTTE.PARAMCD.EQ.TTUMOR"/><arm:AnalysisVariable ItemOID="IT.ADTTE.AVAL"/><arm:AnalysisVariable ItemOID="IT.ADTTE.CNSR"/><arm:AnalysisVariable ItemOID="IT.ADTTE.TRT01P"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (survival::coxph / survdiff)"><arm:Code>coxph(Surv(AVAL, 1 - CNSR) ~ TRT01P, data = adtte[PARAMCD=='TTUMOR'])</arm:Code></arm:ProgrammingCode></arm:AnalysisResult></arm:ResultDisplay><arm:ResultDisplay OID="RD.SAFETY.TEAE" Name="Treatment-Emergent Adverse Event Summary"><Description><TranslatedText xml:lang="en">Incidence of treatment-emergent adverse events (TRTEMFL='Y') by MedDRA preferred term and treatment, per SAP v3.0 section 5.2 (table T-20).</TranslatedText></Description><arm:AnalysisResult OID="AR.TEAE.INCIDENCE" ParameterOID="IT.ADAE.AEDECOD" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="SAFETY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">TEAE incidence (subjects with at least one event) by preferred term, CbzP vs MP.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADAE"><def:WhereClauseRef WhereClauseOID="WC.ADAE.TRTEMFL.EQ.Y"/><arm:AnalysisVariable ItemOID="IT.ADAE.AEDECOD"/><arm:AnalysisVariable ItemOID="IT.ADAE.TRTA"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (dplyr)"><arm:Code>adae[TRTEMFL=='Y'] |&gt; distinct(USUBJID, TRTA, AEDECOD) |&gt; count(TRTA, AEDECOD)</arm:Code></arm:ProgrammingCode></arm:AnalysisResult></arm:ResultDisplay></arm:AnalysisResultDisplays></MetaDataVersion>
 </Study>
   </ODM>

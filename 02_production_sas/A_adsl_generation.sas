@@ -100,7 +100,7 @@ quit;
 proc sql;
     create table work.pn_trt as
     select pn.usubjid, pn.pntestcd, pn.pnstresn,
-           input(pn.pndtc, yymmdd10.) as pndt format=yymmdd10.
+           input(pn.pndtc, ? yymmdd10.) as pndt format=yymmdd10.
     from staging.pn as pn;
 quit;
 

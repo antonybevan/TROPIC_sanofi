@@ -25,10 +25,12 @@
 proc sql;
     /* Create base dataset merging AE and ADSL */
     create table work.ae_base as
-    select 
+    select
         adsl.studyid,
         adsl.usubjid,
         adsl.trt01p,
+        adsl.trt01a as TRTA length=20,
+        adsl.trt01an as TRTAN,
         adsl.trtsdt,
         ae.aeseq,            /* carried only as a deterministic sort tie-breaker; dropped before output */
         ae.aedecod,
@@ -94,8 +96,14 @@ data work.ae_episodes;
     end;
     else do;
         if not missing(cq02nam) and cq02nam ne '' then do;
-            /* Gap rule: check if start date is within 3 days of prior end date */
-            if astdt <= (_ciaeedt + &EPISODE_GAP_DAYS.) then do;
+            /* Gap rule: check if start date is within 3 days of prior end date.
+               Compute the window end without arithmetic on a missing prior end date
+               (avoids a benign "missing values" NOTE); the comparison semantics are
+               identical — a missing prior end yields a missing window, exactly as
+               (_ciaeedt + gap) would. */
+            if missing(_ciaeedt) then _ci_gapend = .;
+            else _ci_gapend = _ciaeedt + &EPISODE_GAP_DAYS.;
+            if astdt <= _ci_gapend then do;
                 /* Merge: update end date to running maximum */
                 _ciaeedt = max(_ciaeedt, aendt);
                 AEOCCFL = 'N';
@@ -122,7 +130,11 @@ data work.ae_episodes;
         CIAESEQ = _ciaeseq;
         CIAESDT = _ciaesdt;
         CIAEEDT = _ciaeedt;
-        CIAEDUR = (CIAEEDT - CIAESDT + 1) / 30.4375;
+        /* Guard duration arithmetic; result (missing) is unchanged when either
+           episode boundary date is missing, but no "missing values" NOTE is emitted. */
+        if not missing(CIAEEDT) and not missing(CIAESDT) then
+            CIAEDUR = (CIAEEDT - CIAESDT + 1) / 30.4375;
+        else CIAEDUR = .;
     end;
     else do;
         CIAESEQ = .;
@@ -140,7 +152,7 @@ proc sort data=work.ae_episodes;
     by usubjid aedecod astdt aendt aeseq;
 run;
 
-data adam.adae(keep=STUDYID USUBJID AEDECOD AEBODSYS AEHLT AESEV ATOXGR AESER AEREL ASTDT AENDT ASTDY AENDY AEACN AEOUT CQ02NAM CIAESEQ CIAESDT CIAEEDT CIAEDUR AEOCCFL TRTEMFL ADURN ADURU AESEQ);
+data adam.adae(keep=STUDYID USUBJID TRTA TRTAN AEDECOD AEBODSYS AEHLT AESEV ATOXGR AESER AEREL ASTDT AENDT ASTDY AENDY AEACN AEOUT CQ02NAM CIAESEQ CIAESDT CIAEEDT CIAEDUR AEOCCFL TRTEMFL ADURN ADURU AESEQ);
     set work.ae_episodes;
     by usubjid aedecod;
     

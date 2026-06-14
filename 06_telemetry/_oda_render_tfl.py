@@ -23,13 +23,18 @@ sys.path.insert(0, PROJECT_ROOT)
 
 import saspy  # noqa: E402
 
-ODA_HOME      = "/home/u64235016"
-PROJ_ROOT_ODA = f"{ODA_HOME}/TROPIC"
-PGMDIR_ODA    = f"{PROJ_ROOT_ODA}/02_production_sas"
-CBZ_ODA       = f"{PROJ_ROOT_ODA}/01_raw_source/cbzp_reconstructed"
-ADAM_ODA      = f"{PROJ_ROOT_ODA}/04_adam"
-SASFIG_ODA    = f"{PROJ_ROOT_ODA}/09_tfl/output/sas"
+# No developer account id is hard-coded (roadmap #10): default to a ~/TROPIC layout that is
+# resolved against the connected account's $HOME after login; override via TROPIC_ODA_PROJ_ROOT.
+PROJ_ROOT_ODA = os.environ.get("TROPIC_ODA_PROJ_ROOT", "~/TROPIC")
 CFG_FILE      = os.path.join(PROJECT_ROOT, "sascfg_personal.py")
+
+
+def _oda_paths(root):
+    return (f"{root}/02_production_sas", f"{root}/01_raw_source/cbzp_reconstructed",
+            f"{root}/04_adam", f"{root}/09_tfl/output/sas")
+
+
+PGMDIR_ODA, CBZ_ODA, ADAM_ODA, SASFIG_ODA = _oda_paths(PROJ_ROOT_ODA)
 
 DATASETS = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte"]
 CBZ_DOMS = ["adsl", "adtte", "adae", "adlb", "adex", "adrs"]
@@ -68,6 +73,18 @@ def errors_in(log):
 print("Connecting to ODA...", flush=True)
 sas = saspy.SASsession(cfgname="oda", cfgfile=CFG_FILE)
 print("Connected.", flush=True)
+
+# Resolve a leading '~' in the ODA root against the connected account's $HOME, so no per-user
+# absolute path is committed (roadmap #10).
+if "~" in PROJ_ROOT_ODA:
+    _log = sas.submit("%put TROPIC_ODA_HOME=%sysget(HOME);").get("LOG", "")
+    for _line in _log.splitlines():
+        if "TROPIC_ODA_HOME=" in _line and "%put" not in _line and "%sysget" not in _line:
+            _home = _line.split("TROPIC_ODA_HOME=", 1)[1].strip()
+            if _home:
+                PROJ_ROOT_ODA = PROJ_ROOT_ODA.replace("~", _home, 1)
+                PGMDIR_ODA, CBZ_ODA, ADAM_ODA, SASFIG_ODA = _oda_paths(PROJ_ROOT_ODA)
+            break
 
 try:
     # 1. Upload programs (+ CbzP bridge XPTs unless tfl-only)

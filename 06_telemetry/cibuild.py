@@ -107,8 +107,26 @@ def _saspy_available():
 
 # Outcome of the most recent ODA Stage-10 attempt, merged into pipeline_health.json (brief §6).
 _ODA_OUTCOME = {}
-PROJ_ROOT_ODA = "/home/u64235016/TROPIC"
+# ODA project root. No developer account id is hard-coded (roadmap #10): defaults to the
+# connecting account's home (~/TROPIC, resolved against the live session's $HOME) and can be
+# overridden with TROPIC_ODA_PROJ_ROOT for a non-default ODA layout.
+PROJ_ROOT_ODA = os.environ.get("TROPIC_ODA_PROJ_ROOT", "~/TROPIC")
 ODA_DATASETS = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte"]
+
+
+def _resolve_oda_root(sas, template):
+    """Expand a leading '~' in the ODA project root against the connected account's $HOME,
+    so no per-user absolute path needs to be committed. Returns template unchanged if it is
+    already absolute or $HOME cannot be read."""
+    if not template.startswith("~"):
+        return template
+    log = sas.submit("%put TROPIC_ODA_HOME=%sysget(HOME);").get("LOG", "")
+    for line in log.splitlines():
+        if "TROPIC_ODA_HOME=" in line and "%put" not in line and "%sysget" not in line:
+            home = line.split("TROPIC_ODA_HOME=", 1)[1].strip()
+            if home:
+                return template.replace("~", home, 1)
+    return template
 
 
 def _sim_byte_copy(datasets):
@@ -140,9 +158,6 @@ def _run_saspy_stage10():
     import oda_broker
     import seed_sdtm
 
-    PGMDIR_ODA = f"{PROJ_ROOT_ODA}/02_production_sas"
-    ADAM_ODA = f"{PROJ_ROOT_ODA}/04_adam"
-
     # ---- Resilient, probe-verified connect (broker rides spawner timeouts) ----
     try:
         conn = oda_broker.connect(max_wait_s=_oda_max_wait())
@@ -157,18 +172,30 @@ def _run_saspy_stage10():
             "reconciliation": "sim_only"}
 
     sas = conn.sas
+    proj_root_oda = _resolve_oda_root(sas, PROJ_ROOT_ODA)
+    PGMDIR_ODA = f"{proj_root_oda}/02_production_sas"
+    ADAM_ODA = f"{proj_root_oda}/04_adam"
     try:
         # ---- Guarantee the SDTM library on ODA is the verified-correct one ----
-        if os.environ.get("TROPIC_ODA_FORCE_SDTM") == "TRUE":
-            res = seed_sdtm.seed(sas, force=True)
+        # Single-session optimisation: with --force-upload-sdtm or --seed-if-needed we seed
+        # INSIDE this Stage-10 session (one ODA spawn for seed+execute+download) instead of
+        # requiring a separate seed_sdtm.py run (two spawns = double the flaky-spawner/session
+        # -limit exposure). The seed is delta-aware, so a resident library costs only a manifest
+        # check. Default (neither flag) keeps the strict CI contract: verify, else hard-fail.
+        force_sdtm = os.environ.get("TROPIC_ODA_FORCE_SDTM") == "TRUE"
+        if force_sdtm or os.environ.get("TROPIC_ODA_SEED_INLINE") == "TRUE":
+            res = seed_sdtm.seed(sas, force=force_sdtm)
             if res["status"] not in ("seeded", "already-resident"):
                 return 2, "", f"SDTM seed/verify failed: {res}", {"reconciliation": "none"}
             manifest_sha = res["manifest_sha"]
+            print(f"  [ODA] SDTM {res['status']}: {res.get('uploaded', 0)} uploaded, "
+                  f"{res.get('skipped', 0)} resident (manifest {manifest_sha[:12]}).")
         else:
             ok, manifest_sha, reason = seed_sdtm.verify_resident(sas)
             if not ok:
-                return 2, "", (f"SDTM not verified-resident on ODA ({reason}). "
-                               f"Seed it first: python3 06_telemetry/seed_sdtm.py"), {
+                return 2, "", (f"SDTM not verified-resident on ODA ({reason}). Seed first: "
+                               f"python3 06_telemetry/seed_sdtm.py  — or re-run with "
+                               f"--seed-if-needed for a single-session seed+run."), {
                     "reconciliation": "none"}
             print(f"  [ODA] SDTM verified resident (manifest {manifest_sha[:12]}).")
 
@@ -182,7 +209,7 @@ def _run_saspy_stage10():
         log = sas.submit(f"""
 options notes source;
 %global PROJ_ROOT PGMDIR;
-%let PROJ_ROOT = {PROJ_ROOT_ODA};
+%let PROJ_ROOT = {proj_root_oda};
 %let PGMDIR    = {PGMDIR_ODA};
 filename drv "{PGMDIR_ODA}/00_master_driver.sas";
 %include drv;
@@ -226,7 +253,9 @@ def _resolve_sas_mode(real_sas, use_cached_sas):
     saspy_ok = _saspy_available()
     if use_cached_sas:
         return "cached"
-    if local_sas:
+    # Real SAS execution must be explicitly requested (roadmap #10): a local 'sas' on PATH
+    # no longer silently overrides the default. Without --real-sas the run is labelled sim.
+    if real_sas and local_sas:
         return "local"
     if real_sas and saspy_ok:
         return "oda"
@@ -336,10 +365,12 @@ def run_single_stage(stage, from_stage, sas_mode, results):
         write_telemetry(results, sas_mode)
         sys.exit(1)
 
-def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=False, force_upload_sdtm=False):
+def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=False, force_upload_sdtm=False, seed_if_needed=False):
     print("=== EXECUTING TROPIC (Study EFC6193 / XRP6258) PIPELINE ===")
     # Force a full SDTM re-upload on ODA this run (default: upload only the delta).
     os.environ["TROPIC_ODA_FORCE_SDTM"] = "TRUE" if force_upload_sdtm else "FALSE"
+    # Seed SDTM inline within the Stage-10 ODA session (single spawn) if it isn't resident.
+    os.environ["TROPIC_ODA_SEED_INLINE"] = "TRUE" if seed_if_needed else "FALSE"
 
     # Run the configuration generator
     print("  [CONFIG] Generating configuration from study_config.yaml...")
@@ -553,6 +584,7 @@ def main():
     parser.add_argument("--demo", action="store_true", help="Run self-contained demo smoke test (tests/smoke_test.R).")
     parser.add_argument("--serial", action="store_true", help="Run stages serially rather than parallelizing Stages 4-8.")
     parser.add_argument("--force-upload-sdtm", action="store_true", help="ODA only: force a full re-upload of the ~200 MB SDTM source (default uploads only missing/changed files). Use after a source-data refresh.")
+    parser.add_argument("--seed-if-needed", action="store_true", help="ODA only: seed the SDTM library inline within the Stage-10 session if it is not already resident (single ODA spawn for seed+run). Delta-aware: a resident library costs only a manifest check.")
 
     args = parser.parse_args()
 
@@ -562,11 +594,14 @@ def main():
         rollback()
     elif args.demo:
         print("=== RUNNING SELF-CONTAINED DEMO (SMOKE TEST) ===")
-        rc, stdout, stderr = run_command([RSCRIPT_PATH, "tests/smoke_test.R"])
-        print(stdout)
-        if rc != 0:
-            print(f"ERROR: Smoke test failed!\n{stderr}")
-            sys.exit(1)
+        for label, script in (("reconciliation engine", "tests/smoke_test.R"),
+                              ("TFL survival-stats snapshot", "tests/test_tfl_stats.R")):
+            print(f"--- demo: {label} ({script}) ---")
+            rc, stdout, stderr = run_command([RSCRIPT_PATH, script])
+            print(stdout)
+            if rc != 0:
+                print(f"ERROR: {label} test failed!\n{stderr}")
+                sys.exit(1)
         print("Demo smoke test completed successfully!")
         sys.exit(0)
     else:
@@ -577,7 +612,7 @@ def main():
         if args.real_sas and args.use_cached_sas:
             print("ERROR: --real-sas and --use-cached-sas are mutually exclusive.")
             sys.exit(1)
-        execute_pipeline(args.from_stage, args.real_sas, args.use_cached_sas, args.serial, args.force_upload_sdtm)
+        execute_pipeline(args.from_stage, args.real_sas, args.use_cached_sas, args.serial, args.force_upload_sdtm, args.seed_if_needed)
 
 if __name__ == "__main__":
     main()

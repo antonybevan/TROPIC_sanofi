@@ -67,7 +67,10 @@ data work.lb_windows;
     if ADY <= &W_BL_HI. then do;
         AVISITN = 0;
         AVISIT = 'Baseline';
-        AWDIST = abs(ADY - (-1));
+        /* Missing ADY sorts into Baseline (. <= W_BL_HI); guard the distance calc so
+           it does not emit a "missing values generated" NOTE. AWDIST stays missing,
+           the window classification above is unchanged. */
+        if not missing(ADY) then AWDIST = abs(ADY - (-1));
     end;
     else if &W_C1D1_LO. <= ADY <= &W_C1D1_HI. then do;
         AVISITN = 1;
@@ -251,9 +254,14 @@ proc sql;
     left join adam.adsl as adsl on r.usubjid = adsl.usubjid;
 quit;
 
-/* Combine base and derived Optimus kinetics */
-data adam.adlb(keep=STUDYID USUBJID SUBJID TRT01P TRTSDT PARAMCD PARAM PARAMN PARCAT1 AVAL AVALC LBNRLO LBNRHI LBNRIND AVISIT AVISITN AWDIST ATOXGR BASE BASEC BTOXGR CHG PCHG ANL01FL BASEFL LBDY);
+/* Combine base and derived Optimus kinetics.
+   ADT (analysis date) is carried so downstream ADaM (e.g. ADTTE PSA-progression
+   censoring) can source the last PSA assessment date from ADLB rather than reaching
+   back into raw SDTM/staging (traceability, roadmap #3). Derived Optimus rows have
+   no single assessment date and carry ADT missing. */
+data adam.adlb(keep=STUDYID USUBJID SUBJID TRT01P TRTSDT PARAMCD PARAM PARAMN PARCAT1 ADT AVAL AVALC LBNRLO LBNRHI LBNRIND AVISIT AVISITN AWDIST ATOXGR BASE BASEC BTOXGR CHG PCHG ANL01FL BASEFL LBDY);
     set work.lb_anl01(rename=(ADY=LBDY)) work.optimus_nadir work.optimus_rec;
+    format ADT yymmdd10.;
 run;
 
 proc sort data=adam.adlb;

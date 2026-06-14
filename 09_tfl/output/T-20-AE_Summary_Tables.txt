@@ -1,0 +1,32 @@
+============================================================================
+ NOTICE: The CbzP (Cabazitaxel) arm shown below is a SYNTHETIC, illustrative
+ cohort reconstructed by proportional-hazards scaling of the real MP arm.
+ Between-arm comparisons are circular by construction and are NOT clinical
+ findings. All Mitoxantrone (MP) arm values are derived from real trial data.
+============================================================================
+
+ TROPIC (Study EFC6193 / XRP6258) Adverse Event Summary Tables
+ ==============================================================
+
+ T-20-1: Treatment-Emergent Adverse Events Summary (Safety Population)
+ -----------------------------------------------------------------------
+                                           CbzP (N=378)        MP (N=371)
+ Any TEAE                                  364 (96%)       328 (88%)
+ Any Grade >= 3 TEAE                       310 (82%)       147 (40%)
+ Any Serious TEAE (SAE)                    145 (38%)        78 (21%)
+ Any TEAE leading to discontinuation        68 (18%)        0 (0%)
+
+ T-20-2: Grade >=3 TEAEs by System Organ Class (Top 10, MP Arm)
+ -----------------------------------------------------------------------
+ System Organ Class                         CbzP (n, %)        MP (n, %)
+  GENERAL DISORDERS AND ADMINISTRATION SITE CONDITIO   35 (9%)        36 (10%)
+  GASTROINTESTINAL DISORDERS                           34 (9%)         6 (2%)
+  MUSCULOSKELETAL AND CONNECTIVE TISSUE DISORDERS      18 (5%)        35 (9%)
+  INFECTIONS AND INFESTATIONS                           8 (2%)        19 (5%)
+  NERVOUS SYSTEM DISORDERS                              4 (1%)        14 (4%)
+  BLOOD AND LYMPHATIC SYSTEM DISORDERS                293 (78%)        39 (11%)
+  SKIN AND SUBCUTANEOUS TISSUE DISORDERS                0 (0%)         1 (0%)
+  METABOLISM AND NUTRITION DISORDERS                    0 (0%)         8 (2%)
+  RESPIRATORY, THORACIC AND MEDIASTINAL DISORDERS       0 (0%)        13 (4%)
+  INVESTIGATIONS                                        0 (0%)         5 (1%)
+

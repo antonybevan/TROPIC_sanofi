@@ -156,6 +156,7 @@ df_optimus_nadir <- df_anc_nadir %>%
   transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRTSDT,
     PARAMCD = "ANCNADIR", PARAM = "ANC Nadir Value (x10^3/uL)", PARCAT1 = "OPTIMUS KINETICS",
+    ADT = as.Date(NA),
     AVAL = nadir_val, AVALC = sprintf("%.2f", sas_round(nadir_val, 2)), AVISIT = paste("CYCLE", cycle), AVISITN = cycle,
     ANL01FL = "Y", BASEFL = "N", lbdy = nadir_dy
   )
@@ -166,6 +167,7 @@ df_optimus_rec <- df_anc_rec %>%
   transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRTSDT,
     PARAMCD = "ANCRECDY", PARAM = "Days from ANC Nadir to Recovery", PARCAT1 = "OPTIMUS KINETICS",
+    ADT = as.Date(NA),
     AVAL = rec_dy - nadir_dy, AVALC = as.character(rec_dy - nadir_dy), AVISIT = paste("CYCLE", cycle), AVISITN = cycle,
     ANL01FL = "Y", BASEFL = "N", lbdy = rec_dy
   )
@@ -174,7 +176,7 @@ df_optimus_rec <- df_anc_rec %>%
 adlb_final <- bind_rows(
   df_anl01 %>% select(
     STUDYID, USUBJID, SUBJID, TRT01P, TRTSDT, PARAMCD, PARAM, PARAMN, PARCAT1,
-    AVAL, AVALC, LBNRLO = LBORNRLO, LBNRHI = LBORNRHI, LBNRIND, AVISIT, AVISITN, AWDIST, ATOXGR,
+    ADT = lbdt, AVAL, AVALC, LBNRLO = LBORNRLO, LBNRHI = LBORNRHI, LBNRIND, AVISIT, AVISITN, AWDIST, ATOXGR,
     BASE, BASEC, BTOXGR, CHG, PCHG, ANL01FL, BASEFL, lbdy
   ),
   df_optimus_nadir,
@@ -196,6 +198,6 @@ if (nrow(adlb_final %>% filter(PARAMCD == "ANCNADIR")) == 0) {
 # XPT v5 compliance (clean log): uppercase variable names + SAS date formats (lbdy -> LBDY)
 names(adlb_final) <- toupper(names(adlb_final))
 for (.dv in names(adlb_final)) if (inherits(adlb_final[[.dv]], "Date")) attr(adlb_final[[.dv]], "format.sas") <- "DATE9."
-xportr_write(adlb_final, "04_adam/adlb_v.xpt", domain = "ADLB")
+write_xpt_v(adlb_final, "04_adam/adlb_v.xpt", domain = "ADLB")
 
 cat("NOTE: [VALIDATION] Wrote validation ADLB: 04_adam/adlb_v.xpt\n")

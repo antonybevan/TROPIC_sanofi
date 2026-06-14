@@ -62,3 +62,28 @@ W_C3D1_LO  <- as.integer(cfg$W_C3D1_LO);  W_C3D1_HI  <- as.integer(cfg$W_C3D1_HI
 # Staging data path (relative to project root)
 STAGING_PATH <- do.call(file.path, as.list(strsplit(cfg$STAGING_PATH, "/")[[1]]))
 
+# --------------------------------------------------------------------------- #
+# write_xpt_v(): xportr_write wrapper for the R validation track.
+#
+# Validation-track outputs use a deliberate `<domain>_v.xpt` naming convention to
+# keep them distinct from the SAS production `<domain>_prod.xpt` the reconciliation
+# compares against. The underscore in that member name is valid for a SAS v5
+# transport file, but xportr's name check (stricter than the v5 spec — it rejects
+# underscores) emits a benign warning:
+#   "The following validation checks failed: `.df` cannot contain any non-ASCII,
+#    symbol or underscore characters."
+# That single, known false-positive is the only thing standing between the nine
+# validation logs and a clean Errors/Warnings section. Muffle ONLY that exact
+# message; every other xportr warning (real label/type/length violations) still
+# surfaces in the log untouched.
+write_xpt_v <- function(.df, path, domain) {
+  withCallingHandlers(
+    xportr::xportr_write(.df, path, domain = domain),
+    warning = function(w) {
+      if (grepl("non-ASCII, symbol or underscore", conditionMessage(w), fixed = TRUE)) {
+        invokeRestart("muffleWarning")
+      }
+    }
+  )
+}
+

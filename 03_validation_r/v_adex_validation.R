@@ -150,5 +150,5 @@ if (nrow(adex %>% filter(PARAMCD == "PERFDOSE")) == 0) {
 # XPT v5 compliance (clean log): uppercase variable names + SAS date formats
 names(adex) <- toupper(names(adex))
 for (.dv in names(adex)) if (inherits(adex[[.dv]], "Date")) attr(adex[[.dv]], "format.sas") <- "DATE9."
-xportr_write(adex, "04_adam/adex_v.xpt", domain = "ADEX")
+write_xpt_v(adex, "04_adam/adex_v.xpt", domain = "ADEX")
 cat("NOTE: [VALIDATION] Wrote validation ADEX: 04_adam/adex_v.xpt\n")
