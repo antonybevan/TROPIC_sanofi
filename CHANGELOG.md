@@ -126,7 +126,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   deterministic fixtures; wired into `cibuild.py --demo`.
 - **Pinnacle 21 / CDISC CORE runbook (#9):** `07_define_xml/P21_RUNBOOK.md` (turn-key commands;
   the business-rule layer remains data-gated and is not faked).
-- **Portfolio visibility (#6):** the rendered TFL gallery (`09_tfl/output/`) and the execution
+- **Portfolio visibility (#6):** the rendered TFL gallery (`09_tfl/output/tables/` and `09_tfl/output/figures/`) and the execution
   evidence (`pipeline_health.json`, `reconciliation_status.json`) are no longer git-ignored, so a
   reviewer sees the figures/tables and the honest `sas_execution_mode` without a local run.
 
@@ -344,7 +344,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   can deliver regulatory-grade graphics and providing an independent visual check that
   the SAS analyses (Cox HR, KM survival, at-risk counts) agree with the R reporting
   track. Six figures at 300 dpi: KM OS & PFS (number-at-risk, HR, censoring), OS subgroup
-  forest, PSA waterfall, exposure swimmer, Project Optimus E-R scatter → `09_tfl/output/sas/`.
+  forest, PSA waterfall, exposure swimmer, Project Optimus E-R scatter → `09_tfl/output/figures/sas/`.
   *(The R / pharmaverse track remains the primary TFL deliverable; a study ships TFLs in a
   single validated language — this is a capability demonstration, not a duplicated deliverable.)*
 - **CbzP→SAS bridge (`01_raw_source/export_cbzp_xpt.R`):** an idempotent program exports
@@ -365,7 +365,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **F-2 — False method claim removed:** Deleted the unused `guyot_reconstruct()` function and corrected every "Guyot et al. (2012)" citation (README, ANALYSIS_REPORT, ADRG, reconstruction log/script). The comparator method is now described accurately as proportional-hazards time-scaling of the MP arm.
 - **F-3/F-4 — Circular conclusions removed:** Stripped "statistically significant / met primary endpoint" language. Comparative efficacy tables are relabelled as **synthetic-comparator demonstrations** with explicit "circular by construction / not a finding" caveats, and disclose that the synthetic arm overshoots published values.
 - **F-5 — Build/telemetry honesty:** `cibuild.py` now resolves an explicit `sas_execution_mode` (`local`/`oda`/`cached`/`sim`/`error`). `--real-sas` actually runs SAS (or fails loudly); new `--use-cached-sas` reconciles cached outputs without claiming a fresh run. Telemetry reports what actually executed.
-- **F-7 — Single source of truth:** Cross-document statistics aligned to the generated `09_tfl/output/*.txt` (e.g. TTPSA MP 2.2 mo, p=0.0362; TEAE/Grade≥3 percentages).
+- **F-7 — Single source of truth:** Cross-document statistics aligned to the generated `09_tfl/output/tables/*.txt` (e.g. TTPSA MP 2.2 mo, p=0.0362; TEAE/Grade≥3 percentages).
 - **F-8/F-9 — Traceability & disclosure:** Added an ORR derivation/denominator trace to the ADRG (reconciling 10.5% vs published 4.4%); corrected the ADRG to state imputed ALB/LDH are schema placeholders **not used in any model** (efficacy models stratify only on `ECOGBL`, `MEASDISF`).
 
 ## [3.1.0] - 2026-06-11
