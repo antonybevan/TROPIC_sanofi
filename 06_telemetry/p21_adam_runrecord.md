@@ -1,7 +1,6 @@
 # Conformance Run Record — Pinnacle 21 Community (ADaM)
 
 **Date:** 2026-06-14 · **Engine:** Pinnacle 21 Community **4.1.0** (FDA rule-pack **2304.3**, ADaMIG 1.3).
-**Governed by:** [`../07_define_xml/CONFORMANCE_VALIDATION_PLAN.md`](../07_define_xml/CONFORMANCE_VALIDATION_PLAN.md).
 
 ## Status: SET UP IN FULL — BLOCKED at execution by vendor build-expiry
 
@@ -57,5 +56,4 @@ COMP="…/app.asar.unpacked/components"
    or once Certara ships a newer non-expired Community build — using the command above verbatim.
 2. **Pinnacle 21 Enterprise** (licensed, server-based, no self-expiry) — the authoritative engine FDA
    itself uses; pair with the FDA Validator Rules matched to the Data Standards Catalog.
-3. Triage the resulting `p21_adam_report.xlsx` per CVP §5 (Reject → must-fix, Error → fix/justify,
-   Warning → disposition in ADRG); known/expected findings are pre-documented in `P21_RUNBOOK.md`.
+3. Triage the resulting `p21_adam_report.xlsx` (Reject → must-fix, Error → fix/justify, Warning → disposition in ADRG).

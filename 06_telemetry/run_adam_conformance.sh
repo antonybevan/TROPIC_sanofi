@@ -5,7 +5,7 @@
 # (dataset<->define.xml consistency, ADaMIG structural rules, identifier/key integrity, controlled
 # terminology). It is the interim gate used while the authoritative Pinnacle 21 Enterprise run is
 # unavailable (CORE has no ADaM rules; P21 Community 4.1.0 is engine-expired). See
-# 06_telemetry/p21_adam_runrecord.md and 07_define_xml/CONFORMANCE_VALIDATION_PLAN.md.
+# 06_telemetry/p21_adam_runrecord.md.
 #
 # Usage:  bash 06_telemetry/run_adam_conformance.sh
 # Outputs: 06_telemetry/adam_conformance_report.{csv,md} + adam_conformance_status.json
