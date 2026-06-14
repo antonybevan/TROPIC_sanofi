@@ -333,6 +333,6 @@ proc sort data=adam.adrs;
 run;
 
 /* Clean up work library */
-proc datasets lib=work nolist kill;
+proc delete data=work.base_sod work.post_sod work.cycle_sod_comp work.recist_calc work.recist_ovrl work.rs_disp work.rs_base work.bor_rank work.bor_summary work.orr_summary work.psa_base work.psa_post work.psa_decline work.psa_resp_cand work.psa_responders work.psa_all work.psa_nadir work.psa_prog_check work.psa_prog_eval work.psa_prog_conf work.psprog work.psaresp work.adrs_union;
 run;
 quit;

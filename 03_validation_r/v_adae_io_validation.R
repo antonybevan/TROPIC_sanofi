@@ -45,7 +45,9 @@ df_ae <- ae %>%
       atoxgr >= 3.0 ~ "SEVERE",
       TRUE ~ NA_character_
     ),
-    CQ02NAM = if_else(AEDECOD %in% c("NEUTROPENIA", "FEBRILE NEUTROPENIA", "LEUKOPENIA"), "HEMATOLOGIC IRAE", ""),
+    CQ02NAM = if_else(AEDECOD %in% c("NEUTROPENIA", "FEBRILE NEUTROPENIA", "LEUKOPENIA"), "HEMATOLOGIC EVENT", ""),
+    CQ02CD = if_else(AEDECOD %in% c("NEUTROPENIA", "FEBRILE NEUTROPENIA", "LEUKOPENIA"), "CQ02", ""),
+    CQ02SC = if_else(AEDECOD %in% c("NEUTROPENIA", "FEBRILE NEUTROPENIA", "LEUKOPENIA"), "SPONSOR", ""),
     aetrtem_clean = if_else(is.na(AETRTEM) | trimws(AETRTEM) == "", NA_character_, trimws(AETRTEM))
   )
 
@@ -168,7 +170,7 @@ adae_final <- adae_pre %>%
     STUDYID, USUBJID, TRTA = TRT01A, TRTAN = TRT01AN,
     AEDECOD, AEBODSYS, AEHLT, AESEV, ATOXGR = atoxgr, AESER, AEREL,
     ASTDT = astdt, AENDT = aendt, ASTDY = astdy, AENDY = aendy, AEACN, AEOUT,
-    CQ02NAM, CIAESEQ = ciaeseq, CIAESDT = ciaesdt, CIAEEDT = ciaeedt, CIAEDUR = ciaedur,
+    CQ02NAM, CQ02CD, CQ02SC, CIAESEQ = ciaeseq, CIAESDT = ciaesdt, CIAEEDT = ciaeedt, CIAEDUR = ciaedur,
     AEOCCFL, TRTEMFL, ADURN, ADURU, AESEQ
   )
 

@@ -289,6 +289,6 @@ proc sql;
 quit;
 
 /* Clean up work library */
-proc datasets lib=work nolist kill;
+proc delete data=work.trtsdt_map;
 run;
 quit;

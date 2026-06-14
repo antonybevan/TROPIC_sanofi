@@ -269,6 +269,6 @@ proc sort data=adam.adlb;
 run;
 
 /* Clean up work library */
-proc datasets lib=work nolist kill;
+proc delete data=work.lb_base work.lb_windows work.lb_base_pre work.baselines work.lb_base_merged work.lb_anl01 work.anc_records work.anc_nadir_val work.anc_nadir_summary work.anc_recovery work.optimus_nadir work.optimus_rec;
 run;
 quit;

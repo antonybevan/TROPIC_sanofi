@@ -121,6 +121,6 @@
 %transpose_supp(pn);
 
 /* Clean up temporary utility datasets in work library */
-proc datasets lib=work nolist kill;
+proc delete data=work._supp_sorted work._supp_transposed work._main_sorted work._supp_sorted2 work._supp_ready;
 run;
 quit;

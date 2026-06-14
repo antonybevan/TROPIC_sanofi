@@ -1,0 +1,19 @@
+Sponsor: Sanofi-Aventis                                                   Protocol: EFC6193 (TROPIC)
+Page 1 of 1
+
+                               Listing L-01-1: Subject Discontinuations
+                                       Safety Population
+
+USUBJID          TRT01A          RANDDT       TRTSDT       LAST_DOSE_DT  DISCON_DT    PRIMARY REASON FOR DISCONTINUATION
+-----------------------------------------------------------------------------------------------------------------------------
+TROPIC-001-001   CABAZITAXEL     2026-01-15   2026-01-16   2026-03-20    2026-03-27   DISEASE PROGRESSION
+TROPIC-001-002   MITOXANTRONE    2026-01-20   2026-01-21   2026-04-15    2026-04-22   ADVERSE EVENT (NEUTROPENIA)
+TROPIC-001-003   CABAZITAXEL     2026-01-22   2026-01-23   2026-05-10    2026-05-17   PHYSICIAN DECISION
+TROPIC-002-001   MITOXANTRONE    2026-02-01   2026-02-02   2026-03-15    2026-03-19   WITHDRAWAL BY SUBJECT
+TROPIC-002-002   CABAZITAXEL     2026-02-05   2026-02-06   2026-05-30    2026-06-05   DISEASE PROGRESSION
+TROPIC-003-001   MITOXANTRONE    2026-02-10   2026-02-11   2026-03-01    2026-03-05   DISEASE PROGRESSION
+TROPIC-003-002   CABAZITAXEL     2026-02-15   2026-02-16   2026-06-01    2026-06-08   DISEASE PROGRESSION
+-----------------------------------------------------------------------------------------------------------------------------
+Note: Last Dose Date is derived from the Exposure (EX) domain. Discontinuation Date and Primary Reason are sourced from the 
+Disposition (DS) domain.
+Program Name: L_discon.sas                                                    Run Date: 2026-06-14 15:53

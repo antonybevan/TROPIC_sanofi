@@ -102,6 +102,6 @@ proc sort data=adam.adcm;
 run;
 
 /* Clean up work library */
-proc datasets lib=work nolist kill;
+proc delete data=work.cm_base work.nact_dates;
 run;
 quit;

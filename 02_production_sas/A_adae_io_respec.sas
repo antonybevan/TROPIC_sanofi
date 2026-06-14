@@ -52,11 +52,19 @@ proc sql;
         ae.aeout,
         ae.aeacn,
         ae.aetrtem,
-        /* Custom Sponsor Grouping: Customized Query 02 Name for irAEs */
+        /* Custom Sponsor Grouping: Customized Query 02 Name for Hematologic Events */
         case 
-            when ae.aedecod in ('NEUTROPENIA', 'FEBRILE NEUTROPENIA', 'LEUKOPENIA') then 'HEMATOLOGIC IRAE'
+            when ae.aedecod in ('NEUTROPENIA', 'FEBRILE NEUTROPENIA', 'LEUKOPENIA') then 'HEMATOLOGIC EVENT'
             else ''
-        end as CQ02NAM length=40
+        end as CQ02NAM length=40,
+        case 
+            when ae.aedecod in ('NEUTROPENIA', 'FEBRILE NEUTROPENIA', 'LEUKOPENIA') then 'CQ02'
+            else ''
+        end as CQ02CD length=8,
+        case 
+            when ae.aedecod in ('NEUTROPENIA', 'FEBRILE NEUTROPENIA', 'LEUKOPENIA') then 'SPONSOR'
+            else ''
+        end as CQ02SC length=10
     from sdtm.ae as ae
     left join adam.adsl as adsl on ae.usubjid = adsl.usubjid
     where adsl.saffl = 'Y';
@@ -152,7 +160,7 @@ proc sort data=work.ae_episodes;
     by usubjid aedecod astdt aendt aeseq;
 run;
 
-data adam.adae(keep=STUDYID USUBJID TRTA TRTAN AEDECOD AEBODSYS AEHLT AESEV ATOXGR AESER AEREL ASTDT AENDT ASTDY AENDY AEACN AEOUT CQ02NAM CIAESEQ CIAESDT CIAEEDT CIAEDUR AEOCCFL TRTEMFL ADURN ADURU AESEQ);
+data adam.adae(keep=STUDYID USUBJID TRTA TRTAN AEDECOD AEBODSYS AEHLT AESEV ATOXGR AESER AEREL ASTDT AENDT ASTDY AENDY AEACN AEOUT CQ02NAM CQ02CD CQ02SC CIAESEQ CIAESDT CIAEEDT CIAEDUR AEOCCFL TRTEMFL ADURN ADURU AESEQ);
     set work.ae_episodes;
     by usubjid aedecod;
     
@@ -180,6 +188,8 @@ data adam.adae(keep=STUDYID USUBJID TRTA TRTAN AEDECOD AEBODSYS AEHLT AESEV ATOX
         TRTEMFL = 'Treatment Emergent AE Flag'
         AEOCCFL = 'OCCDS Denominator Flag'
         CQ02NAM = 'Customized Query 02 Name'
+        CQ02CD  = 'Customized Query 02 Code'
+        CQ02SC  = 'Customized Query 02 Source'
         CIAESEQ = 'Continuous Episode Sequence'
         CIAESDT = 'Continuous Episode Start Date'
         CIAEEDT = 'Continuous Episode End Date'
@@ -191,6 +201,6 @@ proc sort data=adam.adae;
 run;
 
 /* Clean up work library */
-proc datasets lib=work nolist kill;
+proc delete data=work.ae_base work.ae_episodes;
 run;
 quit;

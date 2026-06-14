@@ -246,10 +246,10 @@ proc sql;
         case when missing(labs.PSABL) then 'Y' else 'N' end as PSABLIF length=1,
         coalesce(labs.ALPBL, &ALPBL_DEFAULT.) as ALPBL,
         case when missing(labs.ALPBL) then 'Y' else 'N' end as ALPBLIF length=1,
-        &ALBBL_DEFAULT. as ALBBL,
-        'Y' as ALBBLIF length=1,
-        &LDHBL_DEFAULT. as LDHBL,
-        'Y' as LDHBLIF length=1,
+        . as ALBBL,
+        ' ' as ALBBLIF length=1,
+        . as LDHBL,
+        ' ' as LDHBLIF length=1,
         coalesce(labs.HGBBL, &HGBBL_DEFAULT.) as HGBBL,
         case when missing(labs.HGBBL) then 'Y' else 'N' end as HGBBLIF length=1,
         coalesce(doc.docprog, 'AFTER') as DOCPROG length=10,
@@ -267,6 +267,6 @@ proc sql;
 quit;
 
 /* Clean up work library */
-proc datasets lib=work nolist kill;
+proc delete data=work.ex_dates work.survival_ds work.survival work.lstalv work.ecog work.meas work.visc work.pn_trt work.pn_base_daily work.pn_median work.ppi_med work.an_med work.pain_base work.labs_base work.labs_wide work.labs_ready work.docetaxel_recs work.docetaxel_resp work.docetaxel_prog work.docetaxel_summary;
 run;
 quit;

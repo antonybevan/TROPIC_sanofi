@@ -83,7 +83,9 @@ ADAE,ASTDY,Analysis Start Day
 ADAE,AENDY,Analysis End Day
 ADAE,AEACN,Action Taken with Study Treatment
 ADAE,AEOUT,Outcome of Adverse Event
-ADAE,CQ02NAM,Custom Query 02 Name
+ADAE,CQ02NAM,Customized Query 02 Name
+ADAE,CQ02CD,Customized Query 02 Code
+ADAE,CQ02SC,Customized Query 02 Source
 ADAE,CIAESEQ,Custom Episode Sequence Number
 ADAE,CIAESDT,Custom Episode Start Date
 ADAE,CIAEEDT,Custom Episode End Date

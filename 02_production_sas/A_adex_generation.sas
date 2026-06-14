@@ -201,6 +201,6 @@ proc sort data=adam.adex;
 run;
 
 /* Clean up work library */
-proc datasets lib=work nolist kill;
+proc delete data=work.subj_mods work.adsl_sorted work.adex_bds_merged work.adex_bds work.ex_sorted work.adex_cycle_merged work.adex_cycle;
 run;
 quit;
