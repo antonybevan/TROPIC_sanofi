@@ -182,7 +182,8 @@ TROPIC/
 ### Prerequisites
 - **R 4.6.0+** (via Homebrew: `brew install r`)
 - **Python 3.10+**
-- **SAS 9.4** *(optional — pipeline runs in simulation mode without it)*
+- **SAS 9.4** or **SAS OnDemand for Academics (ODA)** *(optional — pipeline runs in simulation mode without a SAS engine)*
+  * *For ODA mode:* Requires a **Java Runtime (JRE 8+)**, the **`saspy`** Python package, and ODA credentials setup (see [`06_telemetry/ODA_GUIDE.md`](06_telemetry/ODA_GUIDE.md)).
 
 ### Run the Full Pipeline
 
