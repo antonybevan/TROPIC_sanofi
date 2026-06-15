@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-14T16:12:18.707523",
+  "timestamp": "2026-06-15T10:07:01.012934",
   "runner": "apple (System Agent)",
   "pipeline_health_status": "GREEN",
   "sas_execution_mode": "oda",
@@ -19,7 +19,7 @@
   },
   "oda_endpoint": "odaws01-apse1-2.oda.sas.com",
   "oda_attempts": 1,
-  "oda_total_wait_s": 5.8,
+  "oda_total_wait_s": 5.2,
   "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007",
   "reconciliation": "SAS_vs_R",
   "probe_nonce_echoed": true,

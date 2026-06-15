@@ -1,7 +1,9 @@
-# Program: tfl_generation.R | Version: 3.5.0 | Author: Antony Bevan, Clinical Programming | Date: 2026-06-12
-# Standard: ICH E3 TFL Catalogue / NEJM & Lancet Style Guides | renv.lock hash: locked
-# Description: Compiles all efficacy, safety, and Project Optimus clinical reports,
-#              rendering the efficacy/safety tables and figures.
+# Program: tfl_generation.R | Version: 3.5.0
+# Author: Antony Bevan, Clinical Programming | Date: 2026-06-12
+# Standard: ICH E3 TFL Catalogue / NEJM & Lancet Style Guides
+# renv.lock hash: locked
+# Description: Compiles all efficacy, safety, and Project Optimus clinical
+#              reports, rendering the efficacy/safety tables and figures.
 
 library(haven)
 library(dplyr)
@@ -11,26 +13,38 @@ library(survival)
 library(patchwork)
 library(scales)
 
+# Avoid linter warnings for column names in ggplot/dplyr pipelines
+surv <- NULL
+
 cat("NOTE: [TFL] Starting Efficacy & Safety TFL Suite compilation...\n")
 
 dir.create("09_tfl/output/tables", showWarnings = FALSE, recursive = TRUE)
 dir.create("09_tfl/output/figures", showWarnings = FALSE, recursive = TRUE)
 dir.create("09_tfl/output/listings", showWarnings = FALSE, recursive = TRUE)
 
-# Mandatory on-artifact disclosure (review-board condition CR-1): every comparative
-# figure carries this caption so a detached PNG cannot be mistaken for a real result.
-SYNTH_CAP <- paste0(
-  "CbzP is a SYNTHETIC, illustrative comparator (PH-scaled from the real MP arm).\n",
-  "Between-arm statistics are circular by construction — NOT clinical findings; the MP arm is real."
+# Mandatory on-artifact disclosure (review-board condition CR-1): every
+# comparative figure carries this caption so a detached PNG cannot be
+# mistaken for a real result.
+synth_cap <- paste0(
+  "CbzP is a SYNTHETIC, illustrative comparator ",
+  "(PH-scaled from the real MP arm).\n",
+  "Between-arm statistics are circular by construction — NOT clinical ",
+  "findings; the MP arm is real."
 )
 # Plain-text banner prepended to every text table output for the same reason.
-SYNTH_BANNER <- paste0(
-  "============================================================================\n",
-  " NOTICE: The CbzP (Cabazitaxel) arm shown below is a SYNTHETIC, illustrative\n",
-  " cohort reconstructed by proportional-hazards scaling of the real MP arm.\n",
-  " Between-arm comparisons are circular by construction and are NOT clinical\n",
-  " findings. All Mitoxantrone (MP) arm values are derived from real trial data.\n",
-  "============================================================================\n"
+synth_banner <- paste0(
+  "==========================================================",
+  "==================\n",
+  " NOTICE: The CbzP (Cabazitaxel) arm shown below is a ",
+  "SYNTHETIC, illustrative\n",
+  " cohort reconstructed by proportional-hazards scaling of ",
+  "the real MP arm.\n",
+  " Between-arm comparisons are circular by construction ",
+  "and are NOT clinical\n",
+  " findings. All Mitoxantrone (MP) arm values are derived ",
+  "from real trial data.\n",
+  "==========================================================",
+  "==================\n"
 )
 
 # Load validation datasets
@@ -74,22 +88,22 @@ cat("NOTE: [TFL] Verifying statistical boundaries (Hierarchical step-down gateke
 # same recipe is regression-tested on a deterministic fixture (tests/test_tfl_stats.R, roadmap #8).
 source("09_tfl/tfl_stats.R")
 
-os_data <- adtte %>% filter(PARAMCD == "OS") %>% left_join(adsl %>% select(USUBJID, ECOGBL, MEASDISF), by = "USUBJID")
+os_data <- adtte |> filter(PARAMCD == "OS") |> left_join(adsl |> select(USUBJID, ECOGBL, MEASDISF), by = "USUBJID")
 os_stats <- compute_tte_stats(os_data)
 os_pval <- os_stats$pval
 os_significant <- os_pval < 0.05
 cat(sprintf("  Step 1: OS Significance check -> p = %f (Significant: %s)\n", os_pval, as.character(os_significant)))
 
 # Step 2: Progression-Free Survival (Tested only if OS is significant)
-pfs_data <- adtte %>% filter(PARAMCD == "PFS") %>% left_join(adsl %>% select(USUBJID, ECOGBL, MEASDISF), by = "USUBJID")
+pfs_data <- adtte |> filter(PARAMCD == "PFS") |> left_join(adsl |> select(USUBJID, ECOGBL, MEASDISF), by = "USUBJID")
 pfs_stats <- compute_tte_stats(pfs_data)
 pfs_pval <- pfs_stats$pval
 pfs_significant <- os_significant && (pfs_pval < 0.05)
 cat(sprintf("  Step 2: PFS Significance check -> p = %f (Significant & Tested: %s)\n", pfs_pval, as.character(pfs_significant)))
 
 # Step 3: PSA Response (Tested only if PFS is significant)
-psa_resp_data <- adrs %>% 
-  filter(PARAMCD == "PSARESP") %>%
+psa_resp_data <- adrs |>
+  filter(PARAMCD == "PSARESP") |>
   mutate(
     TRT01P = factor(TRT01P, levels = c("MP", "CbzP")),
     AVALC = factor(AVALC, levels = c("N", "Y"))
@@ -102,9 +116,9 @@ cat(sprintf("  Step 3: PSA Response Significance check -> p = %e (Significant & 
 
 # Step 4: ORR (Tested only if PSA Response is significant)
 # Conformed to SAP measurable-disease ITT population (MEASDISF == 'Y')
-orr_resp_data <- adrs %>% 
-  filter(PARAMCD == "OBJRESP") %>%
-  filter(USUBJID %in% adsl$USUBJID[adsl$MEASDISF == "Y"]) %>%
+orr_resp_data <- adrs |>
+  filter(PARAMCD == "OBJRESP") |>
+  filter(USUBJID %in% adsl$USUBJID[adsl$MEASDISF == "Y"]) |>
   mutate(
     TRT01P = factor(TRT01P, levels = c("MP", "CbzP")),
     AVALC = factor(AVALC, levels = c("N", "Y"))
@@ -151,14 +165,14 @@ theme_nejm_custom <- function() {
 render_km <- function(data, stats, x_max, title, subtitle_endpoint, y_lab, outfile) {
   # Fit survfit once (Issue 5)
   fit <- survfit(Surv(AVAL / 30.4375, 1 - CNSR) ~ TRT01P, data = data)
-  
+
   # Extract true KM step-plot data
   plot_list <- list()
   if (!is.null(fit$strata)) {
     for (stratum in names(fit$strata)) {
       stratum_clean <- gsub("TRT01P=", "", stratum)
       idx <- which(summary(fit)$strata == stratum)
-      
+
       # Ensure curves start at time 0 with 100% survival
       plot_list[[stratum_clean]] <- data.frame(
         time = c(0, fit$time[idx]),
@@ -175,11 +189,11 @@ render_km <- function(data, stats, x_max, title, subtitle_endpoint, y_lab, outfi
     )
   }
   plot_data <- bind_rows(plot_list)
-  
+
   # Main KM Plot Panel
   km_plot <- ggplot(plot_data, aes(x = time, y = surv, color = TRT01P)) +
     geom_step(linewidth = 1.0) +
-    scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"), 
+    scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"),
                        labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) +
     scale_y_continuous(labels = scales::percent, expand = c(0, 0)) +
     scale_x_continuous(breaks = seq(0, x_max, by = 3), expand = c(0, 0)) +
@@ -190,7 +204,7 @@ render_km <- function(data, stats, x_max, title, subtitle_endpoint, y_lab, outfi
       x = "Months from Randomization",
       y = y_lab,
       color = "Treatment Group:",
-      caption = SYNTH_CAP
+      caption = synth_cap
     ) +
     theme_nejm_custom() +
     theme(
@@ -199,7 +213,7 @@ render_km <- function(data, stats, x_max, title, subtitle_endpoint, y_lab, outfi
       legend.key = element_blank(),
       plot.margin = margin(t = 10, r = 15, b = 5, l = 30)
     )
-  
+
   # Vectorized risk table counts query (Issue 4 & 5)
   times <- seq(0, x_max, by = 3)
   sum_fit <- summary(fit, times = times, extend = TRUE)
@@ -208,14 +222,14 @@ render_km <- function(data, stats, x_max, title, subtitle_endpoint, y_lab, outfi
     Time = sum_fit$time,
     n.risk = sum_fit$n.risk
   )
-  
+
   active_trts <- c("CbzP", "MP")
   risk_data$TRT01P <- factor(risk_data$TRT01P, levels = active_trts)
-  
-  risk_table_plot <- ggplot(risk_data, aes(x = Time, y = factor(TRT01P, levels = rev(active_trts)), label = n.risk)) +
+
+  risk_table_plot <- ggplot(risk_data, aes(x = .data$Time, y = factor(TRT01P, levels = rev(active_trts)), label = .data$n.risk)) +
     geom_text(size = 3.2, fontface = "bold", aes(color = TRT01P), family = "serif") +
-    scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"), 
-                       labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)"), 
+    scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"),
+                       labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)"),
                        guide = "none") +
     scale_y_discrete(labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) +
     scale_x_continuous(limits = c(0, x_max), breaks = times, expand = c(0, 0)) +
@@ -232,7 +246,7 @@ render_km <- function(data, stats, x_max, title, subtitle_endpoint, y_lab, outfi
       axis.text.y = element_text(face = "bold", size = 8.5, color = "#222222"),
       plot.margin = margin(t = -5, r = 15, b = 5, l = 30)
     )
-  
+
   final_km_plot <- km_plot / risk_table_plot + plot_layout(heights = c(4.1, 1))
   ggsave(outfile, final_km_plot, width = 8, height = 5.5, dpi = 300)
 }
@@ -241,7 +255,7 @@ render_km <- function(data, stats, x_max, title, subtitle_endpoint, y_lab, outfi
 # FIGURE F-11-1: Kaplan-Meier Curve — OS by Arm (Primary Endpoint)
 # ==============================================================================
 cat("  [TFL] Rendering KM Curve: Overall Survival (with Aligned Risk Table)...\n")
-os_data <- adtte %>% filter(PARAMCD == "OS")
+os_data <- adtte |> filter(PARAMCD == "OS")
 
 render_km(
   data = os_data,
@@ -249,7 +263,7 @@ render_km(
   x_max = 24,
   title = "F-11-1: Kaplan-Meier Overall Survival (OS) Analysis — ITT Population",
   subtitle_endpoint = sprintf("Primary Endpoint: Cabazitaxel + Prednisone (CbzP) vs Mitoxantrone + Prednisone (MP)\nHR = %.2f (95%% CI: %.2f-%.2f), Stratified Log-Rank %s",
-                              os_stats$hr, os_stats$lcl, os_stats$ucl, 
+                              os_stats$hr, os_stats$lcl, os_stats$ucl,
                               if(os_stats$pval < 0.0001) "p < 0.0001" else sprintf("p = %.4f", os_stats$pval)),
   y_lab = "Overall Survival Probability",
   outfile = "09_tfl/output/figures/F-11-1_KM_OS.png"
@@ -260,16 +274,16 @@ render_km(
 # ==============================================================================
 cat("  [TFL] Rendering Project Optimus E-R Scatter Plot...\n")
 # Fetch RDI from ADEX
-rdi_data <- adex %>% 
-  filter(PARAMCD == "RDI" & AVISIT == "ALL CYCLES") %>%
+rdi_data <- adex |>
+  filter(PARAMCD == "RDI" & AVISIT == "ALL CYCLES") |>
   select(USUBJID, RDI = AVAL, TRT01P)
 
 # Fetch ANC Nadir from ADLB
-nadir_data <- adlb %>%
-  filter(PARAMCD == "ANCNADIR" & AVISIT == "CYCLE 1") %>%
+nadir_data <- adlb |>
+  filter(PARAMCD == "ANCNADIR" & AVISIT == "CYCLE 1") |>
   select(USUBJID, ANC = AVAL)
 
-er_data <- rdi_data %>%
+er_data <- rdi_data |>
   inner_join(nadir_data, by = "USUBJID")
 
 # Use the dual-arm exposure-response data directly from ADaM
@@ -287,7 +301,7 @@ er_plot <- ggplot(er_data, aes(x = RDI, y = ANC, color = TRT01P)) +
     y = "ANC Nadir Value (x10^3/uL)",
     color = "Treatment Group:",
     fill = "95% Confidence Interval:",
-    caption = SYNTH_CAP
+    caption = synth_cap
   ) +
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "#e74c3c", linewidth = 0.8) +
   annotate("text", x = 43, y = 0.72, label = "Grade 4 Neutropenia Limit (< 0.5 x 10^3/uL)", color = "#e74c3c", size = 3.2, fontface = "bold", family = "serif", hjust = 0) +
@@ -306,31 +320,31 @@ ggsave("09_tfl/output/figures/F-17-1_Optimus_Scatter.png", er_plot, width = 8, h
 cat("  [TFL] Rendering Subgroup Forest Plot...\n")
 
 # Filter OS data and join with ADSL covariates
-os_sub_data <- adtte %>%
-  filter(PARAMCD == "OS") %>%
-  left_join(adsl %>% select(USUBJID, AGEGR1, ECOGBL, MEASDISF, VISCFL, PAINBL, DOCPROG), by = "USUBJID")
+os_sub_data <- adtte |>
+  filter(PARAMCD == "OS") |>
+  left_join(adsl |> select(USUBJID, AGEGR1, ECOGBL, MEASDISF, VISCFL, PAINBL, DOCPROG), by = "USUBJID")
 
 # Use the dual-arm subgroup data directly from ADaM
 
 # Helper to run subgroup Cox models of CbzP vs MP
 run_subgroup_cox <- function(factor_name, level_val, display_label) {
-  df <- os_sub_data %>%
-    filter(get(factor_name) == level_val) %>%
+  df <- os_sub_data |>
+    filter(get(factor_name) == level_val) |>
     mutate(TREAT = if_else(TRT01P == "CbzP", 1, 0))
-  
+
   n_total <- nrow(df)
-  
+
   if (n_total < 5) {
     return(data.frame(Subgroup = display_label, N = n_total, HR = 1.0, LCL = 1.0, UCL = 1.0))
   }
-  
+
   fit <- coxph(Surv(AVAL, 1 - CNSR) ~ TREAT, data = df)
   s <- summary(fit)
-  
+
   hr <- s$conf.int[1]
   lcl <- s$conf.int[3]
   ucl <- s$conf.int[4]
-  
+
   return(data.frame(
     Subgroup = display_label,
     N = n_total,
@@ -339,16 +353,16 @@ run_subgroup_cox <- function(factor_name, level_val, display_label) {
 }
 
 # Run for pre-specified subgroup factors comparing treatment groups
-overall_df <- os_sub_data %>% mutate(TREAT = if_else(TRT01P == "CbzP", 1, 0))
+overall_df <- os_sub_data |> mutate(TREAT = if_else(TRT01P == "CbzP", 1, 0))
 fit_overall <- coxph(Surv(AVAL, 1 - CNSR) ~ TREAT, data = overall_df)
 s_overall <- summary(fit_overall)
 
 subgroups <- rbind(
   data.frame(
-    Subgroup = "All Treated Patients", 
-    N = nrow(os_sub_data), 
-    HR = s_overall$conf.int[1], 
-    LCL = s_overall$conf.int[3], 
+    Subgroup = "All Treated Patients",
+    N = nrow(os_sub_data),
+    HR = s_overall$conf.int[1],
+    LCL = s_overall$conf.int[3],
     UCL = s_overall$conf.int[4]
   ),
   run_subgroup_cox("AGEGR1", "<65", "Age < 65"),
@@ -386,7 +400,7 @@ forest_left <- ggplot(subgroups) +
     subtitle = "Univariate Hazard Ratios (Cox Proportional Hazards model of CbzP (Synthetic) vs MP (Real)) and 95% Wald CIs",
     x = "Hazard Ratio (Favors CbzP (Synthetic) <-- | --> Favors MP (Real))",
     y = "",
-    caption = SYNTH_CAP
+    caption = synth_cap
   ) +
   theme_nejm_custom() +
   theme(
@@ -435,9 +449,9 @@ n_mp_rdi <- sum(adex$TRT01P == "MP" & adex$PARAMCD == "RDIDL")
 n_cbzp_rdi <- sum(adex$TRT01P == "CbzP" & adex$PARAMCD == "RDIDL")
 
 # Dynamic calculations for T-17-2
-optimus_gcsf <- adlb %>%
-  filter(TRT01P == "CbzP" & PARAMCD == "ANCNADIR" & AVISIT == "CYCLE 1") %>%
-  left_join(adsl %>% select(USUBJID, GCSFPRFL), by = "USUBJID") %>%
+optimus_gcsf <- adlb |>
+  filter(TRT01P == "CbzP" & PARAMCD == "ANCNADIR" & AVISIT == "CYCLE 1") |>
+  left_join(adsl |> select(USUBJID, GCSFPRFL), by = "USUBJID") |>
   mutate(GCSF_PROP = coalesce(GCSFPRFL, "N"))
 
 n_gcsf_y <- sum(optimus_gcsf$GCSF_PROP == "Y")
@@ -452,30 +466,30 @@ gcsf_n_g3  <- sum(optimus_gcsf$GCSF_PROP == "N" & optimus_gcsf$ATOXGR == 3)
 gcsf_n_g4  <- sum(optimus_gcsf$GCSF_PROP == "N" & optimus_gcsf$ATOXGR == 4)
 
 # Dynamic calculations for T-17-4
-cbzp_rdi <- adex %>%
-  filter(TRT01P == "CbzP" & PARAMCD == "RDIDL" & AVISIT == "ALL CYCLES") %>%
+cbzp_rdi <- adex |>
+  filter(TRT01P == "CbzP" & PARAMCD == "RDIDL" & AVISIT == "ALL CYCLES") |>
   select(USUBJID, RDIDL = AVALC)
 
-cbzp_os <- adtte %>%
-  filter(TRT01P == "CbzP" & PARAMCD == "OS") %>%
+cbzp_os <- adtte |>
+  filter(TRT01P == "CbzP" & PARAMCD == "OS") |>
   left_join(cbzp_rdi, by = "USUBJID")
 
-cbzp_neut <- adlb %>%
-  filter(TRT01P == "CbzP" & PARAMCD == "NEUT" & BASEFL == "N" & ANL01FL == "Y") %>%
-  group_by(USUBJID) %>%
-  summarise(worst_grade = max(ATOXGR, na.rm = TRUE), .groups = "drop") %>%
+cbzp_neut <- adlb |>
+  filter(TRT01P == "CbzP" & PARAMCD == "NEUT" & BASEFL == "N" & ANL01FL == "Y") |>
+  group_by(USUBJID) |>
+  summarise(worst_grade = max(ATOXGR, na.rm = TRUE), .groups = "drop") |>
   left_join(cbzp_rdi, by = "USUBJID")
 
 get_tertile_stats <- function(cat_name) {
-  sub_os <- cbzp_os %>% filter(RDIDL == cat_name)
+  sub_os <- cbzp_os |> filter(.data$RDIDL == cat_name)
   fit_os <- survfit(Surv(AVAL / 30.4375, 1 - CNSR) ~ 1, data = sub_os)
   med_os <- summary(fit_os)$table["median"]
-  
-  sub_neut <- cbzp_neut %>% filter(RDIDL == cat_name)
+
+  sub_neut <- cbzp_neut |> filter(.data$RDIDL == cat_name)
   n_total <- nrow(sub_neut)
   n_g34 <- sum(sub_neut$worst_grade >= 3, na.rm = TRUE)
   rate_g34 <- if (n_total > 0) 100 * n_g34 / n_total else 0
-  
+
   list(med_os = med_os, rate_g34 = rate_g34)
 }
 
@@ -511,16 +525,16 @@ Low (<65%%)     %.1f months          %.1f%%
   rdi_cbzp_85, 100 * rdi_cbzp_85 / n_cbzp_rdi, rdi_mp_85, 100 * rdi_mp_85 / n_mp_rdi,
   rdi_cbzp_65, 100 * rdi_cbzp_65 / n_cbzp_rdi, rdi_mp_65, 100 * rdi_mp_65 / n_mp_rdi,
   rdi_cbzp_low, 100 * rdi_cbzp_low / n_cbzp_rdi, rdi_mp_low, 100 * rdi_mp_low / n_mp_rdi,
-  
+
   n_gcsf_y, gcsf_y_g12, 100 * gcsf_y_g12 / n_gcsf_y, gcsf_y_g3, 100 * gcsf_y_g3 / n_gcsf_y, gcsf_y_g4, 100 * gcsf_y_g4 / n_gcsf_y,
   n_gcsf_n, gcsf_n_g12, 100 * gcsf_n_g12 / n_gcsf_n, gcsf_n_g3, 100 * gcsf_n_g3 / n_gcsf_n, gcsf_n_g4, 100 * gcsf_n_g4 / n_gcsf_n,
-  
+
   high_stats$med_os, high_stats$rate_g34,
   med_stats$med_os, med_stats$rate_g34,
   low_stats$med_os, low_stats$rate_g34
 )
 
-writeLines(paste0(SYNTH_BANNER, table_content), "09_tfl/output/tables/T-17-Optimus_Tables.txt")
+writeLines(paste0(synth_banner, table_content), "09_tfl/output/tables/T-17-Optimus_Tables.txt")
 
 # ==============================================================================
 # TABLES T-11-6 / T-11-7: Dynamic Efficacy Summaries for Secondary Endpoints
@@ -528,7 +542,7 @@ writeLines(paste0(SYNTH_BANNER, table_content), "09_tfl/output/tables/T-17-Optim
 cat("  [TFL] Calculating dynamic KM and Cox PH statistics for TTPSA and TTUMOR...\n")
 
 # TTPSA Analysis
-psa_data <- adtte %>% filter(PARAMCD == "TTPSA")
+psa_data <- adtte |> filter(PARAMCD == "TTPSA")
 fit_psa <- survfit(Surv(AVAL / 30.4375, 1 - CNSR) ~ TRT01P, data = psa_data)
 psa_data$TRT01P <- factor(psa_data$TRT01P, levels = c("MP", "CbzP"))
 cox_psa <- coxph(Surv(AVAL, 1 - CNSR) ~ TRT01P, data = psa_data)
@@ -552,7 +566,7 @@ events_psa_mp   <- sum_fit_psa["TRT01P=MP", "events"]
 total_psa_mp    <- sum_fit_psa["TRT01P=MP", "n.max"]
 
 # TTUMOR Analysis
-tumor_data <- adtte %>% filter(PARAMCD == "TTUMOR")
+tumor_data <- adtte |> filter(PARAMCD == "TTUMOR")
 fit_tumor <- survfit(Surv(AVAL / 30.4375, 1 - CNSR) ~ TRT01P, data = tumor_data)
 tumor_data$TRT01P <- factor(tumor_data$TRT01P, levels = c("MP", "CbzP"))
 cox_tumor <- coxph(Surv(AVAL, 1 - CNSR) ~ TRT01P, data = tumor_data)
@@ -576,7 +590,7 @@ events_tumor_mp   <- sum_fit_tumor["TRT01P=MP", "events"]
 total_tumor_mp    <- sum_fit_tumor["TRT01P=MP", "n.max"]
 
 # Best Clinical Response Endpoints Analysis (PSA response and ORR)
-psa_resp_data <- adrs %>% filter(PARAMCD == "PSARESP")
+psa_resp_data <- adrs |> filter(PARAMCD == "PSARESP")
 psa_cbzp_resp <- sum(psa_resp_data$AVALC == "Y" & psa_resp_data$TRT01P == "CbzP")
 psa_cbzp_total <- sum(psa_resp_data$TRT01P == "CbzP")
 psa_cbzp_pct <- psa_cbzp_resp / psa_cbzp_total * 100
@@ -585,9 +599,9 @@ psa_mp_total <- sum(psa_resp_data$TRT01P == "MP")
 psa_mp_pct <- psa_mp_resp / psa_mp_total * 100
 
 # Objective Response Rate (ORR) restricted to Measurable-Disease ITT population
-meas_subj <- adsl %>% filter(MEASDISF == "Y") %>% select(USUBJID, TRT01P)
-orr_resp_data <- adrs %>% 
-  filter(PARAMCD == "OBJRESP") %>%
+meas_subj <- adsl |> filter(MEASDISF == "Y") |> select(USUBJID, TRT01P)
+orr_resp_data <- adrs |>
+  filter(PARAMCD == "OBJRESP") |>
   filter(USUBJID %in% meas_subj$USUBJID)
 orr_cbzp_resp <- sum(orr_resp_data$AVALC == "Y" & orr_resp_data$TRT01P == "CbzP")
 orr_cbzp_total <- sum(meas_subj$TRT01P == "CbzP")
@@ -641,28 +655,28 @@ Objective Response Rate (ORR) - Measurable ITT Population†
   as.integer(events_psa_mp), as.integer(total_psa_mp),
   med_psa_cbzp, med_psa_mp, ci_psa_cbzp, ci_psa_mp,
   hr_psa, hr_psa_lcl, hr_psa_ucl, p_psa,
-  
+
   total_tumor_cbzp, total_tumor_mp,
   as.integer(events_tumor_cbzp), as.integer(total_tumor_cbzp),
   as.integer(events_tumor_mp), as.integer(total_tumor_mp),
   med_tumor_cbzp, med_tumor_mp, ci_tumor_cbzp, ci_tumor_mp,
   hr_tumor, hr_tumor_lcl, hr_tumor_ucl, p_tumor,
-  
+
   as.integer(psa_cbzp_resp), as.integer(psa_cbzp_total), psa_cbzp_pct,
   as.integer(psa_mp_resp), as.integer(psa_mp_total), psa_mp_pct,
   psa_pval,
-  
+
   as.integer(orr_cbzp_resp), as.integer(orr_cbzp_total), orr_cbzp_pct,
   as.integer(orr_mp_resp), as.integer(orr_mp_total), orr_mp_pct,
   orr_pval,
-  
+
   total_tumor_cbzp, total_tumor_mp
 )
 
 # Objective Response Rate (ORR) with response-evaluable denominator (review-board SR-1).
 # The T-11-8 block above uses the SAP measurable-disease ITT denominator.
 # Report the response-evaluable denominator version here for full transparency.
-orr_ev_resp_data <- adrs %>% filter(PARAMCD == "OBJRESP")
+orr_ev_resp_data <- adrs |> filter(PARAMCD == "OBJRESP")
 orr_ev_cbzp_resp <- sum(orr_ev_resp_data$AVALC == "Y" & orr_ev_resp_data$TRT01P == "CbzP")
 orr_ev_cbzp_total <- sum(orr_ev_resp_data$TRT01P == "CbzP")
 orr_ev_mp_resp <- sum(orr_ev_resp_data$AVALC == "Y" & orr_ev_resp_data$TRT01P == "MP")
@@ -680,13 +694,13 @@ efficacy_tables <- paste0(efficacy_tables, orr_md_addendum)
 cat(sprintf("  [TFL] ORR (response-evaluable): MP %d/%d (%.1f%%)\n",
             orr_ev_mp_resp, orr_ev_mp_total, 100 * orr_ev_mp_resp / max(orr_ev_mp_total, 1)))
 
-writeLines(paste0(SYNTH_BANNER, efficacy_tables), "09_tfl/output/tables/T-11-Efficacy_Tables.txt")
+writeLines(paste0(synth_banner, efficacy_tables), "09_tfl/output/tables/T-11-Efficacy_Tables.txt")
 
 # ==============================================================================
 # FIGURE F-11-2: Kaplan-Meier Curve — PFS by Arm (Secondary Endpoint)
 # ==============================================================================
 cat("  [TFL] Rendering KM Curve: Progression-Free Survival...\n")
-pfs_data <- adtte %>% filter(PARAMCD == "PFS")
+pfs_data <- adtte |> filter(PARAMCD == "PFS")
 
 render_km(
   data = pfs_data,
@@ -694,7 +708,7 @@ render_km(
   x_max = 18,
   title = "F-11-2: Kaplan-Meier Progression-Free Survival (PFS) Analysis — ITT Population",
   subtitle_endpoint = sprintf("Secondary Endpoint: Cabazitaxel + Prednisone (CbzP) vs Mitoxantrone + Prednisone (MP)\nHR = %.2f (95%% CI: %.2f-%.2f), Stratified Log-Rank %s",
-                              pfs_stats$hr, pfs_stats$lcl, pfs_stats$ucl, 
+                              pfs_stats$hr, pfs_stats$lcl, pfs_stats$ucl,
                               if(pfs_stats$pval < 0.0001) "p < 0.0001" else sprintf("p = %.4f", pfs_stats$pval)),
   y_lab = "Progression-Free Survival Probability",
   outfile = "09_tfl/output/figures/F-11-2_KM_PFS.png"
@@ -706,17 +720,17 @@ render_km(
 cat("  [TFL] Rendering PSA Waterfall Plot...\n")
 
 # Best PSA % change from baseline per subject
-psa_lb <- adlb %>%
-  filter(PARAMCD == "PSA", !is.na(PCHG)) %>%
-  group_by(USUBJID) %>%
-  summarise(best_pchg = min(PCHG, na.rm = TRUE), .groups = "drop") %>%
-  left_join(adsl %>% select(USUBJID, TRT01P), by = "USUBJID") %>%
+psa_lb <- adlb |>
+  filter(PARAMCD == "PSA", !is.na(PCHG)) |>
+  group_by(USUBJID) |>
+  summarise(best_pchg = min(PCHG, na.rm = TRUE), .groups = "drop") |>
+  left_join(adsl |> select(USUBJID, TRT01P), by = "USUBJID") |>
   filter(!is.na(TRT01P))
 
 # Use the dual-arm PSA data directly from ADaM
 
-psa_lb <- psa_lb %>%
-  arrange(TRT01P, best_pchg) %>%
+psa_lb <- psa_lb |>
+  arrange(TRT01P, best_pchg) |>
   mutate(subj_rank = row_number(),
          TRT_LABEL = if_else(TRT01P == "CbzP", "CbzP (Synthetic)", "MP (Real)"),
          response_color = case_when(
@@ -744,7 +758,7 @@ waterfall_plot <- ggplot(psa_lb, aes(x = subj_rank, y = best_pchg, fill = respon
     x = "Subjects (ranked by PSA response within arm)",
     y = "Best PSA % Change from Baseline",
     fill = "Response Category:",
-    caption = SYNTH_CAP
+    caption = synth_cap
   ) +
   theme_nejm_custom() +
   theme(
@@ -762,27 +776,27 @@ ggsave("09_tfl/output/figures/F-13-1_PSA_Waterfall.png", waterfall_plot, width =
 cat("  [TFL] Rendering Treatment Swimmer Plot...\n")
 
 # Build per-subject exposure duration from ADEX (cycle count) & ADSL
-ncycle_all <- adex %>%
-  filter(PARAMCD == "NCYCLE", AVISIT == "ALL CYCLES") %>%
+ncycle_all <- adex |>
+  filter(PARAMCD == "NCYCLE", AVISIT == "ALL CYCLES") |>
   select(USUBJID, n_cycles = AVAL)
 
-swimmer_data <- adsl %>%
-  select(USUBJID, TRT01P, TRTDURD, DTHFL, TRTSDT) %>%
-  left_join(ncycle_all, by = "USUBJID") %>%
+swimmer_data <- adsl |>
+  select(USUBJID, TRT01P, TRTDURD, DTHFL, TRTSDT) |>
+  left_join(ncycle_all, by = "USUBJID") |>
   mutate(
     duration_months = TRTDURD / 30.4375,
     death_event    = DTHFL == "Y",
     TRT_LABEL = if_else(TRT01P == "CbzP", "CbzP (Synthetic)", "MP (Real)")
-  ) %>%
-  arrange(TRT01P, desc(duration_months)) %>%
-  group_by(TRT01P) %>%
-  slice_head(n = 30) %>%   # Top 30 per arm for readability
-  ungroup() %>%
+  ) |>
+  arrange(TRT01P, desc(duration_months)) |>
+  group_by(TRT01P) |>
+  slice_head(n = 30) |>   # Top 30 per arm for readability
+  ungroup() |>
   mutate(subj_label = factor(row_number()))
 
 swimmer_plot <- ggplot(swimmer_data, aes(y = subj_label, x = duration_months, fill = TRT01P)) +
   geom_col(width = 0.85, alpha = 0.85) +
-  geom_point(data = swimmer_data %>% filter(death_event),
+  geom_point(data = swimmer_data |> filter(death_event),
              aes(x = duration_months, y = subj_label), shape = 4, size = 2.5,
              color = "#A6192E", stroke = 1.2) +
   scale_fill_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"), labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) +
@@ -794,7 +808,7 @@ swimmer_plot <- ggplot(swimmer_data, aes(y = subj_label, x = duration_months, fi
     x = "Months on Treatment",
     y = "Subjects (ranked by duration)",
     fill = "Treatment Arm:",
-    caption = SYNTH_CAP
+    caption = synth_cap
   ) +
   theme_nejm_custom() +
   theme(
@@ -812,18 +826,18 @@ ggsave("09_tfl/output/figures/F-14-1_Swimmer_Plot.png", swimmer_plot, width = 9,
 cat("  [TFL] Compiling AE Summary Tables...\n")
 
 # Join AE to ADSL to get treatment arm (TRTEMFL: T=treatment-emergent, P=pre-existing, N=not TEAE)
-ae_safety <- adae %>%
-  select(-any_of("TRT01P")) %>%
-  filter(TRTEMFL == "Y") %>%
-  left_join(adsl %>% select(USUBJID, TRT01P), by = "USUBJID")
+ae_safety <- adae |>
+  select(-any_of("TRT01P")) |>
+  filter(TRTEMFL == "Y") |>
+  left_join(adsl |> select(USUBJID, TRT01P), by = "USUBJID")
 
 # Total subjects per arm derived dynamically from ADSL (Issue 3 / 2.5)
 n_mp   <- sum(adsl$TRT01P == "MP")
 n_cbzp <- sum(adsl$TRT01P == "CbzP")
 
 # Precompute AE summary counts once (Issue 6 / 2.4)
-ae_counts <- ae_safety %>%
-  group_by(TRT01P) %>%
+ae_counts <- ae_safety |>
+  group_by(TRT01P) |>
   summarise(
     any_teae = n_distinct(USUBJID),
     g3 = n_distinct(USUBJID[!is.na(ATOXGR) & ATOXGR >= 3]),
@@ -841,22 +855,22 @@ n_sae_cbzp <- if ("CbzP" %in% ae_counts$TRT01P) ae_counts$sae[ae_counts$TRT01P =
 n_sae_mp   <- if ("MP" %in% ae_counts$TRT01P) ae_counts$sae[ae_counts$TRT01P == "MP"] else 0
 
 # Overall AE incidence
-tot_ae <- ae_safety %>%
-  group_by(TRT01P) %>%
+tot_ae <- ae_safety |>
+  group_by(TRT01P) |>
   summarise(n_subj = n_distinct(USUBJID), .groups = "drop")
 
 # Top 10 SOC by frequency (MP arm as reference)
-top_soc <- ae_safety %>%
-  filter(!is.na(AEBODSYS)) %>%
-  group_by(AEBODSYS) %>%
-  summarise(n_mp_soc = n_distinct(USUBJID[TRT01P == "MP"]), .groups = "drop") %>%
-  arrange(desc(n_mp_soc)) %>%
+top_soc <- ae_safety |>
+  filter(!is.na(AEBODSYS)) |>
+  group_by(AEBODSYS) |>
+  summarise(n_mp_soc = n_distinct(USUBJID[TRT01P == "MP"]), .groups = "drop") |>
+  arrange(desc(n_mp_soc)) |>
   slice_head(n = 10)
 
 # Grade >=3 AEs by SOC
-ae_g3 <- ae_safety %>%
-  filter(!is.na(ATOXGR) & ATOXGR >= 3) %>%
-  group_by(AEBODSYS) %>%
+ae_g3 <- ae_safety |>
+  filter(!is.na(ATOXGR) & ATOXGR >= 3) |>
+  group_by(AEBODSYS) |>
   summarise(
     n_mp_g3 = n_distinct(USUBJID[TRT01P == "MP"]),
     n_cbzp_g3 = n_distinct(USUBJID[TRT01P == "CbzP"]),
@@ -864,23 +878,23 @@ ae_g3 <- ae_safety %>%
   )
 
 # Serious AEs
-ae_ser <- ae_safety %>%
-  filter(AESER == "Y") %>%
-  group_by(AEBODSYS) %>%
+ae_ser <- ae_safety |>
+  filter(AESER == "Y") |>
+  group_by(AEBODSYS) |>
   summarise(
     n_mp_ser = n_distinct(USUBJID[TRT01P == "MP"]),
     n_cbzp_ser = n_distinct(USUBJID[TRT01P == "CbzP"]),
     .groups = "drop"
   )
 
-n_disc_mp <- adae %>%
-  filter(TRT01P == "MP" & AEACN == "DRUG WITHDRAWN") %>%
-  distinct(USUBJID) %>%
+n_disc_mp <- adae |>
+  filter(TRT01P == "MP" & AEACN == "DRUG WITHDRAWN") |>
+  distinct(USUBJID) |>
   nrow()
 
-n_disc_cbzp <- adae %>%
-  filter(TRT01P == "CbzP" & AEACN == "DRUG WITHDRAWN") %>%
-  distinct(USUBJID) %>%
+n_disc_cbzp <- adae |>
+  filter(TRT01P == "CbzP" & AEACN == "DRUG WITHDRAWN") |>
+  distinct(USUBJID) |>
   nrow()
 
 ae_summary_txt <- sprintf("
@@ -902,13 +916,13 @@ ae_summary_txt <- sprintf("
   n_cbzp, n_mp,
   n_any_cbzp, round(100 * n_any_cbzp / n_cbzp),
   n_any_mp, round(100 * n_any_mp / n_mp),
-  
+
   n_g3_cbzp_tot, round(100 * n_g3_cbzp_tot / n_cbzp),
   n_g3_mp_tot, round(100 * n_g3_mp_tot / n_mp),
-  
+
   n_sae_cbzp, round(100 * n_sae_cbzp / n_cbzp),
   n_sae_mp, round(100 * n_sae_mp / n_mp),
-  
+
   n_disc_cbzp, round(100 * n_disc_cbzp / n_cbzp),
   n_disc_mp, round(100 * n_disc_mp / n_mp)
 )
@@ -918,13 +932,13 @@ for (i in seq_len(nrow(top_soc))) {
   n_g3_mp <- if (soc %in% ae_g3$AEBODSYS) ae_g3$n_mp_g3[ae_g3$AEBODSYS == soc] else 0
   n_g3_cbzp <- if (soc %in% ae_g3$AEBODSYS) ae_g3$n_cbzp_g3[ae_g3$AEBODSYS == soc] else 0
   ae_summary_txt <- paste0(ae_summary_txt,
-    sprintf("  %-50s  %3d (%d%%)       %3d (%d%%)\n", 
-            substr(soc, 1, 50), 
+    sprintf("  %-50s  %3d (%d%%)       %3d (%d%%)\n",
+            substr(soc, 1, 50),
             n_g3_cbzp, round(100 * n_g3_cbzp / n_cbzp),
             n_g3_mp, round(100 * n_g3_mp / n_mp)))
 }
 
-writeLines(paste0(SYNTH_BANNER, ae_summary_txt), "09_tfl/output/tables/T-20-AE_Summary_Tables.txt")
+writeLines(paste0(synth_banner, ae_summary_txt), "09_tfl/output/tables/T-20-AE_Summary_Tables.txt")
 
 # ==============================================================================
 # TABLE T-21-1: Lab Shift Table — ANC/PSA Baseline to Worst
@@ -933,36 +947,52 @@ cat("  [TFL] Compiling Lab Shift Tables...\n")
 
 build_shift_table <- function(lb_data, paramcd_val, param_label, n_total) {
   # Baseline values
-  base <- lb_data %>%
-    filter(PARAMCD == paramcd_val, BASEFL == "Y", !is.na(ATOXGR)) %>%
-    select(USUBJID, BASE_GRADE = ATOXGR)
-  
+  base <- lb_data |>
+    filter(
+      .data$PARAMCD == paramcd_val,
+      .data$BASEFL == "Y",
+      !is.na(.data$ATOXGR)
+    ) |>
+    select("USUBJID", BASE_GRADE = "ATOXGR")
+
   # Worst post-baseline
-  worst <- lb_data %>%
-    filter(PARAMCD == paramcd_val, BASEFL == "N", ANL01FL == "Y", !is.na(ATOXGR)) %>%
-    group_by(USUBJID) %>%
-    slice_max(ATOXGR, n = 1, with_ties = FALSE) %>%
-    ungroup() %>%
-    select(USUBJID, WORST_GRADE = ATOXGR)
-  
-  shift <- base %>%
-    inner_join(worst, by = "USUBJID") %>%
+  worst <- lb_data |>
+    filter(
+      .data$PARAMCD == paramcd_val,
+      .data$BASEFL == "N",
+      .data$ANL01FL == "Y",
+      !is.na(.data$ATOXGR)
+    ) |>
+    group_by(.data$USUBJID) |>
+    slice_max(.data$ATOXGR, n = 1, with_ties = FALSE) |>
+    ungroup() |>
+    select("USUBJID", WORST_GRADE = "ATOXGR")
+
+  shift <- base |>
+    inner_join(worst, by = "USUBJID") |>
     mutate(
-      BASE_GRADE  = paste0("Grade ", BASE_GRADE),
-      WORST_GRADE = paste0("Grade ", WORST_GRADE)
+      BASE_GRADE  = paste0("Grade ", .data$BASE_GRADE),
+      WORST_GRADE = paste0("Grade ", .data$WORST_GRADE)
     )
-  
-  tbl <- shift %>%
-    count(BASE_GRADE, WORST_GRADE) %>%
-    pivot_wider(names_from = WORST_GRADE, values_from = n, values_fill = 0)
-  
-  header <- sprintf("\n  %s Baseline vs Worst Post-Baseline Grade Shift (n=%d)\n", param_label, n_total)
+
+  tbl <- shift |>
+    count(.data$BASE_GRADE, .data$WORST_GRADE) |>
+    pivot_wider(
+      names_from = "WORST_GRADE",
+      values_from = "n",
+      values_fill = 0
+    )
+
+  header <- sprintf(
+    "\n  %s Baseline vs Worst Post-Baseline Grade Shift (n=%d)\n",
+    param_label, n_total
+  )
   tbl_str <- paste(capture.output(print(as.data.frame(tbl))), collapse = "\n")
   paste0(header, tbl_str, "\n")
 }
 
-adlb_mp <- adlb %>% filter(TRT01P == "MP")
-adlb_cbzp <- adlb %>% filter(TRT01P == "CbzP")
+adlb_mp <- adlb |> filter(TRT01P == "MP")
+adlb_cbzp <- adlb |> filter(TRT01P == "CbzP")
 
 shift_output <- paste0(
   "\n TROPIC (Study EFC6193 / XRP6258) Laboratory Toxicity Shift Tables\n",
@@ -978,7 +1008,7 @@ shift_output <- paste0(
   build_shift_table(adlb_cbzp, "PLAT", "Platelets",         n_cbzp)
 )
 
-writeLines(paste0(SYNTH_BANNER, shift_output), "09_tfl/output/tables/T-21-Lab_Shift_Tables.txt")
+writeLines(paste0(synth_banner, shift_output), "09_tfl/output/tables/T-21-Lab_Shift_Tables.txt")
 
 # ==============================================================================
 # FIGURE F-01-1: CONSORT Patient Disposition Flow Diagram
@@ -987,10 +1017,10 @@ cat("  [TFL] Rendering CONSORT Patient Disposition Diagram...\n")
 
 # Derive disposition numbers from ADSL
 n_total     <- nrow(adsl)
-n_itt       <- nrow(adsl %>% filter(ITTFL == "Y"))
+n_itt       <- nrow(adsl |> filter(ITTFL == "Y"))
 n_safety    <- n_itt
-n_deaths    <- nrow(adsl %>% filter(DTHFL == "Y"))
-n_completed <- nrow(adsl %>% filter(TRTDURD >= 60))
+n_deaths    <- nrow(adsl |> filter(DTHFL == "Y"))
+n_completed <- nrow(adsl |> filter(TRTDURD >= 60))
 n_disc      <- n_safety - n_completed
 
 # Build diagram as a ggplot canvas with annotated boxes and arrows

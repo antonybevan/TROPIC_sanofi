@@ -1,4 +1,5 @@
-# Program: v_adsl_validation.R | Version: 3.5.0 | Author: Antony Bevan, Clinical Programming | Date: 2026-06-12
+# Program: v_adsl_validation.R | Version: 3.5.0
+# Author: Antony Bevan, Clinical Programming | Date: 2026-06-12
 # Standard: ADaMIG v1.3 | renv.lock hash: locked
 # Description: R Independent Validation double-programming for TROPIC ADSL.
 
@@ -7,6 +8,9 @@ library(haven)
 library(lubridate)
 library(tidyr)
 library(xportr)
+
+# Avoid linter warnings for column names in ggplot/dplyr pipelines
+.env <- NULL
 source("03_validation_r/config_study.R")
 
 cat("NOTE: [VALIDATION] Starting ADSL Validation script...\n")
@@ -22,13 +26,21 @@ pn <- readRDS("01_raw_source/real_sdtm/staging/pn.rds")
 cm <- readRDS("01_raw_source/real_sdtm/staging/cm.rds")
 
 # Derive treatment start and end dates
-df_ex <- ex %>%
-  filter(!is.na(EXSTDTC)) %>%
+df_ex <- ex |>
+  filter(!is.na(EXSTDTC)) |>
   mutate(
-    exstdt = ymd(if_else(!is.na(EXSTDTC) & nchar(EXSTDTC) >= 10, substring(EXSTDTC, 1, 10), NA_character_)),
-    exendt = ymd(if_else(!is.na(EXENDTC) & nchar(EXENDTC) >= 10, substring(EXENDTC, 1, 10), NA_character_))
-  ) %>%
-  group_by(USUBJID) %>%
+    exstdt = ymd(if_else(
+      !is.na(EXSTDTC) & nchar(EXSTDTC) >= 10,
+      substring(EXSTDTC, 1, 10),
+      NA_character_
+    )),
+    exendt = ymd(if_else(
+      !is.na(EXENDTC) & nchar(EXENDTC) >= 10,
+      substring(EXENDTC, 1, 10),
+      NA_character_
+    ))
+  ) |>
+  group_by(USUBJID) |>
   summarise(
     TRTSDT = min(exstdt, na.rm = TRUE),
     TRTEDT = max(exendt, na.rm = TRUE),
@@ -37,13 +49,13 @@ df_ex <- ex %>%
   )
 
 # Calculate survival details from Disposition
-df_death <- ds %>%
-  filter(DSDECOD %in% c("DEATH", "DEAD")) %>%
-  left_join(dm %>% select(USUBJID, RFSTDTC), by = "USUBJID") %>%
+df_death <- ds |>
+  filter(DSDECOD %in% c("DEATH", "DEAD")) |>
+  left_join(select(dm, USUBJID, RFSTDTC), by = "USUBJID") |>
   mutate(
     dth_dt = ymd(substring(RFSTDTC, 1, 10), quiet = TRUE) + (DSSTWK - 1) * 7
-  ) %>%
-  group_by(USUBJID) %>%
+  ) |>
+  group_by(USUBJID) |>
   summarise(
     DTHFL = "Y",
     DTHDT = min(dth_dt, na.rm = TRUE),
@@ -51,79 +63,90 @@ df_death <- ds %>%
     .groups = "drop"
   )
 
-df_alive <- ds %>%
-  left_join(dm %>% select(USUBJID, RFSTDTC), by = "USUBJID") %>%
+df_alive <- ds |>
+  left_join(select(dm, USUBJID, RFSTDTC), by = "USUBJID") |>
   mutate(
     lstalv_dt = ymd(substring(RFSTDTC, 1, 10), quiet = TRUE) + (DSSTWK - 1) * 7
-  ) %>%
-  group_by(USUBJID) %>%
+  ) |>
+  group_by(USUBJID) |>
   summarise(
     LSTALVDT = max(lstalv_dt, na.rm = TRUE),
     .groups = "drop"
   )
 
 # 1. ECOGBL
-df_ecog <- vs %>%
-  filter(VSTESTCD == "ECOG" & VSBLFL == "Y") %>%
-  group_by(USUBJID) %>%
+df_ecog <- vs |>
+  filter(VSTESTCD == "ECOG" & VSBLFL == "Y") |>
+  group_by(USUBJID) |>
   summarise(ECOGBL = first(VSSTRESN), .groups = "drop")
 
 # 2. MEASDISF
-df_meas <- ls %>%
-  filter(LSCAT == "TARGET" & VISIT == "BASELINE") %>%
-  group_by(USUBJID) %>%
+df_meas <- ls |>
+  filter(LSCAT == "TARGET" & VISIT == "BASELINE") |>
+  group_by(USUBJID) |>
   summarise(MEASDISF = "Y", .groups = "drop")
 
 # 3. VISCFL
-df_visc <- ls %>%
-  filter(LSLOC %in% c("LIVER", "LUNGS", "KIDNEYS", "PANCREAS", "ADRENAL", "BRAIN / CNS") & VISIT == "BASELINE") %>%
-  group_by(USUBJID) %>%
+df_visc <- ls |>
+  filter(
+    LSLOC %in% c("LIVER", "LUNGS", "KIDNEYS", "PANCREAS", "ADRENAL",
+                 "BRAIN / CNS") &
+      VISIT == "BASELINE"
+  ) |>
+  group_by(USUBJID) |>
   summarise(VISCFL = "Y", .groups = "drop")
 
 # 4. PAINBL
-pn_trt <- pn %>%
-  left_join(df_ex, by = "USUBJID") %>%
+pn_trt <- pn |>
+  left_join(df_ex, by = "USUBJID") |>
   mutate(PNDT = ymd(substring(PNDTC, 1, 10), quiet = TRUE))
 
-baseline_pn <- pn_trt %>% filter(PNDT <= TRTSDT)
+baseline_pn <- pn_trt |> filter(PNDT <= TRTSDT)
 
-baseline_summary <- baseline_pn %>%
-  group_by(USUBJID, PNTESTCD) %>%
+baseline_summary <- baseline_pn |>
+  group_by(USUBJID, PNTESTCD) |>
   summarise(med_val = median(PNSTRESN, na.rm = TRUE), .groups = "drop")
 
-ppi_meds <- baseline_summary %>% filter(PNTESTCD == "PAININT", med_val >= 2)
-an_meds <- baseline_summary %>% filter(PNTESTCD == "ANSCORE", med_val >= 10)
+ppi_meds <- baseline_summary |> filter(PNTESTCD == "PAININT", med_val >= 2)
+an_meds <- baseline_summary |> filter(PNTESTCD == "ANSCORE", med_val >= 10)
 pain_subjs <- union(ppi_meds$USUBJID, an_meds$USUBJID)
 
 # 5. Baseline Labs
-df_labs <- lb %>%
-  filter(LBBLFL == "Y") %>%
-  group_by(USUBJID, LBTESTCD) %>%
-  summarise(val = first(LBSTRESN), .groups = "drop") %>%
-  filter(LBTESTCD %in% c("PSA", "ALP", "HGB")) %>%
-  pivot_wider(id_cols = USUBJID, names_from = LBTESTCD, values_from = val) %>%
+df_labs <- lb |>
+  filter(LBBLFL == "Y") |>
+  group_by(USUBJID, LBTESTCD) |>
+  summarise(val = first(LBSTRESN), .groups = "drop") |>
+  filter(LBTESTCD %in% c("PSA", "ALP", "HGB")) |>
+  pivot_wider(id_cols = USUBJID, names_from = LBTESTCD, values_from = val) |>
   rename(PSABL = PSA, ALPBL = ALP, HGBBL = HGB)
 
 # 6. Docetaxel Prior History
-docetaxel <- cm %>%
-  filter(CMDECOD == "DOCETAXEL" & CMCAT == "PRIOR TREATMENT CHEMOTHERAPY") %>%
-  group_by(USUBJID) %>%
+docetaxel <- cm |>
+  filter(CMDECOD == "DOCETAXEL" & CMCAT == "PRIOR TREATMENT CHEMOTHERAPY") |>
+  group_by(USUBJID) |>
   summarise(
-    DOCRESP = if_else(any(CMRLTL %in% c("COMPLETE RESPONSE", "PARTIAL RESPONSE"), na.rm = TRUE), "Y", "N"),
-    DOCPROG = if_else(any(CMRSON == "DISEASE PROGRESSION" | CMRLTL == "PROGRESSIVE DISEASE", na.rm = TRUE), "DURING", "AFTER"),
+    DOCRESP = if_else(
+      any(CMRLTL %in% c("COMPLETE RESPONSE", "PARTIAL RESPONSE"), na.rm = TRUE),
+      "Y", "N"
+    ),
+    DOCPROG = if_else(
+      any(CMRSON == "DISEASE PROGRESSION" | CMRLTL == "PROGRESSIVE DISEASE",
+          na.rm = TRUE),
+      "DURING", "AFTER"
+    ),
     .groups = "drop"
   )
 
 # Combine into ADSL
-adsl <- dm %>%
-  left_join(df_ex, by = "USUBJID") %>%
-  left_join(df_death, by = "USUBJID") %>%
-  left_join(df_alive, by = "USUBJID") %>%
-  left_join(df_ecog, by = "USUBJID") %>%
-  left_join(df_meas, by = "USUBJID") %>%
-  left_join(df_visc, by = "USUBJID") %>%
-  left_join(df_labs, by = "USUBJID") %>%
-  left_join(docetaxel, by = "USUBJID") %>%
+adsl <- dm |>
+  left_join(df_ex, by = "USUBJID") |>
+  left_join(df_death, by = "USUBJID") |>
+  left_join(df_alive, by = "USUBJID") |>
+  left_join(df_ecog, by = "USUBJID") |>
+  left_join(df_meas, by = "USUBJID") |>
+  left_join(df_visc, by = "USUBJID") |>
+  left_join(df_labs, by = "USUBJID") |>
+  left_join(docetaxel, by = "USUBJID") |>
   mutate(
     STUDYID = .env$STUDYID,
     SITEID = substring(SUBJID, 1, 3),
@@ -164,28 +187,34 @@ adsl <- dm %>%
     HGBBL = coalesce(HGBBL, .env$HGBBL_DEFAULT),
     DOCPROG = coalesce(DOCPROG, "AFTER"),
     DOCRESP = coalesce(DOCRESP, "N")
-  ) %>%
+  ) |>
   select(
     STUDYID, USUBJID, SUBJID, SITEID,
     AGE, AGEGR1, AGEGR1N, RACE, ETHNIC, SEX,
     TRT01P, TRT01PN, TRT01A, TRT01AN, RANDDT, TRTSDT, TRTEDT, TRTDURD,
     ITTFL, SAFFL, PPROTFL, DTHFL, DTHDT, DTHCAUS, LSTALVDT,
-    ECOGBL, MEASDISF, VISCFL, PAINBL, PSABL, ALPBL, ALBBL, LDHBL, HGBBL, DOCPROG, DOCRESP,
-    ECOGBLIF, PSABLIF, ALPBLIF, HGBBLIF, ALBBLIF, LDHBLIF
+    ECOGBL, MEASDISF, VISCFL, PAINBL, PSABL, ALPBL, ALBBL, LDHBL, HGBBL,
+    DOCPROG, DOCRESP, ECOGBLIF, PSABLIF, ALPBLIF, HGBBLIF, ALBBLIF, LDHBLIF
   )
 
 # Sort and Save
-adsl <- adsl %>% arrange(USUBJID)
+adsl <- adsl |> arrange(USUBJID)
 dir.create("04_adam", showWarnings = FALSE)
 
 # Assertions and Error Guards (QC-03)
 if (nrow(adsl) < 371) {
-  stop("ERROR: [VALIDATION] ADSL output dataset is incomplete (expected N=371)!")
+  stop(
+    "ERROR: [VALIDATION] ADSL output dataset is incomplete (expected N=371)!"
+  )
 }
 
 # XPT v5 compliance (clean log): uppercase variable names + SAS date formats
 names(adsl) <- toupper(names(adsl))
-for (.dv in names(adsl)) if (inherits(adsl[[.dv]], "Date")) attr(adsl[[.dv]], "format.sas") <- "DATE9."
+for (.dv in names(adsl)) {
+  if (inherits(adsl[[.dv]], "Date")) {
+    attr(adsl[[.dv]], "format.sas") <- "DATE9."
+  }
+}
 write_xpt_v(adsl, "04_adam/adsl_v.xpt", domain = "ADSL")
 
 cat("NOTE: [VALIDATION] Wrote validation ADSL: 04_adam/adsl_v.xpt\n")
