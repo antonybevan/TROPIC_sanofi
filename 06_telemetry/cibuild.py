@@ -231,10 +231,48 @@ filename drv "{PGMDIR_ODA}/00_master_driver.sas";
         for ds in ODA_DATASETS:
             sas.download(f"04_adam/{ds}_prod.xpt", f"{ADAM_ODA}/{ds}_prod.xpt")
 
-        return 0, "SASPy/ODA execution complete.", "", {
+        # ---- M-1: independent SAS analysis RESULTS (PROC LIFETEST), MP arm ----
+        # Extends double-programming from the ADaM dataset layer to the analysis-
+        # results layer: SAS computes the MP-arm survival statistics with its own
+        # engine; results_reconcile.R (Stage 13) diffs them numerically against R.
+        print("  [ODA] Computing independent SAS analysis statistics (PROC LIFETEST, MP arm)...")
+        stats_extra = {"sas_results_stats": "downloaded"}
+        stats_log = sas.submit(f"""
+options notes source;
+ods graphics off;
+libname adam "{ADAM_ODA}";
+proc sort data=adam.adtte(where=(TRT01P='MP')) out=work.adtte_mp; by PARAMCD; run;
+proc lifetest data=work.adtte_mp;
+    time AVAL*CNSR(1);
+    by PARAMCD;
+    ods output Quartiles=work.q CensoredSummary=work.cs;
+run;
+data work.med; set work.q; if Percent = 50; keep PARAMCD Estimate; run;
+proc sql;
+    create table work.tte_stats as
+        select c.PARAMCD length=8, c.Total as N, c.Failed as EVENTS,
+               m.Estimate as MEDIAN_DAYS
+        from work.cs as c left join work.med as m on c.PARAMCD = m.PARAMCD
+        order by c.PARAMCD;
+quit;
+proc export data=work.tte_stats outfile="{ADAM_ODA}/tte_stats_prod.csv" dbms=csv replace; run;
+""").get("LOG", "")
+        if any(l.strip().startswith("ERROR:") for l in stats_log.splitlines()):
+            print("  [ODA] WARNING: SAS analysis-stats step failed; "
+                  "results reconciliation will record 'not_available'.")
+            stats_extra = {"sas_results_stats": "error"}
+            if os.path.exists("04_adam/tte_stats_prod.csv"):
+                os.remove("04_adam/tte_stats_prod.csv")
+        else:
+            sas.download("04_adam/tte_stats_prod.csv", f"{ADAM_ODA}/tte_stats_prod.csv")
+            print("  [ODA] Downloaded SAS analysis statistics (tte_stats_prod.csv).")
+
+        meta_out = {
             "oda_endpoint": conn.endpoint, "oda_attempts": conn.attempts,
             "oda_total_wait_s": conn.total_wait_s, "sdtm_manifest_sha": manifest_sha,
             "reconciliation": "SAS_vs_R", "probe_nonce_echoed": conn.probe_nonce_echoed}
+        meta_out.update(stats_extra)
+        return 0, "SASPy/ODA execution complete.", "", meta_out
     finally:
         oda_broker.teardown(sas)
 
@@ -353,6 +391,13 @@ def run_single_stage(stage, from_stage, sas_mode, results):
             rc = 1
             stderr = "Reconciliation status file missing; cannot confirm zero differences."
 
+    if stage["id"] == 12 and rc == 0:
+        ok, problems = output_sanity_check()
+        if not ok:
+            rc = 1
+            stderr = ("Deliverable sanity gate failed (code artifacts in published output): "
+                      + " | ".join(problems[:5]))
+
     if rc == 0:
         print(f"  [SUCCESS] Stage {stage['id']} completed.")
         results[stage["name"]] = "PASS"
@@ -371,6 +416,11 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
     os.environ["TROPIC_ODA_FORCE_SDTM"] = "TRUE" if force_upload_sdtm else "FALSE"
     # Seed SDTM inline within the Stage-10 ODA session (single spawn) if it isn't resident.
     os.environ["TROPIC_ODA_SEED_INLINE"] = "TRUE" if seed_if_needed else "FALSE"
+
+    # M-1: a stale SAS analysis-stats file must not pollute a non-ODA run's results
+    # reconciliation; it is (re)produced only by a real ODA Stage-10 execution.
+    if from_stage <= 10 and os.path.exists("04_adam/tte_stats_prod.csv"):
+        os.remove("04_adam/tte_stats_prod.csv")
 
     # Run the configuration generator
     print("  [CONFIG] Generating configuration from study_config.yaml...")
@@ -398,7 +448,8 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
         {"id": 9, "name": "R ADTTE Validation", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('03_validation_r/v_adtte_validation.R')"]},
         {"id": 10, "name": "SAS Production (ODA/Real/Simulated)", "cmd": "SIMULATE"},
         {"id": 11, "name": "Cross-Language Audit Reconcile", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('05_reconciliation/cross_lang_audit.R')"]},
-        {"id": 12, "name": "Efficacy & Safety TFL Suite Compilation", "cmd": [RSCRIPT_PATH, "09_tfl/tfl_generation.R"]}
+        {"id": 12, "name": "Efficacy & Safety TFL Suite Compilation", "cmd": [RSCRIPT_PATH, "09_tfl/tfl_generation.R"]},
+        {"id": 13, "name": "Numerical Results Reconciliation (SAS vs R)", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('05_reconciliation/results_reconcile.R')"]}
     ]
     
     results = {}
@@ -464,21 +515,62 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
     print("All clinical pipeline stages compiled successfully!")
 
 def update_define_timestamp():
-    # NOTE (review-board RR-2): AsOfDateTime is intentionally restamped to the build
-    # time on every successful run so it reflects when the metadata was last produced.
-    # It is a build provenance stamp, NOT evidence that the underlying data changed.
+    # Audit Mi-02 fix: AsOfDateTime is restamped ONLY when the metadata content
+    # actually changes (content hashed with the timestamp normalised out), not on
+    # every build. A timestamp that mutates each run is misleading provenance and
+    # produces spurious git churn / Part-11 audit-trail noise.
+    import hashlib
     define_path = "07_define_xml/define.xml"
-    if os.path.exists(define_path):
+    hash_path = "06_telemetry/define_content.sha"
+    if not os.path.exists(define_path):
+        return
+    try:
+        with open(define_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        normalized = re.sub(r'AsOfDateTime="[^"]+"', 'AsOfDateTime=""', content)
+        digest = hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+        prev = None
+        if os.path.exists(hash_path):
+            with open(hash_path, "r", encoding="utf-8") as f:
+                prev = f.read().strip()
+        if digest == prev:
+            print("  [METADATA] define.xml content unchanged; AsOfDateTime preserved.")
+            return
+        current_ts = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+        content_updated = re.sub(r'AsOfDateTime="[^"]+"', f'AsOfDateTime="{current_ts}"', content)
+        with open(define_path, "w", encoding="utf-8") as f:
+            f.write(content_updated)
+        with open(hash_path, "w", encoding="utf-8") as f:
+            f.write(digest + "\n")
+        print(f"  [METADATA] define.xml content changed; AsOfDateTime restamped to: {current_ts}")
+    except Exception as e:
+        print(f"  [METADATA WARNING] Failed to update define.xml timestamp: {e}")
+
+
+def output_sanity_check():
+    """Audit M-4 gate: a published TFL table/listing must never contain code
+    artifacts. A cosmetic linter pass once wrote ' # nolint' into T-11; this gate
+    fails the build on unrendered sprintf specs, lint pragmas, and R missing/
+    non-finite sentinels reaching a deliverable."""
+    forbidden = {
+        "lint pragma": re.compile(r"nolint"),
+        "unrendered format spec": re.compile(r"%\.?\d*[disfgeExX]"),
+        "missing/non-finite sentinel": re.compile(r"<NA>|NaN|-?\bInf\b"),
+    }
+    problems = []
+    targets = sorted(glob.glob("09_tfl/output/tables/*.txt")
+                     + glob.glob("09_tfl/output/listings/*.txt"))
+    for path in targets:
         try:
-            with open(define_path, "r", encoding="utf-8") as f:
-                content = f.read()
-            current_ts = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-            content_updated = re.sub(r'AsOfDateTime="[^"]+"', f'AsOfDateTime="{current_ts}"', content)
-            with open(define_path, "w", encoding="utf-8") as f:
-                f.write(content_updated)
-            print(f"  [METADATA] Successfully updated define.xml AsOfDateTime to: {current_ts}")
-        except Exception as e:
-            print(f"  [METADATA WARNING] Failed to update define.xml timestamp: {e}")
+            with open(path, "r", encoding="utf-8") as f:
+                for i, line in enumerate(f, 1):
+                    for label, pat in forbidden.items():
+                        if pat.search(line):
+                            problems.append(
+                                f"{os.path.basename(path)}:{i} [{label}] {line.strip()[:80]}")
+        except OSError:
+            continue
+    return (len(problems) == 0, problems)
 
 def write_telemetry(results, sas_mode="sim"):
     import platform
@@ -509,6 +601,12 @@ def write_telemetry(results, sas_mode="sim"):
     try:
         with open("06_telemetry/reconciliation_status.json") as _rf:
             health["reconciliation_status"] = json.load(_rf).get("overall")
+    except (OSError, json.JSONDecodeError):
+        pass
+    # Results-level (analysis statistics) reconciliation verdict, if Stage 13 wrote one.
+    try:
+        with open("06_telemetry/results_reconciliation_status.json") as _rrf:
+            health["results_reconciliation_status"] = json.load(_rrf).get("overall")
     except (OSError, json.JSONDecodeError):
         pass
 
@@ -606,8 +704,8 @@ def main():
         sys.exit(0)
     else:
         # Validate that from-stage is within valid range (AUTO-03)
-        if args.from_stage < 0 or args.from_stage > 12:
-            print(f"ERROR: Invalid stage number {args.from_stage}. Stage number must be between 1 and 12.")
+        if args.from_stage < 0 or args.from_stage > 13:
+            print(f"ERROR: Invalid stage number {args.from_stage}. Stage number must be between 1 and 13.")
             sys.exit(1)
         if args.real_sas and args.use_cached_sas:
             print("ERROR: --real-sas and --use-cached-sas are mutually exclusive.")

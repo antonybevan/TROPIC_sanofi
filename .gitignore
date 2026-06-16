@@ -9,6 +9,7 @@ AllProvidedFiles_79.zip
 # Binary Outputs & Artifacts (MANDATORY: Never commit binary XPT outputs)
 04_adam/*.xpt
 04_adam/*.sas7bdat
+04_adam/*.csv
 09_tfl/output/
 
 # Telemetry and Health Audits
