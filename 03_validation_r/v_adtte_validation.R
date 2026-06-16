@@ -53,6 +53,21 @@ adtte_cols <- c(
 )
 
 finalize_tte <- function(d) {
+  # Audit MO-4: surface (do not silently mask) any event/censor date that precedes
+  # the time origin before flooring it to 1 day, so a data anomaly is investigable.
+  neg <- d[!is.na(d$ADT) & !is.na(d$STARTDT) & d$ADT < d$STARTDT, , drop = FALSE]
+  if (nrow(neg) > 0) {
+    ids <- if ("USUBJID" %in% names(neg)) {
+      paste(utils::head(unique(neg$USUBJID), 3), collapse = ", ")
+    } else {
+      "n/a"
+    }
+    warning(sprintf(
+      paste0("[ADTTE] %d record(s) have event/censor date before time origin ",
+             "(e.g. %s); floored to 1 day - review source data."),
+      nrow(neg), ids
+    ))
+  }
   d |>
     mutate(
       STUDYID = .env$STUDYID,

@@ -163,22 +163,37 @@ data work.bor_summary;
     drop rank;
 run;
 
-/* Objective Response (CR/PR) */
-data work.orr_summary;
-    set work.bor_summary;
-    
-    PARAMCD = 'OBJRESP';
-    PARAM = 'Objective Response (CR or PR)';
-    
-    if AVALC in ('CR', 'PR') then do;
-        AVALC = 'Y';
-        AVAL = 1.0;
-    end;
-    else do;
-        AVALC = 'N';
-        AVAL = 0.0;
-    end;
-run;
+/* Objective Response (OBJRESP) -- RECIST v1.0 CONFIRMED response (audit M-2).
+   A responder requires a confirmatory CR/PR at least &RECIST_CONFIRM_DAYS days
+   after the first CR/PR (CR confirmed by CR; PR confirmed by CR or PR). Confirmation
+   is evaluated on the lesion-derived RECIST timepoints (work.recist_ovrl) so the SAS
+   and R tracks use an identical, reconcilable basis. Unconfirmed single responses are
+   NOT counted -- this aligns the real-MP ORR with the published confirmed rate, which
+   the prior best-response logic overstated ~4x. */
+proc sql;
+    create table work.orr_confirmed as
+    select distinct a.usubjid
+    from work.recist_ovrl as a
+    inner join work.recist_ovrl as b
+        on a.usubjid = b.usubjid
+       and b.ADT - a.ADT >= &RECIST_CONFIRM_DAYS.
+    where a.AVALC in ('CR', 'PR') and b.AVALC in ('CR', 'PR')
+      and not (a.AVALC = 'CR' and b.AVALC = 'PR');
+quit;
+
+proc sql;
+    create table work.orr_summary as
+    select
+        b.studyid, b.usubjid, b.trt01p, b.trtsdt,
+        'OBJRESP' as PARAMCD length=8,
+        'Objective Response (confirmed CR/PR)' as PARAM length=40,
+        case when c.usubjid is not null then 'Y' else 'N' end as AVALC length=20,
+        case when c.usubjid is not null then 1.0 else 0.0 end as AVAL,
+        b.AVISIT length=40,
+        b.AVISITN
+    from work.bor_summary as b
+    left join work.orr_confirmed as c on b.usubjid = c.usubjid;
+quit;
 
 /* Rigorous PCWG3 PSA Progression Logic */
 proc sql;
@@ -333,6 +348,6 @@ proc sort data=adam.adrs;
 run;
 
 /* Clean up work library */
-proc delete data=work.base_sod work.post_sod work.cycle_sod_comp work.recist_calc work.recist_ovrl work.rs_disp work.rs_base work.bor_rank work.bor_summary work.orr_summary work.psa_base work.psa_post work.psa_decline work.psa_resp_cand work.psa_responders work.psa_all work.psa_nadir work.psa_prog_check work.psa_prog_eval work.psa_prog_conf work.psprog work.psaresp work.adrs_union;
+proc delete data=work.base_sod work.post_sod work.cycle_sod_comp work.recist_calc work.recist_ovrl work.rs_disp work.rs_base work.bor_rank work.bor_summary work.orr_confirmed work.orr_summary work.psa_base work.psa_post work.psa_decline work.psa_resp_cand work.psa_responders work.psa_all work.psa_nadir work.psa_prog_check work.psa_prog_eval work.psa_prog_conf work.psprog work.psaresp work.adrs_union;
 run;
 quit;

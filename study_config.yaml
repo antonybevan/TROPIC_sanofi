@@ -19,6 +19,9 @@ LDHBL_DEFAULT: 220.0
 RECIST_PD_PCT: 20.0
 RECIST_PD_ABS: 5.0
 RECIST_PR_PCT: -30.0
+# Confirmed-response window: a CR/PR must be confirmed by a later CR/PR at least
+# this many days afterwards (RECIST v1.0 "no less than 4 weeks"), SAP §5.3.
+RECIST_CONFIRM_DAYS: 28
 
 # PCWG3 PSA thresholds (SAP §5.4)
 PSA_RESP_THRESHOLD: 0.5

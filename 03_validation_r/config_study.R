@@ -35,6 +35,7 @@ LDHBL_DEFAULT     <- as.numeric(cfg$LDHBL_DEFAULT)
 RECIST_PD_PCT     <- as.numeric(cfg$RECIST_PD_PCT)
 RECIST_PD_ABS     <- as.numeric(cfg$RECIST_PD_ABS)
 RECIST_PR_PCT     <- as.numeric(cfg$RECIST_PR_PCT)
+RECIST_CONFIRM_DAYS <- as.integer(cfg$RECIST_CONFIRM_DAYS)
 
 # PCWG3 PSA thresholds (SAP §5.4)
 PSA_RESP_THRESHOLD   <- as.numeric(cfg$PSA_RESP_THRESHOLD)
@@ -44,7 +45,7 @@ PSA_PROG_MULT_NORESP <- as.numeric(cfg$PSA_PROG_MULT_NORESP)
 PSA_PROG_ABS         <- as.numeric(cfg$PSA_PROG_ABS)
 PSA_PROG_CONFIRM     <- as.integer(cfg$PSA_PROG_CONFIRM)
 
-# OCCDS v1.1 continuous episode merging (SAP §5.2, Custom Query 02)
+# OCCDS v1.0 continuous episode merging (SAP §5.2, Custom Query 02)
 EPISODE_GAP_DAYS  <- as.integer(cfg$EPISODE_GAP_DAYS)
 
 # Project Optimus ANC kinetics (SAP §5.5)
@@ -52,12 +53,18 @@ ANC_RECOVERY_THRESHOLD <- as.numeric(cfg$ANC_RECOVERY_THRESHOLD)
 
 # LB analysis windows — study days from TRTSDT (SAP §5.6)
 W_BL_HI    <- as.integer(cfg$W_BL_HI)
-W_C1D1_LO  <- as.integer(cfg$W_C1D1_LO);  W_C1D1_HI  <- as.integer(cfg$W_C1D1_HI)
-W_C1D8_LO  <- as.integer(cfg$W_C1D8_LO);  W_C1D8_HI  <- as.integer(cfg$W_C1D8_HI)
-W_C1D15_LO <- as.integer(cfg$W_C1D15_LO); W_C1D15_HI <- as.integer(cfg$W_C1D15_HI)
-W_C2D1_LO  <- as.integer(cfg$W_C2D1_LO);  W_C2D1_HI  <- as.integer(cfg$W_C2D1_HI)
-W_C2D8_LO  <- as.integer(cfg$W_C2D8_LO);  W_C2D8_HI  <- as.integer(cfg$W_C2D8_HI)
-W_C3D1_LO  <- as.integer(cfg$W_C3D1_LO);  W_C3D1_HI  <- as.integer(cfg$W_C3D1_HI)
+W_C1D1_LO  <- as.integer(cfg$W_C1D1_LO)
+W_C1D1_HI  <- as.integer(cfg$W_C1D1_HI)
+W_C1D8_LO  <- as.integer(cfg$W_C1D8_LO)
+W_C1D8_HI  <- as.integer(cfg$W_C1D8_HI)
+W_C1D15_LO <- as.integer(cfg$W_C1D15_LO)
+W_C1D15_HI <- as.integer(cfg$W_C1D15_HI)
+W_C2D1_LO  <- as.integer(cfg$W_C2D1_LO)
+W_C2D1_HI  <- as.integer(cfg$W_C2D1_HI)
+W_C2D8_LO  <- as.integer(cfg$W_C2D8_LO)
+W_C2D8_HI  <- as.integer(cfg$W_C2D8_HI)
+W_C3D1_LO  <- as.integer(cfg$W_C3D1_LO)
+W_C3D1_HI  <- as.integer(cfg$W_C3D1_HI)
 
 # Staging data path (relative to project root)
 STAGING_PATH <- do.call(file.path, as.list(strsplit(cfg$STAGING_PATH, "/")[[1]]))
@@ -98,4 +105,3 @@ write_xpt_v <- function(.df, path, domain) {
     }
   )
 }
-

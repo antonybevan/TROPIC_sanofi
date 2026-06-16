@@ -45,7 +45,7 @@ df_recist <- df_post_sod %>%
     pct_chg_base = (post_sod - base_sod) / base_sod * 100,
     pct_chg_nadir = if_else(nadir_sod > 0, (post_sod - nadir_sod) / nadir_sod * 100, NA_real_),
     abs_chg_nadir = post_sod - nadir_sod,
-    
+
     recist_resp = case_when(
       post_sod == 0 ~ "CR",
       pct_chg_nadir >= RECIST_PD_PCT & abs_chg_nadir >= RECIST_PD_ABS ~ "PD",
@@ -119,15 +119,34 @@ df_bor <- df_bor_raw %>%
     ANL01FL = "Y"
   )
 
-# Objective Response (CR/PR)
+# Objective Response (OBJRESP) — RECIST v1.0 CONFIRMED response (audit M-2).
+# A responder requires a confirmatory CR/PR >= RECIST_CONFIRM_DAYS days after the
+# first CR/PR (CR confirmed by CR; PR confirmed by CR or PR). Confirmation is
+# evaluated on the lesion-derived RECIST timepoints (df_recist) so the R and SAS
+# tracks use an identical, reconcilable basis. Unconfirmed single responses are NOT
+# counted — this aligns the real-MP ORR with the published confirmed rate.
+df_recist_resp <- df_recist %>%
+  filter(AVALC %in% c("CR", "PR") & !is.na(ADT)) %>%
+  select(USUBJID, ADT, AVALC)
+
+df_orr_confirmed <- df_recist_resp %>%
+  inner_join(df_recist_resp, by = "USUBJID", suffix = c("1", "2"),
+             relationship = "many-to-many") %>%
+  filter(as.numeric(ADT2 - ADT1) >= RECIST_CONFIRM_DAYS,
+         !(AVALC1 == "CR" & AVALC2 == "PR")) %>%
+  distinct(USUBJID) %>%
+  mutate(orr_conf = "Y")
+
 df_orr <- df_bor %>%
+  left_join(df_orr_confirmed, by = "USUBJID") %>%
   mutate(
-    PARAMCD = "OBJRESP", PARAM = "Objective Response (CR or PR)",
-    AVALC = if_else(AVALC %in% c("CR", "PR"), "Y", "N"),
+    PARAMCD = "OBJRESP", PARAM = "Objective Response (confirmed CR/PR)",
+    AVALC = if_else(coalesce(orr_conf, "N") == "Y", "Y", "N"),
     AVAL = if_else(AVALC == "Y", 1.0, 0.0),
     VISIT = "ALL CYCLES",
     ANL01FL = "Y"
-  )
+  ) %>%
+  select(-orr_conf)
 
 # Rigorous PCWG3 PSA Progression Logic
 df_lb_psa <- lb %>%
@@ -153,7 +172,9 @@ df_psa_decline <- df_psa_post %>%
 
 df_psa_resp_cand <- df_psa_decline %>%
   filter(decline >= PSA_RESP_THRESHOLD) %>%
-  inner_join(df_psa_decline %>% filter(decline >= PSA_RESP_THRESHOLD), by = "USUBJID", suffix = c("1", "2"), relationship = "many-to-many") %>%
+  inner_join(df_psa_decline %>% filter(decline >= PSA_RESP_THRESHOLD),
+             by = "USUBJID", suffix = c("1", "2"),
+             relationship = "many-to-many") %>%
   filter(as.numeric(LBDT2 - LBDT1) >= PSA_RESP_CONFIRM)
 
 df_psa_responders <- df_psa_resp_cand %>%
@@ -219,7 +240,7 @@ df_psaresp <- header %>%
   select(STUDYID, USUBJID, SUBJID, TRT01P, TRTSDT, PARAMCD, PARAM, AVALC, AVAL, VISIT, ANL01FL)
 
 # Combine and Sort
-adrs <- bind_rows(df_ovrl, df_bor, df_orr, df_psprog, df_psaresp) %>% 
+adrs <- bind_rows(df_ovrl, df_bor, df_orr, df_psprog, df_psaresp) %>%
   rename(AVISIT = VISIT)
 
 # Sort and Save

@@ -104,6 +104,8 @@ data work.tte_base;
             CNSDTDSC = 'LAST KNOWN ALIVE DATE';
         end;
 
+        if not missing(ADT) and not missing(STARTDT) and ADT < STARTDT then
+            putlog "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. " PARAMCD= USUBJID=;
         if ADT < STARTDT then ADT = STARTDT;
         AVAL = ADT - STARTDT + 1;
         output;
@@ -132,6 +134,8 @@ data work.tte_base;
             CNSDTDSC = 'LAST KNOWN ALIVE DATE';
         end;
 
+        if not missing(ADT) and not missing(STARTDT) and ADT < STARTDT then
+            putlog "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. " PARAMCD= USUBJID=;
         if ADT < STARTDT then ADT = STARTDT;
         AVAL = ADT - STARTDT + 1;
         output;
@@ -227,7 +231,9 @@ data work.pfs_derived;
         end;
     end;
 
-    if ADT < STARTDT then ADT = STARTDT;
+    if not missing(ADT) and not missing(STARTDT) and ADT < STARTDT then
+            putlog "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. " PARAMCD= USUBJID=;
+        if ADT < STARTDT then ADT = STARTDT;
     AVAL = ADT - STARTDT + 1;
     output;
 run;
@@ -454,7 +460,9 @@ quit;
 
 data work.ttpain_final;
     set work.ttpain_derived;
-    if ADT < STARTDT then ADT = STARTDT;
+    if not missing(ADT) and not missing(STARTDT) and ADT < STARTDT then
+            putlog "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. " PARAMCD= USUBJID=;
+        if ADT < STARTDT then ADT = STARTDT;
     AVAL = ADT - STARTDT + 1;
 run;
 
@@ -525,7 +533,9 @@ quit;
 
 data work.ttpsa_final;
     set work.ttpsa_derived;
-    if ADT < STARTDT then ADT = STARTDT;
+    if not missing(ADT) and not missing(STARTDT) and ADT < STARTDT then
+            putlog "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. " PARAMCD= USUBJID=;
+        if ADT < STARTDT then ADT = STARTDT;
     AVAL = ADT - STARTDT + 1;
 run;
 
@@ -595,7 +605,9 @@ quit;
 
 data work.ttum_final;
     set work.ttum_derived;
-    if ADT < STARTDT then ADT = STARTDT;
+    if not missing(ADT) and not missing(STARTDT) and ADT < STARTDT then
+            putlog "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. " PARAMCD= USUBJID=;
+        if ADT < STARTDT then ADT = STARTDT;
     AVAL = ADT - STARTDT + 1;
 run;
 
