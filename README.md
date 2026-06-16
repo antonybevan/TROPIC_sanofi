@@ -17,7 +17,7 @@
 
 ## Overview
 
-This repository is a clinical analysis pipeline for the TROPIC Phase III trial, organised to mirror an eCTD Module 5 layout. It implements dual-language double programming (SAS and R), CDISC-aligned ADaM datasets, cross-language reconciliation, and TFL generation.
+This repository is a clinical analysis pipeline for the TROPIC Phase III trial, organised to mirror an eCTD Module 5 layout. It implements dual-language double programming (SAS and R), CDISC-aligned ADaM datasets, cross-language reconciliation at both the **dataset** level (cell-by-cell `diffdf`) and the **analysis-results** level (SAS `PROC LIFETEST` vs R `survfit`), and TFL generation.
 
 > **Scope & reproducibility (read first):** This is a portfolio/demonstration project. The real MP-arm SDTM source and ODA credentials are **not** committed (patient-data protection + secrets hygiene), so a bare clone cannot re-run the *real* pipeline — see **[REPRODUCIBILITY.md](REPRODUCIBILITY.md)** for the data-access path, the pinned environment, and a **self-contained `--demo` smoke test** that runs on a clean clone with no real data, no SAS, and no credentials. The comparator (Cabazitaxel) arm is **synthetic and illustrative** (see *Data provenance*); only the real Mitoxantrone arm is reconciled SAS↔R. A genuine SAS↔R reconciliation requires a run executed against a **real** SAS engine (`--real-sas`, recorded `sas_execution_mode` = `oda`/`local`); the **default** no-engine invocation runs in **`sim`** mode, where a zero-difference reconciliation is tautological. Always check `sas_execution_mode` in `06_telemetry/pipeline_health.json` before reading any reconciliation result as double-programming evidence.
 
@@ -141,7 +141,7 @@ TROPIC/
 │   └── cross_lang_audit.R          # diffdf cell-by-cell reconciliation engine
 │
 ├── 06_telemetry/                   # Pipeline Orchestration & Telemetry
-│   ├── cibuild.py                  # Python execution driver (12 stages; Job B reconcile)
+│   ├── cibuild.py                  # Python execution driver (13 stages; Job B reconcile)
 │   ├── oda_broker.py               # Resilient ODA connection broker (probe-earned 'oda' mode)
 │   ├── seed_sdtm.py                # Job A: idempotent, manifest-checked SDTM seeding
 │   ├── test_oda_broker.py          # Unit tests for the broker + seed (no Java/network)
@@ -193,7 +193,7 @@ TROPIC/
 # Clone and enter
 git clone <repo-url> && cd TROPIC
 
-# Run all 12 stages
+# Run all 13 stages
 python3 06_telemetry/cibuild.py
 ```
 

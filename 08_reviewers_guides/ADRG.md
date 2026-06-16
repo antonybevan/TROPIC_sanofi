@@ -2,7 +2,7 @@
 
 **Study Name:** TROPIC Re-Analysis  
 **Compound:** Cabazitaxel (CbzP) vs. Mitoxantrone (MP)  
-**Standard:** CDISC ADaMIG v1.3 / OCCDS v1.1  
+**Standard:** CDISC ADaMIG v1.3 / OCCDS v1.0 (+ custom episode-merging extension)  
 **Created:** 2026-05-23  
 
 ---
@@ -18,7 +18,7 @@ This **demonstration** rebuilds a synthetic comparator to retrospectively exerci
 
 ## 2. Key Derivations & Episode Merging
 ### Myeloid/Neutropenic Episode Merging (ADAE)
-Under standard OCCDS v1.0, separate adverse event records (e.g. repeated reports of neutropenia) artificially inflate the event count denominator. Under OCCDS v1.1, we apply a **3-day continuous episode window**:
+Under the published CDISC OCCDS v1.0 structure, separate adverse event records (e.g. repeated reports of neutropenia) artificially inflate the event count denominator. We therefore apply a **pre-specified custom 3-day continuous episode-merging extension** (this merging rule is a TROPIC analysis convention — it is *not* part of the published OCCDS v1.0; no CDISC "OCCDS v1.1" standard exists):
 1. Within a patient and Customized Query 02 (`CQ02NAM = 'HEMATOLOGIC irAE'`), neutropenic events with a start date within 3 days of the previous event's end date are merged.
 2. The continuous start (`CIAESDT`), end (`CIAEEDT`), and duration (`CIAEDUR`) are calculated across the merged sequence.
 3. The occurrence flag `AEOCCFL` is set to `'Y'` only for the first record in the merged sequence, establishing an accurate, non-inflated safety denominator.
@@ -45,14 +45,19 @@ For Progression-Free Survival (PFS), progression is defined as radiological prog
   * **Time to PSA Progression (TTPSA) (PARAMCD: TTPSA):** Start date is `TRTSDT`. Event is PSA progression (`PARAMCD = 'PSPROG' & AVAL = 1.0`). Censored at last PSA assessment date or last known alive date.
   * **Time to Tumor Progression (TTUMOR) (PARAMCD: TTUMOR):** Start date is `TRTSDT`. Event is RECIST v1.0 overall response of `'PD'`. Censored at last tumor assessment date (`last_tumor_dt`) or last known alive date. **Note: Restrictive analysis population is the measurable disease subpopulation (MEASDISF = 'Y'); SAP v3.0 §3.4 cites 204 MP / 201 CbzP measurable at baseline. The real MP arm yields N=203 here; the synthetic CbzP arm carries N=179 by reconstruction.**
 
+### 4.1 Time-to-Event Analysis Conventions (audit MO-4 / MO-5)
+* **Duration convention.** `AVAL = (event/censor date − time origin) + 1` day, so an event on the origin date contributes 1 day (not 0); applied uniformly across all parameters.
+* **Time origin per parameter is explicit and deliberate.** OS and PFS are anchored at randomization (`RANDDT`, ITT); TTSAE, TTPSA and TTUMOR are anchored at first dose (`TRTSDT`, safety). Efficacy ITT endpoints run from randomization, safety/treatment endpoints from exposure; the origin is recorded on every record via `STARTDT`.
+* **Negative durations are surfaced, not silently masked (audit MO-4).** A small number of source records carry an event/censor date marginally before the time origin — an artefact of the week-precision source dates (±3.5 days; SDRG §2). They are floored to 1 day so the record stays in the risk set, **and** both tracks emit an explicit warning (SAS `putlog`, R `warning()`) identifying the subject so the anomaly is investigable rather than hidden.
+
 ---
 
 ## 4A. Response Endpoint Derivations (ADRS) — Traceability (audit F-8)
 
 To pre-empt reviewer challenge on the response rates, the exact derivation of the two response endpoints (as implemented in the SAS/R ADRS track and consumed by `tfl_generation.R`) is:
 
-* **Objective Response Rate (ORR, `PARAMCD = OBJRESP`):** Responder = best overall response of CR or PR per RECIST v1.0 (`AVALC = 'Y'`). **Denominator = ITT population restricted to patients with measurable disease at baseline** (`MEASDISF == 'Y'`), per SAP v3.0 §3.4 / §5.3 and the publication (de Bono 2010). The SAP cites 204 measurable MP subjects; the real MP arm yields **N = 203** here, giving **37/203 = 18.2%**.
-  * **Reconciliation to the publication:** The published MP ORR was **4.4%**. The remaining difference (18.2% vs 4.4%) is due to the lack of response confirmation requirements in the simplified pipeline derivations (which evaluates the best of any post-baseline assessments without requiring a consecutive confirmed scan at least 4 weeks later). This is a confirmation-rule difference, not a calculation error.
+* **Objective Response Rate (ORR, `PARAMCD = OBJRESP`):** Responder = a **confirmed** CR or PR per RECIST v1.0 (`AVALC = 'Y'`). Confirmation (audit M-2) requires a subsequent CR/PR at least `RECIST_CONFIRM_DAYS` (28) days after the first (CR confirmed by CR; PR confirmed by CR or PR), evaluated on the lesion-derived RECIST timepoints that both the SAS and R tracks compute identically. **Denominator = ITT population restricted to patients with measurable disease at baseline** (`MEASDISF == 'Y'`), per SAP v3.0 §3.4 / §5.3 and the publication (de Bono 2010). The real MP arm yields **16/203 = 7.9%** on the measurable subpopulation.
+  * **Reconciliation to the publication:** The published MP ORR was **4.4%**. With confirmation enforced, the pipeline now yields **7.9%** on the measurable-disease denominator and **4.6%** (16/351) on the response-evaluable denominator (T-11-8b) — both close to the published rate. The prior best-of-any-assessment logic, with no confirmation, overstated this roughly four-fold (18.2%); enforcing the RECIST confirmation rule removed that overstatement. The small residual reflects lesion-sum-derived RECIST vs investigator adjudication and the ±3.5-day source date precision, not a calculation error.
 * **PSA Response (`PARAMCD = PSARESP`):** Responder = ≥50% confirmed decline in PSA from baseline (PCWG3) (`AVALC = 'Y'`); denominator = subjects with a baseline and ≥1 post-baseline PSA. MP arm: **69/371 = 18.6%**.
 
 All response counts/percentages are emitted by `09_tfl/tfl_generation.R` to `09_tfl/output/tables/T-11-Efficacy_Tables.txt` (single source of truth).
@@ -107,6 +112,12 @@ The execution sequence (in `oda` mode) is split into two jobs through a resilien
 
 The cross-language reconciliation audit (Stage 11, `cross_lang_audit.R`) then performs a `diffdf` comparison between the independently SAS-generated `*_prod.xpt` and the R-generated `*_v.xpt` datasets.
 
+### Results-Level Reconciliation (audit M-1, Stage 13)
+Double-programming extends beyond the ADaM **dataset** layer to the **analysis results**. During the ODA run the SAS engine independently computes the MP-arm survival statistics with `PROC LIFETEST` (Kaplan–Meier median, event count, and N per time-to-event parameter), exported to `04_adam/tte_stats_prod.csv`. Stage 13 (`05_reconciliation/results_reconcile.R`) recomputes the identical statistics in R with `survival::survfit` and diffs them **numerically** (KM-median tolerance 1 day; event count and N exact). The verdict is written to `06_telemetry/results_reconciliation_status.json` and **gates the build**. The latest run reconciles all six parameters (OS, PFS, TTPAIN, TTPSA, TTSAE, TTUMOR) PASS.
+
+> [!NOTE]
+> **Scope of the results reconciliation.** This is the **real MP arm only** — the cohort both engines derive independently. The two-arm hazard ratios and log-rank p-values shown in the TFLs are computed on MP + the **synthetic** CbzP comparator; because a single engine (R) holds the synthetic arm, those two-arm statistics are single-programmed **by construction** and are not part of the numerical SAS↔R reconciliation. In `sim` mode (no SAS engine) Stage 13 records `not_available` rather than a tautological pass.
+
 > [!IMPORTANT]
 > **Validation independence (audit F-1) and reconciliation scope (audit F-6).** The R validation track derives every ADaM domain **solely from source SDTM staging and its own logic; it does not read any `*_prod.xpt` file.** (A prior version of the ADAE QC script read `adae_prod.xpt` to recover SAS's row order for tie-breaking; that coupling has been removed and replaced with a unique `AESEQ`-based key: both tracks retain `AESEQ` in the final ADaM dataset to compare on `USUBJID` + `AESEQ` directly.) Because the reconciled OCCDS/BDS datasets do not all carry a unique record identifier (e.g. ADCM, ADLB, ADRS), the audit for those domains is a **keyed record-content (multiset) comparison**: records are aligned by business keys and, within tie groups, by full record content, then compared cell-by-cell. A PASS therefore certifies that **both engines independently produced identical record content** — it does not assert reproduction of an independent unique-key row index. This is a sound dual-programming check for keyless analysis datasets; it is described precisely here rather than overstated as positional row parity.
 
@@ -145,7 +156,7 @@ All 5 primary and secondary time-to-event efficacy parameters were reconstructed
 > - **Time to Serious AE (TTSAE):** Derived dynamically from the first Serious AE occurrence date in ADAE, or censored at `LSTALVDT` if no SAE occurred.
 
 ### 7.5 Adverse Events (ADAE) & Exposure (ADEX)
-* **Adverse Events**: Simulated based on published Table 2 rates, including 82% neutropenia, 8% febrile neutropenia, 31% anemia, and 47% diarrhea. CTCAE toxicity grades and OCCDS v1.1 variables (including continuous episode merging fields `CIAESDT`, `CIAEEDT`, `CIAEDUR`, and occurrence flag `AEOCCFL`) were applied. The Serious AE (SAE) rate is calibrated to match the EPAR safety profile of exactly 39.2% (145/371 safety-evaluable subjects).
+* **Adverse Events**: Simulated based on published Table 2 rates, including 82% neutropenia, 8% febrile neutropenia, 31% anemia, and 47% diarrhea. CTCAE toxicity grades and OCCDS v1.0 occurrence variables (including the custom continuous episode-merging fields `CIAESDT`, `CIAEEDT`, `CIAEDUR`, and occurrence flag `AEOCCFL`) were applied. The Serious AE (SAE) rate is calibrated to match the EPAR safety profile of exactly 39.2% (145/371 safety-evaluable subjects).
 * **Exposure**: Simulated up to 10 cycles with standard Jevtana dosing (25 mg/m² q3w) and cycle-level relative dose intensity (RDI) around a median of 92%, incorporating dose reductions and delays matching the publication safety profile.
 
 ### 7.6 Laboratory (ADLB) & Concomitant Medications (ADCM)

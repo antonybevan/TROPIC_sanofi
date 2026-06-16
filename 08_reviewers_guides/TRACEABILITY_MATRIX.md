@@ -1,7 +1,7 @@
 # Analysis Traceability Matrix
 
 **Study:** TROPIC (EFC6193 / XRP6258) · NCT00417079
-**Standards:** SDTMIG v3.1.1 (source) · ADaMIG v1.3 / OCCDS v1.1 (analysis)
+**Standards:** SDTMIG v3.1.1 (source) · ADaMIG v1.3 / OCCDS v1.0 + custom episode-merging (analysis)
 **Purpose:** End-to-end traceability from source SDTM → ADaM (dual-programmed) → Define-XML
 metadata → TFL output, plus the reconciliation evidence for each analysis dataset. This is
 the single index a reviewer uses to walk any number on a table back to the code and the
@@ -35,7 +35,7 @@ OS / PFS / TTSAE / TTPSA / TTUMOR inherit this limitation (SDRG §2).
 | **ADSL** | `A_adsl_generation.sas` | `v_adsl_validation.R` | `IG.ADSL` | Populations ITTFL/SAFFL/PPROTFL; TRTSDT/TRTEDT (EX); DTHDT/LSTALVDT (DS, week-offset); ECOGBL (VS); MEASDISF/VISCFL (LS); PAINBL (PN, §6.x); baseline labs + **imputation flags `*IF`** (§6.3) | `USUBJID` (unique) | `reconciliation_status.json` |
 | **ADEX** | `A_adex_generation.sas` | `v_adex_validation.R` | `IG.ADEX` | Cycle dose, CUMDOSE, NCYCLE, **RDI** (Project Optimus E-R proxy, §5.5) | `USUBJID,PARAMCD,AVISIT` (multiset) | ″ |
 | **ADCM** | `A_adcm_generation.sas` | `v_adcm_validation.R` | `IG.ADCM` | Prior/concomitant meds; NACTDT (new anti-cancer therapy); docetaxel history | `USUBJID,CMSTDT,CMDECOD` (multiset) | ″ |
-| **ADAE** | `A_adae_io_respec.sas` | `v_adae_io_validation.R` | `IG.ADAE` | TRTEMFL; OCCDS v1.1 **continuous-episode merging** (CQ02 hematologic irAE, ≤3-day gap, §5.2); AEOCCFL denominator flag; ATOXGR | `USUBJID,AESEQ` (unique) | ″ |
+| **ADAE** | `A_adae_io_respec.sas` | `v_adae_io_validation.R` | `IG.ADAE` | TRTEMFL; **custom continuous-episode merging** (OCCDS v1.0 base; CQ02 hematologic irAE, ≤3-day gap, §5.2); AEOCCFL denominator flag; ATOXGR | `USUBJID,AESEQ` (unique) | ″ |
 | **ADLB** | `A_adlb_generation.sas` | `v_adlb_validation.R` | `IG.ADLB` | Analysis windows (§5.6); ATOXGR baseline→worst shift; ANL01FL; ANCNADIR / ANCRECDY (§5.5) | `USUBJID,PARAMCD,AVISITN,LBDY` (multiset) | ″ |
 | **ADRS** | `A_adrs_generation.sas` | `v_adrs_validation.R` | `IG.ADRS` | OVRLRESP (RECIST v1.0, §5.3); PSPROG (PCWG3, §5.4); OBJRESP / PSARESP | `USUBJID,PARAMCD,AVISIT` (multiset) | ″ |
 | **ADTTE** | `A_adtte_generation.sas` | `v_adtte_validation.R` | `IG.ADTTE` | OS; PFS (NACT censoring hierarchy); **TTSAE** (was `TTOS`); TTPAIN; TTPSA; TTUMOR (measurable-disease subpop) | `USUBJID,PARAMCD` (multiset) | ″ |
@@ -80,6 +80,7 @@ SAS↔R-reconciled ADaM — not the rendered pixels.
 | 10 (SAS production) | `cibuild.py` Stage 10 (`local`/`oda`/`cached`/`sim`/`error`) | `pipeline_health.json` `sas_execution_mode` |
 | 11 (reconciliation) | `cross_lang_audit.R` | `reconciliation_status.json`, `reconciliation_report.html` |
 | 12 (TFL) | `tfl_generation.R` | `09_tfl/output/tables/*`, `09_tfl/output/figures/*` |
+| 13 (numerical results reconciliation) | `results_reconcile.R` — SAS `PROC LIFETEST` vs R `survfit` (MP-arm KM medians / events / N) | `results_reconciliation_status.json` |
 
 Run reproducibility: R toolchain pinned by `renv.lock`; self-contained demo
 (`python3 06_telemetry/cibuild.py --demo`) runs `tests/smoke_test.R` with no real data,

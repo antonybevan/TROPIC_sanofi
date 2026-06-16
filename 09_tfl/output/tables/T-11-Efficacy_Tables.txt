@@ -36,15 +36,15 @@ PSA Response Rate (>=50% decline) - ITT Population
   Fisher's Exact p-value                  4.5688e-10
 
 Objective Response Rate (ORR) - Measurable ITT Population†
-  Responders / N (%)                      23/179 (12.8%)      37/203 (18.2%)
-  Fisher's Exact p-value                  0.1594
+  Responders / N (%)                      23/179 (12.8%)      16/203 (7.9%)
+  Fisher's Exact p-value                  0.1296
 
 †Restricted to patients with measurable disease at baseline (CbzP N=179, MP N=203).
 
 T-11-8b: Objective Response Rate — Response-Evaluable Denominator (review-board SR-1)
 --------------------------------------------------------------------------------------
 Denominator basis        CbzP (evaluable)          MP (evaluable)
-Responders / N (%)       54/378 (14.3%)             37/351 (10.5%)
+Responders / N (%)       54/378 (14.3%)             16/351 (4.6%)
 Note: T-11-8 above uses the SAP-specified measurable-disease ITT denominator. The response-
 evaluable denominator version is reported here for full traceability.
 

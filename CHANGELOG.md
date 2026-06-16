@@ -4,6 +4,44 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.7.0] - 2026-06-16 — Results-level double-programming, confirmed ORR, output gate
+
+> **Context.** Post-audit hardening. Double-programming now extends from the ADaM dataset
+> layer to the analysis-results layer; the response derivation is corrected to the published
+> confirmed rate; and a deliverable sanity gate prevents code artifacts reaching a table.
+> Verified on a real ODA run: all **13** stages GREEN, dataset reconciliation PASS (7/7
+> domains), results reconciliation PASS (6/6 parameters).
+
+### Added
+- **Numerical results reconciliation (Stage 13, `05_reconciliation/results_reconcile.R`).** SAS
+  computes MP-arm survival statistics independently with `PROC LIFETEST` (KM median / events / N),
+  exported to `tte_stats_prod.csv`; R recomputes with `survival::survfit` and the two are diffed
+  numerically (median tol 1 day; events/N exact). Verdict in `results_reconciliation_status.json`
+  gates the build; degrades to `not_available` in sim mode. Two-arm HR (synthetic CbzP) stays
+  R-only by construction and is labelled as such.
+- **Deliverable sanity gate (Stage 12, `cibuild.py::output_sanity_check`).** Fails the build if a
+  published table/listing contains lint pragmas, unrendered `sprintf` specs, or `<NA>`/`NaN`/`Inf`.
+- **Committed `.lintr`** pinning the R style standard (line length 120; CDISC-uppercase, dplyr-NSE,
+  mixed-pipe and explicit-return exemptions justified inline) + a **CI lint gate** in `ci.yml`. Lint
+  is now reproducibly **0** across production/validation/reporting R.
+
+### Changed / Fixed
+- **ORR now requires RECIST v1.0 confirmation (M-2)** in `A_adrs_generation.sas` + `v_adrs_validation.R`
+  (a CR/PR confirmed by a later CR/PR ≥ `RECIST_CONFIRM_DAYS` = 28 d). Real-MP ORR drops from the
+  unconfirmed **18.2%** to **7.9%** (measurable) / **4.6%** (response-evaluable) — close to the
+  published 4.4%. define.xml `OBJRESP` decode updated to match.
+- **ADTTE negative-time anomalies surfaced (MO-4):** event/censor dates preceding the time origin are
+  still floored to 1 day but now emit an explicit per-subject warning in both tracks (SAS `putlog`,
+  R `warning()`) instead of being silently masked.
+- **`define.xml` `AsOfDateTime` is hash-gated (Mi-02):** restamped only when metadata content actually
+  changes, not on every run (removes misleading provenance churn). Repo git identity configured.
+- **CDISC accuracy:** "OCCDS v1.1" corrected to **OCCDS v1.0 + custom episode-merging extension**
+  throughout (no CDISC OCCDS v1.1 standard exists); the merging rule is labelled a TROPIC convention.
+- **TFL deliverable fix:** removed leaked `# nolint` pragmas from `T-11-Efficacy_Tables.txt` (root
+  cause in the `efficacy_tables` `sprintf` string; now wrapped in a scoped `# nolint` block).
+- **Docs aligned** (ADRG/SDRG/README/ANALYSIS_REPORT/TRACEABILITY) to the above, incl. TTE analysis
+  conventions (+1-day duration, per-parameter time origin) documented in ADRG §4.1.
+
 ## [3.6.2] - 2026-06-14 — ADaM conformance remediation (129 findings → 0)
 
 > **Context.** With CORE shipping no ADaM rules and Pinnacle 21 Community 4.1.0 engine-expired under

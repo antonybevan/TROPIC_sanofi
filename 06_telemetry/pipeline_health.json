@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-15T10:07:01.012934",
+  "timestamp": "2026-06-16T15:58:30.883882",
   "runner": "apple (System Agent)",
   "pipeline_health_status": "GREEN",
   "sas_execution_mode": "oda",
@@ -15,13 +15,16 @@
     "R ADTTE Validation": "PASS",
     "SAS Production (ODA/Real/Simulated)": "PASS",
     "Cross-Language Audit Reconcile": "PASS",
-    "Efficacy & Safety TFL Suite Compilation": "PASS"
+    "Efficacy & Safety TFL Suite Compilation": "PASS",
+    "Numerical Results Reconciliation (SAS vs R)": "PASS"
   },
   "oda_endpoint": "odaws01-apse1-2.oda.sas.com",
   "oda_attempts": 1,
-  "oda_total_wait_s": 5.2,
+  "oda_total_wait_s": 8.9,
   "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007",
   "reconciliation": "SAS_vs_R",
   "probe_nonce_echoed": true,
-  "reconciliation_status": "PASS"
+  "sas_results_stats": "downloaded",
+  "reconciliation_status": "PASS",
+  "results_reconciliation_status": "PASS"
 }

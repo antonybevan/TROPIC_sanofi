@@ -53,7 +53,7 @@ The gatekeeping logic is exercised on these endpoints; the CbzP column is **synt
 | Time to PSA Progression | 2.8 mo (synthetic) | 2.2 mo (real, 95% CI 1.7–3.3) | 0.84 (0.71–0.99) | 0.0362 | median 6.4 mo, HR 0.75 |
 | Time to Tumour Progression | 3.8 mo (synthetic)§ | 2.3 mo (real)§ | 0.67 (0.54–0.83) | 0.0003 | median 8.8 mo, HR 0.61 |
 | PSA Response (≥50% decrease) | 39.2% (148/378, synthetic) | 18.6% (69/371, real) | Fisher's exact | <0.0001 | 39% vs 24% (p = 0.0002) |
-| Overall Response Rate (ORR) | 12.8% (23/179, synthetic)§ | 18.2% (37/203, real)§ | Fisher's exact | 0.1594 | 14.4% vs 4.4% (p = 0.005) |
+| Overall Response Rate (ORR, confirmed) | 12.8% (23/179, synthetic)§ | 7.9% (16/203, real)§ | Fisher's exact | 0.1296 | 14.4% vs 4.4% (p = 0.005) |
 
 †Synthetic, illustrative — not real patient data. ‡Circular by construction; descriptive of synthetic data only, not a treatment-effect estimate. §Restricted to Measurable Disease Subpopulation (N=179 synthetic CbzP, N=203 real MP). The synthetic CbzP medians **do not match** the published cabazitaxel medians (the reconstruction overshoots; see §8).
 
