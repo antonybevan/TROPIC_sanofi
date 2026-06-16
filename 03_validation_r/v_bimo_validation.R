@@ -51,6 +51,31 @@ clinsite <- bimo_adsl |>
   select(STUDYID, SITEID, INVNAM, N_RAND, N_SAF, N_ITT, N_PPROT, N_DEATH, N_SAE, N_TEAE) |>
   arrange(STUDYID, SITEID)
 
+# F-7: explicit structural conformance gate. The BIMO clinsite is intentionally not in
+# the ADaM define.xml, so adam_conf_check.R never sees it; assert its schema here so a
+# silent column/type drift fails the stage rather than passing only the cell-diff.
+expected_cols <- c(
+  "STUDYID", "SITEID", "INVNAM", "N_RAND", "N_SAF",
+  "N_ITT", "N_PPROT", "N_DEATH", "N_SAE", "N_TEAE"
+)
+if (!identical(names(clinsite), expected_cols)) {
+  stop(sprintf(
+    "BIMO clinsite schema drift: expected [%s], got [%s]",
+    paste(expected_cols, collapse = ", "),
+    paste(names(clinsite), collapse = ", ")
+  ))
+}
+char_cols <- c("STUDYID", "SITEID", "INVNAM")
+num_cols <- setdiff(expected_cols, char_cols)
+stopifnot(
+  "clinsite char columns must be character" =
+    all(vapply(clinsite[char_cols], is.character, logical(1))),
+  "clinsite count columns must be numeric" =
+    all(vapply(clinsite[num_cols], is.numeric, logical(1))),
+  "clinsite must be one row per site (unique SITEID)" =
+    anyDuplicated(clinsite$SITEID) == 0L
+)
+
 # BIMO labels (match B_bimo_generation.sas).
 attr(clinsite$STUDYID, "label") <- "Study Identifier"
 attr(clinsite$SITEID, "label")  <- "Study Site Identifier"
