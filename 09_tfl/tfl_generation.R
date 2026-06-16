@@ -88,18 +88,24 @@ cat("NOTE: [TFL] Verifying statistical boundaries (Hierarchical step-down gateke
 # same recipe is regression-tested on a deterministic fixture (tests/test_tfl_stats.R, roadmap #8).
 source("09_tfl/tfl_stats.R")
 
-os_data <- adtte |> filter(PARAMCD == "OS") |> left_join(adsl |> select(USUBJID, ECOGBL, MEASDISF), by = "USUBJID")
+os_data <- adtte |>
+  filter(PARAMCD == "OS") |>
+  left_join(adsl |> select(USUBJID, ECOGBL, MEASDISF), by = "USUBJID")
 os_stats <- compute_tte_stats(os_data)
 os_pval <- os_stats$pval
 os_significant <- os_pval < 0.05
-cat(sprintf("  Step 1: OS Significance check -> p = %f (Significant: %s)\n", os_pval, as.character(os_significant)))
+cat(sprintf("  Step 1: OS Significance check -> p = %f (Significant: %s)\n", os_pval,
+    as.character(os_significant)))
 
 # Step 2: Progression-Free Survival (Tested only if OS is significant)
-pfs_data <- adtte |> filter(PARAMCD == "PFS") |> left_join(adsl |> select(USUBJID, ECOGBL, MEASDISF), by = "USUBJID")
+pfs_data <- adtte |>
+  filter(PARAMCD == "PFS") |>
+  left_join(adsl |> select(USUBJID, ECOGBL, MEASDISF), by = "USUBJID")
 pfs_stats <- compute_tte_stats(pfs_data)
 pfs_pval <- pfs_stats$pval
 pfs_significant <- os_significant && (pfs_pval < 0.05)
-cat(sprintf("  Step 2: PFS Significance check -> p = %f (Significant & Tested: %s)\n", pfs_pval, as.character(pfs_significant)))
+cat(sprintf("  Step 2: PFS Significance check -> p = %f (Significant & Tested: %s)\n", pfs_pval,
+    as.character(pfs_significant)))
 
 # Step 3: PSA Response (Tested only if PFS is significant)
 psa_resp_data <- adrs |>
@@ -112,7 +118,8 @@ psa_table <- table(psa_resp_data$TRT01P, psa_resp_data$AVALC)
 psa_test <- fisher.test(psa_table)
 psa_pval <- psa_test$p.value
 psa_significant <- pfs_significant && (psa_pval < 0.05)
-cat(sprintf("  Step 3: PSA Response Significance check -> p = %e (Significant & Tested: %s)\n", psa_pval, as.character(psa_significant)))
+cat(sprintf("  Step 3: PSA Response Significance check -> p = %e (Significant & Tested: %s)\n", psa_pval,
+    as.character(psa_significant)))
 
 # Step 4: ORR (Tested only if PSA Response is significant)
 # Conformed to SAP measurable-disease ITT population (MEASDISF == 'Y')
@@ -127,7 +134,8 @@ orr_table <- table(orr_resp_data$TRT01P, orr_resp_data$AVALC)
 orr_test <- fisher.test(orr_table)
 orr_pval <- orr_test$p.value
 orr_significant <- psa_significant && (orr_pval < 0.05)
-cat(sprintf("  Step 4: ORR Significance check -> p = %f (Significant & Tested: %s)\n", orr_pval, as.character(orr_significant)))
+cat(sprintf("  Step 4: ORR Significance check -> p = %f (Significant & Tested: %s)\n", orr_pval,
+    as.character(orr_significant)))
 
 if (!os_significant) {
   cat("WARNING: [TFL] Primary endpoint (OS) did not meet statistical significance boundary. Subsequent p-values are descriptive.\n")
@@ -139,8 +147,10 @@ if (!os_significant) {
 theme_nejm_custom <- function() {
   theme_minimal(base_family = "serif") +
     theme(
-      plot.title = element_text(face = "bold", size = 12, color = "#111111", hjust = 0, margin = margin(b = 4)),
-      plot.subtitle = element_text(size = 9, color = "#444444", hjust = 0, margin = margin(b = 12)),
+      plot.title = element_text(face = "bold", size = 12, color = "#111111",
+        hjust = 0, margin = margin(b = 4)),
+      plot.subtitle = element_text(size = 9, color = "#444444",
+        hjust = 0, margin = margin(b = 12)),
       axis.title = element_text(face = "bold", size = 9.5, color = "#111111"),
       axis.text = element_text(size = 8.5, color = "#222222"),
       panel.grid.major.y = element_line(color = "#e5e7eb", linewidth = 0.3),
@@ -155,7 +165,8 @@ theme_nejm_custom <- function() {
       legend.margin = margin(t = -5, b = -5),
       legend.background = element_blank(),
       legend.key = element_blank(),
-      plot.caption = element_text(size = 7, color = "#A6192E", face = "bold", hjust = 0, margin = margin(t = 8))
+      plot.caption = element_text(size = 7, color = "#A6192E", face = "bold",
+        hjust = 0, margin = margin(t = 8))
     )
 }
 
@@ -193,8 +204,10 @@ render_km <- function(data, stats, x_max, title, subtitle_endpoint, y_lab, outfi
   # Main KM Plot Panel
   km_plot <- ggplot(plot_data, aes(x = time, y = surv, color = TRT01P)) +
     geom_step(linewidth = 1.0) +
-    scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"),
-                       labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) +
+    scale_color_manual(
+      values = c("CbzP" = "#005A9C", "MP" = "#A6192E"),
+      labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")
+    ) +
     scale_y_continuous(labels = scales::percent, expand = c(0, 0)) +
     scale_x_continuous(breaks = seq(0, x_max, by = 3), expand = c(0, 0)) +
     coord_cartesian(xlim = c(0, x_max), ylim = c(0, 1.02)) +
@@ -228,9 +241,11 @@ render_km <- function(data, stats, x_max, title, subtitle_endpoint, y_lab, outfi
 
   risk_table_plot <- ggplot(risk_data, aes(x = .data$Time, y = factor(TRT01P, levels = rev(active_trts)), label = .data$n.risk)) +
     geom_text(size = 3.2, fontface = "bold", aes(color = TRT01P), family = "serif") +
-    scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"),
-                       labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)"),
-                       guide = "none") +
+    scale_color_manual(
+      values = c("CbzP" = "#005A9C", "MP" = "#A6192E"),
+      labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)"),
+      guide = "none"
+    ) +
     scale_y_discrete(labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) +
     scale_x_continuous(limits = c(0, x_max), breaks = times, expand = c(0, 0)) +
     labs(
@@ -242,7 +257,8 @@ render_km <- function(data, stats, x_max, title, subtitle_endpoint, y_lab, outfi
       panel.grid = element_blank(),
       axis.text.x = element_blank(),
       axis.ticks = element_blank(),
-      axis.title.y = element_text(face = "bold", size = 8.5, color = "#111111", angle = 0, vjust = 0.5),
+      axis.title.y = element_text(face = "bold", size = 8.5, color = "#111111",
+        angle = 0, vjust = 0.5),
       axis.text.y = element_text(face = "bold", size = 8.5, color = "#222222"),
       plot.margin = margin(t = -5, r = 15, b = 5, l = 30)
     )
@@ -262,9 +278,11 @@ render_km(
   stats = os_stats,
   x_max = 24,
   title = "F-11-1: Kaplan-Meier Overall Survival (OS) Analysis — ITT Population",
-  subtitle_endpoint = sprintf("Primary Endpoint: Cabazitaxel + Prednisone (CbzP) vs Mitoxantrone + Prednisone (MP)\nHR = %.2f (95%% CI: %.2f-%.2f), Stratified Log-Rank %s",
-                              os_stats$hr, os_stats$lcl, os_stats$ucl,
-                              if(os_stats$pval < 0.0001) "p < 0.0001" else sprintf("p = %.4f", os_stats$pval)),
+  subtitle_endpoint = sprintf(
+    "Primary Endpoint: Cabazitaxel + Prednisone (CbzP) vs Mitoxantrone + Prednisone (MP)\nHR = %.2f (95%% CI: %.2f-%.2f), Stratified Log-Rank %s",
+    os_stats$hr, os_stats$lcl, os_stats$ucl,
+    if (os_stats$pval < 0.0001) "p < 0.0001" else sprintf("p = %.4f", os_stats$pval)
+  ),
   y_lab = "Overall Survival Probability",
   outfile = "09_tfl/output/figures/F-11-1_KM_OS.png"
 )
@@ -292,8 +310,10 @@ er_plot <- ggplot(er_data, aes(x = RDI, y = ANC, color = TRT01P)) +
   # Styled points with white fill, transparency, and clinical palette borders
   geom_point(alpha = 0.5, size = 2.0, shape = 21, stroke = 0.6, fill = "white", aes(color = TRT01P)) +
   geom_smooth(method = "loess", span = 1.0, se = TRUE, linewidth = 1.2, aes(fill = TRT01P, color = TRT01P), alpha = 0.15) +
-  scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"), labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) +
-  scale_fill_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"), labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) +
+  scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"),
+    labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) +
+  scale_fill_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"),
+    labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) +
   labs(
     title = "F-17-1: Project Optimus Exposure-Response Analysis",
     subtitle = "Continuous ANC Nadir (Cycle 1) vs Relative Dose Intensity (RDI) by Arm\nFitted with LOWESS smoothing local regression curves",
@@ -304,7 +324,9 @@ er_plot <- ggplot(er_data, aes(x = RDI, y = ANC, color = TRT01P)) +
     caption = synth_cap
   ) +
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "#e74c3c", linewidth = 0.8) +
-  annotate("text", x = 43, y = 0.72, label = "Grade 4 Neutropenia Limit (< 0.5 x 10^3/uL)", color = "#e74c3c", size = 3.2, fontface = "bold", family = "serif", hjust = 0) +
+  annotate("text", x = 43, y = 0.72, label = "Grade 4 Neutropenia Limit (< 0.5 x 10^3/uL)",
+    color = "#e74c3c",
+    size = 3.2, fontface = "bold", family = "serif", hjust = 0) +
   coord_cartesian(ylim = c(0, 6.0)) +
   theme_nejm_custom() +
   theme(
@@ -312,7 +334,8 @@ er_plot <- ggplot(er_data, aes(x = RDI, y = ANC, color = TRT01P)) +
     plot.margin = margin(t = 10, r = 15, b = 10, l = 15)
   )
 
-ggsave("09_tfl/output/figures/F-17-1_Optimus_Scatter.png", er_plot, width = 8, height = 5.5, dpi = 300)
+ggsave("09_tfl/output/figures/F-17-1_Optimus_Scatter.png", er_plot,
+  width = 8, height = 5.5, dpi = 300)
 
 # ==============================================================================
 # FIGURE F-12-1: Statistical Subgroup Forest Plot (OS Subgroups)
@@ -390,7 +413,8 @@ bg_rects <- data.frame(
 # Left Panel: Forest Plot Graphical curves
 forest_left <- ggplot(subgroups) +
   # Alternating row bands
-  geom_rect(data = bg_rects, aes(xmin = 0.1, xmax = 2.7, ymin = ymin, ymax = ymax), fill = "#f5f7f8", alpha = 0.8, inherit.aes = FALSE) +
+  geom_rect(data = bg_rects, aes(xmin = 0.1, xmax = 2.7, ymin = ymin, ymax = ymax), fill = "#f5f7f8", alpha = 0.8,
+    inherit.aes = FALSE) +
   geom_vline(xintercept = 1.0, linetype = "dashed", color = "#7f8c8d", linewidth = 0.5) +
   geom_errorbarh(aes(y = Subgroup, xmin = LCL, xmax = UCL), height = 0.15, color = "#1a5276", linewidth = 0.8) +
   geom_point(aes(y = Subgroup, x = HR), shape = 22, size = 3.2, fill = "#1a5276", color = "#0f324a") + # Clinical square symbol
@@ -413,12 +437,19 @@ forest_left <- ggplot(subgroups) +
 
 # Right Panel: Aligned Text Data Columns (Lancet Standard!)
 table_right <- ggplot(subgroups, aes(y = Subgroup)) +
-  geom_rect(data = bg_rects, aes(xmin = -0.5, xmax = 2.5, ymin = ymin, ymax = ymax), fill = "#f5f7f8", alpha = 0.8, inherit.aes = FALSE) +
-  geom_text(aes(x = 0, label = N), size = 3, fontface = "bold", color = "#333333", family = "serif") +
-  geom_text(aes(x = 1.4, label = sprintf("%.2f (95%% CI: %.2f-%.2f)", HR, LCL, UCL)), size = 3, fontface = "bold", color = "#333333", family = "serif") +
+  geom_rect(data = bg_rects, aes(xmin = -0.5, xmax = 2.5, ymin = ymin, ymax = ymax), fill = "#f5f7f8", alpha = 0.8,
+    inherit.aes = FALSE) +
+  geom_text(aes(x = 0, label = N),
+    size = 3, fontface = "bold", color = "#333333", family = "serif") +
+  geom_text(aes(x = 1.4, label = sprintf("%.2f (95%% CI: %.2f-%.2f)", HR, LCL, UCL)),
+    size = 3, fontface = "bold", color = "#333333", family = "serif") +
   # Text Headers
-  annotate("text", x = 0, y = nrow(subgroups) + 0.8, label = "N", size = 3.2, fontface = "bold", color = "#111111", family = "serif") +
-  annotate("text", x = 1.4, y = nrow(subgroups) + 0.8, label = "Hazard Ratio (95% CI)", size = 3.2, fontface = "bold", color = "#111111", family = "serif") +
+  annotate("text", x = 0, y = nrow(subgroups) + 0.8, label = "N",
+    size = 3.2, fontface = "bold",
+    color = "#111111", family = "serif") +
+  annotate("text", x = 1.4, y = nrow(subgroups) + 0.8, label = "Hazard Ratio (95% CI)",
+    size = 3.2, fontface = "bold",
+    color = "#111111", family = "serif") +
   scale_x_continuous(limits = c(-0.5, 2.5), expand = c(0, 0)) +
   scale_y_discrete(expand = expansion(add = c(0.5, 1.2))) +
   theme_void(base_family = "serif") +
@@ -429,7 +460,8 @@ table_right <- ggplot(subgroups, aes(y = Subgroup)) +
 # Combine Left Graphical & Right Text panels horizontally
 final_forest <- forest_left + table_right + plot_layout(widths = c(3.5, 2))
 
-ggsave("09_tfl/output/figures/F-12-1_Subgroup_Forest.png", final_forest, width = 8, height = 5.5, dpi = 300)
+ggsave("09_tfl/output/figures/F-12-1_Subgroup_Forest.png", final_forest,
+  width = 8, height = 5.5, dpi = 300)
 
 # ==============================================================================
 # TABLES T-17-1 / T-17-2 / T-17-4: Text-based summary table exports
@@ -437,13 +469,19 @@ ggsave("09_tfl/output/figures/F-12-1_Subgroup_Forest.png", final_forest, width =
 cat("  [TFL] Compiling clinical table summaries...\n")
 
 # Dynamic calculations for T-17-1
-rdi_mp_85  <- sum(adex$TRT01P == "MP" & adex$PARAMCD == "RDIDL" & adex$AVALC == ">=85%")
-rdi_mp_65  <- sum(adex$TRT01P == "MP" & adex$PARAMCD == "RDIDL" & adex$AVALC == "65-<85%")
-rdi_mp_low <- sum(adex$TRT01P == "MP" & adex$PARAMCD == "RDIDL" & adex$AVALC == "<65%")
+rdi_mp_85 <- sum(adex$TRT01P == "MP" & adex$PARAMCD == "RDIDL" &
+    adex$AVALC == ">=85%")
+rdi_mp_65 <- sum(adex$TRT01P == "MP" & adex$PARAMCD == "RDIDL" &
+    adex$AVALC == "65-<85%")
+rdi_mp_low <- sum(adex$TRT01P == "MP" & adex$PARAMCD == "RDIDL" &
+    adex$AVALC == "<65%")
 
-rdi_cbzp_85  <- sum(adex$TRT01P == "CbzP" & adex$PARAMCD == "RDIDL" & adex$AVALC == ">=85%")
-rdi_cbzp_65  <- sum(adex$TRT01P == "CbzP" & adex$PARAMCD == "RDIDL" & adex$AVALC == "65-<85%")
-rdi_cbzp_low <- sum(adex$TRT01P == "CbzP" & adex$PARAMCD == "RDIDL" & adex$AVALC == "<65%")
+rdi_cbzp_85 <- sum(adex$TRT01P == "CbzP" & adex$PARAMCD == "RDIDL" &
+    adex$AVALC == ">=85%")
+rdi_cbzp_65 <- sum(adex$TRT01P == "CbzP" & adex$PARAMCD == "RDIDL" &
+    adex$AVALC == "65-<85%")
+rdi_cbzp_low <- sum(adex$TRT01P == "CbzP" & adex$PARAMCD == "RDIDL" &
+    adex$AVALC == "<65%")
 
 n_mp_rdi <- sum(adex$TRT01P == "MP" & adex$PARAMCD == "RDIDL")
 n_cbzp_rdi <- sum(adex$TRT01P == "CbzP" & adex$PARAMCD == "RDIDL")
@@ -458,12 +496,12 @@ n_gcsf_y <- sum(optimus_gcsf$GCSF_PROP == "Y")
 n_gcsf_n <- sum(optimus_gcsf$GCSF_PROP == "N")
 
 gcsf_y_g12 <- sum(optimus_gcsf$GCSF_PROP == "Y" & optimus_gcsf$ATOXGR <= 2)
-gcsf_y_g3  <- sum(optimus_gcsf$GCSF_PROP == "Y" & optimus_gcsf$ATOXGR == 3)
-gcsf_y_g4  <- sum(optimus_gcsf$GCSF_PROP == "Y" & optimus_gcsf$ATOXGR == 4)
+gcsf_y_g3 <- sum(optimus_gcsf$GCSF_PROP == "Y" & optimus_gcsf$ATOXGR == 3)
+gcsf_y_g4 <- sum(optimus_gcsf$GCSF_PROP == "Y" & optimus_gcsf$ATOXGR == 4)
 
 gcsf_n_g12 <- sum(optimus_gcsf$GCSF_PROP == "N" & optimus_gcsf$ATOXGR <= 2)
-gcsf_n_g3  <- sum(optimus_gcsf$GCSF_PROP == "N" & optimus_gcsf$ATOXGR == 3)
-gcsf_n_g4  <- sum(optimus_gcsf$GCSF_PROP == "N" & optimus_gcsf$ATOXGR == 4)
+gcsf_n_g3 <- sum(optimus_gcsf$GCSF_PROP == "N" & optimus_gcsf$ATOXGR == 3)
+gcsf_n_g4 <- sum(optimus_gcsf$GCSF_PROP == "N" & optimus_gcsf$ATOXGR == 4)
 
 # Dynamic calculations for T-17-4
 cbzp_rdi <- adex |>
@@ -494,10 +532,11 @@ get_tertile_stats <- function(cat_name) {
 }
 
 high_stats <- get_tertile_stats(">=85%")
-med_stats  <- get_tertile_stats("65-<85%")
-low_stats  <- get_tertile_stats("<65%")
+med_stats <- get_tertile_stats("65-<85%")
+low_stats <- get_tertile_stats("<65%")
 
-table_content <- sprintf("
+table_content <- sprintf(
+  "
 TROPIC (Study EFC6193 / XRP6258) Clinical Reporting Tables
 =============================================
 
@@ -525,16 +564,15 @@ Low (<65%%)     %.1f months          %.1f%%
   rdi_cbzp_85, 100 * rdi_cbzp_85 / n_cbzp_rdi, rdi_mp_85, 100 * rdi_mp_85 / n_mp_rdi,
   rdi_cbzp_65, 100 * rdi_cbzp_65 / n_cbzp_rdi, rdi_mp_65, 100 * rdi_mp_65 / n_mp_rdi,
   rdi_cbzp_low, 100 * rdi_cbzp_low / n_cbzp_rdi, rdi_mp_low, 100 * rdi_mp_low / n_mp_rdi,
-
   n_gcsf_y, gcsf_y_g12, 100 * gcsf_y_g12 / n_gcsf_y, gcsf_y_g3, 100 * gcsf_y_g3 / n_gcsf_y, gcsf_y_g4, 100 * gcsf_y_g4 / n_gcsf_y,
   n_gcsf_n, gcsf_n_g12, 100 * gcsf_n_g12 / n_gcsf_n, gcsf_n_g3, 100 * gcsf_n_g3 / n_gcsf_n, gcsf_n_g4, 100 * gcsf_n_g4 / n_gcsf_n,
-
   high_stats$med_os, high_stats$rate_g34,
   med_stats$med_os, med_stats$rate_g34,
   low_stats$med_os, low_stats$rate_g34
 )
 
-writeLines(paste0(synth_banner, table_content), "09_tfl/output/tables/T-17-Optimus_Tables.txt")
+writeLines(paste0(synth_banner, table_content),
+  "09_tfl/output/tables/T-17-Optimus_Tables.txt")
 
 # ==============================================================================
 # TABLES T-11-6 / T-11-7: Dynamic Efficacy Summaries for Secondary Endpoints
@@ -551,9 +589,9 @@ sum_fit_psa <- summary(fit_psa)$table
 sum_cox_psa <- summary(cox_psa)
 
 med_psa_cbzp <- sum_fit_psa["TRT01P=CbzP", "median"]
-med_psa_mp   <- sum_fit_psa["TRT01P=MP", "median"]
-ci_psa_cbzp  <- sprintf("(95%% CI: %.1f-%.1f)", sum_fit_psa["TRT01P=CbzP", "0.95LCL"], sum_fit_psa["TRT01P=CbzP", "0.95UCL"])
-ci_psa_mp    <- sprintf("(95%% CI: %.1f-%.1f)", sum_fit_psa["TRT01P=MP", "0.95LCL"], sum_fit_psa["TRT01P=MP", "0.95UCL"])
+med_psa_mp <- sum_fit_psa["TRT01P=MP", "median"]
+ci_psa_cbzp <- sprintf("(95%% CI: %.1f-%.1f)", sum_fit_psa["TRT01P=CbzP", "0.95LCL"], sum_fit_psa["TRT01P=CbzP", "0.95UCL"])
+ci_psa_mp <- sprintf("(95%% CI: %.1f-%.1f)", sum_fit_psa["TRT01P=MP", "0.95LCL"], sum_fit_psa["TRT01P=MP", "0.95UCL"])
 
 hr_psa <- sum_cox_psa$conf.int[1]
 hr_psa_lcl <- sum_cox_psa$conf.int[3]
@@ -561,9 +599,9 @@ hr_psa_ucl <- sum_cox_psa$conf.int[4]
 p_psa <- sum_cox_psa$coefficients[1, "Pr(>|z|)"]
 
 events_psa_cbzp <- sum_fit_psa["TRT01P=CbzP", "events"]
-total_psa_cbzp  <- sum_fit_psa["TRT01P=CbzP", "n.max"]
-events_psa_mp   <- sum_fit_psa["TRT01P=MP", "events"]
-total_psa_mp    <- sum_fit_psa["TRT01P=MP", "n.max"]
+total_psa_cbzp <- sum_fit_psa["TRT01P=CbzP", "n.max"]
+events_psa_mp <- sum_fit_psa["TRT01P=MP", "events"]
+total_psa_mp <- sum_fit_psa["TRT01P=MP", "n.max"]
 
 # TTUMOR Analysis
 tumor_data <- adtte |> filter(PARAMCD == "TTUMOR")
@@ -575,9 +613,9 @@ sum_fit_tumor <- summary(fit_tumor)$table
 sum_cox_tumor <- summary(cox_tumor)
 
 med_tumor_cbzp <- sum_fit_tumor["TRT01P=CbzP", "median"]
-med_tumor_mp   <- sum_fit_tumor["TRT01P=MP", "median"]
-ci_tumor_cbzp  <- sprintf("(95%% CI: %.1f-%.1f)", sum_fit_tumor["TRT01P=CbzP", "0.95LCL"], sum_fit_tumor["TRT01P=CbzP", "0.95UCL"])
-ci_tumor_mp    <- sprintf("(95%% CI: %.1f-%.1f)", sum_fit_tumor["TRT01P=MP", "0.95LCL"], sum_fit_tumor["TRT01P=MP", "0.95UCL"])
+med_tumor_mp <- sum_fit_tumor["TRT01P=MP", "median"]
+ci_tumor_cbzp <- sprintf("(95%% CI: %.1f-%.1f)", sum_fit_tumor["TRT01P=CbzP", "0.95LCL"], sum_fit_tumor["TRT01P=CbzP", "0.95UCL"])
+ci_tumor_mp <- sprintf("(95%% CI: %.1f-%.1f)", sum_fit_tumor["TRT01P=MP", "0.95LCL"], sum_fit_tumor["TRT01P=MP", "0.95UCL"])
 
 hr_tumor <- sum_cox_tumor$conf.int[1]
 hr_tumor_lcl <- sum_cox_tumor$conf.int[3]
@@ -585,9 +623,9 @@ hr_tumor_ucl <- sum_cox_tumor$conf.int[4]
 p_tumor <- sum_cox_tumor$coefficients[1, "Pr(>|z|)"]
 
 events_tumor_cbzp <- sum_fit_tumor["TRT01P=CbzP", "events"]
-total_tumor_cbzp  <- sum_fit_tumor["TRT01P=CbzP", "n.max"]
-events_tumor_mp   <- sum_fit_tumor["TRT01P=MP", "events"]
-total_tumor_mp    <- sum_fit_tumor["TRT01P=MP", "n.max"]
+total_tumor_cbzp <- sum_fit_tumor["TRT01P=CbzP", "n.max"]
+events_tumor_mp <- sum_fit_tumor["TRT01P=MP", "events"]
+total_tumor_mp <- sum_fit_tumor["TRT01P=MP", "n.max"]
 
 # Best Clinical Response Endpoints Analysis (PSA response and ORR)
 psa_resp_data <- adrs |> filter(PARAMCD == "PSARESP")
@@ -599,7 +637,9 @@ psa_mp_total <- sum(psa_resp_data$TRT01P == "MP")
 psa_mp_pct <- psa_mp_resp / psa_mp_total * 100
 
 # Objective Response Rate (ORR) restricted to Measurable-Disease ITT population
-meas_subj <- adsl |> filter(MEASDISF == "Y") |> select(USUBJID, TRT01P)
+meas_subj <- adsl |>
+  filter(MEASDISF == "Y") |>
+  select(USUBJID, TRT01P)
 orr_resp_data <- adrs |>
   filter(PARAMCD == "OBJRESP") |>
   filter(USUBJID %in% meas_subj$USUBJID)
@@ -611,9 +651,10 @@ orr_mp_total <- sum(meas_subj$TRT01P == "MP")
 orr_mp_pct <- orr_mp_resp / orr_mp_total * 100
 
 n_cbzp_itt <- sum(adsl$TRT01P == "CbzP")
-n_mp_itt   <- sum(adsl$TRT01P == "MP")
+n_mp_itt <- sum(adsl$TRT01P == "MP")
 
-efficacy_tables <- sprintf("
+efficacy_tables <- sprintf(
+  "
 TROPIC (Study EFC6193 / XRP6258) Secondary Efficacy Tables
 ==========================================================
 
@@ -655,21 +696,17 @@ Objective Response Rate (ORR) - Measurable ITT Population†
   as.integer(events_psa_mp), as.integer(total_psa_mp),
   med_psa_cbzp, med_psa_mp, ci_psa_cbzp, ci_psa_mp,
   hr_psa, hr_psa_lcl, hr_psa_ucl, p_psa,
-
   total_tumor_cbzp, total_tumor_mp,
   as.integer(events_tumor_cbzp), as.integer(total_tumor_cbzp),
   as.integer(events_tumor_mp), as.integer(total_tumor_mp),
   med_tumor_cbzp, med_tumor_mp, ci_tumor_cbzp, ci_tumor_mp,
   hr_tumor, hr_tumor_lcl, hr_tumor_ucl, p_tumor,
-
   as.integer(psa_cbzp_resp), as.integer(psa_cbzp_total), psa_cbzp_pct,
   as.integer(psa_mp_resp), as.integer(psa_mp_total), psa_mp_pct,
   psa_pval,
-
   as.integer(orr_cbzp_resp), as.integer(orr_cbzp_total), orr_cbzp_pct,
   as.integer(orr_mp_resp), as.integer(orr_mp_total), orr_mp_pct,
   orr_pval,
-
   total_tumor_cbzp, total_tumor_mp
 )
 
@@ -681,20 +718,28 @@ orr_ev_cbzp_resp <- sum(orr_ev_resp_data$AVALC == "Y" & orr_ev_resp_data$TRT01P 
 orr_ev_cbzp_total <- sum(orr_ev_resp_data$TRT01P == "CbzP")
 orr_ev_mp_resp <- sum(orr_ev_resp_data$AVALC == "Y" & orr_ev_resp_data$TRT01P == "MP")
 orr_ev_mp_total <- sum(orr_ev_resp_data$TRT01P == "MP")
-orr_md_addendum <- sprintf(paste0(
-  "\nT-11-8b: Objective Response Rate — Response-Evaluable Denominator (review-board SR-1)\n",
-  "--------------------------------------------------------------------------------------\n",
-  "Denominator basis        CbzP (evaluable)          MP (evaluable)\n",
-  "Responders / N (%%)       %d/%d (%.1f%%)             %d/%d (%.1f%%)\n",
-  "Note: T-11-8 above uses the SAP-specified measurable-disease ITT denominator. The response-\n",
-  "evaluable denominator version is reported here for full traceability.\n"),
+orr_md_addendum <- sprintf(
+  paste0(
+    "\nT-11-8b: Objective Response Rate — Response-Evaluable Denominator (review-board SR-1)\n",
+    "--------------------------------------------------------------------------------------\n",
+    "Denominator basis        CbzP (evaluable)          MP (evaluable)\n",
+    "Responders / N (%%)       %d/%d (%.1f%%)             %d/%d (%.1f%%)\n",
+    "Note: T-11-8 above uses the SAP-specified measurable-disease ITT denominator. The response-\n",
+    "evaluable denominator version is reported here for full traceability.\n"
+  ),
   orr_ev_cbzp_resp, orr_ev_cbzp_total, 100 * orr_ev_cbzp_resp / max(orr_ev_cbzp_total, 1),
-  orr_ev_mp_resp,   orr_ev_mp_total,   100 * orr_ev_mp_resp   / max(orr_ev_mp_total, 1))
+  orr_ev_mp_resp, orr_ev_mp_total,
+  100 * orr_ev_mp_resp / max(orr_ev_mp_total, 1)
+)
 efficacy_tables <- paste0(efficacy_tables, orr_md_addendum)
-cat(sprintf("  [TFL] ORR (response-evaluable): MP %d/%d (%.1f%%)\n",
-            orr_ev_mp_resp, orr_ev_mp_total, 100 * orr_ev_mp_resp / max(orr_ev_mp_total, 1)))
+cat(sprintf(
+  "  [TFL] ORR (response-evaluable): MP %d/%d (%.1f%%)\n",
+  orr_ev_mp_resp, orr_ev_mp_total,
+  100 * orr_ev_mp_resp / max(orr_ev_mp_total, 1)
+))
 
-writeLines(paste0(synth_banner, efficacy_tables), "09_tfl/output/tables/T-11-Efficacy_Tables.txt")
+writeLines(paste0(synth_banner, efficacy_tables),
+           "09_tfl/output/tables/T-11-Efficacy_Tables.txt")
 
 # ==============================================================================
 # FIGURE F-11-2: Kaplan-Meier Curve — PFS by Arm (Secondary Endpoint)
@@ -706,10 +751,23 @@ render_km(
   data = pfs_data,
   stats = pfs_stats,
   x_max = 18,
-  title = "F-11-2: Kaplan-Meier Progression-Free Survival (PFS) Analysis — ITT Population",
-  subtitle_endpoint = sprintf("Secondary Endpoint: Cabazitaxel + Prednisone (CbzP) vs Mitoxantrone + Prednisone (MP)\nHR = %.2f (95%% CI: %.2f-%.2f), Stratified Log-Rank %s",
-                              pfs_stats$hr, pfs_stats$lcl, pfs_stats$ucl,
-                              if(pfs_stats$pval < 0.0001) "p < 0.0001" else sprintf("p = %.4f", pfs_stats$pval)),
+  title = paste0(
+      "F-11-2: Kaplan-Meier Progression-Free Survival (PFS) Analysis ",
+      "— ITT Population"
+    ),
+  subtitle_endpoint = sprintf(
+    paste0(
+      "Secondary Endpoint: Cabazitaxel + Prednisone (CbzP) vs ",
+      "Mitoxantrone + Prednisone (MP)\nHR = %.2f ",
+      "(95%% CI: %.2f-%.2f), Stratified Log-Rank %s"
+    ),
+    pfs_stats$hr, pfs_stats$lcl, pfs_stats$ucl,
+    if (pfs_stats$pval < 0.0001) {
+      "p < 0.0001"
+    } else {
+      sprintf("p = %.4f", pfs_stats$pval)
+    }
+  ),
   y_lab = "Progression-Free Survival Probability",
   outfile = "09_tfl/output/figures/F-11-2_KM_PFS.png"
 )
@@ -724,37 +782,51 @@ psa_lb <- adlb |>
   filter(PARAMCD == "PSA", !is.na(PCHG)) |>
   group_by(USUBJID) |>
   summarise(best_pchg = min(PCHG, na.rm = TRUE), .groups = "drop") |>
-  left_join(adsl |> select(USUBJID, TRT01P), by = "USUBJID") |>
+  left_join(select(adsl, USUBJID, TRT01P), by = "USUBJID") |>
   filter(!is.na(TRT01P))
 
 # Use the dual-arm PSA data directly from ADaM
 
 psa_lb <- psa_lb |>
   arrange(TRT01P, best_pchg) |>
-  mutate(subj_rank = row_number(),
-         TRT_LABEL = if_else(TRT01P == "CbzP", "CbzP (Synthetic)", "MP (Real)"),
-         response_color = case_when(
-           best_pchg <= -50 ~ "PSA Response (>=50% decrease)",
-           best_pchg < 0   ~ "PSA Decrease (<50%)",
-           TRUE             ~ "PSA Increase"
-         ))
+  mutate(
+    subj_rank = row_number(),
+    TRT_LABEL = if_else(TRT01P == "CbzP", "CbzP (Synthetic)", "MP (Real)"),
+    response_color = case_when(
+      best_pchg <= -50 ~ "PSA Response (>=50% decrease)",
+      best_pchg < 0 ~ "PSA Decrease (<50%)",
+      TRUE ~ "PSA Increase"
+    )
+  )
 
-waterfall_plot <- ggplot(psa_lb, aes(x = subj_rank, y = best_pchg, fill = response_color)) +
+waterfall_plot <- ggplot(psa_lb, aes(
+  x = subj_rank, y = best_pchg, fill = response_color
+)) +
   geom_col(width = 0.85) +
-  geom_hline(yintercept = -50, linetype = "dashed", color = "#005A9C", linewidth = 0.7) +
+  geom_hline(
+    yintercept = -50, linetype = "dashed", color = "#005A9C", linewidth = 0.7
+  ) +
   geom_hline(yintercept = 0, color = "#333333", linewidth = 0.4) +
-  annotate("text", x = max(psa_lb$subj_rank) * 0.05, y = -54, label = "50% decrease threshold",
-           color = "#005A9C", size = 3, fontface = "bold", hjust = 0, family = "serif") +
+  annotate("text",
+    x = max(psa_lb$subj_rank) * 0.05, y = -54, label = "50% decrease threshold",
+    color = "#005A9C", size = 3, fontface = "bold", hjust = 0, family = "serif"
+  ) +
   scale_fill_manual(values = c(
     "PSA Response (>=50% decrease)" = "#005A9C",
     "PSA Decrease (<50%)"           = "#7fb3d3",
     "PSA Increase"                  = "#A6192E"
   )) +
-  scale_y_continuous(labels = function(x) paste0(x, "%"), limits = c(-105, min(max(psa_lb$best_pchg, na.rm=TRUE) + 20, 300))) +
+  scale_y_continuous(
+    labels = function(x) paste0(x, "%"),
+    limits = c(-105, min(max(psa_lb$best_pchg, na.rm = TRUE) + 20, 300))
+  ) +
   facet_wrap(~TRT_LABEL, scales = "free_x", ncol = 2) +
   labs(
     title = "F-13-1: PSA Best Percentage Change from Baseline — Waterfall Plot",
-    subtitle = "Each bar represents one subject's maximum PSA decrease (or increase). Sorted within arm.",
+    subtitle = paste0(
+      "Each bar represents one subject's maximum PSA decrease \n",
+      "(or increase). Sorted within arm."
+    ),
     x = "Subjects (ranked by PSA response within arm)",
     y = "Best PSA % Change from Baseline",
     fill = "Response Category:",
@@ -768,7 +840,8 @@ waterfall_plot <- ggplot(psa_lb, aes(x = subj_rank, y = best_pchg, fill = respon
     legend.position = "bottom"
   )
 
-ggsave("09_tfl/output/figures/F-13-1_PSA_Waterfall.png", waterfall_plot, width = 9, height = 5.5, dpi = 300)
+ggsave("09_tfl/output/figures/F-13-1_PSA_Waterfall.png", waterfall_plot,
+       width = 9, height = 5.5, dpi = 300)
 
 # ==============================================================================
 # FIGURE F-14-1: Treatment Exposure Swimmer Plot
@@ -785,26 +858,39 @@ swimmer_data <- adsl |>
   left_join(ncycle_all, by = "USUBJID") |>
   mutate(
     duration_months = TRTDURD / 30.4375,
-    death_event    = DTHFL == "Y",
+    death_event = DTHFL == "Y",
     TRT_LABEL = if_else(TRT01P == "CbzP", "CbzP (Synthetic)", "MP (Real)")
   ) |>
   arrange(TRT01P, desc(duration_months)) |>
   group_by(TRT01P) |>
-  slice_head(n = 30) |>   # Top 30 per arm for readability
+  slice_head(n = 30) |> # Top 30 per arm for readability
   ungroup() |>
   mutate(subj_label = factor(row_number()))
 
-swimmer_plot <- ggplot(swimmer_data, aes(y = subj_label, x = duration_months, fill = TRT01P)) +
+swimmer_plot <- ggplot(swimmer_data, aes(
+  y = subj_label, x = duration_months, fill = TRT01P
+)) +
   geom_col(width = 0.85, alpha = 0.85) +
-  geom_point(data = swimmer_data |> filter(death_event),
-             aes(x = duration_months, y = subj_label), shape = 4, size = 2.5,
-             color = "#A6192E", stroke = 1.2) +
-  scale_fill_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"), labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) +
-  scale_x_continuous(breaks = seq(0, ceiling(max(swimmer_data$duration_months, na.rm=TRUE) / 3) * 3, by = 3)) +
+  geom_point(
+    data = swimmer_data |> filter(death_event),
+    aes(x = duration_months, y = subj_label), shape = 4, size = 2.5,
+    color = "#A6192E", stroke = 1.2
+  ) +
+  scale_fill_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"),
+    labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) +
+  scale_x_continuous(
+    breaks = seq(
+      0, ceiling(max(swimmer_data$duration_months, na.rm = TRUE) / 3) * 3,
+      by = 3
+    )
+  ) +
   facet_wrap(~TRT_LABEL, scales = "free_y", ncol = 2) +
   labs(
-    title = "F-14-1: Treatment Exposure Duration — Swimmer Plot (Representative Sample)",
-    subtitle = "Bar length = treatment duration. \u2717 = death event on study. Top 30 subjects per arm shown.",
+    title = paste0(
+      "F-14-1: Treatment Exposure Duration \n",
+      "— Swimmer Plot (Representative Sample)"
+    ),
+    subtitle = "Bar length = treatment duration. \n\u2717 = death event on study. Top 30 subjects per arm shown.",
     x = "Months on Treatment",
     y = "Subjects (ranked by duration)",
     fill = "Treatment Arm:",
@@ -818,21 +904,23 @@ swimmer_plot <- ggplot(swimmer_data, aes(y = subj_label, x = duration_months, fi
     legend.position = "bottom"
   )
 
-ggsave("09_tfl/output/figures/F-14-1_Swimmer_Plot.png", swimmer_plot, width = 9, height = 5.5, dpi = 300)
+ggsave("09_tfl/output/figures/F-14-1_Swimmer_Plot.png", swimmer_plot,
+       width = 9, height = 5.5, dpi = 300)
 
 # ==============================================================================
 # TABLE T-20-1: Adverse Event Summary Table (Safety Population)
 # ==============================================================================
 cat("  [TFL] Compiling AE Summary Tables...\n")
 
-# Join AE to ADSL to get treatment arm (TRTEMFL: T=treatment-emergent, P=pre-existing, N=not TEAE)
+# Join AE to ADSL to get treatment arm (TRTEMFL: T=treatment-emergent,
+# P=pre-existing, N=not TEAE)
 ae_safety <- adae |>
   select(-any_of("TRT01P")) |>
   filter(TRTEMFL == "Y") |>
   left_join(adsl |> select(USUBJID, TRT01P), by = "USUBJID")
 
 # Total subjects per arm derived dynamically from ADSL (Issue 3 / 2.5)
-n_mp   <- sum(adsl$TRT01P == "MP")
+n_mp <- sum(adsl$TRT01P == "MP")
 n_cbzp <- sum(adsl$TRT01P == "CbzP")
 
 # Precompute AE summary counts once (Issue 6 / 2.4)
@@ -845,14 +933,38 @@ ae_counts <- ae_safety |>
     .groups = "drop"
   )
 
-n_any_cbzp <- if ("CbzP" %in% ae_counts$TRT01P) ae_counts$any_teae[ae_counts$TRT01P == "CbzP"] else 0
-n_any_mp   <- if ("MP" %in% ae_counts$TRT01P) ae_counts$any_teae[ae_counts$TRT01P == "MP"] else 0
+n_any_cbzp <- if ("CbzP" %in% ae_counts$TRT01P) {
+  ae_counts$any_teae[ae_counts$TRT01P == "CbzP"]
+} else {
+  0
+}
+n_any_mp <- if ("MP" %in% ae_counts$TRT01P) {
+  ae_counts$any_teae[ae_counts$TRT01P == "MP"]
+} else {
+  0
+}
 
-n_g3_cbzp_tot <- if ("CbzP" %in% ae_counts$TRT01P) ae_counts$g3[ae_counts$TRT01P == "CbzP"] else 0
-n_g3_mp_tot   <- if ("MP" %in% ae_counts$TRT01P) ae_counts$g3[ae_counts$TRT01P == "MP"] else 0
+n_g3_cbzp_tot <- if ("CbzP" %in% ae_counts$TRT01P) {
+  ae_counts$g3[ae_counts$TRT01P == "CbzP"]
+} else {
+  0
+}
+n_g3_mp_tot <- if ("MP" %in% ae_counts$TRT01P) {
+  ae_counts$g3[ae_counts$TRT01P == "MP"]
+} else {
+  0
+}
 
-n_sae_cbzp <- if ("CbzP" %in% ae_counts$TRT01P) ae_counts$sae[ae_counts$TRT01P == "CbzP"] else 0
-n_sae_mp   <- if ("MP" %in% ae_counts$TRT01P) ae_counts$sae[ae_counts$TRT01P == "MP"] else 0
+n_sae_cbzp <- if ("CbzP" %in% ae_counts$TRT01P) {
+  ae_counts$sae[ae_counts$TRT01P == "CbzP"]
+} else {
+  0
+}
+n_sae_mp <- if ("MP" %in% ae_counts$TRT01P) {
+  ae_counts$sae[ae_counts$TRT01P == "MP"]
+} else {
+  0
+}
 
 # Overall AE incidence
 tot_ae <- ae_safety |>
@@ -897,7 +1009,8 @@ n_disc_cbzp <- adae |>
   distinct(USUBJID) |>
   nrow()
 
-ae_summary_txt <- sprintf("
+ae_summary_txt <- sprintf(
+  "
  TROPIC (Study EFC6193 / XRP6258) Adverse Event Summary Tables
  ==============================================================
 
@@ -916,29 +1029,39 @@ ae_summary_txt <- sprintf("
   n_cbzp, n_mp,
   n_any_cbzp, round(100 * n_any_cbzp / n_cbzp),
   n_any_mp, round(100 * n_any_mp / n_mp),
-
   n_g3_cbzp_tot, round(100 * n_g3_cbzp_tot / n_cbzp),
   n_g3_mp_tot, round(100 * n_g3_mp_tot / n_mp),
-
   n_sae_cbzp, round(100 * n_sae_cbzp / n_cbzp),
   n_sae_mp, round(100 * n_sae_mp / n_mp),
-
   n_disc_cbzp, round(100 * n_disc_cbzp / n_cbzp),
   n_disc_mp, round(100 * n_disc_mp / n_mp)
 )
 
 for (i in seq_len(nrow(top_soc))) {
   soc <- top_soc$AEBODSYS[i]
-  n_g3_mp <- if (soc %in% ae_g3$AEBODSYS) ae_g3$n_mp_g3[ae_g3$AEBODSYS == soc] else 0
-  n_g3_cbzp <- if (soc %in% ae_g3$AEBODSYS) ae_g3$n_cbzp_g3[ae_g3$AEBODSYS == soc] else 0
-  ae_summary_txt <- paste0(ae_summary_txt,
-    sprintf("  %-50s  %3d (%d%%)       %3d (%d%%)\n",
-            substr(soc, 1, 50),
-            n_g3_cbzp, round(100 * n_g3_cbzp / n_cbzp),
-            n_g3_mp, round(100 * n_g3_mp / n_mp)))
+  n_g3_mp <- if (soc %in% ae_g3$AEBODSYS) {
+    ae_g3$n_mp_g3[ae_g3$AEBODSYS == soc]
+  } else {
+    0
+  }
+  n_g3_cbzp <- if (soc %in% ae_g3$AEBODSYS) {
+    ae_g3$n_cbzp_g3[ae_g3$AEBODSYS == soc]
+  } else {
+    0
+  }
+  ae_summary_txt <- paste0(
+    ae_summary_txt,
+    sprintf(
+      "  %-50s  %3d (%d%%)       %3d (%d%%)\n",
+      substr(soc, 1, 50),
+      n_g3_cbzp, round(100 * n_g3_cbzp / n_cbzp),
+      n_g3_mp, round(100 * n_g3_mp / n_mp)
+    )
+  )
 }
 
-writeLines(paste0(synth_banner, ae_summary_txt), "09_tfl/output/tables/T-20-AE_Summary_Tables.txt")
+writeLines(paste0(synth_banner, ae_summary_txt),
+           "09_tfl/output/tables/T-20-AE_Summary_Tables.txt")
 
 # ==============================================================================
 # TABLE T-21-1: Lab Shift Table — ANC/PSA Baseline to Worst
@@ -999,16 +1122,17 @@ shift_output <- paste0(
   " =================================================================\n",
   " T-21-1: Baseline to Worst Post-Baseline CTCAE Grade Shift (MP Arm)\n\n",
   build_shift_table(adlb_mp, "NEUT", "ANC / Neutrophils", n_mp),
-  build_shift_table(adlb_mp, "HGB",  "Haemoglobin",       n_mp),
-  build_shift_table(adlb_mp, "PLAT", "Platelets",         n_mp),
+  build_shift_table(adlb_mp, "HGB", "Haemoglobin", n_mp),
+  build_shift_table(adlb_mp, "PLAT", "Platelets", n_mp),
   "\n -----------------------------------------------------------------\n",
   " T-21-2: Baseline to Worst Post-Baseline CTCAE Grade Shift (CbzP Arm)\n\n",
   build_shift_table(adlb_cbzp, "NEUT", "ANC / Neutrophils", n_cbzp),
-  build_shift_table(adlb_cbzp, "HGB",  "Haemoglobin",       n_cbzp),
-  build_shift_table(adlb_cbzp, "PLAT", "Platelets",         n_cbzp)
+  build_shift_table(adlb_cbzp, "HGB", "Haemoglobin", n_cbzp),
+  build_shift_table(adlb_cbzp, "PLAT", "Platelets", n_cbzp)
 )
 
-writeLines(paste0(synth_banner, shift_output), "09_tfl/output/tables/T-21-Lab_Shift_Tables.txt")
+writeLines(paste0(synth_banner, shift_output),
+           "09_tfl/output/tables/T-21-Lab_Shift_Tables.txt")
 
 # ==============================================================================
 # FIGURE F-01-1: CONSORT Patient Disposition Flow Diagram
@@ -1016,75 +1140,136 @@ writeLines(paste0(synth_banner, shift_output), "09_tfl/output/tables/T-21-Lab_Sh
 cat("  [TFL] Rendering CONSORT Patient Disposition Diagram...\n")
 
 # Derive disposition numbers from ADSL
-n_total     <- nrow(adsl)
-n_itt       <- nrow(adsl |> filter(ITTFL == "Y"))
-n_safety    <- n_itt
-n_deaths    <- nrow(adsl |> filter(DTHFL == "Y"))
+n_total <- nrow(adsl)
+n_itt <- nrow(adsl |> filter(ITTFL == "Y"))
+n_safety <- n_itt
+n_deaths <- nrow(adsl |> filter(DTHFL == "Y"))
 n_completed <- nrow(adsl |> filter(TRTDURD >= 60))
-n_disc      <- n_safety - n_completed
+n_disc <- n_safety - n_completed
 
 # Build diagram as a ggplot canvas with annotated boxes and arrows
 consort <- ggplot() +
   # ---- Box coordinates (x_center, y_center, width, height) ----
   # Screened
-  annotate("rect", xmin = 0.3, xmax = 0.7, ymin = 0.88, ymax = 0.98,
-           fill = "#dbeafe", color = "#1d4ed8", linewidth = 0.6) +
-  annotate("text", x = 0.5, y = 0.93,
-           label = sprintf("Patients enrolled\nN = %d", n_total),
-           size = 3.2, fontface = "bold", color = "#1e3a5f", family = "serif") +
+  annotate("rect",
+    xmin = 0.3, xmax = 0.7, ymin = 0.88, ymax = 0.98,
+    fill = "#dbeafe", color = "#1d4ed8", linewidth = 0.6
+  ) +
+  annotate("text",
+    x = 0.5, y = 0.93,
+    label = sprintf("Patients enrolled\nN = %d", n_total),
+    size = 3.2, fontface = "bold", color = "#1e3a5f", family = "serif"
+  ) +
   # Arrow down
-  annotate("segment", x = 0.5, xend = 0.5, y = 0.88, yend = 0.79,
-           arrow = arrow(length = unit(0.025, "npc")), color = "#333333", linewidth = 0.5) +
-  # ITT / Safety
-  annotate("rect", xmin = 0.3, xmax = 0.7, ymin = 0.68, ymax = 0.79,
-           fill = "#d1fae5", color = "#065f46", linewidth = 0.6) +
-  annotate("text", x = 0.5, y = 0.735,
-           label = sprintf("ITT & Safety Population\nN = %d (100%%)", n_itt),
-           size = 3.2, fontface = "bold", color = "#065f46", family = "serif") +
+  annotate("segment",
+    x = 0.5, xend = 0.5, y = 0.88, yend = 0.79,
+    arrow = arrow(length = unit(0.025, "npc")),
+    color = "#333333", linewidth = 0.5
+  ) +
+  annotate("rect",
+    xmin = 0.3, xmax = 0.7, ymin = 0.68, ymax = 0.79,
+    fill = "#d1fae5", color = "#065f46", linewidth = 0.6
+  ) +
+  annotate("text",
+    x = 0.5, y = 0.735,
+    label = sprintf("ITT & Safety Population\nN = %d (100%%)", n_itt),
+    size = 3.2, fontface = "bold", color = "#065f46", family = "serif"
+  ) +
   # Arrow down to branches
-  annotate("segment", x = 0.5, xend = 0.5, y = 0.68, yend = 0.63,
-           arrow = arrow(length = unit(0.025, "npc")), color = "#333333", linewidth = 0.5) +
+  annotate("segment",
+    x = 0.5, xend = 0.5, y = 0.68, yend = 0.63,
+    arrow = arrow(length = unit(0.025, "npc")),
+    color = "#333333", linewidth = 0.5
+  ) +
   # Branch left: Completed
-  annotate("segment", x = 0.5, xend = 0.25, y = 0.63, yend = 0.63, color = "#333333", linewidth = 0.5) +
-  annotate("segment", x = 0.25, xend = 0.25, y = 0.63, yend = 0.575,
-           arrow = arrow(length = unit(0.025, "npc")), color = "#333333", linewidth = 0.5) +
-  annotate("rect", xmin = 0.05, xmax = 0.45, ymin = 0.49, ymax = 0.575,
-           fill = "#f0fdf4", color = "#15803d", linewidth = 0.6) +
-  annotate("text", x = 0.25, y = 0.532,
-           label = sprintf("Completed >=60 days\nn = %d (%d%%)", n_completed,
-                           round(100 * n_completed / n_safety)),
-           size = 3, color = "#15803d", family = "serif") +
+  annotate("segment", x = 0.5, xend = 0.25, y = 0.63, yend = 0.63,
+           color = "#333333", linewidth = 0.5) +
+  annotate("segment",
+    x = 0.25, xend = 0.25, y = 0.63, yend = 0.575,
+    arrow = arrow(length = unit(0.025, "npc")),
+    color = "#333333", linewidth = 0.5
+  ) +
+  annotate("rect",
+    xmin = 0.05, xmax = 0.45, ymin = 0.49, ymax = 0.575,
+    fill = "#f0fdf4", color = "#15803d", linewidth = 0.6
+  ) +
+  annotate("text",
+    x = 0.25, y = 0.532,
+    label = sprintf(
+      "Completed >=60 days\nn = %d (%d%%)", n_completed,
+      round(100 * n_completed / n_safety)
+    ),
+    size = 3, color = "#15803d", family = "serif"
+  ) +
   # Branch right: Discontinued
-  annotate("segment", x = 0.5, xend = 0.75, y = 0.63, yend = 0.63, color = "#333333", linewidth = 0.5) +
-  annotate("segment", x = 0.75, xend = 0.75, y = 0.63, yend = 0.575,
-           arrow = arrow(length = unit(0.025, "npc")), color = "#333333", linewidth = 0.5) +
-  annotate("rect", xmin = 0.55, xmax = 0.95, ymin = 0.49, ymax = 0.575,
-           fill = "#fef2f2", color = "#b91c1c", linewidth = 0.6) +
-  annotate("text", x = 0.75, y = 0.532,
-           label = sprintf("Discontinued early\nn = %d (%d%%)", n_disc,
-                           round(100 * n_disc / n_safety)),
-           size = 3, color = "#b91c1c", family = "serif") +
+  annotate("segment", x = 0.5, xend = 0.75, y = 0.63, yend = 0.63,
+           color = "#333333", linewidth = 0.5) +
+  annotate("segment",
+    x = 0.75, xend = 0.75, y = 0.63, yend = 0.575,
+    arrow = arrow(length = unit(0.025, "npc")),
+    color = "#333333", linewidth = 0.5
+  ) +
+  annotate("rect",
+    xmin = 0.55, xmax = 0.95, ymin = 0.49, ymax = 0.575,
+    fill = "#fef2f2", color = "#b91c1c", linewidth = 0.6
+  ) +
+  annotate("text",
+    x = 0.75, y = 0.532,
+    label = sprintf(
+      "Discontinued early\nn = %d (%d%%)", n_disc,
+      round(100 * n_disc / n_safety)
+    ),
+    size = 3, color = "#b91c1c", family = "serif"
+  ) +
   # Arrow down: Deaths
-  annotate("segment", x = 0.5, xend = 0.5, y = 0.49, yend = 0.415,
-           arrow = arrow(length = unit(0.025, "npc")), color = "#333333", linewidth = 0.5) +
-  annotate("rect", xmin = 0.3, xmax = 0.7, ymin = 0.33, ymax = 0.415,
-           fill = "#fef9c3", color = "#854d0e", linewidth = 0.6) +
-  annotate("text", x = 0.5, y = 0.372,
-           label = sprintf("Deaths during study\nN = %d (%d%%)", n_deaths,
-                           round(100 * n_deaths / n_safety)),
-           size = 3.2, fontface = "bold", color = "#854d0e", family = "serif") +
+  annotate("segment",
+    x = 0.5, xend = 0.5, y = 0.49, yend = 0.415,
+    arrow = arrow(length = unit(0.025, "npc")),
+    color = "#333333", linewidth = 0.5
+  ) +
+  annotate("rect",
+    xmin = 0.3, xmax = 0.7, ymin = 0.33, ymax = 0.415,
+    fill = "#fef9c3", color = "#854d0e", linewidth = 0.6
+  ) +
+  annotate("text",
+    x = 0.5, y = 0.372,
+    label = sprintf(
+      "Deaths during study\nN = %d (%d%%)", n_deaths,
+      round(100 * n_deaths / n_safety)
+    ),
+    size = 3.2, fontface = "bold", color = "#854d0e", family = "serif"
+  ) +
   # Title
-  annotate("text", x = 0.5, y = 1.02,
-           label = "F-01-1: CONSORT Patient Disposition Flow Diagram — Safety Population",
-           size = 4, fontface = "bold", color = "#111111", family = "serif") +
-  annotate("text", x = 0.5, y = 0.24,
-           label = paste0("Source: ADSL (N=", n_total, "). All percentages are relative to Safety Population.\n",
-                          "SYNTHETIC illustrative Cabazitaxel (CbzP) arm integrated alongside the REAL Mitoxantrone (MP) arm; CbzP is not real data."),
-           size = 2.8, color = "#555555", family = "serif") +
+  annotate("text",
+    x = 0.5, y = 1.02,
+    label = paste0(
+      "F-01-1: CONSORT Patient Disposition Flow Diagram \n",
+      "— Safety Population"
+    ),
+    size = 4, fontface = "bold", color = "#111111", family = "serif"
+  ) +
+  annotate("text",
+    x = 0.5, y = 0.24,
+    label = paste0(
+      "Source: ADSL (N=", n_total, "). \n",
+      "All percentages are relative to Safety Population.\n",
+      paste0(
+        "SYNTHETIC illustrative Cabazitaxel (CbzP) arm integrated ",
+        "alongside the REAL Mitoxantrone (MP) arm; \n",
+        "CbzP is not real data."
+      )
+    ),
+    size = 2.8, color = "#555555", family = "serif"
+  ) +
   coord_cartesian(xlim = c(0, 1), ylim = c(0.20, 1.05)) +
   theme_void(base_family = "serif") +
   theme(plot.margin = margin(10, 20, 10, 20))
 
-ggsave("09_tfl/output/figures/F-01-1_CONSORT_Disposition.png", consort, width = 8, height = 7, dpi = 300)
+ggsave("09_tfl/output/figures/F-01-1_CONSORT_Disposition.png", consort,
+       width = 8, height = 7, dpi = 300)
 
-cat("NOTE: [TFL] TFL suites compiled successfully. Figures & tables saved to 09_tfl/output/figures/ & tables/\n")
+cat(
+  "NOTE: [TFL] TFL suites compiled successfully.\n",
+  "Figures & tables saved to 09_tfl/output/figures/ & tables/\n",
+  sep = ""
+)
