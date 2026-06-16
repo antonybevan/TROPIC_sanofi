@@ -653,13 +653,14 @@ orr_mp_pct <- orr_mp_resp / orr_mp_total * 100
 n_cbzp_itt <- sum(adsl$TRT01P == "CbzP")
 n_mp_itt <- sum(adsl$TRT01P == "MP")
 
+# nolint start: line_length_linter.
 efficacy_tables <- sprintf(
   "
 TROPIC (Study EFC6193 / XRP6258) Secondary Efficacy Tables
 ==========================================================
 
-T-11-6: Kaplan-Meier Analysis of Time to PSA Progression (TTPSA) - ITT Population # nolint
---------------------------------------------------------------------------------- # nolint
+T-11-6: Kaplan-Meier Analysis of Time to PSA Progression (TTPSA) - ITT Population
+---------------------------------------------------------------------------------
 Statistic                                 CbzP (N=%d)        MP (N=%d)
 Number of Events / Total N                %d/%d               %d/%d
 Median Survival Time (Months)             %.1f                %.1f
@@ -668,8 +669,8 @@ Unstratified Hazard Ratio (CbzP vs MP)     %.2f (95%% CI: %.2f-%.2f)
 Wald Log-Rank p-value                     %.4f
 
 
-T-11-7: Kaplan-Meier Analysis of Time to Tumor Progression (TTUMOR) - Measurable Subpopulation # nolint
------------------------------------------------------------------------------------------------- # nolint
+T-11-7: Kaplan-Meier Analysis of Time to Tumor Progression (TTUMOR) - Measurable Subpopulation
+------------------------------------------------------------------------------------------------
 Statistic                                 CbzP (N=%d)        MP (N=%d)
 Number of Events / Total N                %d/%d               %d/%d
 Median Survival Time (Months)             %.1f                %.1f
@@ -689,7 +690,7 @@ Objective Response Rate (ORR) - Measurable ITT Population†
   Responders / N (%%)                      %d/%d (%.1f%%)      %d/%d (%.1f%%)
   Fisher's Exact p-value                  %.4f
 
-†Restricted to patients with measurable disease at baseline (CbzP N=%d, MP N=%d). # nolint
+†Restricted to patients with measurable disease at baseline (CbzP N=%d, MP N=%d).
 ",
   n_cbzp_itt, n_mp_itt,
   as.integer(events_psa_cbzp), as.integer(total_psa_cbzp),
@@ -709,6 +710,7 @@ Objective Response Rate (ORR) - Measurable ITT Population†
   orr_pval,
   total_tumor_cbzp, total_tumor_mp
 )
+# nolint end
 
 # Objective Response Rate (ORR) with response-evaluable denominator (review-board SR-1). # nolint
 # The T-11-8 block above uses the SAP measurable-disease ITT denominator.
