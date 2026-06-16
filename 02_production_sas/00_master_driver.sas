@@ -4,7 +4,7 @@
    Version: 2.2.0
    Author: Antony Bevan, Clinical Programming
    Date: 2026-05-27
-   Standard: CDISC ADaMIG v1.3 / OCCDS v1.1
+   Standard: CDISC ADaMIG v1.3 / OCCDS v1.0
    Description: Master execution driver for TROPIC (Study EFC6193 / XRP6258) pipeline.
    ============================================================================== */
 

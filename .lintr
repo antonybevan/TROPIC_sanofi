@@ -1,15 +1,31 @@
 # TROPIC R lint standard. Committed so `lintr` results are reproducible: the
 # 2026-06-16 audit found prior "zero-warning" commits had no committed config,
-# so the claim could not be reproduced (lintr's unpinned default is 80 chars).
+# so lintr's unpinned default (80 chars) applied and the claim was unverifiable.
 linters: linters_with_defaults(
     line_length_linter = line_length_linter(120L),
     # ADaM/SDTM variables are uppercase by CDISC mandate (USUBJID, TRT01P, AVAL);
     # snake_case is not permissible, so object naming cannot be linted here.
     object_name_linter = NULL,
+    # The same bare uppercase CDISC columns are referenced inside dplyr NSE
+    # (filter/mutate/summarise), which object_usage_linter cannot resolve and
+    # reports only as false-positive "no visible binding" notes.
+    object_usage_linter = NULL,
     # Clinical scripts intentionally retain SAP/spec excerpts and worked
     # derivation formulas as inline comments for traceability.
-    commented_code_linter = NULL
+    commented_code_linter = NULL,
+    # The independent validation track uses magrittr `%>%` (pharmaverse
+    # convention); the reporting/reconciliation track uses the native `|>`.
+    # Operator choice is deliberate per track and is not enforced repo-wide.
+    pipe_consistency_linter = NULL,
+    pipe_continuation_linter = NULL,
+    # Explicit return() on derivation helpers is a deliberate clinical-programming
+    # house style: it makes the returned analysis value auditable at a glance.
+    return_linter = NULL
   )
 exclusions: list(
-    "renv"
+    "renv",
+    # Test scaffolding uses a deliberately compact style (inline braces / one-line
+    # helpers); it is not a clinical deliverable, so the deliverable style rules are
+    # not enforced here. The tests themselves still run in CI.
+    "tests"
   )

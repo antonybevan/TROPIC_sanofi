@@ -46,6 +46,11 @@ jobs:
         Rscript -e "install.packages('renv', repos='https://cloud.r-project.org')"
         Rscript -e "renv::restore()"
 
+    - name: Lint R sources (zero-warning gate)
+      run: |
+        Rscript -e 'if (!requireNamespace("lintr", quietly = TRUE)) install.packages("lintr", repos = "https://cloud.r-project.org")'
+        Rscript -e 'files <- list.files(c("03_validation_r", "05_reconciliation", "09_tfl"), pattern = "[.]R$", full.names = TRUE); n <- sum(vapply(files, function(f) length(lintr::lint(f)), integer(1))); if (n > 0) { for (f in files) print(lintr::lint(f)); stop(sprintf("lintr gate failed: %d issue(s)", n)) }; cat(sprintf("lintr gate passed: 0 issues across %d files\n", length(files)))'
+
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip

@@ -5,7 +5,10 @@
 # Description: Environmental manager for R validation packages, ensuring automated
 #              self-healing installation of CRAN/Pharmaverse packages.
 
-required_packages <- c("jsonlite", "dplyr", "haven", "lubridate", "ggplot2", "xportr", "logrx", "survival", "patchwork", "scales", "diffdf")
+required_packages <- c(
+  "jsonlite", "dplyr", "haven", "lubridate", "ggplot2", "xportr",
+  "logrx", "survival", "patchwork", "scales", "diffdf"
+)
 missing_packages <- required_packages[!(required_packages %in% rownames(installed.packages()))]
 
 if (length(missing_packages) > 0) {

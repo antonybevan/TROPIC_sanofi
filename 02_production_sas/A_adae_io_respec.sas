@@ -4,10 +4,10 @@
    Version: 2.2.0
    Author: Antony Bevan, Clinical Programming
    Date: 2026-05-27
-   Standard: ADaMIG v1.3 OCCDS v1.1
+   Standard: ADaMIG v1.3 OCCDS v1.0
    Input: sdtm.ae, adam.adsl
    Output: adam.adae
-   Description: Generates Adverse Events ADaM (ADAE) under OCCDS v1.1.
+   Description: Generates Adverse Events ADaM (ADAE) under OCCDS v1.0.
                 Implements custom sponsor-defined continuous episode merging (gap <= 3 days)
                 with corrected AEOCCFL occurrence denominator flags.
    ============================================================================= */
@@ -78,7 +78,7 @@ proc sort data=work.ae_base;
     by usubjid CQ02NAM astdt aendt aeseq;
 run;
 
-/* Episode Merging and OCCDS v1.1 Occurrence Flagging */
+/* Episode Merging and OCCDS v1.0 Occurrence Flagging */
 data work.ae_episodes;
     set work.ae_base;
     by usubjid CQ02NAM;
@@ -154,7 +154,7 @@ data work.ae_episodes;
     format CIAESDT CIAEEDT yymmdd10. CIAEDUR 8.2;
 run;
 
-/* Resolve standard OCCDS v1.1 denominator flag for non-grouped AEDECODs.
+/* Resolve standard OCCDS v1.0 denominator flag for non-grouped AEDECODs.
    AENDT + AESEQ appended as deterministic tie-breakers (audit F-1). */
 proc sort data=work.ae_episodes;
     by usubjid aedecod astdt aendt aeseq;

@@ -13,40 +13,43 @@ validation_failed <- FALSE
 
 for (dom in domains) {
   file_path <- file.path(staging_dir, paste0(dom, ".rds"))
-  
+
   if (!file.exists(file_path)) {
     cat(sprintf("  [ERROR] Staging file missing for domain %s: %s\n", toupper(dom), file_path))
     validation_failed <- TRUE
     next
   }
-  
+
   df <- readRDS(file_path)
   row_cnt <- nrow(df)
   col_cnt <- ncol(df)
-  
+
   cat(sprintf("  [CHECK] Domain %s: %d rows, %d columns.\n", toupper(dom), row_cnt, col_cnt))
-  
+
   if (row_cnt == 0) {
     cat(sprintf("  [ERROR] Domain %s contains 0 records.\n", toupper(dom)))
-    validation_failed = TRUE
+    validation_failed <- TRUE
   }
-  
+
   # 1. Validate key identifier presence
   if (!"USUBJID" %in% colnames(df)) {
     cat(sprintf("  [ERROR] Domain %s is missing mandatory key variable USUBJID.\n", toupper(dom)))
-    validation_failed = TRUE
+    validation_failed <- TRUE
   }
-  
+
   # 2. Validate STUDYID consistency
   if ("STUDYID" %in% colnames(df)) {
     studyids <- unique(df$STUDYID)
     if (!all(studyids == "EFC6193")) {
-      cat(sprintf("  [ERROR] Domain %s has inconsistent STUDYID: %s (expected EFC6193)\n", toupper(dom), paste(studyids, collapse = ", ")))
-      validation_failed = TRUE
+      cat(sprintf(
+        "  [ERROR] Domain %s has inconsistent STUDYID: %s (expected EFC6193)\n",
+        toupper(dom), paste(studyids, collapse = ", ")
+      ))
+      validation_failed <- TRUE
     }
   } else {
     cat(sprintf("  [ERROR] Domain %s is missing STUDYID.\n", toupper(dom)))
-    validation_failed = TRUE
+    validation_failed <- TRUE
   }
 
   # 3. Validate mandatory domain-level variables (VAL-02)
@@ -61,12 +64,12 @@ for (dom in domains) {
     ls = c("LSTESTCD", "LSSEQ"),
     pn = c("PNTESTCD", "PNSEQ")
   )
-  
+
   if (dom %in% names(mandatory_vars)) {
     for (var in mandatory_vars[[dom]]) {
       if (!var %in% colnames(df)) {
         cat(sprintf("  [ERROR] Domain %s is missing mandatory variable %s.\n", toupper(dom), var))
-        validation_failed = TRUE
+        validation_failed <- TRUE
       }
     }
   }
@@ -80,7 +83,7 @@ for (dom in domains) {
       ungroup()
     if (nrow(dups) > 0) {
       cat(sprintf("  [ERROR] Domain %s has duplicate keys on USUBJID + %s!\n", toupper(dom), seq_var))
-      validation_failed = TRUE
+      validation_failed <- TRUE
     }
   }
 
@@ -93,13 +96,16 @@ for (dom in domains) {
       # DTC variables must be character class in CDISC SDTM
       if (!is.character(vals)) {
         cat(sprintf("  [ERROR] Domain %s variable %s is not character class.\n", toupper(dom), fld))
-        validation_failed = TRUE
+        validation_failed <- TRUE
       }
       # Warn on partial/dirty dates (which are common in raw clinical data) instead of failing
       valid_date <- grepl("^\\d{4}(-\\d{2})?(-\\d{2})?([T\\s]\\d{2}:\\d{2}(:\\d{2})?)?$", vals)
       if (!all(valid_date)) {
         bad_vals <- unique(vals[!valid_date])
-        cat(sprintf("  [WARNING] Domain %s variable %s has partial/dirty date values: %s\n", toupper(dom), fld, paste(head(bad_vals), collapse = ", ")))
+        cat(sprintf(
+          "  [WARNING] Domain %s variable %s has partial/dirty date values: %s\n",
+          toupper(dom), fld, paste(head(bad_vals), collapse = ", ")
+        ))
       }
     }
   }

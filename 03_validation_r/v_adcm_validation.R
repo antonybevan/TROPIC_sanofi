@@ -1,5 +1,5 @@
 # Program: v_adcm_validation.R | Version: 2.0 | Author: Antony Bevan, Clinical Programming | Date: 2026-05-23
-# Standard: ADaMIG v1.3 OCCDS v1.1 | renv.lock hash: locked
+# Standard: ADaMIG v1.3 OCCDS v1.0 | renv.lock hash: locked
 # Description: R Independent Validation double-programming for TROPIC ADCM.
 
 library(dplyr)
@@ -47,16 +47,20 @@ adcm <- df_cm %>%
   left_join(df_nact, by = "USUBJID") %>%
   mutate(
     GCSFFL = if_else(CMDECOD %in% c("FILGRASTIM", "PEGFILGRASTIM", "LENOGRASTIM"), "Y", "N"),
-    
+
     # Prophylaxis: administered within 3 days of treatment start or specified as prophylaxis
-    GCSFPRFL = if_else(GCSFFL == "Y" & (CMINDC == "PROPHYLAXIS" | (!is.na(cmstdy) & cmstdy >= -3 & cmstdy <= 3)), "Y", "N"),
-    
+    GCSFPRFL = if_else(
+      GCSFFL == "Y" &
+        (CMINDC == "PROPHYLAXIS" | (!is.na(cmstdy) & cmstdy >= -3 & cmstdy <= 3)),
+      "Y", "N"
+    ),
+
     NACTFL = if_else(CMCAT == "POST TREATMENT ANTI-CANCER DRUG THERAPY", "Y", "N"),
     PREDNFL = if_else(CMDECOD %in% c("PREDNISONE", "PREDNISOLONE"), "Y", "N"),
     TRTEMFL = if_else(!is.na(cmstdt) & cmstdt >= TRTSDT, "Y", "N")
   ) %>%
   select(
-    STUDYID, USUBJID, CMDECOD, CMCAT, CMINDC, CMSTDT = cmstdt, CMENDT = cmendt, 
+    STUDYID, USUBJID, CMDECOD, CMCAT, CMINDC, CMSTDT = cmstdt, CMENDT = cmendt,
     CMTRT, CMSTDY = cmstdy, GCSFFL, GCSFPRFL, NACTFL, NACTDT = nactdt, PREDNFL, TRTEMFL
   )
 

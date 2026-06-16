@@ -29,24 +29,24 @@ cat("NOTE: [RECONCILIATION] Starting Cross-Language Audit...\n")
 compare_datasets <- function(ds_name) {
   prod_path <- paste0("04_adam/", ds_name, "_prod.xpt")
   val_path <- paste0("04_adam/", ds_name, "_v.xpt")
-  
+
   if (!file.exists(prod_path) || !file.exists(val_path)) {
     return(list(status = "FAIL", reason = "Missing production or validation XPT file"))
   }
-  
+
   prod <- read_xpt(prod_path)
   val <- read_xpt(val_path)
-  
+
   # Standardize column casing
   colnames(prod) <- toupper(colnames(prod))
   colnames(val) <- toupper(colnames(val))
-  
+
   # Column symmetry check (QC-02)
   prod_cols <- colnames(prod)
   val_cols <- colnames(val)
   extra_in_prod <- setdiff(prod_cols, val_cols)
   extra_in_val <- setdiff(val_cols, prod_cols)
-  
+
   if (length(extra_in_prod) > 0 || length(extra_in_val) > 0) {
     reason_parts <- c()
     if (length(extra_in_prod) > 0) {
@@ -57,7 +57,7 @@ compare_datasets <- function(ds_name) {
     }
     return(list(status = "FAIL", reason = paste("Column mismatch -", paste(reason_parts, collapse = "; "))))
   }
-  
+
   # Align business keys based on dataset name (QC-01)
   if (ds_name == "adsl") {
     sort_keys <- "USUBJID"
@@ -74,19 +74,19 @@ compare_datasets <- function(ds_name) {
   } else if (ds_name == "adtte") {
     sort_keys <- c("USUBJID", "PARAMCD")
   }
-  
+
   # Align column classes & types first to ensure clean sorting
   common_cols <- intersect(colnames(prod), colnames(val))
   for (col in common_cols) {
     p_col <- prod[[col]]
     v_col <- val[[col]]
-    
+
     # Handle factor/character mismatch
     if (is.character(p_col) || is.factor(p_col)) {
       prod[[col]] <- as.character(p_col)
       val[[col]]  <- as.character(v_col)
     }
-    
+
     # Coerce missing representations (empty strings and "NA" to NA)
     if (is.character(prod[[col]])) {
       prod[[col]] <- trimws(prod[[col]])
@@ -95,7 +95,7 @@ compare_datasets <- function(ds_name) {
       val[[col]][is.na(val[[col]]) | val[[col]] == "" | val[[col]] == "NA"]   <- NA_character_
     }
   }
-  
+
   # Keyed multiset alignment (audit F-6): sort by business keys FIRST, then by
   # remaining columns only to disambiguate records that share a (non-unique)
   # business key. This makes the within-group pairing deterministic so diffdf can
@@ -107,22 +107,22 @@ compare_datasets <- function(ds_name) {
 
   # Add SEQ number within each business key group to guarantee uniqueness
   prod <- prod %>%
-    group_by(across(all_of(sort_keys))) %>% 
-    mutate(SEQ = row_number()) %>% 
+    group_by(across(all_of(sort_keys))) %>%
+    mutate(SEQ = row_number()) %>%
     ungroup()
-    
-  val <- val %>% 
-    group_by(across(all_of(sort_keys))) %>% 
-    mutate(SEQ = row_number()) %>% 
+
+  val <- val %>%
+    group_by(across(all_of(sort_keys))) %>%
+    mutate(SEQ = row_number()) %>%
     ungroup()
-    
+
   keys <- c(sort_keys, "SEQ")
-  
+
   # Compare using diffdf package
   diff_res <- diffdf(prod, val, keys = keys, suppress_warnings = TRUE)
-  
+
   actual_issues <- setdiff(names(diff_res), c("DataSummary", "AttribDiffs"))
-  
+
   if (length(actual_issues) == 0) {
     return(list(status = "PASS", reason = "Zero cell-level differences"))
   } else {
@@ -166,7 +166,9 @@ if (is_simulated) {
   )
 }
 
-# Generate visual HTML report
+# Generate visual HTML report. Static HTML/CSS template lines exceed the line
+# length limit by nature; scoped nolint keeps the markup readable in one piece.
+# nolint start: line_length_linter.
 html_content <- paste0(
   "<html><head><title>TROPIC Cross-Language Reconciliation Report</title>",
   "<style>body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f8f9fa; color: #333; margin: 40px; }",
@@ -191,6 +193,7 @@ for (ds in datasets) {
 }
 
 html_content <- paste0(html_content, "</tbody></table></div></body></html>")
+# nolint end
 
 dir.create("06_telemetry", showWarnings = FALSE)
 writeLines(html_content, "06_telemetry/reconciliation_report.html")

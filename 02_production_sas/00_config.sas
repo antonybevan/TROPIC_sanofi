@@ -4,7 +4,7 @@
    Version: 3.5.0
    Author: Antony Bevan, Clinical Programming
    Date: 2026-06-12
-   Standard: CDISC ADaMIG v1.3 / OCCDS v1.1
+   Standard: CDISC ADaMIG v1.3 / OCCDS v1.0
    Description: Environment configuration, library allocations, and helper macros.
    ============================================================================== */
 

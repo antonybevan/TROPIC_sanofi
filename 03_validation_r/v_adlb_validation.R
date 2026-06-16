@@ -53,7 +53,7 @@ df_windows <- df_lb %>%
     PARCAT1 = if_else(LBTESTCD == "PSA", "TUMOR MARKER", "HEMATOLOGY"),
     AVAL = avals,
     AVALC = LBORRES,
-    
+
     AVISITN = case_when(
       is.na(lbdy) | lbdy <= W_BL_HI ~ 0.0,
       lbdy >= W_C1D1_LO  & lbdy <= W_C1D1_HI  ~ 1.0,
@@ -64,7 +64,7 @@ df_windows <- df_lb %>%
       lbdy >= W_C3D1_LO  & lbdy <= W_C3D1_HI  ~ 6.0,
       TRUE ~ 99.0
     ),
-    
+
     AVISIT = case_when(
       AVISITN == 0.0 ~ "Baseline",
       AVISITN == 1.0 ~ "Cycle 1 Day 1 Pre-dose",
@@ -75,7 +75,7 @@ df_windows <- df_lb %>%
       AVISITN == 6.0 ~ "Cycle 3 Day 1 Pre-dose",
       TRUE ~ "Unscheduled"
     ),
-    
+
     AWDIST = case_when(
       AVISITN == 0.0 ~ abs(lbdy - (-1)),
       AVISITN == 1.0 ~ abs(lbdy - 1),
@@ -86,7 +86,7 @@ df_windows <- df_lb %>%
       AVISITN == 6.0 ~ abs(lbdy - 43),
       TRUE ~ as.numeric(NA)
     ),
-    
+
     ATOXGR = as.numeric(LBTOXGR)
   )
 
@@ -197,7 +197,11 @@ if (nrow(adlb_final %>% filter(PARAMCD == "ANCNADIR")) == 0) {
 
 # XPT v5 compliance (clean log): uppercase variable names + SAS date formats (lbdy -> LBDY)
 names(adlb_final) <- toupper(names(adlb_final))
-for (.dv in names(adlb_final)) if (inherits(adlb_final[[.dv]], "Date")) attr(adlb_final[[.dv]], "format.sas") <- "DATE9."
+for (.dv in names(adlb_final)) {
+  if (inherits(adlb_final[[.dv]], "Date")) {
+    attr(adlb_final[[.dv]], "format.sas") <- "DATE9."
+  }
+}
 write_xpt_v(adlb_final, "04_adam/adlb_v.xpt", domain = "ADLB")
 
 cat("NOTE: [VALIDATION] Wrote validation ADLB: 04_adam/adlb_v.xpt\n")

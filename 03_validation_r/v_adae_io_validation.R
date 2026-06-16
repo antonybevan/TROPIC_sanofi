@@ -1,6 +1,6 @@
 # Program: v_adae_io_validation.R | Version: 3.5.0
 # Author: Antony Bevan, Clinical Programming | Date: 2026-06-12
-# Standard: ADaMIG v1.3 OCCDS v1.1 | renv.lock hash: locked
+# Standard: ADaMIG v1.3 OCCDS v1.0 | renv.lock hash: locked
 # Description: R Independent Validation double-programming for TROPIC ADAE.
 
 library(dplyr)

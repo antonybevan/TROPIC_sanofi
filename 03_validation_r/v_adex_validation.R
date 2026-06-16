@@ -97,7 +97,7 @@ summary_bds <- bind_rows(
   summary_records %>% transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRT01PN, TRTSDT,
     PARAMCD = "RDIDL", PARAM = "Relative Dose Intensity Category", PARCAT1 = "SUMMARY",
-    AVAL = rdi, 
+    AVAL = rdi,
     AVALC = if_else(rdi >= 85, ">=85%", if_else(rdi >= 65, "65-<85%", "<65%")),
     AVISIT = "ALL CYCLES"
   )
@@ -117,8 +117,8 @@ cycle_adj <- ex_clean %>%
   transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRT01PN, TRTSDT,
     PARAMCD = "ADJ", PARAM = "Dose Adjusted Flag", PARCAT1 = "INDIVIDUAL",
-    AVAL = if_else(!is.na(EXDSRCM) & EXDSRCM != "", 1.0, 0.0), 
-    AVALC = if_else(!is.na(EXDSRCM) & EXDSRCM != "", "Y", "N"), 
+    AVAL = if_else(!is.na(EXDSRCM) & EXDSRCM != "", 1.0, 0.0),
+    AVALC = if_else(!is.na(EXDSRCM) & EXDSRCM != "", "Y", "N"),
     AVISIT = paste("CYCLE", EXSEQ)
   )
 
@@ -127,8 +127,8 @@ cycle_adj_ae <- ex_clean %>%
   transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRT01PN, TRTSDT,
     PARAMCD = "ADJAE", PARAM = "Dose Adjusted due to AE Flag", PARCAT1 = "INDIVIDUAL",
-    AVAL = if_else(!is.na(EXDSRCM) & EXDSRCM == "ADVERSE EVENT", 1.0, 0.0), 
-    AVALC = if_else(!is.na(EXDSRCM) & EXDSRCM == "ADVERSE EVENT", "Y", "N"), 
+    AVAL = if_else(!is.na(EXDSRCM) & EXDSRCM == "ADVERSE EVENT", 1.0, 0.0),
+    AVALC = if_else(!is.na(EXDSRCM) & EXDSRCM == "ADVERSE EVENT", "Y", "N"),
     AVISIT = paste("CYCLE", EXSEQ)
   )
 

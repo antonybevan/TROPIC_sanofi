@@ -12,22 +12,22 @@ dir.create("01_raw_source/real_sdtm/staging", showWarnings = FALSE, recursive = 
 transpose_supp <- function(domain_name) {
   main_path <- paste0("01_raw_source/real_sdtm/", domain_name, ".sas7bdat")
   supp_path <- paste0("01_raw_source/real_sdtm/supp", domain_name, ".sas7bdat")
-  
+
   if (!file.exists(main_path)) {
     cat(sprintf("  [WARNING] Main domain file %s does not exist. Skipping.\n", main_path))
     return(NULL)
   }
-  
+
   main_df <- read_sas(main_path)
-  
+
   # Standardize all column names to uppercase
   colnames(main_df) <- toupper(colnames(main_df))
-  
+
   if (file.exists(supp_path)) {
     supp_df <- read_sas(supp_path)
     if (nrow(supp_df) > 0) {
       colnames(supp_df) <- toupper(colnames(supp_df))
-      
+
       # Pivot supplemental variables from long to wide format
       supp_wide <- supp_df %>%
         select(USUBJID, IDVAR, IDVARVAL, QNAM, QVAL) %>%
@@ -38,7 +38,7 @@ transpose_supp <- function(domain_name) {
           values_from = QVAL,
           values_fn = first
         )
-      
+
       # Merge based on standard domain mapping
       if (toupper(domain_name) == "DM") {
         main_df <- main_df %>% left_join(supp_wide %>% select(-IDVAR, -IDVARVAL), by = "USUBJID")
@@ -50,10 +50,10 @@ transpose_supp <- function(domain_name) {
           supp_wide <- supp_wide %>%
             mutate(ID_JOIN = as.numeric(IDVARVAL)) %>%
             select(-IDVAR, -IDVARVAL)
-          
+
           join_args <- c("USUBJID" = "USUBJID")
           join_args[idvar_col] <- "ID_JOIN"
-          
+
           main_df <- main_df %>% left_join(supp_wide, by = join_args)
         } else {
           main_df <- main_df %>% left_join(supp_wide %>% select(-IDVAR, -IDVARVAL), by = "USUBJID")
@@ -61,13 +61,13 @@ transpose_supp <- function(domain_name) {
       }
     }
   }
-  
+
   # Ensure all column names of output are uppercase
   colnames(main_df) <- toupper(colnames(main_df))
-  
+
   save_path <- paste0("01_raw_source/real_sdtm/staging/", tolower(domain_name), ".rds")
   saveRDS(main_df, save_path)
-  cat(sprintf("  [SUCCESS] Ingested and staging-saved: %s -> %s (Rows: %d, Cols: %d)\n", 
+  cat(sprintf("  [SUCCESS] Ingested and staging-saved: %s -> %s (Rows: %d, Cols: %d)\n",
               toupper(domain_name), save_path, nrow(main_df), ncol(main_df)))
   return(main_df)
 }
