@@ -98,11 +98,14 @@ compare_datasets <- function(ds_name) {
     }
   }
 
-  # Keyed multiset alignment (audit F-6): sort by business keys FIRST, then by
-  # remaining columns only to disambiguate records that share a (non-unique)
-  # business key. This makes the within-group pairing deterministic so diffdf can
-  # compare cell values; it is a record-content/multiset test, not a claim that an
-  # independent unique-key row index was reproduced (see methodology note above).
+  # Keyed multiset alignment (audit F-6/F-8): sort by business keys FIRST, then by ALL
+  # remaining columns to disambiguate records that share a (non-unique) business key.
+  # Because the sort spans every common column, two records that differ in ANY cell sort
+  # to distinct positions -> cell-level equivalence between the tracks IS guaranteed by a
+  # PASS. What a PASS does NOT assert is reproduction of an independent unique-key row
+  # index; rows that are identical in all columns are interchangeable by definition. This
+  # is a sound record-content/multiset test for keyless analysis datasets, not positional
+  # row parity (see methodology note in ADRG §6).
   other_cols <- setdiff(common_cols, sort_keys)
   prod <- prod %>% arrange(across(all_of(c(sort_keys, other_cols))))
   val  <- val  %>% arrange(across(all_of(c(sort_keys, other_cols))))

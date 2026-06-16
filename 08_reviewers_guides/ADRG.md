@@ -80,16 +80,23 @@ Several baseline laboratory variables are carried on ADSL to satisfy the ADaM sc
 > [!IMPORTANT]
 > **Correction (audit F-9):** These imputed/constant covariates are **not used as covariates or stratification factors in any efficacy model.** The primary and secondary Cox / log-rank analyses stratify **only on `ECOGBL` and `MEASDISF`** (see `09_tfl/tfl_generation.R`, `compute_tte_stats()` → `strata(ECOGBL, MEASDISF)`). Albumin (`ALBBL`) and LDH (`LDHBL`) were never collected in the public MP SDTM release; a single constant column conveys no subject-level information and a degenerate (constant) covariate would in any case contribute nothing to a model. They are retained purely as schema placeholders and should be read as "not available," not as analysis inputs.
 
+**Imputation method and flags (audit F-5).** The method is a single **published population-median constant** per variable (values in `study_config.yaml`); it is *not* model-based or multiple imputation, and is applied only where the per-subject value is absent. Every imputed/placeholder baseline carries a companion **imputation flag** — `ECOGBLIF`, `PSABLIF`, `ALPBLIF`, `HGBBLIF`, `ALBBLIF`, `LDHBLIF` (= `'Y'` when imputed) — computed identically in SAS (`case when missing(...)`) and R (`is.na(...)` pre-coalesce), so a reviewer can isolate every imputed cell. `ALBBL`/`LDHBL` (a single constant for all subjects) are flagged imputed on all rows and carry `def:Origin = Assigned` in `define.xml`.
+
 ### 5.2 Analysis Window Gaps (ADLB)
 The ADLB windowing schema leaves Days 35–38 unassigned (between the C2D8 window [Days 25–34] and C3D1 window [Days 39–45]). Laboratory assessments on Days 35–38 are assigned `AVISITN = 99` (Unscheduled) and are excluded from the primary `ANL01FL = 'Y'` worst-case analysis. This is consistent with the protocol visit schedule and **SAP v3.0 §11.1.3 (ADLB Analysis Windows — CBC Schedule)**, which does not specify a Day 35–38 nominal visit.
 
 ### 5.3 Demographic Covariates
 All subjects are assigned `SEX = 'M'` in `A_adsl_generation.sas`. This demographic assignment matches the actual study cohort (metastatic castration-resistant prostate cancer, which is exclusively male). Geographic indicators `COUNTRY` and `REGION` are assigned to `'IND'` and `'REST OF WORLD'` as default placeholder categories since site geographic source metadata was unavailable.
 
+### 5.4 Analysis Populations — Source-Inherited and Non-Discriminating (audit F-3)
+
+> [!IMPORTANT]
+> The population flags `ITTFL`, `SAFFL`, and `PPROTFL` are **carried through from the source SDTM DM** (`dm.itt/safety/pprot`; `A_adsl_generation.sas` → `coalesce(...,'N')`, mirrored in `v_adsl_validation.R`). They are **not** independently re-derived from inclusion/exclusion or protocol-deviation logic. Because the public de-identified PDS release is **already restricted to the randomized analysis cohort**, all 371 subjects carry `ITTFL = SAFFL = PPROTFL = 'Y'` — the three populations **coincide and are non-discriminating** in this dataset. In particular, **no per-protocol *exclusion* is exercised**, because the release contains **no SDTM `DV` (protocol-deviations) domain** from which to derive one. These flags should be read as *"present in the analysis cohort,"* and any population-based subsetting — including the BIMO `N_ITT`/`N_SAF`/`N_PPROT` counts — is a structurally-correct placeholder rather than a demonstrated filter. A production build with operational data would populate the `DV` domain and derive a discriminating per-protocol flag.
+
 ---
 
 ## 6. Quality Control & SAS/R Parity (VAL-01)
-Each ADaM dataset is produced by two independent implementations (double programming):
+Each ADaM dataset is produced by two independent **cross-language implementations** — single-author, so this is *implementation* reconciliation, **not** two-programmer GxP double programming (see the disclosure note below):
 1. **Production Track (SAS 9.4):** Implemented in modular SAS programs (`02_production_sas/`) utilizing standard SAS DATA steps, PROC SQL, and MACRO facilities.
 2. **Validation Track (R 4.6.0):** Independently re-implemented in R (`03_validation_r/`) utilizing the tidyverse (`dplyr`, `tidyr`, `lubridate`) and CDISC Pharmaverse standard libraries (`xportr`).
 

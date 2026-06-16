@@ -31,7 +31,8 @@ PSA_PROG_MULT_NORESP: 1.25
 PSA_PROG_ABS: 5.0
 PSA_PROG_CONFIRM: 7
 
-# OCCDS v1.1 continuous episode merging (SAP §5.2, Custom Query 02)
+# OCCDS v1.0 + custom 3-day continuous episode-merging convention (SAP §5.2, Custom
+# Query 02). NB: there is no CDISC "OCCDS v1.1"; the merging rule is a TROPIC extension.
 EPISODE_GAP_DAYS: 3
 
 # Project Optimus ANC kinetics (SAP §5.5)

@@ -487,7 +487,22 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
         {"id": 14, "name": "Numerical Results Reconciliation (SAS vs R)", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('05_reconciliation/results_reconcile.R')"]},
         {"id": 15, "name": "eCTD Final Package", "cmd": [sys.executable, "06_telemetry/package_ectd.py"]}
     ]
-    
+
+    # F-6 guard: the post-execution gates in run_single_stage() key on these exact stage
+    # names. Assert they exist so a future rename fails loudly HERE instead of silently
+    # detaching a gate from the step it guards (the C-3 regression class).
+    gated_stage_names = {
+        "Cross-Language Audit Reconcile",
+        "Efficacy & Safety TFL Suite Compilation",
+        "Numerical Results Reconciliation (SAS vs R)",
+    }
+    missing_gates = gated_stage_names - {s["name"] for s in stages}
+    if missing_gates:
+        raise RuntimeError(
+            "Gate wiring error: gated stage name(s) absent from the pipeline "
+            f"(a rename detached a QC gate): {sorted(missing_gates)}"
+        )
+
     results = {}
 
     if serial:
