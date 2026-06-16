@@ -73,6 +73,8 @@ compare_datasets <- function(ds_name) {
     sort_keys <- c("USUBJID", "PARAMCD", "AVISIT")
   } else if (ds_name == "adtte") {
     sort_keys <- c("USUBJID", "PARAMCD")
+  } else if (ds_name == "clinsite") {
+    sort_keys <- c("STUDYID", "SITEID")
   }
 
   # Align column classes & types first to ensure clean sorting
@@ -142,7 +144,7 @@ compare_datasets <- function(ds_name) {
   }
 }
 
-datasets <- c("adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte")
+datasets <- c("adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte", "clinsite")
 results <- list()
 
 for (ds in datasets) {

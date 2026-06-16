@@ -111,7 +111,7 @@ _ODA_OUTCOME = {}
 # connecting account's home (~/TROPIC, resolved against the live session's $HOME) and can be
 # overridden with TROPIC_ODA_PROJ_ROOT for a non-default ODA layout.
 PROJ_ROOT_ODA = os.environ.get("TROPIC_ODA_PROJ_ROOT", "~/TROPIC")
-ODA_DATASETS = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte"]
+ODA_DATASETS = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte", "clinsite"]
 
 
 def _resolve_oda_root(sas, template):
@@ -308,7 +308,7 @@ def run_stage_parallel_worker(stage):
 
 def run_stage_execution(stage, sas_mode):
     if stage["cmd"] == "SIMULATE":
-        datasets = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte"]
+        datasets = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte", "clinsite"]
 
         if sas_mode == "oda":
             print("  [ODA] Stage 10 via resilient broker (probe-verified, manifest-checked)...")
@@ -378,7 +378,12 @@ def run_single_stage(stage, from_stage, sas_mode, results):
 
     rc, stdout, stderr = run_stage_execution(stage, sas_mode)
 
-    if stage["id"] == 11 and rc == 0:
+    # Post-execution gates are keyed by stage NAME, not by a positional id, so
+    # inserting/renumbering a stage can never silently detach a gate from the step it
+    # guards (audit C-3: the M-4 sanity gate had drifted off the TFL stage onto packaging).
+    stage_status_override = None
+
+    if stage["name"] == "Cross-Language Audit Reconcile" and rc == 0:
         status_path = "06_telemetry/reconciliation_status.json"
         try:
             with open(status_path) as sf:
@@ -391,16 +396,36 @@ def run_single_stage(stage, from_stage, sas_mode, results):
             rc = 1
             stderr = "Reconciliation status file missing; cannot confirm zero differences."
 
-    if stage["id"] == 12 and rc == 0:
+    # M-4 sanity gate fires immediately after the TFL deliverables are rendered, so a
+    # corrupted table is caught BEFORE results-reconciliation or eCTD packaging consume it.
+    if stage["name"] == "Efficacy & Safety TFL Suite Compilation" and rc == 0:
         ok, problems = output_sanity_check()
         if not ok:
             rc = 1
             stderr = ("Deliverable sanity gate failed (code artifacts in published output): "
                       + " | ".join(problems[:5]))
 
+    # C-2: results-level reconciliation legitimately has nothing to do when no real SAS
+    # analysis statistics exist (a sim/cached run with no PROC LIFETEST CSV). In that case
+    # results_reconcile.R writes overall='not_available' and exits 0 - which must surface
+    # as SKIPPED, never a false PASS. A genuine FAIL still fails the stage.
+    if stage["name"] == "Numerical Results Reconciliation (SAS vs R)" and rc == 0:
+        try:
+            with open("06_telemetry/results_reconciliation_status.json") as sf:
+                overall = json.load(sf).get("overall")
+            if overall == "not_available":
+                stage_status_override = "SKIPPED"
+            elif overall not in ("PASS", None):
+                rc = 1
+                stderr = f"Results reconciliation did not pass (overall='{overall}')."
+        except (FileNotFoundError, json.JSONDecodeError):
+            stage_status_override = "SKIPPED"
+
     if rc == 0:
-        print(f"  [SUCCESS] Stage {stage['id']} completed.")
-        results[stage["name"]] = "PASS"
+        status = stage_status_override or "PASS"
+        label = "SUCCESS" if status == "PASS" else status
+        print(f"  [{label}] Stage {stage['id']} completed ({status}).")
+        results[stage["name"]] = status
         return True
     else:
         print(f"  [FAILED] Stage {stage['id']} failed. Reason: {stderr.strip()}")
@@ -421,6 +446,15 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
     # reconciliation; it is (re)produced only by a real ODA Stage-10 execution.
     if from_stage <= 10 and os.path.exists("04_adam/tte_stats_prod.csv"):
         os.remove("04_adam/tte_stats_prod.csv")
+
+    # Run SAS static-analysis pre-flight gate (advisory; blocks only on hardcoded paths).
+    print("  [LINT] Running SAS static analysis...")
+    rc_lint, stdout_lint, stderr_lint = run_command([sys.executable, "06_telemetry/lint_sas.py"])
+    if rc_lint != 0:
+        print(f"  [LINT FAILED] Blocking SAS static-analysis error(s):\n{stdout_lint}\n{stderr_lint}")
+        sys.exit(1)
+    else:
+        print("  [LINT] SAS static analysis passed (no blocking errors).")
 
     # Run the configuration generator
     print("  [CONFIG] Generating configuration from study_config.yaml...")
@@ -446,10 +480,12 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
         {"id": 7, "name": "R ADLB Validation", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('03_validation_r/v_adlb_validation.R')"]},
         {"id": 8, "name": "R ADRS Validation", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('03_validation_r/v_adrs_validation.R')"]},
         {"id": 9, "name": "R ADTTE Validation", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('03_validation_r/v_adtte_validation.R')"]},
-        {"id": 10, "name": "SAS Production (ODA/Real/Simulated)", "cmd": "SIMULATE"},
-        {"id": 11, "name": "Cross-Language Audit Reconcile", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('05_reconciliation/cross_lang_audit.R')"]},
-        {"id": 12, "name": "Efficacy & Safety TFL Suite Compilation", "cmd": [RSCRIPT_PATH, "09_tfl/tfl_generation.R"]},
-        {"id": 13, "name": "Numerical Results Reconciliation (SAS vs R)", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('05_reconciliation/results_reconcile.R')"]}
+        {"id": 10, "name": "R BIMO Validation", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('03_validation_r/v_bimo_validation.R')"]},
+        {"id": 11, "name": "SAS Production (ODA/Real/Simulated)", "cmd": "SIMULATE"},
+        {"id": 12, "name": "Cross-Language Audit Reconcile", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('05_reconciliation/cross_lang_audit.R')"]},
+        {"id": 13, "name": "Efficacy & Safety TFL Suite Compilation", "cmd": [RSCRIPT_PATH, "09_tfl/tfl_generation.R"]},
+        {"id": 14, "name": "Numerical Results Reconciliation (SAS vs R)", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('05_reconciliation/results_reconcile.R')"]},
+        {"id": 15, "name": "eCTD Final Package", "cmd": [sys.executable, "06_telemetry/package_ectd.py"]}
     ]
     
     results = {}
@@ -506,7 +542,7 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
                     write_telemetry(results, sas_mode)
                     sys.exit(1)
 
-        # Run Stages 9-12 sequentially
+        # Run Stages 9-14 sequentially
         for stage in stages[8:]:
             run_single_stage(stage, from_stage, sas_mode, results)
 
@@ -574,7 +610,9 @@ def output_sanity_check():
 
 def write_telemetry(results, sas_mode="sim"):
     import platform
-    health_status = "GREEN" if all(v == "PASS" for v in results.values()) else "RED"
+    # A legitimately SKIPPED stage (e.g. results-reconciliation in sim/cached mode) does
+    # not turn the pipeline RED; only a real FAIL does.
+    health_status = "RED" if any(v == "FAIL" for v in results.values()) else "GREEN"
 
     # Update define.xml timestamp if the build succeeds (Mi-02)
     if health_status == "GREEN":
@@ -638,7 +676,7 @@ def write_telemetry(results, sas_mode="sim"):
 
 """
     for name, status in results.items():
-        icon = "[PASS]" if status == "PASS" else "[FAIL]"
+        icon = {"PASS": "[PASS]", "SKIPPED": "[SKIP]"}.get(status, "[FAIL]")
         dashboard_content += f"* {icon} **{name}**: `{status}`\n"
         
     # Honest per-mode dashboard annotations (audit F-5)
