@@ -1,0 +1,15 @@
+# TROPIC R lint standard. Committed so `lintr` results are reproducible: the
+# 2026-06-16 audit found prior "zero-warning" commits had no committed config,
+# so the claim could not be reproduced (lintr's unpinned default is 80 chars).
+linters: linters_with_defaults(
+    line_length_linter = line_length_linter(120L),
+    # ADaM/SDTM variables are uppercase by CDISC mandate (USUBJID, TRT01P, AVAL);
+    # snake_case is not permissible, so object naming cannot be linted here.
+    object_name_linter = NULL,
+    # Clinical scripts intentionally retain SAP/spec excerpts and worked
+    # derivation formulas as inline comments for traceability.
+    commented_code_linter = NULL
+  )
+exclusions: list(
+    "renv"
+  )
