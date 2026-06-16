@@ -90,3 +90,7 @@ scratch/
 !09_tfl/output/**
 !06_telemetry/pipeline_health.json
 !06_telemetry/reconciliation_status.json
+
+# Ephemeral eCTD Module 5 submission package
+m5/
+

@@ -4,6 +4,51 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.9.0] - 2026-06-16 — Audit remediation: status integrity, BIMO, evidence badge
+
+> **Context.** Post-audit hardening pass (findings C-1…C-6). Verified end-to-end on a **genuine
+> ODA run**: `sas_execution_mode = oda`, all **15** stages GREEN, dataset reconciliation PASS
+> (**8/8** domains incl. CLINSITE), results reconciliation PASS (6/6 parameters), SAS log 0 ERROR.
+
+### Added
+- **Committed GREEN-ODA evidence badge (`06_telemetry/evidence/`, C-1).** Immutable snapshot of a
+  real `oda`-mode run (pipeline_health, both reconciliation verdicts, and an md5 manifest showing
+  every `*_prod.xpt` (SAS) is byte-distinct from its `*_v.xpt` (R) yet reconciles cell-identical).
+  Stored separately from live telemetry so a later `sim` run can never clobber the proof.
+- **BIMO Data Reviewer's Guide (`08_reviewers_guides/BDRG.md`, C-5).** Documents the `clinsite`
+  scope honestly against the FDA BIMO TCG Appendix-3 (~39-var) structure, the synthetic-PI
+  disclosure, and the ICH E9 population definitions.
+
+### Changed / Fixed
+- **Status integrity (C-2).** Results-reconciliation no longer reports a false `PASS` when it legitimately
+  no-ops (sim/cached run with no SAS `PROC LIFETEST` stats); it now records `SKIPPED`, and a SKIPPED
+  stage keeps the pipeline GREEN without claiming a verification that did not happen.
+- **Gate wiring (C-3).** Post-execution gates are keyed by stage NAME, not positional id, so the
+  M-4 output-sanity gate fires immediately after TFL rendering again (it had drifted onto the
+  packaging stage during a renumber) — corrupted tables are caught before results-recon/packaging.
+- **BIMO `clinsite` (C-5).** Expanded to a credible, honestly-derived site-level set
+  (`N_RAND/N_SAF/N_ITT/N_PPROT/N_DEATH/N_SAE/N_TEAE`); ITT is no longer mislabelled "Efficacy
+  Population"; the synthetic `INVNAM` is explicitly flagged; export uses the proven `&PROJ_ROOT.`
+  XPORT idiom (the prior `&adam_path.` macro was undefined and would have failed on real SAS).
+  Now double-programmed SAS↔R as the 8th reconciled domain.
+- **Define-XML extract (C-4).** The define-derived workbook is renamed `ADaM_Define_Extract.xlsx`
+  and carries a provenance sheet stating it is a reviewer-facing VIEW of `define.xml`, not the
+  governing specification (removing the spec↔define traceability inversion); spec→define generation
+  is documented as roadmap.
+- **SAS static analysis (C-6).** Reframed honestly (advisory warnings vs. blocking errors), and
+  wired into CI as a real gate (`.github/workflows/ci.yml`) so the blocking-error class cannot regress.
+
+## [3.8.0] - 2026-06-16 — Automated eCTD Module 5 Packaging
+
+> **Context.** Realizing full compliance with eCTD Module 5 structure. This release implements an
+> automated packaging orchestrator script to compile the functional pipeline components (datasets,
+> programs, metadata, generated PDF reviewer guides, and CSR with outputs) into a canonical FDA eCTD
+> Module 5 directory structure.
+
+### Added
+- **eCTD Module 5 packaging orchestrator (`06_telemetry/package_ectd.py`).** Dynamically compiles SDTM datasets into v5 `.xpt` files, copies/renames ADaM datasets to strip `_prod` suffixes, generates PDF formatted reviewer guides (ADRG/SDRG) and CSR (with outputs in appendices), creates a blank CRF placeholder, and co-locates Define-XML metadata files.
+- **Git protection for deliverables.** Added `m5/` directory to `.gitignore` to ensure the generated eCTD package remains an ephemeral build artifact.
+
 ## [3.7.0] - 2026-06-16 — Results-level double-programming, confirmed ORR, output gate
 
 > **Context.** Post-audit hardening. Double-programming now extends from the ADaM dataset
@@ -474,7 +519,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [2.0.0] - 2026-05-23
 
 ### Added
-- **Repository eCTD Layout:** Fully structured FDA eCTD Module 5 folder system.
+- **Conceptual Repository eCTD Layout:** Conceptual layout mapped in documentation, physically organised as a functional programming pipeline.
 - **Real Patient-Level Ingestion:** Native ingestion and cleaning of authentic de-identified Phase III clinical trial datasets (371 safety-treated subjects).
 - **SAS ADaM Suite:** Added full production mapping programs (ADSL, ADEX, ADCM, ADAE, ADLB, ADRS, ADTTE) with sub-8 char variable constraints, sub-40 char labels, and XPT v5 export capabilities.
 - **Pharmaverse R Suite:** Independent QC double-programming pipeline mirroring SAS logic using modern clinical libraries (`admiral`, `admiralonco`, `metatools`, `xportr`).

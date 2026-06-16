@@ -56,6 +56,10 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install pyreadstat lxml saspy
 
+    - name: SAS static-analysis gate (blocks on hardcoded paths)
+      run: |
+        python3 06_telemetry/lint_sas.py
+
     - name: Run unit tests (Broker + Seeder)
       run: |
         python3 06_telemetry/test_oda_broker.py

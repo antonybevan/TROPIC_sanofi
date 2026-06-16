@@ -17,7 +17,7 @@
 
 ## Overview
 
-This repository is a clinical analysis pipeline for the TROPIC Phase III trial, organised to mirror an eCTD Module 5 layout. It implements dual-language double programming (SAS and R), CDISC-aligned ADaM datasets, cross-language reconciliation at both the **dataset** level (cell-by-cell `diffdf`) and the **analysis-results** level (SAS `PROC LIFETEST` vs R `survfit`), and TFL generation.
+This repository is a clinical analysis pipeline for the TROPIC Phase III trial. It is physically organised as a functional programming pipeline (with SAS and R tracks), and includes an automated packaging orchestrator (`06_telemetry/package_ectd.py`) that dynamically compiles these components into a canonical FDA eCTD Module 5 submission directory tree. It implements dual-language double programming (SAS and R), CDISC-aligned ADaM datasets, cross-language reconciliation at both the **dataset** level (cell-by-cell `diffdf`) and the **analysis-results** level (SAS `PROC LIFETEST` vs R `survfit`), and TFL generation.
 
 > **Scope & reproducibility (read first):** This is a portfolio/demonstration project. The real MP-arm SDTM source and ODA credentials are **not** committed (patient-data protection + secrets hygiene), so a bare clone cannot re-run the *real* pipeline — see **[REPRODUCIBILITY.md](REPRODUCIBILITY.md)** for the data-access path, the pinned environment, and a **self-contained `--demo` smoke test** that runs on a clean clone with no real data, no SAS, and no credentials. The comparator (Cabazitaxel) arm is **synthetic and illustrative** (see *Data provenance*); only the real Mitoxantrone arm is reconciled SAS↔R. A genuine SAS↔R reconciliation requires a run executed against a **real** SAS engine (`--real-sas`, recorded `sas_execution_mode` = `oda`/`local`); the **default** no-engine invocation runs in **`sim`** mode, where a zero-difference reconciliation is tautological. Always check `sas_execution_mode` in `06_telemetry/pipeline_health.json` before reading any reconciliation result as double-programming evidence.
 
@@ -50,7 +50,7 @@ This repository is a clinical analysis pipeline for the TROPIC Phase III trial, 
 │                    TROPIC Analysis Pipeline                          │
 │                  Python Orchestrator (cibuild.py)                   │
 └────────────────────────────┬────────────────────────────────────────┘
-                             │  12 Stages
+                             │  15 Stages
          ┌───────────────────┼───────────────────┐
          ▼                   ▼                   ▼
    ┌───────────┐      ┌────────────┐      ┌────────────┐
@@ -141,7 +141,8 @@ TROPIC/
 │   └── cross_lang_audit.R          # diffdf cell-by-cell reconciliation engine
 │
 ├── 06_telemetry/                   # Pipeline Orchestration & Telemetry
-│   ├── cibuild.py                  # Python execution driver (13 stages; Job B reconcile)
+│   ├── cibuild.py                  # Python execution driver (15 stages; Job B reconcile)
+│   ├── package_ectd.py             # eCTD Module 5 packaging orchestrator
 │   ├── oda_broker.py               # Resilient ODA connection broker (probe-earned 'oda' mode)
 │   ├── seed_sdtm.py                # Job A: idempotent, manifest-checked SDTM seeding
 │   ├── test_oda_broker.py          # Unit tests for the broker + seed (no Java/network)
@@ -158,7 +159,8 @@ TROPIC/
 │
 ├── 08_reviewers_guides/            # Submission Documentation
 │   ├── ADRG.md                     # Analysis Data Reviewer's Guide
-│   └── SDRG.md                     # SDTM Data Reviewer's Guide
+│   ├── SDRG.md                     # SDTM Data Reviewer's Guide
+│   └── BDRG.md                     # BIMO Data Reviewer's Guide (clinsite)
 │
 └── 09_tfl/                         # Tables, Figures & Listings
     ├── tfl_generation.R            # Full TFL compilation script
@@ -174,7 +176,12 @@ TROPIC/
         │   └── sas/                # SAS-generated figures (OS/PFS/subgroup/Optimus)
         ├── tables/                 # Efficacy/safety text tables (T-11, T-20, T-21)
         └── listings/               # Subject listings (L-01-1)
-
+│
+└── m5/                             # Ephemeral Compiled FDA eCTD Module 5 Package (ignored)
+    ├── datasets/tropic/
+    │   ├── tabulations/sdtm/       # sdrg.pdf, blankcrf.pdf, and datasets/ (SDTM XPTs + define.xml)
+    │   └── analysis/adam/          # adrg.pdf, datasets/ (ADaM XPTs + define.xml), and programs/
+    └── 53-clin-stud-rep/           # csr.pdf / tropic.pdf and appendices (TFL figures/tables/listings)
 ```
 
 ---
@@ -193,26 +200,45 @@ TROPIC/
 # Clone and enter
 git clone <repo-url> && cd TROPIC
 
-# Run all 13 stages
+# Run all 15 stages (default = sim mode; add --real-sas for a genuine ODA run)
 python3 06_telemetry/cibuild.py
 ```
 
-Expected output:
+Expected output (default `sim` mode):
 ```
-[SUCCESS] Stage 1  — R Environment Setup
-[SUCCESS] Stage 2  — SDTM Validation
-[SUCCESS] Stage 3  — ADSL Validation
-[SUCCESS] Stage 4  — ADEX Validation
-[SUCCESS] Stage 5  — ADCM Validation
-[SUCCESS] Stage 6  — ADAE Validation
-[SUCCESS] Stage 7  — ADLB Validation
-[SUCCESS] Stage 8  — ADRS Validation
-[SUCCESS] Stage 9  — ADTTE Validation
-[SUCCESS] Stage 10 — SAS Production (or Simulation)
-[SUCCESS] Stage 11 — Cross-Language Reconciliation
-[SUCCESS] Stage 12 — TFL Suite Compilation
+[SUCCESS] Stage 1  — Real SDTM Staging Ingest
+[SUCCESS] Stage 2  — R SDTM Validation
+[SUCCESS] Stage 3  — R ADSL Validation
+[SUCCESS] Stage 4  — R ADEX Validation
+[SUCCESS] Stage 5  — R ADCM Validation
+[SUCCESS] Stage 6  — R ADAE Validation
+[SUCCESS] Stage 7  — R ADLB Validation
+[SUCCESS] Stage 8  — R ADRS Validation
+[SUCCESS] Stage 9  — R ADTTE Validation
+[SUCCESS] Stage 10 — R BIMO Validation
+[SUCCESS] Stage 11 — SAS Production (ODA/Real/Simulated)
+[SUCCESS] Stage 12 — Cross-Language Audit Reconcile
+[SUCCESS] Stage 13 — Efficacy & Safety TFL Suite Compilation
+[SKIPPED] Stage 14 — Numerical Results Reconciliation (SAS vs R)   # PASS under --real-sas
+[SUCCESS] Stage 15 — eCTD Final Package
 All clinical pipeline stages compiled successfully!
 ```
+
+> Stage 14 honestly reports **`SKIPPED`** in `sim`/`cached` mode (no real SAS `PROC LIFETEST`
+> statistics exist to reconcile); under `--real-sas` it computes and reports a real `PASS`/`FAIL`.
+
+### eCTD Module 5 Submission Package
+
+eCTD Module 5 packaging runs automatically as **Stage 15** of the pipeline. It can also be invoked
+standalone after a pipeline run to (re)compile the deliverables (datasets, metadata, source
+programs, generated reviewer guides incl. the BIMO BDRG, and CSR with outputs) into the canonical
+FDA eCTD Module 5 directory structure:
+
+```bash
+python3 06_telemetry/package_ectd.py
+```
+
+This compiles the canonical folder layout under `m5/` (which is excluded from Git to prevent tracking redundant output file clones).
 
 ---
 
@@ -318,6 +344,12 @@ The broker uses status-gated full-jitter backoff within a wall-clock budget (`TR
 fails fast on auth/encryption errors, keeps slot hygiene (single-flight lock + teardown), and
 **earns** `oda` mode via a live nonce probe. Confirm a genuine run with
 `sas_execution_mode == "oda"` **and** `reconciliation == "SAS_vs_R"` in `pipeline_health.json`.
+
+> **Committed evidence:** A frozen snapshot of a genuine GREEN `oda` run is kept under
+> [`06_telemetry/evidence/`](06_telemetry/evidence/) — including an md5 manifest proving every
+> SAS-produced `*_prod.xpt` is **byte-distinct** from its R-produced `*_v.xpt` yet reconciles
+> **cell-identical** across all 8 domains (ADSL…ADTTE + the BIMO `clinsite`). It is stored apart
+> from the live telemetry so a later `sim` run cannot overwrite the proof.
 
 ---
 

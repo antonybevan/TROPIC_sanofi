@@ -56,6 +56,10 @@
 %include "&PGMDIR./A_adtte_generation.sas";
 %check_err(A_adtte_generation);
 
+/* Stage 9b: BIMO Package */
+%include "&PGMDIR./B_bimo_generation.sas";
+%check_err(B_bimo_generation);
+
 /* Stage 10: XPT Export with Constraints */
 %include "&PGMDIR./U_xpt_export.sas";
 %check_err(U_xpt_export);
