@@ -1,7 +1,7 @@
 {
   "Conformance_Details": {
-    "Report_Generation": "2026-06-17T11:51:29",
-    "Total_Runtime": "3.8 seconds",
+    "Report_Generation": "2026-06-17T12:08:09",
+    "Total_Runtime": "2.81 seconds",
     "CORE_Engine_Version": "0.16.0",
     "Issue_Limit_Per_Rule": "None",
     "Issue_Limit_Per_Dataset": "None",

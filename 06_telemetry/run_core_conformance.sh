@@ -13,6 +13,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 RUN="$ROOT/.core_run"; ENGINE="$RUN/engine"; VENV="$ROOT/.core_venv"; CACHE="$ENGINE/resources/cache"
 PY="$VENV/bin/python"; CORE="$ENGINE/core.py"
+cd "$ROOT"
 mkdir -p "$RUN" "$ROOT/06_telemetry/conformance"
 [ -f "$RUN/.env" ] && set -a && . "$RUN/.env" && set +a || true
 : "${CDISC_LIBRARY_API_KEY:?Set CDISC_LIBRARY_API_KEY (free CDISC account) or add it to .core_run/.env}"
@@ -25,26 +26,33 @@ mkdir -p "$RUN" "$ROOT/06_telemetry/conformance"
 if [ ! -f "$CORE" ]; then
   git clone --depth 1 --branch v0.16.0 https://github.com/cdisc-org/cdisc-rules-engine "$ENGINE"
 fi
-# CORE 0.16.0 CLI gate bug: StandardTypes omits 'adamig' though the engine requires it. Patch it.
-grep -q 'ADAMIG = "adamig"' "$ENGINE/cdisc_rules_engine/enums/standard_types.py" || \
-  sed -i '' 's/    ADAM = "adam"/    ADAM = "adam"\n    ADAMIG = "adamig"/' \
-    "$ENGINE/cdisc_rules_engine/enums/standard_types.py"
+# CORE 0.16.0 CLI gate bug: StandardTypes omits 'adamig' though the engine requires it. Patch it
+# (portable across BSD/GNU sed via Python).
+STD_TYPES="$ENGINE/cdisc_rules_engine/enums/standard_types.py"
+grep -q 'ADAMIG = "adamig"' "$STD_TYPES" || "$VENV/bin/python" - "$STD_TYPES" <<'PYEOF'
+import sys
+p = sys.argv[1]; s = open(p).read()
+open(p, "w").write(s.replace('    ADAM = "adam"\n', '    ADAM = "adam"\n    ADAMIG = "adamig"\n', 1))
+PYEOF
 
 # 3. One-time library metadata cache (ADaM/SDTM standard + CT) via CDISC Library
 "$PY" "$CORE" update-cache -c "$CACHE" >/dev/null
 
 # 4. SDTM: convert source sas7bdat -> v5 XPT, validate against CORE's published SDTMIG rules.
 #    NOTE: source is SDTMIG 3.1.1; CORE's lowest rule set is 3.2 -> version-gap findings expected.
-Rscript -e 'library(haven); d<-c("dm","ae","ex","ds","vs"); dir.create(".core_run/sdtm",showWarnings=FALSE,recursive=TRUE);
+rm -rf "$RUN/sdtm"; mkdir -p "$RUN/sdtm"   # clean dir: validate only these std domains (avoids stale/large-supp deadlock)
+Rscript -e 'library(haven); d<-c("dm","ae","ex","ds","vs");
   for(x in d) write_xpt(read_sas(sprintf("01_raw_source/real_sdtm/%s.sas7bdat",x)), sprintf(".core_run/sdtm/%s.xpt",x), name=toupper(x), version=5)'
-"$PY" "$CORE" validate -s sdtmig -v 3.2 -d "$RUN/sdtm" -ft xpt -ca "$CACHE" \
+cp "$ROOT/07_define_xml/define_sdtm.xml" "$RUN/sdtm/define.xml"
+"$PY" "$CORE" validate -s sdtmig -v 3.2 -d "$RUN/sdtm" -ft xpt -dxp "$RUN/sdtm/define.xml" -ca "$CACHE" \
   -rt "$CACHE/../templates/report-template.xlsx" -ps 1 -of JSON \
   -o "$ROOT/06_telemetry/conformance/core_sdtm_report"
 
 # 5. ADaM: validate the *_prod.xpt against our executable custom rules (CORE has no ADaM pack).
-mkdir -p "$RUN/adam"; for f in "$ROOT"/04_adam/*_prod.xpt; do b=$(basename "$f" _prod.xpt); cp "$f" "$RUN/adam/$b.xpt"; done
+rm -rf "$RUN/adam"; mkdir -p "$RUN/adam"; for f in "$ROOT"/04_adam/*_prod.xpt; do b=$(basename "$f" _prod.xpt); cp "$f" "$RUN/adam/$b.xpt"; done
 rm -f "$RUN/adam/clinsite.xpt"   # BIMO dataset, not ADaM
-"$PY" "$CORE" validate -s adamig -v 1.3 -d "$RUN/adam" -ft xpt \
+cp "$ROOT/07_define_xml/define.xml" "$RUN/adam/define.xml"
+"$PY" "$CORE" validate -s adamig -v 1.3 -d "$RUN/adam" -ft xpt -dxp "$RUN/adam/define.xml" \
   -lr "$ROOT/06_telemetry/conformance_rules/adam" -ca "$CACHE" \
   -rt "$CACHE/../templates/report-template.xlsx" -ps 1 -of JSON \
   -o "$ROOT/06_telemetry/conformance/core_adam_report"
