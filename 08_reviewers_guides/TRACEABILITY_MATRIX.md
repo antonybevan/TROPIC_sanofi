@@ -39,11 +39,18 @@ OS / PFS / TTSAE / TTPSA / TTUMOR inherit this limitation (SDRG §2).
 | **ADLB** | `A_adlb_generation.sas` | `v_adlb_validation.R` | `IG.ADLB` | Analysis windows (§5.6); ATOXGR baseline→worst shift; ANL01FL; ANCNADIR / ANCRECDY (§5.5) | `USUBJID,PARAMCD,AVISITN,LBDY` (multiset) | ″ |
 | **ADRS** | `A_adrs_generation.sas` | `v_adrs_validation.R` | `IG.ADRS` | OVRLRESP (RECIST v1.0, §5.3); PSPROG (PCWG3, §5.4); OBJRESP / PSARESP | `USUBJID,PARAMCD,AVISIT` (multiset) | ″ |
 | **ADTTE** | `A_adtte_generation.sas` | `v_adtte_validation.R` | `IG.ADTTE` | OS; PFS (NACT censoring hierarchy); **TTSAE** (was `TTOS`); TTPAIN; TTPSA; TTUMOR (measurable-disease subpop) | `USUBJID,PARAMCD` (multiset) | ″ |
+| **CLINSITE** (BIMO) | `B_bimo_generation.sas` | `v_bimo_validation.R` | *(BIMO — not in ADaM define; documented in [BDRG](BDRG.md))* | Site-level roll-up of ADSL populations + ADAE safety: `N_RAND/N_SAF/N_ITT/N_PPROT/N_DEATH/N_SAE/N_TEAE` (per FDA BIMO TCG subset) | `STUDYID,SITEID` (unique) | ″ |
 
-**Reconciliation engine:** `05_reconciliation/cross_lang_audit.R` (diffdf). "unique" keys
-give positional parity; "multiset" keys give keyed record-content parity (no unique row id
-exists — ADRG §6). Both paths are unit-demonstrated in `tests/smoke_test.R` (Cases A/B
-unique-key, Cases C/D keyless).
+**Reconciliation engine:** `05_reconciliation/cross_lang_audit.R` (diffdf), **8 domains**.
+"unique" keys give positional parity; "multiset" keys give keyed record-content parity (no
+unique row id exists — ADRG §6). Both paths are unit-demonstrated in `tests/smoke_test.R`
+(Cases A/B unique-key, Cases C/D keyless).
+
+**Metadata conformance:** both `define.xml` (ADaM) and `define_sdtm.xml` pass XSD **and** parse in
+the CDISC CORE reference engine (`Define_XML_Version 2.1.0`); each ADaM domain's structure/CT is
+also checked by `06_telemetry/adam_conf_check.R` and the executable CORE rules in
+`06_telemetry/conformance_rules/adam/` (traceable to ADaMIG; CORE_RUN_RECORD.md). `CLINSITE` is a
+BIMO deliverable outside the ADaM define — its schema is asserted in `v_bimo_validation.R`.
 
 ---
 
@@ -70,18 +77,38 @@ QC convention: the validated objects are the **analysis results behind each figu
 (survival functions, HRs, at-risk counts, response distributions), driven by the
 SAS↔R-reconciled ADaM — not the rendered pixels.
 
+**Analysis Results Metadata (ARM).** `07_define_xml/define.xml` carries ARM v1.0 ResultDisplays
+that link key results to their ADaM data + method — the define-level complement to this matrix:
+
+| ResultDisplay (define ARM) | Covers | This matrix's outputs |
+|---|---|---|
+| `RD.EFFICACY.SURVIVAL` | OS / PFS KM + Cox | `F-11-1`, `F-11-2`, `T-11` |
+| `RD.EFFICACY.SECONDARY` | Secondary efficacy (TTPSA/TTUMOR, response) | `T-11`, `ADRS`-derived |
+| `RD.SAFETY.TEAE` | TEAE summary | `T-20` |
+
+> **ARM gap (honest):** the exploratory figure displays (`F-12` subgroup forest, `F-13` PSA
+> waterfall, `F-14` swimmer, `F-17` Optimus) and the lab-shift table (`T-21`) do **not** yet have
+> dedicated ARM ResultDisplay entries; their traceability is via this matrix + the generator
+> functions above. Extending ARM to those displays is a documented follow-up.
+
 ---
 
 ## 4. Orchestration & Provenance
 
+The pipeline is **15 stages** (`cibuild.py`); the BIMO domain inserted at Stage 10 shifted the
+later stage numbers.
+
 | Stage | Driver | Evidence artifact |
 |---|---|---|
 | 1–9 (staging + R ADaM validation) | `06_telemetry/cibuild.py` → `logrx::axecute(...)` | `03_validation_r/*.log` |
-| 10 (SAS production) | `cibuild.py` Stage 10 (`local`/`oda`/`cached`/`sim`/`error`) | `pipeline_health.json` `sas_execution_mode` |
-| 11 (reconciliation) | `cross_lang_audit.R` | `reconciliation_status.json`, `reconciliation_report.html` |
-| 12 (TFL) | `tfl_generation.R` | `09_tfl/output/tables/*`, `09_tfl/output/figures/*` |
-| 13 (numerical results reconciliation) | `results_reconcile.R` — SAS `PROC LIFETEST` vs R `survfit` (MP-arm KM medians / events / N) | `results_reconciliation_status.json` |
+| 10 (R BIMO validation) | `v_bimo_validation.R` | `04_adam/clinsite_v.xpt` |
+| 11 (SAS production) | `cibuild.py` (`local`/`oda`/`cached`/`sim`/`error`) | `pipeline_health.json` `sas_execution_mode` |
+| 12 (cross-language reconciliation) | `cross_lang_audit.R` | `reconciliation_status.json` (**8 domains** incl. CLINSITE), `reconciliation_report.html` |
+| 13 (TFL) | `tfl_generation.R` | `09_tfl/output/tables/*`, `09_tfl/output/figures/*` |
+| 14 (numerical results reconciliation) | `results_reconcile.R` — SAS `PROC LIFETEST` vs R `survfit` (MP-arm KM medians / events / N) | `results_reconciliation_status.json` |
+| 15 (eCTD Module 5 packaging) | `package_ectd.py` | `m5/` (ephemeral) |
+| *(offline)* CDISC CORE conformance | `06_telemetry/run_core_conformance.sh` — SDTMIG-3.2 rules + executable ADaM rules (`conformance_rules/adam/`, `--local-rules`) | `06_telemetry/conformance/core_{sdtm,adam}_report.json`, `CORE_RUN_RECORD.md` |
 
 Run reproducibility: R toolchain pinned by `renv.lock`; self-contained demo
 (`python3 06_telemetry/cibuild.py --demo`) runs `tests/smoke_test.R` with no real data,
-no SAS, no credentials.
+no SAS, no credentials. CORE conformance reproduction: `run_core_conformance.sh` (REPRODUCIBILITY.md §7).
