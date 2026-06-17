@@ -94,3 +94,7 @@ scratch/
 # Ephemeral eCTD Module 5 submission package
 m5/
 
+.core_venv/
+
+# Ephemeral CDISC CORE run inputs (contain patient-data XPT)
+.core_run/
