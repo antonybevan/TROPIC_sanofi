@@ -1,6 +1,6 @@
 <div align="center">
 
-# TROPIC — Clinical Analysis Pipeline
+# TROPIC — CDISC Analysis & FDA Submission Pipeline
 ### Study EFC6193 / XRP6258 · NCT00417079
 
 **Cabazitaxel vs Mitoxantrone in mCRPC — Phase III RCT**
@@ -8,6 +8,7 @@
 
 [![CDISC](https://img.shields.io/badge/CDISC-ADaMIG%20v1.3%20%7C%20SDTMIG%20v3.1.1-005A9C?style=flat-square)](https://www.cdisc.org/)
 [![Define-XML](https://img.shields.io/badge/Define--XML-2.1%20%2B%20ARM%20%28XSD%20validated%29-005A9C?style=flat-square)](07_define_xml/)
+[![eCTD](https://img.shields.io/badge/eCTD-Module%205%20%C2%A75.3-005A9C?style=flat-square)](06_telemetry/package_ectd.py)
 [![R](https://img.shields.io/badge/R-4.6.0-276DC3?style=flat-square&logo=r)](https://www.r-project.org/)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python)](06_telemetry/cibuild.py)
 
@@ -17,18 +18,18 @@
 
 ## Overview
 
-This repository is a clinical analysis pipeline for the TROPIC Phase III trial. It is physically organised as a functional programming pipeline (with SAS and R tracks), and includes an automated packaging orchestrator (`06_telemetry/package_ectd.py`) that dynamically compiles these components into a canonical FDA eCTD Module 5 submission directory tree. It implements dual-language **cross-language implementation reconciliation** (independent SAS and R tracks — single-author, so *implementation* reconciliation rather than two-programmer GxP double programming; see [ADRG §6](08_reviewers_guides/ADRG.md)), CDISC-aligned ADaM datasets, reconciliation at both the **dataset** level (cell-by-cell `diffdf`) and the **analysis-results** level (SAS `PROC LIFETEST` vs R `survfit`), and TFL generation.
+This repository is an end-to-end **analysis-data production and reporting pipeline** for the TROPIC Phase III trial, structured to mirror a U.S. FDA electronic submission. Independent SAS 9.4 and R tracks derive CDISC-conformant **ADaM** analysis datasets from the source **SDTM** tabulations; a Python orchestrator (`06_telemetry/cibuild.py`) drives the 17-stage build, and an automated packaging step (`06_telemetry/package_ectd.py`) assembles the deliverables into the canonical **eCTD Module 5 (Section 5.3)** directory structure prescribed by the FDA *Study Data Technical Conformance Guide* (SDTCG). Quality control is performed by **cross-language implementation reconciliation** — independent SAS and R implementations of each derivation (single-author, therefore *implementation* reconciliation rather than two-programmer GxP double programming; see [ADRG §6](08_reviewers_guides/ADRG.md)) — at both the **analysis-dataset** level (cell-by-cell `diffdf`) and the **analysis-results** level (SAS `PROC LIFETEST` vs R `survfit`). Submission metadata is delivered as machine-readable **Define-XML v2.1 with Analysis Results Metadata (ARM)**, governed by an upstream **ADaM specification (single source of truth)**, and accompanied by PHUSE-style **data Reviewer's Guides** (ADRG / SDRG / BIMO BDRG) and the **Tables, Figures & Listings (TFL)** set.
 
 > **Scope & reproducibility (read first):** This is a portfolio/demonstration project. The real MP-arm SDTM source and ODA credentials are **not** committed (patient-data protection + secrets hygiene), so a bare clone cannot re-run the *real* pipeline — see **[REPRODUCIBILITY.md](REPRODUCIBILITY.md)** for the data-access path, the pinned environment, and a **self-contained `--demo` smoke test** that runs on a clean clone with no real data, no SAS, and no credentials. The comparator (Cabazitaxel) arm is **synthetic and illustrative** (see *Data provenance*); only the real Mitoxantrone arm is reconciled SAS↔R. A genuine SAS↔R reconciliation requires a run executed against a **real** SAS engine (`--real-sas`, recorded `sas_execution_mode` = `oda`/`local`); the **default** no-engine invocation runs in **`sim`** mode, where a zero-difference reconciliation is tautological. Always check `sas_execution_mode` in `06_telemetry/pipeline_health.json` before reading any reconciliation result as double-programming evidence.
 
-> **Data provenance:** The MP control arm data (371 patients) is the official, de-identified SDTM dataset (`*.sas7bdat`) released by Sanofi in 2013 and accessed via the Project Data Sphere (PDS) repository — real trial data from the *Lancet* 2010 publication. The CbzP comparator arm (378 patients) is a **synthetic, illustrative** cohort generated at the ADaM layer by **proportional-hazards time-scaling of the real MP arm** (real MP event times divided by the published hazard ratio, with censoring calibrated to published event counts) plus fixed-seed sampling from published Table 1/Table 2 marginal distributions for non-survival domains. It is **not real patient data and not an independent reconstruction of the cabazitaxel arm**; it exists only to exercise the comparative-TFL and Project Optimus machinery.
+> **Data provenance:** The MP control arm data (371 patients) is the official, de-identified SDTM dataset (`*.sas7bdat`) released by Sanofi in 2013 and accessed via the Project Data Sphere (PDS) repository — real trial data from the *Lancet* 2010 publication. The CbzP comparator arm (378 patients) is a **synthetic, illustrative** cohort generated at the ADaM layer by **proportional-hazards time-scaling of the real MP arm** (real MP event times divided by the published hazard ratio, with censoring calibrated to published event counts) plus fixed-seed sampling from published Table 1/Table 2 marginal distributions for non-survival domains. It is **not real patient data and not an independent reconstruction of the cabazitaxel arm**; it exists solely to exercise the comparative-TFL and Project Optimus workflows.
 
 ---
 
 ## Illustrative Pipeline Outputs *(synthetic comparator — not clinical findings)*
 
 > [!NOTE]
-> **These numbers are not study results and must not be read as a re-analysis of the TROPIC trial.** The CbzP arm is synthetic (see *Data provenance* above). Because the comparator is built by dividing the real MP arm's event times by an *assumed* hazard ratio, any treatment effect computed from it is **circular by construction** (effect assumed in → effect measured out) and carries **no evidentiary weight**. The procedure also does **not reproduce the published cabazitaxel values** — it overshoots them (e.g. synthetic OS median 21.7 mo vs published 15.1 mo; synthetic HR 0.43 vs published 0.70). The table below shows what the TFL machinery *computes from the synthetic data*, alongside the published values, purely to demonstrate the analysis pipeline.
+> **These numbers are not study results and must not be read as a re-analysis of the TROPIC trial.** The CbzP arm is synthetic (see *Data provenance* above). Because the comparator is built by dividing the real MP arm's event times by an *assumed* hazard ratio, any treatment effect computed from it is **circular by construction**: a benefit is imposed during construction, so any effect estimated from it merely reflects that assumption and carries **no evidentiary weight**. The procedure also does **not reproduce the published cabazitaxel values** — it markedly overstates the headline OS benefit (synthetic median 21.7 mo vs published 15.1 mo; synthetic HR 0.43 vs published 0.70) and diverges from the published medians on the remaining endpoints. The table below presents what the TFL programs *compute from the synthetic data*, alongside the published values, solely to demonstrate the analysis pipeline.
 
 | Endpoint | Synthetic CbzP (N=378)† | Real MP (N=371) | Pipeline HR from synthetic data‡ | Published value (de Bono 2010) |
 |---|---|---|---|---|
@@ -46,33 +47,28 @@ This repository is a clinical analysis pipeline for the TROPIC Phase III trial. 
 ## Pipeline Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                    TROPIC Analysis Pipeline                          │
-│                  Python Orchestrator (cibuild.py)                   │
-└────────────────────────────┬────────────────────────────────────────┘
-                             │  15 Stages
-         ┌───────────────────┼───────────────────┐
-         ▼                   ▼                   ▼
-   ┌───────────┐      ┌────────────┐      ┌────────────┐
-   │  Stage 1  │      │ Stages 3-9 │      │ Stage 10   │
-   │  R Env    │      │ R ADaM     │      │ SAS Prod   │
-   │  Setup    │      │ Validation │      │  via ODA   │
-   └─────┬─────┘      └─────┬──────┘      └─────┬──────┘
-         │                  │                    │
-         ▼                  ▼                    ▼
-   ┌───────────┐      ┌────────────┐      ┌────────────┐
-   │  Stage 2  │      │  Stage 11  │      │  Stage 12  │
-   │  SDTM     │      │  diffdf    │      │  TFL Suite │
-   │  Validate │      │  Reconcile │      │  10 Outputs│
-   └───────────┘      └────────────┘      └────────────┘
-         ▲
-         │
-   ┌───────────────────────────┐
-   │  01_raw_source/real_sdtm/ │
-   │  34 SAS7BDAT files        │
-   │  Official Sanofi 2013     │
-   │  public data release      │
-   └───────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────┐
+│  TROPIC Analysis Pipeline · Python orchestrator cibuild.py · 17 stages     │
+└────────────────────────────────────────────────────────────────────────────┘
+
+  01_raw_source/real_sdtm/   (34 native SAS data sets, sas7bdat — official Sanofi 2013 release)
+        │
+        ▼
+  [1]    SDTM staging ingest          [2]   R SDTM validation
+        │
+        ▼                                              ┐
+  [3–9]  R ADaM validation track                       │  independent SAS + R
+  [10]   R BIMO validation                             │  implementations of
+  [11]   SAS 9.4 production  (ODA / local / sim)        ┘  every derivation
+        │
+        ▼
+  [12]   dataset reconciliation        (diffdf, cell-by-cell, 8 domains)   ◀─ cross-language QC
+  [13]   TFL suite                     (figures / tables / listings)
+  [14]   analysis-results reconciliation  (SAS PROC LIFETEST vs R survfit)
+  [15]   spec → define conformance     [16]  spec → data conformance
+        │
+        ▼
+  [17]   eCTD Module 5 packaging  →  m5/   (Section 5.3 submission tree)
 ```
 
 ### Dual-Language Validation Model
@@ -98,15 +94,21 @@ Real SDTM (SAS7BDAT)
 
 ```
 TROPIC/
+├── 00_specifications/              # Single source of truth (audit C-4 inversion)
+│   ├── ADaM_spec.xlsx              # Authoritative ADaM spec (metacore P21 format) — governs define + data
+│   └── build_spec_seed.R           # One-time migration that bootstrapped the spec from define.xml
+│
 ├── 01_raw_source/                  # READ-ONLY source data
 │   ├── Sanofi Study Protocol Tropic.pdf
 │   ├── Sanofi CRF Tropic.pdf
 │   └── real_sdtm/                  # 34 official SAS7BDAT files (201 MB)
 │       └── staging/                # R-enriched staging RDS files
 │
-├── 02_production_sas/              # SAS Production ADaM Programs
+├── 02_production_sas/              # SAS 9.4 production ADaM programs
 │   ├── 00_config.sas               # Global paths, macros, options
 │   ├── 00_master_driver.sas        # Full SAS execution driver
+│   ├── S_sdtm_mapping.sas          # SDTM mapping structures (SDTMIG 3.1.1)
+│   ├── L_staging_ingest.sas        # Staging ingest + SUPP-- transpose/merge
 │   ├── A_adsl_generation.sas       # ADSL — Subject Level
 │   ├── A_adex_generation.sas       # ADEX — Exposure
 │   ├── A_adcm_generation.sas       # ADCM — Concomitant Medications
@@ -114,19 +116,25 @@ TROPIC/
 │   ├── A_adlb_generation.sas       # ADLB — Laboratory Findings (BDS)
 │   ├── A_adrs_generation.sas       # ADRS — Response Analysis
 │   ├── A_adtte_generation.sas      # ADTTE — Time-to-Event
-│   └── U_xpt_export.sas            # XPT Transport export
+│   ├── B_bimo_generation.sas       # BIMO clinical-site dataset (clinsite)
+│   ├── T_tfl_generation.sas        # SAS-track TFL graphics (ODS / SGPLOT)
+│   └── U_xpt_export.sas            # XPORT v5 transport export (spec-sourced labels)
 │
-├── 03_validation_r/                # R Independent Validation (Double-Programming)
+├── 03_validation_r/                # Independent R QC track (cross-language reconciliation)
 │   ├── activate_renv.R             # Self-healing package installer
+│   ├── config_study.R              # Study parameters (thresholds, windows) from study_config.yaml
 │   ├── v_sdtm_validation.R         # SDTM structure checks
 │   ├── v_staging_ingest.R          # Staging ingestion validator
-│   ├── v_adsl_validation.R         # ADSL double-program
-│   ├── v_adex_validation.R         # ADEX double-program
-│   ├── v_adcm_validation.R         # ADCM double-program
-│   ├── v_adae_io_validation.R      # ADAE double-program
-│   ├── v_adlb_validation.R         # ADLB double-program
-│   ├── v_adrs_validation.R         # ADRS double-program
-│   └── v_adtte_validation.R        # ADTTE double-program
+│   ├── v_adsl_validation.R         # ADSL independent R re-derivation
+│   ├── v_adex_validation.R         # ADEX independent R re-derivation
+│   ├── v_adcm_validation.R         # ADCM independent R re-derivation
+│   ├── v_adae_io_validation.R      # ADAE independent R re-derivation
+│   ├── v_adlb_validation.R         # ADLB independent R re-derivation
+│   ├── v_adrs_validation.R         # ADRS independent R re-derivation
+│   ├── v_adtte_validation.R        # ADTTE independent R re-derivation
+│   ├── v_bimo_validation.R         # BIMO clinsite schema + re-derivation
+│   ├── load_spec.R                 # Loads ADaM_spec.xlsx → metacore object (single source of truth)
+│   └── spec_data_checks.R          # spec→data conformance (metacore/metatools/xportr)
 │
 ├── 04_adam/                        # CDISC ADaM XPT Datasets (output)
 │   ├── adsl_v.xpt / adsl_prod.xpt
@@ -141,7 +149,7 @@ TROPIC/
 │   └── cross_lang_audit.R          # diffdf cell-by-cell reconciliation engine
 │
 ├── 06_telemetry/                   # Pipeline Orchestration & Telemetry
-│   ├── cibuild.py                  # Python execution driver (15 stages; Job B reconcile)
+│   ├── cibuild.py                  # Python execution driver (17 stages; Job B reconcile)
 │   ├── package_ectd.py             # eCTD Module 5 packaging orchestrator
 │   ├── oda_broker.py               # Resilient ODA connection broker (probe-earned 'oda' mode)
 │   ├── seed_sdtm.py                # Job A: idempotent, manifest-checked SDTM seeding
@@ -159,33 +167,35 @@ TROPIC/
 │   ├── define2-1.xsl               # Browser stylesheet
 │   ├── schema/                     # Vendored CDISC Define-XML 2.1 + ARM + ODM XSD bundle
 │   ├── validate_xsd.sh             # Authoritative XSD validation (xmllint vs vendored schema)
-│   └── validate_define.py          # Fast no-deps structural + referential-integrity gate
+│   ├── validate_define.py          # Fast no-deps structural + referential-integrity gate
+│   └── check_define_conformance.R  # spec→define conformance gate (C-4 inversion; --self-test)
 │
 ├── 08_reviewers_guides/            # Submission Documentation
 │   ├── ADRG.md                     # Analysis Data Reviewer's Guide
 │   ├── SDRG.md                     # SDTM Data Reviewer's Guide
 │   └── BDRG.md                     # BIMO Data Reviewer's Guide (clinsite)
 │
-└── 09_tfl/                         # Tables, Figures & Listings
-    ├── tfl_generation.R            # Full TFL compilation script
-    └── output/                     # Organized TFL outputs
-        ├── figures/                # Figures (R and SAS)
-        │   ├── F-01-1_CONSORT_Disposition.png
-        │   ├── F-11-1_KM_OS.png
-        │   ├── F-11-2_KM_PFS.png
-        │   ├── F-12-1_Subgroup_Forest.png
-        │   ├── F-13-1_PSA_Waterfall.png
-        │   ├── F-14-1_Swimmer_Plot.png
-        │   ├── F-17-1_Optimus_Scatter.png
-        │   └── sas/                # SAS-generated figures (OS/PFS/subgroup/Optimus)
-        ├── tables/                 # Efficacy/safety text tables (T-11, T-20, T-21)
-        └── listings/               # Subject listings (L-01-1)
+├── 09_tfl/                         # Tables, Figures & Listings
+│   ├── tfl_generation.R            # Full TFL compilation script
+│   └── output/                     # Organised TFL outputs
+│       ├── figures/                # Figures (R and SAS)
+│       │   ├── F-01-1_CONSORT_Disposition.png
+│       │   ├── F-11-1_KM_OS.png
+│       │   ├── F-11-2_KM_PFS.png
+│       │   ├── F-12-1_Subgroup_Forest.png
+│       │   ├── F-13-1_PSA_Waterfall.png
+│       │   ├── F-14-1_Swimmer_Plot.png
+│       │   ├── F-17-1_Optimus_Scatter.png
+│       │   └── sas/                # SAS-generated figures (OS/PFS/subgroup/Optimus)
+│       ├── tables/                 # Efficacy/safety text tables (T-11, T-17, T-20, T-21)
+│       └── listings/               # Subject listings (L-01-1)
 │
-└── m5/                             # Ephemeral Compiled FDA eCTD Module 5 Package (ignored)
+└── m5/                             # eCTD Module 5 (Sec 5.3) — data-free preview tracked; *.xpt never tracked
     ├── datasets/tropic/
-    │   ├── tabulations/sdtm/       # sdrg.pdf, blankcrf.pdf, and datasets/ (SDTM XPTs + define.xml)
-    │   └── analysis/adam/          # adrg.pdf, datasets/ (ADaM XPTs + define.xml), and programs/
-    └── 53-clin-stud-rep/           # csr.pdf / tropic.pdf and appendices (TFL figures/tables/listings)
+    │   ├── tabulations/sdtm/       # SDRG, blank CRF, datasets/ (SDTM XPORT v5 + define.xml)
+    │   ├── analysis/adam/          # ADRG, ADaM_spec.xlsx + spec→define report, datasets/ (ADaM XPORT v5 + define.xml/ARM), programs/
+    │   └── bimo/datasets/          # BIMO clinsite.xpt + BDRG (per FDA BIMO TCG)
+    └── 53-clin-stud-rep/535-rep-effic-safety-stud/   # CSR (ICH E3) + TFL appendices (figures/tables/listings)
 ```
 
 ---
@@ -204,7 +214,7 @@ TROPIC/
 # Clone and enter
 git clone <repo-url> && cd TROPIC
 
-# Run all 15 stages (default = sim mode; add --real-sas for a genuine ODA run)
+# Run all 17 stages (default = sim mode; add --real-sas for a genuine ODA run)
 python3 06_telemetry/cibuild.py
 ```
 
@@ -224,33 +234,41 @@ Expected output (default `sim` mode):
 [SUCCESS] Stage 12 — Cross-Language Audit Reconcile
 [SUCCESS] Stage 13 — Efficacy & Safety TFL Suite Compilation
 [SKIPPED] Stage 14 — Numerical Results Reconciliation (SAS vs R)   # PASS under --real-sas
-[SUCCESS] Stage 15 — eCTD Final Package
+[SUCCESS] Stage 15 — ADaM Spec to Define Conformance              # spec governs define (C-4)
+[SUCCESS] Stage 16 — ADaM Spec to Data Conformance                # metacore/metatools/xportr
+[SUCCESS] Stage 17 — eCTD Final Package
 All clinical pipeline stages compiled successfully!
 ```
 
-> Stage 14 honestly reports **`SKIPPED`** in `sim`/`cached` mode (no real SAS `PROC LIFETEST`
-> statistics exist to reconcile); under `--real-sas` it computes and reports a real `PASS`/`FAIL`.
+> Stage 14 transparently reports **`SKIPPED`** in `sim`/`cached` mode (no real SAS `PROC LIFETEST`
+> statistics exist to reconcile); under `--real-sas` it computes and reports a genuine `PASS`/`FAIL`.
 
 ### eCTD Module 5 Submission Package
 
-eCTD Module 5 packaging runs automatically as **Stage 15** of the pipeline. It can also be invoked
-standalone after a pipeline run to (re)compile the deliverables (datasets, metadata, source
-programs, generated reviewer guides incl. the BIMO BDRG, and CSR with outputs) into the canonical
-FDA eCTD Module 5 directory structure:
+eCTD packaging runs automatically as the pipeline's final stage (**Stage 17**) and may also be invoked standalone after a build:
 
 ```bash
 python3 06_telemetry/package_ectd.py
 ```
 
-This compiles the canonical folder layout under `m5/` (which is excluded from Git to prevent tracking redundant output file clones).
+It assembles the deliverables into the canonical structure of **eCTD Module 5 — Clinical Study Reports (Section 5.3)**, following the folder conventions of the FDA *Study Data Technical Conformance Guide*:
+
+- **`m5/datasets/<study>/tabulations/sdtm/`** — SDTM datasets as **SAS Transport (XPORT v5, `.xpt`)** files, the trial-level `define.xml` (Define-XML 2.1), the blank CRF placeholder (`blankcrf.pdf`), and the **SDTM Data Reviewer's Guide** (`sdrg.pdf`).
+- **`m5/datasets/<study>/analysis/adam/`** — ADaM datasets (XPORT v5), the analysis `define.xml` (Define-XML 2.1 + ARM), the governing ADaM specification (`ADaM_spec.xlsx`) with its spec→define conformance report, the **Analysis Data Reviewer's Guide** (`adrg.pdf`), and the source `programs/`.
+- **`m5/datasets/<study>/bimo/`** — the **Bioresearch Monitoring (BIMO)** clinical-site dataset (`clinsite.xpt`) and its data Reviewer's Guide (`bdrg.pdf`), per the FDA BIMO Technical Conformance Guide.
+- **`m5/53-clin-stud-rep/535-rep-effic-safety-stud/…`** — the **Clinical Study Report (ICH E3)** with its Tables, Figures & Listings appendices.
+
+A co-located, machine-readable `define.xml` accompanies every dataset folder; its absence is an FDA **Technical Rejection Criterion** for study data.
+
+A **data-free preview** of the package is committed for portfolio visibility — the full eCTD tree with metadata, rendered reviewer guides/CSR, the ADaM spec, conformance reports, and TFLs, with a placeholder note wherever a patient-level dataset would sit. The patient-level transport files (`*.xpt`) are **never** version-controlled: they are de-identified data obtained via Project Data Sphere under a Data Use Agreement that does not permit redistribution. Build the preview with `python3 06_telemetry/package_ectd.py --preview`; build the full, data-bearing package locally (with the licensed source present) with `python3 06_telemetry/package_ectd.py`.
 
 ---
 
 ## ADaM Datasets Produced
 
-The submitted ADaM datasets (`04_adam/*.xpt`) contain strictly the **real Mitoxantrone (MP) arm (N=371)** and are the only datasets reconciled SAS↔R. The **synthetic, illustrative** Cabazitaxel (CbzP) arm is stored separately as RDS files under `01_raw_source/cbzp_reconstructed/` and merged **only** at the TFL step for demonstration figures/tables — it is never written into the reconciled `*_v.xpt`/`*_prod.xpt` deliverables:
+The submission ADaM datasets (`04_adam/*.xpt`, **SAS Transport / XPORT v5**) contain strictly the **real Mitoxantrone (MP) arm (N=371)** and are the only datasets reconciled SAS↔R. The **synthetic, illustrative** Cabazitaxel (CbzP) arm is stored separately as RDS files under `01_raw_source/cbzp_reconstructed/` and merged **only** at the TFL step for demonstration figures/tables — it is never written into the reconciled `*_v.xpt`/`*_prod.xpt` deliverables:
 
-| Dataset | Domain | MP-Only Rows (Saved in `04_adam/`) | Combined Rows (Merged in TFLs) | Description |
+| Dataset | Content | MP-Only Rows (saved in `04_adam/`) | Combined Rows (merged in TFLs) | Description |
 |---|---|---|---|---|
 | ADSL | Subject Level | 371 | 749 | Demographics, treatment flags, baseline covariates |
 | ADEX | Exposure | 13,052 | 25,823 | Cycle-by-cycle dose, RDI, cumulative exposure |
@@ -259,7 +277,6 @@ The submitted ADaM datasets (`04_adam/*.xpt`) contain strictly the **real Mitoxa
 | ADLB | Lab Findings | 78,938 | 82,718 | Longitudinal labs, toxicity grades, CTCAE shifts |
 | ADRS | Response | 2,533 | 4,883 | Tumour response assessments |
 | ADTTE | Time-to-Event | 2,226 | 4,494 | OS, PFS, TTPSA, TTPAIN, TTUMOR |
-
 
 ---
 
@@ -277,38 +294,42 @@ the reconciled ADaM and the analysis derivations documented in the ADRG/SAP.
 | `F-13-1_PSA_Waterfall.png` | PSA best % change from baseline |
 | `F-14-1_Swimmer_Plot.png` | Treatment-exposure swimmer |
 | `F-17-1_Optimus_Scatter.png` | Project Optimus exposure–response |
-| `T-11` / `T-20` / `T-21` (`.txt`) | Efficacy (KM/Cox), TEAE summary, CTCAE lab shifts |
+| `T-11` / `T-17` / `T-20` / `T-21` (`.txt`) | Efficacy (KM/Cox), Project Optimus tables, TEAE summary, CTCAE lab shifts |
+| `L-01-1_Discontinuations.txt` | Subject discontinuation listing |
 
-Figure QC follows standard practice: the **analysis results behind each figure** —
+Figure QC follows standard practice: the **analysis results underlying each figure** —
 survival functions, hazard ratios, subjects-at-risk, and response distributions — are
-the validated objects (driven by the SAS↔R-reconciled ADaM), not the rendered pixels.
+the validated objects (driven by the SAS↔R-reconciled ADaM), not the rendered image itself.
 
 ### SAS production-track graphics (capability demonstration)
 
-To show the production environment can deliver regulatory-grade graphics natively, the
+To demonstrate that the production environment can deliver regulatory-grade graphics natively, the
 core efficacy/safety statistical figures are **also** rendered in SAS 9.4 via ODS
 Graphics (`02_production_sas/T_tfl_generation.sas` — PROC LIFETEST / SGPLOT / SGPANEL),
 output to [`09_tfl/output/figures/sas/`](09_tfl/output/figures/sas/): KM OS & PFS, subgroup forest, PSA
 waterfall, exposure swimmer, and the Optimus exposure–response scatter.
 
-> This is a **breadth demonstration**, not a duplicated deliverable — a study ships its
-> TFLs in a single validated language. It does double as an independent visual check that
-> the SAS production analyses (Cox HR, KM survival, at-risk counts) agree with the R
-> reporting track. CONSORT and the text tables are R-track outputs only. SAS figures are
-> rendered on ODA via `python3 06_telemetry/_oda_render_tfl.py`.
+> This is a **capability demonstration**, not a duplicated deliverable: a regulatory submission
+> ships its TFLs in a single validated language. It also serves as an independent visual cross-check
+> that the SAS production analyses (Cox hazard ratios, Kaplan–Meier survival, subjects-at-risk)
+> concur with the R reporting track. CONSORT and the text tables are produced on the R track only.
+> The SAS figures are rendered on ODA via `python3 06_telemetry/_oda_render_tfl.py`.
 
 ---
 
-## Standards Alignment
+## Regulatory Standards Alignment
 
-This is a **demonstration / portfolio** project, not a regulatory submission. The table below states what the pipeline *implements*, not a certified compliance status. "Pattern demonstrated" means the technique is applied correctly on this (partly synthetic) dataset; it does **not** assert validated, audited conformance.
+The pipeline is engineered to mirror the data-standards expectations of a U.S. FDA marketing submission — the CDISC versions named in the **FDA Data Standards Catalog**, the eCTD Module 5 packaging conventions of the *Study Data Technical Conformance Guide*, and the ICH E3/E9 reporting frameworks. **This remains a demonstration / portfolio project, not a regulatory submission:** the table states what the pipeline *implements*, not certified, audited compliance. "Pattern demonstrated/implemented" means the technique is applied correctly on this (partly synthetic) dataset; it does **not** assert validated conformance.
 
-| Standard | What this repo actually does |
+| Standard / FDA expectation | What this repository implements |
 |---|---|
 | CDISC ADaMIG v1.3 | ADaM structure/metadata modelled for all 7 datasets (real MP arm) |
 | CDISC Define-XML 2.1 + ARM v1.0 | Both `define.xml` (ADaM) and `define_sdtm.xml` **pass full XSD validation** (`07_define_xml/validate_xsd.sh`) **and parse cleanly in the CDISC CORE reference engine** (`Define_XML_Version 2.1.0`). The CORE run surfaced + fixed 3 defects the XSD check missed (invalid `Role` on `ItemGroupDef`, empty `TranslatedText`, missing `def:Class`). |
 | **CDISC CORE business-rule conformance** | **Real CDISC reference-engine run** (CORE 0.16.0). **SDTM:** 392 SDTMIG-3.2 rules executed (`06_telemetry/conformance/core_sdtm_report.json`; SDTMIG 3.1.1-vs-3.2 version-gap caveat). **ADaM:** CORE/CDISC Library ships **0 executable ADaM rules**, so executable ADaM rules are authored in CORE YAML (`06_telemetry/conformance_rules/adam/`) and run via `--local-rules` → 7/7 SUCCESS. See `06_telemetry/conformance/CORE_RUN_RECORD.md`. Official `AD####` rule IDs are members-only. |
 | CDISC SDTMIG v3.1.1 | Trial-era source SDTM standard (per SAP v3.0 §1) consumed and structurally validated |
+| ADaM specification — single source of truth | Authoring-format `ADaM_spec.xlsx` (metacore / Pinnacle 21) governs both `define.xml` and the produced data; automated **spec→define** and **spec→data** (metacore/metatools/xportr) conformance gates run in the pipeline and CI |
+| FDA Study Data Technical Conformance Guide | eCTD Module 5 (Section 5.3) folder layout, SAS Transport (XPORT v5) datasets, and a co-located `define.xml` per dataset folder, assembled by `package_ectd.py`. Structure followed only — **not** a validated submission sequence (no eCTD `index.xml` backbone) |
+| FDA BIMO Technical Conformance Guide | Clinical-site-level dataset (`clinsite`) with per-site enrollment/safety roll-ups + a BIMO Data Reviewer's Guide (BDRG). Site investigator name (`INVNAM`) is a **flagged synthetic placeholder** |
 | ICH E9 (Statistical Principles) | Hierarchical step-down gatekeeping **pattern implemented** (exercised on a synthetic comparator — not an inferential result) |
 | ICH E3 (TFL Catalogue) | TFL set rendered in NEJM/Lancet style |
 | FDA Project Optimus | Exposure–response dose-optimisation analysis **pattern demonstrated** on synthetic data |
@@ -318,43 +339,43 @@ This is a **demonstration / portfolio** project, not a regulatory submission. Th
 
 ## SAS Execution via SAS OnDemand for Academics
 
-Stage 10 obtains the SAS 9.4 production datasets in one of several **explicitly-labelled** modes (the chosen mode is resolved at runtime and recorded in `06_telemetry/pipeline_health.json` as `sas_execution_mode`):
+Stage 11 obtains the SAS 9.4 production datasets through one of several **explicitly labelled** execution modes. The mode is resolved at runtime and recorded in `06_telemetry/pipeline_health.json` as `sas_execution_mode`:
 
 | Invocation | Mode | What happens |
 |---|---|---|
 | `--real-sas` (local `sas` on PATH) | `local` | Runs `00_master_driver.sas` on the local SAS 9.4 engine this session. |
 | `--real-sas` (no local SAS, SASPy configured) | `oda` | Connects to **SAS OnDemand for Academics** via the resilient broker, verifies the resident SDTM manifest, runs `00_master_driver.sas` via SASPy IOM, downloads the 7 `*_prod.xpt`. |
-| `--real-sas` (ODA unreachable after the budget) | `sim` | Honest fallback: byte-copy, telemetry records `oda_last_error_class` + `next_recommended_window`. Never relabeled `oda`. |
-| `--real-sas` (no engine at all) | `error` | **Fails loudly** — real SAS was requested but cannot be run. No false "PASS". |
-| `--use-cached-sas` | `cached` | Reconciles against **pre-existing** `*_prod.xpt` from a prior SAS run. **SAS is not re-run this session;** telemetry says so. |
-| *(no flag, no SAS)* | `sim` | Byte-copies `*_v.xpt` → `*_prod.xpt`. Clearly flagged as **NOT** double-programming (zero diffs are tautological). |
+| `--real-sas` (ODA unreachable within the budget) | `sim` | Transparent fallback: the validation outputs are byte-copied, and telemetry records `oda_last_error_class` and `next_recommended_window`. The mode is never relabelled `oda`. |
+| `--real-sas` (no engine available) | `error` | **Fails explicitly** — a real SAS run was requested but no engine is available; the build aborts rather than record a false PASS. |
+| `--use-cached-sas` | `cached` | Reconciles against **pre-existing** `*_prod.xpt` from a prior SAS run. SAS is **not** re-executed this session, and telemetry records this explicitly. |
+| *(no flag, no SAS)* | `sim` | Byte-copies `*_v.xpt` → `*_prod.xpt`; explicitly flagged as **not** double programming, since a zero-difference reconciliation is tautological in this mode. |
 
-> The `cached` and `sim` modes never claim a real SAS run occurred. `oda` mode is **earned** — it is recorded only after a live workspace probe and a verified SDTM manifest (see below); only `local` and `oda` are reported as genuine double-programming.
+> The `cached` and `sim` modes never represent a real SAS run as having occurred. `oda` mode is **earned** — it is recorded only after a live workspace probe and verification of the resident SDTM manifest (see below); only `local` and `oda` are reported as genuine double programming.
 
 ### Two-job ODA workflow (Job A seed · Job B reconcile)
 
-ODA's ~200 MB SDTM upload and its flaky load-balancing spawner are handled by splitting the work
-and routing every connection through a resilient broker (`06_telemetry/oda_broker.py`). Full
-operator guide: **[`06_telemetry/ODA_GUIDE.md`](06_telemetry/ODA_GUIDE.md)**.
+ODA's ~200 MB SDTM upload and its intermittent load-balancing spawner are accommodated by
+separating the work into two jobs and routing every connection through a resilient broker
+(`06_telemetry/oda_broker.py`). Full operator guide: **[`06_telemetry/ODA_GUIDE.md`](06_telemetry/ODA_GUIDE.md)**.
 
 ```bash
 # Job A — seed the SDTM once (idempotent; sha256/nrows manifest; zero upload if already resident)
 python3 06_telemetry/seed_sdtm.py
 
-# Job B — reconcile on demand (broker rides spawner timeouts; verifies the manifest before running)
+# Job B — reconcile on demand (broker absorbs spawner timeouts; verifies the manifest before running)
 python3 06_telemetry/cibuild.py --real-sas
 ```
 
-The broker uses status-gated full-jitter backoff within a wall-clock budget (`TROPIC_ODA_MAX_WAIT`),
-fails fast on auth/encryption errors, keeps slot hygiene (single-flight lock + teardown), and
-**earns** `oda` mode via a live nonce probe. Confirm a genuine run with
-`sas_execution_mode == "oda"` **and** `reconciliation == "SAS_vs_R"` in `pipeline_health.json`.
+The broker applies status-gated, full-jitter backoff within a wall-clock budget (`TROPIC_ODA_MAX_WAIT`),
+fails fast on authentication or encryption errors, maintains connection-slot hygiene (a single-flight
+lock with guaranteed teardown), and **earns** `oda` mode only through a live nonce probe. A genuine run
+is confirmed by `sas_execution_mode == "oda"` **and** `reconciliation == "SAS_vs_R"` in `pipeline_health.json`.
 
-> **Committed evidence:** A frozen snapshot of a genuine GREEN `oda` run is kept under
-> [`06_telemetry/evidence/`](06_telemetry/evidence/) — including an md5 manifest proving every
+> **Committed evidence:** A frozen snapshot of a genuine GREEN `oda` run is retained under
+> [`06_telemetry/evidence/`](06_telemetry/evidence/) — including an MD5 manifest demonstrating that every
 > SAS-produced `*_prod.xpt` is **byte-distinct** from its R-produced `*_v.xpt` yet reconciles
-> **cell-identical** across all 8 domains (ADSL…ADTTE + the BIMO `clinsite`). It is stored apart
-> from the live telemetry so a later `sim` run cannot overwrite the proof.
+> **cell-identical** across all eight domains (ADSL…ADTTE plus the BIMO `clinsite`). It is stored
+> separately from the live telemetry so that a subsequent `sim` run cannot overwrite this evidence.
 
 ---
 

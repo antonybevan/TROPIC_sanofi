@@ -1,0 +1,30 @@
+============================================================================
+ NOTICE: The CbzP (Cabazitaxel) arm shown below is a SYNTHETIC, illustrative
+ cohort reconstructed by proportional-hazards scaling of the real MP arm.
+ Between-arm comparisons are circular by construction and are NOT clinical
+ findings. All Mitoxantrone (MP) arm values are derived from real trial data.
+============================================================================
+
+TROPIC (Study EFC6193 / XRP6258) Clinical Reporting Tables
+=============================================
+
+T-17-1: Relative Dose Intensity (RDI) Category Distribution by Arm
+------------------------------------------------------------------
+Category     CbzP (N=378)   MP (N=371)
+>=85%        245 (64.8%)    327 (88.1%)
+65-<85%      98 (25.9%)     43 (11.6%)
+<65%         35 (9.3%)     1 (0.3%)
+
+T-17-2: Worst Cycle ANC Nadir Grade Stratified by G-CSF Usage (CbzP)
+--------------------------------------------------------------------
+Group                   Grade 1/2      Grade 3        Grade 4
+G-CSF Prophylaxis (N=30) 30 (100.0%)    0 (0.0%)      0 (0.0%)
+No Prophylaxis (N=341)  243 (71.3%)     80 (23.5%)      18 (5.3%)
+
+T-17-4: Benefit-Risk Summary by RDI Tertile (CbzP Arm)
+------------------------------------------------------
+RDI Tertile    Median OS (Months)   Grade >=3 Neutropenia Rate (%)
+High (>=85%)   23.0 months          86.2%
+Med (65-<85%)  19.1 months          87.6%
+Low (<65%)     19.1 months          85.7%
+

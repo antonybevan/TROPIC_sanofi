@@ -91,8 +91,14 @@ scratch/
 !06_telemetry/pipeline_health.json
 !06_telemetry/reconciliation_status.json
 
-# Ephemeral eCTD Module 5 submission package
-m5/
+# eCTD Module 5 package. The DATA-FREE preview (package_ectd.py --preview) is tracked for
+# portfolio visibility; patient-level transport/native data is NEVER tracked, even when the
+# full package is built locally with the licensed source data present.
+m5/**/*.xpt
+m5/**/*.sas7bdat
+# Re-include the rendered submission artifacts that the global *.pdf / *.png rules would ignore.
+!m5/**/*.pdf
+!m5/**/*.png
 
 .core_venv/
 

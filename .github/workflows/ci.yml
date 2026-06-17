@@ -83,3 +83,12 @@ jobs:
         bash 07_define_xml/validate_xsd.sh 07_define_xml/define_sdtm.xml
         python3 07_define_xml/validate_define.py 07_define_xml/define.xml
         python3 07_define_xml/validate_define.py 07_define_xml/define_sdtm.xml
+
+    - name: ADaM specification conformance gates (C-4 inversion)
+      run: |
+        # The authoritative spec (00_specifications/ADaM_spec.xlsx) governs both
+        # define.xml and the produced data. Assert both, and prove the define gate
+        # actually detects drift (self-test) rather than being a no-op.
+        Rscript 07_define_xml/check_define_conformance.R
+        Rscript 07_define_xml/check_define_conformance.R --self-test
+        Rscript 03_validation_r/spec_data_checks.R
