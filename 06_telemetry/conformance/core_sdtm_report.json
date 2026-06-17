@@ -1,7 +1,7 @@
 {
   "Conformance_Details": {
-    "Report_Generation": "2026-06-17T11:52:08",
-    "Total_Runtime": "122.43 seconds",
+    "Report_Generation": "2026-06-17T12:08:00",
+    "Total_Runtime": "106.09 seconds",
     "CORE_Engine_Version": "0.16.0",
     "Issue_Limit_Per_Rule": "None",
     "Issue_Limit_Per_Dataset": "None",
@@ -15,40 +15,40 @@
     {
       "filename": "AE",
       "label": null,
-      "path": "/Users/apple/Desktop/TROPIC/.core_run/sdtm_small",
-      "modification_date": "2026-06-17T10:45:06",
+      "path": "/Users/apple/Desktop/TROPIC/.core_run/sdtm",
+      "modification_date": "2026-06-17T12:06:10",
       "size_kb": 2393.12,
       "length": 5428
     },
     {
       "filename": "DM",
       "label": null,
-      "path": "/Users/apple/Desktop/TROPIC/.core_run/sdtm_small",
-      "modification_date": "2026-06-17T10:45:06",
+      "path": "/Users/apple/Desktop/TROPIC/.core_run/sdtm",
+      "modification_date": "2026-06-17T12:06:10",
       "size_kb": 49.52,
       "length": 371
     },
     {
       "filename": "EX",
       "label": null,
-      "path": "/Users/apple/Desktop/TROPIC/.core_run/sdtm_small",
-      "modification_date": "2026-06-17T10:45:06",
+      "path": "/Users/apple/Desktop/TROPIC/.core_run/sdtm",
+      "modification_date": "2026-06-17T12:06:10",
       "size_kb": 626.8,
       "length": 3485
     },
     {
       "filename": "DS",
       "label": null,
-      "path": "/Users/apple/Desktop/TROPIC/.core_run/sdtm_small",
-      "modification_date": "2026-06-17T10:45:08",
+      "path": "/Users/apple/Desktop/TROPIC/.core_run/sdtm",
+      "modification_date": "2026-06-17T12:06:10",
       "size_kb": 880.96,
       "length": 2842
     },
     {
       "filename": "VS",
       "label": null,
-      "path": "/Users/apple/Desktop/TROPIC/.core_run/sdtm_small",
-      "modification_date": "2026-06-17T10:45:08",
+      "path": "/Users/apple/Desktop/TROPIC/.core_run/sdtm",
+      "modification_date": "2026-06-17T12:06:10",
       "size_kb": 3074.24,
       "length": 18388
     }
