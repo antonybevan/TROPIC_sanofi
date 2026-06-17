@@ -4,6 +4,41 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.10.0] - 2026-06-17 — CDISC CORE conformance + Define-XML hardening
+
+> **Context.** Ran the **official CDISC reference engine (CORE 0.16.0)** against the project's
+> SDTM and ADaM — the real business-rule layer the home-grown `adam_conf_check.R` stood in for —
+> and fixed the Define-XML defects CORE surfaced. Honest headline finding: **CORE/CDISC Library
+> ships 0 executable ADaM rules** (confirming, not refuting, ADRG §6), so executable ADaM rules
+> are authored in CORE format and run via `--local-rules`.
+
+### Added
+- **Executable ADaM conformance rules in CORE YAML** (`06_telemetry/conformance_rules/adam/`,
+  7 rules across all 7 ADaM datasets) run via CORE `--local-rules` → **7/7 SUCCESS** with the
+  Define-XML engaged (`Define_XML_Version 2.1.0`). Fills the gap where CDISC ships no ADaM pack.
+- **CORE runner** (`06_telemetry/run_core_conformance.sh`) — reproducible setup (venv, engine,
+  library-metadata cache via `CDISC_LIBRARY_API_KEY`, SDTM XPT conversion, SDTM + ADaM runs).
+- **CI gate** (`06_telemetry/validate_core_rules.py`) — rule-pack well-formedness check (no API
+  key/data needed), wired into `.github/workflows/ci.yml`.
+- **CORE run evidence** (`06_telemetry/conformance/`) — `CORE_RUN_RECORD.md` + redacted SDTM/ADaM
+  JSON reports (per-record subject-level `Issue_Details` stripped).
+
+### Changed / Fixed
+- **Define-XML now parses in CORE (both files), root-caused and fixed.** CORE's reader failed with
+  `'NoneType' object has no attribute 'Name'` because no `ItemGroupDef` declared a `def:Class`.
+  Added `def:Class` (correct position, valid enumeration) to all **16 SDTM + 7 ADaM** datasets;
+  also removed an invalid `Role` attribute (`ItemGroupDef`) and populated 16 empty `TranslatedText`
+  descriptions in `define_sdtm.xml`. Both defines **still pass XSD** and now read in CORE at 2.1.0.
+- **SDTM CORE run:** 392 SDTMIG-3.2 rules executed (15 issue-reporting / 47 finding rows);
+  documented the **SDTMIG 3.1.1-vs-3.2 version-gap** caveat — a real engine run, not a clean pass.
+- **ADRG §6** updated with the 2026-06-17 CORE re-verification and the Define-XML parse fix.
+
+### Notes
+- The official **CDISC ADaM Conformance Rules v4.0/v5.0** (for an `AD####` ID crosswalk) are
+  **members-only** (Library API returns "Members-only content" on a free key); rule IDs here are
+  `TROPIC-ADAM-###` placeholders pending a membership account. CORE engine/venv/cache and any
+  converted XPT stay under gitignored `.core_run/` / `.core_venv/` (never committed).
+
 ## [3.9.0] - 2026-06-16 — Audit remediation: status integrity, BIMO, evidence badge
 
 > **Context.** Post-audit hardening pass (findings C-1…C-6). Verified end-to-end on a **genuine

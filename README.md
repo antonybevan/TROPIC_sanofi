@@ -147,6 +147,10 @@ TROPIC/
 │   ├── seed_sdtm.py                # Job A: idempotent, manifest-checked SDTM seeding
 │   ├── test_oda_broker.py          # Unit tests for the broker + seed (no Java/network)
 │   ├── ODA_GUIDE.md                # Operator guide for the resilient real-SAS workflow
+│   ├── run_core_conformance.sh     # CDISC CORE conformance runner (SDTM + executable ADaM rules)
+│   ├── validate_core_rules.py      # CI gate: CORE rule-pack well-formedness check
+│   ├── conformance_rules/adam/     # Executable ADaM conformance rules (CORE YAML)
+│   ├── conformance/                # CORE reports + CORE_RUN_RECORD.md (run evidence)
 │   ├── health_dashboard.md         # Live pipeline status dashboard
 │   └── reconciliation_report.html  # diffdf audit HTML report
 │
@@ -302,7 +306,8 @@ This is a **demonstration / portfolio** project, not a regulatory submission. Th
 | Standard | What this repo actually does |
 |---|---|
 | CDISC ADaMIG v1.3 | ADaM structure/metadata modelled for all 7 datasets (real MP arm) |
-| CDISC Define-XML 2.1 + ARM v1.0 | `07_define_xml/define.xml` **passes full XSD validation** against the official CDISC schema (vendored under `07_define_xml/schema/`): `07_define_xml/validate_xsd.sh` → *validates*. Schema-layer conformance; the Pinnacle 21 / CDISC CORE business-rule layer remains a pre-submission step. |
+| CDISC Define-XML 2.1 + ARM v1.0 | Both `define.xml` (ADaM) and `define_sdtm.xml` **pass full XSD validation** (`07_define_xml/validate_xsd.sh`) **and parse cleanly in the CDISC CORE reference engine** (`Define_XML_Version 2.1.0`). The CORE run surfaced + fixed 3 defects the XSD check missed (invalid `Role` on `ItemGroupDef`, empty `TranslatedText`, missing `def:Class`). |
+| **CDISC CORE business-rule conformance** | **Real CDISC reference-engine run** (CORE 0.16.0). **SDTM:** 392 SDTMIG-3.2 rules executed (`06_telemetry/conformance/core_sdtm_report.json`; SDTMIG 3.1.1-vs-3.2 version-gap caveat). **ADaM:** CORE/CDISC Library ships **0 executable ADaM rules**, so executable ADaM rules are authored in CORE YAML (`06_telemetry/conformance_rules/adam/`) and run via `--local-rules` → 7/7 SUCCESS. See `06_telemetry/conformance/CORE_RUN_RECORD.md`. Official `AD####` rule IDs are members-only. |
 | CDISC SDTMIG v3.1.1 | Trial-era source SDTM standard (per SAP v3.0 §1) consumed and structurally validated |
 | ICH E9 (Statistical Principles) | Hierarchical step-down gatekeeping **pattern implemented** (exercised on a synthetic comparator — not an inferential result) |
 | ICH E3 (TFL Catalogue) | TFL set rendered in NEJM/Lancet style |
