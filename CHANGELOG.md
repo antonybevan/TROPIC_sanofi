@@ -4,6 +4,68 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.12.0] - 2026-06-17 — ARM expansion to all analysis displays
+
+> **Context.** Analysis Results Metadata (ARM v1.0) previously covered only the 3 survival/
+> secondary/TEAE ResultDisplays; the exploratory figure displays and the lab-shift table had no
+> ARM. This release extends ARM to **every analysis display** so each has result→method→ADaM
+> dataset/variable traceability. Pure `define.xml` authoring — no new dependencies.
+
+### Added
+- **5 new ARM ResultDisplays / AnalysisResults** in `07_define_xml/define.xml` (ARM now
+  **8 ResultDisplays / 10 AnalysisResults**):
+  - `RD.EFFICACY.SUBGROUP` / `AR.OS.SUBGROUP` — OS prognostic-subgroup forest (figure **F-12-1**).
+  - `RD.EFFICACY.PSA.RESPONSE` / `AR.PSA.BESTPCHG` — PSA best % change waterfall (**F-13-1**).
+  - `RD.SAFETY.EXPOSURE` / `AR.TRTDUR.EXPOSURE` — treatment-exposure swimmer (**F-14-1**).
+  - `RD.OPTIMUS.ER` / `AR.OPTIMUS.RDI.ANC` — Project Optimus RDI vs ANC-nadir scatter (**F-17-1**).
+  - `RD.SAFETY.LABSHIFT` / `AR.LAB.SHIFT` — CTCAE grade shift baseline→worst (table **T-21-1**).
+- Each `ResultDisplay` names its TFL ID for ARM↔TFL traceability and links the exact ADaM
+  datasets/variables (+ value-level `WhereClauseRef`s) and the analysis method/programming code.
+
+### Changed / Fixed
+- **Verified:** define.xml still **XSD VALID** (Define-XML 2.1 + ARM v1.0); `validate_define.py`
+  referential-integrity gate **PASS (324 checks**, up from 284 — every new ARM `ParameterOID` /
+  `ItemGroupOID` / `AnalysisVariable.ItemOID` / `WhereClauseOID` resolves); spec→define gate
+  unaffected. CONSORT disposition (F-01) and the discontinuation listing (L-01) are intentionally
+  out of ARM scope (flow diagram / listing, not analysis results).
+- **ADRG §6** and the traceability matrix updated to reflect full ARM coverage.
+
+## [3.11.0] - 2026-06-17 — Specification → define inversion (audit C-4 fixed)
+
+> **Context.** Closes audit finding **C-4** for real. The previous "spec"
+> (`ADaM_Define_Extract.xlsx`) was rendered *from* `define.xml` on every build — a circular,
+> zero-verification traceability inversion. This release makes an authoring-format ADaM
+> specification the **single source of truth** and checks the define + the produced data
+> *against* it, using the pharmaverse **metacore / metatools / xportr** toolchain. The previous
+> remediation only *reframed* the extract honestly; this one actually *inverts* the direction.
+
+### Added
+- **Authoritative ADaM specification** `00_specifications/ADaM_spec.xlsx` (CDISC / Pinnacle-21
+  metacore workbook: Study, Datasets, Variables, ValueLevel, WhereClauses, Codelists, Methods).
+  Loadable via `metacore::spec_to_metacore()` (`03_validation_r/load_spec.R`). Bootstrapped once
+  by `00_specifications/build_spec_seed.R` (documented one-time migration), human-edited master after.
+- **spec → define conformance gate** `07_define_xml/check_define_conformance.R` — asserts every
+  dataset/variable/label/type/length/order/mandatory/codelist/method in `define.xml` matches the
+  spec; exits non-zero on drift. Ships a `--self-test` that injects synthetic drift and confirms
+  detection (proves the gate is not a no-op). Latest run **PASS** (7 datasets / 157 variables).
+- **spec → data conformance gate** `03_validation_r/spec_data_checks.R` — checks the produced
+  `04_adam/*_prod.xpt` against the spec with `metatools::check_variables` / `check_ct_data` and
+  `xportr::xportr_type`/`xportr_length`. Independent (non-circular) verification. Latest run
+  **PASS** across all 7 datasets. Reports in `06_telemetry/conformance/spec_{define,data}_conformance.json`.
+- Pipeline **Stages 15–16** (cibuild) and a CI step run both gates; `metacore`, `metatools`,
+  `writexl` added to `renv.lock`.
+
+### Changed / Fixed
+- **Variable-label artifacts are now spec-sourced.** `06_telemetry/gen_adam_labels.R` derives
+  `03_validation_r/adam_var_labels.csv` (R track) and `02_production_sas/_adam_labels.sas` (SAS
+  track) from the spec — replacing the define-sourced `gen_adam_labels.py`. Label content is
+  **byte-identical** to before (no output regression); only the provenance flips define → spec.
+- `package_ectd.py` now ships `ADaM_spec.xlsx` + the spec→define conformance report instead of
+  the retired extract. eCTD packaging is now Stage 17 (was 15).
+- **Retired** `06_telemetry/generate_adam_specs.py`, `06_telemetry/gen_adam_labels.py`, and
+  `00_specifications/ADaM_Define_Extract.xlsx` (the circular define → extract path).
+- **ADRG §6.1** added documenting the inversion and the two gates.
+
 ## [3.10.0] - 2026-06-17 — CDISC CORE conformance + Define-XML hardening
 
 > **Context.** Ran the **official CDISC reference engine (CORE 0.16.0)** against the project's

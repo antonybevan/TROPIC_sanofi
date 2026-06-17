@@ -485,7 +485,13 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
         {"id": 12, "name": "Cross-Language Audit Reconcile", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('05_reconciliation/cross_lang_audit.R')"]},
         {"id": 13, "name": "Efficacy & Safety TFL Suite Compilation", "cmd": [RSCRIPT_PATH, "09_tfl/tfl_generation.R"]},
         {"id": 14, "name": "Numerical Results Reconciliation (SAS vs R)", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('05_reconciliation/results_reconcile.R')"]},
-        {"id": 15, "name": "eCTD Final Package", "cmd": [sys.executable, "06_telemetry/package_ectd.py"]}
+        # Audit C-4 inversion: the authoritative spec (00_specifications/ADaM_spec.xlsx)
+        # governs both define.xml and the produced data. These two gates assert that
+        # downstream agreement; they run before packaging so the submission ships a
+        # passing conformance report.
+        {"id": 15, "name": "ADaM Spec to Define Conformance", "cmd": [RSCRIPT_PATH, "07_define_xml/check_define_conformance.R"]},
+        {"id": 16, "name": "ADaM Spec to Data Conformance", "cmd": [RSCRIPT_PATH, "03_validation_r/spec_data_checks.R"]},
+        {"id": 17, "name": "eCTD Final Package", "cmd": [sys.executable, "06_telemetry/package_ectd.py"]}
     ]
 
     # F-6 guard: the post-execution gates in run_single_stage() key on these exact stage
@@ -757,8 +763,8 @@ def main():
         sys.exit(0)
     else:
         # Validate that from-stage is within valid range (AUTO-03)
-        if args.from_stage < 0 or args.from_stage > 13:
-            print(f"ERROR: Invalid stage number {args.from_stage}. Stage number must be between 1 and 13.")
+        if args.from_stage < 0 or args.from_stage > 17:
+            print(f"ERROR: Invalid stage number {args.from_stage}. Stage number must be between 1 and 17.")
             sys.exit(1)
         if args.real_sas and args.use_cached_sas:
             print("ERROR: --real-sas and --use-cached-sas are mutually exclusive.")

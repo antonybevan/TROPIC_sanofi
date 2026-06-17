@@ -1,0 +1,1340 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:def="http://www.cdisc.org/ns/def/v2.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ODMVersion="1.3.2" FileType="Snapshot" FileOID="TROPIC_SDTM_Metadata_v2.1" CreationDateTime="2026-06-12T21:49:25" AsOfDateTime="2026-06-12T21:49:25" Originator="Antony Bevan, Clinical Programming" def:Context="Submission" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 http://schema.cdisc.org/define/v2.1/define2-1-0.xsd">
+  <Study OID="STDY.TROPIC">
+    <GlobalVariables>
+      <StudyName>TROPIC (EFC6193 / XRP6258)</StudyName>
+      <StudyDescription>Cabazitaxel vs Mitoxantrone in mCRPC progressing after docetaxel (NCT00417079).</StudyDescription>
+      <ProtocolName>EFC6193</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.TROPIC_NCT00417079.SDTM.3.1.1" Name="TROPIC Trial SDTM Metadata Specification" Description="Metadata specification for TROPIC Phase III re-analysis SDTM datasets" def:DefineVersion="2.1.0">
+      <def:Standards>
+        <def:Standard OID="STD.SDTMIG.3.1.1" Name="SDTMIG" Type="IG" Version="3.1.1" Status="Final"/>
+        <def:Standard OID="STD.SDTMCT.2024-03-29" Name="CDISC/NCI" Type="CT" PublishingSet="SDTM" Version="2024-03-29" Status="Final"/>
+      </def:Standards>
+      <ItemGroupDef OID="IG.DM" Name="DM" Repeating="No" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject" def:ArchiveLocationID="LF.DM" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">DM (One record per subject)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.DM.AGEGRP" Mandatory="No" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.DM.STUDYID" Mandatory="Yes" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.DM.DOMAIN" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.DM.USUBJID" Mandatory="Yes" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.DM.SUBJID" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.DM.RFSTDTC" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.DM.RFENDTC" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.DM.AGEU" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.DM.SEX" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.DM.RACE" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.DM.ARM" Mandatory="No" OrderNumber="11"/>
+        <ItemRef ItemOID="IT.DM.ARMCD" Mandatory="No" OrderNumber="12"/>
+        <ItemRef ItemOID="IT.DM.ARM2" Mandatory="No" OrderNumber="13"/>
+        <ItemRef ItemOID="IT.DM.ARMA" Mandatory="No" OrderNumber="14"/>
+        <ItemRef ItemOID="IT.DM.ARMCD2" Mandatory="No" OrderNumber="15"/>
+        <ItemRef ItemOID="IT.DM.BSABL" Mandatory="No" OrderNumber="16"/>
+        <ItemRef ItemOID="IT.DM.ITT" Mandatory="No" OrderNumber="17"/>
+        <ItemRef ItemOID="IT.DM.PPROT" Mandatory="No" OrderNumber="18"/>
+        <ItemRef ItemOID="IT.DM.SAFETY" Mandatory="No" OrderNumber="19"/>
+        <def:Class Name="SPECIAL PURPOSE"/>
+        <def:leaf ID="LF.DM" xlink:href="dm.xpt">
+          <def:title>dm.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.AE" Name="AE" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per adverse event" def:ArchiveLocationID="LF.AE" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">AE (One record per subject per adverse event)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.AE.AESTWKF" Mandatory="No" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.AE.AEENWKF" Mandatory="No" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.AE.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.AE.STUDYID" Mandatory="Yes" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.AE.DOMAIN" Mandatory="Yes" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.AE.AESEQ" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.AE.AESPID" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.AE.AEREFID" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.AE.AETERM" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.AE.AEDECOD" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.AE.AEBODSYS" Mandatory="No" OrderNumber="11"/>
+        <ItemRef ItemOID="IT.AE.AESER" Mandatory="No" OrderNumber="12"/>
+        <ItemRef ItemOID="IT.AE.AEACN" Mandatory="No" OrderNumber="13"/>
+        <ItemRef ItemOID="IT.AE.AECONTRT" Mandatory="No" OrderNumber="14"/>
+        <ItemRef ItemOID="IT.AE.AEREL" Mandatory="No" OrderNumber="15"/>
+        <ItemRef ItemOID="IT.AE.AEPATT" Mandatory="No" OrderNumber="16"/>
+        <ItemRef ItemOID="IT.AE.AEOUT" Mandatory="No" OrderNumber="17"/>
+        <ItemRef ItemOID="IT.AE.AESCONG" Mandatory="No" OrderNumber="18"/>
+        <ItemRef ItemOID="IT.AE.AESDISAB" Mandatory="No" OrderNumber="19"/>
+        <ItemRef ItemOID="IT.AE.AESDTH" Mandatory="No" OrderNumber="20"/>
+        <ItemRef ItemOID="IT.AE.AESHOSP" Mandatory="No" OrderNumber="21"/>
+        <ItemRef ItemOID="IT.AE.AESLIFE" Mandatory="No" OrderNumber="22"/>
+        <ItemRef ItemOID="IT.AE.AESMIE" Mandatory="No" OrderNumber="23"/>
+        <ItemRef ItemOID="IT.AE.AETOXGR" Mandatory="No" OrderNumber="24"/>
+        <ItemRef ItemOID="IT.AE.VISITNUM" Mandatory="No" OrderNumber="25"/>
+        <ItemRef ItemOID="IT.AE.VISIT" Mandatory="No" OrderNumber="26"/>
+        <ItemRef ItemOID="IT.AE.AESTWK" Mandatory="No" OrderNumber="27"/>
+        <ItemRef ItemOID="IT.AE.AEENWK" Mandatory="No" OrderNumber="28"/>
+        <ItemRef ItemOID="IT.AE.SUBJID" Mandatory="No" OrderNumber="29"/>
+        <ItemRef ItemOID="IT.AE.AECOLGR" Mandatory="No" OrderNumber="30"/>
+        <ItemRef ItemOID="IT.AE.AECOLGRN" Mandatory="No" OrderNumber="31"/>
+        <ItemRef ItemOID="IT.AE.AEDICTVS" Mandatory="No" OrderNumber="32"/>
+        <ItemRef ItemOID="IT.AE.AEHLGT" Mandatory="No" OrderNumber="33"/>
+        <ItemRef ItemOID="IT.AE.AEHLT" Mandatory="No" OrderNumber="34"/>
+        <ItemRef ItemOID="IT.AE.AELLT" Mandatory="No" OrderNumber="35"/>
+        <ItemRef ItemOID="IT.AE.AEOVISIT" Mandatory="No" OrderNumber="36"/>
+        <ItemRef ItemOID="IT.AE.AETOXGRN" Mandatory="No" OrderNumber="37"/>
+        <ItemRef ItemOID="IT.AE.AETRTEM" Mandatory="No" OrderNumber="38"/>
+        <ItemRef ItemOID="IT.AE.AEREFER" Mandatory="No" OrderNumber="39"/>
+        <ItemRef ItemOID="IT.AE.AEDTHDTC" Mandatory="No" OrderNumber="40"/>
+        <ItemRef ItemOID="IT.AE.AESEQUCM" Mandatory="No" OrderNumber="41"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.AE" xlink:href="ae.xpt">
+          <def:title>ae.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.EX" Name="EX" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per constant exposure cycle" def:ArchiveLocationID="LF.EX" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">EX (One record per subject per constant exposure cycle)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.EX.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.EX.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.EX.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.EX.EXSEQ" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.EX.EXTRT" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.EX.EXLOT" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.EX.EXDOSE" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.EX.EXDOSU" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.EX.EXDOSFRM" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.EX.EXROUTE" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.EX.VISITNUM" Mandatory="No" OrderNumber="11"/>
+        <ItemRef ItemOID="IT.EX.VISIT" Mandatory="No" OrderNumber="12"/>
+        <ItemRef ItemOID="IT.EX.EXSTDTC" Mandatory="No" OrderNumber="13"/>
+        <ItemRef ItemOID="IT.EX.EXSTDY" Mandatory="No" OrderNumber="14"/>
+        <ItemRef ItemOID="IT.EX.EXENDTC" Mandatory="No" OrderNumber="15"/>
+        <ItemRef ItemOID="IT.EX.SUBJID" Mandatory="No" OrderNumber="16"/>
+        <ItemRef ItemOID="IT.EX.EXPDOSE" Mandatory="No" OrderNumber="17"/>
+        <ItemRef ItemOID="IT.EX.EXPDOSU" Mandatory="No" OrderNumber="18"/>
+        <ItemRef ItemOID="IT.EX.EXCUMD" Mandatory="No" OrderNumber="19"/>
+        <ItemRef ItemOID="IT.EX.EXCUMD2" Mandatory="No" OrderNumber="20"/>
+        <ItemRef ItemOID="IT.EX.EXDOSE2" Mandatory="No" OrderNumber="21"/>
+        <ItemRef ItemOID="IT.EX.EXPDOSE2" Mandatory="No" OrderNumber="22"/>
+        <ItemRef ItemOID="IT.EX.EXTINT" Mandatory="No" OrderNumber="23"/>
+        <ItemRef ItemOID="IT.EX.EXTRINT" Mandatory="No" OrderNumber="24"/>
+        <ItemRef ItemOID="IT.EX.EXDSREA" Mandatory="No" OrderNumber="25"/>
+        <ItemRef ItemOID="IT.EX.EXDELAY" Mandatory="No" OrderNumber="26"/>
+        <ItemRef ItemOID="IT.EX.EXDSRCM" Mandatory="No" OrderNumber="27"/>
+        <ItemRef ItemOID="IT.EX.ENDTCOL" Mandatory="No" OrderNumber="28"/>
+        <def:Class Name="INTERVENTIONS"/>
+        <def:leaf ID="LF.EX" xlink:href="ex.xpt">
+          <def:title>ex.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.CM" Name="CM" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per medication" def:ArchiveLocationID="LF.CM" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">CM (One record per subject per medication)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.CM.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.CM.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.CM.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.CM.CMSEQ" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.CM.CMTRT" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.CM.CMDECOD" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.CM.CMCAT" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.CM.CMINDC" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.CM.CMDOSE" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.CM.CMDOSU" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.CM.CMDOSRGM" Mandatory="No" OrderNumber="11"/>
+        <ItemRef ItemOID="IT.CM.VISITNUM" Mandatory="No" OrderNumber="12"/>
+        <ItemRef ItemOID="IT.CM.VISIT" Mandatory="No" OrderNumber="13"/>
+        <ItemRef ItemOID="IT.CM.CMSTDTC" Mandatory="No" OrderNumber="14"/>
+        <ItemRef ItemOID="IT.CM.CMSTDY" Mandatory="No" OrderNumber="15"/>
+        <ItemRef ItemOID="IT.CM.CMENDTC" Mandatory="No" OrderNumber="16"/>
+        <ItemRef ItemOID="IT.CM.CMENDY" Mandatory="No" OrderNumber="17"/>
+        <ItemRef ItemOID="IT.CM.SUBJID" Mandatory="No" OrderNumber="18"/>
+        <ItemRef ItemOID="IT.CM.CMATCL1" Mandatory="No" OrderNumber="19"/>
+        <ItemRef ItemOID="IT.CM.CMATCL2" Mandatory="No" OrderNumber="20"/>
+        <ItemRef ItemOID="IT.CM.CMATCSEL" Mandatory="No" OrderNumber="21"/>
+        <ItemRef ItemOID="IT.CM.CMONGB" Mandatory="No" OrderNumber="22"/>
+        <ItemRef ItemOID="IT.CM.CMONGO" Mandatory="No" OrderNumber="23"/>
+        <ItemRef ItemOID="IT.CM.CMLOC" Mandatory="No" OrderNumber="24"/>
+        <ItemRef ItemOID="IT.CM.CMENDRCM" Mandatory="No" OrderNumber="25"/>
+        <ItemRef ItemOID="IT.CM.CMRLTL" Mandatory="No" OrderNumber="26"/>
+        <ItemRef ItemOID="IT.CM.CMRSON" Mandatory="No" OrderNumber="27"/>
+        <ItemRef ItemOID="IT.CM.CMPRGDTC" Mandatory="No" OrderNumber="28"/>
+        <def:Class Name="INTERVENTIONS"/>
+        <def:leaf ID="LF.CM" xlink:href="cm.xpt">
+          <def:title>cm.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.LB" Name="LB" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per laboratory test per visit" def:ArchiveLocationID="LF.LB" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">LB (One record per subject per laboratory test per visit)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.LB.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.LB.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.LB.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.LB.LBSEQ" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.LB.LBTESTCD" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.LB.LBTEST" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.LB.LBCAT" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.LB.LBSCAT" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.LB.LBORRES" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.LB.LBORRESU" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.LB.LBORNRLO" Mandatory="No" OrderNumber="11"/>
+        <ItemRef ItemOID="IT.LB.LBORNRHI" Mandatory="No" OrderNumber="12"/>
+        <ItemRef ItemOID="IT.LB.LBSTRESC" Mandatory="No" OrderNumber="13"/>
+        <ItemRef ItemOID="IT.LB.LBSTRESN" Mandatory="No" OrderNumber="14"/>
+        <ItemRef ItemOID="IT.LB.LBSTRESU" Mandatory="No" OrderNumber="15"/>
+        <ItemRef ItemOID="IT.LB.LBSTNRLO" Mandatory="No" OrderNumber="16"/>
+        <ItemRef ItemOID="IT.LB.LBSTNRHI" Mandatory="No" OrderNumber="17"/>
+        <ItemRef ItemOID="IT.LB.LBNRIND" Mandatory="No" OrderNumber="18"/>
+        <ItemRef ItemOID="IT.LB.LBSTAT" Mandatory="No" OrderNumber="19"/>
+        <ItemRef ItemOID="IT.LB.LBTOX" Mandatory="No" OrderNumber="20"/>
+        <ItemRef ItemOID="IT.LB.LBTOXGR" Mandatory="No" OrderNumber="21"/>
+        <ItemRef ItemOID="IT.LB.LBBLFL" Mandatory="No" OrderNumber="22"/>
+        <ItemRef ItemOID="IT.LB.VISITNUM" Mandatory="No" OrderNumber="23"/>
+        <ItemRef ItemOID="IT.LB.VISIT" Mandatory="No" OrderNumber="24"/>
+        <ItemRef ItemOID="IT.LB.LBDTC" Mandatory="No" OrderNumber="25"/>
+        <ItemRef ItemOID="IT.LB.LBDY" Mandatory="No" OrderNumber="26"/>
+        <ItemRef ItemOID="IT.LB.SUBJID" Mandatory="No" OrderNumber="27"/>
+        <ItemRef ItemOID="IT.LB.LBOVISIT" Mandatory="No" OrderNumber="28"/>
+        <def:Class Name="FINDINGS"/>
+        <def:leaf ID="LF.LB" xlink:href="lb.xpt">
+          <def:title>lb.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.DS" Name="DS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per disposition event" def:ArchiveLocationID="LF.DS" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">DS (One record per subject per disposition event)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.DS.DSSTWKF" Mandatory="No" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.DS.USUBJID" Mandatory="Yes" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.DS.STUDYID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.DS.DOMAIN" Mandatory="Yes" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.DS.DSSEQ" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.DS.DSTERM" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.DS.DSDECOD" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.DS.DSCAT" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.DS.DSSCAT" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.DS.EPOCH" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.DS.VISITNUM" Mandatory="No" OrderNumber="11"/>
+        <ItemRef ItemOID="IT.DS.VISIT" Mandatory="No" OrderNumber="12"/>
+        <ItemRef ItemOID="IT.DS.DSSTWK" Mandatory="No" OrderNumber="13"/>
+        <ItemRef ItemOID="IT.DS.SUBJID" Mandatory="No" OrderNumber="14"/>
+        <ItemRef ItemOID="IT.DS.DSPROG" Mandatory="No" OrderNumber="15"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.DS" xlink:href="ds.xpt">
+          <def:title>ds.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.VS" Name="VS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per vital sign measurement per visit" def:ArchiveLocationID="LF.VS" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">VS (One record per subject per vital sign measurement per visit)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.VS.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.VS.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.VS.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.VS.VSSEQ" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.VS.VSTESTCD" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.VS.VSTEST" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.VS.VSORRES" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.VS.VSORRESU" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.VS.VSSTRESC" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.VS.VSSTRESN" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.VS.VSSTRESU" Mandatory="No" OrderNumber="11"/>
+        <ItemRef ItemOID="IT.VS.VSMETHOD" Mandatory="No" OrderNumber="12"/>
+        <ItemRef ItemOID="IT.VS.VSBLFL" Mandatory="No" OrderNumber="13"/>
+        <ItemRef ItemOID="IT.VS.VSDRVFL" Mandatory="No" OrderNumber="14"/>
+        <ItemRef ItemOID="IT.VS.VISITNUM" Mandatory="No" OrderNumber="15"/>
+        <ItemRef ItemOID="IT.VS.VISIT" Mandatory="No" OrderNumber="16"/>
+        <ItemRef ItemOID="IT.VS.VSDTC" Mandatory="No" OrderNumber="17"/>
+        <ItemRef ItemOID="IT.VS.VSDY" Mandatory="No" OrderNumber="18"/>
+        <ItemRef ItemOID="IT.VS.SUBJID" Mandatory="No" OrderNumber="19"/>
+        <def:Class Name="FINDINGS"/>
+        <def:leaf ID="LF.VS" xlink:href="vs.xpt">
+          <def:title>vs.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.LS" Name="LS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per lesion per assessment visit" def:ArchiveLocationID="LF.LS" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">LS (One record per subject per lesion per assessment visit)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.LS.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.LS.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.LS.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.LS.LSSEQ" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.LS.LSSPID" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.LS.LSTESTCD" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.LS.LSTEST" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.LS.LSCAT" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.LS.LSLOC" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.LS.LSORRES" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.LS.LSORRESU" Mandatory="No" OrderNumber="11"/>
+        <ItemRef ItemOID="IT.LS.LSSTRESC" Mandatory="No" OrderNumber="12"/>
+        <ItemRef ItemOID="IT.LS.LSSTRESN" Mandatory="No" OrderNumber="13"/>
+        <ItemRef ItemOID="IT.LS.LSSTRESU" Mandatory="No" OrderNumber="14"/>
+        <ItemRef ItemOID="IT.LS.LSMETHOD" Mandatory="No" OrderNumber="15"/>
+        <ItemRef ItemOID="IT.LS.LSSTAT" Mandatory="No" OrderNumber="16"/>
+        <ItemRef ItemOID="IT.LS.LSBLFL" Mandatory="No" OrderNumber="17"/>
+        <ItemRef ItemOID="IT.LS.VISITNUM" Mandatory="No" OrderNumber="18"/>
+        <ItemRef ItemOID="IT.LS.VISIT" Mandatory="No" OrderNumber="19"/>
+        <ItemRef ItemOID="IT.LS.LSDTC" Mandatory="No" OrderNumber="20"/>
+        <ItemRef ItemOID="IT.LS.SUBJID" Mandatory="No" OrderNumber="21"/>
+        <ItemRef ItemOID="IT.LS.LSSLOC" Mandatory="No" OrderNumber="22"/>
+        <def:Class Name="FINDINGS"/>
+        <def:leaf ID="LF.LS" xlink:href="ls.xpt">
+          <def:title>ls.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.PN" Name="PN" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per pain assessment per visit" def:ArchiveLocationID="LF.PN" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">PN (One record per subject per pain assessment per visit)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.PN.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.PN.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.PN.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.PN.PNSEQ" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.PN.PNSPID" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.PN.PNTESTCD" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.PN.PNTEST" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.PN.PNCAT" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.PN.PNORRES" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.PN.PNORRESU" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.PN.PNSTRESC" Mandatory="No" OrderNumber="11"/>
+        <ItemRef ItemOID="IT.PN.PNSTRESN" Mandatory="No" OrderNumber="12"/>
+        <ItemRef ItemOID="IT.PN.PNSTRESU" Mandatory="No" OrderNumber="13"/>
+        <ItemRef ItemOID="IT.PN.PNSTAT" Mandatory="No" OrderNumber="14"/>
+        <ItemRef ItemOID="IT.PN.VISITNUM" Mandatory="No" OrderNumber="15"/>
+        <ItemRef ItemOID="IT.PN.VISIT" Mandatory="No" OrderNumber="16"/>
+        <ItemRef ItemOID="IT.PN.PNDTC" Mandatory="No" OrderNumber="17"/>
+        <ItemRef ItemOID="IT.PN.SUBJID" Mandatory="No" OrderNumber="18"/>
+        <def:Class Name="FINDINGS"/>
+        <def:leaf ID="LF.PN" xlink:href="pn.xpt">
+          <def:title>pn.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.SUPPDM" Name="SUPPDM" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per supplemental qualifier" def:ArchiveLocationID="LF.SUPPDM" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">SUPPDM (One record per subject per supplemental qualifier)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.SUPPDM.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.SUPPDM.RDOMAIN" Mandatory="No" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.SUPPDM.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.SUPPDM.IDVAR" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.SUPPDM.IDVARVAL" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.SUPPDM.QNAM" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.SUPPDM.QLABEL" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.SUPPDM.QVAL" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.SUPPDM.QORIG" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.SUPPDM.QEVAL" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.SUPPDM.SUBJID" Mandatory="No" OrderNumber="11"/>
+        <def:Class Name="RELATIONSHIP"/>
+        <def:leaf ID="LF.SUPPDM" xlink:href="suppdm.xpt">
+          <def:title>suppdm.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.SUPPAE" Name="SUPPAE" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per adverse event per supplemental qualifier" def:ArchiveLocationID="LF.SUPPAE" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">SUPPAE (One record per subject per adverse event per supplemental qualifier)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.SUPPAE.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.SUPPAE.RDOMAIN" Mandatory="No" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.SUPPAE.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.SUPPAE.IDVAR" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.SUPPAE.IDVARVAL" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.SUPPAE.QNAM" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.SUPPAE.QLABEL" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.SUPPAE.QVAL" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.SUPPAE.QORIG" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.SUPPAE.QEVAL" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.SUPPAE.SUBJID" Mandatory="No" OrderNumber="11"/>
+        <def:Class Name="RELATIONSHIP"/>
+        <def:leaf ID="LF.SUPPAE" xlink:href="suppae.xpt">
+          <def:title>suppae.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.SUPPEX" Name="SUPPEX" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per exposure cycle per supplemental qualifier" def:ArchiveLocationID="LF.SUPPEX" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">SUPPEX (One record per subject per exposure cycle per supplemental qualifier)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.SUPPEX.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.SUPPEX.RDOMAIN" Mandatory="No" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.SUPPEX.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.SUPPEX.IDVAR" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.SUPPEX.IDVARVAL" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.SUPPEX.QNAM" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.SUPPEX.QLABEL" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.SUPPEX.QVAL" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.SUPPEX.QORIG" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.SUPPEX.QEVAL" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.SUPPEX.SUBJID" Mandatory="No" OrderNumber="11"/>
+        <def:Class Name="RELATIONSHIP"/>
+        <def:leaf ID="LF.SUPPEX" xlink:href="suppex.xpt">
+          <def:title>suppex.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.SUPPCM" Name="SUPPCM" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per medication per supplemental qualifier" def:ArchiveLocationID="LF.SUPPCM" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">SUPPCM (One record per subject per medication per supplemental qualifier)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.SUPPCM.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.SUPPCM.RDOMAIN" Mandatory="No" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.SUPPCM.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.SUPPCM.IDVAR" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.SUPPCM.IDVARVAL" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.SUPPCM.QNAM" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.SUPPCM.QLABEL" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.SUPPCM.QVAL" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.SUPPCM.QORIG" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.SUPPCM.QEVAL" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.SUPPCM.SUBJID" Mandatory="No" OrderNumber="11"/>
+        <def:Class Name="RELATIONSHIP"/>
+        <def:leaf ID="LF.SUPPCM" xlink:href="suppcm.xpt">
+          <def:title>suppcm.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.SUPPLB" Name="SUPPLB" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per laboratory test per supplemental qualifier" def:ArchiveLocationID="LF.SUPPLB" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">SUPPLB (One record per subject per laboratory test per supplemental qualifier)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.SUPPLB.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.SUPPLB.RDOMAIN" Mandatory="No" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.SUPPLB.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.SUPPLB.IDVAR" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.SUPPLB.IDVARVAL" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.SUPPLB.QNAM" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.SUPPLB.QLABEL" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.SUPPLB.QVAL" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.SUPPLB.QORIG" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.SUPPLB.QEVAL" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.SUPPLB.SUBJID" Mandatory="No" OrderNumber="11"/>
+        <def:Class Name="RELATIONSHIP"/>
+        <def:leaf ID="LF.SUPPLB" xlink:href="supplb.xpt">
+          <def:title>supplb.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.SUPPDS" Name="SUPPDS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per disposition event per supplemental qualifier" def:ArchiveLocationID="LF.SUPPDS" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">SUPPDS (One record per subject per disposition event per supplemental qualifier)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.SUPPDS.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.SUPPDS.RDOMAIN" Mandatory="No" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.SUPPDS.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.SUPPDS.IDVAR" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.SUPPDS.IDVARVAL" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.SUPPDS.QNAM" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.SUPPDS.QLABEL" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.SUPPDS.QVAL" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.SUPPDS.QORIG" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.SUPPDS.QEVAL" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.SUPPDS.SUBJID" Mandatory="No" OrderNumber="11"/>
+        <def:Class Name="RELATIONSHIP"/>
+        <def:leaf ID="LF.SUPPDS" xlink:href="suppds.xpt">
+          <def:title>suppds.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.SUPPLS" Name="SUPPLS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per lesion per supplemental qualifier" def:ArchiveLocationID="LF.SUPPLS" def:StandardOID="STD.SDTMIG.3.1.1">
+        <Description>
+          <TranslatedText xml:lang="en">SUPPLS (One record per subject per lesion per supplemental qualifier)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.SUPPLS.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.SUPPLS.RDOMAIN" Mandatory="No" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.SUPPLS.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.SUPPLS.IDVAR" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.SUPPLS.IDVARVAL" Mandatory="No" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.SUPPLS.QNAM" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.SUPPLS.QLABEL" Mandatory="No" OrderNumber="7"/>
+        <ItemRef ItemOID="IT.SUPPLS.QVAL" Mandatory="No" OrderNumber="8"/>
+        <ItemRef ItemOID="IT.SUPPLS.QORIG" Mandatory="No" OrderNumber="9"/>
+        <ItemRef ItemOID="IT.SUPPLS.QEVAL" Mandatory="No" OrderNumber="10"/>
+        <ItemRef ItemOID="IT.SUPPLS.SUBJID" Mandatory="No" OrderNumber="11"/>
+        <def:Class Name="RELATIONSHIP"/>
+        <def:leaf ID="LF.SUPPLS" xlink:href="suppls.xpt">
+          <def:title>suppls.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemDef OID="IT.DM.AGEGRP" Name="AGEGRP" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.DOMAIN" Name="DOMAIN" DataType="text" Length="4">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.RFSTDTC" Name="RFSTDTC" DataType="text" Length="20">
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.RFENDTC" Name="RFENDTC" DataType="text" Length="20">
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.AGEU" Name="AGEU" DataType="text" Length="10">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.SEX" Name="SEX" DataType="text" Length="2">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.RACE" Name="RACE" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.ARM" Name="ARM" DataType="text" Length="40">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.ARMCD" Name="ARMCD" DataType="text" Length="20">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.ARM2" Name="ARM2" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.ARMA" Name="ARMA" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.ARMCD2" Name="ARMCD2" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.BSABL" Name="BSABL" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.ITT" Name="ITT" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.PPROT" Name="PPROT" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.SAFETY" Name="SAFETY" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AESTWKF" Name="AESTWKF" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEENWKF" Name="AEENWKF" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.DOMAIN" Name="DOMAIN" DataType="text" Length="4">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AESEQ" Name="AESEQ" DataType="integer" Length="8">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AESPID" Name="AESPID" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEREFID" Name="AEREFID" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AETERM" Name="AETERM" DataType="text" Length="200">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEDECOD" Name="AEDECOD" DataType="text" Length="100">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEBODSYS" Name="AEBODSYS" DataType="text" Length="100">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AESER" Name="AESER" DataType="text" Length="2">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEACN" Name="AEACN" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AECONTRT" Name="AECONTRT" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEREL" Name="AEREL" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEPATT" Name="AEPATT" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEOUT" Name="AEOUT" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AESCONG" Name="AESCONG" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AESDISAB" Name="AESDISAB" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AESDTH" Name="AESDTH" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AESHOSP" Name="AESHOSP" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AESLIFE" Name="AESLIFE" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AESMIE" Name="AESMIE" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AETOXGR" Name="AETOXGR" DataType="text" Length="10">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.VISITNUM" Name="VISITNUM" DataType="float" Length="8">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.VISIT" Name="VISIT" DataType="text" Length="40">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AESTWK" Name="AESTWK" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEENWK" Name="AEENWK" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AECOLGR" Name="AECOLGR" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AECOLGRN" Name="AECOLGRN" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEDICTVS" Name="AEDICTVS" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEHLGT" Name="AEHLGT" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEHLT" Name="AEHLT" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AELLT" Name="AELLT" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEOVISIT" Name="AEOVISIT" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AETOXGRN" Name="AETOXGRN" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AETRTEM" Name="AETRTEM" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEREFER" Name="AEREFER" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AEDTHDTC" Name="AEDTHDTC" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AE.AESEQUCM" Name="AESEQUCM" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.DOMAIN" Name="DOMAIN" DataType="text" Length="4">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXSEQ" Name="EXSEQ" DataType="integer" Length="8">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXTRT" Name="EXTRT" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXLOT" Name="EXLOT" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXDOSE" Name="EXDOSE" DataType="float" Length="8">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXDOSU" Name="EXDOSU" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXDOSFRM" Name="EXDOSFRM" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXROUTE" Name="EXROUTE" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.VISITNUM" Name="VISITNUM" DataType="float" Length="8">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.VISIT" Name="VISIT" DataType="text" Length="40">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXSTDTC" Name="EXSTDTC" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXSTDY" Name="EXSTDY" DataType="integer" Length="8">
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXENDTC" Name="EXENDTC" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXPDOSE" Name="EXPDOSE" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXPDOSU" Name="EXPDOSU" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXCUMD" Name="EXCUMD" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXCUMD2" Name="EXCUMD2" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXDOSE2" Name="EXDOSE2" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXPDOSE2" Name="EXPDOSE2" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXTINT" Name="EXTINT" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXTRINT" Name="EXTRINT" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXDSREA" Name="EXDSREA" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXDELAY" Name="EXDELAY" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXDSRCM" Name="EXDSRCM" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.ENDTCOL" Name="ENDTCOL" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.DOMAIN" Name="DOMAIN" DataType="text" Length="4">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMSEQ" Name="CMSEQ" DataType="integer" Length="8">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMTRT" Name="CMTRT" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMDECOD" Name="CMDECOD" DataType="text" Length="100">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMCAT" Name="CMCAT" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMINDC" Name="CMINDC" DataType="text" Length="200">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMDOSE" Name="CMDOSE" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMDOSU" Name="CMDOSU" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMDOSRGM" Name="CMDOSRGM" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.VISITNUM" Name="VISITNUM" DataType="float" Length="8">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.VISIT" Name="VISIT" DataType="text" Length="40">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMSTDTC" Name="CMSTDTC" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMSTDY" Name="CMSTDY" DataType="integer" Length="8">
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMENDTC" Name="CMENDTC" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMENDY" Name="CMENDY" DataType="integer" Length="8">
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMATCL1" Name="CMATCL1" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMATCL2" Name="CMATCL2" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMATCSEL" Name="CMATCSEL" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMONGB" Name="CMONGB" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMONGO" Name="CMONGO" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMLOC" Name="CMLOC" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMENDRCM" Name="CMENDRCM" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMRLTL" Name="CMRLTL" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMRSON" Name="CMRSON" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.CM.CMPRGDTC" Name="CMPRGDTC" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.DOMAIN" Name="DOMAIN" DataType="text" Length="4">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBSEQ" Name="LBSEQ" DataType="integer" Length="8">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBTESTCD" Name="LBTESTCD" DataType="text" Length="20">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBTEST" Name="LBTEST" DataType="text" Length="100">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBCAT" Name="LBCAT" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBSCAT" Name="LBSCAT" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBORRES" Name="LBORRES" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBORRESU" Name="LBORRESU" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBORNRLO" Name="LBORNRLO" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBORNRHI" Name="LBORNRHI" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBSTRESC" Name="LBSTRESC" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBSTRESN" Name="LBSTRESN" DataType="float" Length="8">
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBSTRESU" Name="LBSTRESU" DataType="text" Length="20">
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBSTNRLO" Name="LBSTNRLO" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBSTNRHI" Name="LBSTNRHI" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBNRIND" Name="LBNRIND" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBSTAT" Name="LBSTAT" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBTOX" Name="LBTOX" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBTOXGR" Name="LBTOXGR" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBBLFL" Name="LBBLFL" DataType="text" Length="1">
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.VISITNUM" Name="VISITNUM" DataType="float" Length="8">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.VISIT" Name="VISIT" DataType="text" Length="40">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBDTC" Name="LBDTC" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBDY" Name="LBDY" DataType="integer" Length="8">
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBOVISIT" Name="LBOVISIT" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.DSSTWKF" Name="DSSTWKF" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.DOMAIN" Name="DOMAIN" DataType="text" Length="4">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.DSSEQ" Name="DSSEQ" DataType="integer" Length="8">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.DSTERM" Name="DSTERM" DataType="text" Length="200">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.DSDECOD" Name="DSDECOD" DataType="text" Length="100">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.DSCAT" Name="DSCAT" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.DSSCAT" Name="DSSCAT" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.EPOCH" Name="EPOCH" DataType="text" Length="20">
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.VISITNUM" Name="VISITNUM" DataType="float" Length="8">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.VISIT" Name="VISIT" DataType="text" Length="40">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.DSSTWK" Name="DSSTWK" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DS.DSPROG" Name="DSPROG" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.DOMAIN" Name="DOMAIN" DataType="text" Length="4">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSSEQ" Name="VSSEQ" DataType="integer" Length="8">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSTESTCD" Name="VSTESTCD" DataType="text" Length="20">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSTEST" Name="VSTEST" DataType="text" Length="100">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSORRES" Name="VSORRES" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSORRESU" Name="VSORRESU" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSSTRESC" Name="VSSTRESC" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSSTRESN" Name="VSSTRESN" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSSTRESU" Name="VSSTRESU" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSMETHOD" Name="VSMETHOD" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSBLFL" Name="VSBLFL" DataType="text" Length="1">
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSDRVFL" Name="VSDRVFL" DataType="text" Length="1">
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VISITNUM" Name="VISITNUM" DataType="float" Length="8">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VISIT" Name="VISIT" DataType="text" Length="40">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSDTC" Name="VSDTC" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSDY" Name="VSDY" DataType="integer" Length="8">
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.DOMAIN" Name="DOMAIN" DataType="text" Length="4">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSSEQ" Name="LSSEQ" DataType="integer" Length="8">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSSPID" Name="LSSPID" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSTESTCD" Name="LSTESTCD" DataType="text" Length="20">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSTEST" Name="LSTEST" DataType="text" Length="100">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSCAT" Name="LSCAT" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSLOC" Name="LSLOC" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSORRES" Name="LSORRES" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSORRESU" Name="LSORRESU" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSSTRESC" Name="LSSTRESC" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSSTRESN" Name="LSSTRESN" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSSTRESU" Name="LSSTRESU" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSMETHOD" Name="LSMETHOD" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSSTAT" Name="LSSTAT" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSBLFL" Name="LSBLFL" DataType="text" Length="1">
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.VISITNUM" Name="VISITNUM" DataType="float" Length="8">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.VISIT" Name="VISIT" DataType="text" Length="40">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSDTC" Name="LSDTC" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LS.LSSLOC" Name="LSSLOC" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.DOMAIN" Name="DOMAIN" DataType="text" Length="4">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.PNSEQ" Name="PNSEQ" DataType="integer" Length="8">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.PNSPID" Name="PNSPID" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.PNTESTCD" Name="PNTESTCD" DataType="text" Length="20">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.PNTEST" Name="PNTEST" DataType="text" Length="100">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.PNCAT" Name="PNCAT" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.PNORRES" Name="PNORRES" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.PNORRESU" Name="PNORRESU" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.PNSTRESC" Name="PNSTRESC" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.PNSTRESN" Name="PNSTRESN" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.PNSTRESU" Name="PNSTRESU" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.PNSTAT" Name="PNSTAT" DataType="text" Length="100">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.VISITNUM" Name="VISITNUM" DataType="float" Length="8">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.VISIT" Name="VISIT" DataType="text" Length="40">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.PNDTC" Name="PNDTC" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.PN.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDM.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDM.RDOMAIN" Name="RDOMAIN" DataType="text" Length="4">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDM.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDM.IDVAR" Name="IDVAR" DataType="text" Length="8">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDM.IDVARVAL" Name="IDVARVAL" DataType="text" Length="40">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDM.QNAM" Name="QNAM" DataType="text" Length="8">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDM.QLABEL" Name="QLABEL" DataType="text" Length="40">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDM.QVAL" Name="QVAL" DataType="text" Length="200">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDM.QORIG" Name="QORIG" DataType="text" Length="10">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDM.QEVAL" Name="QEVAL" DataType="text" Length="40">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDM.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPAE.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPAE.RDOMAIN" Name="RDOMAIN" DataType="text" Length="4">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPAE.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPAE.IDVAR" Name="IDVAR" DataType="text" Length="8">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPAE.IDVARVAL" Name="IDVARVAL" DataType="text" Length="40">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPAE.QNAM" Name="QNAM" DataType="text" Length="8">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPAE.QLABEL" Name="QLABEL" DataType="text" Length="40">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPAE.QVAL" Name="QVAL" DataType="text" Length="200">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPAE.QORIG" Name="QORIG" DataType="text" Length="10">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPAE.QEVAL" Name="QEVAL" DataType="text" Length="40">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPAE.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPEX.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPEX.RDOMAIN" Name="RDOMAIN" DataType="text" Length="4">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPEX.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPEX.IDVAR" Name="IDVAR" DataType="text" Length="8">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPEX.IDVARVAL" Name="IDVARVAL" DataType="text" Length="40">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPEX.QNAM" Name="QNAM" DataType="text" Length="8">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPEX.QLABEL" Name="QLABEL" DataType="text" Length="40">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPEX.QVAL" Name="QVAL" DataType="text" Length="200">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPEX.QORIG" Name="QORIG" DataType="text" Length="10">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPEX.QEVAL" Name="QEVAL" DataType="text" Length="40">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPEX.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPCM.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPCM.RDOMAIN" Name="RDOMAIN" DataType="text" Length="4">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPCM.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPCM.IDVAR" Name="IDVAR" DataType="text" Length="8">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPCM.IDVARVAL" Name="IDVARVAL" DataType="text" Length="40">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPCM.QNAM" Name="QNAM" DataType="text" Length="8">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPCM.QLABEL" Name="QLABEL" DataType="text" Length="40">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPCM.QVAL" Name="QVAL" DataType="text" Length="200">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPCM.QORIG" Name="QORIG" DataType="text" Length="10">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPCM.QEVAL" Name="QEVAL" DataType="text" Length="40">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPCM.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.RDOMAIN" Name="RDOMAIN" DataType="text" Length="4">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.IDVAR" Name="IDVAR" DataType="text" Length="8">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.IDVARVAL" Name="IDVARVAL" DataType="text" Length="40">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.QNAM" Name="QNAM" DataType="text" Length="8">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.QLABEL" Name="QLABEL" DataType="text" Length="40">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.QVAL" Name="QVAL" DataType="text" Length="200">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.QORIG" Name="QORIG" DataType="text" Length="10">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.QEVAL" Name="QEVAL" DataType="text" Length="40">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDS.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDS.RDOMAIN" Name="RDOMAIN" DataType="text" Length="4">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDS.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDS.IDVAR" Name="IDVAR" DataType="text" Length="8">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDS.IDVARVAL" Name="IDVARVAL" DataType="text" Length="40">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDS.QNAM" Name="QNAM" DataType="text" Length="8">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDS.QLABEL" Name="QLABEL" DataType="text" Length="40">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDS.QVAL" Name="QVAL" DataType="text" Length="200">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDS.QORIG" Name="QORIG" DataType="text" Length="10">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDS.QEVAL" Name="QEVAL" DataType="text" Length="40">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPDS.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLS.STUDYID" Name="STUDYID" DataType="text" Length="40">
+        <def:Origin Type="Protocol" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLS.RDOMAIN" Name="RDOMAIN" DataType="text" Length="4">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLS.USUBJID" Name="USUBJID" DataType="text" Length="40">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLS.IDVAR" Name="IDVAR" DataType="text" Length="8">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLS.IDVARVAL" Name="IDVARVAL" DataType="text" Length="40">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLS.QNAM" Name="QNAM" DataType="text" Length="8">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLS.QLABEL" Name="QLABEL" DataType="text" Length="40">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLS.QVAL" Name="QVAL" DataType="text" Length="200">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLS.QORIG" Name="QORIG" DataType="text" Length="10">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLS.QEVAL" Name="QEVAL" DataType="text" Length="40">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLS.SUBJID" Name="SUBJID" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Sponsor"/>
+      </ItemDef>
+    </MetaDataVersion>
+  </Study>
+</ODM>

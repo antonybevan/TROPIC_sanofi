@@ -7,7 +7,7 @@ STUDY_CUTOFF_DT: "2009-09-25"
 PLANNED_DOSE: 12.0
 AGE_STRAT_CUT: 65
 
-# Missing data imputation defaults (SAP §6.3)
+# Missing data imputation defaults (no formal SAP imputation section; method per ADRG §5.1)
 ECOGBL_DEFAULT: 1.0
 PSABL_DEFAULT: 110.0
 ALPBL_DEFAULT: 140.0
@@ -23,7 +23,7 @@ RECIST_PR_PCT: -30.0
 # this many days afterwards (RECIST v1.0 "no less than 4 weeks"), SAP §5.3.
 RECIST_CONFIRM_DAYS: 28
 
-# PCWG3 PSA thresholds (SAP §5.4)
+# PCWG3 PSA thresholds (SAP §5.2 — response §5.2.1, progression §5.2.2)
 PSA_RESP_THRESHOLD: 0.5
 PSA_RESP_CONFIRM: 21
 PSA_PROG_MULT_RESP: 1.5
@@ -31,14 +31,14 @@ PSA_PROG_MULT_NORESP: 1.25
 PSA_PROG_ABS: 5.0
 PSA_PROG_CONFIRM: 7
 
-# OCCDS v1.0 + custom 3-day continuous episode-merging convention (SAP §5.2, Custom
+# OCCDS v1.0 + custom 3-day continuous episode-merging convention (SAP §7.7, Custom
 # Query 02). NB: there is no CDISC "OCCDS v1.1"; the merging rule is a TROPIC extension.
 EPISODE_GAP_DAYS: 3
 
-# Project Optimus ANC kinetics (SAP §5.5)
+# Project Optimus ANC kinetics (SAP §10)
 ANC_RECOVERY_THRESHOLD: 1.5
 
-# LB analysis windows — study days from TRTSDT (SAP §5.6)
+# LB analysis windows — study days from TRTSDT (SAP §11.1.3)
 W_BL_HI: 0
 W_C1D1_LO: 1
 W_C1D1_HI: 3
