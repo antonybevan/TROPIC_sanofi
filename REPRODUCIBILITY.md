@@ -57,7 +57,7 @@ requires only R.
   `sascfg_personal.py` + `~/.authinfo` (key `oda`, perm 600). For ODA the SDTM is seeded
   once via Job A; see [`06_telemetry/ODA_GUIDE.md`](06_telemetry/ODA_GUIDE.md).
 
-### Run matrix (Stage 10 mode is resolved at runtime and saved to `pipeline_health.json`)
+### Run matrix (Stage 11 mode is resolved at runtime and saved to `pipeline_health.json`)
 | Command | SAS source | Reconciliation meaning |
 |---|---|---|
 | `seed_sdtm.py` then `cibuild.py --real-sas` (ODA) | SAS 9.4 on ODA, this run | **genuine** SAS↔R double programming (mode `oda`, earned via live probe + verified manifest) |
