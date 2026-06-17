@@ -51,7 +51,7 @@ python3 06_telemetry/seed_sdtm.py --force    # override: re-upload regardless
 ```bash
 python3 06_telemetry/cibuild.py --real-sas
 ```
-`cibuild.py` Stage 10:
+`cibuild.py` Stage 11:
 1. **Connects via the broker** (§3) — rides transient spawner timeouts.
 2. **Verifies** the SDTM manifest on ODA. If it is missing/stale, the run **fails with a clear
    message to run Job A** — it never silently drops to sim against an unseeded library.
