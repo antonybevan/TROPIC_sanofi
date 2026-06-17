@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<?xml-stylesheet type="text/xsl" href="define2-1.xsl"?>
-<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:def="http://www.cdisc.org/ns/def/v2.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:arm="http://www.cdisc.org/ns/arm/v1.0" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 http://schema.cdisc.org/define/v2.1/define2-1-0.xsd" ODMVersion="1.3.2" FileType="Snapshot" FileOID="TROPIC_ADAM_Metadata_v2.1" CreationDateTime="2026-06-12T21:52:12" AsOfDateTime="2026-06-16T15:58:30" Originator="Antony Bevan, Clinical Programming" def:Context="Submission"><Study OID="STDY.TROPIC">
+<?xml-stylesheet type="text/xsl" href="define2-1.xsl"?><ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:def="http://www.cdisc.org/ns/def/v2.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:arm="http://www.cdisc.org/ns/arm/v1.0" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 http://schema.cdisc.org/define/v2.1/define2-1-0.xsd" ODMVersion="1.3.2" FileType="Snapshot" FileOID="TROPIC_ADAM_Metadata_v2.1" CreationDateTime="2026-06-12T21:52:12" AsOfDateTime="2026-06-16T15:58:30" Originator="Antony Bevan, Clinical Programming" def:Context="Submission"><Study OID="STDY.TROPIC">
     <GlobalVariables>
       <StudyName>TROPIC (EFC6193 / XRP6258)</StudyName>
       <StudyDescription>Cabazitaxel vs Mitoxantrone in mCRPC progressing after docetaxel (NCT00417079).</StudyDescription>
@@ -134,6 +133,7 @@
       <ItemRef ItemOID="IT.ADSL.HGBBLIF" Mandatory="No" OrderNumber="40"/>
       <ItemRef ItemOID="IT.ADSL.ALBBLIF" Mandatory="No" OrderNumber="41"/>
       <ItemRef ItemOID="IT.ADSL.LDHBLIF" Mandatory="No" OrderNumber="42"/>
+      <def:Class Name="SUBJECT LEVEL ANALYSIS DATASET"/>
       <def:leaf ID="LF.ADSL" xlink:href="adsl.xpt">
         <def:title>adsl.xpt</def:title>
       </def:leaf>
@@ -154,6 +154,7 @@
       <ItemRef ItemOID="IT.ADEX.AVAL" Mandatory="No" OrderNumber="10"/>
       <ItemRef ItemOID="IT.ADEX.AVALC" Mandatory="No" OrderNumber="11"/>
       <ItemRef ItemOID="IT.ADEX.AVISIT" Mandatory="Yes" OrderNumber="12"/>
+      <def:Class Name="BASIC DATA STRUCTURE"/>
       <def:leaf ID="LF.ADEX" xlink:href="adex.xpt">
         <def:title>adex.xpt</def:title>
       </def:leaf>
@@ -177,6 +178,7 @@
       <ItemRef ItemOID="IT.ADCM.NACTDT" Mandatory="No" OrderNumber="13"/>
       <ItemRef ItemOID="IT.ADCM.PREDNFL" Mandatory="No" OrderNumber="14"/>
       <ItemRef ItemOID="IT.ADCM.TRTEMFL" Mandatory="No" OrderNumber="15"/>
+      <def:Class Name="OCCURRENCE DATA STRUCTURE"/>
       <def:leaf ID="LF.ADCM" xlink:href="adcm.xpt">
         <def:title>adcm.xpt</def:title>
       </def:leaf>
@@ -214,6 +216,7 @@
       <ItemRef ItemOID="IT.ADAE.AESEQ" Mandatory="No" OrderNumber="27"/>
       <ItemRef ItemOID="IT.ADAE.TRTA" Mandatory="Yes" OrderNumber="28"/>
       <ItemRef ItemOID="IT.ADAE.TRTAN" Mandatory="Yes" OrderNumber="29"/>
+      <def:Class Name="OCCURRENCE DATA STRUCTURE"/>
       <def:leaf ID="LF.ADAE" xlink:href="adae.xpt">
         <def:title>adae.xpt</def:title>
       </def:leaf>
@@ -249,6 +252,7 @@
       <ItemRef ItemOID="IT.ADLB.BASEFL" Mandatory="No" OrderNumber="25"/>
       <ItemRef ItemOID="IT.ADLB.LBDY" Mandatory="No" OrderNumber="26"/>
       <ItemRef ItemOID="IT.ADLB.ADT" Mandatory="No" OrderNumber="27"/>
+      <def:Class Name="BASIC DATA STRUCTURE"/>
       <def:leaf ID="LF.ADLB" xlink:href="adlb.xpt">
         <def:title>adlb.xpt</def:title>
       </def:leaf>
@@ -270,6 +274,7 @@
       <ItemRef ItemOID="IT.ADRS.VISIT" Mandatory="Yes" OrderNumber="11"/>
       <ItemRef ItemOID="IT.ADRS.ANL01FL" Mandatory="No" OrderNumber="12"/>
       <ItemRef ItemOID="IT.ADRS.AVAL" Mandatory="No" OrderNumber="13"/>
+      <def:Class Name="BASIC DATA STRUCTURE"/>
       <def:leaf ID="LF.ADRS" xlink:href="adrs.xpt">
         <def:title>adrs.xpt</def:title>
       </def:leaf>
@@ -297,6 +302,7 @@
       <ItemRef ItemOID="IT.ADTTE.CNSDTDSC" Mandatory="No" OrderNumber="17"/>
       <ItemRef ItemOID="IT.ADTTE.AVAL" Mandatory="Yes" MethodOID="MT.AVAL_TTE" OrderNumber="18"/>
       <ItemRef ItemOID="IT.ADTTE.AVALU" Mandatory="No" OrderNumber="19"/>
+      <def:Class Name="BASIC DATA STRUCTURE"/>
       <def:leaf ID="LF.ADTTE" xlink:href="adtte.xpt">
         <def:title>adtte.xpt</def:title>
       </def:leaf>
@@ -1144,7 +1150,7 @@
       </CodeListItem>
       <CodeListItem CodedValue="PSARESP">
         <Decode>
-          <TranslatedText xml:lang="en">PSA Response (>=50% decline)</TranslatedText>
+          <TranslatedText xml:lang="en">PSA Response (&gt;=50% decline)</TranslatedText>
         </Decode>
       </CodeListItem>
       <CodeListItem CodedValue="PSPROG">

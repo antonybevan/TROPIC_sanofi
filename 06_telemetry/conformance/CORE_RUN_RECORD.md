@@ -42,16 +42,30 @@ presented as one.
 
 ## Findings this run surfaced (that the project's own checks missed)
 
-1. **`define_sdtm.xml` defects (FIXED this session):** an invalid `Role` attribute on all 16
-   `<ItemGroupDef>` elements (`Role` is valid on `ItemRef`, not `ItemGroupDef`) and 16 empty
-   `<TranslatedText>` dataset descriptions — both crash CORE's `odmlib` parser. Removed `Role`
-   and populated the descriptions; the define **still passes the project's XSD validation**.
-2. **Deeper define loader issue (OPEN):** after the above, both `define_sdtm.xml` and `define.xml`
-   still fail CORE's `odmlib` loader with `'NoneType' object has no attribute 'Name'` (an
-   unresolved reference during metadata load). Define-*based* CORE rules can't run until this is
-   resolved; dataset-level rules run fine without the define.
-3. **CORE 0.16.0 CLI bug (patched locally, reported upstream):** the `StandardTypes` gate rejects
-   `-s adamig` although the engine's `normalize_adam_input()` requires it.
+Three define defects were found **and all fixed** so both defines now parse in the CDISC
+reference engine (CORE reads them at `Define_XML_Version 2.1.0`) while still passing the
+project's XSD validation:
+1. **Invalid `Role` on `ItemGroupDef` (`define_sdtm.xml`, FIXED):** `Role` is valid on `ItemRef`,
+   not `ItemGroupDef`; removed from all 16 elements.
+2. **Empty `<TranslatedText>` descriptions (`define_sdtm.xml`, FIXED):** odmlib rejects empty
+   description text; populated all 16 from each dataset's Name/Structure.
+3. **Missing `def:Class` element (BOTH defines, FIXED):** the real root cause of
+   `'NoneType' object has no attribute 'Name'` — CORE's reader does `metadata.Class.Name`, and
+   no `ItemGroupDef` declared `def:Class`. Added `def:Class` (correct position before `def:leaf`)
+   to all 16 SDTM + 7 ADaM datasets with their proper SDTM/ADaM classes (e.g. DM=SPECIAL PURPOSE,
+   AE=EVENTS, SUPP--=RELATIONSHIP; ADSL=SUBJECT LEVEL ANALYSIS DATASET, ADTTE=BASIC DATA STRUCTURE,
+   ADAE=OCCURRENCE DATA STRUCTURE). Both defines now parse in CORE **and** validate against XSD.
+
+Also: **CORE 0.16.0 CLI bug (patched locally, reported upstream)** — the `StandardTypes` gate
+rejects `-s adamig` although the engine's `normalize_adam_input()` requires it.
+
+## Official ADaM Conformance Rules — access boundary
+
+Mapping the rule pack 1:1 to official `AD####` IDs requires the **CDISC ADaM Conformance Rules
+v4.0/v5.0**, which are **members-only**: the CDISC Library API returns *"Members-only content"*
+for the rules catalog with a free-tier key, and the published spreadsheet is behind CDISC
+membership. The rules here therefore implement ADaMIG conformance *principles* with
+`TROPIC-ADAM-###` IDs; a membership account is needed to complete the official-ID crosswalk.
 
 ## Reproducing
 

@@ -1,15 +1,15 @@
 {
   "Conformance_Details": {
-    "Report_Generation": "2026-06-17T11:36:43",
-    "Total_Runtime": "3.01 seconds",
+    "Report_Generation": "2026-06-17T11:51:29",
+    "Total_Runtime": "3.8 seconds",
     "CORE_Engine_Version": "0.16.0",
     "Issue_Limit_Per_Rule": "None",
     "Issue_Limit_Per_Dataset": "None",
     "Issue_Limit_Per_Sheet": null,
     "Standard": "ADAMIG",
     "Version": "V1.3",
-    "CT_Version": "",
-    "Define_XML_Version": null
+    "CT_Version": "adamct-2024-03-29",
+    "Define_XML_Version": "2.1.0"
   },
   "Dataset_Details": [
     {
@@ -70,7 +70,7 @@
     }
   ],
   "Issue_Summary": [],
-  "Issue_Details": "[REDACTED: 0 per-record rows removed \u2014 contain subject-level USUBJID/values; regenerate locally via run_core_conformance.sh]",
+  "Issue_Details": "[REDACTED: 0 per-record rows removed \u2014 subject-level USUBJID/values; regenerate via run_core_conformance.sh]",
   "Rules_Report": [
     {
       "core_id": "TROPIC.ADAMIG.TROPIC-ADAM-101",
