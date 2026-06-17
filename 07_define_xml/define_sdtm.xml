@@ -11,9 +11,9 @@
         <def:Standard OID="STD.SDTMIG.3.1.1" Name="SDTMIG" Type="IG" Version="3.1.1" Status="Final"/>
         <def:Standard OID="STD.SDTMCT.2024-03-29" Name="CDISC/NCI" Type="CT" PublishingSet="SDTM" Version="2024-03-29" Status="Final"/>
       </def:Standards>
-      <ItemGroupDef OID="IG.DM" Name="DM" Repeating="No" IsReferenceData="No" Purpose="Tabulation" Role="Demographics" def:Structure="One record per subject" def:ArchiveLocationID="LF.DM" def:StandardOID="STD.SDTMIG.3.1.1">
+      <ItemGroupDef OID="IG.DM" Name="DM" Repeating="No" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject" def:ArchiveLocationID="LF.DM" def:StandardOID="STD.SDTMIG.3.1.1">
         <Description>
-          <TranslatedText xml:lang="en"></TranslatedText>
+          <TranslatedText xml:lang="en">DM (One record per subject)</TranslatedText>
         </Description>
         <ItemRef ItemOID="IT.DM.AGEGRP" Mandatory="No" OrderNumber="1"/>
         <ItemRef ItemOID="IT.DM.STUDYID" Mandatory="Yes" OrderNumber="2"/>
@@ -38,9 +38,9 @@
           <def:title>dm.xpt</def:title>
         </def:leaf>
       </ItemGroupDef>
-      <ItemGroupDef OID="IG.AE" Name="AE" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Adverse Events" def:Structure="One record per subject per adverse event" def:ArchiveLocationID="LF.AE" def:StandardOID="STD.SDTMIG.3.1.1">
+      <ItemGroupDef OID="IG.AE" Name="AE" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per adverse event" def:ArchiveLocationID="LF.AE" def:StandardOID="STD.SDTMIG.3.1.1">
         <Description>
-          <TranslatedText xml:lang="en"></TranslatedText>
+          <TranslatedText xml:lang="en">AE (One record per subject per adverse event)</TranslatedText>
         </Description>
         <ItemRef ItemOID="IT.AE.AESTWKF" Mandatory="No" OrderNumber="1"/>
         <ItemRef ItemOID="IT.AE.AEENWKF" Mandatory="No" OrderNumber="2"/>
@@ -87,9 +87,9 @@
           <def:title>ae.xpt</def:title>
         </def:leaf>
       </ItemGroupDef>
-      <ItemGroupDef OID="IG.EX" Name="EX" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Exposure" def:Structure="One record per subject per constant exposure cycle" def:ArchiveLocationID="LF.EX" def:StandardOID="STD.SDTMIG.3.1.1">
+      <ItemGroupDef OID="IG.EX" Name="EX" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per constant exposure cycle" def:ArchiveLocationID="LF.EX" def:StandardOID="STD.SDTMIG.3.1.1">
         <Description>
-          <TranslatedText xml:lang="en"></TranslatedText>
+          <TranslatedText xml:lang="en">EX (One record per subject per constant exposure cycle)</TranslatedText>
         </Description>
         <ItemRef ItemOID="IT.EX.STUDYID" Mandatory="Yes" OrderNumber="1"/>
         <ItemRef ItemOID="IT.EX.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
@@ -123,9 +123,9 @@
           <def:title>ex.xpt</def:title>
         </def:leaf>
       </ItemGroupDef>
-      <ItemGroupDef OID="IG.CM" Name="CM" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Concomitant Medications" def:Structure="One record per subject per medication" def:ArchiveLocationID="LF.CM" def:StandardOID="STD.SDTMIG.3.1.1">
+      <ItemGroupDef OID="IG.CM" Name="CM" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per medication" def:ArchiveLocationID="LF.CM" def:StandardOID="STD.SDTMIG.3.1.1">
         <Description>
-          <TranslatedText xml:lang="en"></TranslatedText>
+          <TranslatedText xml:lang="en">CM (One record per subject per medication)</TranslatedText>
         </Description>
         <ItemRef ItemOID="IT.CM.STUDYID" Mandatory="Yes" OrderNumber="1"/>
         <ItemRef ItemOID="IT.CM.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
@@ -159,9 +159,9 @@
           <def:title>cm.xpt</def:title>
         </def:leaf>
       </ItemGroupDef>
-      <ItemGroupDef OID="IG.LB" Name="LB" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Laboratory Test Results" def:Structure="One record per subject per laboratory test per visit" def:ArchiveLocationID="LF.LB" def:StandardOID="STD.SDTMIG.3.1.1">
+      <ItemGroupDef OID="IG.LB" Name="LB" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per laboratory test per visit" def:ArchiveLocationID="LF.LB" def:StandardOID="STD.SDTMIG.3.1.1">
         <Description>
-          <TranslatedText xml:lang="en"></TranslatedText>
+          <TranslatedText xml:lang="en">LB (One record per subject per laboratory test per visit)</TranslatedText>
         </Description>
         <ItemRef ItemOID="IT.LB.STUDYID" Mandatory="Yes" OrderNumber="1"/>
         <ItemRef ItemOID="IT.LB.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
@@ -195,9 +195,9 @@
           <def:title>lb.xpt</def:title>
         </def:leaf>
       </ItemGroupDef>
-      <ItemGroupDef OID="IG.DS" Name="DS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Disposition" def:Structure="One record per subject per disposition event" def:ArchiveLocationID="LF.DS" def:StandardOID="STD.SDTMIG.3.1.1">
+      <ItemGroupDef OID="IG.DS" Name="DS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per disposition event" def:ArchiveLocationID="LF.DS" def:StandardOID="STD.SDTMIG.3.1.1">
         <Description>
-          <TranslatedText xml:lang="en"></TranslatedText>
+          <TranslatedText xml:lang="en">DS (One record per subject per disposition event)</TranslatedText>
         </Description>
         <ItemRef ItemOID="IT.DS.DSSTWKF" Mandatory="No" OrderNumber="1"/>
         <ItemRef ItemOID="IT.DS.USUBJID" Mandatory="Yes" OrderNumber="2"/>
@@ -218,9 +218,9 @@
           <def:title>ds.xpt</def:title>
         </def:leaf>
       </ItemGroupDef>
-      <ItemGroupDef OID="IG.VS" Name="VS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Vital Signs" def:Structure="One record per subject per vital sign measurement per visit" def:ArchiveLocationID="LF.VS" def:StandardOID="STD.SDTMIG.3.1.1">
+      <ItemGroupDef OID="IG.VS" Name="VS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per vital sign measurement per visit" def:ArchiveLocationID="LF.VS" def:StandardOID="STD.SDTMIG.3.1.1">
         <Description>
-          <TranslatedText xml:lang="en"></TranslatedText>
+          <TranslatedText xml:lang="en">VS (One record per subject per vital sign measurement per visit)</TranslatedText>
         </Description>
         <ItemRef ItemOID="IT.VS.STUDYID" Mandatory="Yes" OrderNumber="1"/>
         <ItemRef ItemOID="IT.VS.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
@@ -245,9 +245,9 @@
           <def:title>vs.xpt</def:title>
         </def:leaf>
       </ItemGroupDef>
-      <ItemGroupDef OID="IG.LS" Name="LS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Lesion Assessment" def:Structure="One record per subject per lesion per assessment visit" def:ArchiveLocationID="LF.LS" def:StandardOID="STD.SDTMIG.3.1.1">
+      <ItemGroupDef OID="IG.LS" Name="LS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per lesion per assessment visit" def:ArchiveLocationID="LF.LS" def:StandardOID="STD.SDTMIG.3.1.1">
         <Description>
-          <TranslatedText xml:lang="en"></TranslatedText>
+          <TranslatedText xml:lang="en">LS (One record per subject per lesion per assessment visit)</TranslatedText>
         </Description>
         <ItemRef ItemOID="IT.LS.STUDYID" Mandatory="Yes" OrderNumber="1"/>
         <ItemRef ItemOID="IT.LS.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
@@ -275,9 +275,9 @@
           <def:title>ls.xpt</def:title>
         </def:leaf>
       </ItemGroupDef>
-      <ItemGroupDef OID="IG.PN" Name="PN" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Pain Assessment" def:Structure="One record per subject per pain assessment per visit" def:ArchiveLocationID="LF.PN" def:StandardOID="STD.SDTMIG.3.1.1">
+      <ItemGroupDef OID="IG.PN" Name="PN" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per pain assessment per visit" def:ArchiveLocationID="LF.PN" def:StandardOID="STD.SDTMIG.3.1.1">
         <Description>
-          <TranslatedText xml:lang="en"></TranslatedText>
+          <TranslatedText xml:lang="en">PN (One record per subject per pain assessment per visit)</TranslatedText>
         </Description>
         <ItemRef ItemOID="IT.PN.STUDYID" Mandatory="Yes" OrderNumber="1"/>
         <ItemRef ItemOID="IT.PN.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
@@ -301,9 +301,9 @@
           <def:title>pn.xpt</def:title>
         </def:leaf>
       </ItemGroupDef>
-      <ItemGroupDef OID="IG.SUPPDM" Name="SUPPDM" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Relationship" def:Structure="One record per subject per supplemental qualifier" def:ArchiveLocationID="LF.SUPPDM" def:StandardOID="STD.SDTMIG.3.1.1">
+      <ItemGroupDef OID="IG.SUPPDM" Name="SUPPDM" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per supplemental qualifier" def:ArchiveLocationID="LF.SUPPDM" def:StandardOID="STD.SDTMIG.3.1.1">
         <Description>
-          <TranslatedText xml:lang="en"></TranslatedText>
+          <TranslatedText xml:lang="en">SUPPDM (One record per subject per supplemental qualifier)</TranslatedText>
         </Description>
         <ItemRef ItemOID="IT.SUPPDM.STUDYID" Mandatory="Yes" OrderNumber="1"/>
         <ItemRef ItemOID="IT.SUPPDM.RDOMAIN" Mandatory="No" OrderNumber="2"/>
@@ -320,9 +320,9 @@
           <def:title>suppdm.xpt</def:title>
         </def:leaf>
       </ItemGroupDef>
-      <ItemGroupDef OID="IG.SUPPAE" Name="SUPPAE" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Relationship" def:Structure="One record per subject per adverse event per supplemental qualifier" def:ArchiveLocationID="LF.SUPPAE" def:StandardOID="STD.SDTMIG.3.1.1">
+      <ItemGroupDef OID="IG.SUPPAE" Name="SUPPAE" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per adverse event per supplemental qualifier" def:ArchiveLocationID="LF.SUPPAE" def:StandardOID="STD.SDTMIG.3.1.1">
         <Description>
-          <TranslatedText xml:lang="en"></TranslatedText>
+          <TranslatedText xml:lang="en">SUPPAE (One record per subject per adverse event per supplemental qualifier)</TranslatedText>
         </Description>
         <ItemRef ItemOID="IT.SUPPAE.STUDYID" Mandatory="Yes" OrderNumber="1"/>
         <ItemRef ItemOID="IT.SUPPAE.RDOMAIN" Mandatory="No" OrderNumber="2"/>
@@ -339,9 +339,9 @@
           <def:title>suppae.xpt</def:title>
         </def:leaf>
       </ItemGroupDef>
-      <ItemGroupDef OID="IG.SUPPEX" Name="SUPPEX" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Relationship" def:Structure="One record per subject per exposure cycle per supplemental qualifier" def:ArchiveLocationID="LF.SUPPEX" def:StandardOID="STD.SDTMIG.3.1.1">
+      <ItemGroupDef OID="IG.SUPPEX" Name="SUPPEX" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per exposure cycle per supplemental qualifier" def:ArchiveLocationID="LF.SUPPEX" def:StandardOID="STD.SDTMIG.3.1.1">
         <Description>
-          <TranslatedText xml:lang="en"></TranslatedText>
+          <TranslatedText xml:lang="en">SUPPEX (One record per subject per exposure cycle per supplemental qualifier)</TranslatedText>
         </Description>
         <ItemRef ItemOID="IT.SUPPEX.STUDYID" Mandatory="Yes" OrderNumber="1"/>
         <ItemRef ItemOID="IT.SUPPEX.RDOMAIN" Mandatory="No" OrderNumber="2"/>
@@ -358,9 +358,9 @@
           <def:title>suppex.xpt</def:title>
         </def:leaf>
       </ItemGroupDef>
-      <ItemGroupDef OID="IG.SUPPCM" Name="SUPPCM" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Relationship" def:Structure="One record per subject per medication per supplemental qualifier" def:ArchiveLocationID="LF.SUPPCM" def:StandardOID="STD.SDTMIG.3.1.1">
+      <ItemGroupDef OID="IG.SUPPCM" Name="SUPPCM" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per medication per supplemental qualifier" def:ArchiveLocationID="LF.SUPPCM" def:StandardOID="STD.SDTMIG.3.1.1">
         <Description>
-          <TranslatedText xml:lang="en"></TranslatedText>
+          <TranslatedText xml:lang="en">SUPPCM (One record per subject per medication per supplemental qualifier)</TranslatedText>
         </Description>
         <ItemRef ItemOID="IT.SUPPCM.STUDYID" Mandatory="Yes" OrderNumber="1"/>
         <ItemRef ItemOID="IT.SUPPCM.RDOMAIN" Mandatory="No" OrderNumber="2"/>
@@ -377,9 +377,9 @@
           <def:title>suppcm.xpt</def:title>
         </def:leaf>
       </ItemGroupDef>
-      <ItemGroupDef OID="IG.SUPPLB" Name="SUPPLB" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Relationship" def:Structure="One record per subject per laboratory test per supplemental qualifier" def:ArchiveLocationID="LF.SUPPLB" def:StandardOID="STD.SDTMIG.3.1.1">
+      <ItemGroupDef OID="IG.SUPPLB" Name="SUPPLB" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per laboratory test per supplemental qualifier" def:ArchiveLocationID="LF.SUPPLB" def:StandardOID="STD.SDTMIG.3.1.1">
         <Description>
-          <TranslatedText xml:lang="en"></TranslatedText>
+          <TranslatedText xml:lang="en">SUPPLB (One record per subject per laboratory test per supplemental qualifier)</TranslatedText>
         </Description>
         <ItemRef ItemOID="IT.SUPPLB.STUDYID" Mandatory="Yes" OrderNumber="1"/>
         <ItemRef ItemOID="IT.SUPPLB.RDOMAIN" Mandatory="No" OrderNumber="2"/>
@@ -396,9 +396,9 @@
           <def:title>supplb.xpt</def:title>
         </def:leaf>
       </ItemGroupDef>
-      <ItemGroupDef OID="IG.SUPPDS" Name="SUPPDS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Relationship" def:Structure="One record per subject per disposition event per supplemental qualifier" def:ArchiveLocationID="LF.SUPPDS" def:StandardOID="STD.SDTMIG.3.1.1">
+      <ItemGroupDef OID="IG.SUPPDS" Name="SUPPDS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per disposition event per supplemental qualifier" def:ArchiveLocationID="LF.SUPPDS" def:StandardOID="STD.SDTMIG.3.1.1">
         <Description>
-          <TranslatedText xml:lang="en"></TranslatedText>
+          <TranslatedText xml:lang="en">SUPPDS (One record per subject per disposition event per supplemental qualifier)</TranslatedText>
         </Description>
         <ItemRef ItemOID="IT.SUPPDS.STUDYID" Mandatory="Yes" OrderNumber="1"/>
         <ItemRef ItemOID="IT.SUPPDS.RDOMAIN" Mandatory="No" OrderNumber="2"/>
@@ -415,9 +415,9 @@
           <def:title>suppds.xpt</def:title>
         </def:leaf>
       </ItemGroupDef>
-      <ItemGroupDef OID="IG.SUPPLS" Name="SUPPLS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" Role="Relationship" def:Structure="One record per subject per lesion per supplemental qualifier" def:ArchiveLocationID="LF.SUPPLS" def:StandardOID="STD.SDTMIG.3.1.1">
+      <ItemGroupDef OID="IG.SUPPLS" Name="SUPPLS" Repeating="Yes" IsReferenceData="No" Purpose="Tabulation" def:Structure="One record per subject per lesion per supplemental qualifier" def:ArchiveLocationID="LF.SUPPLS" def:StandardOID="STD.SDTMIG.3.1.1">
         <Description>
-          <TranslatedText xml:lang="en"></TranslatedText>
+          <TranslatedText xml:lang="en">SUPPLS (One record per subject per lesion per supplemental qualifier)</TranslatedText>
         </Description>
         <ItemRef ItemOID="IT.SUPPLS.STUDYID" Mandatory="Yes" OrderNumber="1"/>
         <ItemRef ItemOID="IT.SUPPLS.RDOMAIN" Mandatory="No" OrderNumber="2"/>

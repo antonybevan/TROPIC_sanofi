@@ -60,6 +60,11 @@ jobs:
       run: |
         python3 06_telemetry/lint_sas.py
 
+    - name: CDISC CORE ADaM rule-pack validation (well-formedness gate)
+      run: |
+        python -m pip install pyyaml
+        python3 06_telemetry/validate_core_rules.py
+
     - name: Run unit tests (Broker + Seeder)
       run: |
         python3 06_telemetry/test_oda_broker.py
