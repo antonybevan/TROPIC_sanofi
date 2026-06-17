@@ -34,6 +34,7 @@
         <ItemRef ItemOID="IT.DM.ITT" Mandatory="No" OrderNumber="17"/>
         <ItemRef ItemOID="IT.DM.PPROT" Mandatory="No" OrderNumber="18"/>
         <ItemRef ItemOID="IT.DM.SAFETY" Mandatory="No" OrderNumber="19"/>
+        <def:Class Name="SPECIAL PURPOSE"/>
         <def:leaf ID="LF.DM" xlink:href="dm.xpt">
           <def:title>dm.xpt</def:title>
         </def:leaf>
@@ -83,6 +84,7 @@
         <ItemRef ItemOID="IT.AE.AEREFER" Mandatory="No" OrderNumber="39"/>
         <ItemRef ItemOID="IT.AE.AEDTHDTC" Mandatory="No" OrderNumber="40"/>
         <ItemRef ItemOID="IT.AE.AESEQUCM" Mandatory="No" OrderNumber="41"/>
+        <def:Class Name="EVENTS"/>
         <def:leaf ID="LF.AE" xlink:href="ae.xpt">
           <def:title>ae.xpt</def:title>
         </def:leaf>
@@ -119,6 +121,7 @@
         <ItemRef ItemOID="IT.EX.EXDELAY" Mandatory="No" OrderNumber="26"/>
         <ItemRef ItemOID="IT.EX.EXDSRCM" Mandatory="No" OrderNumber="27"/>
         <ItemRef ItemOID="IT.EX.ENDTCOL" Mandatory="No" OrderNumber="28"/>
+        <def:Class Name="INTERVENTIONS"/>
         <def:leaf ID="LF.EX" xlink:href="ex.xpt">
           <def:title>ex.xpt</def:title>
         </def:leaf>
@@ -155,6 +158,7 @@
         <ItemRef ItemOID="IT.CM.CMRLTL" Mandatory="No" OrderNumber="26"/>
         <ItemRef ItemOID="IT.CM.CMRSON" Mandatory="No" OrderNumber="27"/>
         <ItemRef ItemOID="IT.CM.CMPRGDTC" Mandatory="No" OrderNumber="28"/>
+        <def:Class Name="INTERVENTIONS"/>
         <def:leaf ID="LF.CM" xlink:href="cm.xpt">
           <def:title>cm.xpt</def:title>
         </def:leaf>
@@ -191,6 +195,7 @@
         <ItemRef ItemOID="IT.LB.LBDY" Mandatory="No" OrderNumber="26"/>
         <ItemRef ItemOID="IT.LB.SUBJID" Mandatory="No" OrderNumber="27"/>
         <ItemRef ItemOID="IT.LB.LBOVISIT" Mandatory="No" OrderNumber="28"/>
+        <def:Class Name="FINDINGS"/>
         <def:leaf ID="LF.LB" xlink:href="lb.xpt">
           <def:title>lb.xpt</def:title>
         </def:leaf>
@@ -214,6 +219,7 @@
         <ItemRef ItemOID="IT.DS.DSSTWK" Mandatory="No" OrderNumber="13"/>
         <ItemRef ItemOID="IT.DS.SUBJID" Mandatory="No" OrderNumber="14"/>
         <ItemRef ItemOID="IT.DS.DSPROG" Mandatory="No" OrderNumber="15"/>
+        <def:Class Name="EVENTS"/>
         <def:leaf ID="LF.DS" xlink:href="ds.xpt">
           <def:title>ds.xpt</def:title>
         </def:leaf>
@@ -241,6 +247,7 @@
         <ItemRef ItemOID="IT.VS.VSDTC" Mandatory="No" OrderNumber="17"/>
         <ItemRef ItemOID="IT.VS.VSDY" Mandatory="No" OrderNumber="18"/>
         <ItemRef ItemOID="IT.VS.SUBJID" Mandatory="No" OrderNumber="19"/>
+        <def:Class Name="FINDINGS"/>
         <def:leaf ID="LF.VS" xlink:href="vs.xpt">
           <def:title>vs.xpt</def:title>
         </def:leaf>
@@ -271,6 +278,7 @@
         <ItemRef ItemOID="IT.LS.LSDTC" Mandatory="No" OrderNumber="20"/>
         <ItemRef ItemOID="IT.LS.SUBJID" Mandatory="No" OrderNumber="21"/>
         <ItemRef ItemOID="IT.LS.LSSLOC" Mandatory="No" OrderNumber="22"/>
+        <def:Class Name="FINDINGS"/>
         <def:leaf ID="LF.LS" xlink:href="ls.xpt">
           <def:title>ls.xpt</def:title>
         </def:leaf>
@@ -297,6 +305,7 @@
         <ItemRef ItemOID="IT.PN.VISIT" Mandatory="No" OrderNumber="16"/>
         <ItemRef ItemOID="IT.PN.PNDTC" Mandatory="No" OrderNumber="17"/>
         <ItemRef ItemOID="IT.PN.SUBJID" Mandatory="No" OrderNumber="18"/>
+        <def:Class Name="FINDINGS"/>
         <def:leaf ID="LF.PN" xlink:href="pn.xpt">
           <def:title>pn.xpt</def:title>
         </def:leaf>
@@ -316,6 +325,7 @@
         <ItemRef ItemOID="IT.SUPPDM.QORIG" Mandatory="No" OrderNumber="9"/>
         <ItemRef ItemOID="IT.SUPPDM.QEVAL" Mandatory="No" OrderNumber="10"/>
         <ItemRef ItemOID="IT.SUPPDM.SUBJID" Mandatory="No" OrderNumber="11"/>
+        <def:Class Name="RELATIONSHIP"/>
         <def:leaf ID="LF.SUPPDM" xlink:href="suppdm.xpt">
           <def:title>suppdm.xpt</def:title>
         </def:leaf>
@@ -335,6 +345,7 @@
         <ItemRef ItemOID="IT.SUPPAE.QORIG" Mandatory="No" OrderNumber="9"/>
         <ItemRef ItemOID="IT.SUPPAE.QEVAL" Mandatory="No" OrderNumber="10"/>
         <ItemRef ItemOID="IT.SUPPAE.SUBJID" Mandatory="No" OrderNumber="11"/>
+        <def:Class Name="RELATIONSHIP"/>
         <def:leaf ID="LF.SUPPAE" xlink:href="suppae.xpt">
           <def:title>suppae.xpt</def:title>
         </def:leaf>
@@ -354,6 +365,7 @@
         <ItemRef ItemOID="IT.SUPPEX.QORIG" Mandatory="No" OrderNumber="9"/>
         <ItemRef ItemOID="IT.SUPPEX.QEVAL" Mandatory="No" OrderNumber="10"/>
         <ItemRef ItemOID="IT.SUPPEX.SUBJID" Mandatory="No" OrderNumber="11"/>
+        <def:Class Name="RELATIONSHIP"/>
         <def:leaf ID="LF.SUPPEX" xlink:href="suppex.xpt">
           <def:title>suppex.xpt</def:title>
         </def:leaf>
@@ -373,6 +385,7 @@
         <ItemRef ItemOID="IT.SUPPCM.QORIG" Mandatory="No" OrderNumber="9"/>
         <ItemRef ItemOID="IT.SUPPCM.QEVAL" Mandatory="No" OrderNumber="10"/>
         <ItemRef ItemOID="IT.SUPPCM.SUBJID" Mandatory="No" OrderNumber="11"/>
+        <def:Class Name="RELATIONSHIP"/>
         <def:leaf ID="LF.SUPPCM" xlink:href="suppcm.xpt">
           <def:title>suppcm.xpt</def:title>
         </def:leaf>
@@ -392,6 +405,7 @@
         <ItemRef ItemOID="IT.SUPPLB.QORIG" Mandatory="No" OrderNumber="9"/>
         <ItemRef ItemOID="IT.SUPPLB.QEVAL" Mandatory="No" OrderNumber="10"/>
         <ItemRef ItemOID="IT.SUPPLB.SUBJID" Mandatory="No" OrderNumber="11"/>
+        <def:Class Name="RELATIONSHIP"/>
         <def:leaf ID="LF.SUPPLB" xlink:href="supplb.xpt">
           <def:title>supplb.xpt</def:title>
         </def:leaf>
@@ -411,6 +425,7 @@
         <ItemRef ItemOID="IT.SUPPDS.QORIG" Mandatory="No" OrderNumber="9"/>
         <ItemRef ItemOID="IT.SUPPDS.QEVAL" Mandatory="No" OrderNumber="10"/>
         <ItemRef ItemOID="IT.SUPPDS.SUBJID" Mandatory="No" OrderNumber="11"/>
+        <def:Class Name="RELATIONSHIP"/>
         <def:leaf ID="LF.SUPPDS" xlink:href="suppds.xpt">
           <def:title>suppds.xpt</def:title>
         </def:leaf>
@@ -430,6 +445,7 @@
         <ItemRef ItemOID="IT.SUPPLS.QORIG" Mandatory="No" OrderNumber="9"/>
         <ItemRef ItemOID="IT.SUPPLS.QEVAL" Mandatory="No" OrderNumber="10"/>
         <ItemRef ItemOID="IT.SUPPLS.SUBJID" Mandatory="No" OrderNumber="11"/>
+        <def:Class Name="RELATIONSHIP"/>
         <def:leaf ID="LF.SUPPLS" xlink:href="suppls.xpt">
           <def:title>suppls.xpt</def:title>
         </def:leaf>

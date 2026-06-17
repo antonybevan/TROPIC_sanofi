@@ -1,15 +1,15 @@
 {
   "Conformance_Details": {
-    "Report_Generation": "2026-06-17T11:26:24",
-    "Total_Runtime": "96.62 seconds",
+    "Report_Generation": "2026-06-17T11:52:08",
+    "Total_Runtime": "122.43 seconds",
     "CORE_Engine_Version": "0.16.0",
     "Issue_Limit_Per_Rule": "None",
     "Issue_Limit_Per_Dataset": "None",
     "Issue_Limit_Per_Sheet": null,
     "Standard": "SDTMIG",
     "Version": "V3.2",
-    "CT_Version": "",
-    "Define_XML_Version": null
+    "CT_Version": "sdtmct-2024-03-29",
+    "Define_XML_Version": "2.1.0"
   },
   "Dataset_Details": [
     {
@@ -337,7 +337,7 @@
       "issues": 1
     }
   ],
-  "Issue_Details": "[REDACTED: 42324 per-record rows removed \u2014 contain subject-level USUBJID/values; regenerate locally via run_core_conformance.sh]",
+  "Issue_Details": "[REDACTED: 42324 per-record rows removed \u2014 subject-level USUBJID/values; regenerate via run_core_conformance.sh]",
   "Rules_Report": [
     {
       "core_id": "CORE-000001",

@@ -53,9 +53,10 @@ core validate -s adamig -v 1.3 -d <adam_xpt_dir> -ft xpt \
 - **CLI gate bug:** CORE's `StandardTypes` gate rejects `-s adamig` even though the engine's
   `normalize_adam_input()` requires it. The runner applies a one-line local patch
   (`enums/standard_types.py`) to add `adamig`; reported for upstream.
-- **Define-XML:** define-based rules need a define CORE's `odmlib` can parse. The SDTM define's
-  invalid `Role`-on-`ItemGroupDef` and empty `TranslatedText` were fixed; a deeper loader issue
-  (`'NoneType' object has no attribute 'Name'`) remains open for both defines.
+- **Define-XML (RESOLVED):** both defines now parse in CORE (`Define_XML_Version 2.1.0`). Three
+  defects were fixed — invalid `Role` on `ItemGroupDef`, empty `TranslatedText`, and the missing
+  `def:Class` element (the root cause of `'NoneType'.Name`) — added to all SDTM + ADaM datasets.
+  The ADaM rules run with the define engaged; both defines still pass the project's XSD.
 
 ## CI
 
