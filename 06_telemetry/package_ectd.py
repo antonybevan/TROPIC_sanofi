@@ -12,6 +12,11 @@ import glob
 import subprocess
 import re
 import argparse
+from datetime import datetime, timezone
+
+# Fixed PDF creation/mod date so the rendered reviewer guides and CSR are byte-reproducible.
+# The tracked data-free m5 preview must only change when content changes, not on every rebuild.
+_PDF_DATE = datetime(2026, 6, 17, tzinfo=timezone.utc)
 
 # Resolve Rscript path
 def resolve_rscript():
@@ -83,6 +88,7 @@ def md_to_pdf(md_path, pdf_path):
 
     print(f"Converting Markdown: {md_path} -> PDF: {pdf_path}")
     pdf = PDF()
+    pdf.creation_date = _PDF_DATE
     pdf.alias_nb_pages()
     pdf.add_page()
     pdf.set_font("helvetica", size=10)
@@ -214,6 +220,7 @@ def generate_blank_crf(pdf_path):
     from fpdf import FPDF
     print(f"Generating Blank CRF: {pdf_path}")
     pdf = FPDF()
+    pdf.creation_date = _PDF_DATE
     pdf.add_page()
     pdf.set_font("helvetica", "B", 16)
     pdf.cell(0, 20, "TROPIC Study - Blank Case Report Form (CRF)", align="C")
