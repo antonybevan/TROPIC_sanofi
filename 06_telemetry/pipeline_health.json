@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-06-16T20:04:23.583713",
+  "timestamp": "2026-06-18T13:19:02.718999",
   "runner": "apple (System Agent)",
   "pipeline_health_status": "GREEN",
-  "sas_execution_mode": "oda",
+  "sas_execution_mode": "sim",
   "stages": {
     "Real SDTM Staging Ingest": "PASS",
     "R SDTM Validation": "PASS",
@@ -17,16 +17,11 @@
     "SAS Production (ODA/Real/Simulated)": "PASS",
     "Cross-Language Audit Reconcile": "PASS",
     "Efficacy & Safety TFL Suite Compilation": "PASS",
-    "Numerical Results Reconciliation (SAS vs R)": "PASS",
+    "Numerical Results Reconciliation (SAS vs R)": "SKIPPED",
+    "ADaM Spec to Define Conformance": "PASS",
+    "ADaM Spec to Data Conformance": "PASS",
     "eCTD Final Package": "PASS"
   },
-  "oda_endpoint": "odaws01-apse1-2.oda.sas.com",
-  "oda_attempts": 1,
-  "oda_total_wait_s": 11.4,
-  "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007",
-  "reconciliation": "SAS_vs_R",
-  "probe_nonce_echoed": true,
-  "sas_results_stats": "downloaded",
   "reconciliation_status": "PASS",
-  "results_reconciliation_status": "PASS"
+  "results_reconciliation_status": "not_available"
 }

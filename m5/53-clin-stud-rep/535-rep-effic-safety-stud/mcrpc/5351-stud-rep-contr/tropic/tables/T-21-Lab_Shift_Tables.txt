@@ -1,8 +1,9 @@
 ============================================================================
- NOTICE: The CbzP (Cabazitaxel) arm shown below is a SYNTHETIC, illustrative
- cohort reconstructed by proportional-hazards scaling of the real MP arm.
- Between-arm comparisons are circular by construction and are NOT clinical
- findings. All Mitoxantrone (MP) arm values are derived from real trial data.
+ NOTICE: The CbzP (Cabazitaxel) arm shown below is a SYNTHETIC, illustrative cohort.
+ Primary endpoints (OS, PFS) are reconstructed via Guyot (2012) IPD reconstruction from
+ the published Kaplan-Meier curves; secondary endpoints (TTPSA/TTPAIN/TTUMOR) are PH-scaled
+ from the real MP arm and are circular by construction. All Mitoxantrone (MP) arm
+ values are derived from real trial data.
 ============================================================================
 
  TROPIC (Study EFC6193 / XRP6258) Laboratory Toxicity Shift Tables

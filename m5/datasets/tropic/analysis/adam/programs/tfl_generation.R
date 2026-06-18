@@ -16,6 +16,31 @@ library(scales)
 # Avoid linter warnings for column names in ggplot/dplyr pipelines
 surv <- NULL
 
+# --- Deterministic output -----------------------------------------------------
+# Fixed RNG seed (insurance against any randomness in layout) and a helper that
+# strips non-deterministic PNG metadata (the tIME timestamp + text chunks that some
+# graphics devices, e.g. ragg/Cairo, embed) so every figure is byte-reproducible
+# across machines and devices. Applied to all rendered figures at the end.
+set.seed(20100701L) # de Bono 2010 publication year; arbitrary but fixed
+
+strip_png_metadata <- function(path) {
+  raw <- readBin(path, "raw", n = file.info(path)$size)
+  drop <- c("tIME", "tEXt", "zTXt", "iTXt")
+  pieces <- list(raw[1:8]) # PNG signature
+  i <- 9L
+  n <- length(raw)
+  repeat {
+    b <- as.integer(raw[i:(i + 3)])
+    len <- b[1] * 16777216 + b[2] * 65536 + b[3] * 256 + b[4] # big-endian, double-safe
+    type <- rawToChar(raw[(i + 4):(i + 7)])
+    end <- i + 12 + len - 1 # 4 length + 4 type + len data + 4 CRC
+    if (!type %in% drop) pieces[[length(pieces) + 1L]] <- raw[i:end]
+    i <- end + 1
+    if (type == "IEND" || i > n) break
+  }
+  writeBin(unlist(pieces), path)
+}
+
 cat("NOTE: [TFL] Starting Efficacy & Safety TFL Suite compilation...\n")
 
 dir.create("09_tfl/output/tables", showWarnings = FALSE, recursive = TRUE)
@@ -26,23 +51,23 @@ dir.create("09_tfl/output/listings", showWarnings = FALSE, recursive = TRUE)
 # comparative figure carries this caption so a detached PNG cannot be
 # mistaken for a real result.
 synth_cap <- paste0(
-  "CbzP is a SYNTHETIC, illustrative comparator ",
-  "(PH-scaled from the real MP arm).\n",
-  "Between-arm statistics are circular by construction — NOT clinical ",
-  "findings; the MP arm is real."
+  "CbzP is a SYNTHETIC, illustrative comparator — NOT real patient data; the MP arm is real.\n",
+  "Primary endpoints (OS, PFS): Guyot (2012) IPD reconstruction from the published KM curves.\n",
+  "Secondary endpoints (TTPSA/TTPAIN/TTUMOR): PH-scaled from MP — circular by construction."
 )
 # Plain-text banner prepended to every text table output for the same reason.
 synth_banner <- paste0(
   "==========================================================",
   "==================\n",
   " NOTICE: The CbzP (Cabazitaxel) arm shown below is a ",
-  "SYNTHETIC, illustrative\n",
-  " cohort reconstructed by proportional-hazards scaling of ",
-  "the real MP arm.\n",
-  " Between-arm comparisons are circular by construction ",
-  "and are NOT clinical\n",
-  " findings. All Mitoxantrone (MP) arm values are derived ",
-  "from real trial data.\n",
+  "SYNTHETIC, illustrative cohort.\n",
+  " Primary endpoints (OS, PFS) are reconstructed via Guyot (2012) IPD ",
+  "reconstruction from\n",
+  " the published Kaplan-Meier curves; secondary endpoints (TTPSA/TTPAIN/TTUMOR) ",
+  "are PH-scaled\n",
+  " from the real MP arm and are circular by construction. ",
+  "All Mitoxantrone (MP) arm\n",
+  " values are derived from real trial data.\n",
   "==========================================================",
   "==================\n"
 )
@@ -1269,6 +1294,14 @@ consort <- ggplot() +
 
 ggsave("09_tfl/output/figures/F-01-1_CONSORT_Disposition.png", consort,
        width = 8, height = 7, dpi = 300)
+
+# Byte-stability pass: strip embedded timestamps/text from the R-track figures so the
+# committed PNGs are identical across rebuilds and graphics devices (the SAS-track
+# figures under figures/sas/ are rendered separately and are not touched here).
+invisible(lapply(
+  list.files("09_tfl/output/figures", pattern = "[.]png$", full.names = TRUE),
+  strip_png_metadata
+))
 
 cat(
   "NOTE: [TFL] TFL suites compiled successfully.\n",

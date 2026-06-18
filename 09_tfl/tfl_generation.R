@@ -51,23 +51,23 @@ dir.create("09_tfl/output/listings", showWarnings = FALSE, recursive = TRUE)
 # comparative figure carries this caption so a detached PNG cannot be
 # mistaken for a real result.
 synth_cap <- paste0(
-  "CbzP is a SYNTHETIC, illustrative comparator ",
-  "(PH-scaled from the real MP arm).\n",
-  "Between-arm statistics are circular by construction — NOT clinical ",
-  "findings; the MP arm is real."
+  "CbzP is a SYNTHETIC, illustrative comparator — NOT real patient data; the MP arm is real.\n",
+  "Primary endpoints (OS, PFS): Guyot (2012) IPD reconstruction from the published KM curves.\n",
+  "Secondary endpoints (TTPSA/TTPAIN/TTUMOR): PH-scaled from MP — circular by construction."
 )
 # Plain-text banner prepended to every text table output for the same reason.
 synth_banner <- paste0(
   "==========================================================",
   "==================\n",
   " NOTICE: The CbzP (Cabazitaxel) arm shown below is a ",
-  "SYNTHETIC, illustrative\n",
-  " cohort reconstructed by proportional-hazards scaling of ",
-  "the real MP arm.\n",
-  " Between-arm comparisons are circular by construction ",
-  "and are NOT clinical\n",
-  " findings. All Mitoxantrone (MP) arm values are derived ",
-  "from real trial data.\n",
+  "SYNTHETIC, illustrative cohort.\n",
+  " Primary endpoints (OS, PFS) are reconstructed via Guyot (2012) IPD ",
+  "reconstruction from\n",
+  " the published Kaplan-Meier curves; secondary endpoints (TTPSA/TTPAIN/TTUMOR) ",
+  "are PH-scaled\n",
+  " from the real MP arm and are circular by construction. ",
+  "All Mitoxantrone (MP) arm\n",
+  " values are derived from real trial data.\n",
   "==========================================================",
   "==================\n"
 )

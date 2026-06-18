@@ -1,8 +1,9 @@
 ============================================================================
- NOTICE: The CbzP (Cabazitaxel) arm shown below is a SYNTHETIC, illustrative
- cohort reconstructed by proportional-hazards scaling of the real MP arm.
- Between-arm comparisons are circular by construction and are NOT clinical
- findings. All Mitoxantrone (MP) arm values are derived from real trial data.
+ NOTICE: The CbzP (Cabazitaxel) arm shown below is a SYNTHETIC, illustrative cohort.
+ Primary endpoints (OS, PFS) are reconstructed via Guyot (2012) IPD reconstruction from
+ the published Kaplan-Meier curves; secondary endpoints (TTPSA/TTPAIN/TTUMOR) are PH-scaled
+ from the real MP arm and are circular by construction. All Mitoxantrone (MP) arm
+ values are derived from real trial data.
 ============================================================================
 
 TROPIC (Study EFC6193 / XRP6258) Secondary Efficacy Tables
@@ -12,20 +13,20 @@ T-11-6: Kaplan-Meier Analysis of Time to PSA Progression (TTPSA) - ITT Populatio
 ---------------------------------------------------------------------------------
 Statistic                                 CbzP (N=378)        MP (N=371)
 Number of Events / Total N                286/378               265/371
-Median Survival Time (Months)             2.8                2.2
-95% Confidence Interval                   (95% CI: 1.9-3.3)      (95% CI: 1.7-3.3)
-Unstratified Hazard Ratio (CbzP vs MP)     0.84 (95% CI: 0.71-0.99)
-Wald Log-Rank p-value                     0.0362
+Median Survival Time (Months)             2.7                2.2
+95% Confidence Interval                   (95% CI: 1.9-3.2)      (95% CI: 1.7-3.3)
+Unstratified Hazard Ratio (CbzP vs MP)     0.85 (95% CI: 0.72-1.00)
+Wald Log-Rank p-value                     0.0514
 
 
 T-11-7: Kaplan-Meier Analysis of Time to Tumor Progression (TTUMOR) - Measurable Subpopulation
 ------------------------------------------------------------------------------------------------
 Statistic                                 CbzP (N=179)        MP (N=203)
 Number of Events / Total N                166/179               182/203
-Median Survival Time (Months)             3.8                2.3
-95% Confidence Interval                   (95% CI: 3.1-5.7)      (95% CI: 2.1-3.5)
-Unstratified Hazard Ratio (CbzP vs MP)     0.67 (95% CI: 0.54-0.83)
-Wald Log-Rank p-value                     0.0003
+Median Survival Time (Months)             3.4                2.3
+95% Confidence Interval                   (95% CI: 2.7-5.7)      (95% CI: 2.1-3.5)
+Unstratified Hazard Ratio (CbzP vs MP)     0.68 (95% CI: 0.55-0.85)
+Wald Log-Rank p-value                     0.0006
 
 
 T-11-8: Analysis of Best Clinical Response Endpoints

@@ -146,10 +146,14 @@ To establish a true, functionally equivalent validation track, the core producti
 
 ## 7. Cabazitaxel (CbzP) Arm Reconstruction & Analysis-Step Merging
 
-To exercise the comparative-efficacy/safety TFLs (total N=749: 371 real MP + 378 **synthetic** CbzP) and the retrospective Project Optimus demonstration, a **synthetic, illustrative** CbzP cohort was generated and merged at the analysis step. The method is **proportional-hazards time-scaling of the real MP arm** (real MP event times ÷ published HR, censoring calibrated to published event counts) plus fixed-seed sampling from published Lancet 2010 Table 1/Table 2 marginals. **This is not the Guyot et al. (2012) KM-digitisation algorithm** (which is not used anywhere in the codebase), and the synthetic arm is **not** real patient data:
+To exercise the comparative-efficacy/safety TFLs (total N=749: 371 real MP + 378 **synthetic** CbzP) and the retrospective Project Optimus demonstration, a **synthetic, illustrative** CbzP cohort was generated and merged at the analysis step. The synthetic arm is **not** real patient data. Two reconstruction methods are used depending on endpoint type:
+
+* **Primary endpoints (OS, PFS):** Reconstructed via genuine **Guyot (2012) IPD reconstruction** (Guyot et al., BMC Med Res Methodol 2012;12:9), implemented with the `IPDfromKM` package (CRAN). The published CbzP Kaplan–Meier curves (de Bono et al., Lancet 2010;376:1147-1154, Figure 2A = OS, Figure 3 = PFS) were digitised (WebPlotDigitizer; raw exports retained) and combined with the **published numbers-at-risk tables transcribed from the same figures** (OS at 0/6/12/18/24/30 mo = 378/321/231/90/28/4; PFS at 0/3/6/9/12/15 mo = 378/168/90/52/15/4). The KM estimator is then inverted to solve for the event/censoring times reproducing the observed curve, constrained by N=378 and, for OS, the published death total. The CbzP survival shape comes from the **published curve itself** — not from any assumed parametric form and **independently of the MP arm** (no hazard-ratio division) — an accepted HTA technique (NICE TSD-14) that removes the circularity of the previous PH-scaling approach (see `01_raw_source/reconstruct_cbzp_guyot.R`, `guyot_validation_report.R`). Accuracy is bounded by digitisation fidelity, validated against the published summary statistics below.
+* **Secondary endpoints (TTPAIN, TTPSA, TTUMOR):** Remain **PH-scaled** from the real MP arm (no published KM curves with numbers-at-risk tables exist for these endpoints, so Guyot reconstruction is not possible). These are clearly labelled as PH-scaled and circular in the reconstruction log and TFL footnotes.
+* **Non-TTE domains (ADSL, ADAE, ADEX, ADLB, ADRS):** Fixed-seed sampling from published Table 1/Table 2 marginal distributions.
 
 ### 7.1 Separation of Reconstruction Logic
-To prevent circular validation dependencies, the reconstruction program [reconstruct_cbzp_arm.R](file:///Users/apple/Desktop/TROPIC/01_raw_source/reconstruct_cbzp_arm.R) operates independently. It loads the validated MP ADaM datasets (`04_adam/adtte_v.xpt` etc.) to extract patient timelines, performs Proportional Hazards (PH) survival scaling and Table 1/2 baseline simulations, and writes CbzP demographic, exposure, laboratory, and time-to-event profiles as isolated RDS files to `01_raw_source/cbzp_reconstructed/`.
+To prevent circular validation dependencies, the reconstruction program [reconstruct_cbzp_arm.R](file:///Users/apple/Desktop/TROPIC/01_raw_source/reconstruct_cbzp_arm.R) operates independently. For OS and PFS, it sources `reconstruct_cbzp_guyot.R`, which generates the Guyot pseudo-IPD from the digitised published KM curves + transcribed at-risk tables only (no MP arm data is read for the primary endpoints). For secondary endpoints, it loads the validated MP ADaM datasets (`04_adam/adtte_v.xpt`) to perform PH scaling. Demographics and non-TTE domains are simulated from Table 1/2 baselines. All CbzP outputs are written as isolated RDS files to `01_raw_source/cbzp_reconstructed/`.
 
 ### 7.2 Analysis-Step Merging
 In the final reporting step ([tfl_generation.R](file:///Users/apple/Desktop/TROPIC/09_tfl/tfl_generation.R)), the validated MP-only ADaMs are loaded from `04_adam/` and dynamically merged with the reconstructed CbzP RDS files. This combined dataset (N=749: 371 MP + 378 CbzP) is used to generate the TFLs and the exposure-response analysis.
@@ -162,16 +166,29 @@ Subject-level demographics for the CbzP cohort (N=378) were simulated using a fi
 * **Other Stratification Factors**: Prior docetaxel response (25% CR/PR), progression timeline (34% during docetaxel), measurable disease (45%), pain at baseline (59%), and visceral disease (26%).
 
 ### 7.4 Time-to-Event Reconstitution (ADTTE)
-All 5 primary and secondary time-to-event efficacy parameters were reconstructed for the CbzP arm using Proportional Hazards (PH) survival scaling on the real Mitoxantrone (MP) patient data, scaled by the inverse of the published Hazard Ratios (HR) and calibrated to match target event counts. 
+
+**Primary endpoints (OS, PFS) — Guyot (2012) IPD reconstruction:**
+The KM estimator is inverted (`IPDfromKM`) from the digitised published curve plus the transcribed numbers-at-risk table to yield pseudo-IPD consistent with the observed step function. The reconstruction passes the following validation gates (`guyot_validation_report.R`):
+
+| Criterion | Published | Reconstructed | Tolerance | Status |
+|---|---|---|---|---|
+| OS median | 15.1 mo (14.1–16.3) | 15.2 mo | ±1.0 mo | PASS |
+| PFS median | 2.8 mo (2.4–3.0) | 2.7 mo | ±0.5 mo | PASS |
+| OS deaths | 227 (Table 5, cabazitaxel) | 228 | ±10 | PASS |
+| OS curve fit (max\|dev\| vs digitised) | — | 0.033 | <0.05 | PASS |
+| PFS curve fit (max\|dev\| vs digitised) | — | 0.024 | <0.05 | PASS |
+| OS HR vs real MP | 0.70 (0.59–0.83) | 0.70 (0.59–0.84) | 0.60–0.80 | PASS |
+| PFS HR vs real MP | 0.74 (0.64–0.86) | 0.72 (0.62–0.84) | 0.64–0.84 | PASS |
 
 > [!NOTE]
-> **Reconstruction Calibration Discrepancy:** Because the reconstruction scales the survival times of real MP patients (who have a median OS of 12.7 months) by the inverse of the published hazard ratios and then applies censoring to match target event counts exactly, the resulting derived KM medians and unstratified hazard ratios for the combined analysis differ from the published aggregate values:
-> - **Overall Survival (OS):** CbzP median of **21.7 months** vs. MP median of **12.7 months**; Unstratified Hazard Ratio = **0.43 (95% CI: 0.35–0.52)** (Target published: CbzP median 15.1 mo, HR 0.70).
-> - **Progression-Free Survival (PFS):** CbzP median of **1.9 months** vs. MP median of **1.4 months**; Unstratified Hazard Ratio = **0.66 (95% CI: 0.56–0.78)** (Target published: CbzP median 2.8 mo, HR 0.74).
-> - **Time to PSA Progression (TTPSA):** CbzP median of **2.8 months** vs. MP median of **2.1 months**; Unstratified Hazard Ratio = **0.84 (95% CI: 0.71–1.00)** (Target published: CbzP median 6.4 mo, HR 0.75).
-> - **Time to Tumor Progression (TTUMOR):** CbzP median of **3.8 months** vs. MP median of **2.3 months**; Unstratified Hazard Ratio = **0.67 (95% CI: 0.54–0.83)** (Target published: CbzP median 5.7 mo, HR 0.61).
-> - **Time to Pain Progression (TTPAIN):** Reconstructed with HR = 0.80 (CbzP median ~5.0 mo, 130/378 events).
-> - **Time to Serious AE (TTSAE):** Derived dynamically from the first Serious AE occurrence date in ADAE, or censored at `LSTALVDT` if no SAE occurred.
+> The reconstructed OS HR vs the real MP arm is **0.70 — matching the published 0.70 exactly** — and the PFS HR (0.72) is within tolerance of the published 0.74. These emerge from the independently reconstructed CbzP curve versus the real MP data; they are **not circular**. The paper reports no separate cabazitaxel PFS event count (the Figure 3 PFS panel has no event total), so PFS events are reconstructed from the curve + at-risk table (358) rather than constrained to an assumed value. The OS death total (227) is taken from Table 5 (cabazitaxel total deaths, 61%).
+
+**Secondary endpoints (TTPAIN, TTPSA, TTUMOR) — PH-scaled (circular):**
+Reconstructed using proportional-hazards scaling of the real MP event times (t_CbzP = t_MP / HR), with event counts calibrated to match published totals. These HRs are **circular by construction** and carry no evidentiary weight:
+* **Time to PSA Progression (TTPSA):** PH-scaled with HR = 0.75 (286/378 events).
+* **Time to Tumor Progression (TTUMOR):** PH-scaled with HR = 0.61 (166/179 events, measurable-disease subpopulation).
+* **Time to Pain Progression (TTPAIN):** PH-scaled with HR = 0.80 (130/378 events).
+* **Time to Serious AE (TTSAE):** Derived dynamically from the first Serious AE occurrence date in ADAE, or censored at `LSTALVDT` if no SAE occurred.
 
 ### 7.5 Adverse Events (ADAE) & Exposure (ADEX)
 * **Adverse Events**: Simulated based on published Table 2 rates, including 82% neutropenia, 8% febrile neutropenia, 31% anemia, and 47% diarrhea. CTCAE toxicity grades and OCCDS v1.0 occurrence variables (including the custom continuous episode-merging fields `CIAESDT`, `CIAEEDT`, `CIAEDUR`, and occurrence flag `AEOCCFL`) were applied. The Serious AE (SAE) rate is calibrated to match the EPAR safety profile of exactly 39.2% (145/371 safety-evaluable subjects).
