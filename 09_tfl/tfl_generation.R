@@ -202,17 +202,22 @@ render_km <- function(data, stats, x_max, title, subtitle_endpoint, y_lab, outfi
   # Fit survfit once (Issue 5)
   fit <- survfit(Surv(AVAL / 30.4375, 1 - CNSR) ~ TRT01P, data = data)
 
-  # Extract true KM step-plot data
+  # Extract true KM step-plot data.
+  # NB: index the RAW fit arrays (fit$time/$surv) by their own strata layout via
+  # rep(names, fit$strata). Do NOT use which(summary(fit)$strata==...): summary()
+  # drops censoring-only rows, so its indices are shorter than fit$time and would
+  # mis-map strata onto the wrong rows (scrambled curves / spurious vertical drops).
   plot_list <- list()
   if (!is.null(fit$strata)) {
+    strata_of_row <- rep(names(fit$strata), fit$strata)
     for (stratum in names(fit$strata)) {
       stratum_clean <- gsub("TRT01P=", "", stratum)
-      idx <- which(summary(fit)$strata == stratum)
+      sel <- strata_of_row == stratum
 
       # Ensure curves start at time 0 with 100% survival
       plot_list[[stratum_clean]] <- data.frame(
-        time = c(0, fit$time[idx]),
-        surv = c(1.0, fit$surv[idx]),
+        time = c(0, fit$time[sel]),
+        surv = c(1.0, fit$surv[sel]),
         TRT01P = stratum_clean
       )
     }
@@ -272,7 +277,8 @@ render_km <- function(data, stats, x_max, title, subtitle_endpoint, y_lab, outfi
       guide = "none"
     ) +
     scale_y_discrete(labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) + # nolint
-    scale_x_continuous(limits = c(0, x_max), breaks = times, expand = c(0, 0)) +
+    scale_x_continuous(limits = c(0, x_max), breaks = times,
+      expand = expansion(mult = c(0.02, 0.04))) +  # room so end labels (e.g. 28) aren't clipped
     labs(
       x = NULL,
       y = "Number at risk:"
