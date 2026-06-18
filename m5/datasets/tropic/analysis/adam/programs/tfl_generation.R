@@ -448,7 +448,7 @@ forest_left <- ggplot(subgroups) +
   geom_rect(data = bg_rects, aes(xmin = 0.1, xmax = 2.7, ymin = ymin, ymax = ymax), fill = "#f5f7f8", alpha = 0.8, # nolint
     inherit.aes = FALSE) + # nolint
   geom_vline(xintercept = 1.0, linetype = "dashed", color = "#7f8c8d", linewidth = 0.5) + # nolint
-  geom_errorbarh(aes(y = Subgroup, xmin = LCL, xmax = UCL), height = 0.15, color = "#1a5276", linewidth = 0.8) + # nolint
+  geom_errorbar(aes(y = Subgroup, xmin = LCL, xmax = UCL), orientation = "y", width = 0.15, color = "#1a5276", linewidth = 0.8) + # nolint
   geom_point(aes(y = Subgroup, x = HR), shape = 22, size = 3.2, fill = "#1a5276", color = "#0f324a") + # Clinical square symbol # nolint
   scale_x_continuous(limits = c(0.1, 2.7), breaks = c(0.2, 0.5, 1.0, 1.5, 2.0, 2.5)) + # nolint
   labs(
