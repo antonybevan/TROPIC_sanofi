@@ -277,8 +277,9 @@ render_km <- function(data, stats, x_max, title, subtitle_endpoint, y_lab, outfi
       guide = "none"
     ) +
     scale_y_discrete(labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) + # nolint
+    # right-side room so the final at-risk labels (e.g. month-24 "28") are not clipped
     scale_x_continuous(limits = c(0, x_max), breaks = times,
-      expand = expansion(mult = c(0.02, 0.04))) +  # room so end labels (e.g. 28) aren't clipped
+                       expand = expansion(mult = c(0.02, 0.04))) +
     labs(
       x = NULL,
       y = "Number at risk:"
