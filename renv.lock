@@ -9,6 +9,32 @@
     ]
   },
   "Packages": {
+    "IPDfromKM": {
+      "Package": "IPDfromKM",
+      "Version": "0.1.10",
+      "Source": "Repository",
+      "Type": "Package",
+      "Title": "Map Digitized Survival Curves Back to Individual Patient Data",
+      "Date": "2020-10-20",
+      "Authors@R": "c(person(given=\"Na\", family=\"Liu\",role=c(\"aut\",\"cre\"),email=\"nliu1104@gmail.com\"), person(given=\"J.Jack\",family=\"Lee\",rol=c(\"aut\",\"ths\")), person(given=\"Yanhong\",family=\"Zhou\",rol=c(\"ctb\")))",
+      "Description": "An implementation to reconstruct individual patient data from Kaplan-Meier (K-M) survival curves, visualize and assess the accuracy of the reconstruction, then perform secondary analysis on the reconstructed data. We involve a simple function to extract the coordinates form the published K-M curves. The function is developed based on Poisot T. ’s digitize package (2011)  <doi:10.32614/RJ-2011-004> . For more complex and tangled together graphs, digitizing software, such as 'DigitizeIt' (for MAC or windows) or 'ScanIt'(for windows) can be used to get the coordinates. Additional information should also be involved to increase the accuracy, like numbers of patients at risk (often reported at 5-10 time points under the x-axis of the K-M graph), total number of patients, and total number of events. The package implements the modified iterative K-M estimation algorithm (modified-iKM) improved upon the approach proposed by Guyot (2012) <doi:10.1186/1471-2288-12-9> with some modifications.",
+      "Depends": [
+        "R (>= 3.6.0)",
+        "ggplot2",
+        "dplyr",
+        "survival",
+        "gridExtra",
+        "readbitmap"
+      ],
+      "License": "GPL-2",
+      "Encoding": "UTF-8",
+      "LazyData": "true",
+      "RoxygenNote": "7.1.1",
+      "NeedsCompilation": "no",
+      "Author": "Na Liu [aut, cre], J.Jack Lee [aut, ths], Yanhong Zhou [ctb]",
+      "Maintainer": "Na Liu <nliu1104@gmail.com>",
+      "Repository": "CRAN"
+    },
     "Matrix": {
       "Package": "Matrix",
       "Version": "1.7-5",
@@ -247,6 +273,28 @@
       "NeedsCompilation": "yes",
       "Author": "Michael Chirico [aut, cre], Jens Oehlschlägel [aut], Leonardo Silvestri [ctb], Ofek Shilon [ctb], Christian Ullerich [ctb]",
       "Maintainer": "Michael Chirico <michaelchirico4@gmail.com>",
+      "Repository": "CRAN"
+    },
+    "bmp": {
+      "Package": "bmp",
+      "Version": "0.3.1",
+      "Source": "Repository",
+      "Maintainer": "Gregory Jefferis <jefferis@gmail.com>",
+      "License": "GPL (>= 2)",
+      "Title": "Read Windows Bitmap (BMP) Images",
+      "Authors@R": "c(person(given = \"Gregory\", family = \"Jefferis\", role = c(\"aut\", \"cre\"), email = \"jefferis@gmail.com\", comment = c(ORCID = \"0000-0002-0587-9355\")) )",
+      "Description": "Reads Windows BMP format images. Currently limited to 8 bit greyscale images and 24,32 bit (A)RGB images. Pure R implementation without external dependencies.",
+      "Suggests": [
+        "pixmap",
+        "testthat"
+      ],
+      "Collate": "'read-bmp.R'",
+      "RoxygenNote": "7.3.2",
+      "Encoding": "UTF-8",
+      "URL": "https://github.com/jefferis/bmp",
+      "BugReports": "https://github.com/jefferis/bmp/issues",
+      "NeedsCompilation": "no",
+      "Author": "Gregory Jefferis [aut, cre] (ORCID: <https://orcid.org/0000-0002-0587-9355>)",
       "Repository": "CRAN"
     },
     "cellranger": {
@@ -792,6 +840,36 @@
       "Maintainer": "Jennifer Bryan <jenny@posit.co>",
       "Repository": "CRAN"
     },
+    "gridExtra": {
+      "Package": "gridExtra",
+      "Version": "2.3",
+      "Source": "Repository",
+      "Authors@R": "c(person(\"Baptiste\", \"Auguie\", email = \"baptiste.auguie@gmail.com\", role = c(\"aut\", \"cre\")), person(\"Anton\", \"Antonov\", email = \"tonytonov@gmail.com\", role = c(\"ctb\")))",
+      "License": "GPL (>= 2)",
+      "Title": "Miscellaneous Functions for \"Grid\" Graphics",
+      "Type": "Package",
+      "Description": "Provides a number of user-level functions to work with \"grid\" graphics, notably to arrange multiple grid-based plots on a page, and draw tables.",
+      "VignetteBuilder": "knitr",
+      "Imports": [
+        "gtable",
+        "grid",
+        "grDevices",
+        "graphics",
+        "utils"
+      ],
+      "Suggests": [
+        "ggplot2",
+        "egg",
+        "lattice",
+        "knitr",
+        "testthat"
+      ],
+      "RoxygenNote": "6.0.1",
+      "NeedsCompilation": "no",
+      "Author": "Baptiste Auguie [aut, cre], Anton Antonov [ctb]",
+      "Maintainer": "Baptiste Auguie <baptiste.auguie@gmail.com>",
+      "Repository": "CRAN"
+    },
     "gtable": {
       "Package": "gtable",
       "Version": "0.3.6",
@@ -955,6 +1033,25 @@
       "NeedsCompilation": "yes",
       "Author": "Hadley Wickham [aut] (ORCID: <https://orcid.org/0000-0003-4757-117X>), Claus O. Wilke [aut] (Original author, ORCID: <https://orcid.org/0000-0002-7470-9261>), Thomas Lin Pedersen [aut, cre] (ORCID: <https://orcid.org/0000-0002-5147-4711>), Posit, PBC [cph, fnd] (ROR: <https://ror.org/03wc8by49>)",
       "Maintainer": "Thomas Lin Pedersen <thomas.pedersen@posit.co>",
+      "Repository": "CRAN"
+    },
+    "jpeg": {
+      "Package": "jpeg",
+      "Version": "0.1-11",
+      "Source": "Repository",
+      "Title": "Read and write JPEG images",
+      "Author": "Simon Urbanek [aut, cre, cph] (https://urbanek.org, <https://orcid.org/0000-0003-2297-1732>)",
+      "Authors@R": "person(\"Simon\", \"Urbanek\", role=c(\"aut\",\"cre\",\"cph\"), email=\"Simon.Urbanek@r-project.org\", comment=c(\"https://urbanek.org\", ORCID=\"0000-0003-2297-1732\"))",
+      "Maintainer": "Simon Urbanek <Simon.Urbanek@r-project.org>",
+      "Depends": [
+        "R (>= 2.9.0)"
+      ],
+      "Description": "This package provides an easy and simple way to read, write and display bitmap images stored in the JPEG format. It can read and write both files and in-memory raw vectors.",
+      "License": "GPL-2 | GPL-3",
+      "SystemRequirements": "libjpeg",
+      "URL": "https://www.rforge.net/jpeg/",
+      "BugReports": "https://github.com/s-u/jpeg/issues",
+      "NeedsCompilation": "yes",
       "Repository": "CRAN"
     },
     "jsonlite": {
@@ -1372,6 +1469,25 @@
       "NeedsCompilation": "no",
       "Repository": "CRAN"
     },
+    "png": {
+      "Package": "png",
+      "Version": "0.1-9",
+      "Source": "Repository",
+      "Title": "Read and write PNG images",
+      "Author": "Simon Urbanek [aut, cre, cph] (https://urbanek.nz, ORCID: <https://orcid.org/0000-0003-2297-1732>)",
+      "Authors@R": "person(\"Simon\", \"Urbanek\", role=c(\"aut\",\"cre\",\"cph\"), email=\"Simon.Urbanek@r-project.org\", comment=c(\"https://urbanek.nz\", ORCID=\"0000-0003-2297-1732\"))",
+      "Maintainer": "Simon Urbanek <Simon.Urbanek@r-project.org>",
+      "Depends": [
+        "R (>= 2.9.0)"
+      ],
+      "Description": "This package provides an easy and simple way to read, write and display bitmap images stored in the PNG format. It can read and write both files and in-memory raw vectors.",
+      "License": "GPL-2 | GPL-3",
+      "SystemRequirements": "libpng",
+      "URL": "https://www.rforge.net/png/",
+      "BugReports": "https://github.com/s-u/png/issues/",
+      "NeedsCompilation": "yes",
+      "Repository": "CRAN"
+    },
     "prettyunits": {
       "Package": "prettyunits",
       "Version": "1.2.0",
@@ -1477,6 +1593,33 @@
       "NeedsCompilation": "yes",
       "Author": "Hadley Wickham [aut, cre] (ORCID: <https://orcid.org/0000-0003-4757-117X>), Lionel Henry [aut], Posit Software, PBC [cph, fnd] (ROR: <https://ror.org/03wc8by49>)",
       "Maintainer": "Hadley Wickham <hadley@posit.co>",
+      "Repository": "CRAN"
+    },
+    "readbitmap": {
+      "Package": "readbitmap",
+      "Version": "0.1.5",
+      "Source": "Repository",
+      "License": "GPL (>= 2)",
+      "Title": "Simple Unified Interface to Read Bitmap Images (BMP,JPEG,PNG,TIFF)",
+      "Authors@R": "c( person(\"Gregory\",\"Jefferis\", email=\"jefferis@gmail.com\",  role = c(\"aut\", \"cre\"), comment = c(ORCID = \"0000-0002-0587-9355\")), person(\"Derek\", \"Ogle\", role = c(\"ctb\")), person(\"Simon\", \"Barthelme\", role = c(\"ctb\")) )",
+      "Description": "Identifies and reads Windows BMP, JPEG, PNG, and TIFF format bitmap images. Identification defaults to the use of the magic number embedded in the file rather than the file extension. Reading of JPEG and PNG image depends on libjpg and libpng libraries. See file INSTALL for details if necessary.",
+      "URL": "https://github.com/jefferis/readbitmap",
+      "BugReports": "https://github.com/jefferis/readbitmap/issues",
+      "SystemRequirements": "libjpeg, libpng",
+      "Imports": [
+        "bmp",
+        "jpeg",
+        "png",
+        "tiff"
+      ],
+      "Suggests": [
+        "pixmap",
+        "testthat"
+      ],
+      "RoxygenNote": "6.0.1",
+      "NeedsCompilation": "no",
+      "Author": "Gregory Jefferis [aut, cre] (<https://orcid.org/0000-0002-0587-9355>), Derek Ogle [ctb], Simon Barthelme [ctb]",
+      "Maintainer": "Gregory Jefferis <jefferis@gmail.com>",
       "Repository": "CRAN"
     },
     "readr": {
@@ -2010,6 +2153,23 @@
       "NeedsCompilation": "yes",
       "Author": "Lionel Henry [aut, cre], Hadley Wickham [aut], Posit Software, PBC [cph, fnd]",
       "Maintainer": "Lionel Henry <lionel@posit.co>",
+      "Repository": "CRAN"
+    },
+    "tiff": {
+      "Package": "tiff",
+      "Version": "0.1-12",
+      "Source": "Repository",
+      "Title": "Read and Write TIFF Images",
+      "Author": "Simon Urbanek <Simon.Urbanek@r-project.org> [aut, cre], Kent Johnson <kjohnson@akoyabio.com> [ctb]",
+      "Maintainer": "Simon Urbanek <Simon.Urbanek@r-project.org>",
+      "Depends": [
+        "R (>= 2.9.0)"
+      ],
+      "Description": "Functions to read, write and display bitmap images stored in the TIFF format. It can read and write both files and in-memory raw vectors, including native image representation.",
+      "License": "GPL-2 | GPL-3",
+      "SystemRequirements": "tiff and jpeg libraries",
+      "URL": "https://www.rforge.net/tiff/",
+      "NeedsCompilation": "yes",
       "Repository": "CRAN"
     },
     "timechange": {

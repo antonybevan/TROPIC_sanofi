@@ -1,0 +1,16 @@
+DIGITISED
+# First line is the provenance token read by reconstruct_cbzp_guyot.R.
+#
+# Status: DIGITISED (2026-06-18).
+#   - os_cbzp_digitised.csv / pfs_cbzp_digitised.csv: GENUINELY digitised from
+#     de Bono 2010 Lancet Fig 2A (OS) / Fig 3 (PFS), CbzP arm, via WebPlotDigitizer.
+#     Raw WPD exports preserved as *_wpd_raw.csv. Curves validate against the
+#     published medians (OS S(15.1)~0.50, PFS S(2.8)~0.50).
+#   - At-risk tables: the previously committed os/pfs_cbzp_nrisk.csv were
+#     FABRICATED (reverse-engineered to fit the old synthetic curve) and are
+#     inconsistent with the real digitised curve. They have been retired to
+#     *.nrisk.csv.UNVERIFIED. The reconstruction currently runs in Guyot's
+#     N + total-events mode (no at-risk table).
+#   - TODO (accuracy improvement): transcribe the REAL numbers-at-risk row
+#     printed beneath Fig 2A (OS) / Fig 3 (PFS), save as os/pfs_cbzp_nrisk.csv,
+#     and re-run. This tightens HR accuracy per Guyot 2012.

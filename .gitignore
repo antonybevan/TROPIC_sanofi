@@ -3,8 +3,23 @@
 # ==============================================================================
 
 # Clinical Data Protection (MANDATORY: Never commit patient data)
-01_raw_source/
+# Ignore the CONTENTS of 01_raw_source/ (note the /*, not /) so that the
+# negations below can re-include specific non-patient files. A bare
+# `01_raw_source/` prunes the whole dir and git never evaluates the `!` rules.
+01_raw_source/*
 AllProvidedFiles_79.zip
+
+# Re-include reconstruction CODE, the validation report, and PUBLISHED aggregate
+# data (no patient data): (a) code that generates the synthetic CbzP arm, and
+# (b) digitised coordinates from the published de Bono 2010 Lancet figures.
+# This also addresses Finding D (untracked reconstruction dependency).
+!01_raw_source/reconstruct_cbzp_arm.R
+!01_raw_source/reconstruct_cbzp_guyot.R
+!01_raw_source/guyot_validation_report.R
+!01_raw_source/guyot_validation_report.md
+!01_raw_source/export_cbzp_xpt.R
+!01_raw_source/guyot_digitised/
+!01_raw_source/guyot_digitised/**
 
 # Binary Outputs & Artifacts (MANDATORY: Never commit binary XPT outputs)
 04_adam/*.xpt
@@ -104,3 +119,6 @@ m5/**/*.sas7bdat
 
 # Ephemeral CDISC CORE run inputs (contain patient-data XPT)
 .core_run/
+
+# macOS
+.DS_Store
