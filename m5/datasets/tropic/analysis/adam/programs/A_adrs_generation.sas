@@ -430,8 +430,14 @@ proc sql;
     where adsl.saffl = 'Y';
 quit;
 
-/* Combine all parameters and sort before merge */
+/* Combine all parameters and sort before merge.
+   AVALC must be declared $100 (= define.xml IT.ADRS.AVALC Length) BEFORE the SET:
+   in a DATA-step concatenation the variable length is otherwise fixed by the first
+   contributing dataset (work.rs_base -> $20), which silently truncates the longest
+   BSGRESP term 'PROGRESSION UNCONFIRMED' (23 chars) to 'PROGRESSION UNCONFIR'. That
+   truncation is what the SAS-vs-R cross-language audit caught (5 BSGRESP cells). */
 data work.adrs_union;
+    length AVALC $100;
     set work.rs_base work.bor_summary work.orr_summary work.psprog work.psaresp work.bsgresp;
 run;
 
