@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-16T20:04:23.583713",
+  "timestamp": "2026-06-18T17:33:30.840671",
   "runner": "apple (System Agent)",
   "pipeline_health_status": "GREEN",
   "sas_execution_mode": "oda",
@@ -18,11 +18,13 @@
     "Cross-Language Audit Reconcile": "PASS",
     "Efficacy & Safety TFL Suite Compilation": "PASS",
     "Numerical Results Reconciliation (SAS vs R)": "PASS",
+    "ADaM Spec to Define Conformance": "PASS",
+    "ADaM Spec to Data Conformance": "PASS",
     "eCTD Final Package": "PASS"
   },
   "oda_endpoint": "odaws01-apse1-2.oda.sas.com",
   "oda_attempts": 1,
-  "oda_total_wait_s": 11.4,
+  "oda_total_wait_s": 42.2,
   "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007",
   "reconciliation": "SAS_vs_R",
   "probe_nonce_echoed": true,

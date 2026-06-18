@@ -1,10 +1,10 @@
 # md5 of SAS-produced (*_prod) vs R-produced (*_v) XPTs at the GREEN ODA run
 # byte-DISTINCT (independent engines) yet cell-identical per reconciliation_status.oda-green.json
-adsl      prod(SAS)=37f3599ee437f43c6081700574bb2156  v(R)=6a1f31d4df6296662e0e934e8b48429f  DISTINCT
-adex      prod(SAS)=7de17730b8fbc5dc3746daa4b96311ba  v(R)=dde82cc93e636320b0c5b00dd4db6bce  DISTINCT
-adcm      prod(SAS)=32b7642851629f48d8a43f2badb86794  v(R)=fb4036597bc578087aa5479c8dcb87cf  DISTINCT
-adae      prod(SAS)=1b3d85bc0c31d0895d591d220c94d469  v(R)=5912282082704729231e3f102eff6767  DISTINCT
-adlb      prod(SAS)=f28434692781522637477d1626960196  v(R)=a5fbfe5ba075c5d6041c164ef983d92f  DISTINCT
-adrs      prod(SAS)=a89d359a09de9c74a9edb59858f56f01  v(R)=61f3b058e080a937bc994b5d288e6f63  DISTINCT
-adtte     prod(SAS)=bff641c9c985263f2876f73612ed5b98  v(R)=08d253eea48aca79a156b3d5a63e5bf3  DISTINCT
-clinsite  prod(SAS)=51953d754e8675f1a43db1bccd96c7dc  v(R)=f1f8324858ad0a25366f269aa4bb6b62  DISTINCT
+adsl      prod(SAS)=7f2fb957cf5630021ab6da7326f5c130  v(R)=09c7c1343d7074a70df1a934b9690f42  DISTINCT
+adex      prod(SAS)=7cb7324f617bc81db9f2456059f4ad22  v(R)=5bf957409a07f7551c387ea9244b45a1  DISTINCT
+adcm      prod(SAS)=bdf79c7a48ad5816ad3289ed42142bb0  v(R)=07acc99aa2094d7ce74c72c97cbeaf11  DISTINCT
+adae      prod(SAS)=1d1a7f5593508af4ee4c3fe870da8c27  v(R)=835acd4f008f658c8e92f67a424fd07a  DISTINCT
+adlb      prod(SAS)=3e4c855a9d1a1989fe2a9737f566faa8  v(R)=91e48deca89e00098c2a81d9e9383885  DISTINCT
+adrs      prod(SAS)=f1fc3e8df910de39791c575654f1a88b  v(R)=82b82d626de0e4e6399b71ab7087c33d  DISTINCT
+adtte     prod(SAS)=d9141a36170ecdd26aeb0ab9ee9dd550  v(R)=c58695da7ae07986a208a9b94f589ff2  DISTINCT
+clinsite  prod(SAS)=5cb35ff8de036d9ad8a40eea699e2e3f  v(R)=861a67cb623675f1174749d634f6cb2c  DISTINCT
