@@ -4,6 +4,41 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.13.0] - 2026-06-18 — PCWG3-correct integrated RECIST response + bone 2+2, verified on real SAS
+
+> **Context.** Two linked changes, both proven on a **genuine `oda`-mode run** (real SAS 9.4 on
+> ODA, endpoint `odaws01-apse1-2`, SDTM manifest `329430f6…`, `probe_nonce_echoed = true`):
+> Finding **B**'s integrated overall-response derivation, and a SAS character-length fix that the
+> **real** SAS↔R reconciliation surfaced — a discrepancy `sim` mode is structurally blind to.
+
+### Added
+- **Integrated RECIST overall response (`OVRLRESP`)** in both tracks (`A_adrs_generation.sas`,
+  `v_adrs_validation.R`): a new lesion ⇒ auto-PD; non-target PD ⇒ PD; target CR with non-target
+  non-CR ⇒ PR; with a defensive target-only fallback. 648 `OVRLRESP=PD` records now reflect
+  non-target / new-lesion progression that target-only logic missed.
+- **Bone Scan Progression (`PARAMCD = BSGRESP`)** — PCWG3 **2+2** rule (Scher 2016), 3-level
+  `AVALC`: `PROGRESSION` / `PROGRESSION UNCONFIRMED` / `NO PROGRESSION`. Confirmed `PROGRESSION`
+  is the only state that feeds `TTUMOR` (the `A_adtte` PD-date logic already expected this slot).
+  Thresholds (`BONE_PROG_MIN_NEW`, `BONE_PROG_CONFIRM_NEW`) are config-driven via `study_config.yaml`.
+  On the real MP arm the strict 2+2 yields **5 PDu / 0 confirmed** — reported honestly, not tuned.
+
+### Changed / Fixed
+- **`AVALC` truncation fixed (real-SAS reconciliation catch).** In `data work.adrs_union; set …
+  work.bsgresp;` the `AVALC` length was fixed by the first contributing dataset (`$20`), silently
+  truncating `'PROGRESSION UNCONFIRMED'` (23 chars) to `'PROGRESSION UNCONFIR'`. The Stage-12
+  cross-language audit flagged **5 `BSGRESP` cells** (SAS vs R). Fix: `length AVALC $100;` before
+  the SET — matching `define.xml IT.ADRS.AVALC Length=100`. This is a defect `sim` mode could
+  never have shown (its zero-diff is a byte-copy tautology); only an independent SAS engine exposes it.
+- **Stage 14 (numerical results reconciliation, SAS vs R) closed.** Previously `not_available`
+  (no real `PROC LIFETEST` stats existed); now **PASS** on all 6 parameters (OS, PFS, TTPAIN,
+  TTPSA, TTSAE, TTUMOR). Full 17-stage pipeline GREEN; dataset reconciliation **8/8 PASS**
+  (ADRS FAIL→PASS). Expected downstream shifts confirmed: MP ORR 7.9%→**6.4%** (measurable),
+  TTUMOR median 2.3→**2.1 mo**; TTPSA unchanged.
+- **GREEN-ODA evidence badge refreshed** (`06_telemetry/evidence/`, audit C-1): the immutable
+  snapshot + `*_prod`/`*_v` md5 manifest now certify this current ADRS code, not the pre-Finding-B run.
+- **ADRG §4A** documents the integration matrix, the PCWG3 2+2 rule, and the honest 5-PDu/0-confirmed
+  result; §4 (`TTUMOR`), README and the traceability matrix updated; m5 copies + `adrg.pdf` resynced.
+
 ## [3.12.0] - 2026-06-17 — ARM expansion to all analysis displays
 
 > **Context.** Analysis Results Metadata (ARM v1.0) previously covered only the 3 survival/

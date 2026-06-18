@@ -6,6 +6,13 @@ against a **real SAS 9.4 engine on SAS OnDemand for Academics (ODA)**. They are 
 `sim`/`--demo` run — which legitimately overwrites the live file — can **never clobber the proof**
 (audit finding C‑1).
 
+> **Snapshot provenance:** refreshed **2026-06-18** (endpoint `odaws01-apse1-2.oda.sas.com`,
+> SDTM manifest `329430f6…`). This run certifies the **current** ADRS derivation — i.e. the
+> PCWG3-correct integrated RECIST overall response + bone-scan 2+2 (`BSGRESP`) of Finding B,
+> and the `AVALC $100` length fix that the real-SAS reconciliation itself surfaced (the SET
+> concatenation was truncating `'PROGRESSION UNCONFIRMED'` to `'PROGRESSION UNCONFIR'`; 5
+> `BSGRESP` cells). All 8 domains + 6 results parameters reconcile against this code.
+
 | File | What it proves |
 |---|---|
 | `pipeline_health.oda-green.json` | `sas_execution_mode = "oda"` (earned via live workspace probe), pipeline GREEN, all stages PASS, `probe_nonce_echoed` + ODA endpoint/attempts recorded. |
