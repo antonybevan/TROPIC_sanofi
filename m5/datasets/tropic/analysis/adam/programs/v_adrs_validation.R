@@ -37,7 +37,8 @@ df_post_sod <- df_targets %>%
   summarise(post_sod = sum(LSSTRESN), .groups = "drop") %>%
   left_join(df_baseline_sod, by = "USUBJID")
 
-df_recist <- df_post_sod %>%
+# Target-lesion response only; integrated with non-target + new lesions below.
+df_target <- df_post_sod %>%
   group_by(USUBJID) %>%
   arrange(VISITNUM) %>%
   mutate(
@@ -46,14 +47,52 @@ df_recist <- df_post_sod %>%
     pct_chg_nadir = if_else(nadir_sod > 0, (post_sod - nadir_sod) / nadir_sod * 100, NA_real_),
     abs_chg_nadir = post_sod - nadir_sod,
 
-    recist_resp = case_when(
+    target_resp = case_when(
       post_sod == 0 ~ "CR",
       pct_chg_nadir >= RECIST_PD_PCT & abs_chg_nadir >= RECIST_PD_ABS ~ "PD",
       pct_chg_base <= RECIST_PR_PCT ~ "PR",
       TRUE ~ "SD"
     )
   ) %>%
-  ungroup() %>%
+  ungroup()
+
+# Non-target lesion response per visit (worst-per-visit: PD > SD > CR > NE).
+# Absent for a subject/visit => integration falls back to target-only (no downgrade).
+df_nontarget <- ls_data %>%
+  filter(LSCAT == "NON-TARGET" & LSTESTCD == "STATUS" & VISIT != "BASELINE" &
+           !is.na(LSSTRESC) & LSSTRESC != "" & LSSTRESC != "MISSING DATA") %>%
+  mutate(nt_rank = case_when(
+    LSSTRESC == "PROGRESSIVE DISEASE" ~ 4,
+    LSSTRESC == "INCOMPLETE RESPONSE/STABLE DISEASE" ~ 3,
+    LSSTRESC == "COMPLETE RESPONSE" ~ 2,
+    TRUE ~ 1
+  )) %>%
+  group_by(USUBJID, VISIT) %>%
+  summarise(nt_rank = max(nt_rank), .groups = "drop") %>%
+  mutate(nt_resp = case_when(nt_rank == 4 ~ "PD", nt_rank == 3 ~ "SD",
+                             nt_rank == 2 ~ "CR", TRUE ~ "NE")) %>%
+  select(USUBJID, VISIT, nt_resp)
+
+# New-lesion flag per visit (RECIST: any new lesion => PD).
+df_newles <- ls_data %>%
+  filter(LSTESTCD == "NEWLES" & LSSTRESC == "NEW LESION" & VISIT != "BASELINE") %>%
+  distinct(USUBJID, VISIT) %>%
+  mutate(newles_fl = "Y")
+
+# Integrated RECIST v1.0 overall response (target + non-target + new lesion).
+# Mirrors A_adrs_generation.sas: new lesion => PD; any PD => PD; target CR with a
+# non-CR non-target => PR; else target response carries.
+df_recist <- df_target %>%
+  left_join(df_nontarget, by = c("USUBJID", "VISIT")) %>%
+  left_join(df_newles, by = c("USUBJID", "VISIT")) %>%
+  mutate(
+    recist_resp = case_when(
+      coalesce(newles_fl, "") == "Y" ~ "PD",
+      target_resp == "PD" | coalesce(nt_resp, "") == "PD" ~ "PD",
+      target_resp == "CR" & !(coalesce(nt_resp, "") %in% c("", "CR")) ~ "PR",
+      TRUE ~ target_resp
+    )
+  ) %>%
   inner_join(header, by = "USUBJID") %>%
   mutate(
     lsdtc_clean = trimws(LSDTC),
@@ -239,8 +278,53 @@ df_psaresp <- header %>%
   ) %>%
   select(STUDYID, USUBJID, SUBJID, TRT01P, TRTSDT, PARAMCD, PARAM, AVALC, AVAL, VISIT, ANL01FL)
 
+# PCWG3 Bone-Scan Progression (BSGRESP) — 2+2 rule (Scher 2016). Methodological
+# demonstration (post-2010, not in the trial-era SAP; see ADRG §4A), mirroring the SAS.
+df_bone_new <- ls_data %>%
+  filter(LSTESTCD == "NEWLES" & LSLOC == "BONE" & LSSTRESC == "NEW LESION" & VISIT != "BASELINE") %>%
+  mutate(
+    lsdtc_clean = trimws(LSDTC),
+    scan_dt = if_else(grepl("^\\d{4}-\\d{1,2}-\\d{1,2}", lsdtc_clean), ymd(lsdtc_clean, quiet = TRUE), as.Date(NA))
+  ) %>%
+  filter(!is.na(scan_dt)) %>%
+  group_by(USUBJID, scan_dt) %>%
+  summarise(n_new_bone = n(), .groups = "drop")
+
+# PDu: first scan with >= MIN_NEW new bone lesions (unconfirmed progression).
+df_bone_pdu <- df_bone_new %>%
+  filter(n_new_bone >= BONE_PROG_MIN_NEW) %>%
+  group_by(USUBJID) %>%
+  summarise(pdu_date = min(scan_dt), .groups = "drop")
+
+# Confirmed: a later scan adds >= CONFIRM_NEW further new bone lesions (2+2).
+df_bone_conf <- df_bone_pdu %>%
+  inner_join(df_bone_new %>% filter(n_new_bone >= BONE_PROG_CONFIRM_NEW),
+             by = "USUBJID", relationship = "many-to-many") %>%
+  filter(scan_dt > pdu_date) %>%
+  distinct(USUBJID) %>%
+  mutate(confirmed = "Y")
+
+# Three-level result: confirmed PROGRESSION feeds TTUMOR; PROGRESSION UNCONFIRMED (PDu)
+# is informational and does NOT count as an event.
+df_bsgresp <- header %>%
+  left_join(df_bone_pdu, by = "USUBJID") %>%
+  left_join(df_bone_conf, by = "USUBJID") %>%
+  transmute(
+    STUDYID, USUBJID, SUBJID, TRT01P, TRTSDT,
+    PARAMCD = "BSGRESP", PARAM = "Bone Scan Progression (PCWG3)",
+    AVALC = case_when(
+      coalesce(confirmed, "") == "Y" ~ "PROGRESSION",
+      !is.na(pdu_date) ~ "PROGRESSION UNCONFIRMED",
+      TRUE ~ "NO PROGRESSION"
+    ),
+    AVAL = if_else(coalesce(confirmed, "") == "Y", 1.0, 0.0),
+    ADT = pdu_date,
+    VISIT = "ALL CYCLES",
+    ANL01FL = "Y"
+  )
+
 # Combine and Sort
-adrs <- bind_rows(df_ovrl, df_bor, df_orr, df_psprog, df_psaresp) %>%
+adrs <- bind_rows(df_ovrl, df_bor, df_orr, df_psprog, df_psaresp, df_bsgresp) %>%
   rename(AVISIT = VISIT)
 
 # Sort and Save

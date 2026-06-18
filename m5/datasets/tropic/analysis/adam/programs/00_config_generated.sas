@@ -1,6 +1,6 @@
 /* ==============================================================================
    Generated automatically from study_config.yaml. Do not edit directly.
-   Generated on: 2026-06-18T13:42:43.268940
+   Generated on: 2026-06-18T17:12:02.550791
    ============================================================================== */
 
 %global STUDYID;
@@ -50,6 +50,12 @@
 
 %global RECIST_CONFIRM_DAYS;
 %let RECIST_CONFIRM_DAYS = 28;
+
+%global BONE_PROG_MIN_NEW;
+%let BONE_PROG_MIN_NEW = 2;
+
+%global BONE_PROG_CONFIRM_NEW;
+%let BONE_PROG_CONFIRM_NEW = 2;
 
 %global PSA_RESP_THRESHOLD;
 %let PSA_RESP_THRESHOLD = 0.5;

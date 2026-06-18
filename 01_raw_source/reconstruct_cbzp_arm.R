@@ -783,6 +783,34 @@ adrs_psprog <- data.frame(
   stringsAsFactors = FALSE
 )
 
+# PCWG3 bone-scan progression (BSGRESP) — synthetic/illustrative three-level result
+# matching the real-arm derivation (A_adrs_generation.sas). Confirmed PROGRESSION feeds
+# TTUMOR; PROGRESSION UNCONFIRMED (PDu) is informational. CbzP TTE is independently
+# reconstructed, so this exists only for CT/define/TFL coherence with the merged arm.
+set.seed(20100104)
+bsg_pool <- c(rep("PROGRESSION", 11), rep("PROGRESSION UNCONFIRMED", 8),
+              rep("NO PROGRESSION", N_cbzp - 19))
+bsg_val  <- sample(bsg_pool, N_cbzp)
+bsg_num  <- if_else(bsg_val == "PROGRESSION", 1.0, 0.0)
+bsg_adt  <- if_else(bsg_val %in% c("PROGRESSION", "PROGRESSION UNCONFIRMED"),
+                    adsl_cbzp$TRTSDT + round(runif(N_cbzp, 60, 400)), as.Date(NA))
+
+adrs_bsgresp <- data.frame(
+  STUDYID  = "TROPIC-NCT00417079",
+  USUBJID  = adsl_cbzp$USUBJID,
+  SUBJID   = adsl_cbzp$SUBJID,
+  TRT01P   = "CbzP",
+  TRTSDT   = adsl_cbzp$TRTSDT,
+  PARAMCD  = "BSGRESP",
+  PARAM    = "Bone Scan Progression (PCWG3)",
+  AVALC    = bsg_val,
+  AVAL     = bsg_num,
+  ADT      = bsg_adt,
+  AVISIT   = "ALL CYCLES",
+  ANL01FL  = "Y",
+  stringsAsFactors = FALSE
+)
+
 # Merge visit-level response records for CbzP
 ovrl_records <- list()
 for (i in 1:N_cbzp) {
@@ -818,7 +846,7 @@ for (i in 1:N_cbzp) {
 }
 adrs_ovrl <- bind_rows(ovrl_records)
 
-adrs_cbzp <- bind_rows(adrs_ovrl, adrs_bestresp, adrs_objresp, adrs_psaresp, adrs_psprog) %>%
+adrs_cbzp <- bind_rows(adrs_ovrl, adrs_bestresp, adrs_objresp, adrs_psaresp, adrs_psprog, adrs_bsgresp) %>%
   arrange(USUBJID, PARAMCD, AVISIT)
 
 # ==============================================================================
