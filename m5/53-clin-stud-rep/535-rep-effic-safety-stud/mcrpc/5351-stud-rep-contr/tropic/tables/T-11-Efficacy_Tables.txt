@@ -22,11 +22,11 @@ Wald Log-Rank p-value                     0.0514
 T-11-7: Kaplan-Meier Analysis of Time to Tumor Progression (TTUMOR) - Measurable Subpopulation
 ------------------------------------------------------------------------------------------------
 Statistic                                 CbzP (N=179)        MP (N=203)
-Number of Events / Total N                166/179               182/203
-Median Survival Time (Months)             3.4                2.3
-95% Confidence Interval                   (95% CI: 2.7-5.7)      (95% CI: 2.1-3.5)
-Unstratified Hazard Ratio (CbzP vs MP)     0.68 (95% CI: 0.55-0.85)
-Wald Log-Rank p-value                     0.0006
+Number of Events / Total N                166/179               186/203
+Median Survival Time (Months)             3.4                2.1
+95% Confidence Interval                   (95% CI: 2.7-5.7)      (95% CI: 1.7-2.8)
+Unstratified Hazard Ratio (CbzP vs MP)     0.62 (95% CI: 0.50-0.77)
+Wald Log-Rank p-value                     0.0000
 
 
 T-11-8: Analysis of Best Clinical Response Endpoints
@@ -37,15 +37,15 @@ PSA Response Rate (>=50% decline) - ITT Population
   Fisher's Exact p-value                  4.5688e-10
 
 Objective Response Rate (ORR) - Measurable ITT Population†
-  Responders / N (%)                      23/179 (12.8%)      16/203 (7.9%)
-  Fisher's Exact p-value                  0.1296
+  Responders / N (%)                      23/179 (12.8%)      13/203 (6.4%)
+  Fisher's Exact p-value                  0.0365
 
 †Restricted to patients with measurable disease at baseline (CbzP N=179, MP N=203).
 
 T-11-8b: Objective Response Rate — Response-Evaluable Denominator (review-board SR-1)
 --------------------------------------------------------------------------------------
 Denominator basis        CbzP (evaluable)          MP (evaluable)
-Responders / N (%)       54/378 (14.3%)             16/351 (4.6%)
+Responders / N (%)       54/378 (14.3%)             13/351 (3.7%)
 Note: T-11-8 above uses the SAP-specified measurable-disease ITT denominator. The response-
 evaluable denominator version is reported here for full traceability.
 

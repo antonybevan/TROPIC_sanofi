@@ -36,7 +36,7 @@ This repository is an end-to-end **analysis-data production and reporting pipeli
 | **Overall Survival** | 15.2 mo (Guyot) | 12.7 mo (real) | 0.70 (Guyot, non-circular) | median 15.1 mo · HR 0.70 (0.59–0.83) |
 | **Progression-Free Survival** | 2.7 mo (Guyot) | 1.4 mo (real) | 0.72 (Guyot, non-circular) | median 2.8 mo · HR 0.74 (0.64–0.86) |
 | **Time to PSA Progression** | 2.8 mo (PH-scaled) | 2.2 mo (real) | 0.84 (PH-scaled)‡ | median 6.4 mo · HR 0.75 (0.63–0.90) |
-| **Time to Tumor Progression** | 3.8 mo (PH-scaled) | 2.3 mo (real) | 0.67 (PH-scaled)‡ | median 8.8 mo · HR 0.61 (0.49–0.76) |
+| **Time to Tumor Progression** | 3.4 mo (PH-scaled) | 2.1 mo (real) | 0.62 (PH-scaled)‡ | median 8.8 mo · HR 0.61 (0.49–0.76) |
 | **Any TEAE** | 96% (364/378, synthetic) | 88% (328/371, real) | — | 98% vs 88% |
 | **Grade ≥3 TEAE** | 82% (310/378, synthetic) | 40% (147/371, real) | — | 57% vs 39% |
 

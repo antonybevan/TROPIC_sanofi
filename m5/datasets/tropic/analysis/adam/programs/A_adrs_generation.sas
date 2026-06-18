@@ -69,11 +69,70 @@ data work.recist_calc;
     else pct_chg_nadir = .;
     abs_chg_nadir = post_sod - nadir_sod;
     
+    /* Target-lesion response only; integrated with non-target + new lesions below. */
+    length target_resp $20;
+    if post_sod = 0 then target_resp = 'CR';
+    else if pct_chg_nadir >= &RECIST_PD_PCT. and abs_chg_nadir >= &RECIST_PD_ABS. then target_resp = 'PD';
+    else if pct_chg_base <= &RECIST_PR_PCT. then target_resp = 'PR';
+    else target_resp = 'SD';
+run;
+
+/* 1a. Non-target lesion response per visit (RECIST integration component).
+   Worst-per-visit collapse of LSCAT='NON-TARGET' / LSTESTCD='STATUS' results.
+   Ranking: PD > Non-CR/Non-PD (SD) > CR > NE. Absent for a subject/visit => the
+   integration below falls back to target-only (no downgrade). */
+proc sql;
+    create table work.nontarget_resp as
+    select usubjid, visit,
+           max(case when lsstresc = 'PROGRESSIVE DISEASE'                then 4
+                    when lsstresc = 'INCOMPLETE RESPONSE/STABLE DISEASE' then 3
+                    when lsstresc = 'COMPLETE RESPONSE'                  then 2
+                    else 1 end) as nt_rank
+    from staging.ls
+    where lscat = 'NON-TARGET' and lstestcd = 'STATUS' and visit ne 'BASELINE'
+      and not missing(lsstresc) and lsstresc ne 'MISSING DATA'
+    group by usubjid, visit;
+quit;
+
+data work.nontarget_resp;
+    set work.nontarget_resp;
+    length nt_resp $20;
+    select (nt_rank);
+        when (4) nt_resp = 'PD';
+        when (3) nt_resp = 'SD';   /* Non-CR/Non-PD */
+        when (2) nt_resp = 'CR';
+        otherwise nt_resp = 'NE';
+    end;
+    keep usubjid visit nt_resp;
+run;
+
+/* 1b. New-lesion flag per visit (RECIST: any new lesion => PD). */
+proc sql;
+    create table work.newles_flag as
+    select distinct usubjid, visit, 'Y' as newles_fl length=1
+    from staging.ls
+    where lstestcd = 'NEWLES' and lsstresc = 'NEW LESION' and visit ne 'BASELINE';
+quit;
+
+/* 1c. Integrated RECIST v1.0 overall response (target + non-target + new lesion).
+   Overrides: new lesion => PD; any PD (target or non-target) => PD; target CR with a
+   non-CR non-target => PR. Otherwise the target response carries (defensive: missing
+   non-target / new-lesion rows reproduce the prior target-only result). */
+proc sql;
+    create table work.recist_join as
+    select r.*, n.nt_resp, x.newles_fl
+    from work.recist_calc as r
+    left join work.nontarget_resp as n on r.usubjid = n.usubjid and r.visit = n.visit
+    left join work.newles_flag   as x on r.usubjid = x.usubjid and r.visit = x.visit;
+quit;
+
+data work.recist_integrated;
+    set work.recist_join;
     length recist_resp $20;
-    if post_sod = 0 then recist_resp = 'CR';
-    else if pct_chg_nadir >= &RECIST_PD_PCT. and abs_chg_nadir >= &RECIST_PD_ABS. then recist_resp = 'PD';
-    else if pct_chg_base <= &RECIST_PR_PCT. then recist_resp = 'PR';
-    else recist_resp = 'SD';
+    if newles_fl = 'Y' then recist_resp = 'PD';
+    else if target_resp = 'PD' or nt_resp = 'PD' then recist_resp = 'PD';
+    else if target_resp = 'CR' and nt_resp not in ('', 'CR') then recist_resp = 'PR';
+    else recist_resp = target_resp;
 run;
 
 /* Map derived RECIST overall response records */
@@ -90,7 +149,7 @@ proc sql;
         r.lsd_dt as ADT format=yymmdd10.,
         r.lsd_dt - adsl.trtsdt + 1 as ADY,
         r.visit as AVISIT length=40
-    from work.recist_calc as r
+    from work.recist_integrated as r
     left join adam.adsl as adsl on r.usubjid = adsl.usubjid;
 quit;
 
@@ -313,9 +372,67 @@ proc sql;
     where adsl.saffl = 'Y';
 quit;
 
+/* PCWG3 Bone-Scan Progression (BSGRESP) -- 2+2 rule (Scher 2016). Methodological
+   demonstration (post-2010, not in the trial-era SAP; see ADRG SS4A), mirroring how
+   PSPROG already applies PCWG3 to this 2010 trial. Bone is the dominant mCRPC
+   progression site and is largely non-measurable by RECIST, so it is tracked
+   separately and feeds A_adtte_generation.sas (BSGRESP='PROGRESSION'). */
+proc sql;
+    /* New bone lesions per post-baseline scan date */
+    create table work.bone_new as
+    select usubjid,
+           input(substr(lsdtc, 1, 10), yymmdd10.) as scan_dt format=yymmdd10.,
+           count(*) as n_new_bone
+    from staging.ls
+    where lstestcd = 'NEWLES' and lsloc = 'BONE' and lsstresc = 'NEW LESION'
+      and visit ne 'BASELINE' and not missing(lsdtc)
+    group by usubjid, calculated scan_dt;
+quit;
+
+proc sql;
+    /* PDu: first scan with >= MIN_NEW new bone lesions (unconfirmed progression). */
+    create table work.bone_pdu as
+    select usubjid, min(scan_dt) as pdu_date format=yymmdd10.
+    from work.bone_new
+    where n_new_bone >= &BONE_PROG_MIN_NEW.
+    group by usubjid;
+quit;
+
+proc sql;
+    /* Confirmed: a later scan adds >= CONFIRM_NEW further new bone lesions (2+2).
+       PD date is backdated to the PDu scan. */
+    create table work.bone_conf as
+    select distinct p.usubjid
+    from work.bone_pdu as p
+    inner join work.bone_new as b
+        on p.usubjid = b.usubjid and b.scan_dt > p.pdu_date
+       and b.n_new_bone >= &BONE_PROG_CONFIRM_NEW.;
+quit;
+
+proc sql;
+    /* Three-level PCWG3 result: confirmed PROGRESSION feeds TTUMOR (A_adtte);
+       PROGRESSION UNCONFIRMED (PDu) is informational and does NOT count as an event. */
+    create table work.bsgresp as
+    select
+        adsl.usubjid,
+        'BSGRESP' as PARAMCD length=8,
+        'Bone Scan Progression (PCWG3)' as PARAM length=40,
+        case when c.usubjid is not null then 'PROGRESSION'
+             when p.usubjid is not null then 'PROGRESSION UNCONFIRMED'
+             else 'NO PROGRESSION' end as AVALC length=24,
+        case when c.usubjid is not null then 1.0 else 0.0 end as AVAL,
+        p.pdu_date as ADT format=yymmdd10.,
+        'ALL CYCLES' as AVISIT length=40,
+        99 as AVISITN
+    from adam.adsl as adsl
+    left join work.bone_pdu  as p on adsl.usubjid = p.usubjid
+    left join work.bone_conf as c on adsl.usubjid = c.usubjid
+    where adsl.saffl = 'Y';
+quit;
+
 /* Combine all parameters and sort before merge */
 data work.adrs_union;
-    set work.rs_base work.bor_summary work.orr_summary work.psprog work.psaresp;
+    set work.rs_base work.bor_summary work.orr_summary work.psprog work.psaresp work.bsgresp;
 run;
 
 proc sort data=work.adrs_union;
@@ -348,6 +465,6 @@ proc sort data=adam.adrs;
 run;
 
 /* Clean up work library */
-proc delete data=work.base_sod work.post_sod work.cycle_sod_comp work.recist_calc work.recist_ovrl work.rs_disp work.rs_base work.bor_rank work.bor_summary work.orr_confirmed work.orr_summary work.psa_base work.psa_post work.psa_decline work.psa_resp_cand work.psa_responders work.psa_all work.psa_nadir work.psa_prog_check work.psa_prog_eval work.psa_prog_conf work.psprog work.psaresp work.adrs_union;
+proc delete data=work.base_sod work.post_sod work.cycle_sod_comp work.recist_calc work.nontarget_resp work.newles_flag work.recist_join work.recist_integrated work.recist_ovrl work.rs_disp work.rs_base work.bor_rank work.bor_summary work.orr_confirmed work.orr_summary work.psa_base work.psa_post work.psa_decline work.psa_resp_cand work.psa_responders work.psa_all work.psa_nadir work.psa_prog_check work.psa_prog_eval work.psa_prog_conf work.psprog work.psaresp work.bone_new work.bone_pdu work.bone_conf work.bsgresp work.adrs_union;
 run;
 quit;

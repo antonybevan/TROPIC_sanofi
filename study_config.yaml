@@ -23,6 +23,11 @@ RECIST_PR_PCT: -30.0
 # this many days afterwards (RECIST v1.0 "no less than 4 weeks"), SAP §5.3.
 RECIST_CONFIRM_DAYS: 28
 
+# PCWG3 bone-scan 2+2 progression (Scher 2016) — methodological demonstration, not
+# in the trial-era SAP; see ADRG §4A. Drives the BSGRESP parameter in ADRS.
+BONE_PROG_MIN_NEW: 2      # new bone lesions on first post-baseline scan => PDu
+BONE_PROG_CONFIRM_NEW: 2  # additional new bone lesions on a later scan to confirm
+
 # PCWG3 PSA thresholds (SAP §5.2 — response §5.2.1, progression §5.2.2)
 PSA_RESP_THRESHOLD: 0.5
 PSA_RESP_CONFIRM: 21

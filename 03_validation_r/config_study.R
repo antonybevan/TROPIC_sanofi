@@ -37,6 +37,10 @@ RECIST_PD_ABS     <- as.numeric(cfg$RECIST_PD_ABS)
 RECIST_PR_PCT     <- as.numeric(cfg$RECIST_PR_PCT)
 RECIST_CONFIRM_DAYS <- as.integer(cfg$RECIST_CONFIRM_DAYS)
 
+# PCWG3 bone-scan 2+2 progression (Scher 2016 — methodological demonstration; see ADRG §4A)
+BONE_PROG_MIN_NEW     <- as.integer(cfg$BONE_PROG_MIN_NEW)
+BONE_PROG_CONFIRM_NEW <- as.integer(cfg$BONE_PROG_CONFIRM_NEW)
+
 # PCWG3 PSA thresholds (SAP §5.2 — response §5.2.1, progression §5.2.2)
 PSA_RESP_THRESHOLD   <- as.numeric(cfg$PSA_RESP_THRESHOLD)
 PSA_RESP_CONFIRM     <- as.integer(cfg$PSA_RESP_CONFIRM)
