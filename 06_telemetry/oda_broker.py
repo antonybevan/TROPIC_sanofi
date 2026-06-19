@@ -18,14 +18,16 @@ injectable, so the state machine is unit-testable without Java, network, or a li
 
 Public API:
     connect(max_wait_s=3600, ...) -> OdaConnection      # raise OdaFatal / OdaExhausted
+    submit_timed(sas, code, timeout_s=1800) -> dict      # raise OdaExecTimeout
     classify(exc_text) -> str
-    teardown(sas)
+    teardown(sas, force=False)
     recommend_window() -> str | None
     detect_region_hosts() -> (region, [fqdn, ...])
 """
 import os
 import json
 import time
+import signal
 import random
 import datetime
 
@@ -68,6 +70,16 @@ class OdaExhausted(Exception):
         self.last_class = last_class
         self.attempts = attempts
         super().__init__(f"ODA unavailable after {attempts} attempts (last: {last_class})")
+
+
+class OdaExecTimeout(Exception):
+    """A submitted SAS step exceeded its wall-clock deadline; the workspace is presumed hung.
+    connect()'s budget only covers the CONNECT phase — once connected, a wedged server-side
+    workspace would otherwise block submit() forever (the execution half of the zombie-session
+    failure mode). The caller must teardown(sas, force=True) to reap the wedged session."""
+    def __init__(self, timeout_s):
+        self.timeout_s = timeout_s
+        super().__init__(f"SAS submit exceeded {timeout_s}s wall-clock; workspace presumed hung")
 
 
 class OdaConnection:
@@ -252,14 +264,95 @@ def sweep_orphans():
     return None
 
 
-def teardown(sas):
-    """End a session and clear its breadcrumb. Never raises."""
+def _call_with_timeout(fn, timeout_s):
+    """Run fn() in a DAEMON thread and return once it completes OR timeout_s elapses (whichever
+    first). Returns True if fn finished within the budget, else False. Never propagates fn's
+    exception. The daemon thread means a still-hung fn can never block interpreter exit."""
+    import threading
+    done = threading.Event()
+    def _run():
+        try:
+            fn()
+        except Exception:
+            pass
+        finally:
+            done.set()
+    threading.Thread(target=_run, daemon=True, name="oda-endsas").start()
+    return done.wait(timeout_s)
+
+
+def _session_child_pid(sas):
+    """Best-effort OS pid of the LOCAL subprocess saspy spawned for this session — the Java IOM
+    gateway for ODA (a Popen, so `.pid` is its int) or a bare int pid for stdio/ssh. Returns None
+    if not discoverable or already reaped (saspy nulls `_io.pid` after a clean endsas). Never
+    raises; reads saspy internals defensively."""
     try:
-        if sas is not None:
-            sas.endsas()
+        p = getattr(getattr(sas, "_io", None), "pid", None)
+        p = getattr(p, "pid", p)   # Popen -> its .pid; bare int -> itself
+        if isinstance(p, int) and p > 0:
+            return p
     except Exception:
         pass
+    return None
+
+
+def _pid_alive(pid):
+    """True if `pid` is a live process (signal 0 probe). Never raises."""
+    try:
+        os.kill(pid, 0)
+        return True
+    except OSError:
+        return False
+
+
+def teardown(sas, *, force=False, endsas_timeout=20.0,
+             kill_fn=os.kill, alive_fn=_pid_alive, call_with_timeout=_call_with_timeout):
+    """End a session, clear its breadcrumb, and SIGKILL the lingering local SAS/Java child.
+    Never raises.
+
+    A graceful endsas() can ITSELF hang when the IOM workspace is wedged (the symptom behind the
+    zombie sessions: a local Java gateway stuck at 100% CPU). So we (a) run endsas() under a
+    wall-clock cap and (b) force-kill the local child subprocess if it is still alive afterwards.
+
+    force=True is used after an execution-phase timeout, when a worker thread may STILL be blocked
+    inside submit() on this same session: calling endsas() then would race that thread on the
+    shared IOM socket, so we skip the graceful close and go straight to the child kill (which also
+    unblocks that worker by tearing the socket out from under it).
+
+    NOTE: this reaps the LOCAL gateway only. The server-side ODA workspace slot is released by
+    ODA's own reaper on its schedule, not client-side — there is no client API to free it."""
+    pid = _session_child_pid(sas)   # capture BEFORE endsas (a clean endsas nulls it)
+    if sas is not None and not force:
+        call_with_timeout(lambda: sas.endsas(), endsas_timeout)
+    if pid is not None and alive_fn(pid):
+        try:
+            kill_fn(pid, signal.SIGKILL)
+        except OSError:
+            pass
     _clear_breadcrumb()
+
+
+def submit_timed(sas, code, *, timeout_s=1800):
+    """sas.submit(code) under a wall-clock deadline. Returns the saspy result dict on success;
+    raises OdaExecTimeout if the workspace stalls past timeout_s. The submit runs in a daemon
+    worker thread; on timeout we deliberately do NOT touch `sas` here — the caller's
+    `teardown(sas, force=True)` will SIGKILL the gateway, which unblocks this thread. Any
+    exception raised inside submit() is re-raised in the caller's thread unchanged."""
+    import threading
+    box = {}
+    def _run():
+        try:
+            box["r"] = sas.submit(code)
+        except Exception as e:  # noqa: BLE001 — re-raised below in the caller thread
+            box["e"] = e
+    t = threading.Thread(target=_run, daemon=True, name="oda-submit")
+    t.start()
+    t.join(timeout_s)
+    if t.is_alive():
+        raise OdaExecTimeout(timeout_s)
+    if "e" in box:
+        raise box["e"]
+    return box.get("r", {})
 
 
 # --------------------------------------------------------------------------- defaults (real)

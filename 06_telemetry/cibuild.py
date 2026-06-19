@@ -175,6 +175,11 @@ def _run_saspy_stage10():
     proj_root_oda = _resolve_oda_root(sas, PROJ_ROOT_ODA)
     PGMDIR_ODA = f"{proj_root_oda}/02_production_sas"
     ADAM_ODA = f"{proj_root_oda}/04_adam"
+    # Execution-phase deadline: connect()'s budget only covers the spawn; a wedged server-side
+    # workspace would otherwise block submit() forever. On a hit we force-reap (SIGKILL) the
+    # local gateway instead of leaking a CPU-burning zombie. Default 30 min for the full suite.
+    exec_timeout = int(os.environ.get("TROPIC_ODA_EXEC_TIMEOUT", "1800"))
+    force_teardown = False
     try:
         # ---- Guarantee the SDTM library on ODA is the verified-correct one ----
         # Single-session optimisation: with --force-upload-sdtm or --seed-if-needed we seed
@@ -206,14 +211,21 @@ def _run_saspy_stage10():
 
         # ---- Execute master driver ----
         print("  [ODA] Submitting 00_master_driver.sas via SAS IOM...")
-        log = sas.submit(f"""
+        try:
+            log = oda_broker.submit_timed(sas, f"""
 options notes source;
 %global PROJ_ROOT PGMDIR;
 %let PROJ_ROOT = {proj_root_oda};
 %let PGMDIR    = {PGMDIR_ODA};
 filename drv "{PGMDIR_ODA}/00_master_driver.sas";
 %include drv;
-""").get("LOG", "")
+""", timeout_s=exec_timeout).get("LOG", "")
+        except oda_broker.OdaExecTimeout as e:
+            force_teardown = True
+            return 1, "", (f"ODA master-driver execution timed out after {e.timeout_s}s "
+                           f"(workspace presumed hung; session force-reaped)."), {
+                "oda_endpoint": conn.endpoint, "oda_exec_timeout": True,
+                "reconciliation": "none"}
         try:
             with open("02_production_sas/oda_master_driver.log", "w", encoding="utf-8") as _lf:
                 _lf.write(log)
@@ -237,7 +249,8 @@ filename drv "{PGMDIR_ODA}/00_master_driver.sas";
         # engine; results_reconcile.R (Stage 13) diffs them numerically against R.
         print("  [ODA] Computing independent SAS analysis statistics (PROC LIFETEST, MP arm)...")
         stats_extra = {"sas_results_stats": "downloaded"}
-        stats_log = sas.submit(f"""
+        try:
+            stats_log = oda_broker.submit_timed(sas, f"""
 options notes source;
 ods graphics off;
 libname adam "{ADAM_ODA}";
@@ -256,7 +269,13 @@ proc sql;
         order by c.PARAMCD;
 quit;
 proc export data=work.tte_stats outfile="{ADAM_ODA}/tte_stats_prod.csv" dbms=csv replace; run;
-""").get("LOG", "")
+""", timeout_s=exec_timeout).get("LOG", "")
+        except oda_broker.OdaExecTimeout:
+            # Non-fatal step: the prod XPTs are already downloaded. Mark the session for a force
+            # reap and let the ERROR branch below degrade reconciliation to 'not_available'.
+            force_teardown = True
+            print("  [ODA] WARNING: SAS analysis-stats step timed out (workspace hung).")
+            stats_log = "ERROR: analysis-stats submit timed out (workspace presumed hung)"
         if any(l.strip().startswith("ERROR:") for l in stats_log.splitlines()):
             print("  [ODA] WARNING: SAS analysis-stats step failed; "
                   "results reconciliation will record 'not_available'.")
@@ -274,7 +293,7 @@ proc export data=work.tte_stats outfile="{ADAM_ODA}/tte_stats_prod.csv" dbms=csv
         meta_out.update(stats_extra)
         return 0, "SASPy/ODA execution complete.", "", meta_out
     finally:
-        oda_broker.teardown(sas)
+        oda_broker.teardown(sas, force=force_teardown)
 
 
 def _resolve_sas_mode(real_sas, use_cached_sas):

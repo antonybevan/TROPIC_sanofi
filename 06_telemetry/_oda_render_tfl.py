@@ -20,8 +20,9 @@ import subprocess
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 os.chdir(PROJECT_ROOT)
 sys.path.insert(0, PROJECT_ROOT)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # 06_telemetry/, for oda_broker
 
-import saspy  # noqa: E402
+import oda_broker  # noqa: E402 — single source of truth for ODA connect/teardown (slot hygiene)
 
 # No developer account id is hard-coded (roadmap #10): default to a ~/TROPIC layout that is
 # resolved against the connected account's $HOME after login; override via TROPIC_ODA_PROJ_ROOT.
@@ -36,7 +37,7 @@ def _oda_paths(root):
 
 PGMDIR_ODA, CBZ_ODA, ADAM_ODA, SASFIG_ODA = _oda_paths(PROJ_ROOT_ODA)
 
-DATASETS = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte"]
+DATASETS = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte", "clinsite"]  # match cibuild ODA_DATASETS
 CBZ_DOMS = ["adsl", "adtte", "adae", "adlb", "adex", "adrs"]
 FIGURES  = [
     "F-11-1_KM_OS_SAS", "F-11-2_KM_PFS_SAS", "F-12-1_Subgroup_Forest_SAS",
@@ -70,9 +71,18 @@ def errors_in(log):
     return [l.strip() for l in log.split("\n") if l.strip().startswith("ERROR")]
 
 
-print("Connecting to ODA...", flush=True)
-sas = saspy.SASsession(cfgname="oda", cfgfile=CFG_FILE)
-print("Connected.", flush=True)
+print("Connecting to ODA (via broker)...", flush=True)
+try:
+    conn = oda_broker.connect(max_wait_s=int(os.environ.get("TROPIC_ODA_MAX_WAIT", "3600")))
+except oda_broker.OdaFatal as e:
+    sys.exit(f"ERROR: ODA fatal ({e.error_class}): {e}")
+except oda_broker.OdaExhausted as e:
+    sys.exit(f"ERROR: ODA unavailable after {e.attempts} attempt(s) (last: {e.last_class}).")
+sas = conn.sas
+print(f"Connected via broker (endpoint={conn.endpoint}, attempts={conn.attempts}).", flush=True)
+
+EXEC_TIMEOUT = int(os.environ.get("TROPIC_ODA_EXEC_TIMEOUT", "1800"))  # per-submit deadline
+force_td = False  # set True if a submit times out -> finally force-reaps the wedged session
 
 # Resolve a leading '~' in the ODA root against the connected account's $HOME, so no per-user
 # absolute path is committed (roadmap #10).
@@ -107,14 +117,19 @@ run;
     # 2. Master driver (ADaM + XPT) — skipped in --tfl-only mode
     if not TFL_ONLY:
         print("\n=== Running 00_master_driver.sas ===", flush=True)
-        r = sas.submit(f"""
+        try:
+            r = oda_broker.submit_timed(sas, f"""
 options notes source;
 %global PROJ_ROOT PGMDIR;
 %let PROJ_ROOT = {PROJ_ROOT_ODA};
 %let PGMDIR    = {PGMDIR_ODA};
 filename drv "{PGMDIR_ODA}/00_master_driver.sas";
 %include drv;
-""")
+""", timeout_s=EXEC_TIMEOUT)
+        except oda_broker.OdaExecTimeout as e:
+            force_td = True
+            sys.exit(f"RESULT: master driver TIMED OUT after {e.timeout_s}s "
+                     f"(workspace presumed hung; session force-reaped).")
         errs = errors_in(r["LOG"])
         if errs:
             print(f"RESULT: master driver FAILED — {len(errs)} ERROR line(s):", flush=True)
@@ -127,14 +142,19 @@ filename drv "{PGMDIR_ODA}/00_master_driver.sas";
 
     # 3. SAS TFL figures
     print("\n=== Running T_tfl_generation.sas ===", flush=True)
-    r2 = sas.submit(f"""
+    try:
+        r2 = oda_broker.submit_timed(sas, f"""
 options notes source;
 %global PROJ_ROOT PGMDIR;
 %let PROJ_ROOT = {PROJ_ROOT_ODA};
 %let PGMDIR    = {PGMDIR_ODA};
 filename tfl "{PGMDIR_ODA}/T_tfl_generation.sas";
 %include tfl;
-""")
+""", timeout_s=EXEC_TIMEOUT)
+    except oda_broker.OdaExecTimeout as e:
+        force_td = True
+        sys.exit(f"RESULT: T_tfl_generation TIMED OUT after {e.timeout_s}s "
+                 f"(workspace presumed hung; session force-reaped).")
     with open(os.path.join(PROJECT_ROOT, "02_production_sas", "oda_tfl.log"), "w") as fh:
         fh.write(r2["LOG"])
     errs2 = errors_in(r2["LOG"])
@@ -172,4 +192,4 @@ filename tfl "{PGMDIR_ODA}/T_tfl_generation.sas";
         sys.exit(2)
     print("\nSAS TFL RENDER COMPLETE — all figures downloaded to 09_tfl/output/figures/sas/.", flush=True)
 finally:
-    sas.endsas()
+    oda_broker.teardown(sas, force=force_td)

@@ -8,6 +8,8 @@ import os
 import sys
 import json
 import glob
+import signal
+import threading
 import tempfile
 import unittest
 
@@ -224,6 +226,125 @@ class TestSeedIdempotent(unittest.TestCase):
         self.assertIn("ae.sas7bdat", sas.uploaded)
         self.assertNotIn("dm.sas7bdat", sas.uploaded)       # unchanged member NOT re-uploaded
         self.assertEqual(sas.uploaded[-1], S.MANIFEST_NAME)  # manifest still written LAST
+
+
+class _FakeKillSas:
+    """Session whose local child pid and endsas() are controllable for teardown tests."""
+    def __init__(self, child_pid=None):
+        self.ended = False
+        if child_pid is not None:
+            # mimic saspy IOM: sas._io.pid is a Popen whose .pid is the OS pid
+            self._io = type("IO", (), {"pid": type("P", (), {"pid": child_pid})()})()
+    def endsas(self):
+        self.ended = True
+
+
+def _kill_recorder():
+    calls = []
+    return calls, (lambda pid, sig: calls.append((pid, sig)))
+
+
+# call_with_timeout stub that RUNS fn and reports completion (the normal, non-hung path)
+_RAN = lambda fn, t: (fn(), True)[1]
+
+
+class TestTeardownForceKill(unittest.TestCase):
+    """Finding 2: teardown must force-kill the lingering local Java/SAS child so a wedged
+    endsas() can't leave a CPU-burning zombie. The server-side ODA slot is ODA's to reap."""
+    def setUp(self):
+        self._td = tempfile.mkdtemp()
+        self._orig = B.BREADCRUMB
+        B.BREADCRUMB = os.path.join(self._td, "crumb.json")
+
+    def tearDown(self):
+        B.BREADCRUMB = self._orig
+
+    def test_kills_alive_child_after_graceful_endsas(self):
+        sas = _FakeKillSas(child_pid=4242)
+        calls, kill = _kill_recorder()
+        B.teardown(sas, kill_fn=kill, alive_fn=lambda pid: True, call_with_timeout=_RAN)
+        self.assertTrue(sas.ended, "graceful endsas() must still be attempted")
+        self.assertEqual(calls, [(4242, signal.SIGKILL)])
+
+    def test_no_kill_when_child_already_dead(self):
+        sas = _FakeKillSas(child_pid=4242)
+        calls, kill = _kill_recorder()
+        B.teardown(sas, kill_fn=kill, alive_fn=lambda pid: False, call_with_timeout=_RAN)
+        self.assertTrue(sas.ended)
+        self.assertEqual(calls, [], "a cleanly-ended session must not be SIGKILLed")
+
+    def test_force_skips_endsas_but_kills(self):
+        """force=True (post exec-timeout): a worker thread may still be blocked in submit() on
+        this session, so endsas() must be SKIPPED (it would race that thread) and we kill."""
+        sas = _FakeKillSas(child_pid=99)
+        calls, kill = _kill_recorder()
+        boom = lambda fn, t: (_ for _ in ()).throw(AssertionError("endsas must not run on force"))
+        B.teardown(sas, force=True, kill_fn=kill, alive_fn=lambda pid: True, call_with_timeout=boom)
+        self.assertFalse(sas.ended)
+        self.assertEqual(calls, [(99, signal.SIGKILL)])
+
+    def test_no_child_pid_no_kill(self):
+        sas = _FakeKillSas(child_pid=None)  # no _io -> pid undiscoverable
+        calls, kill = _kill_recorder()
+        B.teardown(sas, kill_fn=kill, alive_fn=lambda pid: True, call_with_timeout=_RAN)
+        self.assertTrue(sas.ended)
+        self.assertEqual(calls, [])
+
+    def test_none_session_is_safe(self):
+        calls, kill = _kill_recorder()
+        B.teardown(None, kill_fn=kill, alive_fn=lambda pid: True, call_with_timeout=_RAN)
+        self.assertEqual(calls, [])  # nothing to end or kill; must not raise
+
+
+class TestSessionChildPid(unittest.TestCase):
+    def test_popen_like(self):
+        self.assertEqual(B._session_child_pid(_FakeKillSas(child_pid=777)), 777)
+
+    def test_bare_int_pid(self):
+        sas = type("S", (), {"_io": type("IO", (), {"pid": 555})()})()
+        self.assertEqual(B._session_child_pid(sas), 555)
+
+    def test_none_when_no_io_or_reaped(self):
+        self.assertIsNone(B._session_child_pid(object()))
+        self.assertIsNone(B._session_child_pid(None))
+        reaped = type("S", (), {"_io": type("IO", (), {"pid": None})()})()
+        self.assertIsNone(B._session_child_pid(reaped))
+
+
+class TestCallWithTimeout(unittest.TestCase):
+    def test_quick_fn_completes(self):
+        ran = []
+        self.assertTrue(B._call_with_timeout(lambda: ran.append(1), 2.0))
+        self.assertEqual(ran, [1])
+
+    def test_hung_fn_times_out(self):
+        block = threading.Event()
+        try:
+            self.assertFalse(B._call_with_timeout(lambda: block.wait(30), 0.15))
+        finally:
+            block.set()  # release the daemon worker
+
+
+class TestSubmitTimed(unittest.TestCase):
+    """Finding 3: a wedged server-side workspace must not block submit() forever."""
+    def test_returns_result_on_quick_submit(self):
+        sas = type("S", (), {"submit": lambda self, code: {"LOG": "ok"}})()
+        self.assertEqual(B.submit_timed(sas, "x", timeout_s=2)["LOG"], "ok")
+
+    def test_raises_exec_timeout_on_hang(self):
+        block = threading.Event()
+        sas = type("S", (), {"submit": lambda self, code: block.wait(30)})()
+        try:
+            with self.assertRaises(B.OdaExecTimeout):
+                B.submit_timed(sas, "x", timeout_s=0.15)
+        finally:
+            block.set()
+
+    def test_propagates_submit_exception_unchanged(self):
+        sas = type("S", (), {"submit": lambda self, code:
+                             (_ for _ in ()).throw(RuntimeError("boom"))})()
+        with self.assertRaises(RuntimeError):
+            B.submit_timed(sas, "x", timeout_s=2)
 
 
 if __name__ == "__main__":
