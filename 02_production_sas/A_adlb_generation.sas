@@ -259,7 +259,9 @@ quit;
    censoring) can source the last PSA assessment date from ADLB rather than reaching
    back into raw SDTM/staging (traceability, roadmap #3). Derived Optimus rows have
    no single assessment date and carry ADT missing. */
-data adam.adlb(keep=STUDYID USUBJID SUBJID TRT01P TRTSDT PARAMCD PARAM PARAMN PARCAT1 ADT AVAL AVALC LBNRLO LBNRHI LBNRIND AVISIT AVISITN AWDIST ATOXGR BASE BASEC BTOXGR CHG PCHG ANL01FL BASEFL LBDY);
+data adam.adlb(keep=STUDYID USUBJID SUBJID TRT01P TRTSDT PARAMCD PARAM PARAMN PARCAT1 ADT
+                    AVAL AVALC LBNRLO LBNRHI LBNRIND AVISIT AVISITN AWDIST ATOXGR BASE BASEC
+                    BTOXGR CHG PCHG ANL01FL BASEFL LBDY);
     set work.lb_anl01(rename=(ADY=LBDY)) work.optimus_nadir work.optimus_rec;
     format ADT yymmdd10.;
 run;
@@ -269,6 +271,8 @@ proc sort data=adam.adlb;
 run;
 
 /* Clean up work library */
-proc delete data=work.lb_base work.lb_windows work.lb_base_pre work.baselines work.lb_base_merged work.lb_anl01 work.anc_records work.anc_nadir_val work.anc_nadir_summary work.anc_recovery work.optimus_nadir work.optimus_rec;
+proc delete data=work.lb_base work.lb_windows work.lb_base_pre work.baselines
+            work.lb_base_merged work.lb_anl01 work.anc_records work.anc_nadir_val
+            work.anc_nadir_summary work.anc_recovery work.optimus_nadir work.optimus_rec;
 run;
 quit;
