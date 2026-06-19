@@ -94,8 +94,8 @@ Real SDTM (SAS7BDAT)
 
 ```
 TROPIC/
-├── study_manifest.yaml            # Pipeline STRUCTURE — datasets, keys, 17-stage DAG (single source of truth)
-├── study_config.yaml              # Clinical PARAMETERS — thresholds, windows, imputation defaults
+├── study_manifest.yaml             # Pipeline structure — reconciled datasets, keys & 17-stage DAG
+├── study_config.yaml               # Clinical parameters — thresholds, windows, imputation defaults
 ├── 00_specifications/              # Single source of truth (audit C-4 inversion)
 │   ├── ADaM_spec.xlsx              # Authoritative ADaM spec (metacore P21 format) — governs define + data
 │   └── build_spec_seed.R           # One-time migration that bootstrapped the spec from define.xml
@@ -193,7 +193,7 @@ TROPIC/
 │       ├── tables/                 # Efficacy/safety text tables (T-11, T-17, T-20, T-21)
 │       └── listings/               # Subject listings (L-01-1)
 │
-├── studies/                        # Multi-study engine (I/J): per-study manifest/config/programs
+├── studies/                        # Multi-study engine — per-study manifest/config/programs
 │   ├── README.md                   # How to add a study
 │   └── DEMO02/                     # Synthetic proof study (ADSL+ADAE) — `cibuild.py --study DEMO02`
 │
