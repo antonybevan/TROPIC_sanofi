@@ -623,6 +623,12 @@ proc sort data=adam.adtte;
 run;
 
 /* Clean up work library */
-proc delete data=work.pd_dates work.sae_dates work.os_ttsae_raw work.nact_mapping work.pfs_raw work.pn_trt_tte work.pn_base_tte work.pn_post_daily work.pn_first_day work.pn_cycle_min_date work.cycle_comp_raw work.confirmed_triggers work.prog_dates work.censor_dates work.ttpain_derived work.psa_prog_dates work.psa_censor_dates work.ttpsa_derived work.tumor_prog_dates work.tumor_censor_dates work.ttum_derived work.tte_base work.pfs_derived work.pn_base_final work.pn_cycle_med work.cycle_comp work.ttpain_final work.ttpsa_final work.ttum_final;
+proc delete data=work.pd_dates work.sae_dates work.os_ttsae_raw work.nact_mapping work.pfs_raw
+            work.pn_trt_tte work.pn_base_tte work.pn_post_daily work.pn_first_day
+            work.pn_cycle_min_date work.cycle_comp_raw work.confirmed_triggers work.prog_dates
+            work.censor_dates work.ttpain_derived work.psa_prog_dates work.psa_censor_dates
+            work.ttpsa_derived work.tumor_prog_dates work.tumor_censor_dates work.ttum_derived
+            work.tte_base work.pfs_derived work.pn_base_final work.pn_cycle_med work.cycle_comp
+            work.ttpain_final work.ttpsa_final work.ttum_final;
 run;
 quit;
