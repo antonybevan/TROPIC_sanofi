@@ -266,6 +266,10 @@ proc sql;
 quit;
 
 /* Clean up work library */
-proc delete data=work.ex_dates work.survival_ds work.survival work.lstalv work.ecog work.meas work.visc work.pn_trt work.pn_base_daily work.pn_median work.ppi_med work.an_med work.pain_base work.labs_base work.labs_wide work.labs_ready work.docetaxel_recs work.docetaxel_resp work.docetaxel_prog work.docetaxel_summary;
+proc delete data=work.ex_dates work.survival_ds work.survival work.lstalv work.ecog
+            work.meas work.visc work.pn_trt work.pn_base_daily work.pn_median
+            work.ppi_med work.an_med work.pain_base work.labs_base work.labs_wide
+            work.labs_ready work.docetaxel_recs work.docetaxel_resp work.docetaxel_prog
+            work.docetaxel_summary;
 run;
 quit;

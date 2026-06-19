@@ -5,6 +5,16 @@ Practice. It hard-fails (exit 1) only on issues that are objectively unsafe for 
 portable pipeline - currently hardcoded absolute paths. Everything else (header
 block, line length, step/terminator balance) is a non-blocking WARNING. It runs as a
 pre-flight gate in cibuild.py and in CI so the ERROR class cannot regress.
+
+Scope/threshold notes:
+  * The production *analysis* track only — git/dev helper scripts under
+    `02_production_sas/utilities/` are excluded.
+  * Line length uses the SAS-traditional 132-column standard (the classic LINESIZE
+    print width), not an arbitrary 80/120, and ignores quoted-string-literal content
+    (`"..."`, `'...'`, `%str(...)`): a title/footnote/label string cannot be wrapped
+    without altering the rendered deliverable, so only genuinely long *code* is flagged.
+  * Step/terminator balance counts `run;`/`quit;` anywhere on a line (not just at the
+    line start) so single-line steps like `data x; set y; run;` are not false-flagged.
 """
 import os
 import glob
@@ -35,9 +45,11 @@ def lint_sas_file(filepath):
         line_stripped = line.strip()
         line_upper = line_stripped.upper()
         
-        # Line length
-        if len(line.rstrip('\n')) > 120:
-            warnings.append(f"Line {i}: Exceeds 120 characters.")
+        # Line length (SAS-traditional 132 cols; quoted-string content exempt — a
+        # deliverable title/footnote/label literal cannot be wrapped without changing output)
+        bare = re.sub(r'"[^"]*"|\'[^\']*\'|%str\([^)]*\)', '', line.rstrip('\n'))
+        if len(bare) > 132:
+            warnings.append(f"Line {i}: Exceeds 132 characters (excluding string literals).")
             
         # Hardcoded paths (basic check)
         if re.search(r'([A-Za-z]:\\[^ ]+|/Users/[^ ]+|/home/[^ ]+)', line):
@@ -45,13 +57,13 @@ def lint_sas_file(filepath):
             if not line_stripped.startswith('*') and not line_stripped.startswith('/*'):
                 errors.append(f"Line {i}: Hardcoded path detected. Use relative paths or macro variables.")
                 
-        # Step counting (naive)
+        # Step counting. PROC/DATA are step-starts (line-initial); RUN;/QUIT; are counted
+        # ANYWHERE on the line so single-line steps (`data x; set y; run;`) balance correctly.
         if line_upper.startswith("PROC ") and ";" in line_upper:
             proc_count += 1
         elif line_upper.startswith("DATA ") and ";" in line_upper and not line_upper.startswith("DATA ="):
             data_count += 1
-        elif line_upper == "RUN;" or line_upper.startswith("RUN;") or line_upper == "QUIT;" or line_upper.startswith("QUIT;"):
-            run_quit_count += 1
+        run_quit_count += len(re.findall(r'\b(?:RUN|QUIT)\s*;', line_upper))
 
     # 3. Missing RUN/QUIT check (Warning)
     total_steps = proc_count + data_count
@@ -69,6 +81,9 @@ def main():
     
     for f in sas_files:
         if "00_config_generated.sas" in f:
+            continue
+        # Exclude git/dev helper scripts — they are not part of the production analysis track.
+        if os.path.sep + "utilities" + os.path.sep in f or "/utilities/" in f:
             continue
             
         errs, warns = lint_sas_file(f)

@@ -36,7 +36,8 @@ proc sql;
 quit;
 
 /* Sort ADSL safety population by usubjid */
-proc sort data=adam.adsl(keep=studyid usubjid subjid siteid trt01p trt01pn saffl trtsdt trtedt trtdurd where=(saffl = 'Y')) out=work.adsl_sorted;
+proc sort data=adam.adsl(keep=studyid usubjid subjid siteid trt01p trt01pn saffl trtsdt trtedt trtdurd
+                         where=(saffl = 'Y')) out=work.adsl_sorted;
     by usubjid;
 run;
 
@@ -201,6 +202,7 @@ proc sort data=adam.adex;
 run;
 
 /* Clean up work library */
-proc delete data=work.subj_mods work.adsl_sorted work.adex_bds_merged work.adex_bds work.ex_sorted work.adex_cycle_merged work.adex_cycle;
+proc delete data=work.subj_mods work.adsl_sorted work.adex_bds_merged work.adex_bds
+            work.ex_sorted work.adex_cycle_merged work.adex_cycle;
 run;
 quit;
