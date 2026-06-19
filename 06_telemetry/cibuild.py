@@ -117,6 +117,11 @@ PROJ_ROOT_ODA = os.environ.get("TROPIC_ODA_PROJ_ROOT", "~/TROPIC")
 # they are no longer hardcoded here. A missing/malformed manifest falls back to the
 # legacy TROPIC values, so the engine never hard-fails on a manifest problem.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# The engine lives at the repo root (parent of 06_telemetry/). The default study IS
+# that root (TROPIC); a named study (--study) lives under studies/<name>/ and is
+# activated by _activate_study(), which chdirs into it and reloads the manifest.
+_ENGINE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_RELOCATE_ENGINE = False   # True once a study root != engine root is active (Phase 2)
 try:
     import manifest as _manifest_mod
     _MANIFEST = _manifest_mod.load_manifest()
@@ -128,6 +133,33 @@ except Exception as _e:  # noqa: BLE001 — fall back to legacy hardcoded struct
     STUDY_DATASETS = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte", "clinsite"]
     STUDY_LABEL = "TROPIC (Study EFC6193 / XRP6258)"
 ODA_DATASETS = STUDY_DATASETS
+
+
+def _activate_study(study):
+    """Resolve and activate the target study (I/J Phase 2, multi-study).
+
+    Default (study=None) = the engine/repo root (TROPIC). A named study lives under
+    studies/<study>/ with its own manifest/config/programs. We chdir into the study
+    root so the engine's relative paths (04_adam/, 03_validation_r/, study_config.yaml,
+    study_manifest.yaml) resolve per-study, and set _RELOCATE_ENGINE so shared engine
+    scripts (flagged `engine: true` in the manifest) are run from absolute engine-root
+    paths. For the default study, study root == engine root, so nothing relocates and
+    behaviour is byte-identical to single-study mode."""
+    global _MANIFEST, STUDY_DATASETS, STUDY_LABEL, ODA_DATASETS, _RELOCATE_ENGINE
+    study_root = os.path.join(_ENGINE_ROOT, "studies", study) if study else _ENGINE_ROOT
+    if not os.path.isdir(study_root):
+        print(f"  [ERROR] study directory not found: {study_root}")
+        sys.exit(1)
+    os.chdir(study_root)
+    _RELOCATE_ENGINE = os.path.abspath(study_root) != os.path.abspath(_ENGINE_ROOT)
+    try:
+        _MANIFEST = _manifest_mod.load_manifest()
+    except Exception as e:  # noqa: BLE001
+        print(f"  [ERROR] could not load manifest for study at {study_root}: {e}")
+        sys.exit(1)
+    STUDY_DATASETS = _manifest_mod.dataset_names(_MANIFEST)
+    STUDY_LABEL = _manifest_mod.study_label(_MANIFEST)
+    ODA_DATASETS = STUDY_DATASETS
 
 
 def _resolve_oda_root(sas, template):
@@ -470,44 +502,51 @@ def run_single_stage(stage, from_stage, sas_mode, results):
         write_telemetry(results, sas_mode)
         sys.exit(1)
 
-def _stage_cmd(script, runner):
+def _stage_cmd(script, runner, engine_root=None, relocate=False, is_engine=False):
     """Build the subprocess argv for a stage given its runner style.
       logrx   -> Rscript -e logrx::axecute('<script>')  (default for R stages)
       rscript -> Rscript <script>                       (scripts that self-log)
       python  -> <python> <script>
+    Shared engine scripts (is_engine) are resolved to an absolute engine-root path when
+    a relocated study is active, so they run from the engine even though the CWD is the
+    study root. For the default study (relocate=False) the path stays relative/unchanged.
     """
+    path = os.path.join(engine_root, script) if (is_engine and relocate and engine_root) else script
     if runner == "python":
-        return [sys.executable, script]
+        return [sys.executable, path]
     if runner == "rscript":
-        return [RSCRIPT_PATH, script]
-    return [RSCRIPT_PATH, "-e", f"logrx::axecute('{script}')"]
+        return [RSCRIPT_PATH, path]
+    return [RSCRIPT_PATH, "-e", f"logrx::axecute('{path}')"]
 
 
-def build_stages(manifest):
+def build_stages(manifest, engine_root=None, relocate=False):
     """Assemble the ordered pipeline stage list from the study manifest (I/J Phase 1).
 
     Order: pre-infrastructure -> per-dataset R validations (manifest list order,
     parallel where parallel_group is set) -> SAS production sentinel ('SIMULATE') ->
-    post-infrastructure. Each stage is {id, name, cmd, parallel}. Stage NAMES are
-    preserved exactly so the name-keyed post-execution gates stay attached.
+    post-infrastructure. Each stage is {id, name, cmd, parallel, gated}. Stage NAMES are
+    preserved exactly so the name-keyed post-execution gates stay attached. engine_root/
+    relocate thread shared-engine-script relocation through for multi-study (Phase 2).
     """
     infra = manifest.get("infrastructure_stages", {})
     stages = []
     for s in infra.get("pre", []):
         stages.append({"name": s["name"],
-                       "cmd": _stage_cmd(s["script"], s.get("runner", "logrx")),
-                       "parallel": False})
+                       "cmd": _stage_cmd(s["script"], s.get("runner", "logrx"),
+                                         engine_root, relocate, s.get("engine", False)),
+                       "parallel": False, "gated": bool(s.get("gated"))})
     for d in manifest["datasets"]:
         label = d.get("val_stage", f"R {d['name'].upper()} Validation")
         stages.append({"name": label,
                        "cmd": _stage_cmd(f"03_validation_r/{d['val']}", "logrx"),
-                       "parallel": "parallel_group" in d})
+                       "parallel": "parallel_group" in d, "gated": False})
     stages.append({"name": "SAS Production (ODA/Real/Simulated)", "cmd": "SIMULATE",
-                   "parallel": False})
+                   "parallel": False, "gated": False})
     for s in infra.get("post", []):
         stages.append({"name": s["name"],
-                       "cmd": _stage_cmd(s["script"], s.get("runner", "logrx")),
-                       "parallel": False})
+                       "cmd": _stage_cmd(s["script"], s.get("runner", "logrx"),
+                                         engine_root, relocate, s.get("engine", False)),
+                       "parallel": False, "gated": bool(s.get("gated"))})
     for i, s in enumerate(stages, 1):
         s["id"] = i
     return stages
@@ -567,9 +606,15 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
     if from_stage <= 10 and os.path.exists("04_adam/tte_stats_prod.csv"):
         os.remove("04_adam/tte_stats_prod.csv")
 
+    # Engine scripts (lint, config-gen) are invoked by absolute engine-root path so they
+    # run regardless of the active study's CWD; both scan/emit relative to the CWD (the
+    # active study root), so they remain per-study correct.
+    lint_py = os.path.join(_ENGINE_ROOT, "06_telemetry", "lint_sas.py")
+    config_py = os.path.join(_ENGINE_ROOT, "06_telemetry", "generate_config.py")
+
     # Run SAS static-analysis pre-flight gate (advisory; blocks only on hardcoded paths).
     print("  [LINT] Running SAS static analysis...")
-    rc_lint, stdout_lint, stderr_lint = run_command([sys.executable, "06_telemetry/lint_sas.py"])
+    rc_lint, stdout_lint, stderr_lint = run_command([sys.executable, lint_py])
     if rc_lint != 0:
         print(f"  [LINT FAILED] Blocking SAS static-analysis error(s):\n{stdout_lint}\n{stderr_lint}")
         sys.exit(1)
@@ -578,7 +623,7 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
 
     # Run the configuration generator
     print("  [CONFIG] Generating configuration from study_config.yaml...")
-    rc, stdout, stderr = run_command([sys.executable, "06_telemetry/generate_config.py"])
+    rc, stdout, stderr = run_command([sys.executable, config_py])
     if rc != 0:
         print(f"  [CONFIG FAILED] Failed to generate configuration: {stderr}")
         sys.exit(1)
@@ -596,21 +641,23 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
     if _MANIFEST is None:
         print("  [ERROR] study_manifest.yaml could not be loaded; cannot build the pipeline DAG.")
         sys.exit(1)
-    stages = build_stages(_MANIFEST)
+    stages = build_stages(_MANIFEST, _ENGINE_ROOT, _RELOCATE_ENGINE)
 
-    # F-6 guard: the post-execution gates in run_single_stage() key on these exact stage
-    # names. Assert they exist so a future rename fails loudly HERE instead of silently
-    # detaching a gate from the step it guards (the C-3 regression class).
-    gated_stage_names = {
+    # F-6 guard: run_single_stage() implements post-execution QC gate logic keyed on
+    # these exact stage names. A study legitimately may use a subset of them (e.g. a stub
+    # study with no TFL/results-recon), so the check is: fail loudly if the manifest marks
+    # a stage `gated` that the engine has NO gate logic for — a rename/typo that would
+    # otherwise run silently ungated (the C-3 regression class).
+    implemented_gates = {
         "Cross-Language Audit Reconcile",
         "Efficacy & Safety TFL Suite Compilation",
         "Numerical Results Reconciliation (SAS vs R)",
     }
-    missing_gates = gated_stage_names - {s["name"] for s in stages}
-    if missing_gates:
+    unimplemented_gates = {s["name"] for s in stages if s.get("gated")} - implemented_gates
+    if unimplemented_gates:
         raise RuntimeError(
-            "Gate wiring error: gated stage name(s) absent from the pipeline "
-            f"(a rename detached a QC gate): {sorted(missing_gates)}"
+            "Gate wiring error: manifest marks stage(s) gated with no engine gate logic "
+            f"(a rename detached a QC gate): {sorted(unimplemented_gates)}"
         )
 
     results = {}
@@ -808,6 +855,7 @@ def main():
     parser.add_argument("--serial", action="store_true", help="Run stages serially rather than parallelizing Stages 4-8.")
     parser.add_argument("--force-upload-sdtm", action="store_true", help="ODA only: force a full re-upload of the ~200 MB SDTM source (default uploads only missing/changed files). Use after a source-data refresh.")
     parser.add_argument("--seed-if-needed", action="store_true", help="ODA only: seed the SDTM library inline within the Stage-10 session if it is not already resident (single ODA spawn for seed+run). Delta-aware: a resident library costs only a manifest check.")
+    parser.add_argument("--study", default=None, help="Run a named study under studies/<name>/ (default: the TROPIC study at the repo root). Multi-study: the engine chdirs into the study root and builds its DAG from that study's manifest.")
 
     args = parser.parse_args()
 
@@ -828,9 +876,13 @@ def main():
         print("Demo smoke test completed successfully!")
         sys.exit(0)
     else:
+        # Resolve & activate the target study (default = TROPIC at the repo root;
+        # --study <name> = studies/<name>/). Chdirs into the study root and loads its
+        # manifest before the DAG is built (I/J Phase 2, multi-study).
+        _activate_study(args.study)
         # Validate that from-stage is within valid range (AUTO-03). The stage count is
         # derived from the manifest-built DAG rather than a hardcoded 17.
-        max_stage = len(build_stages(_MANIFEST)) if _MANIFEST is not None else 17
+        max_stage = len(build_stages(_MANIFEST, _ENGINE_ROOT, _RELOCATE_ENGINE))
         if args.from_stage < 0 or args.from_stage > max_stage:
             print(f"ERROR: Invalid stage number {args.from_stage}. Stage number must be between 1 and {max_stage}.")
             sys.exit(1)

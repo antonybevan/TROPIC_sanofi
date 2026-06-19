@@ -1,0 +1,3 @@
+# Keeps studies/DEMO02/02_production_sas/ present so generate_config.py has a target
+# directory for 00_config_generated.sas. DEMO02 ships no SAS programs (it is an R-only
+# sim stub), so the SAS static-analysis gate passes trivially (zero files).

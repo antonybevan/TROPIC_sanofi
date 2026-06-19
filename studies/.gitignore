@@ -1,0 +1,8 @@
+# Generated per-study runtime artifacts (not source). The engine writes each study's
+# outputs under its own root; only the source (manifests, configs, programs, .gitkeep)
+# is tracked — outputs are reproduced deterministically by running the pipeline.
+*/04_adam/
+*/06_telemetry/
+*/backup_adam/
+*/02_production_sas/00_config_generated.sas
+*/03_validation_r/*.log

@@ -54,7 +54,12 @@ def generate_sas_config(config, output_path):
             f.write(f"%let {key} = {sas_val};\n\n")
 
 def main():
-    proj_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    # Resolve the study root from the current working directory first (multi-study:
+    # cibuild chdirs into the active study root), falling back to the engine location
+    # for a standalone/default invocation.
+    proj_root = os.getcwd()
+    if not os.path.exists(os.path.join(proj_root, "study_config.yaml")):
+        proj_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     yaml_path = os.path.join(proj_root, "study_config.yaml")
     sas_out_path = os.path.join(proj_root, "02_production_sas", "00_config_generated.sas")
     
