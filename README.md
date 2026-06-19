@@ -94,6 +94,8 @@ Real SDTM (SAS7BDAT)
 
 ```
 TROPIC/
+├── study_manifest.yaml            # Pipeline STRUCTURE — datasets, keys, 17-stage DAG (single source of truth)
+├── study_config.yaml              # Clinical PARAMETERS — thresholds, windows, imputation defaults
 ├── 00_specifications/              # Single source of truth (audit C-4 inversion)
 │   ├── ADaM_spec.xlsx              # Authoritative ADaM spec (metacore P21 format) — governs define + data
 │   └── build_spec_seed.R           # One-time migration that bootstrapped the spec from define.xml
@@ -149,7 +151,8 @@ TROPIC/
 │   └── cross_lang_audit.R          # diffdf cell-by-cell reconciliation engine
 │
 ├── 06_telemetry/                   # Pipeline Orchestration & Telemetry
-│   ├── cibuild.py                  # Python execution driver (17 stages; Job B reconcile)
+│   ├── cibuild.py                  # Python execution driver (manifest-driven 17-stage DAG; --study)
+│   ├── manifest.py                 # Study-manifest loader (datasets, keys, identity, DAG structure)
 │   ├── package_ectd.py             # eCTD Module 5 packaging orchestrator
 │   ├── oda_broker.py               # Resilient ODA connection broker (probe-earned 'oda' mode)
 │   ├── seed_sdtm.py                # Job A: idempotent, manifest-checked SDTM seeding
@@ -189,6 +192,10 @@ TROPIC/
 │       │   └── sas/                # SAS-generated figures (OS/PFS/subgroup/Optimus)
 │       ├── tables/                 # Efficacy/safety text tables (T-11, T-17, T-20, T-21)
 │       └── listings/               # Subject listings (L-01-1)
+│
+├── studies/                        # Multi-study engine (I/J): per-study manifest/config/programs
+│   ├── README.md                   # How to add a study
+│   └── DEMO02/                     # Synthetic proof study (ADSL+ADAE) — `cibuild.py --study DEMO02`
 │
 └── m5/                             # eCTD Module 5 (Sec 5.3) — data-free preview tracked; *.xpt never tracked
     ├── datasets/tropic/
@@ -242,6 +249,10 @@ All clinical pipeline stages compiled successfully!
 
 > Stage 14 transparently reports **`SKIPPED`** in `sim`/`cached` mode (no real SAS `PROC LIFETEST`
 > statistics exist to reconcile); under `--real-sas` it computes and reports a genuine `PASS`/`FAIL`.
+
+> **Multi-study.** The engine is study-agnostic — pipeline *structure* lives in `study_manifest.yaml`,
+> not in code. A second study runs through the **same** engine via
+> `python3 06_telemetry/cibuild.py --study DEMO02` (see [`studies/README.md`](studies/README.md)).
 
 ### eCTD Module 5 Submission Package
 

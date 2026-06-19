@@ -4,6 +4,42 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.14.0] - 2026-06-19 — Study-agnostic engine: manifest-driven pipeline + multi-study (Findings I/J)
+
+> **Context.** Generalises the orchestration/reconciliation engine from a single-study demo
+> toward a study-agnostic, config-driven platform (strategic Findings **I/J**). Pipeline
+> *structure* now lives in a declarative `study_manifest.yaml` (companion to `study_config.yaml`,
+> which holds clinical *parameters*), and a second proof study (`DEMO02`) runs end-to-end through
+> the **unchanged** engine. TROPIC's 17-stage DAG is byte-identical to before (golden-verified;
+> full `sim` run GREEN, 8/8 dataset reconciliation PASS).
+
+### Added
+- **`study_manifest.yaml`** — single source of truth for pipeline *structure*: study identity,
+  the reconciled datasets (name, business `keys`, validation/SAS programs, `parallel_group`,
+  `results_recon` spec), and the infrastructure stages (`pre`/`post`, each with a `runner` and
+  optional `gated`/`engine` flags). Captures the `ADAE` and BIMO→`clinsite` naming exceptions
+  declaratively. Loaded by **`06_telemetry/manifest.py`** (pyyaml).
+- **Multi-study support** — `cibuild.py --study <name>` runs any study under `studies/<name>/`
+  through the same engine: it chdirs into the study root, builds the DAG from that study's
+  manifest, and resolves shared engine scripts (manifest `engine: true`) back to the engine root.
+- **`studies/DEMO02/`** — a tiny synthetic proof study (ADSL + ADAE, no SAS). `cibuild.py
+  --study DEMO02` runs green end-to-end (2 validations → SAS sim → cross-language reconcile =
+  PASS), demonstrating the engine is genuinely study-agnostic. `studies/README.md` documents how
+  to add a study.
+- **`docs/I_J_generalisation_plan.md`** — the P0–P2 implementation/scoping plan.
+
+### Changed
+- **`cibuild.py`** now *generates* its 17-stage DAG from the manifest (`build_stages()`) instead
+  of a hardcoded list; a group-aware executor replaces the positional `[:3]/[3:8]/[8:]` slices,
+  and `--from-stage` bounds are derived from the built DAG. The post-execution gate guard is
+  manifest-derived (a study may legitimately use a subset of the QC gates).
+- **Dataset list de-duplicated** — the reconciled-dataset list (previously hardcoded in 5 places)
+  and `cross_lang_audit.R`'s per-dataset business-key map (previously an `if/else` chain) now read
+  from the manifest; study-identity strings in dashboards/reports flow from it too.
+- **`generate_config.py`** resolves the study root from the working directory (falls back to the
+  engine root), so configuration generation is per-study.
+- **CI** — `pyyaml` promoted to the main Python-deps step (the manifest loader depends on it).
+
 ## [3.13.0] - 2026-06-18 — PCWG3-correct integrated RECIST response + bone 2+2, verified on real SAS
 
 > **Context.** Two linked changes, both proven on a **genuine `oda`-mode run** (real SAS 9.4 on
