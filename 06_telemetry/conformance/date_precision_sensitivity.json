@@ -1,0 +1,86 @@
+{
+  "jitter_days": 3.5,
+  "replicates": 2000,
+  "seed": 20260620,
+  "arm": "MP (real) only",
+  "parameters": {
+    "OS": {
+      "n": 371,
+      "events": 266,
+      "median_reached_fraction": 1.0,
+      "point_median_days": 386.0,
+      "point_median_months": 12.68,
+      "mc_p2_5_days": 386.3,
+      "mc_p50_days": 388.7,
+      "mc_p97_5_days": 389.5,
+      "mc_band_months": 0.104,
+      "max_abs_shift_days": 3.5,
+      "verdict": "ROBUST"
+    },
+    "PFS": {
+      "n": 371,
+      "events": 326,
+      "median_reached_fraction": 1.0,
+      "point_median_days": 43.0,
+      "point_median_months": 1.41,
+      "mc_p2_5_days": 41.0,
+      "mc_p50_days": 42.1,
+      "mc_p97_5_days": 43.2,
+      "mc_band_months": 0.071,
+      "max_abs_shift_days": 2.68,
+      "verdict": "ROBUST"
+    },
+    "TTUMOR": {
+      "n": 203,
+      "events": 186,
+      "median_reached_fraction": 1.0,
+      "point_median_days": 64.0,
+      "point_median_months": 2.1,
+      "mc_p2_5_days": 63.4,
+      "mc_p50_days": 65.2,
+      "mc_p97_5_days": 66.6,
+      "mc_band_months": 0.103,
+      "max_abs_shift_days": 3.12,
+      "verdict": "ROBUST"
+    },
+    "TTPSA": {
+      "n": 371,
+      "events": 265,
+      "median_reached_fraction": 1.0,
+      "point_median_days": 68.0,
+      "point_median_months": 2.23,
+      "mc_p2_5_days": 65.0,
+      "mc_p50_days": 66.8,
+      "mc_p97_5_days": 68.3,
+      "mc_band_months": 0.108,
+      "max_abs_shift_days": 4.41,
+      "verdict": "ROBUST"
+    },
+    "TTSAE": {
+      "n": 371,
+      "events": 78,
+      "median_reached_fraction": 0.0,
+      "point_median_days": null,
+      "point_median_months": null,
+      "mc_p2_5_days": null,
+      "mc_p50_days": null,
+      "mc_p97_5_days": null,
+      "mc_band_months": null,
+      "max_abs_shift_days": null,
+      "verdict": "ROBUST (n/r)"
+    },
+    "TTPAIN": {
+      "n": 371,
+      "events": 73,
+      "median_reached_fraction": 0.0,
+      "point_median_days": null,
+      "point_median_months": null,
+      "mc_p2_5_days": null,
+      "mc_p50_days": null,
+      "mc_p97_5_days": null,
+      "mc_band_months": null,
+      "max_abs_shift_days": null,
+      "verdict": "ROBUST (n/r)"
+    }
+  }
+}

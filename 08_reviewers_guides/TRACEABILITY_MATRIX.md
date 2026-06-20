@@ -1,7 +1,7 @@
 # Analysis Traceability Matrix
 
 **Study:** TROPIC (EFC6193 / XRP6258) · NCT00417079
-**Standards:** SDTMIG v3.1.1 (source) · ADaMIG v1.3 / OCCDS v1.0 + custom episode-merging (analysis)
+**Standards:** SDTMIG v3.1.1 source → v3.4 uplift · ADaMIG v1.3 / OCCDS v1.0 + custom episode-merging (analysis)
 **Purpose:** End-to-end traceability from source SDTM → ADaM (dual-programmed) → Define-XML
 metadata → TFL output, plus the reconciliation evidence for each analysis dataset. This is
 the single index a reviewer uses to walk any number on a table back to the code and the

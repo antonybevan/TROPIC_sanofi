@@ -4,6 +4,53 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.15.0] - 2026-06-20 — SDTMIG 3.4 conformance uplift + current CT + authoritative CORE run (terminal-session remediation)
+
+> **Context.** Executes the SAS/CT/validator-gated submission-standard items from
+> `06_telemetry/SUBMISSION_STANDARDS_REMEDIATION.md` and the FDA-reviewer audit
+> (T-1/T-2/m-1/m-2/M-2), now that the CDISC Library key, populated CORE cache, network, and
+> R/haven are available. The pristine source SDTM (`01_raw_source/real_sdtm/`, SDTMIG 3.1.1) is
+> **never modified** — a derived 3.4 layer is produced deterministically and packaged.
+
+### Added
+- **`06_telemetry/uplift_sdtm_34.R`** — SDTMIG 3.1.1→3.4 data uplift (read pristine source →
+  write XPT v5 to the m5 tabulation copy + CORE staging). Derives `DM.AGE` from the de-identified
+  `AGEGRP` (`>=85` floored, cap flagged in `SUPPDM`), `ACTARM`/`ACTARMCD`, `AE.AESOC=AEBODSYS`,
+  `EPOCH` (VISIT-based, SE absent), `EX.EXENDY`; relocates the non-standard week-offset timing
+  (`AESTWK`/`AEENWK`/…, `DSSTWK`/…) to `SUPPAE`/`SUPPDS`; drops redundant `SUBJID`; enriches `TS`
+  (`NARMS`/`ACTSUB`/`SSTDTC`/`AGEMIN`); builds `TA`; aligns variable order/labels to the CDISC library.
+- **`07_define_xml/uplift_define_34.py`** — regenerates `define_sdtm.xml` to **SDTMIG 3.4 + CT
+  2026-03-27**, syncing ItemRefs/ItemDefs to the uplifted data (removes phantom `ARM2`/`ARMA`/…),
+  adding `IG.TS`/`IG.TA`/`IG.SUPPAE`/`IG.SUPPDS`. XSD-VALID (Define 2.1); 315 ref-integrity checks PASS. Idempotent.
+- **`06_telemetry/conformance/CORE_SDTM34_RUN_RECORD.md`** + `core_sdtm34_report.json` —
+  authoritative CDISC CORE 0.16.0 run at `-s sdtmig -v 3.4`. All targeted structural rules cleared
+  (AESOC, AGE, EPOCH, EXENDY, non-standard→SUPP, var order, types, labels, whitespace); residual
+  findings classified (inherent-de-id / real-source-data / cross-domain-no-FA / engine-internal) —
+  none are programming defects; real-data findings (AESER, VSSTRESC) are not overwritten.
+- **`06_telemetry/materialize_ectd.py`** — closes remediation **5a**: copies each `m5/` deliverable
+  to its `index.xml` `xlink:href` under `11_ectd/0000/` and re-verifies every leaf MD5 (89/89; all
+  90 hrefs resolve in-place; in-sequence SDTM define is the 3.4 copy). Sequence is now self-contained.
+- **eCTD now DTD-VALID** — with the official DTDs in `util/dtd/` (`ich-ectd-3-2`, `ich-stf-v2-2`,
+  `us-regional-v3-3`), all three backbone XML files pass `xmllint --noout --valid`. Fixes the
+  DTDs surfaced in `build_ectd_backbone.py`: the `#FIXED` xlink-typo URI, the required `indication`
+  attribute, **us-regional migrated v2.01 → v3.3** (FDA retired v2.01), and the STF retargeted to
+  ICH STF v2.2. All application identifiers are labelled `EXAMPLE` placeholders.
+
+### Security / data hygiene
+- **`.gitignore`** — CORE conformance reports (`06_telemetry/conformance/core_*_report.json`) now
+  ignored: the 3.4 report's per-record findings (AESER/VSSTRESC/RELREC) emit subject `USUBJID` rows
+  (371). Prior tracked reports (which held no subject IDs) untracked for a consistent data-free
+  policy; the tracked evidence is the `*_RUN_RECORD.md` (no patient data). eCTD materialized payload
+  (datasets + report binaries) ignored as a reproducible copy of `m5/`.
+
+### Changed
+- **`07_define_xml/define.xml`** (+ m5 copies) — ADaM CT bumped `2024-03-29`→`2026-03-27`.
+- **`08_reviewers_guides/SDRG.md`** — new §5 documents the 3.4 uplift, EPOCH derivation rule, and CORE residual classification; header now declares submission SDTMIG 3.4 / source 3.1.1.
+- Downstream re-synced: SDTM Dataset-JSON regenerated (35/35 valid); eCTD backbone checksums refreshed.
+
+### Not done (require real data / org change — audit R-1/R-2/M-3)
+- Real two-arm patient data + `DV` domain; independent second-programmer (GxP) validation.
+
 ## [3.14.0] - 2026-06-19 — Study-agnostic engine: manifest-driven pipeline + multi-study (Findings I/J)
 
 > **Context.** Generalises the orchestration/reconciliation engine from a single-study demo

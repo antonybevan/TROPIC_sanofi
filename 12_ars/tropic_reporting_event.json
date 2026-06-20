@@ -1,0 +1,384 @@
+{
+  "id": "RE.TROPIC",
+  "name": "TROPIC MP-arm time-to-event reporting event",
+  "version": 1,
+  "label": "ARS v1.0 results for the real Mitoxantrone arm (NCT00417079)",
+  "mainListOfContents": {
+    "name": "TROPIC time-to-event analyses",
+    "contents": [
+      {
+        "order": 1,
+        "analysisId": "AN.OS"
+      },
+      {
+        "order": 2,
+        "analysisId": "AN.PFS"
+      },
+      {
+        "order": 3,
+        "analysisId": "AN.TTPSA"
+      },
+      {
+        "order": 4,
+        "analysisId": "AN.TTUMOR"
+      }
+    ]
+  },
+  "referenceDocuments": [
+    {
+      "id": "RD.SAP",
+      "name": "TROPIC SAP v3.0",
+      "location": "TROPIC_SAP_v3.0.docx"
+    },
+    {
+      "id": "RD.ADRG",
+      "name": "Analysis Data Reviewer's Guide",
+      "location": "08_reviewers_guides/ADRG.md"
+    }
+  ],
+  "analysisSets": [
+    {
+      "id": "AS.ITT",
+      "name": "Intent-to-Treat",
+      "label": "Randomized analysis cohort (ITTFL = Y)",
+      "order": 1,
+      "condition": {
+        "dataset": "ADSL",
+        "variable": "ITTFL",
+        "comparator": "EQ",
+        "value": [
+          "Y"
+        ]
+      }
+    }
+  ],
+  "analysisGroupings": [
+    {
+      "id": "GF.TRT",
+      "name": "Treatment",
+      "label": "Planned treatment",
+      "groupingDataset": "ADSL",
+      "groupingVariable": "TRT01P",
+      "dataDriven": false,
+      "groups": [
+        {
+          "id": "G.MP",
+          "name": "Mitoxantrone + Prednisone",
+          "label": "MP",
+          "condition": {
+            "dataset": "ADSL",
+            "variable": "TRT01P",
+            "comparator": "EQ",
+            "value": [
+              "MP"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "methods": [
+    {
+      "id": "MTH.KMTTE",
+      "name": "Kaplan-Meier time-to-event summary",
+      "label": "KM N / events / median",
+      "description": "Kaplan-Meier estimate of the survival function; median is the first time at which S(t) <= 0.5. Time origin and event per ADTTE PARAM (ADRG section 4).",
+      "operations": [
+        {
+          "id": "OP.N",
+          "name": "Number of subjects",
+          "order": 1,
+          "resultPattern": "XXX"
+        },
+        {
+          "id": "OP.EVNT",
+          "name": "Number of events",
+          "order": 2,
+          "resultPattern": "XXX"
+        },
+        {
+          "id": "OP.MEDD",
+          "name": "KM median (days)",
+          "order": 3,
+          "resultPattern": "XXX.X"
+        },
+        {
+          "id": "OP.MEDM",
+          "name": "KM median (months)",
+          "order": 4,
+          "resultPattern": "XX.XX"
+        }
+      ]
+    }
+  ],
+  "analyses": [
+    {
+      "id": "AN.OS",
+      "name": "Overall Survival",
+      "description": "Kaplan-Meier Overall Survival on the real MP arm.",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "controlledTerm": "PRIMARY OUTCOME MEASURE"
+      },
+      "dataset": "ADTTE",
+      "variable": "AVAL",
+      "analysisSetId": "AS.ITT",
+      "methodId": "MTH.KMTTE",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "GF.TRT"
+        }
+      ],
+      "results": [
+        {
+          "operationId": "OP.N",
+          "resultGroups": [
+            {
+              "groupingId": "GF.TRT",
+              "groupId": "G.MP"
+            }
+          ],
+          "rawValue": 371,
+          "formattedValue": "371"
+        },
+        {
+          "operationId": "OP.EVNT",
+          "resultGroups": [
+            {
+              "groupingId": "GF.TRT",
+              "groupId": "G.MP"
+            }
+          ],
+          "rawValue": 266,
+          "formattedValue": "266"
+        },
+        {
+          "operationId": "OP.MEDD",
+          "resultGroups": [
+            {
+              "groupingId": "GF.TRT",
+              "groupId": "G.MP"
+            }
+          ],
+          "rawValue": 386.0,
+          "formattedValue": "386.0"
+        },
+        {
+          "operationId": "OP.MEDM",
+          "resultGroups": [
+            {
+              "groupingId": "GF.TRT",
+              "groupId": "G.MP"
+            }
+          ],
+          "rawValue": 12.68,
+          "formattedValue": "12.68"
+        }
+      ]
+    },
+    {
+      "id": "AN.PFS",
+      "name": "Progression-Free Survival",
+      "description": "Kaplan-Meier Progression-Free Survival on the real MP arm.",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "controlledTerm": "SECONDARY OUTCOME MEASURE"
+      },
+      "dataset": "ADTTE",
+      "variable": "AVAL",
+      "analysisSetId": "AS.ITT",
+      "methodId": "MTH.KMTTE",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "GF.TRT"
+        }
+      ],
+      "results": [
+        {
+          "operationId": "OP.N",
+          "resultGroups": [
+            {
+              "groupingId": "GF.TRT",
+              "groupId": "G.MP"
+            }
+          ],
+          "rawValue": 371,
+          "formattedValue": "371"
+        },
+        {
+          "operationId": "OP.EVNT",
+          "resultGroups": [
+            {
+              "groupingId": "GF.TRT",
+              "groupId": "G.MP"
+            }
+          ],
+          "rawValue": 326,
+          "formattedValue": "326"
+        },
+        {
+          "operationId": "OP.MEDD",
+          "resultGroups": [
+            {
+              "groupingId": "GF.TRT",
+              "groupId": "G.MP"
+            }
+          ],
+          "rawValue": 43.0,
+          "formattedValue": "43.0"
+        },
+        {
+          "operationId": "OP.MEDM",
+          "resultGroups": [
+            {
+              "groupingId": "GF.TRT",
+              "groupId": "G.MP"
+            }
+          ],
+          "rawValue": 1.41,
+          "formattedValue": "1.41"
+        }
+      ]
+    },
+    {
+      "id": "AN.TTPSA",
+      "name": "Time to PSA Progression",
+      "description": "Kaplan-Meier Time to PSA Progression on the real MP arm.",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "controlledTerm": "SECONDARY OUTCOME MEASURE"
+      },
+      "dataset": "ADTTE",
+      "variable": "AVAL",
+      "analysisSetId": "AS.ITT",
+      "methodId": "MTH.KMTTE",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "GF.TRT"
+        }
+      ],
+      "results": [
+        {
+          "operationId": "OP.N",
+          "resultGroups": [
+            {
+              "groupingId": "GF.TRT",
+              "groupId": "G.MP"
+            }
+          ],
+          "rawValue": 371,
+          "formattedValue": "371"
+        },
+        {
+          "operationId": "OP.EVNT",
+          "resultGroups": [
+            {
+              "groupingId": "GF.TRT",
+              "groupId": "G.MP"
+            }
+          ],
+          "rawValue": 265,
+          "formattedValue": "265"
+        },
+        {
+          "operationId": "OP.MEDD",
+          "resultGroups": [
+            {
+              "groupingId": "GF.TRT",
+              "groupId": "G.MP"
+            }
+          ],
+          "rawValue": 68.0,
+          "formattedValue": "68.0"
+        },
+        {
+          "operationId": "OP.MEDM",
+          "resultGroups": [
+            {
+              "groupingId": "GF.TRT",
+              "groupId": "G.MP"
+            }
+          ],
+          "rawValue": 2.23,
+          "formattedValue": "2.23"
+        }
+      ]
+    },
+    {
+      "id": "AN.TTUMOR",
+      "name": "Time to Tumor Progression",
+      "description": "Kaplan-Meier Time to Tumor Progression on the real MP arm.",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "controlledTerm": "SECONDARY OUTCOME MEASURE"
+      },
+      "dataset": "ADTTE",
+      "variable": "AVAL",
+      "analysisSetId": "AS.ITT",
+      "methodId": "MTH.KMTTE",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "GF.TRT"
+        }
+      ],
+      "results": [
+        {
+          "operationId": "OP.N",
+          "resultGroups": [
+            {
+              "groupingId": "GF.TRT",
+              "groupId": "G.MP"
+            }
+          ],
+          "rawValue": 203,
+          "formattedValue": "203"
+        },
+        {
+          "operationId": "OP.EVNT",
+          "resultGroups": [
+            {
+              "groupingId": "GF.TRT",
+              "groupId": "G.MP"
+            }
+          ],
+          "rawValue": 186,
+          "formattedValue": "186"
+        },
+        {
+          "operationId": "OP.MEDD",
+          "resultGroups": [
+            {
+              "groupingId": "GF.TRT",
+              "groupId": "G.MP"
+            }
+          ],
+          "rawValue": 64.0,
+          "formattedValue": "64.0"
+        },
+        {
+          "operationId": "OP.MEDM",
+          "resultGroups": [
+            {
+              "groupingId": "GF.TRT",
+              "groupId": "G.MP"
+            }
+          ],
+          "rawValue": 2.1,
+          "formattedValue": "2.10"
+        }
+      ]
+    }
+  ]
+}

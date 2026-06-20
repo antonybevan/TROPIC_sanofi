@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../../../../../../util/style/us-stf-stylesheet.xsl"?>
+<!DOCTYPE ectd:study SYSTEM "../../../../../../util/dtd/ich-stf-v2-2.dtd">
+<ectd:study xmlns:ectd="http://www.ich.org/ectd" xml:lang="en"
+            dtd-version="2.2" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <study-identifier>
+    <title>A randomized, open-label, multicenter study of cabazitaxel plus prednisone vs mitoxantrone plus prednisone in mCRPC previously treated with docetaxel (TROPIC, EFC6193 / NCT00417079)</title>
+    <study-id>TROPIC</study-id>
+    <category name="type-of-control" info-type="ich">active-control-without-placebo</category>
+  </study-identifier>
+  <study-document>
+    <doc-content xlink:href="../../../../../../index.xml#L0001">
+      <file-tag name="data-tabulation-data-definition" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0002">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0003">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0004">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0005">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0006">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0007">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0008">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0009">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0010">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0011">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0012">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0013">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0014">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0015">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0016">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0017">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0018">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0019">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0020">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0021">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0022">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0023">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0024">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0025">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0026">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0027">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0028">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0029">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0030">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0031">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0032">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0033">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0034">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0035">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0036">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0037">
+      <file-tag name="data-tabulation-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0038">
+      <file-tag name="annotated-crf" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0039">
+      <file-tag name="data-tabulation-data-reviewers-guide" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0040">
+      <file-tag name="data-tabulation-data-reviewers-guide" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0041">
+      <file-tag name="analysis-data-definition" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0042">
+      <file-tag name="analysis-data-definition" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0043">
+      <file-tag name="analysis-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0044">
+      <file-tag name="analysis-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0045">
+      <file-tag name="analysis-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0046">
+      <file-tag name="analysis-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0047">
+      <file-tag name="analysis-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0048">
+      <file-tag name="analysis-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0049">
+      <file-tag name="analysis-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0050">
+      <file-tag name="analysis-dataset" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0051">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0052">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0053">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0054">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0055">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0056">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0057">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0058">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0059">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0060">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0061">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0062">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0063">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0064">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0065">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0066">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0067">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0068">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0069">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0070">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0071">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0072">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0073">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0074">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0075">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0076">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0077">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0078">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0079">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0080">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0081">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0082">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0083">
+      <file-tag name="analysis-program" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0084">
+      <file-tag name="analysis-data-reviewers-guide" info-type="us"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0085">
+      <file-tag name="study-report-body" info-type="ich"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0086">
+      <file-tag name="study-report-body" info-type="ich"/>
+    </doc-content>
+  </study-document>
+</ectd:study>

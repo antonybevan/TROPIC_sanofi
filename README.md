@@ -6,9 +6,9 @@
 **Cabazitaxel vs Mitoxantrone in mCRPC — Phase III RCT**
 *Sanofi · de Bono et al., Lancet 2010*
 
-[![CDISC](https://img.shields.io/badge/CDISC-ADaMIG%20v1.3%20%7C%20SDTMIG%20v3.1.1-005A9C?style=flat-square)](https://www.cdisc.org/)
+[![CDISC](https://img.shields.io/badge/CDISC-ADaMIG%20v1.3%20%7C%20SDTMIG%20v3.4-005A9C?style=flat-square)](https://www.cdisc.org/)
 [![Define-XML](https://img.shields.io/badge/Define--XML-2.1%20%2B%20ARM%20%28XSD%20validated%29-005A9C?style=flat-square)](07_define_xml/)
-[![eCTD](https://img.shields.io/badge/eCTD-Module%205%20%C2%A75.3-005A9C?style=flat-square)](06_telemetry/package_ectd.py)
+[![eCTD](https://img.shields.io/badge/eCTD-Module%205%20%E2%80%A2%20DTD--valid-005A9C?style=flat-square)](06_telemetry/package_ectd.py)
 [![R](https://img.shields.io/badge/R-4.6.0-276DC3?style=flat-square&logo=r)](https://www.r-project.org/)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python)](06_telemetry/cibuild.py)
 
@@ -109,7 +109,7 @@ TROPIC/
 ├── 02_production_sas/              # SAS 9.4 production ADaM programs
 │   ├── 00_config.sas               # Global paths, macros, options
 │   ├── 00_master_driver.sas        # Full SAS execution driver
-│   ├── S_sdtm_mapping.sas          # SDTM mapping structures (SDTMIG 3.1.1)
+│   ├── S_sdtm_mapping.sas          # SDTM mapping structures (3.1.1 source → 3.4 uplift)
 │   ├── L_staging_ingest.sas        # Staging ingest + SUPP-- transpose/merge
 │   ├── A_adsl_generation.sas       # ADSL — Subject Level
 │   ├── A_adex_generation.sas       # ADEX — Exposure
