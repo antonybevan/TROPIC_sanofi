@@ -4,6 +4,36 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.16.0] - 2026-06-20 — admiral third derivation track for ADSL + ADTTE (Finding #4)
+
+> **Context.** Adds a third, independent derivation track using the pharmaverse
+> `admiral` package (v1.5.0), reconciled cell-for-cell against the SAS production
+> track. Extends the reconciliation moat from two engines (bespoke SAS + bespoke R)
+> to a third built on the community-maintained reference implementation.
+
+### Added
+- **`03_validation_r/admiral_adsl.R`** — admiral ADSL core re-derivation
+  (`derive_vars_merged`, `derive_var_trtdurd`) → `04_adam/adsl_admiral.xpt`. All 16
+  admiral-derivable core variables reconcile **0-diff** vs `adsl_prod.xpt` (n=371).
+- **`03_validation_r/admiral_adtte.R`** — admiral ADTTE OS + PFS via
+  `derive_param_tte()` with `event_source`/`censor_source` → `04_adam/adtte_admiral.xpt`.
+  OS and PFS reconcile **0-diff** vs `adtte_prod.xpt` on STARTDT/ADT/AVAL/CNSR/EVNTDESC/CNSDTDSC.
+- **`05_reconciliation/admiral_reconcile.R`** — scoped, exact (0-tolerance) diff →
+  `06_telemetry/admiral_reconciliation_status.json` (overall **PASS**). Graceful
+  degradation: records `not_available` and exits 0 when admiral outputs are absent.
+- **`06_telemetry/ADMIRAL_RECONCILIATION.md`** — track documentation, scope, and the
+  PFS finding (admiral's event-precedence / latest-censor model vs the study's
+  NACT-before-progression censoring; faithful fix pre-derives the single PFS censor
+  date per the SAP). Initially surfaced as 39 censor-date differences (CNSR already
+  matched); resolved to 0.
+
+### Scope (honest, documented)
+- admiral re-derives the admiral-idiomatic **core** only; study-specific ADSL
+  covariates (PSABL/ECOGBL/… + `*IF`) and SAFETY ADTTE params (TTSAE/TTPAIN/TTPSA/
+  TTUMOR) remain with the SAS+R double-programming. MP arm only (synthetic CbzP is
+  downstream). Not yet wired into the gated `cibuild.py` (needs `admiral` in the CI
+  renv lockfile) — a deliberate follow-up.
+
 ## [3.15.0] - 2026-06-20 — SDTMIG 3.4 conformance uplift + current CT + authoritative CORE run (terminal-session remediation)
 
 > **Context.** Executes the SAS/CT/validator-gated submission-standard items from

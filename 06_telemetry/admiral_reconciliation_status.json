@@ -1,0 +1,11 @@
+{
+  "overall": "PASS",
+  "scope": "admiral-derivable core only; ADSL covariates + SAFETY TTE params out of scope; MP arm",
+  "tolerance": "exact (0 cell differences)",
+  "domains": {
+    "ADSL": {"n": 371, "cell_diffs": 0, "status": "PASS"},
+    "ADTTE.OS": {"n": 371, "cell_diffs": 0, "status": "PASS"},
+    "ADTTE.PFS": {"n": 371, "cell_diffs": 0, "status": "PASS"}
+  }
+}
+
