@@ -4,6 +4,25 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.17.0] - 2026-06-20 — Risk-based validation plan (Finding #7)
+
+> **Context.** Reframes the single-author QC posture as a deliberate,
+> risk-proportionate validation policy (ICH E9 / industry consensus: full independent
+> re-derivation is reserved for high-risk outputs, not mandated for all). Organizes the
+> existing validation machinery (ADRG §6) into explicit tiers and makes the
+> single-programmer limitation legible rather than a blanket gap.
+
+### Added
+- **`08_reviewers_guides/RISK_BASED_VALIDATION.md`** — validation tiers (T1 Critical →
+  T4 Structural), an output→tier→evidence map, and the honest single-author reframe.
+  Ties in Finding #4: primary efficacy (OS, PFS) + ADSL now carry **three** independent
+  derivation engines (SAS · R · admiral), secondary/derived carry two, metadata is
+  automated conformance — validation depth escalates with risk.
+
+### Changed
+- **`08_reviewers_guides/ADRG.md` §6** — adds a risk-allocation lead-in pointing to the
+  new plan; the section continues to document the underlying mechanics.
+
 ## [3.16.0] - 2026-06-20 — admiral third derivation track for ADSL + ADTTE (Finding #4)
 
 > **Context.** Adds a third, independent derivation track using the pharmaverse
