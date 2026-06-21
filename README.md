@@ -88,7 +88,7 @@ Real SDTM (SAS7BDAT)
                                     09_tfl/  (TFL Suite)
 ```
 
-> **Third track for the highest-risk endpoints.** Under the [risk-based validation plan](08_reviewers_guides/RISK_BASED_VALIDATION.md), ADSL and the primary efficacy endpoints (OS, PFS) are *additionally* re-derived with the pharmaverse **`admiral`** package and reconciled cell-for-cell (0-diff) against the SAS production track — see [`06_telemetry/ADMIRAL_RECONCILIATION.md`](06_telemetry/ADMIRAL_RECONCILIATION.md). Validation depth scales with risk: three engines on the critical endpoints, two on supporting datasets, automated conformance on metadata.
+> **Third track for the highest-risk endpoints.** Under the [risk-based validation plan](08_reviewers_guides/RISK_BASED_VALIDATION.md), ADSL and the primary efficacy endpoints (OS, PFS) are *additionally* re-derived with the pharmaverse **`admiral`** package and reconciled cell-for-cell (zero cell-level differences) against the SAS production track — see [`06_telemetry/ADMIRAL_RECONCILIATION.md`](06_telemetry/ADMIRAL_RECONCILIATION.md). Validation depth scales with risk: three engines on the critical endpoints, two on supporting datasets, automated conformance on metadata.
 
 ---
 
@@ -98,7 +98,7 @@ Real SDTM (SAS7BDAT)
 TROPIC/
 ├── study_manifest.yaml             # Pipeline structure — reconciled datasets, keys & 17-stage DAG
 ├── study_config.yaml               # Clinical parameters — thresholds, windows, imputation defaults
-├── 00_specifications/              # Single source of truth (audit C-4 inversion)
+├── 00_specifications/              # Single source of truth — ADaM spec governs define + data
 │   ├── ADaM_spec.xlsx              # Authoritative ADaM spec (metacore P21 format) — governs define + data
 │   └── build_spec_seed.R           # One-time migration that bootstrapped the spec from define.xml
 │
@@ -137,8 +137,8 @@ TROPIC/
 │   ├── v_adrs_validation.R         # ADRS independent R re-derivation
 │   ├── v_adtte_validation.R        # ADTTE independent R re-derivation
 │   ├── v_bimo_validation.R         # BIMO clinsite schema + re-derivation
-│   ├── admiral_adsl.R              # admiral 3rd-track re-derivation — ADSL core (Finding #4)
-│   ├── admiral_adtte.R             # admiral 3rd-track re-derivation — ADTTE OS/PFS (derive_param_tte)
+│   ├── admiral_adsl.R              # ADSL re-derivation via pharmaverse admiral
+│   ├── admiral_adtte.R             # ADTTE (OS, PFS) re-derivation via admiral derive_param_tte
 │   ├── load_spec.R                 # Loads ADaM_spec.xlsx → metacore object (single source of truth)
 │   └── spec_data_checks.R          # spec→data conformance (metacore/metatools/xportr)
 │
@@ -154,7 +154,7 @@ TROPIC/
 ├── 05_reconciliation/              # Cross-language, results & admiral reconciliation
 │   ├── cross_lang_audit.R          # diffdf cell-by-cell SAS↔R dataset reconciliation
 │   ├── results_reconcile.R         # analysis-results reconciliation (PROC LIFETEST vs survfit)
-│   └── admiral_reconcile.R         # admiral track ↔ SAS production reconciliation (Finding #4)
+│   └── admiral_reconcile.R         # admiral ↔ SAS production reconciliation
 │
 ├── 06_telemetry/                   # Pipeline Orchestration & Telemetry
 │   ├── cibuild.py                  # Python execution driver (manifest-driven 17-stage DAG; --study)
@@ -168,8 +168,8 @@ TROPIC/
 │   ├── validate_core_rules.py      # CI gate: CORE rule-pack well-formedness check
 │   ├── conformance_rules/adam/     # Executable ADaM conformance rules (CORE YAML)
 │   ├── conformance/                # CORE reports + CORE_RUN_RECORD.md (run evidence)
-│   ├── upstream_contributions/     # Prepared/submitted CDISC CORE engine fix (PR #1770, Finding #6)
-│   ├── ADMIRAL_RECONCILIATION.md   # admiral third-track scope + 0-diff results (Finding #4)
+│   ├── upstream_contributions/     # CDISC CORE engine contribution (cdisc-rules-engine PR #1770)
+│   ├── ADMIRAL_RECONCILIATION.md   # admiral reconciliation — scope, methodology, and results
 │   ├── health_dashboard.md         # Live pipeline status dashboard
 │   └── reconciliation_report.html  # diffdf audit HTML report
 │
@@ -179,14 +179,14 @@ TROPIC/
 │   ├── schema/                     # Vendored CDISC Define-XML 2.1 + ARM + ODM XSD bundle
 │   ├── validate_xsd.sh             # Authoritative XSD validation (xmllint vs vendored schema)
 │   ├── validate_define.py          # Fast no-deps structural + referential-integrity gate
-│   └── check_define_conformance.R  # spec→define conformance gate (C-4 inversion; --self-test)
+│   └── check_define_conformance.R  # spec→define conformance gate (self-testing)
 │
 ├── 08_reviewers_guides/            # Submission Documentation
 │   ├── ADRG.md                     # Analysis Data Reviewer's Guide
 │   ├── SDRG.md                     # SDTM Data Reviewer's Guide
 │   ├── BDRG.md                     # BIMO Data Reviewer's Guide (clinsite)
 │   ├── SDSP.md                     # Study Data Standardization Plan
-│   ├── RISK_BASED_VALIDATION.md    # Risk-based validation tiering plan (Finding #7)
+│   ├── RISK_BASED_VALIDATION.md    # Risk-based validation tiering plan
 │   └── TRACEABILITY_MATRIX.md      # End-to-end spec ↔ define ↔ data ↔ TFL traceability
 │
 ├── 09_tfl/                         # Tables, Figures & Listings
@@ -257,7 +257,7 @@ Expected output (default `sim` mode):
 [SUCCESS] Stage 12 — Cross-Language Audit Reconcile
 [SUCCESS] Stage 13 — Efficacy & Safety TFL Suite Compilation
 [SKIPPED] Stage 14 — Numerical Results Reconciliation (SAS vs R)   # PASS under --real-sas
-[SUCCESS] Stage 15 — ADaM Spec to Define Conformance              # spec governs define (C-4)
+[SUCCESS] Stage 15 — ADaM Spec to Define Conformance              # spec governs define
 [SUCCESS] Stage 16 — ADaM Spec to Data Conformance                # metacore/metatools/xportr
 [SUCCESS] Stage 17 — eCTD Final Package
 All clinical pipeline stages compiled successfully!
