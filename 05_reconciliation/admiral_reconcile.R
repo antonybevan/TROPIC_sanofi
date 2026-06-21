@@ -32,27 +32,40 @@ cat("NOTE: [ADMIRAL-RECON] Starting admiral<->SAS reconciliation (scoped core)..
 # match, so it must not poison the count with NA).
 col_diffs <- function(a, b) {
   if (inherits(b, "Date")) a <- as.Date(a)
-  if (is.numeric(b)) { a <- as.numeric(a); b <- as.numeric(b) }
-  else { a <- trimws(as.character(a)); b <- trimws(as.character(b)) }
+  if (is.numeric(b)) {
+    a <- as.numeric(a)
+    b <- as.numeric(b)
+  } else {
+    a <- trimws(as.character(a))
+    b <- trimws(as.character(b))
+  }
   sum((is.na(a) != is.na(b)) | (!is.na(a) & !is.na(b) & a != b))
 }
 
 reconcile <- function(adm_path, prod_path, cols, key_extra = NULL,
                       param = NULL, param_col = "PARAMCD") {
   if (!file.exists(adm_path) || !file.exists(prod_path)) return(NULL)
-  ad <- read_xpt(adm_path); names(ad) <- toupper(names(ad))
-  pr <- read_xpt(prod_path); names(pr) <- toupper(names(pr))
+  ad <- read_xpt(adm_path)
+  names(ad) <- toupper(names(ad))
+  pr <- read_xpt(prod_path)
+  names(pr) <- toupper(names(pr))
   if (!is.null(param)) {
-    ad <- ad[ad[[param_col]] == param, ]; pr <- pr[pr[[param_col]] == param, ]
+    ad <- ad[ad[[param_col]] == param, ]
+    pr <- pr[pr[[param_col]] == param, ]
   }
   ord <- function(d) d[do.call(order, d[c("USUBJID", key_extra)]), ]
-  ad <- ord(ad); pr <- ord(pr)
+  ad <- ord(ad)
+  pr <- ord(pr)
   # Compare on the common subject set (admiral covers the real MP cohort).
   common <- intersect(ad$USUBJID, pr$USUBJID)
-  ad <- ad[ad$USUBJID %in% common, ]; pr <- pr[pr$USUBJID %in% common, ]
+  ad <- ad[ad$USUBJID %in% common, ]
+  pr <- pr[pr$USUBJID %in% common, ]
   total <- 0L
   for (v in cols) {
-    if (!v %in% names(ad) || !v %in% names(pr)) { total <- total + nrow(pr); next }
+    if (!v %in% names(ad) || !v %in% names(pr)) {
+      total <- total + nrow(pr)
+      next
+    }
     total <- total + col_diffs(ad[[v]], pr[[v]])
   }
   list(n = length(common), diffs = total, status = if (total == 0) "PASS" else "FAIL")
@@ -77,7 +90,8 @@ if (length(avail) == 0) {
 for (nm in names(results)) {
   r <- results[[nm]]
   if (is.null(r)) {
-    cat(sprintf("NOTE: [ADMIRAL-RECON] %-10s -> not_available\n", nm)); next
+    cat(sprintf("NOTE: [ADMIRAL-RECON] %-10s -> not_available\n", nm))
+    next
   }
   cat(sprintf("NOTE: [ADMIRAL-RECON] %-10s n=%-4d cell-diffs=%-3d -> %s\n",
               nm, r$n, r$diffs, r$status))
