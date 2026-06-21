@@ -153,7 +153,7 @@ adsl <- dm |>
     AGE = if_else(AGEGRP == ">=85", 85, suppressWarnings(as.numeric(AGEGRP))),
     AGEGR1 = if_else(AGE < .env$AGE_STRAT_CUT, "<65", ">=65"),
     AGEGR1N = if_else(AGE < .env$AGE_STRAT_CUT, 1.0, 2.0),
-    ETHNIC = "NOT HISPANIC OR LATINO",
+    ETHNIC = "NOT REPORTED",
     SEX = "M",
     TRT01P = .env$TRT01P_CODE,
     TRT01PN = .env$TRT01PN_CODE,

@@ -333,7 +333,7 @@
       <Description><TranslatedText xml:lang="en">Race</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADSL.ETHNIC" Name="ETHNIC" DataType="text" Length="40">
-      <Description><TranslatedText xml:lang="en">Ethnicity</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
+      <Description><TranslatedText xml:lang="en">Ethnicity</TranslatedText></Description><def:Origin Type="Assigned" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADSL.SEX" Name="SEX" DataType="text" Length="2">
       <Description><TranslatedText xml:lang="en">Sex</TranslatedText></Description><CodeListRef CodeListOID="CL.SEX"/>

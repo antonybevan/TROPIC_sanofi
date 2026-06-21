@@ -230,7 +230,7 @@ adsl_cbzp <- data.frame(
   AGEGR1   = if_else(age_raw < 65, "<65", ">=65"),
   AGEGR1N  = if_else(age_raw < 65, 1.0, 2.0),
   RACE     = race_raw,
-  ETHNIC   = "NOT HISPANIC OR LATINO",
+  ETHNIC   = "NOT REPORTED",
   SEX      = "M",
   TRT01P   = "CbzP",
   TRT01PN  = 1.0,

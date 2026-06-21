@@ -4,6 +4,29 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.18.0] - 2026-06-21 — Honest unsourced demographics (Finding #8)
+
+> **Context.** Closes the hardcoded-demographics hygiene finding. The de-identified
+> public release does not carry ethnicity or site geography; the pipeline previously
+> asserted specific values for them. Those are now represented honestly. `SEX = 'M'`
+> is retained (clinically justified — mCRPC is exclusively male) and `RACE` continues
+> to be carried from source SDTM `DM`.
+
+### Changed
+- **`ETHNIC`** — was hardcoded to `'NOT HISPANIC OR LATINO'` although ethnicity is not
+  collected in the source. Now set to the CDISC controlled-terminology value
+  `'NOT REPORTED'` in both the SAS production (`A_adsl_generation.sas`) and R
+  validation (`v_adsl_validation.R`) tracks, so the two still reconcile.
+- **define.xml (+ m5 copy)** — `IT.ADSL.ETHNIC` `def:Origin` changed
+  `Type="Collected"` → `Type="Assigned"`; the value is sponsor-assigned, not observed.
+- **`ADRG.md` §5.3** — documents the `ETHNIC` treatment and corrects a stale claim that
+  `COUNTRY`/`REGION` are assigned to `'IND'`/`'REST OF WORLD'`; those indicators are not
+  present in the de-identified release and no placeholder geography is assigned.
+
+### Note
+The ADRS investigator-vs-derived `OVRLRESP` union (the other half of Finding #8) was
+already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
+
 ## [3.17.0] - 2026-06-20 — Risk-based validation plan (Finding #7)
 
 > **Context.** Reframes the single-author QC posture as a deliberate,

@@ -210,7 +210,7 @@ proc sql;
             else 2
         end as AGEGR1N,
         dm.race as RACE length=40,
-        'NOT HISPANIC OR LATINO' as ETHNIC length=40,
+        'NOT REPORTED' as ETHNIC length=40,
         'M' as SEX length=1,
 
         "&TRT01P_CODE." as TRT01P length=20,

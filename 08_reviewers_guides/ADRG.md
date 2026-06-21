@@ -88,7 +88,7 @@ Several baseline laboratory variables are carried on ADSL to satisfy the ADaM sc
 The ADLB windowing schema leaves Days 35–38 unassigned (between the C2D8 window [Days 25–34] and C3D1 window [Days 39–45]). Laboratory assessments on Days 35–38 are assigned `AVISITN = 99` (Unscheduled) and are excluded from the primary `ANL01FL = 'Y'` worst-case analysis. This is consistent with the protocol visit schedule and **SAP v3.0 §11.1.3 (ADLB Analysis Windows — CBC Schedule)**, which does not specify a Day 35–38 nominal visit.
 
 ### 5.3 Demographic Covariates
-All subjects are assigned `SEX = 'M'` in `A_adsl_generation.sas`. This demographic assignment matches the actual study cohort (metastatic castration-resistant prostate cancer, which is exclusively male). Geographic indicators `COUNTRY` and `REGION` are assigned to `'IND'` and `'REST OF WORLD'` as default placeholder categories since site geographic source metadata was unavailable.
+All subjects are assigned `SEX = 'M'` in `A_adsl_generation.sas`. This demographic assignment matches the actual study cohort (metastatic castration-resistant prostate cancer, which is exclusively male). `RACE` is carried from the source SDTM `DM`. `ETHNIC` was **not collected** in the de-identified public release; it is therefore set to the CDISC controlled-terminology value `'NOT REPORTED'` and carries `def:Origin Type="Assigned"` (not `Collected`) in the define, so it is not presented as observed data. Geographic indicators `COUNTRY` and `REGION` are **not present** in the de-identified release and are not derived (see the note in `B_bimo_generation.sas`); no placeholder geography is assigned.
 
 ### 5.4 Analysis Populations — Source-Inherited and Non-Discriminating (audit F-3)
 
