@@ -30,8 +30,10 @@ adsl <- adsl |>
 
 # Event dates pulled from the existing ADaM intermediates (same inputs both other
 # tracks use): first PD from ADRS, first new-anti-cancer-therapy from ADCM.
-adrs <- read_xpt("04_adam/adrs_v.xpt"); names(adrs) <- toupper(names(adrs))
-adcm <- read_xpt("04_adam/adcm_v.xpt"); names(adcm) <- toupper(names(adcm))
+adrs <- read_xpt("04_adam/adrs_v.xpt")
+names(adrs) <- toupper(names(adrs))
+adcm <- read_xpt("04_adam/adcm_v.xpt")
+names(adcm) <- toupper(names(adcm))
 
 first_pd <- adrs |>
   filter((PARAMCD == "OVRLRESP" & AVALC == "PD") |
