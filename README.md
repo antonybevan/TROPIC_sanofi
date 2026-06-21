@@ -18,7 +18,7 @@
 
 ## Overview
 
-This repository is an end-to-end **analysis-data production and reporting pipeline** for the TROPIC Phase III trial, structured to mirror a U.S. FDA electronic submission. Independent SAS 9.4 and R tracks derive CDISC-conformant **ADaM** analysis datasets from the source **SDTM** tabulations; a Python orchestrator (`06_telemetry/cibuild.py`) drives the 17-stage build, and an automated packaging step (`06_telemetry/package_ectd.py`) assembles the deliverables into the canonical **eCTD Module 5 (Section 5.3)** directory structure prescribed by the FDA *Study Data Technical Conformance Guide* (SDTCG). Quality control is performed by **cross-language implementation reconciliation** — independent SAS and R implementations of each derivation (single-author, therefore *implementation* reconciliation rather than two-programmer GxP double programming; see [ADRG §6](08_reviewers_guides/ADRG.md)) — at both the **analysis-dataset** level (cell-by-cell `diffdf`) and the **analysis-results** level (SAS `PROC LIFETEST` vs R `survfit`). Submission metadata is delivered as machine-readable **Define-XML v2.1 with Analysis Results Metadata (ARM)**, governed by an upstream **ADaM specification (single source of truth)**, and accompanied by PHUSE-style **data Reviewer's Guides** (ADRG / SDRG / BIMO BDRG) and the **Tables, Figures & Listings (TFL)** set.
+This repository is an end-to-end **analysis-data production and reporting pipeline** for the TROPIC Phase III trial, structured to mirror a U.S. FDA electronic submission. Independent SAS 9.4 and R tracks derive CDISC-conformant **ADaM** analysis datasets from the source **SDTM** tabulations; a Python orchestrator (`06_telemetry/cibuild.py`) drives the 17-stage build, and an automated packaging step (`06_telemetry/package_ectd.py`) assembles the deliverables into the canonical **eCTD Module 5 (Section 5.3)** directory structure prescribed by the FDA *Study Data Technical Conformance Guide* (SDTCG). Quality control is performed by **cross-language implementation reconciliation** — independent SAS and R implementations of each derivation (single-author, therefore *implementation* reconciliation rather than two-programmer GxP double programming; see [ADRG §6](08_reviewers_guides/ADRG.md)) — at both the **analysis-dataset** level (cell-by-cell `diffdf`) and the **analysis-results** level (SAS `PROC LIFETEST` vs R `survfit`), allocated by an explicit **[risk-based validation plan](08_reviewers_guides/RISK_BASED_VALIDATION.md)** under which the highest-risk endpoints (OS, PFS) and ADSL additionally carry a **third independent derivation built with the pharmaverse `admiral` package**, reconciled cell-for-cell against the SAS track ([ADMIRAL_RECONCILIATION.md](06_telemetry/ADMIRAL_RECONCILIATION.md)). Submission metadata is delivered as machine-readable **Define-XML v2.1 with Analysis Results Metadata (ARM)**, governed by an upstream **ADaM specification (single source of truth)**, and accompanied by PHUSE-style **data Reviewer's Guides** (ADRG / SDRG / BIMO BDRG) and the **Tables, Figures & Listings (TFL)** set.
 
 > **Scope & reproducibility (read first):** This is a portfolio/demonstration project. The real MP-arm SDTM source and ODA credentials are **not** committed (patient-data protection + secrets hygiene), so a bare clone cannot re-run the *real* pipeline — see **[REPRODUCIBILITY.md](REPRODUCIBILITY.md)** for the data-access path, the pinned environment, and a **self-contained `--demo` smoke test** that runs on a clean clone with no real data, no SAS, and no credentials. The comparator (Cabazitaxel) arm is **synthetic and illustrative** (see *Data provenance*); only the real Mitoxantrone arm is reconciled SAS↔R. A genuine SAS↔R reconciliation requires a run executed against a **real** SAS engine (`--real-sas`, recorded `sas_execution_mode` = `oda`/`local`); the **default** no-engine invocation runs in **`sim`** mode, where a zero-difference reconciliation is tautological. Always check `sas_execution_mode` in `06_telemetry/pipeline_health.json` before reading any reconciliation result as double-programming evidence.
 
@@ -88,6 +88,8 @@ Real SDTM (SAS7BDAT)
                                     09_tfl/  (TFL Suite)
 ```
 
+> **Third track for the highest-risk endpoints.** Under the [risk-based validation plan](08_reviewers_guides/RISK_BASED_VALIDATION.md), ADSL and the primary efficacy endpoints (OS, PFS) are *additionally* re-derived with the pharmaverse **`admiral`** package and reconciled cell-for-cell (0-diff) against the SAS production track — see [`06_telemetry/ADMIRAL_RECONCILIATION.md`](06_telemetry/ADMIRAL_RECONCILIATION.md). Validation depth scales with risk: three engines on the critical endpoints, two on supporting datasets, automated conformance on metadata.
+
 ---
 
 ## Repository Structure
@@ -135,6 +137,8 @@ TROPIC/
 │   ├── v_adrs_validation.R         # ADRS independent R re-derivation
 │   ├── v_adtte_validation.R        # ADTTE independent R re-derivation
 │   ├── v_bimo_validation.R         # BIMO clinsite schema + re-derivation
+│   ├── admiral_adsl.R              # admiral 3rd-track re-derivation — ADSL core (Finding #4)
+│   ├── admiral_adtte.R             # admiral 3rd-track re-derivation — ADTTE OS/PFS (derive_param_tte)
 │   ├── load_spec.R                 # Loads ADaM_spec.xlsx → metacore object (single source of truth)
 │   └── spec_data_checks.R          # spec→data conformance (metacore/metatools/xportr)
 │
@@ -147,8 +151,10 @@ TROPIC/
 │   ├── adrs_v.xpt / adrs_prod.xpt
 │   └── adtte_v.xpt / adtte_prod.xpt
 │
-├── 05_reconciliation/              # Cross-Language Audit
-│   └── cross_lang_audit.R          # diffdf cell-by-cell reconciliation engine
+├── 05_reconciliation/              # Cross-language, results & admiral reconciliation
+│   ├── cross_lang_audit.R          # diffdf cell-by-cell SAS↔R dataset reconciliation
+│   ├── results_reconcile.R         # analysis-results reconciliation (PROC LIFETEST vs survfit)
+│   └── admiral_reconcile.R         # admiral track ↔ SAS production reconciliation (Finding #4)
 │
 ├── 06_telemetry/                   # Pipeline Orchestration & Telemetry
 │   ├── cibuild.py                  # Python execution driver (manifest-driven 17-stage DAG; --study)
@@ -162,6 +168,8 @@ TROPIC/
 │   ├── validate_core_rules.py      # CI gate: CORE rule-pack well-formedness check
 │   ├── conformance_rules/adam/     # Executable ADaM conformance rules (CORE YAML)
 │   ├── conformance/                # CORE reports + CORE_RUN_RECORD.md (run evidence)
+│   ├── upstream_contributions/     # Prepared/submitted CDISC CORE engine fix (PR #1770, Finding #6)
+│   ├── ADMIRAL_RECONCILIATION.md   # admiral third-track scope + 0-diff results (Finding #4)
 │   ├── health_dashboard.md         # Live pipeline status dashboard
 │   └── reconciliation_report.html  # diffdf audit HTML report
 │
@@ -176,7 +184,10 @@ TROPIC/
 ├── 08_reviewers_guides/            # Submission Documentation
 │   ├── ADRG.md                     # Analysis Data Reviewer's Guide
 │   ├── SDRG.md                     # SDTM Data Reviewer's Guide
-│   └── BDRG.md                     # BIMO Data Reviewer's Guide (clinsite)
+│   ├── BDRG.md                     # BIMO Data Reviewer's Guide (clinsite)
+│   ├── SDSP.md                     # Study Data Standardization Plan
+│   ├── RISK_BASED_VALIDATION.md    # Risk-based validation tiering plan (Finding #7)
+│   └── TRACEABILITY_MATRIX.md      # End-to-end spec ↔ define ↔ data ↔ TFL traceability
 │
 ├── 09_tfl/                         # Tables, Figures & Listings
 │   ├── tfl_generation.R            # Full TFL compilation script
@@ -192,6 +203,11 @@ TROPIC/
 │       │   └── sas/                # SAS-generated figures (OS/PFS/subgroup/Optimus)
 │       ├── tables/                 # Efficacy/safety text tables (T-11, T-17, T-20, T-21)
 │       └── listings/               # Subject listings (L-01-1)
+│
+├── 10_datasetjson/                 # Dataset-JSON v1.1 export (CDISC next-gen transport) — README tracked; data not
+├── 11_ectd/                        # eCTD sequence 0000 — DTD-valid backbone (index.xml + STF + US regional) + util/dtd
+├── 12_ars/                         # CDISC Analysis Results Standard — ARD (tropic_ard.csv) + reporting-event metadata
+├── 13_usdm/                        # CDISC USDM — digital study design model (tropic_usdm.json)
 │
 ├── studies/                        # Multi-study engine — per-study manifest/config/programs
 │   ├── README.md                   # How to add a study
@@ -336,10 +352,10 @@ The pipeline is engineered to mirror the data-standards expectations of a U.S. F
 |---|---|
 | CDISC ADaMIG v1.3 | ADaM structure/metadata modelled for all 7 datasets (real MP arm) |
 | CDISC Define-XML 2.1 + ARM v1.0 | Both `define.xml` (ADaM) and `define_sdtm.xml` **pass full XSD validation** (`07_define_xml/validate_xsd.sh`) **and parse cleanly in the CDISC CORE reference engine** (`Define_XML_Version 2.1.0`). The CORE run surfaced + fixed 3 defects the XSD check missed (invalid `Role` on `ItemGroupDef`, empty `TranslatedText`, missing `def:Class`). |
-| **CDISC CORE business-rule conformance** | **Real CDISC reference-engine run** (CORE 0.16.0). **SDTM:** 392 SDTMIG-3.2 rules executed (`06_telemetry/conformance/core_sdtm_report.json`; SDTMIG 3.1.1-vs-3.2 version-gap caveat). **ADaM:** CORE/CDISC Library ships **0 executable ADaM rules**, so executable ADaM rules are authored in CORE YAML (`06_telemetry/conformance_rules/adam/`) and run via `--local-rules` → 7/7 SUCCESS. See `06_telemetry/conformance/CORE_RUN_RECORD.md`. Official `AD####` rule IDs are members-only. |
+| **CDISC CORE business-rule conformance** | **Real CDISC reference-engine run** (CORE 0.16.0). **SDTM:** 392 SDTMIG-3.2 rules executed (`06_telemetry/conformance/core_sdtm_report.json`; SDTMIG 3.1.1-vs-3.2 version-gap caveat). **ADaM:** CORE/CDISC Library ships **0 executable ADaM rules**, so executable ADaM rules are authored in CORE YAML (`06_telemetry/conformance_rules/adam/`) and run via `--local-rules` → 7/7 SUCCESS. See `06_telemetry/conformance/CORE_RUN_RECORD.md`. Official `AD####` rule IDs are members-only. A gate-consistency fix surfaced while authoring these rules was submitted upstream to the engine ([cdisc-rules-engine PR #1770](https://github.com/cdisc-org/cdisc-rules-engine/pull/1770)). |
 | CDISC SDTMIG v3.1.1 | Trial-era source SDTM standard (per SAP v3.0 §1) consumed and structurally validated |
 | ADaM specification — single source of truth | Authoring-format `ADaM_spec.xlsx` (metacore / Pinnacle 21) governs both `define.xml` and the produced data; automated **spec→define** and **spec→data** (metacore/metatools/xportr) conformance gates run in the pipeline and CI |
-| FDA Study Data Technical Conformance Guide | eCTD Module 5 (Section 5.3) folder layout, SAS Transport (XPORT v5) datasets, and a co-located `define.xml` per dataset folder, assembled by `package_ectd.py`. Structure followed only — **not** a validated submission sequence (no eCTD `index.xml` backbone) |
+| FDA Study Data Technical Conformance Guide | eCTD Module 5 (Section 5.3) folder layout, SAS Transport (XPORT v5) datasets, and a co-located `define.xml` per dataset folder, assembled by `package_ectd.py`. A **DTD-valid eCTD sequence backbone** (`index.xml` + STF + US regional metadata) is materialised under `11_ectd/0000/` (`materialize_ectd.py`); application identifiers are `EXAMPLE` placeholders, so it demonstrates the sequence structure rather than a real submission |
 | FDA BIMO Technical Conformance Guide | Clinical-site-level dataset (`clinsite`) with per-site enrollment/safety roll-ups + a BIMO Data Reviewer's Guide (BDRG). Site investigator name (`INVNAM`) is a **flagged synthetic placeholder** |
 | ICH E9 (Statistical Principles) | Hierarchical step-down gatekeeping **pattern implemented** (exercised on a synthetic comparator — not an inferential result) |
 | ICH E3 (TFL Catalogue) | TFL set rendered in NEJM/Lancet style |
