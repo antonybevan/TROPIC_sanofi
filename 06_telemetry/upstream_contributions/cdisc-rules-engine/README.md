@@ -1,56 +1,39 @@
-# Upstream contributions → `cdisc-org/cdisc-rules-engine`
+# Upstream contribution: cdisc-org/cdisc-rules-engine
 
-Prepared while authoring executable ADaM conformance rules for TROPIC. **Verified
-against current upstream `main` (2026-06-20)** — not against a stale tag.
+**Status: SUBMITTED — [PR #1770](https://github.com/cdisc-org/cdisc-rules-engine/pull/1770)**
+(branch `fix/standardtypes-adam-products`, base `main`, author antonybevan, DCO signed).
 
-## Contents
+## What it fixes
 
-| File | Kind | What |
-|---|---|---|
-| `0001-sync-adam-products-into-standardtypes.patch` | **PR (fix in hand)** | Adds the 6 ADaM products still missing from the CLI `StandardTypes` gate (`adam-adae`, `adam-md`, `adam-nca`, `adam-occds`, `adam-tte`, `adam-poppk`) so they match `ADAM_PRODUCTS` / `normalize_standard_input()`. |
-| `PR_sync-adam-products.md` | PR body | Summary, reproduction, root cause (incomplete #1733 sync), test plan, DCO note. |
-| `ISSUE_same-operator-same-dataset-collision.md` | **Issue (no fix)** | Two same-operator rules on the same dataset collide in the per-run operation-result cache. Reproduction + diagnosis only. |
+`StandardTypes` is the allow-list the CLI uses to validate `-s/--standard`; `core.py`
+rejects any value not in `StandardTypes.values()`. On `main` it lists `adamig` but not
+the other six ADaM products in `ADAM_PRODUCTS` (`adam-adae`, `adam-md`, `adam-nca`,
+`adam-occds`, `adam-tte`, `adam-poppk`), which `normalize_standard_input()` already
+handles. So `-s adam-tte` is rejected before the engine runs. The PR adds the six
+products to the enum and a test that keeps the gate in sync with `ADAM_PRODUCTS`,
+completing the normalization begun in PR #1733.
 
-## Verification (why this is real, not a waste)
+## Verification (against `main`, 2026-06-21)
 
-Checked against `cdisc-org/cdisc-rules-engine@main`, not the local `v0.16.0` clone:
+- The original `-s adamig` gate fix is already upstream (PR #1733, merged 2026-06-05),
+  so it was not resubmitted.
+- `StandardTypes` lists `adamig` only; `ADAM_PRODUCTS` lists all 7;
+  `normalize_standard_input()` maps all 7; `core.py` hard-exits on unlisted values.
+  The six-product gap is therefore real and the fix is additive.
+- No open PR duplicated it.
+- `black` and `flake8` pass on both changed files; the new test passes.
 
-- **The original `-s adamig` gate bug is already fixed upstream** (PR #1733, merged
-  2026-06-05). That headline fix is *gone* — do not resubmit it.
-- **`StandardTypes` (main)** has `adamig` but still omits the other 6 ADaM products.
-- **`ADAM_PRODUCTS` (main)** still lists all 7.
-- **`normalize_standard_input()` (main)** still maps all 7 via `ADAM_PRODUCTS`.
-- **`core.py`** hard-exits (`ctx.exit(2)`) on any `-s` value not in
-  `StandardTypes.values()`.
-- ⇒ `-s adam-tte` (and the 5 others) are rejected despite full engine support. The
-  6-line additive fix completes #1733's normalization. **No open PR duplicates it.**
-- Patch verified to `git apply` cleanly to current `main`; patched file parses.
+## Files (local record)
 
-This is a **minor, correct, mergeable** consistency fix — submitted for the durable
-"contributor to `cdisc-org/cdisc-rules-engine`" credential, not for novelty (the
-novel `adamig` window has closed).
+| File | Purpose |
+|---|---|
+| `0001-sync-adam-products-into-standardtypes.patch` | The fix as a standalone patch (as submitted). |
+| `PR_sync-adam-products.md` | Draft PR body (the live PR body is equivalent). |
+| `ISSUE_same-operator-same-dataset-collision.md` | A separate engine bug (same-operator/same-dataset operation-result cache collision), prepared but **not yet filed**. Reproduction and diagnosis only. |
 
-## Why not the `TROPIC-ADAM-###` rules
+## Not contributed: the `TROPIC-ADAM-###` rules
 
 The seven local rules in `../conformance_rules/adam/` are a seed pack (key-variable
-population) with placeholder IDs — **not** upstream-contributable (CDISC's pack is
-authored from the official ADaM Conformance Rules spreadsheet under governed `AD####`
-IDs). The engine fix here is the real contribution.
-
-## How to submit (manual — `gh` not available in this environment)
-
-Submitting publishes under your GitHub identity with your DCO sign-off, so this is
-left for you to drive:
-
-```bash
-# Fork cdisc-org/cdisc-rules-engine on GitHub, then:
-git clone https://github.com/<you>/cdisc-rules-engine && cd cdisc-rules-engine
-git checkout -b fix/sync-adam-products-into-standardtypes
-git apply /path/to/0001-sync-adam-products-into-standardtypes.patch
-git commit -s -am "fix(cli): sync remaining ADaM products into StandardTypes (follow-up #1733)"
-git push -u origin fix/sync-adam-products-into-standardtypes
-# Open the PR using PR_sync-adam-products.md as the body.
-
-# Separately, open the cache-collision issue using
-# ISSUE_same-operator-same-dataset-collision.md as the body.
-```
+population) with placeholder IDs. They are not upstream-contributable: CDISC authors
+its rule pack from the official ADaM Conformance Rules spreadsheet under governed
+`AD####` IDs. The engine fix in PR #1770 is the contribution.
