@@ -6,9 +6,9 @@
 **Cabazitaxel vs Mitoxantrone in mCRPC — Phase III RCT**
 *Sanofi · de Bono et al., Lancet 2010*
 
-[![CDISC](https://img.shields.io/badge/CDISC-ADaMIG%20v1.3%20%7C%20SDTMIG%20v3.1.1-005A9C?style=flat-square)](https://www.cdisc.org/)
+[![CDISC](https://img.shields.io/badge/CDISC-ADaMIG%20v1.3%20%7C%20SDTMIG%20v3.4-005A9C?style=flat-square)](https://www.cdisc.org/)
 [![Define-XML](https://img.shields.io/badge/Define--XML-2.1%20%2B%20ARM%20%28XSD%20validated%29-005A9C?style=flat-square)](07_define_xml/)
-[![eCTD](https://img.shields.io/badge/eCTD-Module%205%20%C2%A75.3-005A9C?style=flat-square)](06_telemetry/package_ectd.py)
+[![eCTD](https://img.shields.io/badge/eCTD-Module%205%20%E2%80%A2%20DTD--valid-005A9C?style=flat-square)](06_telemetry/package_ectd.py)
 [![R](https://img.shields.io/badge/R-4.6.0-276DC3?style=flat-square&logo=r)](https://www.r-project.org/)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python)](06_telemetry/cibuild.py)
 
@@ -94,6 +94,8 @@ Real SDTM (SAS7BDAT)
 
 ```
 TROPIC/
+├── study_manifest.yaml             # Pipeline structure — reconciled datasets, keys & 17-stage DAG
+├── study_config.yaml               # Clinical parameters — thresholds, windows, imputation defaults
 ├── 00_specifications/              # Single source of truth (audit C-4 inversion)
 │   ├── ADaM_spec.xlsx              # Authoritative ADaM spec (metacore P21 format) — governs define + data
 │   └── build_spec_seed.R           # One-time migration that bootstrapped the spec from define.xml
@@ -107,7 +109,7 @@ TROPIC/
 ├── 02_production_sas/              # SAS 9.4 production ADaM programs
 │   ├── 00_config.sas               # Global paths, macros, options
 │   ├── 00_master_driver.sas        # Full SAS execution driver
-│   ├── S_sdtm_mapping.sas          # SDTM mapping structures (SDTMIG 3.1.1)
+│   ├── S_sdtm_mapping.sas          # SDTM mapping structures (3.1.1 source → 3.4 uplift)
 │   ├── L_staging_ingest.sas        # Staging ingest + SUPP-- transpose/merge
 │   ├── A_adsl_generation.sas       # ADSL — Subject Level
 │   ├── A_adex_generation.sas       # ADEX — Exposure
@@ -149,7 +151,8 @@ TROPIC/
 │   └── cross_lang_audit.R          # diffdf cell-by-cell reconciliation engine
 │
 ├── 06_telemetry/                   # Pipeline Orchestration & Telemetry
-│   ├── cibuild.py                  # Python execution driver (17 stages; Job B reconcile)
+│   ├── cibuild.py                  # Python execution driver (manifest-driven 17-stage DAG; --study)
+│   ├── manifest.py                 # Study-manifest loader (datasets, keys, identity, DAG structure)
 │   ├── package_ectd.py             # eCTD Module 5 packaging orchestrator
 │   ├── oda_broker.py               # Resilient ODA connection broker (probe-earned 'oda' mode)
 │   ├── seed_sdtm.py                # Job A: idempotent, manifest-checked SDTM seeding
@@ -189,6 +192,10 @@ TROPIC/
 │       │   └── sas/                # SAS-generated figures (OS/PFS/subgroup/Optimus)
 │       ├── tables/                 # Efficacy/safety text tables (T-11, T-17, T-20, T-21)
 │       └── listings/               # Subject listings (L-01-1)
+│
+├── studies/                        # Multi-study engine — per-study manifest/config/programs
+│   ├── README.md                   # How to add a study
+│   └── DEMO02/                     # Synthetic proof study (ADSL+ADAE) — `cibuild.py --study DEMO02`
 │
 └── m5/                             # eCTD Module 5 (Sec 5.3) — data-free preview tracked; *.xpt never tracked
     ├── datasets/tropic/
@@ -242,6 +249,10 @@ All clinical pipeline stages compiled successfully!
 
 > Stage 14 transparently reports **`SKIPPED`** in `sim`/`cached` mode (no real SAS `PROC LIFETEST`
 > statistics exist to reconcile); under `--real-sas` it computes and reports a genuine `PASS`/`FAIL`.
+
+> **Multi-study.** The engine is study-agnostic — pipeline *structure* lives in `study_manifest.yaml`,
+> not in code. A second study runs through the **same** engine via
+> `python3 06_telemetry/cibuild.py --study DEMO02` (see [`studies/README.md`](studies/README.md)).
 
 ### eCTD Module 5 Submission Package
 

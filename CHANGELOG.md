@@ -4,6 +4,138 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.17.0] - 2026-06-20 — Risk-based validation plan (Finding #7)
+
+> **Context.** Reframes the single-author QC posture as a deliberate,
+> risk-proportionate validation policy (ICH E9 / industry consensus: full independent
+> re-derivation is reserved for high-risk outputs, not mandated for all). Organizes the
+> existing validation machinery (ADRG §6) into explicit tiers and makes the
+> single-programmer limitation legible rather than a blanket gap.
+
+### Added
+- **`08_reviewers_guides/RISK_BASED_VALIDATION.md`** — validation tiers (T1 Critical →
+  T4 Structural), an output→tier→evidence map, and the honest single-author reframe.
+  Ties in Finding #4: primary efficacy (OS, PFS) + ADSL now carry **three** independent
+  derivation engines (SAS · R · admiral), secondary/derived carry two, metadata is
+  automated conformance — validation depth escalates with risk.
+
+### Changed
+- **`08_reviewers_guides/ADRG.md` §6** — adds a risk-allocation lead-in pointing to the
+  new plan; the section continues to document the underlying mechanics.
+
+## [3.16.0] - 2026-06-20 — admiral third derivation track for ADSL + ADTTE (Finding #4)
+
+> **Context.** Adds a third, independent derivation track using the pharmaverse
+> `admiral` package (v1.5.0), reconciled cell-for-cell against the SAS production
+> track. Extends the reconciliation moat from two engines (bespoke SAS + bespoke R)
+> to a third built on the community-maintained reference implementation.
+
+### Added
+- **`03_validation_r/admiral_adsl.R`** — admiral ADSL core re-derivation
+  (`derive_vars_merged`, `derive_var_trtdurd`) → `04_adam/adsl_admiral.xpt`. All 16
+  admiral-derivable core variables reconcile **0-diff** vs `adsl_prod.xpt` (n=371).
+- **`03_validation_r/admiral_adtte.R`** — admiral ADTTE OS + PFS via
+  `derive_param_tte()` with `event_source`/`censor_source` → `04_adam/adtte_admiral.xpt`.
+  OS and PFS reconcile **0-diff** vs `adtte_prod.xpt` on STARTDT/ADT/AVAL/CNSR/EVNTDESC/CNSDTDSC.
+- **`05_reconciliation/admiral_reconcile.R`** — scoped, exact (0-tolerance) diff →
+  `06_telemetry/admiral_reconciliation_status.json` (overall **PASS**). Graceful
+  degradation: records `not_available` and exits 0 when admiral outputs are absent.
+- **`06_telemetry/ADMIRAL_RECONCILIATION.md`** — track documentation, scope, and the
+  PFS finding (admiral's event-precedence / latest-censor model vs the study's
+  NACT-before-progression censoring; faithful fix pre-derives the single PFS censor
+  date per the SAP). Initially surfaced as 39 censor-date differences (CNSR already
+  matched); resolved to 0.
+
+### Scope (honest, documented)
+- admiral re-derives the admiral-idiomatic **core** only; study-specific ADSL
+  covariates (PSABL/ECOGBL/… + `*IF`) and SAFETY ADTTE params (TTSAE/TTPAIN/TTPSA/
+  TTUMOR) remain with the SAS+R double-programming. MP arm only (synthetic CbzP is
+  downstream). Not yet wired into the gated `cibuild.py` (needs `admiral` in the CI
+  renv lockfile) — a deliberate follow-up.
+
+## [3.15.0] - 2026-06-20 — SDTMIG 3.4 conformance uplift + current CT + authoritative CORE run (terminal-session remediation)
+
+> **Context.** Executes the SAS/CT/validator-gated submission-standard items from
+> `06_telemetry/SUBMISSION_STANDARDS_REMEDIATION.md` and the FDA-reviewer audit
+> (T-1/T-2/m-1/m-2/M-2), now that the CDISC Library key, populated CORE cache, network, and
+> R/haven are available. The pristine source SDTM (`01_raw_source/real_sdtm/`, SDTMIG 3.1.1) is
+> **never modified** — a derived 3.4 layer is produced deterministically and packaged.
+
+### Added
+- **`06_telemetry/uplift_sdtm_34.R`** — SDTMIG 3.1.1→3.4 data uplift (read pristine source →
+  write XPT v5 to the m5 tabulation copy + CORE staging). Derives `DM.AGE` from the de-identified
+  `AGEGRP` (`>=85` floored, cap flagged in `SUPPDM`), `ACTARM`/`ACTARMCD`, `AE.AESOC=AEBODSYS`,
+  `EPOCH` (VISIT-based, SE absent), `EX.EXENDY`; relocates the non-standard week-offset timing
+  (`AESTWK`/`AEENWK`/…, `DSSTWK`/…) to `SUPPAE`/`SUPPDS`; drops redundant `SUBJID`; enriches `TS`
+  (`NARMS`/`ACTSUB`/`SSTDTC`/`AGEMIN`); builds `TA`; aligns variable order/labels to the CDISC library.
+- **`07_define_xml/uplift_define_34.py`** — regenerates `define_sdtm.xml` to **SDTMIG 3.4 + CT
+  2026-03-27**, syncing ItemRefs/ItemDefs to the uplifted data (removes phantom `ARM2`/`ARMA`/…),
+  adding `IG.TS`/`IG.TA`/`IG.SUPPAE`/`IG.SUPPDS`. XSD-VALID (Define 2.1); 315 ref-integrity checks PASS. Idempotent.
+- **`06_telemetry/conformance/CORE_SDTM34_RUN_RECORD.md`** + `core_sdtm34_report.json` —
+  authoritative CDISC CORE 0.16.0 run at `-s sdtmig -v 3.4`. All targeted structural rules cleared
+  (AESOC, AGE, EPOCH, EXENDY, non-standard→SUPP, var order, types, labels, whitespace); residual
+  findings classified (inherent-de-id / real-source-data / cross-domain-no-FA / engine-internal) —
+  none are programming defects; real-data findings (AESER, VSSTRESC) are not overwritten.
+- **`06_telemetry/materialize_ectd.py`** — closes remediation **5a**: copies each `m5/` deliverable
+  to its `index.xml` `xlink:href` under `11_ectd/0000/` and re-verifies every leaf MD5 (89/89; all
+  90 hrefs resolve in-place; in-sequence SDTM define is the 3.4 copy). Sequence is now self-contained.
+- **eCTD now DTD-VALID** — with the official DTDs in `util/dtd/` (`ich-ectd-3-2`, `ich-stf-v2-2`,
+  `us-regional-v3-3`), all three backbone XML files pass `xmllint --noout --valid`. Fixes the
+  DTDs surfaced in `build_ectd_backbone.py`: the `#FIXED` xlink-typo URI, the required `indication`
+  attribute, **us-regional migrated v2.01 → v3.3** (FDA retired v2.01), and the STF retargeted to
+  ICH STF v2.2. All application identifiers are labelled `EXAMPLE` placeholders.
+
+### Security / data hygiene
+- **`.gitignore`** — CORE conformance reports (`06_telemetry/conformance/core_*_report.json`) now
+  ignored: the 3.4 report's per-record findings (AESER/VSSTRESC/RELREC) emit subject `USUBJID` rows
+  (371). Prior tracked reports (which held no subject IDs) untracked for a consistent data-free
+  policy; the tracked evidence is the `*_RUN_RECORD.md` (no patient data). eCTD materialized payload
+  (datasets + report binaries) ignored as a reproducible copy of `m5/`.
+
+### Changed
+- **`07_define_xml/define.xml`** (+ m5 copies) — ADaM CT bumped `2024-03-29`→`2026-03-27`.
+- **`08_reviewers_guides/SDRG.md`** — new §5 documents the 3.4 uplift, EPOCH derivation rule, and CORE residual classification; header now declares submission SDTMIG 3.4 / source 3.1.1.
+- Downstream re-synced: SDTM Dataset-JSON regenerated (35/35 valid); eCTD backbone checksums refreshed.
+
+### Not done (require real data / org change — audit R-1/R-2/M-3)
+- Real two-arm patient data + `DV` domain; independent second-programmer (GxP) validation.
+
+## [3.14.0] - 2026-06-19 — Study-agnostic engine: manifest-driven pipeline + multi-study (Findings I/J)
+
+> **Context.** Generalises the orchestration/reconciliation engine from a single-study demo
+> toward a study-agnostic, config-driven platform (strategic Findings **I/J**). Pipeline
+> *structure* now lives in a declarative `study_manifest.yaml` (companion to `study_config.yaml`,
+> which holds clinical *parameters*), and a second proof study (`DEMO02`) runs end-to-end through
+> the **unchanged** engine. TROPIC's 17-stage DAG is byte-identical to before (golden-verified;
+> full `sim` run GREEN, 8/8 dataset reconciliation PASS).
+
+### Added
+- **`study_manifest.yaml`** — single source of truth for pipeline *structure*: study identity,
+  the reconciled datasets (name, business `keys`, validation/SAS programs, `parallel_group`,
+  `results_recon` spec), and the infrastructure stages (`pre`/`post`, each with a `runner` and
+  optional `gated`/`engine` flags). Captures the `ADAE` and BIMO→`clinsite` naming exceptions
+  declaratively. Loaded by **`06_telemetry/manifest.py`** (pyyaml).
+- **Multi-study support** — `cibuild.py --study <name>` runs any study under `studies/<name>/`
+  through the same engine: it chdirs into the study root, builds the DAG from that study's
+  manifest, and resolves shared engine scripts (manifest `engine: true`) back to the engine root.
+- **`studies/DEMO02/`** — a tiny synthetic proof study (ADSL + ADAE, no SAS). `cibuild.py
+  --study DEMO02` runs green end-to-end (2 validations → SAS sim → cross-language reconcile =
+  PASS), demonstrating the engine is genuinely study-agnostic. `studies/README.md` documents how
+  to add a study.
+- **`docs/I_J_generalisation_plan.md`** — the P0–P2 implementation/scoping plan.
+
+### Changed
+- **`cibuild.py`** now *generates* its 17-stage DAG from the manifest (`build_stages()`) instead
+  of a hardcoded list; a group-aware executor replaces the positional `[:3]/[3:8]/[8:]` slices,
+  and `--from-stage` bounds are derived from the built DAG. The post-execution gate guard is
+  manifest-derived (a study may legitimately use a subset of the QC gates).
+- **Dataset list de-duplicated** — the reconciled-dataset list (previously hardcoded in 5 places)
+  and `cross_lang_audit.R`'s per-dataset business-key map (previously an `if/else` chain) now read
+  from the manifest; study-identity strings in dashboards/reports flow from it too.
+- **`generate_config.py`** resolves the study root from the working directory (falls back to the
+  engine root), so configuration generation is per-study.
+- **CI** — `pyyaml` promoted to the main Python-deps step (the manifest loader depends on it).
+
 ## [3.13.0] - 2026-06-18 — PCWG3-correct integrated RECIST response + bone 2+2, verified on real SAS
 
 > **Context.** Two linked changes, both proven on a **genuine `oda`-mode run** (real SAS 9.4 on

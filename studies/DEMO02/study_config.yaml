@@ -1,0 +1,7 @@
+# DEMO02 clinical parameters (companion to study_manifest.yaml). Minimal by design —
+# its only role in the Phase 2 proof is to show the SAME config-generation step
+# (06_telemetry/generate_config.py) reads a different study's parameters and emits this
+# study's 02_production_sas/00_config_generated.sas.
+STUDYID: "DEMO02"
+TRT01P_CODE: "DRUG"
+TRT01PN_CODE: 1

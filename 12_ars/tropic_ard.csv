@@ -1,0 +1,17 @@
+reportingEventId,analysisId,analysis,analysisSetId,groupingId,groupId,operationId,rawValue,formattedValue
+RE.TROPIC,AN.OS,Overall Survival,AS.ITT,GF.TRT,G.MP,OP.N,371,371
+RE.TROPIC,AN.OS,Overall Survival,AS.ITT,GF.TRT,G.MP,OP.EVNT,266,266
+RE.TROPIC,AN.OS,Overall Survival,AS.ITT,GF.TRT,G.MP,OP.MEDD,386.0,386.0
+RE.TROPIC,AN.OS,Overall Survival,AS.ITT,GF.TRT,G.MP,OP.MEDM,12.68,12.68
+RE.TROPIC,AN.PFS,Progression-Free Survival,AS.ITT,GF.TRT,G.MP,OP.N,371,371
+RE.TROPIC,AN.PFS,Progression-Free Survival,AS.ITT,GF.TRT,G.MP,OP.EVNT,326,326
+RE.TROPIC,AN.PFS,Progression-Free Survival,AS.ITT,GF.TRT,G.MP,OP.MEDD,43.0,43.0
+RE.TROPIC,AN.PFS,Progression-Free Survival,AS.ITT,GF.TRT,G.MP,OP.MEDM,1.41,1.41
+RE.TROPIC,AN.TTPSA,Time to PSA Progression,AS.ITT,GF.TRT,G.MP,OP.N,371,371
+RE.TROPIC,AN.TTPSA,Time to PSA Progression,AS.ITT,GF.TRT,G.MP,OP.EVNT,265,265
+RE.TROPIC,AN.TTPSA,Time to PSA Progression,AS.ITT,GF.TRT,G.MP,OP.MEDD,68.0,68.0
+RE.TROPIC,AN.TTPSA,Time to PSA Progression,AS.ITT,GF.TRT,G.MP,OP.MEDM,2.23,2.23
+RE.TROPIC,AN.TTUMOR,Time to Tumor Progression,AS.ITT,GF.TRT,G.MP,OP.N,203,203
+RE.TROPIC,AN.TTUMOR,Time to Tumor Progression,AS.ITT,GF.TRT,G.MP,OP.EVNT,186,186
+RE.TROPIC,AN.TTUMOR,Time to Tumor Progression,AS.ITT,GF.TRT,G.MP,OP.MEDD,64.0,64.0
+RE.TROPIC,AN.TTUMOR,Time to Tumor Progression,AS.ITT,GF.TRT,G.MP,OP.MEDM,2.1,2.10

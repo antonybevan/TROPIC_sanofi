@@ -98,6 +98,14 @@ All subjects are assigned `SEX = 'M'` in `A_adsl_generation.sas`. This demograph
 ---
 
 ## 6. Quality Control & SAS/R Parity (VAL-01)
+
+> **Validation is allocated by risk.** The depth of QC each output receives is set
+> deliberately by a risk tier — primary efficacy (OS, PFS) and ADSL get three
+> independent derivation engines, secondary/derived datasets two, and metadata is
+> covered by automated conformance only. See [`RISK_BASED_VALIDATION.md`](RISK_BASED_VALIDATION.md)
+> for the tier definitions and the output→tier→evidence map; this section documents the
+> mechanics those tiers draw on.
+
 Each ADaM dataset is produced by two independent **cross-language implementations** — single-author, so this is *implementation* reconciliation, **not** two-programmer GxP double programming (see the disclosure note below):
 1. **Production Track (SAS 9.4):** Implemented in modular SAS programs (`02_production_sas/`) utilizing standard SAS DATA steps, PROC SQL, and MACRO facilities.
 2. **Validation Track (R 4.6.0):** Independently re-implemented in R (`03_validation_r/`) utilizing the tidyverse (`dplyr`, `tidyr`, `lubridate`) and CDISC Pharmaverse standard libraries (`xportr`).

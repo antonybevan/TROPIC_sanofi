@@ -37,7 +37,13 @@ def _oda_paths(root):
 
 PGMDIR_ODA, CBZ_ODA, ADAM_ODA, SASFIG_ODA = _oda_paths(PROJ_ROOT_ODA)
 
-DATASETS = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte", "clinsite"]  # match cibuild ODA_DATASETS
+# Reconciled datasets come from the study manifest (single source of truth shared
+# with cibuild.py); fall back to the legacy TROPIC list if the manifest is absent.
+try:
+    import manifest as _manifest_mod  # noqa: E402 — 06_telemetry/ already on sys.path
+    DATASETS = _manifest_mod.dataset_names(_manifest_mod.load_manifest())
+except Exception:  # noqa: BLE001
+    DATASETS = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte", "clinsite"]
 CBZ_DOMS = ["adsl", "adtte", "adae", "adlb", "adex", "adrs"]
 FIGURES  = [
     "F-11-1_KM_OS_SAS", "F-11-2_KM_PFS_SAS", "F-12-1_Subgroup_Forest_SAS",

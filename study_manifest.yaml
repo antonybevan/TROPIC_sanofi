@@ -1,0 +1,83 @@
+# ==============================================================================
+# study_manifest.yaml — pipeline STRUCTURE (single source of truth).
+#
+# Companion to study_config.yaml: that file holds clinical PARAMETERS (thresholds,
+# windows, imputation defaults); this file holds STRUCTURE — which datasets exist,
+# which programs build/validate them, which keys reconcile them, and who the study
+# is. The orchestrator (06_telemetry/cibuild.py), the cross-language reconciler
+# (05_reconciliation/cross_lang_audit.R) and the ODA TFL renderer
+# (06_telemetry/_oda_render_tfl.py) all read this instead of hardcoding the list.
+#
+# Naming is ALMOST mechanical (A_<ds>_generation.sas / v_<ds>_validation.R) but has
+# exceptions that cannot be derived (ADAE; BIMO produces the `clinsite` dataset), so
+# the wiring is declared here explicitly rather than auto-discovered from filenames.
+# ==============================================================================
+
+study:
+  id: "TROPIC-NCT00417079"
+  code: "EFC6193 / XRP6258"
+  title: "TROPIC"
+
+# Reconciled ADaM (+ BIMO clinsite) datasets. List order IS the validation/build order.
+# `keys` are the business keys cross_lang_audit.R aligns on. `parallel_group` marks the
+# datasets cibuild.py validates concurrently as one contiguous fan-out batch; `order` is
+# documentary. `val_stage` overrides the default "R <NAME> Validation" stage label.
+datasets:
+  - name: adsl
+    keys: [USUBJID]
+    sas: A_adsl_generation.sas
+    val: v_adsl_validation.R
+    order: 0                       # subject-level master; must precede the parallel batch
+  - name: adex
+    keys: [USUBJID, PARAMCD, AVISIT]
+    sas: A_adex_generation.sas
+    val: v_adex_validation.R
+    parallel_group: 1
+  - name: adcm
+    keys: [USUBJID, CMSTDT, CMDECOD]
+    sas: A_adcm_generation.sas
+    val: v_adcm_validation.R
+    parallel_group: 1
+  - name: adae
+    keys: [USUBJID, AESEQ]         # unique within-subject key (positional parity)
+    sas: A_adae_io_respec.sas      # exception: not A_adae_generation.sas
+    val: v_adae_io_validation.R    # exception: not v_adae_validation.R
+    parallel_group: 1
+  - name: adlb
+    keys: [USUBJID, PARAMCD, AVISITN, LBDY]
+    sas: A_adlb_generation.sas
+    val: v_adlb_validation.R
+    parallel_group: 1
+  - name: adrs
+    keys: [USUBJID, PARAMCD, AVISIT]
+    sas: A_adrs_generation.sas
+    val: v_adrs_validation.R
+    parallel_group: 1
+  - name: adtte
+    keys: [USUBJID, PARAMCD]
+    sas: A_adtte_generation.sas
+    val: v_adtte_validation.R
+    order: 2
+    results_recon: { dataset: adtte, arm: MP, proc: lifetest }  # M-1 numerical results recon
+  - name: clinsite
+    keys: [STUDYID, SITEID]
+    sas: B_bimo_generation.sas       # exception: BIMO program...
+    val: v_bimo_validation.R         # ...validated by v_bimo_validation.R...
+    val_stage: "R BIMO Validation"   # ...stage labelled BIMO, but the produced dataset is `clinsite`
+    order: 3
+
+# Fixed, non-per-dataset stages, consumed by cibuild.py build_stages(). List order is
+# execution order. `runner` selects the invocation style: logrx (Rscript -e
+# logrx::axecute, the default for R), rscript (bare Rscript), or python. `gated: true`
+# marks the three stages whose post-execution QC gates live in run_single_stage().
+infrastructure_stages:
+  pre:
+    - { name: "Real SDTM Staging Ingest", script: "03_validation_r/v_staging_ingest.R", runner: logrx }
+    - { name: "R SDTM Validation",        script: "03_validation_r/v_sdtm_validation.R", runner: logrx }
+  post:
+    - { name: "Cross-Language Audit Reconcile",              script: "05_reconciliation/cross_lang_audit.R",     runner: logrx,   gated: true }
+    - { name: "Efficacy & Safety TFL Suite Compilation",     script: "09_tfl/tfl_generation.R",                  runner: rscript, gated: true }
+    - { name: "Numerical Results Reconciliation (SAS vs R)", script: "05_reconciliation/results_reconcile.R",    runner: logrx,   gated: true }
+    - { name: "ADaM Spec to Define Conformance",             script: "07_define_xml/check_define_conformance.R", runner: rscript }
+    - { name: "ADaM Spec to Data Conformance",               script: "03_validation_r/spec_data_checks.R",       runner: rscript }
+    - { name: "eCTD Final Package",                          script: "06_telemetry/package_ectd.py",             runner: python }

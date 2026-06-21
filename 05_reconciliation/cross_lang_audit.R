@@ -24,6 +24,22 @@ library(haven)
 library(dplyr)
 library(diffdf)
 
+# Study structure from the manifest (I/J platform generalisation): the reconciled
+# dataset list, their per-dataset business keys, and the study identity are declared
+# in study_manifest.yaml rather than hardcoded here. Resolve from . or .. so the
+# script works whether invoked from the repo root (via cibuild) or 05_reconciliation/.
+.manifest_file <- Filter(file.exists,
+                         c("study_manifest.yaml", file.path("..", "study_manifest.yaml")))
+if (!length(.manifest_file)) stop("study_manifest.yaml not found in . or ..")
+.manifest <- yaml::read_yaml(.manifest_file[[1]])
+datasets <- vapply(.manifest$datasets, function(d) d$name, character(1))
+.key_map <- stats::setNames(
+  lapply(.manifest$datasets, function(d) unlist(d$keys, use.names = FALSE)),
+  datasets
+)
+.study_title <- .manifest$study$title
+.study_code  <- .manifest$study$code
+
 cat("NOTE: [RECONCILIATION] Starting Cross-Language Audit...\n")
 
 compare_datasets <- function(ds_name) {
@@ -58,23 +74,11 @@ compare_datasets <- function(ds_name) {
     return(list(status = "FAIL", reason = paste("Column mismatch -", paste(reason_parts, collapse = "; "))))
   }
 
-  # Align business keys based on dataset name (QC-01)
-  if (ds_name == "adsl") {
-    sort_keys <- "USUBJID"
-  } else if (ds_name == "adex") {
-    sort_keys <- c("USUBJID", "PARAMCD", "AVISIT")
-  } else if (ds_name == "adcm") {
-    sort_keys <- c("USUBJID", "CMSTDT", "CMDECOD")
-  } else if (ds_name == "adae") {
-    sort_keys <- c("USUBJID", "AESEQ")
-  } else if (ds_name == "adlb") {
-    sort_keys <- c("USUBJID", "PARAMCD", "AVISITN", "LBDY")
-  } else if (ds_name == "adrs") {
-    sort_keys <- c("USUBJID", "PARAMCD", "AVISIT")
-  } else if (ds_name == "adtte") {
-    sort_keys <- c("USUBJID", "PARAMCD")
-  } else if (ds_name == "clinsite") {
-    sort_keys <- c("STUDYID", "SITEID")
+  # Align business keys from the manifest's per-dataset key map (QC-01)
+  sort_keys <- .key_map[[ds_name]]
+  if (is.null(sort_keys) || !length(sort_keys)) {
+    return(list(status = "FAIL",
+                reason = paste("No business keys declared in manifest for", ds_name)))
   }
 
   # Align column classes & types first to ensure clean sorting
@@ -147,7 +151,8 @@ compare_datasets <- function(ds_name) {
   }
 }
 
-datasets <- c("adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte", "clinsite")
+# `datasets` is defined at the top of this script from study_manifest.yaml
+# (single source of truth); do not redeclare it here.
 results <- list()
 
 for (ds in datasets) {
@@ -175,12 +180,12 @@ if (is_simulated) {
 # length limit by nature; scoped nolint keeps the markup readable in one piece.
 # nolint start: line_length_linter.
 html_content <- paste0(
-  "<html><head><title>TROPIC Cross-Language Reconciliation Report</title>",
+  "<html><head><title>", .study_title, " Cross-Language Reconciliation Report</title>",
   "<style>body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f8f9fa; color: #333; margin: 40px; }",
   "h1 { color: #002d62; } .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }",
   "table { width: 100%; border-collapse: collapse; margin-top: 20px; } th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }",
   "th { background-color: #002d62; color: white; } .pass { color: green; font-weight: bold; } .fail { color: red; font-weight: bold; }</style></head>",
-  "<body><div class='card'><h1>TROPIC (Study EFC6193 / XRP6258) Cross-Language Audit Dashboard</h1>",
+  "<body><div class='card'><h1>", .study_title, " (Study ", .study_code, ") Cross-Language Audit Dashboard</h1>",
   banner_html,
   "<p>Keyed record-content (multiset) reconciliation comparing the SAS 9.4 production track vs the independent R 4.6.0 Pharmaverse validation track. ",
   "Records are aligned by business keys (within tie groups, by full record content) and compared cell-by-cell with diffdf. ",

@@ -115,6 +115,28 @@ m5/**/*.sas7bdat
 !m5/**/*.pdf
 !m5/**/*.png
 
+# Dataset-JSON v1.1 export (10_datasetjson/) is patient-level data — same data-free
+# policy as the XPT above. The *.json data files are never tracked; README.md (markdown)
+# and any future docs remain tracked.
+10_datasetjson/**/*.json
+10_datasetjson/**/*.ndjson
+
+# eCTD sequence (11_ectd/0000/): the backbone (index.xml, index-md5.txt), Study Tagging File,
+# regional metadata, and util/ are tracked. The materialized dataset + report-binary payload is a
+# reproducible copy of the m5/ tree (06_telemetry/materialize_ectd.py) and is NOT tracked.
+# Patient-level data is guarded unconditionally.
+11_ectd/**/*.xpt
+11_ectd/**/*.sas7bdat
+11_ectd/**/*.json
+11_ectd/0000/m5/datasets/
+11_ectd/0000/m5/**/*.pdf
+11_ectd/0000/m5/**/*.png
+11_ectd/0000/m5/**/*.xlsx
+# eCTD util/dtd: track the official .dtd files (enable DTD-valid checks); ignore download cruft
+# (the ICH zip + its index.htm; FDA spec PDFs are already covered by the global *.pdf rule).
+11_ectd/0000/util/dtd/*.zip
+11_ectd/0000/util/dtd/*.htm
+
 .core_venv/
 
 # Ephemeral CDISC CORE run inputs (contain patient-data XPT)
@@ -122,3 +144,7 @@ m5/**/*.sas7bdat
 
 # macOS
 .DS_Store
+
+# CORE conformance reports carry subject-level USUBJID rows — keep out of the data-free repo
+# (run records / classified summaries in *.md are safe and tracked).
+06_telemetry/conformance/core_*_report.json

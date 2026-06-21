@@ -2,8 +2,9 @@
 
 **Study Name:** TROPIC Re-Analysis  
 **Compound:** Cabazitaxel (CbzP) vs. Mitoxantrone (MP)  
-**Standard:** CDISC SDTMIG v3.1.1  
-**Created:** 2026-05-23  
+**Standard (submission):** CDISC SDTMIG v3.4 + CDISC/NCI CT 2026-03-27 (uplifted; see §5)  
+**Standard (source):** CDISC SDTMIG v3.1.1 (PDS 2013 release; pristine `01_raw_source/real_sdtm/`)  
+**Created:** 2026-05-23 · **Uplifted:** 2026-06-20  
 
 ---
 
@@ -61,3 +62,25 @@ The DM domain in the source data does not contain country-of-study-site informat
 
 ### 4.4 Hardcoded Demographic Constant (SEX = 'M')
 The demographics domain (`DM`) contains a hardcoded variable `SEX = 'M'` assigned to all subjects in `A_adsl_generation.sas`. This is a clinical decision consistent with the trial protocol for metastatic castration-resistant prostate cancer (mCRPC), which is an exclusively male patient population. To ensure metadata conformity, the Define-XML codelist references are maintained; however, no female subjects are present in the analysis dataset.
+
+---
+
+## 5. SDTMIG 3.4 Conformance Uplift (2026-06-20)
+
+The pristine source SDTM (`01_raw_source/real_sdtm/`, PDS 2013) was authored to **SDTMIG 3.1.1**, which is below the FDA Data Standards Catalog support floor. A derived, conformance-uplifted SDTM layer was produced to **SDTMIG 3.4 + CDISC/NCI CT 2026-03-27** and is the version described by `define_sdtm.xml` and packaged in `m5/.../tabulations/sdtm/`. The raw source is **never modified**; the uplift is a deterministic derivation step (`06_telemetry/uplift_sdtm_34.R` for data, `07_define_xml/uplift_define_34.py` for the define).
+
+**Standard derivations applied (each preserves source data values):**
+- **DM.AGE** derived numeric from the de-identified `AGEGRP` (the PDS release masked exact age into `AGEGRP`; subjects coded `>=85` are floored to `AGE=85`, with the cap flagged in `SUPPDM` `QNAM=AGEGRP`). The non-standard `AGEGRP` is removed from DM. `ACTARM`/`ACTARMCD` added (single completed arm, code `A`).
+- **AE.AESOC** populated equal to `AEBODSYS` (MedDRA SOC already carried in `AEBODSYS`).
+- **EPOCH** derived for AE/EX/VS (DS already carried it). Subject Elements (SE) are absent from the de-identified extract, so EPOCH is derived from the collected `VISIT` structure: `SCREENING`→SCREENING; `BASELINE`/`CYCLE n`/`END OF TREATMENT`→TREATMENT; `FOLLOW-UP n`→FOLLOW-UP; `UNSCHEDULED`→TREATMENT. All values are valid EPOCH CT.
+- **EX.EXENDY** derived (study day of `EXENDTC` vs `RFSTDTC`).
+- **Week-offset timing** (`AESTWK`/`AEENWK`/`AESTWKF`/`AEENWKF`, `DSSTWK`/`DSSTWKF`) — non-standard in the parent domains — relocated to **`SUPPAE`/`SUPPDS`** as supplemental qualifiers (linked by `IDVAR`/`IDVARVAL`), preserving the ±3.5-day timing (see §2 Date Precision Note and the date-precision sensitivity analysis, `06_telemetry/DATE_PRECISION_SENSITIVITY_2026-06-20.md`).
+- Redundant **`SUBJID`** removed from non-DM domains; non-standard `ARM2`/`ARMA`/`ARMCD2` (define-only phantoms, never in data) dropped from `IG.DM`.
+- **TS** enriched with public NCT00417079 parameters (`NARMS=2`, `ACTSUB=371`, `SSTDTC=2007`, `AGEMIN=P18Y`). **TA** (Trial Arms) built from the public two-arm design.
+- Variable labels title-cased, leading/trailing whitespace stripped, variable order aligned to the CDISC SDTM library.
+
+**Authoritative conformance run.** Validated with **CDISC CORE** (`cdisc-rules-engine`) at `-s sdtmig -v 3.4` (CT 2026-03-27) — report `06_telemetry/conformance/core_sdtm34_report.json`, run record `CORE_SDTM34_RUN_RECORD.md`. All targeted structural rules cleared (CORE-000264 AESOC, -000453 AGE, -000701 EPOCH, -000776 EXENDY, -000550 non-standard→SUPP, -000852 variable order, -001082 type, -000594/398 labels, -000867 whitespace). Remaining findings are **not programming defects** and fall into four documented classes:
+1. **Inherent to de-identification (5):** expected/required variables removed by the PDS public release (`SITEID`, `COUNTRY`, MedDRA hierarchy codes `AELLT`/`AEPTCD`, exact `AESTDTC`/`AEENDTC`). Cannot be reconstructed.
+2. **Real source-data quality (CORE-000266/022 AESER consistency; CORE-000732 VSSTRESC/N):** present in the source safety data; **not** silently overwritten (doing so would falsify reported safety data).
+3. **Cross-domain (CORE-000767 RELREC/`FAOBJ`):** fires because no `FA` domain is in this analysis-scoped package; not applicable to the submitted domains.
+4. **CORE engine-internal** ("evaluation dataset failed to build").

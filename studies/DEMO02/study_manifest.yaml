@@ -1,0 +1,40 @@
+# ==============================================================================
+# DEMO02 — second study manifest (I/J Phase 2 proof of study-agnosticism).
+#
+# This is a deliberately tiny stub (ADSL + ADAE, synthetic, no real data, no SAS)
+# whose only purpose is to demonstrate that the SAME engine (cibuild.py +
+# cross_lang_audit.R + manifest.py) runs a DIFFERENT study end-to-end with ZERO
+# engine code changes — driven entirely by this manifest. Run it with:
+#
+#     python3 06_telemetry/cibuild.py --study DEMO02
+#
+# The engine chdirs into studies/DEMO02/ and builds the DAG from this file; shared
+# engine scripts (`engine: true`) are resolved back to the repo-root engine.
+# ==============================================================================
+
+study:
+  id: "DEMO02-STUB"
+  code: "DEMO02"
+  title: "DEMO02"
+
+# Two synthetic datasets. The validation scripts self-generate data (no ingest), so
+# there are no pre-infrastructure stages. Keys mirror the real pipeline: ADSL is
+# subject-level (USUBJID); ADAE carries a unique within-subject key (USUBJID+AESEQ).
+datasets:
+  - name: adsl
+    keys: [USUBJID]
+    val: v_adsl_validation.R
+    order: 0
+  - name: adae
+    keys: [USUBJID, AESEQ]
+    val: v_adae_validation.R
+    order: 1
+
+# Reduced pipeline: no SDTM ingest, no TFL/define/eCTD submission tail. Just the
+# cross-language reconciliation — the heart of the validation claim — run from the
+# shared engine (`engine: true`). `runner: rscript` invokes the engine reconciler
+# bare (no logrx log written into the engine tree).
+infrastructure_stages:
+  pre: []
+  post:
+    - { name: "Cross-Language Audit Reconcile", script: "05_reconciliation/cross_lang_audit.R", runner: rscript, engine: true, gated: true }

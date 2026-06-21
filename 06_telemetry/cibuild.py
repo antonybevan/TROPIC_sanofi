@@ -111,7 +111,55 @@ _ODA_OUTCOME = {}
 # connecting account's home (~/TROPIC, resolved against the live session's $HOME) and can be
 # overridden with TROPIC_ODA_PROJ_ROOT for a non-default ODA layout.
 PROJ_ROOT_ODA = os.environ.get("TROPIC_ODA_PROJ_ROOT", "~/TROPIC")
-ODA_DATASETS = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte", "clinsite"]
+
+# --- Study structure from the manifest (I/J platform generalisation) ----------
+# study_manifest.yaml declares the reconciled datasets and the study identity so
+# they are no longer hardcoded here. A missing/malformed manifest falls back to the
+# legacy TROPIC values, so the engine never hard-fails on a manifest problem.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# The engine lives at the repo root (parent of 06_telemetry/). The default study IS
+# that root (TROPIC); a named study (--study) lives under studies/<name>/ and is
+# activated by _activate_study(), which chdirs into it and reloads the manifest.
+_ENGINE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_RELOCATE_ENGINE = False   # True once a study root != engine root is active (Phase 2)
+try:
+    import manifest as _manifest_mod
+    _MANIFEST = _manifest_mod.load_manifest()
+    STUDY_DATASETS = _manifest_mod.dataset_names(_MANIFEST)
+    STUDY_LABEL = _manifest_mod.study_label(_MANIFEST)
+except Exception as _e:  # noqa: BLE001 — fall back to legacy hardcoded structure
+    print(f"  [MANIFEST] Falling back to legacy TROPIC structure ({_e}).")
+    _MANIFEST = None
+    STUDY_DATASETS = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte", "clinsite"]
+    STUDY_LABEL = "TROPIC (Study EFC6193 / XRP6258)"
+ODA_DATASETS = STUDY_DATASETS
+
+
+def _activate_study(study):
+    """Resolve and activate the target study (I/J Phase 2, multi-study).
+
+    Default (study=None) = the engine/repo root (TROPIC). A named study lives under
+    studies/<study>/ with its own manifest/config/programs. We chdir into the study
+    root so the engine's relative paths (04_adam/, 03_validation_r/, study_config.yaml,
+    study_manifest.yaml) resolve per-study, and set _RELOCATE_ENGINE so shared engine
+    scripts (flagged `engine: true` in the manifest) are run from absolute engine-root
+    paths. For the default study, study root == engine root, so nothing relocates and
+    behaviour is byte-identical to single-study mode."""
+    global _MANIFEST, STUDY_DATASETS, STUDY_LABEL, ODA_DATASETS, _RELOCATE_ENGINE
+    study_root = os.path.join(_ENGINE_ROOT, "studies", study) if study else _ENGINE_ROOT
+    if not os.path.isdir(study_root):
+        print(f"  [ERROR] study directory not found: {study_root}")
+        sys.exit(1)
+    os.chdir(study_root)
+    _RELOCATE_ENGINE = os.path.abspath(study_root) != os.path.abspath(_ENGINE_ROOT)
+    try:
+        _MANIFEST = _manifest_mod.load_manifest()
+    except Exception as e:  # noqa: BLE001
+        print(f"  [ERROR] could not load manifest for study at {study_root}: {e}")
+        sys.exit(1)
+    STUDY_DATASETS = _manifest_mod.dataset_names(_MANIFEST)
+    STUDY_LABEL = _manifest_mod.study_label(_MANIFEST)
+    ODA_DATASETS = STUDY_DATASETS
 
 
 def _resolve_oda_root(sas, template):
@@ -327,7 +375,7 @@ def run_stage_parallel_worker(stage):
 
 def run_stage_execution(stage, sas_mode):
     if stage["cmd"] == "SIMULATE":
-        datasets = ["adsl", "adex", "adcm", "adae", "adlb", "adrs", "adtte", "clinsite"]
+        datasets = STUDY_DATASETS
 
         if sas_mode == "oda":
             print("  [ODA] Stage 10 via resilient broker (probe-verified, manifest-checked)...")
@@ -454,8 +502,100 @@ def run_single_stage(stage, from_stage, sas_mode, results):
         write_telemetry(results, sas_mode)
         sys.exit(1)
 
+def _stage_cmd(script, runner, engine_root=None, relocate=False, is_engine=False):
+    """Build the subprocess argv for a stage given its runner style.
+      logrx   -> Rscript -e logrx::axecute('<script>')  (default for R stages)
+      rscript -> Rscript <script>                       (scripts that self-log)
+      python  -> <python> <script>
+    Shared engine scripts (is_engine) are resolved to an absolute engine-root path when
+    a relocated study is active, so they run from the engine even though the CWD is the
+    study root. For the default study (relocate=False) the path stays relative/unchanged.
+    """
+    path = os.path.join(engine_root, script) if (is_engine and relocate and engine_root) else script
+    if runner == "python":
+        return [sys.executable, path]
+    if runner == "rscript":
+        return [RSCRIPT_PATH, path]
+    return [RSCRIPT_PATH, "-e", f"logrx::axecute('{path}')"]
+
+
+def build_stages(manifest, engine_root=None, relocate=False):
+    """Assemble the ordered pipeline stage list from the study manifest (I/J Phase 1).
+
+    Order: pre-infrastructure -> per-dataset R validations (manifest list order,
+    parallel where parallel_group is set) -> SAS production sentinel ('SIMULATE') ->
+    post-infrastructure. Each stage is {id, name, cmd, parallel, gated}. Stage NAMES are
+    preserved exactly so the name-keyed post-execution gates stay attached. engine_root/
+    relocate thread shared-engine-script relocation through for multi-study (Phase 2).
+    """
+    infra = manifest.get("infrastructure_stages", {})
+    stages = []
+    for s in infra.get("pre", []):
+        stages.append({"name": s["name"],
+                       "cmd": _stage_cmd(s["script"], s.get("runner", "logrx"),
+                                         engine_root, relocate, s.get("engine", False)),
+                       "parallel": False, "gated": bool(s.get("gated"))})
+    for d in manifest["datasets"]:
+        label = d.get("val_stage", f"R {d['name'].upper()} Validation")
+        stages.append({"name": label,
+                       "cmd": _stage_cmd(f"03_validation_r/{d['val']}", "logrx"),
+                       "parallel": "parallel_group" in d, "gated": False})
+    stages.append({"name": "SAS Production (ODA/Real/Simulated)", "cmd": "SIMULATE",
+                   "parallel": False, "gated": False})
+    for s in infra.get("post", []):
+        stages.append({"name": s["name"],
+                       "cmd": _stage_cmd(s["script"], s.get("runner", "logrx"),
+                                         engine_root, relocate, s.get("engine", False)),
+                       "parallel": False, "gated": bool(s.get("gated"))})
+    for i, s in enumerate(stages, 1):
+        s["id"] = i
+    return stages
+
+
+def run_parallel_batch(batch, from_stage, sas_mode, results):
+    """Execute a contiguous run of independent (parallel) validation stages concurrently.
+    Mirrors the historical 'fan out the independent ADaM validations' behaviour: honour
+    from_stage skipping, run via a ProcessPool, and roll back + exit on any failure."""
+    import concurrent.futures
+    for s in [s for s in batch if s["id"] < from_stage]:
+        print(f"Skipping Stage {s['id']}: {s['name']}")
+    parallel_stages = [s for s in batch if s["id"] >= from_stage]
+    if not parallel_stages:
+        return
+    print(f"Fanning out Stage(s) {', '.join(str(s['id']) for s in parallel_stages)} in parallel...")
+    for s in parallel_stages:
+        print(f"Executing Stage {s['id']}: {s['name']} (parallel)...")
+    failed_any = False
+    temp_results = {}
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        futures = {executor.submit(run_stage_parallel_worker, s): s for s in parallel_stages}
+        for future in concurrent.futures.as_completed(futures):
+            s = futures[future]
+            try:
+                stage, rc, stdout, stderr = future.result()
+                if rc == 0:
+                    print(f"  [SUCCESS] Stage {stage['id']} completed.")
+                    temp_results[stage["name"]] = "PASS"
+                else:
+                    print(f"  [FAILED] Stage {stage['id']} failed. Reason: {stderr.strip()}")
+                    temp_results[stage["name"]] = "FAIL"
+                    failed_any = True
+            except Exception as exc:
+                print(f"  [FAILED] Stage {s['id']} threw an exception: {exc}")
+                temp_results[s["name"]] = "FAIL"
+                failed_any = True
+    for s in parallel_stages:
+        results[s["name"]] = temp_results.get(s["name"], "FAIL")
+    if failed_any:
+        print("  [ERROR] Validation or execution error detected in parallel stages! "
+              "Automated rollback initiated...")
+        rollback()
+        write_telemetry(results, sas_mode)
+        sys.exit(1)
+
+
 def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=False, force_upload_sdtm=False, seed_if_needed=False):
-    print("=== EXECUTING TROPIC (Study EFC6193 / XRP6258) PIPELINE ===")
+    print(f"=== EXECUTING {STUDY_LABEL} PIPELINE ===")
     # Force a full SDTM re-upload on ODA this run (default: upload only the delta).
     os.environ["TROPIC_ODA_FORCE_SDTM"] = "TRUE" if force_upload_sdtm else "FALSE"
     # Seed SDTM inline within the Stage-10 ODA session (single spawn) if it isn't resident.
@@ -466,9 +606,15 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
     if from_stage <= 10 and os.path.exists("04_adam/tte_stats_prod.csv"):
         os.remove("04_adam/tte_stats_prod.csv")
 
+    # Engine scripts (lint, config-gen) are invoked by absolute engine-root path so they
+    # run regardless of the active study's CWD; both scan/emit relative to the CWD (the
+    # active study root), so they remain per-study correct.
+    lint_py = os.path.join(_ENGINE_ROOT, "06_telemetry", "lint_sas.py")
+    config_py = os.path.join(_ENGINE_ROOT, "06_telemetry", "generate_config.py")
+
     # Run SAS static-analysis pre-flight gate (advisory; blocks only on hardcoded paths).
     print("  [LINT] Running SAS static analysis...")
-    rc_lint, stdout_lint, stderr_lint = run_command([sys.executable, "06_telemetry/lint_sas.py"])
+    rc_lint, stdout_lint, stderr_lint = run_command([sys.executable, lint_py])
     if rc_lint != 0:
         print(f"  [LINT FAILED] Blocking SAS static-analysis error(s):\n{stdout_lint}\n{stderr_lint}")
         sys.exit(1)
@@ -477,7 +623,7 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
 
     # Run the configuration generator
     print("  [CONFIG] Generating configuration from study_config.yaml...")
-    rc, stdout, stderr = run_command([sys.executable, "06_telemetry/generate_config.py"])
+    rc, stdout, stderr = run_command([sys.executable, config_py])
     if rc != 0:
         print(f"  [CONFIG FAILED] Failed to generate configuration: {stderr}")
         sys.exit(1)
@@ -489,102 +635,50 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
     os.environ["TROPIC_SAS_SIMULATION"] = "TRUE" if sas_mode == "sim" else "FALSE"
     print(f"  [SAS MODE] Stage 10 execution mode resolved to: {sas_mode.upper()}")
 
-    stages = [
-        {"id": 1, "name": "Real SDTM Staging Ingest", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('03_validation_r/v_staging_ingest.R')"]},
-        {"id": 2, "name": "R SDTM Validation", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('03_validation_r/v_sdtm_validation.R')"]},
-        {"id": 3, "name": "R ADSL Validation", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('03_validation_r/v_adsl_validation.R')"]},
-        {"id": 4, "name": "R ADEX Validation", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('03_validation_r/v_adex_validation.R')"]},
-        {"id": 5, "name": "R ADCM Validation", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('03_validation_r/v_adcm_validation.R')"]},
-        {"id": 6, "name": "R ADAE Validation", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('03_validation_r/v_adae_io_validation.R')"]},
-        {"id": 7, "name": "R ADLB Validation", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('03_validation_r/v_adlb_validation.R')"]},
-        {"id": 8, "name": "R ADRS Validation", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('03_validation_r/v_adrs_validation.R')"]},
-        {"id": 9, "name": "R ADTTE Validation", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('03_validation_r/v_adtte_validation.R')"]},
-        {"id": 10, "name": "R BIMO Validation", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('03_validation_r/v_bimo_validation.R')"]},
-        {"id": 11, "name": "SAS Production (ODA/Real/Simulated)", "cmd": "SIMULATE"},
-        {"id": 12, "name": "Cross-Language Audit Reconcile", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('05_reconciliation/cross_lang_audit.R')"]},
-        {"id": 13, "name": "Efficacy & Safety TFL Suite Compilation", "cmd": [RSCRIPT_PATH, "09_tfl/tfl_generation.R"]},
-        {"id": 14, "name": "Numerical Results Reconciliation (SAS vs R)", "cmd": [RSCRIPT_PATH, "-e", "logrx::axecute('05_reconciliation/results_reconcile.R')"]},
-        # Audit C-4 inversion: the authoritative spec (00_specifications/ADaM_spec.xlsx)
-        # governs both define.xml and the produced data. These two gates assert that
-        # downstream agreement; they run before packaging so the submission ships a
-        # passing conformance report.
-        {"id": 15, "name": "ADaM Spec to Define Conformance", "cmd": [RSCRIPT_PATH, "07_define_xml/check_define_conformance.R"]},
-        {"id": 16, "name": "ADaM Spec to Data Conformance", "cmd": [RSCRIPT_PATH, "03_validation_r/spec_data_checks.R"]},
-        {"id": 17, "name": "eCTD Final Package", "cmd": [sys.executable, "06_telemetry/package_ectd.py"]}
-    ]
+    # The pipeline DAG is generated from study_manifest.yaml (I/J Phase 1) rather than
+    # hardcoded here. The manifest is required to run the pipeline; a load failure is a
+    # hard error (the soft fallback above only covers banner/ODA-path resilience).
+    if _MANIFEST is None:
+        print("  [ERROR] study_manifest.yaml could not be loaded; cannot build the pipeline DAG.")
+        sys.exit(1)
+    stages = build_stages(_MANIFEST, _ENGINE_ROOT, _RELOCATE_ENGINE)
 
-    # F-6 guard: the post-execution gates in run_single_stage() key on these exact stage
-    # names. Assert they exist so a future rename fails loudly HERE instead of silently
-    # detaching a gate from the step it guards (the C-3 regression class).
-    gated_stage_names = {
+    # F-6 guard: run_single_stage() implements post-execution QC gate logic keyed on
+    # these exact stage names. A study legitimately may use a subset of them (e.g. a stub
+    # study with no TFL/results-recon), so the check is: fail loudly if the manifest marks
+    # a stage `gated` that the engine has NO gate logic for — a rename/typo that would
+    # otherwise run silently ungated (the C-3 regression class).
+    implemented_gates = {
         "Cross-Language Audit Reconcile",
         "Efficacy & Safety TFL Suite Compilation",
         "Numerical Results Reconciliation (SAS vs R)",
     }
-    missing_gates = gated_stage_names - {s["name"] for s in stages}
-    if missing_gates:
+    unimplemented_gates = {s["name"] for s in stages if s.get("gated")} - implemented_gates
+    if unimplemented_gates:
         raise RuntimeError(
-            "Gate wiring error: gated stage name(s) absent from the pipeline "
-            f"(a rename detached a QC gate): {sorted(missing_gates)}"
+            "Gate wiring error: manifest marks stage(s) gated with no engine gate logic "
+            f"(a rename detached a QC gate): {sorted(unimplemented_gates)}"
         )
 
     results = {}
 
-    if serial:
-        for stage in stages:
+    # Execute in declared order. A contiguous run of parallel-marked stages (the
+    # independent ADaM validations) fans out concurrently; everything else runs
+    # sequentially. --serial forces fully sequential execution.
+    idx = 0
+    while idx < len(stages):
+        stage = stages[idx]
+        if stage.get("parallel") and not serial:
+            batch = [stage]
+            j = idx + 1
+            while j < len(stages) and stages[j].get("parallel"):
+                batch.append(stages[j])
+                j += 1
+            run_parallel_batch(batch, from_stage, sas_mode, results)
+            idx = j
+        else:
             run_single_stage(stage, from_stage, sas_mode, results)
-    else:
-        # Run Stages 1-3 sequentially
-        for stage in stages[:3]:
-            run_single_stage(stage, from_stage, sas_mode, results)
-
-        # Run Stages 4-8 in parallel (filtering by from_stage)
-        parallel_stages = [s for s in stages[3:8] if s["id"] >= from_stage]
-        skipped_parallel_stages = [s for s in stages[3:8] if s["id"] < from_stage]
-
-        for s in skipped_parallel_stages:
-            print(f"Skipping Stage {s['id']}: {s['name']}")
-
-        if parallel_stages:
-            import concurrent.futures
-            print(f"Fanning out Stage(s) {', '.join(str(s['id']) for s in parallel_stages)} in parallel...")
-            for s in parallel_stages:
-                print(f"Executing Stage {s['id']}: {s['name']} (parallel)...")
-
-            with concurrent.futures.ProcessPoolExecutor() as executor:
-                futures = {executor.submit(run_stage_parallel_worker, s): s for s in parallel_stages}
-                
-                failed_any = False
-                temp_results = {}
-                for future in concurrent.futures.as_completed(futures):
-                    s = futures[future]
-                    try:
-                        stage, rc, stdout, stderr = future.result()
-                        if rc == 0:
-                            print(f"  [SUCCESS] Stage {stage['id']} completed.")
-                            temp_results[stage["name"]] = ("PASS", rc, stderr)
-                        else:
-                            print(f"  [FAILED] Stage {stage['id']} failed. Reason: {stderr.strip()}")
-                            temp_results[stage["name"]] = ("FAIL", rc, stderr)
-                            failed_any = True
-                    except Exception as exc:
-                        print(f"  [FAILED] Stage {s['id']} threw an exception: {exc}")
-                        temp_results[s["name"]] = ("FAIL", -1, str(exc))
-                        failed_any = True
-
-                for s in parallel_stages:
-                    status, rc, stderr = temp_results.get(s["name"], ("FAIL", -1, "Unknown execution error"))
-                    results[s["name"]] = status
-
-                if failed_any:
-                    print("  [ERROR] Validation or execution error detected in parallel stages! Automated rollback initiated...")
-                    rollback()
-                    write_telemetry(results, sas_mode)
-                    sys.exit(1)
-
-        # Run Stages 9-14 sequentially
-        for stage in stages[8:]:
-            run_single_stage(stage, from_stage, sas_mode, results)
+            idx += 1
 
     clean_backup()
     write_telemetry(results, sas_mode)
@@ -706,7 +800,7 @@ def write_telemetry(results, sas_mode="sim"):
     env_str = f"{platform.system()} {platform.release()} / {sys_track}"
     
     # Write standard markdown dashboard
-    dashboard_content = f"""# TROPIC (Study EFC6193 / XRP6258) Pipeline Validation Dashboard
+    dashboard_content = f"""# {STUDY_LABEL} Pipeline Validation Dashboard
 
 *Captured At:* `{health['timestamp']}`  
 *Environment:* `{env_str}`  
@@ -751,7 +845,7 @@ def write_telemetry(results, sas_mode="sim"):
         f.write(dashboard_content)
 
 def main():
-    parser = argparse.ArgumentParser(description="TROPIC (Study EFC6193 / XRP6258) Pipeline Orchestrator")
+    parser = argparse.ArgumentParser(description=f"{STUDY_LABEL} Pipeline Orchestrator")
     parser.add_argument("--dry-run", action="store_true", help="dry run check")
     parser.add_argument("--rollback", action="store_true", help="rollback check")
     parser.add_argument("--from-stage", type=int, default=0, help="from stage number")
@@ -761,6 +855,7 @@ def main():
     parser.add_argument("--serial", action="store_true", help="Run stages serially rather than parallelizing Stages 4-8.")
     parser.add_argument("--force-upload-sdtm", action="store_true", help="ODA only: force a full re-upload of the ~200 MB SDTM source (default uploads only missing/changed files). Use after a source-data refresh.")
     parser.add_argument("--seed-if-needed", action="store_true", help="ODA only: seed the SDTM library inline within the Stage-10 session if it is not already resident (single ODA spawn for seed+run). Delta-aware: a resident library costs only a manifest check.")
+    parser.add_argument("--study", default=None, help="Run a named study under studies/<name>/ (default: the TROPIC study at the repo root). Multi-study: the engine chdirs into the study root and builds its DAG from that study's manifest.")
 
     args = parser.parse_args()
 
@@ -781,9 +876,15 @@ def main():
         print("Demo smoke test completed successfully!")
         sys.exit(0)
     else:
-        # Validate that from-stage is within valid range (AUTO-03)
-        if args.from_stage < 0 or args.from_stage > 17:
-            print(f"ERROR: Invalid stage number {args.from_stage}. Stage number must be between 1 and 17.")
+        # Resolve & activate the target study (default = TROPIC at the repo root;
+        # --study <name> = studies/<name>/). Chdirs into the study root and loads its
+        # manifest before the DAG is built (I/J Phase 2, multi-study).
+        _activate_study(args.study)
+        # Validate that from-stage is within valid range (AUTO-03). The stage count is
+        # derived from the manifest-built DAG rather than a hardcoded 17.
+        max_stage = len(build_stages(_MANIFEST, _ENGINE_ROOT, _RELOCATE_ENGINE))
+        if args.from_stage < 0 or args.from_stage > max_stage:
+            print(f"ERROR: Invalid stage number {args.from_stage}. Stage number must be between 1 and {max_stage}.")
             sys.exit(1)
         if args.real_sas and args.use_cached_sas:
             print("ERROR: --real-sas and --use-cached-sas are mutually exclusive.")
