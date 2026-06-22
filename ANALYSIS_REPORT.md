@@ -125,7 +125,7 @@ FDA Project Optimus alignment: RDI in Cycle 1 was used as the E-R exposure proxy
 | Independent Validation | R 4.6.0 / Pharmaverse | ADaMIG v1.3 |
 | Reconciliation | `diffdf` package | 100% cell-by-cell match |
 | TFL Generation | ggplot2, survival, patchwork | ICH E3 / NEJM style |
-| Orchestration | Python 3.10 (cibuild.py) | 17-stage CI pipeline |
+| Orchestration | Python 3.10 (cibuild.py) | 20-stage CI pipeline |
 
 ---
 

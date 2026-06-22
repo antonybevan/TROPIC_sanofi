@@ -103,13 +103,16 @@ The following items are explicitly deferred or represent documented limitations 
   2.1 + ARM v1.0."* This certifies the **schema layer** (structure, namespaces, required attributes,
   enumerations, element ordering).
 - **CDISC CORE business-rule conformance — RUN & reproducible (§7).** The open-source CDISC reference
-  engine (CORE 0.16.0) was run against both SDTM and ADaM: **SDTM** = 392 SDTMIG-3.2 rules executed;
+  engine (CORE 0.16.0) was run against both SDTM and ADaM: **SDTM** = validated at **SDTMIG 3.4** on the
+  uplifted layer that the package ships (authoritative; `CORE_SDTM34_RUN_RECORD.md`), plus a 392-rule
+  **SDTMIG 3.2** baseline on the pristine 3.1.1 source (`CORE_RUN_RECORD.md`);
   **ADaM** = CORE/CDISC Library ships **0 executable ADaM rules**, so executable ADaM rules were
   authored in CORE YAML (`06_telemetry/conformance_rules/adam/`) and run via `--local-rules` (7/7 SUCCESS).
   Both Define-XML files were hardened to parse in CORE (`Define_XML_Version 2.1.0`) while still passing
   XSD. Reproduce via `06_telemetry/run_core_conformance.sh` (see §7). **Remaining for a full submission
   run:** the official `AD####` ADaM Conformance Rules (members-only) and a Pinnacle 21 pass with the
-  mature ADaM rule pack; CORE's SDTM run is also caveated by the SDTMIG 3.1.1-vs-3.2 version gap.
+  mature ADaM rule pack. (The 3.2 *baseline* run is caveated by the SDTMIG 3.1.1-vs-3.2 version gap; the
+  authoritative SDTM run validates the uplifted **3.4** layer, the version the package describes.)
 - **Real ODA SAS Run Evidence:** Local execution default is simulated (`sim`) mode. Executing a genuine SAS run requires a SAS engine license or SAS OnDemand for Academics (ODA) credentials (which cannot be shared in a public repository).
 - **Guyot (2012) KM Reconstruction of CbzP:** The synthetic arm is honestly labeled as illustrative and constructed by time-scaling. Using the Guyot (2012) KM reconstruction method for the comparator arm is deferred and recommended as a future upgrade if a true two-arm comparison is desired, as the current divide-by-HR method is circular.
 - **Week-Precision Event Dates:** Week-precision dates (±3.5 days) are inherent to the source data and are disclosed as a dataset limitation.
@@ -127,7 +130,7 @@ The following items are explicitly deferred or represent documented limitations 
 export CDISC_LIBRARY_API_KEY=<free CDISC account key>
 bash 06_telemetry/run_core_conformance.sh
 ```
-The runner builds a Py 3.12 venv (`.core_venv`), clones CORE v0.16.0 (`.core_run/engine`; applies a one-line CLI patch so `-s adamig` is accepted), caches library metadata, converts SDTM to XPT, then validates **SDTM** (`-s sdtmig -v 3.2`) and **ADaM** (`-s adamig -v 1.3 --local-rules 06_telemetry/conformance_rules/adam`). Reports → `06_telemetry/conformance/`.
+The runner builds a Py 3.12 venv (`.core_venv`), clones CORE v0.16.0 (`.core_run/engine`; applies a one-line CLI patch so `-s adamig` is accepted), caches library metadata, converts/uplifts SDTM to XPT, then validates **SDTM** twice — the authoritative uplifted layer (`-s sdtmig -v 3.4`) and the pristine-source baseline (`-s sdtmig -v 3.2`) — and **ADaM** (`-s adamig -v 1.3 --local-rules 06_telemetry/conformance_rules/adam`). Reports → `06_telemetry/conformance/`.
 
 ### Committed vs. ephemeral, and determinism
 - **Committed (inspect without re-running):** the executable rule pack (`06_telemetry/conformance_rules/adam/*.yml`), the **redacted** JSON reports, `CORE_RUN_RECORD.md`, and the now-CORE-parseable Define-XML files.

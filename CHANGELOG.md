@@ -415,6 +415,9 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
 > the log-hygiene edits below changed no values** (a value change would have broken the zero-diff).
 > ADaM record counts are unchanged: ADSL 371, ADEX 13052, ADCM 24534, ADAE 5428, ADLB 78619,
 > ADRS 2904, ADTTE 2058.
+> *(Forward-note, not a retroactive edit: ADRS was **later enriched to 3275 rows** — integrated
+> RECIST non-target/new-lesion + PCWG3 bone records, see ADRG §4A. The 2904 above is the correct
+> 3.6.1-era count and is preserved for historical accuracy.)*
 
 ### Fixed — SAS 9.4 log hygiene (master log now **0 ERROR · 0 WARNING · 0 flagged NOTE**)
 - **Uninitialized-variable bug (`A_adtte_generation.sas`).** A duplicated keyword in the TTE

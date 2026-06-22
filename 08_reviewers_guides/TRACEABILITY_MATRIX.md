@@ -111,7 +111,7 @@ that link key results to their ADaM data + method — the define-level complemen
 
 ## 4. Orchestration & Provenance
 
-The pipeline is **17 stages** (`cibuild.py`); the BIMO domain at Stage 10 and the two ADaM
+The pipeline is **20 stages** (`cibuild.py`); the BIMO domain at Stage 10 and the two ADaM
 specification-conformance gates at Stages 15–16 (audit C-4 inversion) shifted the later stage numbers.
 
 | Stage | Driver | Evidence artifact |
@@ -124,8 +124,11 @@ specification-conformance gates at Stages 15–16 (audit C-4 inversion) shifted 
 | 14 (numerical results reconciliation) | `results_reconcile.R` — SAS `PROC LIFETEST` vs R `survfit` (MP-arm KM medians / events / N) | `results_reconciliation_status.json` |
 | 15 (spec → define conformance) | `07_define_xml/check_define_conformance.R` — `define.xml` checked against `ADaM_spec.xlsx` (C-4 inversion; `--self-test` proves drift detection) | `06_telemetry/conformance/spec_define_conformance.json` |
 | 16 (spec → data conformance) | `03_validation_r/spec_data_checks.R` — metacore/metatools/xportr vs `04_adam/*_prod.xpt` | `06_telemetry/conformance/spec_data_conformance.json` |
-| 17 (eCTD Module 5 packaging) | `package_ectd.py` | `m5/` (ephemeral) |
-| *(offline)* CDISC CORE conformance | `06_telemetry/run_core_conformance.sh` — SDTMIG-3.2 rules + executable ADaM rules (`conformance_rules/adam/`, `--local-rules`) | `06_telemetry/conformance/core_{sdtm,adam}_report.json`, `CORE_RUN_RECORD.md` |
+| 17 (Dataset-JSON v1.1 export) | `export_datasetjson.py` | `10_datasetjson/**/*.json` (ephemeral) |
+| 18 (Analysis Results Standard v1.0) | `build_ars.py` | `12_ars/` (ephemeral) |
+| 19 (USDM v3.0 study definition) | `build_usdm.py` | `13_usdm/tropic_usdm.json` (also a data-free CI gate) |
+| 20 (eCTD Module 5 packaging) | `package_ectd.py` | `m5/` (ephemeral) |
+| *(offline)* CDISC CORE conformance | `06_telemetry/run_core_conformance.sh` — SDTMIG **3.4** rules on the uplifted layer (authoritative) + SDTMIG 3.2 baseline on the pristine 3.1.1 source + executable ADaM rules (`conformance_rules/adam/`, `--local-rules`) | `06_telemetry/conformance/core_sdtm34_report.json` + `core_{sdtm,adam}_report.json`; `CORE_SDTM34_RUN_RECORD.md`, `CORE_RUN_RECORD.md` |
 
 Run reproducibility: R toolchain pinned by `renv.lock`; self-contained demo
 (`python3 06_telemetry/cibuild.py --demo`) runs `tests/smoke_test.R` with no real data,

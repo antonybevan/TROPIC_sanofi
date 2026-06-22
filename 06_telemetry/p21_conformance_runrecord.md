@@ -16,6 +16,8 @@ core validate -s adam -v adamig-1-3 -ca resources/cache \
 ## Result — and the material finding
 - ✅ Engine provisioned and executed; **all 7 ADaM datasets were read and recognised** with correct
   record counts (ADSL 371, ADEX 13052, ADCM 24534, ADAE 5428, ADLB 78619, ADRS 2904, ADTTE 2058).
+  *(Forward-note: ADRS was later enriched to 3275 rows — integrated RECIST non-target/new-lesion +
+  PCWG3 bone records, ADRG §4A; the 2904 here is the 2026-06-14-era count, preserved as recorded.)*
 - ⚠️ **0 rules executed** (`Rules_Report: []`). **Root cause (verified by inspecting the engine's own
   `rules.pkl`, 981 rules): CORE v0.16.0 ships executable rules for `SDTMIG`, `SENDIG`,
   `SENDIG-DART/GENETOX/AR`, `TIG`, `USDM` — and ZERO for ADaM/ADaMIG.**
