@@ -193,6 +193,11 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
   engine root), so configuration generation is per-study.
 - **CI** — `pyyaml` promoted to the main Python-deps step (the manifest loader depends on it).
 
+> *(Forward-note, not a retroactive edit: the **17-stage** counts above were correct as of
+> 3.14.0. The manifest-driven DAG later grew to **20 stages** in [3.19.0] when the
+> Dataset-JSON/ARS/USDM export layer was wired in as post-stages 17–19 and eCTD packaging
+> moved to stage 20; the counts here are preserved for historical accuracy.)*
+
 ## [3.13.0] - 2026-06-18 — PCWG3-correct integrated RECIST response + bone 2+2, verified on real SAS
 
 > **Context.** Two linked changes, both proven on a **genuine `oda`-mode run** (real SAS 9.4 on
