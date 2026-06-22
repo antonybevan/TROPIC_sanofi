@@ -51,7 +51,7 @@ jobs:
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install pyreadstat lxml saspy pyyaml
+        python -m pip install pyreadstat lxml saspy pyyaml usdm
 
     - name: SAS static-analysis gate (blocks on hardcoded paths)
       run: |
@@ -89,3 +89,11 @@ jobs:
         Rscript 07_define_xml/check_define_conformance.R
         Rscript 07_define_xml/check_define_conformance.R --self-test
         Rscript 03_validation_r/spec_data_checks.R
+
+    - name: USDM study-definition build (data-free gate)
+      run: |
+        # build_usdm.py constructs the USDM v3.0 study definition from the usdm_model
+        # classes (no patient data) — so, unlike the Dataset-JSON/ARS generators, it can
+        # run in the data-free CI. Construction IS validation: a non-zero exit fails here.
+        # (Dataset-JSON/ARS are data-dependent and are gated in the full pipeline instead.)
+        python3 06_telemetry/build_usdm.py

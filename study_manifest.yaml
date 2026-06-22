@@ -80,4 +80,9 @@ infrastructure_stages:
     - { name: "Numerical Results Reconciliation (SAS vs R)", script: "05_reconciliation/results_reconcile.R",    runner: logrx,   gated: true }
     - { name: "ADaM Spec to Define Conformance",             script: "07_define_xml/check_define_conformance.R", runner: rscript }
     - { name: "ADaM Spec to Data Conformance",               script: "03_validation_r/spec_data_checks.R",       runner: rscript }
+    # Modern machine-readable export layer. Non-gated: each generator's own exit code gates it
+    # (non-zero -> sys.exit(1)); they run after the data/spec gates and before eCTD packaging.
+    - { name: "Dataset-JSON Export (v1.1)",                  script: "06_telemetry/export_datasetjson.py",       runner: python }
+    - { name: "Analysis Results Standard (ARS v1.0)",        script: "06_telemetry/build_ars.py",                runner: python }
+    - { name: "USDM Study Definition (v3.0)",                script: "06_telemetry/build_usdm.py",               runner: python }
     - { name: "eCTD Final Package",                          script: "06_telemetry/package_ectd.py",             runner: python }
