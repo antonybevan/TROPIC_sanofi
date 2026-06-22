@@ -46,6 +46,12 @@ library(haven)
 cat("NOTE: [RECONSTRUCT] Starting CbzP arm reconstruction from published data...\n")
 dir.create("01_raw_source/cbzp_reconstructed", showWarnings = FALSE, recursive = TRUE)
 
+# Size of the RECIST-evaluable (measurable-disease) subset. This single constant
+# drives BOTH the TTUMOR pseudo-IPD length and the count of MEASDISF=="Y" in ADSL,
+# so the two can never fall out of sync (a length mismatch would otherwise crash
+# make_adtte() with a dplyr recycling error).
+N_meas <- 179
+
 log_lines <- c(
   "TROPIC CbzP Arm Reconstruction Log (SYNTHETIC / ILLUSTRATIVE -- NOT REAL DATA)",
   paste("Date:", Sys.time()),
@@ -144,7 +150,7 @@ reconstruct_ph_arm <- function(mp_data, hr, n_cbzp, n_target_events, label) {
 
 ttpain_ipd <- reconstruct_ph_arm(ttpain_mp, hr = 0.80, n_cbzp = 378, n_target_events = 130, label = "PAIN")
 ttpsa_ipd  <- reconstruct_ph_arm(ttpsa_mp,  hr = 0.75, n_cbzp = 378, n_target_events = 286, label = "PSA ")
-ttumor_ipd <- reconstruct_ph_arm(ttumor_mp, hr = 0.61, n_cbzp = 179, n_target_events = 166, label = "TMR ")
+ttumor_ipd <- reconstruct_ph_arm(ttumor_mp, hr = 0.61, n_cbzp = N_meas, n_target_events = 166, label = "TMR ")
 
 log_lines <- c(log_lines,
   "--- Primary Endpoints (Guyot-Framework Reconstruction) ---",
@@ -186,8 +192,10 @@ visc_raw <- sample(c("Y", "N"), N_cbzp, replace = TRUE, prob = c(0.26, 0.74))
 # Pain at baseline: 59% (Table 1)
 pain_raw <- sample(c("Y", "N"), N_cbzp, replace = TRUE, prob = c(0.59, 0.41))
 
-# Measurable disease: 45% (Table 1)
-meas_raw <- sample(c("Y", "N"), N_cbzp, replace = TRUE, prob = c(0.45, 0.55))
+# Measurable disease: exactly N_meas RECIST-evaluable subjects (the TTUMOR
+# analysis population), randomly placed across the cohort. Drawing an exact count
+# (rather than a Bernoulli rate) keeps MEASDISF=="Y" locked to nrow(ttumor_ipd).
+meas_raw <- sample(c(rep("Y", N_meas), rep("N", N_cbzp - N_meas)))
 
 # Prior docetaxel: progressed during = 34%, progressed after = 66%
 docprog_raw <- sample(c("DURING", "AFTER"), N_cbzp, replace = TRUE, prob = c(0.34, 0.66))
@@ -221,6 +229,15 @@ trtsdt_raw <- as.Date("2007-09-01") + sample(0:700, N_cbzp, replace = TRUE)
 # Approximate as 70% of OS time (exposure ends before death/progression)
 trtdurd_raw <- pmax(21, round(os_ipd$time * runif(N_cbzp, 0.45, 0.85)))
 
+# Safety / per-protocol / GCSF-prophylaxis populations assigned to RANDOM subjects.
+# os_ipd is time-ordered, so a positional slice (e.g. seq_len <= 371) would tie
+# these flags to the lowest-OS subjects and create an artifactual flag-vs-survival
+# correlation. GCSF prophylaxis is a subset of the safety population.
+is_safety <- rep(FALSE, N_cbzp)
+is_safety[sample(N_cbzp, 371)] <- TRUE
+is_gcsf <- rep(FALSE, N_cbzp)
+is_gcsf[sample(which(is_safety), 30)] <- TRUE
+
 adsl_cbzp <- data.frame(
   STUDYID  = "TROPIC-NCT00417079",
   USUBJID  = usubjid_raw,
@@ -241,8 +258,8 @@ adsl_cbzp <- data.frame(
   TRTEDT   = trtsdt_raw + trtdurd_raw,
   TRTDURD  = trtdurd_raw,
   ITTFL    = "Y",
-  SAFFL    = if_else(seq_len(N_cbzp) <= 371, "Y", "N"),
-  PPROTFL  = if_else(seq_len(N_cbzp) <= 371, sample(c("Y", "N"), N_cbzp, replace = TRUE, prob = c(0.88, 0.12)), "N"),
+  SAFFL    = if_else(is_safety, "Y", "N"),
+  PPROTFL  = if_else(is_safety, sample(c("Y", "N"), N_cbzp, replace = TRUE, prob = c(0.88, 0.12)), "N"),
   DTHFL    = if_else(os_ipd$status == 1, "Y", "N"),
   DTHDT    = if_else(os_ipd$status == 1, trtsdt_raw + os_ipd$time, as.Date(NA)),
   DTHCAUS  = if_else(os_ipd$status == 1, "DEATH", ""),
@@ -258,7 +275,7 @@ adsl_cbzp <- data.frame(
   HGBBL    = hgbbl_raw,
   DOCPROG  = docprog_raw,
   DOCRESP  = docresp_raw,
-  GCSFPRFL = if_else(seq_len(N_cbzp) <= 30, "Y", "N"),
+  GCSFPRFL = if_else(is_gcsf, "Y", "N"),
   stringsAsFactors = FALSE
 )
 
@@ -617,7 +634,10 @@ plat_worst <- data.frame(
 # 4. ANCNADIR (Optimus)
 anc_nadir_vals <- 4.5 - 3.8 * (safety_rdis / 100) + rnorm(N_safety_cbzp, mean = 0, sd = 0.35)
 anc_nadir_vals <- pmax(0.01, pmin(4.8, anc_nadir_vals))
-anc_nadir_vals[1:30] <- runif(30, 1.2, 3.2)
+# GCSF-prophylaxis subjects keep a higher (less neutropenic) nadir. Index them by
+# their flag, not by row position, so this tracks the same subjects flagged in ADSL.
+gcsf_in_safety <- safety_subjs$GCSFPRFL == "Y"
+anc_nadir_vals[gcsf_in_safety] <- runif(sum(gcsf_in_safety), 1.2, 3.2)
 
 neut_grades <- case_when(
   anc_nadir_vals < 0.5 ~ 4,
@@ -877,8 +897,8 @@ log_lines <- c(log_lines,
   sprintf("  ADEX records: %d", nrow(adex_cbzp)),
   sprintf("  ADLB records: %d", nrow(adlb_cbzp)),
   sprintf("  ADRS records: %d", nrow(adrs_cbzp)),
-  sprintf("  ADTTE OS    : %d rows, %d events (expected ~200)", nrow(adtte_cbzp %>% filter(PARAMCD=="OS")), sum(adtte_cbzp$CNSR[adtte_cbzp$PARAMCD=="OS"]==0)),
-  sprintf("  ADTTE PFS   : %d rows, %d events (expected ~270)", nrow(adtte_cbzp %>% filter(PARAMCD=="PFS")), sum(adtte_cbzp$CNSR[adtte_cbzp$PARAMCD=="PFS"]==0)),
+  sprintf("  ADTTE OS    : %d rows, %d events (expected ~227, published deaths)", nrow(adtte_cbzp %>% filter(PARAMCD=="OS")), sum(adtte_cbzp$CNSR[adtte_cbzp$PARAMCD=="OS"]==0)),
+  sprintf("  ADTTE PFS   : %d rows, %d events (curve-derived; no published PFS event count)", nrow(adtte_cbzp %>% filter(PARAMCD=="PFS")), sum(adtte_cbzp$CNSR[adtte_cbzp$PARAMCD=="PFS"]==0)),
   sprintf("  ADTTE TTPAIN: %d rows, %d events (expected ~130)", nrow(adtte_cbzp %>% filter(PARAMCD=="TTPAIN")), sum(adtte_cbzp$CNSR[adtte_cbzp$PARAMCD=="TTPAIN"]==0)),
   sprintf("  ADTTE TTPSA : %d rows, %d events (expected ~286)", nrow(adtte_cbzp %>% filter(PARAMCD=="TTPSA")), sum(adtte_cbzp$CNSR[adtte_cbzp$PARAMCD=="TTPSA"]==0)),
   sprintf("  ADTTE TTUMOR: %d rows, %d events (expected ~166)",  nrow(adtte_cbzp %>% filter(PARAMCD=="TTUMOR")), sum(adtte_cbzp$CNSR[adtte_cbzp$PARAMCD=="TTUMOR"]==0))
