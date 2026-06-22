@@ -4,6 +4,40 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.19.0] - 2026-06-22 — Machine-readable export layer wired into the pipeline + CI
+
+> **Context.** The modern machine-readable exports (Dataset-JSON, ARS, USDM) existed as
+> standalone generators but were never part of the gated build. They are now first-class
+> pipeline stages, so they run — and are enforced — on every full run, with the one
+> data-free generator additionally gated in CI.
+
+### Added
+- **Export layer as gated post-stages 17–19** (`study_manifest.yaml`) — Dataset-JSON v1.1
+  (`export_datasetjson.py`, stage 17), Analysis Results Standard v1.0 (`build_ars.py`,
+  stage 18), and USDM v3.0 (`build_usdm.py`, stage 19). They run after the data/spec
+  conformance gates and before eCTD packaging. Non-gated is strict in the full pipeline:
+  any non-zero exit hits `sys.exit(1)` in `run_single_stage`, so each generator's own exit
+  code gates it.
+- **USDM data-free CI gate** (`.github/workflows/ci.yml`) — `build_usdm.py` is built from
+  the `usdm_model` classes with no patient data, so it produces a real signal in the
+  data-free runner; the `usdm` dependency is pinned to **`==0.66.0`** for reproducibility.
+  The data-dependent Dataset-JSON/ARS generators read `04_adam/*_prod.xpt` and are
+  enforced in the full pipeline run instead of CI.
+- **`06_telemetry/OFFLINE_LAYER_RUNBOOK.md`** — standalone reproduction of the three
+  export layers outside the orchestrator.
+
+### Changed
+- **Pipeline is now 20 stages** (was 17); eCTD Module 5 packaging moves to stage 20. Docs
+  updated to match (`README.md`, `ANALYSIS_REPORT.md`, `08_reviewers_guides/TRACEABILITY_MATRIX.md`).
+
+### Fixed
+- **Reconstructed CbzP synthetic arm — flag-vs-survival artifact** (`reconstruct_cbzp_arm.R`).
+  Population/exposure flags (`SAFFL`/`PPROTFL`/`GCSFPRFL`) and the GCSF ANC-nadir bump were
+  assigned by row position against the time-ordered survival data, tying them to the
+  lowest-OS subjects and creating an artifactual flag-vs-survival correlation. They are now
+  assigned to random subjects and indexed by the flag itself; `MEASDISF=="Y"` is locked to
+  an exact `N_meas` (179) so it stays in sync with the TTUMOR pseudo-IPD length.
+
 ## [3.18.0] - 2026-06-21 — Honest unsourced demographics (Finding #8)
 
 > **Context.** Closes the hardcoded-demographics hygiene finding. The de-identified
