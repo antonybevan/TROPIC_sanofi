@@ -239,7 +239,7 @@ TROPIC/
 
 ```bash
 # Clone and enter
-git clone <repo-url> && cd TROPIC
+git clone https://github.com/antonybevan/TROPIC_sanofi.git TROPIC && cd TROPIC
 
 # Run all 20 stages (default = sim mode; add --real-sas for a genuine ODA run)
 python3 06_telemetry/cibuild.py
