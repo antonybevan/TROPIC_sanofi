@@ -160,11 +160,11 @@ log_lines <- c(log_lines,
           sum(pfs_ipd$status), pfs_med_g, pfs_med_g / 30.4375),
   "--- Secondary Endpoints (PH-Scaled — no published KM for Guyot) ---",
   sprintf("PAIN PH-scaled: N=378, events=%d, median=%.0f days", sum(ttpain_ipd$status),
-          summary(survival::survfit(survival::Surv(time,status)~1, data=ttpain_ipd))$table["median"]),
+          summary(survival::survfit(survival::Surv(time, status) ~ 1, data = ttpain_ipd))$table["median"]),
   sprintf("PSA  PH-scaled: N=378, events=%d, median=%.0f days", sum(ttpsa_ipd$status),
-          summary(survival::survfit(survival::Surv(time,status)~1, data=ttpsa_ipd))$table["median"]),
+          summary(survival::survfit(survival::Surv(time, status) ~ 1, data = ttpsa_ipd))$table["median"]),
   sprintf("TMR  PH-scaled: N=179, events=%d, median=%.0f days", sum(ttumor_ipd$status),
-          summary(survival::survfit(survival::Surv(time,status)~1, data=ttumor_ipd))$table["median"])
+          summary(survival::survfit(survival::Surv(time, status) ~ 1, data = ttumor_ipd))$table["median"])
 )
 
 
@@ -292,7 +292,7 @@ cat(sprintf("  ADSL CbzP: N=%d, Deaths=%d (%.0f%%)\n",
             nrow(adsl_cbzp), sum(adsl_cbzp$DTHFL == "Y"),
             100 * mean(adsl_cbzp$DTHFL == "Y")))
 log_lines <- c(log_lines, sprintf("ADSL CbzP: N=%d Deaths=%d",
-                                   nrow(adsl_cbzp), sum(adsl_cbzp$DTHFL == "Y")))
+                                  nrow(adsl_cbzp), sum(adsl_cbzp$DTHFL == "Y")))
 
 
 # ==============================================================================
@@ -305,20 +305,34 @@ cat("  [RECONSTRUCT] Building CbzP ADAE from published Table 2...\n")
 # Published Grade >=3 AE rates for CbzP (Table 2, de Bono Lancet 2010)
 # Any TEAE: 97.7%, Any Grade >=3: 57.4% (vs 39.4% MP), SAE: 39.2%
 ae_specs <- list(
-  list(soc = "BLOOD AND LYMPHATIC SYSTEM DISORDERS",           pt = "NEUTROPENIA",          rate_any = 0.820, rate_g3 = 0.818, aeser_rate = 0.04),
-  list(soc = "BLOOD AND LYMPHATIC SYSTEM DISORDERS",           pt = "FEBRILE NEUTROPENIA",   rate_any = 0.080, rate_g3 = 0.080, aeser_rate = 0.05),
-  list(soc = "BLOOD AND LYMPHATIC SYSTEM DISORDERS",           pt = "ANAEMIA",               rate_any = 0.310, rate_g3 = 0.035, aeser_rate = 0.02),
-  list(soc = "BLOOD AND LYMPHATIC SYSTEM DISORDERS",           pt = "LEUKOPENIA",            rate_any = 0.200, rate_g3 = 0.038, aeser_rate = 0.01),
-  list(soc = "GASTROINTESTINAL DISORDERS",                     pt = "DIARRHOEA",             rate_any = 0.470, rate_g3 = 0.060, aeser_rate = 0.01),
-  list(soc = "GASTROINTESTINAL DISORDERS",                     pt = "NAUSEA",                rate_any = 0.340, rate_g3 = 0.008, aeser_rate = 0.00),
-  list(soc = "GASTROINTESTINAL DISORDERS",                     pt = "VOMITING",              rate_any = 0.220, rate_g3 = 0.011, aeser_rate = 0.01),
-  list(soc = "GASTROINTESTINAL DISORDERS",                     pt = "CONSTIPATION",          rate_any = 0.200, rate_g3 = 0.004, aeser_rate = 0.00),
-  list(soc = "GENERAL DISORDERS AND ADMINISTRATION SITE CONDITIONS", pt = "FATIGUE",         rate_any = 0.370, rate_g3 = 0.049, aeser_rate = 0.01),
-  list(soc = "GENERAL DISORDERS AND ADMINISTRATION SITE CONDITIONS", pt = "ASTHENIA",        rate_any = 0.290, rate_g3 = 0.046, aeser_rate = 0.02),
-  list(soc = "MUSCULOSKELETAL AND CONNECTIVE TISSUE DISORDERS", pt = "BACK PAIN",            rate_any = 0.160, rate_g3 = 0.038, aeser_rate = 0.02),
-  list(soc = "NERVOUS SYSTEM DISORDERS",                       pt = "PERIPHERAL NEUROPATHY", rate_any = 0.130, rate_g3 = 0.010, aeser_rate = 0.01),
-  list(soc = "RENAL AND URINARY DISORDERS",                    pt = "HAEMATURIA",            rate_any = 0.170, rate_g3 = 0.021, aeser_rate = 0.01),
-  list(soc = "INFECTIONS AND INFESTATIONS",                    pt = "URINARY TRACT INFECTION",rate_any = 0.080, rate_g3 = 0.018, aeser_rate = 0.02)
+  list(soc = "BLOOD AND LYMPHATIC SYSTEM DISORDERS",
+       pt = "NEUTROPENIA", rate_any = 0.820, rate_g3 = 0.818, aeser_rate = 0.04),
+  list(soc = "BLOOD AND LYMPHATIC SYSTEM DISORDERS",
+       pt = "FEBRILE NEUTROPENIA", rate_any = 0.080, rate_g3 = 0.080, aeser_rate = 0.05),
+  list(soc = "BLOOD AND LYMPHATIC SYSTEM DISORDERS",
+       pt = "ANAEMIA", rate_any = 0.310, rate_g3 = 0.035, aeser_rate = 0.02),
+  list(soc = "BLOOD AND LYMPHATIC SYSTEM DISORDERS",
+       pt = "LEUKOPENIA", rate_any = 0.200, rate_g3 = 0.038, aeser_rate = 0.01),
+  list(soc = "GASTROINTESTINAL DISORDERS",
+       pt = "DIARRHOEA", rate_any = 0.470, rate_g3 = 0.060, aeser_rate = 0.01),
+  list(soc = "GASTROINTESTINAL DISORDERS",
+       pt = "NAUSEA", rate_any = 0.340, rate_g3 = 0.008, aeser_rate = 0.00),
+  list(soc = "GASTROINTESTINAL DISORDERS",
+       pt = "VOMITING", rate_any = 0.220, rate_g3 = 0.011, aeser_rate = 0.01),
+  list(soc = "GASTROINTESTINAL DISORDERS",
+       pt = "CONSTIPATION", rate_any = 0.200, rate_g3 = 0.004, aeser_rate = 0.00),
+  list(soc = "GENERAL DISORDERS AND ADMINISTRATION SITE CONDITIONS",
+       pt = "FATIGUE", rate_any = 0.370, rate_g3 = 0.049, aeser_rate = 0.01),
+  list(soc = "GENERAL DISORDERS AND ADMINISTRATION SITE CONDITIONS",
+       pt = "ASTHENIA", rate_any = 0.290, rate_g3 = 0.046, aeser_rate = 0.02),
+  list(soc = "MUSCULOSKELETAL AND CONNECTIVE TISSUE DISORDERS",
+       pt = "BACK PAIN", rate_any = 0.160, rate_g3 = 0.038, aeser_rate = 0.02),
+  list(soc = "NERVOUS SYSTEM DISORDERS",
+       pt = "PERIPHERAL NEUROPATHY", rate_any = 0.130, rate_g3 = 0.010, aeser_rate = 0.01),
+  list(soc = "RENAL AND URINARY DISORDERS",
+       pt = "HAEMATURIA", rate_any = 0.170, rate_g3 = 0.021, aeser_rate = 0.01),
+  list(soc = "INFECTIONS AND INFESTATIONS",
+       pt = "URINARY TRACT INFECTION", rate_any = 0.080, rate_g3 = 0.018, aeser_rate = 0.02)
 )
 
 treated_subjs <- adsl_cbzp$USUBJID[adsl_cbzp$SAFFL == "Y"]
@@ -343,7 +357,7 @@ for (ae in ae_specs) {
   grades <- if_else(is_g3plus, sample(3:4, n_ae, replace = TRUE, prob = c(0.7, 0.3)), sample(1:2, n_ae, replace = TRUE))
 
   # Onset: random within treatment window (days 1-90 most common for first cycles)
-  onset_days <- pmax(1, round(rexp(n_ae, rate = 1/25)))
+  onset_days <- pmax(1, round(rexp(n_ae, rate = 1 / 25)))
 
   adae_cbzp_list[[ae_seq]] <- data.frame(
     STUDYID  = "TROPIC-NCT00417079",
@@ -390,11 +404,11 @@ adae_cbzp <- adae_cbzp %>%
 cat(sprintf("  ADAE CbzP: %d records across %d subjects; Grade>=3: %d (%.0f%% subjects)\n",
             nrow(adae_cbzp),
             n_distinct(adae_cbzp$USUBJID),
-            nrow(adae_cbzp[adae_cbzp$ATOXGR >= 3,]),
+            nrow(adae_cbzp[adae_cbzp$ATOXGR >= 3, ]),
             100 * n_distinct(adae_cbzp$USUBJID[adae_cbzp$ATOXGR >= 3]) / N_cbzp))
 log_lines <- c(log_lines, sprintf("ADAE CbzP: %d records %d subjects Grade>=3 in %d subj",
-                                   nrow(adae_cbzp), n_distinct(adae_cbzp$USUBJID),
-                                   n_distinct(adae_cbzp$USUBJID[adae_cbzp$ATOXGR >= 3])))
+                                  nrow(adae_cbzp), n_distinct(adae_cbzp$USUBJID),
+                                  n_distinct(adae_cbzp$USUBJID[adae_cbzp$ATOXGR >= 3])))
 
 
 # ==============================================================================
@@ -420,7 +434,8 @@ make_adtte <- function(ipd, adsl_df, paramcd, param) {
       EVNTDESC = if_else(status == 1, toupper(paramcd), ""),
       CNSDTDSC = if_else(status == 0, "LAST ASSESSMENT", "")
     ) %>%
-    select(STUDYID, USUBJID, SUBJID, SITEID, TRT01P, TRT01PN, PARAMCD, PARAM, STARTDT, ADT, CNSR, EVNTDESC, CNSDTDSC, AVAL)
+    select(STUDYID, USUBJID, SUBJID, SITEID, TRT01P, TRT01PN, PARAMCD, PARAM,
+           STARTDT, ADT, CNSR, EVNTDESC, CNSDTDSC, AVAL)
 }
 
 adsl_cbzp_meas <- adsl_cbzp %>% filter(MEASDISF == "Y")
@@ -460,7 +475,7 @@ rdi_vals <- rdi_vals[shuffle_idx]
 rdi_cats <- rdi_cats[shuffle_idx]
 
 # Cycles received: median 6 (range 1-10)
-ncycles <- sample(1:10, N_cbzp, replace = TRUE, 
+ncycles <- sample(1:10, N_cbzp, replace = TRUE,
                   prob = c(0.08, 0.10, 0.12, 0.12, 0.13, 0.15, 0.10, 0.08, 0.06, 0.06))
 
 adex_cbzp <- bind_rows(
@@ -548,8 +563,8 @@ neut_worst <- data.frame(
   PARAM   = "ANC / Neutrophils",
   PARCAT1 = "HEMATOLOGY",
   AVAL    = if_else(neut_worst_grade == 4, runif(N_safety_cbzp, 0.05, 0.49),
-            if_else(neut_worst_grade == 3, runif(N_safety_cbzp, 0.50, 0.99),
-            runif(N_safety_cbzp, 1.0, 3.0))),
+                    if_else(neut_worst_grade == 3, runif(N_safety_cbzp, 0.50, 0.99),
+                            runif(N_safety_cbzp, 1.0, 3.0))),
   AVISIT  = "Cycle 1 Day 15",
   AVISITN = 3.0,
   BASEFL  = "N",
@@ -838,15 +853,19 @@ for (i in 1:N_cbzp) {
   subjid <- adsl_cbzp$SUBJID[i]
   trtsdt <- adsl_cbzp$TRTSDT[i]
   trtdurd <- adsl_cbzp$TRTDURD[i]
-  
+
   if (is.na(trtdurd) || trtdurd < 21) next
-  
+
   n_cycles <- max(1, floor(trtdurd / 21))
   for (c in 1:n_cycles) {
     adt_val <- trtsdt + (c * 21) - 3
     ady_val <- c * 21 - 3
-    v_resp <- if (c == n_cycles && bestresp_val[i] == "PD") "PD" else sample(c("SD", "PR", "CR"), 1, prob=c(0.6, 0.3, 0.1))
-    
+    v_resp <- if (c == n_cycles && bestresp_val[i] == "PD") {
+      "PD"
+    } else {
+      sample(c("SD", "PR", "CR"), 1, prob = c(0.6, 0.3, 0.1))
+    }
+
     ovrl_records[[length(ovrl_records) + 1]] <- data.frame(
       STUDYID  = "TROPIC-NCT00417079",
       USUBJID  = usubjid,
@@ -897,11 +916,21 @@ log_lines <- c(log_lines,
   sprintf("  ADEX records: %d", nrow(adex_cbzp)),
   sprintf("  ADLB records: %d", nrow(adlb_cbzp)),
   sprintf("  ADRS records: %d", nrow(adrs_cbzp)),
-  sprintf("  ADTTE OS    : %d rows, %d events (expected ~227, published deaths)", nrow(adtte_cbzp %>% filter(PARAMCD=="OS")), sum(adtte_cbzp$CNSR[adtte_cbzp$PARAMCD=="OS"]==0)),
-  sprintf("  ADTTE PFS   : %d rows, %d events (curve-derived; no published PFS event count)", nrow(adtte_cbzp %>% filter(PARAMCD=="PFS")), sum(adtte_cbzp$CNSR[adtte_cbzp$PARAMCD=="PFS"]==0)),
-  sprintf("  ADTTE TTPAIN: %d rows, %d events (expected ~130)", nrow(adtte_cbzp %>% filter(PARAMCD=="TTPAIN")), sum(adtte_cbzp$CNSR[adtte_cbzp$PARAMCD=="TTPAIN"]==0)),
-  sprintf("  ADTTE TTPSA : %d rows, %d events (expected ~286)", nrow(adtte_cbzp %>% filter(PARAMCD=="TTPSA")), sum(adtte_cbzp$CNSR[adtte_cbzp$PARAMCD=="TTPSA"]==0)),
-  sprintf("  ADTTE TTUMOR: %d rows, %d events (expected ~166)",  nrow(adtte_cbzp %>% filter(PARAMCD=="TTUMOR")), sum(adtte_cbzp$CNSR[adtte_cbzp$PARAMCD=="TTUMOR"]==0))
+  sprintf("  ADTTE OS    : %d rows, %d events (expected ~227, published deaths)",
+          nrow(adtte_cbzp %>% filter(PARAMCD == "OS")),
+          sum(adtte_cbzp$CNSR[adtte_cbzp$PARAMCD == "OS"] == 0)),
+  sprintf("  ADTTE PFS   : %d rows, %d events (curve-derived; no published PFS event count)",
+          nrow(adtte_cbzp %>% filter(PARAMCD == "PFS")),
+          sum(adtte_cbzp$CNSR[adtte_cbzp$PARAMCD == "PFS"] == 0)),
+  sprintf("  ADTTE TTPAIN: %d rows, %d events (expected ~130)",
+          nrow(adtte_cbzp %>% filter(PARAMCD == "TTPAIN")),
+          sum(adtte_cbzp$CNSR[adtte_cbzp$PARAMCD == "TTPAIN"] == 0)),
+  sprintf("  ADTTE TTPSA : %d rows, %d events (expected ~286)",
+          nrow(adtte_cbzp %>% filter(PARAMCD == "TTPSA")),
+          sum(adtte_cbzp$CNSR[adtte_cbzp$PARAMCD == "TTPSA"] == 0)),
+  sprintf("  ADTTE TTUMOR: %d rows, %d events (expected ~166)",
+          nrow(adtte_cbzp %>% filter(PARAMCD == "TTUMOR")),
+          sum(adtte_cbzp$CNSR[adtte_cbzp$PARAMCD == "TTUMOR"] == 0))
 )
 
 writeLines(log_lines, "01_raw_source/cbzp_reconstructed/reconstruction_log.txt")
