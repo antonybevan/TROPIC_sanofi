@@ -1,0 +1,14 @@
+# Pre-commit hooks for the TROPIC pipeline.
+#
+# One-time setup per clone:   pip install pre-commit && pre-commit install
+# Run on demand:              pre-commit run --all-files
+#
+# gitleaks scans staged changes for secrets (API keys, passwords, tokens) before they can be
+# committed. Real credentials are already kept out of git by .gitignore (_authinfo,
+# sascfg_personal.py, .core_run/, *.env); this hook is the defence-in-depth that blocks an
+# accidental `git add` of a secret regardless of path or filename.
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.4
+    hooks:
+      - id: gitleaks

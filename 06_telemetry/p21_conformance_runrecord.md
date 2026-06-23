@@ -1,9 +1,17 @@
 # Conformance Run Record — CDISC CORE (ADaM)
 
+> **Superseded (2026-06-23).** This is the 2026-06-14 record of the first ADaM attempt against
+> CORE's *published* rule set, which is empty (see below). It has been superseded by
+> [`conformance/CORE_RUN_RECORD.md`](conformance/CORE_RUN_RECORD.md), the authoritative ADaM CORE
+> run that executes the project's custom rules via `--local-rules` (7 rules, 0 issues; report
+> [`conformance/core_adam_report.json`](conformance/core_adam_report.json)). The raw output
+> referenced below (`p21_report.json`) has since been removed. Retained as a dated provenance
+> record; the finding that CORE ships no published ADaM rules remains accurate.
+
 **Date:** 2026-06-14 · **Engine:** CDISC CORE (CDISC Open Rules Engine) **v0.16.0**, standalone
 mac-apple-silicon build, run **offline** against the engine's bundled rules/CT cache (no CDISC
 Library API key needed).
-**Raw engine output:** [`p21_report.json`](p21_report.json).
+**Raw engine output:** `p21_report.json` (removed; see the superseding record above).
 
 ## Command
 ```bash
@@ -14,19 +22,19 @@ core validate -s adam -v adamig-1-3 -ca resources/cache \
 (7 real-MP ADaM `*_prod.xpt`, domain-named, from the zero-diff ODA run; CHANGELOG 3.6.1.)
 
 ## Result — and the material finding
-- ✅ Engine provisioned and executed; **all 7 ADaM datasets were read and recognised** with correct
+- Engine provisioned and executed; **all 7 ADaM datasets were read and recognised** with correct
   record counts (ADSL 371, ADEX 13052, ADCM 24534, ADAE 5428, ADLB 78619, ADRS 2904, ADTTE 2058).
   *(Forward-note: ADRS was later enriched to 3275 rows — integrated RECIST non-target/new-lesion +
   PCWG3 bone records, ADRG §4A; the 2904 here is the 2026-06-14-era count, preserved as recorded.)*
-- ⚠️ **0 rules executed** (`Rules_Report: []`). **Root cause (verified by inspecting the engine's own
+- Note: **0 rules executed** (`Rules_Report: []`). **Root cause (verified by inspecting the engine's own
   `rules.pkl`, 981 rules): CORE v0.16.0 ships executable rules for `SDTMIG`, `SENDIG`,
   `SENDIG-DART/GENETOX/AR`, `TIG`, `USDM` — and ZERO for ADaM/ADaMIG.**
 
 | Standard in CORE cache | Executable rules | ADaM coverage |
 |---|---|---|
-| SDTMIG 3.2/3.3/3.4 | ✅ ~⅔ of 336 published | — |
-| SENDIG (+DART/GENETOX/AR), TIG, USDM | ✅ | — |
-| **ADaMIG 1.0–1.3 / OCCDS** | ❌ **none published yet** | **engine cannot gate ADaM** |
+| SDTMIG 3.2/3.3/3.4 | ~⅔ of 336 published | — |
+| SENDIG (+DART/GENETOX/AR), TIG, USDM | Yes | — |
+| **ADaMIG 1.0–1.3 / OCCDS** | **none published yet** | **engine cannot gate ADaM** |
 
 This is **not** a defect in the datasets or a misconfiguration. The CDISC **ADaM Conformance
 Rules** exist as a *specification* (v5.0, 1000+ rules, covers ADaMIG 1.3), but their **executable**

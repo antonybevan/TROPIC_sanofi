@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-19T11:10:30.309185",
+  "timestamp": "2026-06-23T10:57:25.059112",
   "runner": "apple (System Agent)",
   "pipeline_health_status": "GREEN",
   "sas_execution_mode": "oda",
@@ -20,15 +20,35 @@
     "Numerical Results Reconciliation (SAS vs R)": "PASS",
     "ADaM Spec to Define Conformance": "PASS",
     "ADaM Spec to Data Conformance": "PASS",
-    "eCTD Final Package": "PASS"
+    "Dataset-JSON Export (v1.1)": "PASS",
+    "Analysis Results Standard (ARS v1.0)": "PASS",
+    "USDM Study Definition (v3.0)": "PASS",
+    "eCTD Final Package": "PASS",
+    "eCTD Backbone + STF (sequence 0000)": "PASS",
+    "Materialize eCTD Sequence": "PASS"
   },
   "oda_endpoint": "odaws01-apse1-2.oda.sas.com",
   "oda_attempts": 1,
-  "oda_total_wait_s": 16.2,
+  "oda_total_wait_s": 9.4,
   "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007",
   "reconciliation": "SAS_vs_R",
   "probe_nonce_echoed": true,
   "sas_results_stats": "downloaded",
   "reconciliation_status": "PASS",
-  "results_reconciliation_status": "PASS"
+  "results_reconciliation_status": "PASS",
+  "provenance_guard": {
+    "passed": true,
+    "checked_datasets": [
+      "adsl",
+      "adex",
+      "adcm",
+      "adae",
+      "adlb",
+      "adrs",
+      "adtte",
+      "clinsite"
+    ],
+    "byte_distinct": true,
+    "sdtm_manifest_sha": "matches current SDTM source (329430f6361e)"
+  }
 }

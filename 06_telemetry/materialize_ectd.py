@@ -38,14 +38,20 @@ def main():
     missing, mismatch = [], []
     for href, recorded in leaves:
         dest = os.path.join(SEQ, href)
-        if os.path.exists(dest):
+        src = os.path.join(ROOT, href)                # href == repo-relative path of source
+        # A dest that already matches the just-recorded checksum stays in place (backbone XML
+        # authored in-sequence has no repo source and lands here). Otherwise (missing, or stale
+        # from an earlier build whose XPT timestamps differ) re-copy from the repo source; the
+        # previous logic trusted any existing dest and so failed verification on every re-run.
+        if os.path.exists(dest) and md5(dest) == recorded.lower():
             in_place += 1
-        else:
-            src = os.path.join(ROOT, href)            # href == repo-relative path of source
-            if not os.path.exists(src):
-                missing.append(href); continue
-            os.makedirs(os.path.dirname(dest), exist_ok=True)
-            shutil.copy2(src, dest); copied += 1
+            verified += 1
+            continue
+        if not os.path.exists(src):
+            (mismatch if os.path.exists(dest) else missing).append(href)
+            continue
+        os.makedirs(os.path.dirname(dest), exist_ok=True)
+        shutil.copy2(src, dest); copied += 1
         if md5(dest) == recorded.lower():
             verified += 1
         else:
