@@ -82,6 +82,11 @@ node_modules/
 sascfg_personal.py
 _authinfo
 .authinfo
+# Dotenv secrets anywhere in the tree (audit M-3): .core_run/ is already ignored, but a
+# stray .env elsewhere must never be committable.
+.env
+*.env
+**/.env
 
 # Local IDE and temporary exploration folders
 .claude/

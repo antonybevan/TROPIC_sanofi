@@ -32,6 +32,68 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   NCI codes as `<Alias Context="nci:ExtCodeID">` elements (codelist and item level), giving
   reviewers/Pinnacle 21 a machine link to CDISC CT 2026-03-27. Remains XSD-valid (Define-XML 2.1 +
   ARM) and passes the spec→define conformance gate.
+## [3.20.0] - 2026-06-23 — Submission-readiness audit remediation (provenance guard, eCTD backbone in-DAG, CORE conformance)
+
+> **Context.** An independent submission-readiness audit found that the committed telemetry
+> could assert a genuine `oda` SAS↔R run while the data on disk was a `sim` byte-copy, that
+> the eCTD backbone was built outside the gated pipeline, and that the ADaM CORE conformance
+> was never actually executed. This release closes those findings: the provenance flag is now
+> uncheatable by construction, the eCTD backbone is a gated pipeline stage, and the pipeline
+> was re-run end-to-end against a **real ODA SAS engine** (all 8 `*_prod.xpt` byte-distinct from
+> their R `*_v.xpt`, `pipeline_health.json` GREEN / `provenance_guard.passed: true`).
+
+### Added
+- **Provenance guard in `write_telemetry()`** (`06_telemetry/cibuild.py`) — an `oda`/`local`
+  run is only finalized GREEN when **both** hold: every `*_prod.xpt` is byte-distinct from its R
+  `*_v.xpt` (the on-disk signature of independent double programming), **and** the SDTM manifest
+  SHA recorded for the run matches the current local SDTM source (the production data was built
+  from the same verified input the R track validated against). Any byte-identical/missing prod
+  file, or a missing/mismatched manifest SHA, forces the health record to **RED** with a
+  `provenance_guard` block detailing the failed check. Makes the `sas_execution_mode` flag
+  uncheatable by a restamped green snapshot, a simulated byte-copy, or a swapped SDTM source. The
+  guard demonstrated its purpose during remediation: when a downstream-stage rollback reverted
+  production datasets to their simulated copies, the run was forced RED rather than recorded as a
+  false GREEN.
+- **Simulation flag in the machine-readable reconciliation status** — `cross_lang_audit.R` now
+  emits `"simulated"` and `"execution_mode"` into `reconciliation_status.json`; the orchestrator
+  exports `TROPIC_SAS_MODE` so a tautological simulated PASS is distinguishable from a genuine one.
+- **eCTD backbone wired into the gated DAG as stages 21–22** (`study_manifest.yaml`) — eCTD
+  Backbone + STF (`build_ectd_backbone.py`) and Materialize eCTD Sequence (`materialize_ectd.py`),
+  previously built outside the manifest/CI and prone to drift from `m5/`. They now run on every
+  full build and in CI (via `cibuild.py --demo`), each gated by its own exit code.
+- **ADaM CORE conformance executed** — the executable ADaM custom rules
+  (`TROPIC-ADAM-101…107`) now run against the actual ADaM XPTs via `run_core_conformance.sh`
+  (report `06_telemetry/conformance/core_adam_report.json`, **0 issues / 7 rules**), upgrading
+  the prior "rule YAML is well-formed" CI check to a real rule execution. CORE publishes no full
+  ADaM rule pack, so full FDA-validator ADaM coverage remains out of scope.
+- **`.gitignore`** — `.env`, `*.env`, `**/.env` so a stray dotenv anywhere in the tree can
+  never be committed (the `.core_run/` tree was already ignored).
+- **`.pre-commit-config.yaml`** — a `gitleaks` secret-scanning pre-commit hook as
+  defence-in-depth, blocking an accidental `git add` of a credential regardless of path
+  (`pip install pre-commit && pre-commit install`).
+
+### Changed
+- **Pipeline is now 22 stages** (was 20); the eCTD Module 5 packaging stays at stage 20, with
+  the backbone/materialize stages appended at 21–22. Docs updated to match (`README.md`).
+- **`08_reviewers_guides/SDRG.md` §4.5** — documents the four `v_sdtm_validation` partial/dirty
+  date `[WARNING]`s (CM/LB/LS/PN) as expected manifestations of the source PDS date precision,
+  not defects.
+
+### Fixed
+- **`materialize_ectd.py` idempotency** — the sequence materializer trusted any pre-existing
+  in-sequence copy and verified it against the freshly recorded checksum, so a dest left over
+  from an earlier build (XPTs carry fresh creation timestamps each run) failed verification on
+  every subsequent run. It now re-copies stale payload leaves from their repo source, making the
+  newly-gated Stage 22 robust across repeated runs.
+
+### Notes
+- **Operator action required:** rotate the **ODA password** and the **CDISC Library API key** —
+  the latter was confirmed expired (HTTP 401); the CORE run succeeded only because the local
+  metadata cache already held the target CT (`2026-03-27`). Both credentials live only in
+  git-ignored working-tree files and were never committed.
+- Two reviewed items required no change: CLINSITE is a BIMO (not ADaM) dataset, already fully
+  documented in `08_reviewers_guides/BDRG.md`, so its absence from the ADaM Define-XML is correct;
+  and the 20 SDTM CORE findings are already triaged in `SDRG.md §5`.
 
 ## [3.19.0] - 2026-06-22 — Machine-readable export layer wired into the pipeline + CI
 

@@ -20,12 +20,12 @@ T-17-2: Worst Cycle ANC Nadir Grade Stratified by G-CSF Usage (CbzP)
 --------------------------------------------------------------------
 Group                   Grade 1/2      Grade 3        Grade 4
 G-CSF Prophylaxis (N=30) 30 (100.0%)    0 (0.0%)      0 (0.0%)
-No Prophylaxis (N=341)  243 (71.3%)     80 (23.5%)      18 (5.3%)
+No Prophylaxis (N=341)  237 (69.5%)     91 (26.7%)      13 (3.8%)
 
 T-17-4: Benefit-Risk Summary by RDI Tertile (CbzP Arm)
 ------------------------------------------------------
 RDI Tertile    Median OS (Months)   Grade >=3 Neutropenia Rate (%)
-High (>=85%)   15.8 months          86.2%
-Med (65-<85%)  14.2 months          87.6%
-Low (<65%)     12.6 months          85.7%
+High (>=85%)   15.8 months          86.7%
+Med (65-<85%)  14.2 months          87.5%
+Low (<65%)     12.6 months          82.4%
 

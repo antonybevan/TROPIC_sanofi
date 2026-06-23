@@ -28,19 +28,19 @@ scope.
 
 | Standard | Current | Repo actual | Verdict |
 |---|---|---|---|
-| SDTMIG | 3.4 final & FDA-supported (4.0 in public review) | `define_sdtm.xml` 3.4 (uplifted) | ✅ current |
-| ADaMIG | 1.3 | 1.3 | ✅ |
-| Define-XML | 2.1 (latest patch 2.1.11) | 2.1.0 | ✅ conformant |
-| Controlled Terminology | 2026-03-27 (RP61) | 2026-03-27 both defines | ✅ current |
-| Dataset-JSON | 1.1 (FDA evaluating, FR notice Apr 2025) | 1.1 + XPT | ✅ ahead |
-| ARS | 1.0 | 1.0 | ✅ |
-| USDM/DDF | v3 final (v4 in review) | 3.0.0 | ✅ |
-| CDISC CORE | v0.16.x; **0 executable ADaM rules** | CORE 0.16.0 + custom ADaM rules | ✅ (gap is upstream, disclosed) |
-| FDA sdTCG | Tech-Specs issued 2025-03-27 | cited | ✅ |
-| FDA Data Standards Catalog | SDTMIG 3.2/3.3/3.4 supported | repo 3.4 | ✅ resolved |
-| eCTD | ICH 3.2.2; FDA us-regional v3.3 | ICH 3.2 + STF 2.2 + us-regional 3.3, **DTD-valid** | ✅ |
-| ICH E9(R1) | estimands, 2020 | step-down pattern | ✅ |
-| pharmaverse admiral | 1.4 (Jan 2026) | used (3rd track) | ✅ |
+| SDTMIG | 3.4 final & FDA-supported (4.0 in public review) | `define_sdtm.xml` 3.4 (uplifted) | current |
+| ADaMIG | 1.3 | 1.3 | Yes |
+| Define-XML | 2.1 (latest patch 2.1.11) | 2.1.0 | conformant |
+| Controlled Terminology | 2026-03-27 (RP61) | 2026-03-27 both defines | current |
+| Dataset-JSON | 1.1 (FDA evaluating, FR notice Apr 2025) | 1.1 + XPT | ahead |
+| ARS | 1.0 | 1.0 | Yes |
+| USDM/DDF | v3 final (v4 in review) | 3.0.0 | Yes |
+| CDISC CORE | v0.16.x; **0 executable ADaM rules** | CORE 0.16.0 + custom ADaM rules | (gap is upstream, disclosed) |
+| FDA sdTCG | Tech-Specs issued 2025-03-27 | cited | Yes |
+| FDA Data Standards Catalog | SDTMIG 3.2/3.3/3.4 supported | repo 3.4 | resolved |
+| eCTD | ICH 3.2.2; FDA us-regional v3.3 | ICH 3.2 + STF 2.2 + us-regional 3.3, **DTD-valid** | Yes |
+| ICH E9(R1) | estimands, 2020 | step-down pattern | Yes |
+| pharmaverse admiral | 1.4 (Jan 2026) | used (3rd track) | Yes |
 
 ## 3. Pipeline flow (real, current)
 
@@ -69,10 +69,10 @@ S17   package_ectd.py → m5/ dataset tree
 
 | # | Finding | Evidence | Category | Sev | Status / fix |
 |---|---|---|---|---|---|
-| F1 | README SDTM rows said 3.1.1 / "392 SDTMIG-3.2 rules / version-gap" vs define 3.4 | `README.md:359-360` vs `define_sdtm.xml` `Version="3.4"`, `SDRG.md:6,70`, `SDSP §1` | STALE/INCONSISTENT | P1 | ✅ FIXED (doc-only) |
+| F1 | README SDTM rows said 3.1.1 / "392 SDTMIG-3.2 rules / version-gap" vs define 3.4 | `README.md:359-360` vs `define_sdtm.xml` `Version="3.4"`, `SDRG.md:6,70`, `SDSP §1` | STALE/INCONSISTENT | P1 | FIXED (doc-only) |
 | F2 | `run_core_conformance.sh` validates SDTMIG **3.2** against 3.1.1 source while the *packaged* SDTM is 3.4; traceability still says "SDTMIG-3.2 rules" | `run_core_conformance.sh:47`; `TRACEABILITY_MATRIX.md:128` | STALE/INCONSISTENT | P2 | **[needs decision]** point the offline CORE run at the 3.4 layer + update the line |
 | F3 | 8 capability scripts + the CORE script are standalone — not in manifest/`cibuild.py`/CI | `cibuild.py:522`; `study_manifest.yaml:74-83`; `.github/workflows/ci.yml` | UNFINISHED (half-wired) | P2 | **[needs decision]** wire deterministic ones into post-stages+CI, or add an "offline runbook" |
-| F4 | README standards table omitted the modern layers (Dataset-JSON/ARS/USDM) | `README.md` table | INCOMPLETE | P3 | ✅ FIXED (doc-only row, honestly flagged "outside CI") |
+| F4 | README standards table omitted the modern layers (Dataset-JSON/ARS/USDM) | `README.md` table | INCOMPLETE | P3 | FIXED (doc-only row, honestly flagged "outside CI") |
 | F5 | Two eCTD paths (`package_ectd.py` vs backbone+materialize) | `study_manifest.yaml:83`; `11_ectd/RUN_RECORD.md` | UNDOCUMENTED overlap | P3 | largely covered (README sdTCG row + RUN_RECORD name both); optional 1-line note |
 | F6 | ADRS actual rows **3275** (post §4A enrichment) vs **2904** cited in two **historical** records | actual `adrs_prod.xpt`=3275; `CHANGELOG.md:417`, `p21_conformance_runrecord.md:18` | STALE (historical) | P3 | **[needs judgment]** do NOT rewrite history; optional forward-note "ADRS later enriched to 3275". No *authoritative* doc (SDRG/ADRG/define) cites a wrong count |
 
@@ -82,18 +82,18 @@ S17   package_ectd.py → m5/ dataset tree
 
 | Area | Status | Reviewer note | Minimal fix |
 |---|---|---|---|
-| SDTMIG version | ✅ resolved (3.4) | was the TRC risk | F2 aligns the offline check |
-| CT currency | ✅ 2026-03-27 | — | refresh at lock |
-| Define-XML/ARM | ✅ 2.1+ARM, referential gates pass | — | optional 2.1.x patch |
-| eCTD sequence | ✅ DTD-valid, materialized; EXAMPLE IDs | placeholder app numbers (disclosed) | real IDs before submission |
+| SDTMIG version | resolved (3.4) | was the TRC risk | F2 aligns the offline check |
+| CT currency | 2026-03-27 | — | refresh at lock |
+| Define-XML/ARM | 2.1+ARM, referential gates pass | — | optional 2.1.x patch |
+| eCTD sequence | DTD-valid, materialized; EXAMPLE IDs | placeholder app numbers (disclosed) | real IDs before submission |
 | ADaM business rules | ◑ none exist upstream; custom + interim | disclosed | P21/Certara when licensed |
-| Process maturity (CI) | ⚠ additive layer not gated (F3) | "could rot / regen unclear" | wire-in or runbook |
+| Process maturity (CI) | Note: additive layer not gated (F3) | "could rot / regen unclear" | wire-in or runbook |
 | Synthetic arm / single-author | ◑ by design, disclosed | not fileable as marketing app | preserve caveats |
 
 ## 6. Prioritized remediation backlog
 
-1. F1 — README SDTM rows → 3.4. **[doc-only]** ✅ done.
-2. F4 — README modern-layers row. **[doc-only]** ✅ done.
+1. F1 — README SDTM rows → 3.4. **[doc-only]** done.
+2. F4 — README modern-layers row. **[doc-only]** done.
 3. F2 — align `run_core_conformance.sh` to the 3.4 packaged layer + traceability line. **[needs decision — script change]**
 4. F3 — orchestrate or document the standalone layer (runbook first cut is low-risk/doc-only; CI wiring is substantive). **[needs decision]**
 5. F6 — optional forward-note on ADRS 2904→3275 in the two historical records (do not falsify). **[needs judgment]**
@@ -146,7 +146,7 @@ pipeline files.
 |---|---|---|---|---|
 | F7 | `02_production_sas/utilities/GIT_RESCUE.sas` — a SAS state-reset/lock-release dev snippet ("QUOTE & MACRO KILLER BLOCK"), referenced nowhere, not in any program flow | basename refs = 0 (excl self) | HANGING/dead | **[needs decision]** remove, or move to a documented `dev/` + note in README |
 | F8 | `07_define_xml/remediate_sdtm_define.py` — one-time lxml define-remediation tool, undocumented and unreferenced; functionally superseded by `uplift_define_34.py` | basename refs = 0; `uplift_define_34.py` now does define uplift | REDUNDANT/HANGING | **[needs decision]** document as historical one-shot, or remove |
-| F9 | Three session audit reports (`ADDITIVE_INTEGRATION_SCAN_2026-06-20.md`, `FDA_REVIEWER_AUDIT_2026-06-20.md`, `REPO_AUDIT_2026-06-21.md`) were not linked from any index; `reference_literature/TROPIC STDM Define.xml` had a filename typo (STDM→SDTM) | not referenced | HANGING (docs) / cosmetic | ✅ **FIXED** — reports indexed in README "Audit & review records"; file renamed to `TROPIC SDTM Define.xml` |
+| F9 | Three session audit reports (`ADDITIVE_INTEGRATION_SCAN_2026-06-20.md`, `FDA_REVIEWER_AUDIT_2026-06-20.md`, `REPO_AUDIT_2026-06-21.md`) were not linked from any index; `reference_literature/TROPIC STDM Define.xml` had a filename typo (STDM→SDTM) | not referenced | HANGING (docs) / cosmetic | **FIXED** — reports indexed in README "Audit & review records"; file renamed to `TROPIC SDTM Define.xml` |
 
 **F7/F8 disposition (your decision: option c):** left in place, not removed. `GIT_RESCUE.sas` and `remediate_sdtm_define.py` remain as-is (potential dev/historical tools); revisit if a cleanup pass is wanted later.
 

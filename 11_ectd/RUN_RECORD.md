@@ -85,9 +85,9 @@ With the official DTDs in `util/dtd/`, **all three eCTD XML files pass `xmllint 
 
 | File | DTD | Result |
 |---|---|---|
-| `index.xml` | `ich-ectd-3-2.dtd` (ICH eCTD 3.2) | ✅ DTD-VALID |
-| `m1/us/us-regional.xml` | `us-regional-v3-3.dtd` (FDA US Regional **v3.3**) | ✅ DTD-VALID |
-| `.../tropic/stf-tropic.xml` | `ich-stf-v2-2.dtd` (ICH STF v2.2) | ✅ DTD-VALID |
+| `index.xml` | `ich-ectd-3-2.dtd` (ICH eCTD 3.2) | DTD-VALID |
+| `m1/us/us-regional.xml` | `us-regional-v3-3.dtd` (FDA US Regional **v3.3**) | DTD-VALID |
+| `.../tropic/stf-tropic.xml` | `ich-stf-v2-2.dtd` (ICH STF v2.2) | DTD-VALID |
 
 Real bugs the DTDs surfaced and fixed in `build_ectd_backbone.py`:
 - **xlink #FIXED typo** — ICH eCTD 3.2 and FDA us-regional v3.3 both hard-code the misspelled
