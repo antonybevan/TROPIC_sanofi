@@ -4,6 +4,34 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.21.0] - 2026-06-23 — CDISC CT traceability: spec/define NCI codes + cross-validation
+
+> **Context.** The ADaM spec's Codelists and the define.xml carried no NCI controlled-terminology
+> codes, so there was no machine-traceable link from the study's codelists to CDISC CT, and nothing
+> validated the spec's CT against the authoritative source. This adds that linkage for the
+> standards-derived codelists and the checks that keep it from drifting.
+
+### Added
+- **`06_telemetry/ct_cross_validation.py`** — validates the ADaM spec `Codelists` sheet against
+  authoritative CDISC Controlled Terminology for the pinned package (`2026-03-27`). Sources CT from
+  the **CDISC Library API** when `CDISC_LIBRARY_API_KEY` is set (`GET /mdr/ct/packages/{package}`),
+  otherwise from the pinned offline CORE cache, so it is reproducible without network/credentials.
+  Links each codelist by NCI code → name → value-set (all-numeric sets excluded as sponsor codes);
+  fails on a high-confidence link to a non-extensible CDISC codelist carrying an invalid submission
+  value, and reports ambiguous links, sponsor-defined codelists, and traceability gaps.
+- **NCI controlled-terminology drift check** in `07_define_xml/check_define_conformance.R` — the
+  spec→define gate now also compares the NCI codelist code and per-term codes between the spec
+  `Codelists` sheet and the define.xml `<Alias Context="nci:ExtCodeID">` entries, so any spec/define
+  CT divergence fails the build. The self-test injects and detects codelist-code drift.
+
+### Changed
+- **`00_specifications/ADaM_spec.xlsx`** — populated the NCI Codelist/Term codes for the two
+  standards-derived codelists: `CL.NY` → C66742 (Y=C49488, N=C49487) and `CL.SEX` → C66731
+  (M=C20197, F=C16576). Sponsor-defined codelists correctly carry no NCI code.
+- **`07_define_xml/define.xml`** — the `CL.NY` and `CL.SEX` codelists and their terms now expose the
+  NCI codes as `<Alias Context="nci:ExtCodeID">` elements (codelist and item level), giving
+  reviewers/Pinnacle 21 a machine link to CDISC CT 2026-03-27. Remains XSD-valid (Define-XML 2.1 +
+  ARM) and passes the spec→define conformance gate.
 ## [3.20.0] - 2026-06-23 — Submission-readiness audit remediation (provenance guard, eCTD backbone in-DAG, CORE conformance)
 
 > **Context.** An independent submission-readiness audit found that the committed telemetry

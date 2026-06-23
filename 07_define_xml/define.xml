@@ -885,24 +885,30 @@
         <Decode>
           <TranslatedText xml:lang="en">Yes</TranslatedText>
         </Decode>
+        <Alias Context="nci:ExtCodeID" Name="C49488"/>
       </CodeListItem>
       <CodeListItem CodedValue="N">
         <Decode>
           <TranslatedText xml:lang="en">No</TranslatedText>
         </Decode>
+        <Alias Context="nci:ExtCodeID" Name="C49487"/>
       </CodeListItem>
+      <Alias Context="nci:ExtCodeID" Name="C66742"/>
     </CodeList>
     <CodeList OID="CL.SEX" Name="Sex Codelist" DataType="text" def:StandardOID="STD.ADaMCT.2026-03-27">
       <CodeListItem CodedValue="M">
         <Decode>
           <TranslatedText xml:lang="en">Male</TranslatedText>
         </Decode>
+        <Alias Context="nci:ExtCodeID" Name="C20197"/>
       </CodeListItem>
       <CodeListItem CodedValue="F">
         <Decode>
           <TranslatedText xml:lang="en">Female</TranslatedText>
         </Decode>
+        <Alias Context="nci:ExtCodeID" Name="C16576"/>
       </CodeListItem>
+      <Alias Context="nci:ExtCodeID" Name="C66731"/>
     </CodeList>
     <CodeList OID="CL.TRT" Name="Treatment Codelist" DataType="text">
       <CodeListItem CodedValue="CbzP">

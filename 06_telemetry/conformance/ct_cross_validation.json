@@ -1,0 +1,78 @@
+{
+  "generated": "2026-06-23T12:02:57.687500",
+  "ct_version": "2026-03-27",
+  "ct_packages": [
+    "sdtmct",
+    "adamct"
+  ],
+  "ct_source": "core_offline_cache (.core_run/engine/resources/cache)",
+  "summary": {
+    "total": 7,
+    "cdisc_linked": 2,
+    "ambiguous_cdisc": 0,
+    "sponsor_defined": 5,
+    "violations": 0,
+    "traceability_gaps": 0
+  },
+  "codelists": [
+    {
+      "id": "CL.NY",
+      "name": "Yes/No Codelist",
+      "n_terms": 2,
+      "classification": "cdisc-linked",
+      "linked_to": "C66742",
+      "linked_name": "No Yes Response",
+      "link_method": "nci_ccode",
+      "link_confidence": "high",
+      "extensible": false,
+      "status": "conformant"
+    },
+    {
+      "id": "CL.SEX",
+      "name": "Sex Codelist",
+      "n_terms": 2,
+      "classification": "cdisc-linked",
+      "linked_to": "C66731",
+      "linked_name": "Sex",
+      "link_method": "nci_ccode",
+      "link_confidence": "high",
+      "extensible": false,
+      "status": "conformant"
+    },
+    {
+      "id": "CL.TRT",
+      "name": "Treatment Codelist",
+      "n_terms": 2,
+      "classification": "sponsor-defined",
+      "note": "no corresponding CDISC CT codelist (study-specific; expected)"
+    },
+    {
+      "id": "CL.TRT01PN",
+      "name": "Treatment Numeric Codelist",
+      "n_terms": 2,
+      "classification": "sponsor-defined",
+      "note": "no corresponding CDISC CT codelist (study-specific; expected)"
+    },
+    {
+      "id": "CL.AGEGR",
+      "name": "Age Group Codelist",
+      "n_terms": 2,
+      "classification": "sponsor-defined",
+      "note": "no corresponding CDISC CT codelist (study-specific; expected)"
+    },
+    {
+      "id": "CL.CNSR",
+      "name": "Censoring Codelist",
+      "n_terms": 2,
+      "classification": "sponsor-defined",
+      "note": "no corresponding CDISC CT codelist (study-specific; expected)"
+    },
+    {
+      "id": "CL.PARAMCD",
+      "name": "Parameter Code Codelist",
+      "n_terms": 48,
+      "classification": "sponsor-defined",
+      "note": "no corresponding CDISC CT codelist (study-specific; expected)"
+    }
+  ]
+}
