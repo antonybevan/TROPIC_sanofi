@@ -6,11 +6,14 @@ DIGITISED
 #     de Bono 2010 Lancet Fig 2A (OS) / Fig 3 (PFS), CbzP arm, via WebPlotDigitizer.
 #     Raw WPD exports preserved as *_wpd_raw.csv. Curves validate against the
 #     published medians (OS S(15.1)~0.50, PFS S(2.8)~0.50).
-#   - At-risk tables: the previously committed os/pfs_cbzp_nrisk.csv were
-#     FABRICATED (reverse-engineered to fit the old synthetic curve) and are
-#     inconsistent with the real digitised curve. They have been retired to
-#     *.nrisk.csv.UNVERIFIED. The reconstruction currently runs in Guyot's
-#     N + total-events mode (no at-risk table).
-#   - TODO (accuracy improvement): transcribe the REAL numbers-at-risk row
-#     printed beneath Fig 2A (OS) / Fig 3 (PFS), save as os/pfs_cbzp_nrisk.csv,
-#     and re-run. This tightens HR accuracy per Guyot 2012.
+#   - At-risk tables (os/pfs_cbzp_nrisk.csv): TRANSCRIBED from the "Number at
+#     risk" rows printed beneath de Bono 2010 Fig 2A (OS) / Fig 3 (PFS), CbzP
+#     arm. Verified against reference_literature/de_bono_lancet_2010.pdf on
+#     2026-06-22. (An earlier note in this file wrongly described these as
+#     "fabricated"; they match the published figures exactly — see below.)
+#       OS  (Fig 2A, x-axis 0,6,12,18,24,30 mo):  378,321,231,90,28,4
+#       PFS (Fig 3,  x-axis 0,3,6,9,12,15,18,21 mo): 378,168,90,52,15,4,0,0
+#     The reconstruction runs in Guyot's full mode (N + at-risk table). The PFS
+#     row's last two points (18->0, 21->0) lie beyond the digitised curve's last
+#     point (t=17.85 mo); IPDfromKM ignores risk-table times past the data, so
+#     they are documentary-only and do not change the reconstruction.

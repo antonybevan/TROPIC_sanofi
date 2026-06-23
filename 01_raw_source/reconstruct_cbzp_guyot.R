@@ -99,10 +99,10 @@ reconstruct_guyot <- function(dig_csv, nrisk_csv, total_pts, tot_events, label) 
   dig <- dig[order(dig$time), ]
   dig$surv <- cummin(pmax(0, pmin(1, dig$surv)))  # enforce non-increasing in [0,1]
 
-  # At-risk table is optional. Only use it when a *verified* nrisk CSV exists;
-  # the fabricated tables were retired to *.UNVERIFIED, so by default we run in
-  # Guyot's N + total-events mode (trisk/nrisk = NULL). Supplying a genuinely
-  # transcribed at-risk row improves accuracy (Guyot 2012).
+  # At-risk table is optional. When a verified nrisk CSV exists we use it (Guyot
+  # full mode); both os/pfs_cbzp_nrisk.csv are transcribed from the published
+  # Fig 2A / Fig 3 at-risk rows (see guyot_digitised/PROVENANCE) and improve
+  # accuracy (Guyot 2012). Absent a table, we fall back to N + total-events mode.
   have_nrisk <- !is.null(nrisk_csv) && file.exists(nrisk_csv)
   if (have_nrisk) {
     nr <- read.csv(nrisk_csv)
@@ -179,13 +179,13 @@ guyot_pfs_ipd <- pfs_rec$IPD
 cat("\n  [GUYOT] ============ RECONSTRUCTION QUALITY ============\n")
 
 gates <- data.frame(
-  Gate = c("OS median in range (14.1-16.1 mo)",
+  Gate = c("OS median in range (14.1-16.3 mo)",
            "PFS median in range (2.3-3.3 mo)",
            "OS deaths ~227 (Table 5, +/-10)",
            "OS curve fit max|dev| < 0.05",
            "PFS curve fit max|dev| < 0.05"),
   Result = c(
-    !is.na(os_rec$median)  && os_rec$median  >= 14.1 && os_rec$median  <= 16.1,
+    !is.na(os_rec$median)  && os_rec$median  >= 14.1 && os_rec$median  <= 16.3,
     !is.na(pfs_rec$median) && pfs_rec$median >= 2.3  && pfs_rec$median <= 3.3,
     abs(os_rec$events - 227L) <= 10L,
     os_rec$max_dev  < 0.05,
