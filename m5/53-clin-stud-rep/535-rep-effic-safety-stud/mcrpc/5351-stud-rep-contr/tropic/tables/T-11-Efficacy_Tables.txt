@@ -24,9 +24,9 @@ T-11-7: Kaplan-Meier Analysis of Time to Tumor Progression (TTUMOR) - Measurable
 Statistic                                 CbzP (N=179)        MP (N=203)
 Number of Events / Total N                166/179               186/203
 Median Survival Time (Months)             3.4                2.1
-95% Confidence Interval                   (95% CI: 2.7-5.7)      (95% CI: 1.7-2.8)
-Unstratified Hazard Ratio (CbzP vs MP)     0.62 (95% CI: 0.50-0.77)
-Wald Log-Rank p-value                     0.0000
+95% Confidence Interval                   (95% CI: 2.7-4.6)      (95% CI: 1.7-2.8)
+Unstratified Hazard Ratio (CbzP vs MP)     0.67 (95% CI: 0.54-0.83)
+Wald Log-Rank p-value                     0.0002
 
 
 T-11-8: Analysis of Best Clinical Response Endpoints
@@ -37,8 +37,8 @@ PSA Response Rate (>=50% decline) - ITT Population
   Fisher's Exact p-value                  4.5688e-10
 
 Objective Response Rate (ORR) - Measurable ITT Population†
-  Responders / N (%)                      23/179 (12.8%)      13/203 (6.4%)
-  Fisher's Exact p-value                  0.0365
+  Responders / N (%)                      30/179 (16.8%)      13/203 (6.4%)
+  Fisher's Exact p-value                  0.0019
 
 †Restricted to patients with measurable disease at baseline (CbzP N=179, MP N=203).
 

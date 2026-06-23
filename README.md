@@ -18,13 +18,13 @@
 
 ## Overview
 
-A complete, end-to-end **clinical data pipeline** — **SDTM → ADaM → Define-XML → eCTD** — engineered to the standards of a U.S. FDA electronic submission for the TROPIC Phase III trial. A manifest-driven **Python orchestrator** (`06_telemetry/cibuild.py`) executes a 20-stage build in which independent **SAS 9.4 and R** tracks derive CDISC-conformant **ADaM** analysis datasets from the source **SDTM** tabulations, and an automated step (`06_telemetry/package_ectd.py`) assembles the deliverables into the canonical **eCTD Module 5 (Section 5.3)** tree prescribed by the FDA *Study Data Technical Conformance Guide* (SDTCG). The engine is **study-agnostic** — pipeline structure is declared in `study_manifest.yaml` rather than hard-coded — so additional studies run through the same orchestrator unchanged.
+A complete, end-to-end **clinical data pipeline** — **SDTM → ADaM → Define-XML → eCTD** — engineered to the standards of a U.S. FDA electronic submission for the TROPIC Phase III trial. A manifest-driven **Python orchestrator** (`06_telemetry/cibuild.py`) executes a 22-stage build in which independent **SAS 9.4 and R** tracks derive CDISC-conformant **ADaM** analysis datasets from the source **SDTM** tabulations, and an automated step (`06_telemetry/package_ectd.py`) assembles the deliverables into the canonical **eCTD Module 5 (Section 5.3)** tree prescribed by the FDA *Study Data Technical Conformance Guide* (SDTCG). The engine is **study-agnostic** — pipeline structure is declared in `study_manifest.yaml` rather than hard-coded — so additional studies run through the same orchestrator unchanged.
 
 **Quality control is enforced as code.** Each derivation is reconciled across two independent language implementations at both the **analysis-dataset** level (cell-by-cell `diffdf`) and the **analysis-results** level (SAS `PROC LIFETEST` vs R `survfit`); every reconciliation gate emits machine-readable status and fails the build on any difference. Validation is allocated by an explicit **[risk-based plan](08_reviewers_guides/RISK_BASED_VALIDATION.md)**: the highest-risk endpoints (OS, PFS) and ADSL additionally carry a **third, independent derivation built with the pharmaverse `admiral` package** ([ADMIRAL_RECONCILIATION.md](06_telemetry/ADMIRAL_RECONCILIATION.md)). All tracks are single-author, so this is rigorous **implementation** reconciliation — *not* the organizational two-programmer GxP double programming a production submission requires (see [ADRG §6](08_reviewers_guides/ADRG.md)).
 
 Submission metadata is delivered as machine-readable **Define-XML v2.1 with Analysis Results Metadata (ARM)**, governed by an upstream **ADaM specification as the single source of truth** and validated against the **CDISC CORE** reference engine, accompanied by PHUSE-style **data Reviewer's Guides** (ADRG / SDRG / BIMO BDRG) and the full **Tables, Figures & Listings (TFL)** set.
 
-> **Scope & reproducibility (read first):** This is a portfolio/demonstration project. The real MP-arm SDTM source and ODA credentials are **not** committed (patient-data protection + secrets hygiene), so a bare clone cannot re-run the *real* pipeline — see **[REPRODUCIBILITY.md](REPRODUCIBILITY.md)** for the data-access path, the pinned environment, and a **self-contained `--demo` smoke test** that runs on a clean clone with no real data, no SAS, and no credentials. The comparator (Cabazitaxel) arm is **synthetic and illustrative** (see *Data provenance*); only the real Mitoxantrone arm is reconciled SAS↔R. A genuine SAS↔R reconciliation requires a run executed against a **real** SAS engine (`--real-sas`, recorded `sas_execution_mode` = `oda`/`local`); the **default** no-engine invocation runs in **`sim`** mode, where a zero-difference reconciliation is tautological. Always check `sas_execution_mode` in `06_telemetry/pipeline_health.json` before reading any reconciliation result as double-programming evidence.
+> **Scope & reproducibility (read first):** This is a portfolio/demonstration project. The real MP-arm SDTM source and ODA credentials are **not** committed (patient-data protection + secrets hygiene), so a bare clone cannot re-run the *real* pipeline — see **[REPRODUCIBILITY.md](REPRODUCIBILITY.md)** for the data-access path, the pinned environment, and a **self-contained `--demo` smoke test** that runs on a clean clone with no real data, no SAS, and no credentials. The comparator (Cabazitaxel) arm is **synthetic and illustrative** (see *Data provenance*); only the real Mitoxantrone arm is reconciled SAS↔R. A genuine SAS↔R reconciliation requires a run executed against a **real** SAS engine (`--real-sas`, recorded `sas_execution_mode` = `oda`/`local`); the **default** no-engine invocation runs in **`sim`** mode, where a zero-difference reconciliation is tautological. Always check `sas_execution_mode` in `06_telemetry/pipeline_health.json` before reading any reconciliation result as double-programming evidence. The flag is guard-enforced: telemetry records `oda`/`local` only when every `*_prod.xpt` is byte-distinct from its R `*_v.xpt` pair (`provenance_guard.passed` in the same file), so a simulated byte-copy cannot be recorded as a real SAS run.
 
 > **Data provenance:** The MP control arm data (371 patients) is the official, de-identified SDTM dataset (`*.sas7bdat`) released by Sanofi in 2013 and accessed via the Project Data Sphere (PDS) repository — real trial data from the *Lancet* 2010 publication. The CbzP comparator arm (378 patients) is a **synthetic, illustrative** cohort generated at the ADaM layer using two methods: **(1) Primary endpoints (OS, PFS)** are reconstructed via genuine **Guyot (2012) IPD reconstruction** (Guyot et al., BMC Med Res Methodol 2012;12:9; `IPDfromKM` package) — the published CbzP Kaplan–Meier curves (de Bono 2010 Fig 2A OS, Fig 3 PFS) are digitised and combined with the published numbers-at-risk tables, then the KM estimator is inverted to recover pseudo-IPD consistent with the observed curve. This derives the CbzP survival shape from the **published curve itself**, **independently of the MP arm** (no HR division) — an accepted HTA technique (NICE TSD-14) that removes the circularity of the previous PH-scaling approach. It validates against the publication: reconstructed OS median 15.2 mo (pub 15.1), 228 deaths (pub 227), and **OS HR vs the real MP arm = 0.70, matching the published 0.70 exactly** (see `01_raw_source/guyot_validation_report.md`). **(2) Secondary endpoints (TTPAIN, TTPSA, TTUMOR)** remain PH-scaled from the real MP arm (the paper publishes no KM curves with at-risk tables for these endpoints, so Guyot reconstruction is not possible). Non-survival domains use fixed-seed sampling from published Table 1/Table 2 marginals. The CbzP arm is **not real patient data**; it exists to exercise the comparative-TFL and Project Optimus workflows.
 
@@ -52,7 +52,7 @@ Submission metadata is delivered as machine-readable **Define-XML v2.1 with Anal
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│  TROPIC Analysis Pipeline · Python orchestrator cibuild.py · 20 stages     │
+│  TROPIC Analysis Pipeline · Python orchestrator cibuild.py · 22 stages     │
 └────────────────────────────────────────────────────────────────────────────┘
 
   01_raw_source/real_sdtm/   (34 native SAS data sets, sas7bdat — official Sanofi 2013 release)
@@ -72,7 +72,11 @@ Submission metadata is delivered as machine-readable **Define-XML v2.1 with Anal
   [15]   spec → define conformance     [16]  spec → data conformance
         │
         ▼
-  [17]   eCTD Module 5 packaging  →  m5/   (Section 5.3 submission tree)
+  [17]   Dataset-JSON export (v1.1)    [18]  ARS (v1.0)    [19]  USDM (v3.0)
+        │
+        ▼
+  [20]   eCTD Module 5 packaging  →  m5/   (Section 5.3 submission tree)
+  [21]   eCTD backbone + STF       [22]  materialize sequence  →  11_ectd/0000/
 ```
 
 ### Dual-Language Validation Model
@@ -100,7 +104,7 @@ Real SDTM (SAS7BDAT)
 
 ```
 TROPIC/
-├── study_manifest.yaml             # Pipeline structure — reconciled datasets, keys & 20-stage DAG
+├── study_manifest.yaml             # Pipeline structure — reconciled datasets, keys & 22-stage DAG
 ├── study_config.yaml               # Clinical parameters — thresholds, windows, imputation defaults
 ├── 00_specifications/              # Single source of truth — ADaM spec governs define + data
 │   ├── ADaM_spec.xlsx              # Authoritative ADaM spec (metacore / Pinnacle 21 format)
@@ -161,7 +165,7 @@ TROPIC/
 │   └── admiral_reconcile.R         # admiral ↔ SAS production reconciliation
 │
 ├── 06_telemetry/                   # Pipeline Orchestration & Telemetry
-│   ├── cibuild.py                  # Python execution driver (manifest-driven 20-stage DAG; --study)
+│   ├── cibuild.py                  # Python execution driver (manifest-driven 22-stage DAG; --study)
 │   ├── manifest.py                 # Study-manifest loader (datasets, keys, identity, DAG structure)
 │   ├── package_ectd.py             # eCTD Module 5 packaging orchestrator
 │   ├── oda_broker.py               # Resilient ODA connection broker (probe-earned 'oda' mode)
@@ -241,7 +245,7 @@ TROPIC/
 # Clone and enter
 git clone https://github.com/antonybevan/TROPIC_sanofi.git TROPIC && cd TROPIC
 
-# Run all 20 stages (default = sim mode; add --real-sas for a genuine ODA run)
+# Run all 22 stages (default = sim mode; add --real-sas for a genuine ODA run)
 python3 06_telemetry/cibuild.py
 ```
 
@@ -263,7 +267,12 @@ Expected output (default `sim` mode):
 [SKIPPED] Stage 14 — Numerical Results Reconciliation (SAS vs R)   # PASS under --real-sas
 [SUCCESS] Stage 15 — ADaM Spec to Define Conformance              # spec governs define
 [SUCCESS] Stage 16 — ADaM Spec to Data Conformance                # metacore/metatools/xportr
-[SUCCESS] Stage 17 — eCTD Final Package
+[SUCCESS] Stage 17 — Dataset-JSON Export (v1.1)
+[SUCCESS] Stage 18 — Analysis Results Standard (ARS v1.0)
+[SUCCESS] Stage 19 — USDM Study Definition (v3.0)
+[SUCCESS] Stage 20 — eCTD Final Package
+[SUCCESS] Stage 21 — eCTD Backbone + STF (sequence 0000)
+[SUCCESS] Stage 22 — Materialize eCTD Sequence
 All clinical pipeline stages compiled successfully!
 ```
 
@@ -276,7 +285,7 @@ All clinical pipeline stages compiled successfully!
 
 ### eCTD Module 5 Submission Package
 
-eCTD packaging runs automatically as the pipeline's final stage (**Stage 17**) and may also be invoked standalone after a build:
+eCTD packaging runs automatically as **Stage 20** (with the eCTD backbone + STF and sequence materialization following as Stages 21–22) and may also be invoked standalone after a build:
 
 ```bash
 python3 06_telemetry/package_ectd.py
@@ -383,6 +392,8 @@ Stage 11 obtains the SAS 9.4 production datasets through one of several **explic
 | *(no flag, no SAS)* | `sim` | Byte-copies `*_v.xpt` → `*_prod.xpt`; explicitly flagged as **not** double programming, since a zero-difference reconciliation is tautological in this mode. |
 
 > The `cached` and `sim` modes never represent a real SAS run as having occurred. `oda` mode is **earned** — it is recorded only after a live workspace probe and verification of the resident SDTM manifest (see below); only `local` and `oda` are reported as genuine double programming.
+>
+> **Provenance guard.** An `oda`/`local` run is finalized GREEN only when every `*_prod.xpt` is byte-distinct from its R validation `*_v.xpt` — the on-disk signature of independent double programming — **and** the SDTM manifest SHA recorded for the run matches the current SDTM source, so the production data is bound to the same verified input the R track validated against. If any production file is byte-identical to (or missing relative to) its pair, or the manifest SHA is missing or mismatched, the health record is set to **RED** with a `provenance_guard` block detailing the failed check; a restamped snapshot, a simulated byte-copy, or a swapped SDTM source therefore cannot be recorded as a real SAS run.
 
 ### Two-job ODA workflow (Job A seed · Job B reconcile)
 

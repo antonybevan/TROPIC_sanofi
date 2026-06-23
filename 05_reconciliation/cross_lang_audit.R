@@ -214,8 +214,15 @@ cat("NOTE: [RECONCILIATION] Visual HTML audit saved to 06_telemetry/reconciliati
 # report GREEN while a domain had cell-level differences. The orchestrator now
 # also reads this file to gate Stage 11.
 any_fail <- any(vapply(results, function(r) r$status != "PASS", logical(1)))
+# Carry the execution mode into the machine-readable status so a tautological sim PASS is
+# distinguishable from a genuine double-programmed PASS (audit M-1). The orchestrator exports
+# TROPIC_SAS_MODE; default to "sim" if absent (safer than implying a real run).
+execution_mode <- Sys.getenv("TROPIC_SAS_MODE", unset = "sim")
 status_json <- paste0(
-  "{\n  \"overall\": \"", if (any_fail) "FAIL" else "PASS", "\",\n  \"domains\": {\n",
+  "{\n  \"overall\": \"", if (any_fail) "FAIL" else "PASS", "\",\n",
+  "  \"simulated\": ", if (is_simulated) "true" else "false", ",\n",
+  "  \"execution_mode\": \"", execution_mode, "\",\n",
+  "  \"domains\": {\n",
   paste(sprintf("    \"%s\": \"%s\"", toupper(datasets),
                 vapply(datasets, function(d) results[[d]]$status, character(1))),
         collapse = ",\n"),

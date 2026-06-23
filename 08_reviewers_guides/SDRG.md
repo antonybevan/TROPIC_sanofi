@@ -63,6 +63,9 @@ The DM domain in the source data does not contain country-of-study-site informat
 ### 4.4 Hardcoded Demographic Constant (SEX = 'M')
 The demographics domain (`DM`) contains a hardcoded variable `SEX = 'M'` assigned to all subjects in `A_adsl_generation.sas`. This is a clinical decision consistent with the trial protocol for metastatic castration-resistant prostate cancer (mCRPC), which is an exclusively male patient population. To ensure metadata conformity, the Define-XML codelist references are maintained; however, no female subjects are present in the analysis dataset.
 
+### 4.5 Partial/Imprecise Source Date Values (CM, LB, LS, PN)
+The independent R SDTM validation (`03_validation_r/v_sdtm_validation.log`) raises four `[WARNING]`s flagging partial or imprecise ISO-8601 date values in source date fields: `CMSTDTC` (CM), `LBDTC` (LB), `LSDTC` (LS), and `PNDTC` (PN) — e.g. `----07`, `--12-26`, `2009---04`. These are **expected manifestations of the source PDS public-release date precision** (the same root cause documented in §2 and §5.1), not programming defects: the values are carried through as-is rather than fabricating spurious precision. They surface as WARNINGs (not ERRORs); no analysis depends on day-level precision in these fields. No action required.
+
 ---
 
 ## 5. SDTMIG 3.4 Conformance Uplift (2026-06-20)

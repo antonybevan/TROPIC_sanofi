@@ -118,22 +118,22 @@
       <file-tag name="data-tabulation-dataset" info-type="us"/>
     </doc-content>
     <doc-content xlink:href="../../../../../../index.xml#L0037">
-      <file-tag name="data-tabulation-dataset" info-type="us"/>
+      <file-tag name="annotated-crf" info-type="us"/>
     </doc-content>
     <doc-content xlink:href="../../../../../../index.xml#L0038">
-      <file-tag name="annotated-crf" info-type="us"/>
+      <file-tag name="data-tabulation-data-reviewers-guide" info-type="us"/>
     </doc-content>
     <doc-content xlink:href="../../../../../../index.xml#L0039">
       <file-tag name="data-tabulation-data-reviewers-guide" info-type="us"/>
     </doc-content>
     <doc-content xlink:href="../../../../../../index.xml#L0040">
-      <file-tag name="data-tabulation-data-reviewers-guide" info-type="us"/>
+      <file-tag name="analysis-data-definition" info-type="us"/>
     </doc-content>
     <doc-content xlink:href="../../../../../../index.xml#L0041">
       <file-tag name="analysis-data-definition" info-type="us"/>
     </doc-content>
     <doc-content xlink:href="../../../../../../index.xml#L0042">
-      <file-tag name="analysis-data-definition" info-type="us"/>
+      <file-tag name="analysis-dataset" info-type="us"/>
     </doc-content>
     <doc-content xlink:href="../../../../../../index.xml#L0043">
       <file-tag name="analysis-dataset" info-type="us"/>
@@ -157,7 +157,7 @@
       <file-tag name="analysis-dataset" info-type="us"/>
     </doc-content>
     <doc-content xlink:href="../../../../../../index.xml#L0050">
-      <file-tag name="analysis-dataset" info-type="us"/>
+      <file-tag name="analysis-program" info-type="us"/>
     </doc-content>
     <doc-content xlink:href="../../../../../../index.xml#L0051">
       <file-tag name="analysis-program" info-type="us"/>
@@ -259,12 +259,15 @@
       <file-tag name="analysis-program" info-type="us"/>
     </doc-content>
     <doc-content xlink:href="../../../../../../index.xml#L0084">
-      <file-tag name="analysis-data-reviewers-guide" info-type="us"/>
+      <file-tag name="analysis-program" info-type="us"/>
     </doc-content>
     <doc-content xlink:href="../../../../../../index.xml#L0085">
-      <file-tag name="study-report-body" info-type="ich"/>
+      <file-tag name="analysis-data-reviewers-guide" info-type="us"/>
     </doc-content>
     <doc-content xlink:href="../../../../../../index.xml#L0086">
+      <file-tag name="study-report-body" info-type="ich"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0087">
       <file-tag name="study-report-body" info-type="ich"/>
     </doc-content>
   </study-document>

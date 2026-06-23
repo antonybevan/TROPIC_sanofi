@@ -187,6 +187,49 @@ def _sim_byte_copy(datasets):
             print(f"    Simulated {ds}_prod.xpt generated.")
 
 
+def _prod_v_byte_identical(datasets):
+    """Return datasets whose *_prod.xpt is byte-identical to (or missing vs) its *_v.xpt.
+
+    A genuine independent SAS run produces *_prod.xpt that is byte-DISTINCT from the R
+    validation *_v.xpt; byte-identical prod==v is the signature of _sim_byte_copy(). This
+    is the uncheatable evidence test behind the 'oda'/'local' provenance flag (audit C-1):
+    the flag may only be recorded GREEN if this returns empty for every produced dataset.
+    """
+    import filecmp
+    offenders = []
+    for ds in datasets:
+        val_file, prod_file = f"04_adam/{ds}_v.xpt", f"04_adam/{ds}_prod.xpt"
+        if not os.path.exists(val_file):
+            continue  # no R validation pair for this dataset; nothing to reconcile against
+        if not os.path.exists(prod_file) or filecmp.cmp(val_file, prod_file, shallow=False):
+            offenders.append(ds)
+    return offenders
+
+
+def _sdtm_manifest_binding(recorded_sha):
+    """(ok, detail) for the provenance guard: confirm the SDTM manifest SHA recorded for an
+    oda/local run is present and matches the current local SDTM source — i.e. the production
+    datasets were generated from the same verified input the R track validated against, not a
+    later/different SDTM (audit C-1). If the local SDTM source is not present (e.g. a clone
+    without licensed data) we can only confirm a SHA was recorded, not recompute it, so we
+    accept with a note rather than fail.
+    """
+    if not recorded_sha:
+        return False, "no sdtm_manifest_sha recorded for an oda/local run"
+    try:
+        import seed_sdtm
+        local = seed_sdtm.compute_local_manifest()
+    except Exception as e:  # noqa: BLE001 - any import/IO failure leaves us unable to recompute
+        return True, f"recorded; local SDTM not recomputable ({type(e).__name__})"
+    if not local.get("datasets"):
+        return True, "recorded; no local SDTM source present to recompute"
+    expected = local.get("manifest_sha")
+    if expected != recorded_sha:
+        return False, (f"recorded sdtm_manifest_sha {recorded_sha[:12]} does not match the current "
+                       f"SDTM source {expected[:12]}")
+    return True, f"matches current SDTM source ({recorded_sha[:12]})"
+
+
 def _oda_max_wait():
     """Connection budget (seconds). TROPIC_ODA_RETRIES is a back-compat alias mapped onto a
     wall-clock budget (~60 s expected/attempt); TROPIC_ODA_MAX_WAIT sets it directly."""
@@ -633,6 +676,8 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
     sas_mode = _resolve_sas_mode(real_sas, use_cached_sas)
     # Only a literal byte-copy simulation counts as "simulation" for the audit flag.
     os.environ["TROPIC_SAS_SIMULATION"] = "TRUE" if sas_mode == "sim" else "FALSE"
+    # Pass the precise mode so the reconciliation status records execution_mode (audit M-1).
+    os.environ["TROPIC_SAS_MODE"] = sas_mode
     print(f"  [SAS MODE] Stage 10 execution mode resolved to: {sas_mode.upper()}")
 
     # The pipeline DAG is generated from study_manifest.yaml (I/J Phase 1) rather than
@@ -781,6 +826,42 @@ def write_telemetry(results, sas_mode="sim"):
             health["results_reconciliation_status"] = json.load(_rrf).get("overall")
     except (OSError, json.JSONDecodeError):
         pass
+
+    # Provenance guard (audit C-1): a recorded 'oda'/'local' mode asserts an independent SAS
+    # run, whose on-disk signature is *_prod.xpt byte-DISTINCT from *_v.xpt. If any prod file
+    # is byte-identical to (or missing vs) its R validation pair, the asserted evidence is not
+    # present, so we refuse to record a clean real-SAS GREEN and flip the health to RED. This
+    # makes the flag uncheatable by a restamped green snapshot.
+    effective_mode = health["sas_execution_mode"]
+    if effective_mode in ("oda", "local"):
+        offenders = _prod_v_byte_identical(STUDY_DATASETS)
+        byte_ok = not offenders
+        sha_ok, sha_detail = _sdtm_manifest_binding(health.get("sdtm_manifest_sha"))
+        if byte_ok and sha_ok:
+            health["provenance_guard"] = {
+                "passed": True,
+                "checked_datasets": list(STUDY_DATASETS),
+                "byte_distinct": True,
+                "sdtm_manifest_sha": sha_detail,
+            }
+        else:
+            health["pipeline_health_status"] = "RED"
+            reasons = []
+            if not byte_ok:
+                reasons.append(f"*_prod.xpt byte-identical to (or missing vs) *_v.xpt for {offenders} "
+                               "-- the sim byte-copy signature, not real double-programming")
+            if not sha_ok:
+                reasons.append(f"SDTM manifest binding failed -- {sha_detail}")
+            health["provenance_guard"] = {
+                "passed": False,
+                "reason": f"sas_execution_mode='{effective_mode}' asserts an independent SAS run, but "
+                          + "; ".join(reasons) + ".",
+                "byte_distinct": byte_ok,
+                "offending_datasets": offenders,
+                "sdtm_manifest_sha": sha_detail,
+            }
+            print(f"  [PROVENANCE GUARD] FAIL ({effective_mode}): " + "; ".join(reasons)
+                  + "; forcing pipeline_health_status=RED.")
 
     os.makedirs("06_telemetry", exist_ok=True)
     with open("06_telemetry/pipeline_health.json", "w", encoding="utf-8") as f:

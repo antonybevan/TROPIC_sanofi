@@ -86,3 +86,8 @@ infrastructure_stages:
     - { name: "Analysis Results Standard (ARS v1.0)",        script: "06_telemetry/build_ars.py",                runner: python }
     - { name: "USDM Study Definition (v3.0)",                script: "06_telemetry/build_usdm.py",               runner: python }
     - { name: "eCTD Final Package",                          script: "06_telemetry/package_ectd.py",             runner: python }
+    # eCTD submission backbone (sequence 0000): build the index/STF/regional layer over the m5/
+    # deliverables, then materialize the sequence and re-verify every leaf MD5. Previously these
+    # ran outside the DAG/CI and drifted from m5/ (audit M-5); now gated by their own exit codes.
+    - { name: "eCTD Backbone + STF (sequence 0000)",         script: "06_telemetry/build_ectd_backbone.py",      runner: python }
+    - { name: "Materialize eCTD Sequence",                   script: "06_telemetry/materialize_ectd.py",         runner: python }
