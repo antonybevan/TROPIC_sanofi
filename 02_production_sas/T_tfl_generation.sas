@@ -134,8 +134,8 @@ ods graphics on / reset=all imagefmt=png width=8in height=5.5in noborder antiali
    FIGURE F-12-1 : OS Subgroup Forest Plot (univariate Cox HRs, CbzP vs MP)
    ============================================================================ */
 data _adsl_all;
-    set adam.adsl(keep=usubjid agegr1 ecogbl measdisf viscfl painbl)
-        cbz_adsl(keep=usubjid agegr1 ecogbl measdisf viscfl painbl);
+    set adam.adsl(keep=usubjid agegr1 ecogbl measdisf viscfl painbl docprog)
+        cbz_adsl(keep=usubjid agegr1 ecogbl measdisf viscfl painbl docprog);
 run;
 data _os;
     set adam.adtte(keep=usubjid trt01p paramcd aval cnsr)
@@ -144,7 +144,7 @@ data _os;
 run;
 proc sql;
     create table _ossub as
-    select a.*, b.agegr1, b.ecogbl, b.measdisf, b.viscfl, b.painbl
+    select a.*, b.agegr1, b.ecogbl, b.measdisf, b.viscfl, b.painbl, b.docprog
     from _os a left join _adsl_all b on a.usubjid=b.usubjid;
 quit;
 
@@ -186,6 +186,8 @@ run;
 %sgcox(viscfl,  N,    %str(Visceral Mets: No),       9)
 %sgcox(painbl,  Y,    %str(Baseline Pain: Yes),      10)
 %sgcox(painbl,  N,    %str(Baseline Pain: No),       11)
+%sgcox(docprog, AFTER, %str(Docetaxel Prog: After),  12)
+%sgcox(docprog, DURING,%str(Docetaxel Prog: During), 13)
 
 proc sort data=forest; by descending ord; run;
 data forest;
@@ -294,14 +296,16 @@ title; title2; footnote;
    FIGURE F-17-1 : Project Optimus Exposure-Response (RDI vs ANC Nadir)
    ============================================================================ */
 data _rdi;
-    set adam.adex(keep=usubjid trt01p paramcd aval rename=(aval=rdi))
-        cbz_adex(keep=usubjid trt01p paramcd aval rename=(aval=rdi));
-    if paramcd='RDI'; keep usubjid trt01p rdi;
+    set adam.adex(keep=usubjid trt01p paramcd avisit aval rename=(aval=rdi))
+        cbz_adex(keep=usubjid trt01p paramcd avisit aval rename=(aval=rdi));
+    if paramcd='RDI' and avisit='ALL CYCLES'; keep usubjid trt01p rdi;
 run;
 data _nadir;
-    set adam.adlb(keep=usubjid paramcd aval rename=(aval=anc))
-        cbz_adlb(keep=usubjid paramcd aval rename=(aval=anc));
-    if paramcd='ANCNADIR'; keep usubjid anc;
+    set adam.adlb(keep=usubjid paramcd avisit aval rename=(aval=anc))
+        cbz_adlb(keep=usubjid paramcd avisit aval rename=(aval=anc));
+    /* CYCLE 1 only: ANCNADIR exists at cycles 1-3 for the real MP arm; without this
+       filter MP subjects are plotted ~3x and the LOESS is inflated (R uses CYCLE 1). */
+    if paramcd='ANCNADIR' and avisit='CYCLE 1'; keep usubjid anc;
 run;
 proc sql;
     create table _er as
@@ -317,7 +321,7 @@ footnote j=l h=7pt c=&LRED. "&SYNTHFN.";
 proc sgplot data=_er nocycleattrs;
     styleattrs datacontrastcolors=(cx005A9C cxA6192E);
     scatter x=rdi y=anc / group=trt01p markerattrs=(symbol=circlefilled size=5) transparency=0.65;
-    loess x=rdi y=anc / group=trt01p nomarkers lineattrs=(thickness=3.5) smooth=0.7;
+    loess x=rdi y=anc / group=trt01p nomarkers lineattrs=(thickness=3.5) smooth=1.0 clm;
     refline 0.5 / axis=y lineattrs=(pattern=shortdash color=cxE74C3C)
         label="Grade 4 Neutropenia (< 0.5)" labelloc=inside labelpos=min;
     xaxis label="Relative Dose Intensity (%)" grid max=105;
