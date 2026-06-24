@@ -906,6 +906,11 @@ swimmer_data <- adsl |>
   ungroup() |>
   mutate(subj_label = factor(row_number()))
 
+# Round the shared x-axis up to the next 3-month tick so the longest bars and
+# their death markers sit inside the panel (parity with the SAS auto-scaled
+# 0-9 axis); without an explicit limit the top break is dropped and clipped.
+x_max <- ceiling(max(swimmer_data$duration_months, na.rm = TRUE) / 3) * 3
+
 swimmer_plot <- ggplot(swimmer_data, aes(
   y = subj_label, x = duration_months, fill = TRT01P
 )) +
@@ -913,15 +918,14 @@ swimmer_plot <- ggplot(swimmer_data, aes(
   geom_point(
     data = swimmer_data |> filter(death_event),
     aes(x = duration_months, y = subj_label), shape = 4, size = 2.5,
-    color = "#A6192E", stroke = 1.2
+    color = "#111111", stroke = 1.2
   ) +
   scale_fill_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"),
     labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) + # nolint
   scale_x_continuous(
-    breaks = seq(
-      0, ceiling(max(swimmer_data$duration_months, na.rm = TRUE) / 3) * 3,
-      by = 3
-    )
+    breaks = seq(0, x_max, by = 3),
+    limits = c(0, x_max),
+    expand = expansion(mult = c(0, 0.03))
   ) +
   facet_wrap(~TRT_LABEL, scales = "free_y", ncol = 2) +
   labs(
@@ -929,7 +933,7 @@ swimmer_plot <- ggplot(swimmer_data, aes(
       "F-14-1: Treatment Exposure Duration \n",
       "— Swimmer Plot (Representative Sample)"
     ),
-    subtitle = "Bar length = treatment duration. \n\u2717 = death event on study. Top 30 subjects per arm shown.", # nolint
+    subtitle = "Bar length = treatment duration. \nX = death event on study. Top 30 subjects per arm shown.", # nolint
     x = "Months on Treatment",
     y = "Subjects (ranked by duration)",
     fill = "Treatment Arm:",
@@ -958,9 +962,11 @@ ae_safety <- adae |>
   filter(TRTEMFL == "Y") |>
   left_join(adsl |> select(USUBJID, TRT01P), by = "USUBJID")
 
-# Total subjects per arm derived dynamically from ADSL (Issue 3 / 2.5)
-n_mp <- sum(adsl$TRT01P == "MP")
-n_cbzp <- sum(adsl$TRT01P == "CbzP")
+# Safety Population denominators per arm from ADSL (SAFFL); these head the
+# Safety Population AE (T-20) and lab shift (T-21) tables. ITT (TRT01P only)
+# would over-count CbzP (378 ITT vs 371 safety).
+n_mp <- sum(adsl$SAFFL == "Y" & adsl$TRT01P == "MP")
+n_cbzp <- sum(adsl$SAFFL == "Y" & adsl$TRT01P == "CbzP")
 
 # Precompute AE summary counts once (Issue 6 / 2.4)
 ae_counts <- ae_safety |>
@@ -1038,12 +1044,15 @@ ae_ser <- ae_safety |>
     .groups = "drop"
   )
 
-n_disc_mp <- adae |>
+# Derive from ae_safety (arm resolved via the ADSL join above). The real
+# adae_v.xpt carries no TRT01P, so filtering raw adae would coerce every MP
+# row to NA after bind_rows and silently drop all MP discontinuations.
+n_disc_mp <- ae_safety |>
   filter(TRT01P == "MP" & AEACN == "DRUG WITHDRAWN") |>
   distinct(USUBJID) |>
   nrow()
 
-n_disc_cbzp <- adae |>
+n_disc_cbzp <- ae_safety |>
   filter(TRT01P == "CbzP" & AEACN == "DRUG WITHDRAWN") |>
   distinct(USUBJID) |>
   nrow()
@@ -1099,6 +1108,15 @@ for (i in seq_len(nrow(top_soc))) {
   )
 }
 
+ae_summary_txt <- paste0(
+  ae_summary_txt,
+  "\n",
+  " Note: The synthetic CbzP adverse-event dictionary is limited to the\n",
+  " principal cabazitaxel preferred terms. System Organ Classes outside that\n",
+  " set (skin, metabolism, respiratory, investigations) therefore report 0%\n",
+  " for the CbzP arm. All MP arm values are derived from real trial data.\n"
+)
+
 writeLines(paste0(synth_banner, ae_summary_txt),
            "09_tfl/output/tables/T-20-AE_Summary_Tables.txt")
 
@@ -1142,7 +1160,8 @@ build_shift_table <- function(lb_data, paramcd_val, param_label, n_total) {
     pivot_wider(
       names_from = "WORST_GRADE",
       values_from = "n",
-      values_fill = 0
+      values_fill = 0,
+      names_sort = TRUE
     )
 
   header <- sprintf(
@@ -1153,8 +1172,11 @@ build_shift_table <- function(lb_data, paramcd_val, param_label, n_total) {
   paste0(header, tbl_str, "\n")
 }
 
-adlb_mp <- adlb |> filter(TRT01P == "MP")
-adlb_cbzp <- adlb |> filter(TRT01P == "CbzP")
+# Restrict to Safety Population so the shift counts match the SAFFL
+# denominators (n_mp / n_cbzp); the 7 non-safety CbzP subjects carry ADLB rows.
+saf_ids <- adsl$USUBJID[adsl$SAFFL == "Y"]
+adlb_mp <- adlb |> filter(TRT01P == "MP", USUBJID %in% saf_ids)
+adlb_cbzp <- adlb |> filter(TRT01P == "CbzP", USUBJID %in% saf_ids)
 
 shift_output <- paste0(
   "\n TROPIC (Study EFC6193 / XRP6258) Laboratory Toxicity Shift Tables\n",
@@ -1178,12 +1200,15 @@ writeLines(paste0(synth_banner, shift_output),
 # ==============================================================================
 cat("  [TFL] Rendering CONSORT Patient Disposition Diagram...\n")
 
-# Derive disposition numbers from ADSL
+# Derive disposition numbers from ADSL. The diagram is the Safety Population,
+# so disposition counts and percentages are within SAFFL == "Y" (742), which
+# is smaller than the ITT set (749); the two are not interchangeable.
 n_total <- nrow(adsl)
 n_itt <- nrow(adsl |> filter(ITTFL == "Y"))
-n_safety <- n_itt
-n_deaths <- nrow(adsl |> filter(DTHFL == "Y"))
-n_completed <- nrow(adsl |> filter(TRTDURD >= 60))
+saf <- adsl |> filter(SAFFL == "Y")
+n_safety <- nrow(saf)
+n_deaths <- nrow(saf |> filter(DTHFL == "Y"))
+n_completed <- nrow(saf |> filter(TRTDURD >= 60))
 n_disc <- n_safety - n_completed
 
 # Build diagram as a ggplot canvas with annotated boxes and arrows
@@ -1211,7 +1236,10 @@ consort <- ggplot() +
   ) +
   annotate("text",
     x = 0.5, y = 0.735,
-    label = sprintf("ITT & Safety Population\nN = %d (100%%)", n_itt),
+    label = sprintf(
+      "ITT Population: N = %d\nSafety Population: N = %d (100%%)",
+      n_itt, n_safety
+    ),
     size = 3.2, fontface = "bold", color = "#065f46", family = "serif"
   ) +
   # Arrow down to branches
@@ -1260,9 +1288,16 @@ consort <- ggplot() +
     ),
     size = 3, color = "#b91c1c", family = "serif"
   ) +
-  # Arrow down: Deaths
+  # Deaths merge from BOTH branches: deaths occur among completers and
+  # discontinuers alike, so the box is not subordinate to either branch.
+  annotate("segment", x = 0.25, xend = 0.25, y = 0.49, yend = 0.45,
+           color = "#333333", linewidth = 0.5) +
+  annotate("segment", x = 0.75, xend = 0.75, y = 0.49, yend = 0.45,
+           color = "#333333", linewidth = 0.5) +
+  annotate("segment", x = 0.25, xend = 0.75, y = 0.45, yend = 0.45,
+           color = "#333333", linewidth = 0.5) +
   annotate("segment",
-    x = 0.5, xend = 0.5, y = 0.49, yend = 0.415,
+    x = 0.5, xend = 0.5, y = 0.45, yend = 0.415,
     arrow = arrow(length = unit(0.025, "npc")),
     color = "#333333", linewidth = 0.5
   ) +

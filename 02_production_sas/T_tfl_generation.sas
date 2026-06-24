@@ -282,7 +282,15 @@ data _swim30;
     death = (dthfl='Y');
 run;
 proc sort data=_swim30; by trt01p durm; run;
-data _swim30; set _swim30; row=_n_; run;
+/* Rank WITHIN arm (1..30 per panel), not a global 1..60 _n_: SGPANEL shares the
+   row axis across panels, so a global index leaves each arm's 30 bars in only
+   half its panel (big blank gap). Per-arm numbering fills both panels — the
+   SGPANEL analog of the R figure's facet_wrap(scales="free_y"). */
+data _swim30;
+    set _swim30; by trt01p;
+    if first.trt01p then row=0;
+    row+1;
+run;
 
 ods graphics on / reset=index imagename="F-14-1_Swimmer_Plot_SAS";
 title  j=l h=12pt c=cx111111 "F-14-1: Treatment Exposure Duration (Swimmer) - SAS Production Track";

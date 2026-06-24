@@ -134,8 +134,8 @@ ods graphics on / reset=all imagefmt=png width=8in height=5.5in noborder antiali
    FIGURE F-12-1 : OS Subgroup Forest Plot (univariate Cox HRs, CbzP vs MP)
    ============================================================================ */
 data _adsl_all;
-    set adam.adsl(keep=usubjid agegr1 ecogbl measdisf viscfl painbl)
-        cbz_adsl(keep=usubjid agegr1 ecogbl measdisf viscfl painbl);
+    set adam.adsl(keep=usubjid agegr1 ecogbl measdisf viscfl painbl docprog)
+        cbz_adsl(keep=usubjid agegr1 ecogbl measdisf viscfl painbl docprog);
 run;
 data _os;
     set adam.adtte(keep=usubjid trt01p paramcd aval cnsr)
@@ -144,7 +144,7 @@ data _os;
 run;
 proc sql;
     create table _ossub as
-    select a.*, b.agegr1, b.ecogbl, b.measdisf, b.viscfl, b.painbl
+    select a.*, b.agegr1, b.ecogbl, b.measdisf, b.viscfl, b.painbl, b.docprog
     from _os a left join _adsl_all b on a.usubjid=b.usubjid;
 quit;
 
@@ -186,11 +186,21 @@ run;
 %sgcox(viscfl,  N,    %str(Visceral Mets: No),       9)
 %sgcox(painbl,  Y,    %str(Baseline Pain: Yes),      10)
 %sgcox(painbl,  N,    %str(Baseline Pain: No),       11)
+%sgcox(docprog, AFTER, %str(Docetaxel Prog: After),  12)
+%sgcox(docprog, DURING,%str(Docetaxel Prog: During), 13)
 
 proc sort data=forest; by descending ord; run;
 data forest;
     set forest; length hrtext $24;
     hrtext = catx(' ', put(hazardratio,4.2), cats('(',put(waldlower,4.2),'-',put(waldupper,4.2),')'));
+run;
+
+/* Export the figure's own forest HRs for numerical SAS<->R reconciliation
+   (05_reconciliation/forest_reconcile.R). Exporting the figure dataset (not an
+   independent re-derivation) makes the gate validate the actual deliverable. */
+proc export data=forest(keep=subgroup hazardratio waldlower waldupper)
+    outfile="&PROJ_ROOT.&PATH_SEP.04_adam&PATH_SEP.forest_hr_prod.csv"
+    dbms=csv replace;
 run;
 
 ods graphics on / reset=index imagename="F-12-1_Subgroup_Forest_SAS";
@@ -272,7 +282,15 @@ data _swim30;
     death = (dthfl='Y');
 run;
 proc sort data=_swim30; by trt01p durm; run;
-data _swim30; set _swim30; row=_n_; run;
+/* Rank WITHIN arm (1..30 per panel), not a global 1..60 _n_: SGPANEL shares the
+   row axis across panels, so a global index leaves each arm's 30 bars in only
+   half its panel (big blank gap). Per-arm numbering fills both panels — the
+   SGPANEL analog of the R figure's facet_wrap(scales="free_y"). */
+data _swim30;
+    set _swim30; by trt01p;
+    if first.trt01p then row=0;
+    row+1;
+run;
 
 ods graphics on / reset=index imagename="F-14-1_Swimmer_Plot_SAS";
 title  j=l h=12pt c=cx111111 "F-14-1: Treatment Exposure Duration (Swimmer) - SAS Production Track";
@@ -284,7 +302,9 @@ proc sgpanel data=_swim30;
     hbarparm category=row response=durm / group=trt01p barwidth=0.85 nooutline;
     scatter x=durm y=row / markerattrs=(symbol=x size=9 color=cx111111) freq=death
         name='death' legendlabel='Death on study';
-    colaxis label="Months on Treatment" grid;
+    /* Fix the months axis to the data range (~9 mo) so bars fill the panel as in
+       the R figure; the default auto-range stretched to ~60 and shrank the bars. */
+    colaxis label="Months on Treatment" grid values=(0 to 9 by 3);
     rowaxis display=none;
     keylegend / position=bottom title='Treatment Arm:';
 run;
@@ -294,14 +314,16 @@ title; title2; footnote;
    FIGURE F-17-1 : Project Optimus Exposure-Response (RDI vs ANC Nadir)
    ============================================================================ */
 data _rdi;
-    set adam.adex(keep=usubjid trt01p paramcd aval rename=(aval=rdi))
-        cbz_adex(keep=usubjid trt01p paramcd aval rename=(aval=rdi));
-    if paramcd='RDI'; keep usubjid trt01p rdi;
+    set adam.adex(keep=usubjid trt01p paramcd avisit aval rename=(aval=rdi))
+        cbz_adex(keep=usubjid trt01p paramcd avisit aval rename=(aval=rdi));
+    if paramcd='RDI' and avisit='ALL CYCLES'; keep usubjid trt01p rdi;
 run;
 data _nadir;
-    set adam.adlb(keep=usubjid paramcd aval rename=(aval=anc))
-        cbz_adlb(keep=usubjid paramcd aval rename=(aval=anc));
-    if paramcd='ANCNADIR'; keep usubjid anc;
+    set adam.adlb(keep=usubjid paramcd avisit aval rename=(aval=anc))
+        cbz_adlb(keep=usubjid paramcd avisit aval rename=(aval=anc));
+    /* CYCLE 1 only: ANCNADIR exists at cycles 1-3 for the real MP arm; without this
+       filter MP subjects are plotted ~3x and the LOESS is inflated (R uses CYCLE 1). */
+    if paramcd='ANCNADIR' and avisit='CYCLE 1'; keep usubjid anc;
 run;
 proc sql;
     create table _er as
@@ -317,7 +339,10 @@ footnote j=l h=7pt c=&LRED. "&SYNTHFN.";
 proc sgplot data=_er nocycleattrs;
     styleattrs datacontrastcolors=(cx005A9C cxA6192E);
     scatter x=rdi y=anc / group=trt01p markerattrs=(symbol=circlefilled size=5) transparency=0.65;
-    loess x=rdi y=anc / group=trt01p nomarkers lineattrs=(thickness=3.5) smooth=0.7;
+    /* degree=2 + smooth=1.0 mirrors R's loess(span=1.0, degree=2). No CLM: the
+       sparse low-RDI MP tail (p5 RDI=79) makes confidence bands fan out into
+       slashing artifacts; R's shaded ribbon is cosmetic and not reproduced. */
+    loess x=rdi y=anc / group=trt01p nomarkers lineattrs=(thickness=3.5) smooth=1.0 degree=2;
     refline 0.5 / axis=y lineattrs=(pattern=shortdash color=cxE74C3C)
         label="Grade 4 Neutropenia (< 0.5)" labelloc=inside labelpos=min;
     xaxis label="Relative Dose Intensity (%)" grid max=105;
