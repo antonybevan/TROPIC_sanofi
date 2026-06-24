@@ -72,7 +72,7 @@ them. SAS production-track copies of the statistical figures are rendered separa
 
 | Output | SAP § | Generator function (`tfl_generation.R`) | Primary ADaM input(s) |
 |---|---|---|---|
-| `F-01-1_CONSORT_Disposition.png` | 3 | CONSORT builder | ADSL (population flags) |
+| `F-01-1_CONSORT_Disposition.png` | 3 | Analysis-population/mortality overview builder | ADSL (ITTFL, SAFFL, TRT01P, DTHFL) |
 | `F-11-1_KM_OS.png` / `F-11-2_KM_PFS.png` | 4.3 (OS), 5.1 (PFS) | `compute_tte_stats()` → KM/Cox | ADTTE (OS, PFS) |
 | `F-12-1_Subgroup_Forest.png` | 8.2 | per-subgroup Cox (`coxph(Surv(AVAL,1-CNSR) ~ TRT)` within each level) | ADTTE (OS) + ADSL covariates |
 | `F-13-1_PSA_Waterfall.png` | 5.2 | PSA best-change (`min(PCHG)` per subject) | ADLB (PSA `PCHG`), ADSL (arm) |
@@ -94,7 +94,7 @@ that link key results to their ADaM data + method — the define-level complemen
 | `RD.EFFICACY.SURVIVAL` | OS / PFS KM + Cox | `F-11-1`, `F-11-2`, `T-11` |
 | `RD.EFFICACY.SECONDARY` | Secondary efficacy (TTPSA/TTUMOR, response) | `T-11`, `ADRS`-derived |
 | `RD.SAFETY.TEAE` | TEAE summary | `T-20` |
-| `RD.EFFICACY.SUBGROUP` | OS prognostic subgroup hazard ratios | `F-12-1` |
+| `RD.EFFICACY.SUBGROUP` | OS treatment-effect subgroup hazard ratios | `F-12-1` |
 | `RD.EFFICACY.PSA.RESPONSE` | PSA best % change from baseline | `F-13-1` |
 | `RD.SAFETY.EXPOSURE` | Treatment exposure duration / cycles | `F-14-1` |
 | `RD.OPTIMUS.ER` | Project Optimus RDI vs ANC-nadir exposure-response | `F-17-1` |
@@ -103,7 +103,8 @@ that link key results to their ADaM data + method — the define-level complemen
 > **ARM coverage (2026-06-17).** ARM now spans **8 ResultDisplays / 10 AnalysisResults** — every
 > analysis display has a dedicated ResultDisplay linking result → method → ADaM dataset/variables
 > (each `Name` cites its TFL ID for ARM↔TFL traceability; referential integrity is gated by
-> `07_define_xml/validate_define.py`). The CONSORT disposition diagram (`F-01`) and the
+> `07_define_xml/validate_define.py`). The analysis-population overview (`F-01`, legacy
+> `CONSORT` filename) and the
 > discontinuation listing (`L-01`) are intentionally **out of ARM scope** — they are a flow
 > diagram and a data listing, not statistical analysis results.
 

@@ -4,6 +4,30 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.23.0] - 2026-06-25 — Figure parity and submission-output QC
+
+### Fixed
+- Corrected the R waterfall's within-arm ranking and aligned the R/SAS waterfall and swimmer
+  canvas, axis, category-order, colour, opacity, and labeling specifications.
+- Added KM censor marks; aligned SAS KM Cox models to the SAP-specified ECOG/measurable-disease
+  stratification; removed SAS risk-table missing-value artifacts.
+- Switched both exposure-response plots to a log10 ANC display so high observations are retained,
+  and removed an unstable sparse-tail LOESS confidence ribbon.
+- Replaced the unsupported CONSORT/completion claim with an ADSL-supported analysis-population and
+  mortality overview; retained the legacy filename for package compatibility.
+
+### Added
+- `tests/test_figure_outputs.R` gates dimensions, completeness, minimum size, and opacity for all
+  seven R and six SAS figures.
+- `05_reconciliation/figure_data_reconcile.R` reconciles exact SAS figure exports to R: KM HR/CIs
+  and 32 risk counts, 747 waterfall records, 60 swimmer selections/events, and 730
+  exposure-response observations. Forest reconciliation remains a separate 13-subgroup gate.
+- SAS ODA rendering now downloads the exact figure-driving CSVs used by this reconciliation.
+
+### Changed
+- Synchronized `renv.lock`; `renv::status()` is clean.
+- Refreshed both TFL tracks and the eCTD copies/checksums after a warning-free live ODA render.
+
 ## [3.22.0] - 2026-06-24 — End-to-end audit remediation (F-01…F-14)
 
 > **Context.** A full independent re-audit surfaced 14 findings — metadata/submission drift, an

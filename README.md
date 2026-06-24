@@ -328,7 +328,7 @@ the reconciled ADaM and the analysis derivations documented in the ADRG/SAP.
 
 | Output | Description |
 |---|---|
-| `F-01-1_CONSORT_Disposition.png` | Patient disposition flow (CONSORT) |
+| `F-01-1_CONSORT_Disposition.png` | Analysis-population and mortality overview (legacy filename; not a CONSORT flowchart) |
 | `F-11-1_KM_OS.png` / `F-11-2_KM_PFS.png` | OS / PFS Kaplan–Meier with number-at-risk |
 | `F-12-1_Subgroup_Forest.png` | OS subgroup forest (univariate Cox HRs) |
 | `F-13-1_PSA_Waterfall.png` | PSA best % change from baseline |
@@ -337,9 +337,12 @@ the reconciled ADaM and the analysis derivations documented in the ADRG/SAP.
 | `T-11` / `T-17` / `T-20` / `T-21` (`.txt`) | Efficacy (KM/Cox), Project Optimus tables, TEAE summary, CTCAE lab shifts |
 | `L-01-1_Discontinuations.txt` | Subject discontinuation listing |
 
-Figure QC follows standard practice: the **analysis results underlying each figure** —
-survival functions, hazard ratios, subjects-at-risk, and response distributions — are
-the validated objects (driven by the SAS↔R-reconciled ADaM), not the rendered image itself.
+Figure QC validates both layers. `tests/test_figure_outputs.R` gates file presence, the
+2400×1650 canvas contract, minimum size, and opaque backgrounds. The exact SAS
+figure-driving exports are reconciled to R by
+`05_reconciliation/figure_data_reconcile.R`: KM HR/CIs and all displayed risk counts,
+waterfall subject/value/category records, swimmer subjects/durations/death markers, and
+exposure-response observations. `forest_reconcile.R` separately checks all 13 forest HR/CIs.
 
 ### SAS production-track graphics (capability demonstration)
 
@@ -350,14 +353,16 @@ output to [`09_tfl/output/figures/sas/`](09_tfl/output/figures/sas/): KM OS & PF
 waterfall, exposure swimmer, and the Optimus exposure–response scatter.
 
 > This is a **capability demonstration**, not a duplicated deliverable: a regulatory submission
-> ships its TFLs in a single validated language. The SAS figures are a supplementary visual
-> rendering of the production-track analyses, not an independent validation of them. A genuine
+> normally ships one validated TFL set. The SAS figures are a supplementary native rendering;
+> their figure-driving records and displayed statistics are numerically reconciled to the R track,
+> but the graphics engines are not expected to produce pixel-identical typography. A genuine
 > independent SAS-vs-R comparison holds for the real MP arm only — its ADaM is derived separately
 > in SAS (`00_master_driver.sas`) and R (admiral) from the common SDTM and reconciled **numerically**
 > in `05_reconciliation/`. The synthetic CbzP arm is reconstructed once (R, Guyot) and rendered on
 > both tracks from that same source (the SAS bridge XPT is a format conversion of the R `.rds`, gated
 > cell-for-cell by `check_cbzp_bridge.R`), so for that arm the figures show rendering fidelity, not an
-> independent derivation. CONSORT and the text tables are produced on the R track only.
+> independent derivation. The analysis-population overview (legacy `CONSORT` filename) and the
+> text tables are produced on the R track only.
 > The SAS figures are rendered on ODA via `python3 06_telemetry/_oda_render_tfl.py`.
 
 ---
