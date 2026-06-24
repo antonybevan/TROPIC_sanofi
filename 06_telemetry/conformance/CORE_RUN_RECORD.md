@@ -56,8 +56,10 @@ project's XSD validation:
    AE=EVENTS, SUPP--=RELATIONSHIP; ADSL=SUBJECT LEVEL ANALYSIS DATASET, ADTTE=BASIC DATA STRUCTURE,
    ADAE=OCCURRENCE DATA STRUCTURE). Both defines now parse in CORE **and** validate against XSD.
 
-Also: **CORE 0.16.0 CLI bug (patched locally, reported upstream)** — the `StandardTypes` gate
-rejects `-s adamig` although the engine's `normalize_adam_input()` requires it.
+CORE 0.16.0 CLI gate (patched locally; resolved upstream): the `StandardTypes` gate rejects
+`-s adamig` although the engine's `normalize_adam_input()` requires it. Resolved upstream in
+PR #1733 (`adamig`, merged 2026-06-05) and PR #1770 (the six other ADaM products, merged
+2026-06-22); the local patch remains only because this project pins v0.16.0, which precedes both.
 
 ## Official ADaM Conformance Rules — access boundary
 

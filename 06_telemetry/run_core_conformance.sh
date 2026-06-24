@@ -26,8 +26,10 @@ mkdir -p "$RUN" "$ROOT/06_telemetry/conformance"
 if [ ! -f "$CORE" ]; then
   git clone --depth 1 --branch v0.16.0 https://github.com/cdisc-org/cdisc-rules-engine "$ENGINE"
 fi
-# CORE 0.16.0 CLI gate bug: StandardTypes omits 'adamig' though the engine requires it. Patch it
-# (portable across BSD/GNU sed via Python).
+# CORE 0.16.0 CLI gate: StandardTypes omits 'adamig' though the engine requires it. Patch it
+# (portable across BSD/GNU sed via Python). Resolved upstream (PR #1733 adamig; PR #1770 the other
+# ADaM products, merged 2026-06-22); this local patch is required only while the engine is pinned
+# to v0.16.0.
 STD_TYPES="$ENGINE/cdisc_rules_engine/enums/standard_types.py"
 grep -q 'ADAMIG = "adamig"' "$STD_TYPES" || "$VENV/bin/python" - "$STD_TYPES" <<'PYEOF'
 import sys

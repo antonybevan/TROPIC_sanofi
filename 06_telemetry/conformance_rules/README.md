@@ -53,11 +53,13 @@ core validate -s adamig -v 1.3 -d <adam_xpt_dir> -ft xpt \
   `../upstream_contributions/cdisc-rules-engine/`.
 - **CLI gate bug:** CORE's `StandardTypes` gate rejected `-s adamig` even though the engine's
   `normalize_*_input()` requires it (the runner patches `enums/standard_types.py` for v0.16.0).
-  **Upstream fixed `adamig` in PR #1733 (merged 2026-06-05).** The gate still omits the 6 other
+  Upstream fixed `adamig` in PR #1733 (merged 2026-06-05). The gate also omitted the six other
   ADaM products (`adam-adae`/`adam-md`/`adam-nca`/`adam-occds`/`adam-tte`/`adam-poppk`) that
-  `ADAM_PRODUCTS` lists — a ready-to-submit follow-up fix + PR write-up is prepared in
-  `../upstream_contributions/cdisc-rules-engine/` (verified against current `main`); submission
-  publishes under a personal GitHub identity.
+  `ADAM_PRODUCTS` lists; this was addressed by follow-up
+  [PR #1770](https://github.com/cdisc-org/cdisc-rules-engine/pull/1770), merged into `main` on
+  2026-06-22 (write-up retained in `../upstream_contributions/cdisc-rules-engine/`). The local
+  runner patches `enums/standard_types.py` only because this project pins v0.16.0, which precedes
+  both fixes.
 - **Define-XML (RESOLVED):** both defines now parse in CORE (`Define_XML_Version 2.1.0`). Three
   defects were fixed — invalid `Role` on `ItemGroupDef`, empty `TranslatedText`, and the missing
   `def:Class` element (the root cause of `'NoneType'.Name`) — added to all SDTM + ADaM datasets.
