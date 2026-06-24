@@ -36,6 +36,7 @@ find_file <- function(rel) {
 read_spec_grid <- function(path) {
   v <- read_excel(path, "Variables")
   d <- read_excel(path, "Datasets")
+  cl <- read_excel(path, "Codelists")
   list(
     vars = transmute(v,
       dataset = Dataset, variable = Variable,
@@ -46,6 +47,12 @@ read_spec_grid <- function(path) {
     ds = transmute(d,
       dataset = Dataset, class = Class,
       structure = Structure, label = Description
+    ),
+    # Codelist/term NCI controlled-terminology codes (one row per term). Empty for
+    # sponsor-defined codelists; populated for codelists derived from CDISC CT.
+    cl = transmute(cl,
+      codelist = ID, term = as.character(Term),
+      cl_code = `NCI Codelist Code`, term_code = `NCI Term Code`
     )
   )
 }
@@ -94,7 +101,25 @@ read_define_grid <- function(path) {
       if (inherits(t, "xml_missing")) NA_character_ else xml_text(t)
     }, character(1))
   )
-  list(vars = vars, ds = ds)
+  # Codelist/term NCI codes carried as <Alias Context="nci:ExtCodeID" Name="C..."/>.
+  cls <- xml_find_all(x, ".//d1:CodeList", ns)
+  alias_code <- function(node) {
+    a <- xml_find_first(node, "./d1:Alias[@Context='nci:ExtCodeID']", ns)
+    if (inherits(a, "xml_missing")) NA_character_ else xml_attr(a, "Name")
+  }
+  cl <- bind_rows(lapply(cls, function(c) {
+    oid <- xml_attr(c, "OID")
+    clc <- alias_code(c)
+    items <- xml_find_all(c, "./d1:CodeListItem", ns)
+    if (!length(items)) {
+      return(tibble(codelist = oid, term = NA_character_, cl_code = clc, term_code = NA_character_))
+    }
+    bind_rows(lapply(items, function(it) {
+      tibble(codelist = oid, term = xml_attr(it, "CodedValue"),
+             cl_code = clc, term_code = alias_code(it))
+    }))
+  }))
+  list(vars = vars, ds = ds, cl = cl)
 }
 
 # ---- comparison -------------------------------------------------------------
@@ -169,6 +194,29 @@ compare <- function(spec, def) {
       )
     }
   }
+  # codelist NCI controlled-terminology codes (spec <-> define). Drift fires only when a
+  # code differs or is present on one side and absent on the other; sponsor codelists
+  # (no code on either side) are NA-equal and never flagged.
+  scl <- distinct(spec$cl, codelist, cl_code)
+  dcl <- distinct(def$cl, codelist, cl_code)
+  clj <- inner_join(scl, dcl, by = "codelist", suffix = c(".s", ".d"))
+  bad <- clj[ne(clj[["cl_code.s"]], clj[["cl_code.d"]]), ]
+  if (nrow(bad)) {
+    out[[length(out) + 1]] <- tibble(
+      level = "codelist", dataset = NA, variable = bad$codelist,
+      attribute = "nci_codelist_code",
+      spec_value = bad[["cl_code.s"]], define_value = bad[["cl_code.d"]], severity = "ERROR"
+    )
+  }
+  tj <- inner_join(spec$cl, def$cl, by = c("codelist", "term"), suffix = c(".s", ".d"))
+  bad <- tj[ne(tj[["term_code.s"]], tj[["term_code.d"]]), ]
+  if (nrow(bad)) {
+    out[[length(out) + 1]] <- tibble(
+      level = "codelist", dataset = NA, variable = paste0(bad$codelist, "/", bad$term),
+      attribute = "nci_term_code",
+      spec_value = bad[["term_code.s"]], define_value = bad[["term_code.d"]], severity = "ERROR"
+    )
+  }
   if (length(out)) {
     bind_rows(out)
   } else {
@@ -232,12 +280,14 @@ self_test <- function() {
     if (nrow(clean) == 0) "(expected 0) OK\n" else "(UNEXPECTED)\n"
   )
 
-  # inject drift into a COPY of the spec: change a length+label, drop a variable
+  # inject drift into a COPY of the spec: change a length+label, drop a variable, and
+  # corrupt a codelist NCI code (proves the CT drift check has teeth)
   bad <- spec
   bad$vars$length[1] <- bad$vars$length[1] + 7
   bad$vars$label[2] <- paste0(bad$vars$label[2], " XX")
   dropped <- bad$vars[nrow(bad$vars), ]
   bad$vars <- bad$vars[-nrow(bad$vars), ]
+  bad$cl$cl_code[bad$cl$codelist == "CL.SEX"] <- "C99999"
   drift <- compare(bad, def)
   kinds <- sort(unique(paste(drift$attribute)))
   cat(
@@ -245,8 +295,8 @@ self_test <- function() {
     "->", paste(kinds, collapse = ", "), "\n"
   )
 
-  ok <- nrow(clean) == 0 && nrow(drift) >= 3 &&
-    all(c("length", "label", "presence") %in% drift$attribute)
+  ok <- nrow(clean) == 0 && nrow(drift) >= 4 &&
+    all(c("length", "label", "presence", "nci_codelist_code") %in% drift$attribute)
   cat(if (ok) {
     "[self-test] PASS: gate detects injected drift.\n"
   } else {

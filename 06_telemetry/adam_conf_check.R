@@ -83,6 +83,19 @@ for (ds in ds_names) {
         if (n_bad > 0) add("AD0107", "Error", ds, "PARAMCD/PARAM", n_bad,
                            "PARAMCD does not map 1:1 to PARAM")
       }
+      # PARAMN must be populated and 1:1 with PARAMCD (audit F-02). The old ADLB scheme
+      # (NEUT/PSA/HGB else 4) collided across analytes and left ANCNADIR/ANCRECDY null.
+      if ("PARAMN" %in% dn) {
+        ok <- !is.na(d$PARAMCD) & trimws(as.character(d$PARAMCD)) != ""
+        nmn <- sum(is.na(d$PARAMN[ok]))
+        if (nmn > 0) add("AD0111", "Error", ds, "PARAMN", nmn,
+                         "PARAMN is missing on records with a populated PARAMCD")
+        pc <- as.character(d$PARAMCD)[ok]; pn <- as.character(d$PARAMN)[ok]
+        bad_pc <- sum(tapply(pn, pc, function(x) length(unique(x))) > 1, na.rm = TRUE)
+        bad_pn <- sum(tapply(pc, pn, function(x) length(unique(x))) > 1, na.rm = TRUE)
+        if (bad_pc + bad_pn > 0) add("AD0112", "Error", ds, "PARAMCD/PARAMN", bad_pc + bad_pn,
+                                     "PARAMN does not map 1:1 to PARAMCD")
+      }
     }
     if (!any(c("AVAL", "AVALC") %in% dn))
       add("AD0108", "Warning", ds, "AVAL/AVALC", 1, "BDS dataset has neither AVAL nor AVALC")
@@ -115,17 +128,25 @@ res <- res[order(factor(res$severity, levels = c("Error", "Warning", "Notice")),
 
 write.csv(res, "06_telemetry/adam_conformance_report.csv", row.names = FALSE)
 n_err <- sum(res$severity == "Error"); n_warn <- sum(res$severity == "Warning")
-status <- if (n_err == 0) "PASS (0 errors at this check level)" else "FAIL — errors present"
-cat(sprintf("\n=== ADaM Conformance Check — %d findings (Error=%d, Warning=%d) -> %s ===\n",
-            nrow(res), n_err, n_warn, status))
+# AD0000 = the dataset XPT is absent (a data-free checkout / CI on a bare clone), which is NOT a
+# conformance failure. Separate it from genuine ADaM errors so the gate (a) exits non-zero on real
+# errors and (b) SKIPs cleanly when there is simply no data to check (audit F-04: this script used
+# to write a FAIL status but always exit 0, so the CI step passed on 7x "XPT not found").
+n_missing <- sum(res$rule == "AD0000")
+n_err_real <- n_err - n_missing
+data_free <- n_missing >= length(ds_names)
+status <- if (data_free) "SKIPPED (no *_prod.xpt present — data-free environment)" else
+          if (n_err_real == 0) "PASS (0 errors at this check level)" else "FAIL — errors present"
+cat(sprintf("\n=== ADaM Conformance Check — %d findings (Error=%d incl %d data-missing, Warning=%d) -> %s ===\n",
+            nrow(res), n_err, n_missing, n_warn, status))
 if (nrow(res)) {
   agg <- aggregate(count ~ rule + severity, data = res, FUN = length)
   agg <- agg[order(factor(agg$severity, levels = c("Error","Warning","Notice"))), ]
   print(agg, row.names = FALSE)
   cat("\n-- by dataset --\n"); print(table(res$dataset, res$severity))
 }
-jsonlite::write_json(list(status = status, errors = n_err, warnings = n_warn,
-                          findings = nrow(res)),
+jsonlite::write_json(list(status = status, errors = n_err_real, warnings = n_warn,
+                          findings = nrow(res), data_missing = n_missing),
                      "06_telemetry/adam_conformance_status.json", auto_unbox = TRUE)
 
 # ---- machine-refreshed markdown report (data tables; interpretation lives in the run-record) ----
@@ -145,7 +166,9 @@ desc <- c(AD0001="Dataset variable not described in define.xml", AD0002="define.
           AD0104="Required identifier (STUDYID/USUBJID) missing", AD0105="Mandatory variable entirely missing",
           AD0106="BDS missing PARAMCD/PARAM", AD0107="PARAMCD not 1:1 with PARAM",
           AD0108="BDS has neither AVAL nor AVALC", AD0109="PARAMCD has missing values",
-          AD0110="USUBJID not present in ADSL", AD0201="Value not in define.xml codelist")
+          AD0110="USUBJID not present in ADSL", AD0201="Value not in define.xml codelist",
+          AD0111="PARAMN missing where PARAMCD populated", AD0112="PARAMN not 1:1 with PARAMCD",
+          AD0000="Dataset XPT not found (data-free environment)")
 if (nrow(res)) {
   byrule <- as.data.frame(table(res$rule, res$severity)); byrule <- byrule[byrule$Freq > 0, ]
   byrule <- byrule[order(factor(byrule$Var2, levels = c("Error","Warning","Notice")), byrule$Var1), ]
@@ -168,3 +191,10 @@ if (nrow(res)) {
 }
 writeLines(md, "06_telemetry/adam_conformance_report.md")
 cat("\nWrote: adam_conformance_report.{csv,md}, adam_conformance_status.json\n")
+
+# Gate (audit F-04): fail the build on genuine ADaM conformance errors; SKIP (exit 0) when there
+# is simply no data present (data-free clone / CI), so the step is a real gate, not a no-op.
+if (!data_free && n_err_real > 0) {
+  cat(sprintf("ADaM conformance gate FAILED: %d error-severity finding(s).\n", n_err_real))
+  quit(status = 1)
+}

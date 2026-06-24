@@ -193,9 +193,30 @@ data work.adex_cycle;
 run;
 
 /* Combine all exposure parameters */
-data adam.adex(keep=STUDYID USUBJID SUBJID TRT01P TRT01PN TRTSDT PARAMCD PARAM PARCAT1 AVAL AVALC AVISIT);
+data work.adex_all(keep=STUDYID USUBJID SUBJID TRT01P TRT01PN TRTSDT PARAMCD PARAM PARCAT1 AVAL AVALC AVISIT AVISITN);
     set work.adex_bds work.adex_cycle;
+    /* AVISITN companion to AVISIT (audit F-09): ALL CYCLES -> 0; CYCLE n -> n */
+    if AVISIT = 'ALL CYCLES' then AVISITN = 0;
+    else AVISITN = input(scan(AVISIT, 2, ' '), ?? best12.);
 run;
+
+/* Deterministic 1:1 PARAMN over the sorted distinct PARAMCD set (audit F-09), identical to the
+   R track's distinct(PARAMCD) |> arrange(PARAMCD) |> row_number(). */
+proc sort data=work.adex_all out=work._pc(keep=PARAMCD) nodupkey;
+    by PARAMCD;
+run;
+data work._pnmap;
+    set work._pc;
+    PARAMN = _n_;
+run;
+
+proc sql;
+    create table adam.adex as
+    select a.STUDYID, a.USUBJID, a.SUBJID, a.TRT01P, a.TRT01PN, a.TRTSDT, a.PARAMCD, a.PARAM,
+           a.PARCAT1, a.AVAL, a.AVALC, a.AVISIT, m.PARAMN, a.AVISITN
+    from work.adex_all as a
+    left join work._pnmap as m on a.PARAMCD = m.PARAMCD;
+quit;
 
 proc sort data=adam.adex;
     by usubjid PARAMCD AVISIT;
@@ -203,6 +224,7 @@ run;
 
 /* Clean up work library */
 proc delete data=work.subj_mods work.adsl_sorted work.adex_bds_merged work.adex_bds
-            work.ex_sorted work.adex_cycle_merged work.adex_cycle;
+            work.ex_sorted work.adex_cycle_merged work.adex_cycle
+            work.adex_all work._pc work._pnmap;
 run;
 quit;

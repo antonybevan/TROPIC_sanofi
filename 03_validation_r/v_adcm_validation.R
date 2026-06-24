@@ -60,14 +60,14 @@ adcm <- df_cm %>%
     TRTEMFL = if_else(!is.na(cmstdt) & cmstdt >= TRTSDT, "Y", "N")
   ) %>%
   select(
-    STUDYID, USUBJID, CMDECOD, CMCAT, CMINDC, CMSTDT = cmstdt, CMENDT = cmendt,
-    CMTRT, CMSTDY = cmstdy, GCSFFL, GCSFPRFL, NACTFL, NACTDT = nactdt, PREDNFL, TRTEMFL
+    STUDYID, USUBJID, CMDECOD, CMCAT, CMINDC, ASTDT = cmstdt, AENDT = cmendt,
+    CMTRT, ASTDY = cmstdy, GCSFFL, GCSFPRFL, NACTFL, NACTDT = nactdt, PREDNFL, TRTEMFL
   )
 
 # Sort and Save
 
 # Sort and Save
-adcm <- adcm %>% arrange(USUBJID, CMSTDT, CMDECOD)
+adcm <- adcm %>% arrange(USUBJID, ASTDT, CMDECOD)
 
 # Assertions and Error Guards (QC-03)
 if (nrow(adcm) == 0) {

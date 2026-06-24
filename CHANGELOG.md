@@ -4,6 +4,48 @@ All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
+## [3.22.0] - 2026-06-24 — End-to-end audit remediation (F-01…F-14)
+
+> **Context.** A full independent re-audit surfaced 14 findings — metadata/submission drift, an
+> uncaught ADaM BDS defect, gates that recorded failures but did not gate, doc/comment drift, and two
+> ADaM-idiom gaps. All are remediated; the data-affecting changes are verified on two GREEN real-ODA
+> runs (22/22 stages, 8/8 dataset + 6/6 results reconciliations, spec→data PASS, provenance guard passed).
+
+### Fixed
+- **F-01 — eCTD package drift.** The materialized `m5/` define.xml lagged the source (missing the six
+  NCI CT codes from 3.21.0). Re-materialized; added a CI **freshness gate** diffing m5 vs source
+  define/conformance (content-compared, `AsOfDateTime`-tolerant) so the package can't be committed stale.
+- **F-02 — ADLB PARAMN.** The old NEUT/PSA/HGB/else=4 scheme collided across analytes and left
+  ANCNADIR/ANCRECDY unset. Replaced with a deterministic 1:1 dense-rank over the sorted PARAMCD set
+  (SAS + R, symmetric); added AD0111/AD0112 PARAMN checks to `adam_conf_check.R`. ODA-reconciled.
+- **F-03 — ANALYSIS_REPORT.md.** Rewrote the stale provenance/efficacy sections (superseded PH-scaling
+  numbers + "not Guyot / circular" framing) to the current Guyot OS/PFS reconstruction; numbers
+  transcribed from the committed TFL tables.
+- **F-04 — ADaM conformance gate.** `adam_conf_check.R` wrote a FAIL status but always exited 0; it now
+  exits non-zero on genuine errors and SKIPs cleanly when no data is present (CI).
+- **F-05 / F-08 / F-11 / F-12** — stage count 20→22 (+ rows in TRACEABILITY_MATRIX); ADSL/ADRS `Input:`
+  headers completed; ADAE AESEQ comment corrected; PCWG2→PCWG3, PSABL ng/mL→µg/L, tfl_stats §-ref.
+- **F-14** — documented that the provenance guard is a runtime control that passes vacuously on a
+  data-free clone (the committed `evidence/xpt_md5_manifest.txt` is the durable, re-checkable artifact).
+
+### Added
+- **F-06** — linked the previously-orphan MethodDefs (MT.RDI/NCYCLE/ANCNADIR) + COM.ANCNADIR to their
+  value-level parameters, removed unused MT.RDIDL, and added a reverse-orphan check to
+  `validate_define.py` (defined-but-unreferenced Method/Comment now fail the gate; 346 checks).
+- **F-09 — ADEX `AVISITN` + `PARAMN`.** Added the AVISIT numeric companion (ALL CYCLES→0, CYCLE n→n)
+  and a 1:1 PARAMN (SAS + R + spec + define). ODA-reconciled. Spec is now 159 variables.
+- **F-13** — widened the CI R-lint gate to seven source dirs (00_specifications, 01_raw_source,
+  03_validation_r, 05_reconciliation, 07_define_xml, 09_tfl, tests); `06_telemetry/` excluded with a
+  documented reason (compact engine-script style, mechanical-only lints). Wired `ct_cross_validation.py`
+  into CI (skips cleanly without the CDISC Library key/cache).
+
+### Changed
+- **F-10 — ADCM OCCDS date naming.** Renamed `CMSTDT/CMENDT/CMSTDY` → `ASTDT/AENDT/ASTDY` (SAS + R +
+  spec + define + the reconciliation key in `study_manifest.yaml`). ODA-reconciled on the new key.
+- **F-07** — evidence snapshot refreshed to the 2026-06-24 GREEN ODA run (22 stages); define.xml restamped.
+- Removed self-aggrandizing "Principal clinical-data-engineer / FDA-submission-lead" framing from
+  `REPO_AUDIT_2026-06-21.md` (+ a dated "superseded" banner) and README.
+
 ## [3.21.0] - 2026-06-23 — CDISC CT traceability: spec/define NCI codes + cross-validation
 
 > **Context.** The ADaM spec's Codelists and the define.xml carried no NCI controlled-terminology

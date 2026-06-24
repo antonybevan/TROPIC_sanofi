@@ -133,7 +133,14 @@ cycle_adj_ae <- ex_clean %>%
   )
 
 # Combine and Sort
-adex <- bind_rows(summary_bds, cycle_bds, cycle_adj, cycle_adj_ae)
+adex <- bind_rows(summary_bds, cycle_bds, cycle_adj, cycle_adj_ae) %>%
+  # AVISITN companion to AVISIT (audit F-09): ALL CYCLES -> 0; CYCLE n -> n
+  mutate(AVISITN = if_else(AVISIT == "ALL CYCLES", 0, as.numeric(sub("^CYCLE ", "", AVISIT))))
+
+# Deterministic 1:1 PARAMN over the sorted distinct PARAMCD set (audit F-09) — identical to the
+# SAS track (proc sort nodupkey by PARAMCD + _n_).
+pn_map <- adex %>% distinct(PARAMCD) %>% arrange(PARAMCD) %>% mutate(PARAMN = as.numeric(row_number()))
+adex <- adex %>% left_join(pn_map, by = "PARAMCD")
 
 # Sort and Save
 

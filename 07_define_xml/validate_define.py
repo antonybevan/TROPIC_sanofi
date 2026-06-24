@@ -89,6 +89,20 @@ def validate(path):
             if c not in comments:
                 problems.append(f"def:CommentOID: {c} -> no def:CommentDef")
 
+    # ---- reverse-orphan: defined-but-unreferenced Method/Comment (audit F-06) ----
+    # validate_define historically only checked ref->def, so a MethodDef/CommentDef defined but
+    # wired to nothing slipped through. Flag those too (dead metadata).
+    used_methods = {e.get("MethodOID") for e in root.iter(o("ItemRef")) if e.get("MethodOID")}
+    for m in methods:
+        checks += 1
+        if m not in used_methods:
+            problems.append(f"orphan MethodDef (defined, never referenced): {m}")
+    used_comments = {e.get(d("CommentOID")) for e in root.iter() if e.get(d("CommentOID"))}
+    for c in comments:
+        checks += 1
+        if c not in used_comments:
+            problems.append(f"orphan def:CommentDef (defined, never referenced): {c}")
+
     # ---- ARM (Analysis Results Metadata), if present ----
     def a(ln): return f"{{{ARM}}}{ln}"
     item_groups = oids(o("ItemGroupDef"))

@@ -44,12 +44,8 @@ df_windows <- df_lb %>%
   mutate(
     PARAMCD = LBTESTCD,
     PARAM = LBTEST,
-    PARAMN = case_when(
-      LBTESTCD == "NEUT" ~ 1.0,
-      LBTESTCD == "PSA" ~ 2.0,
-      LBTESTCD == "HGB" ~ 3.0,
-      TRUE ~ 4.0
-    ),
+    # PARAMN assigned 1:1 over the full PARAMCD set after the Optimus rows are bound (audit F-02);
+    # the old NEUT/PSA/HGB/else=4 scheme collided across analytes and left ANCNADIR/ANCRECDY unset.
     PARCAT1 = if_else(LBTESTCD == "PSA", "TUMOR MARKER", "HEMATOLOGY"),
     AVAL = avals,
     AVALC = LBORRES,
@@ -175,13 +171,20 @@ df_optimus_rec <- df_anc_rec %>%
 # Combine and Sort
 adlb_final <- bind_rows(
   df_anl01 %>% select(
-    STUDYID, USUBJID, SUBJID, TRT01P, TRTSDT, PARAMCD, PARAM, PARAMN, PARCAT1,
+    STUDYID, USUBJID, SUBJID, TRT01P, TRTSDT, PARAMCD, PARAM, PARCAT1,
     ADT = lbdt, AVAL, AVALC, LBNRLO = LBORNRLO, LBNRHI = LBORNRHI, LBNRIND, AVISIT, AVISITN, AWDIST, ATOXGR,
     BASE, BASEC, BTOXGR, CHG, PCHG, ANL01FL, BASEFL, lbdy
   ),
   df_optimus_nadir,
   df_optimus_rec
 )
+
+# Deterministic 1:1 PARAMN over the sorted distinct PARAMCD set (audit F-02) — identical to the
+# SAS track (proc sort nodupkey by PARAMCD + _n_). arrange() on the uppercase-ASCII PARAMCD tokens
+# matches SAS's ASCII collating sequence, so both tracks assign the same numbers.
+pn_map <- adlb_final %>% distinct(PARAMCD) %>% arrange(PARAMCD) %>%
+  mutate(PARAMN = as.numeric(row_number()))
+adlb_final <- adlb_final %>% left_join(pn_map, by = "PARAMCD")
 
 # Sort and Save
 

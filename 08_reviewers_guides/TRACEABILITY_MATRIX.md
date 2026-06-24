@@ -111,8 +111,9 @@ that link key results to their ADaM data + method — the define-level complemen
 
 ## 4. Orchestration & Provenance
 
-The pipeline is **20 stages** (`cibuild.py`); the BIMO domain at Stage 10 and the two ADaM
-specification-conformance gates at Stages 15–16 (audit C-4 inversion) shifted the later stage numbers.
+The pipeline is **22 stages** (`cibuild.py`); the BIMO domain at Stage 10 and the two ADaM
+specification-conformance gates at Stages 15–16 (audit C-4 inversion) shifted the later stage numbers,
+and the eCTD backbone + materialize steps (Stages 21–22) were subsequently folded into the DAG.
 
 | Stage | Driver | Evidence artifact |
 |---|---|---|
@@ -128,6 +129,8 @@ specification-conformance gates at Stages 15–16 (audit C-4 inversion) shifted 
 | 18 (Analysis Results Standard v1.0) | `build_ars.py` | `12_ars/` (ephemeral) |
 | 19 (USDM v3.0 study definition) | `build_usdm.py` | `13_usdm/tropic_usdm.json` (also a data-free CI gate) |
 | 20 (eCTD Module 5 packaging) | `package_ectd.py` | `m5/` (ephemeral) |
+| 21 (eCTD backbone + STF, sequence 0000) | `build_ectd_backbone.py` | `11_ectd/0000/index.xml`, `index-md5.txt`, `stf-tropic.xml` |
+| 22 (materialize eCTD sequence + MD5 re-verify) | `materialize_ectd.py` | `11_ectd/0000/` leaves (every leaf MD5-verified) |
 | *(offline)* CDISC CORE conformance | `06_telemetry/run_core_conformance.sh` — SDTMIG **3.4** rules on the uplifted layer (authoritative) + SDTMIG 3.2 baseline on the pristine 3.1.1 source + executable ADaM rules (`conformance_rules/adam/`, `--local-rules`) | `06_telemetry/conformance/core_sdtm34_report.json` + `core_{sdtm,adam}_report.json`; `CORE_SDTM34_RUN_RECORD.md`, `CORE_RUN_RECORD.md` |
 
 Run reproducibility: R toolchain pinned by `renv.lock`; self-contained demo

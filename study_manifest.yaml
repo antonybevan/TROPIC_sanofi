@@ -34,7 +34,7 @@ datasets:
     val: v_adex_validation.R
     parallel_group: 1
   - name: adcm
-    keys: [USUBJID, CMSTDT, CMDECOD]
+    keys: [USUBJID, ASTDT, CMDECOD]
     sas: A_adcm_generation.sas
     val: v_adcm_validation.R
     parallel_group: 1

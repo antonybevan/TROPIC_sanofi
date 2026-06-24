@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<?xml-stylesheet type="text/xsl" href="define2-1.xsl"?><ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:def="http://www.cdisc.org/ns/def/v2.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:arm="http://www.cdisc.org/ns/arm/v1.0" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 http://schema.cdisc.org/define/v2.1/define2-1-0.xsd" ODMVersion="1.3.2" FileType="Snapshot" FileOID="TROPIC_ADAM_Metadata_v2.1" CreationDateTime="2026-06-12T21:52:12" AsOfDateTime="2026-06-22T21:51:15" Originator="Antony Bevan, Clinical Programming" def:Context="Submission"><Study OID="STDY.TROPIC">
+<?xml-stylesheet type="text/xsl" href="define2-1.xsl"?><ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:def="http://www.cdisc.org/ns/def/v2.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:arm="http://www.cdisc.org/ns/arm/v1.0" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 http://schema.cdisc.org/define/v2.1/define2-1-0.xsd" ODMVersion="1.3.2" FileType="Snapshot" FileOID="TROPIC_ADAM_Metadata_v2.1" CreationDateTime="2026-06-12T21:52:12" AsOfDateTime="2026-06-24T12:09:52" Originator="Antony Bevan, Clinical Programming" def:Context="Submission"><Study OID="STDY.TROPIC">
     <GlobalVariables>
       <StudyName>TROPIC (EFC6193 / XRP6258)</StudyName>
       <StudyDescription>Cabazitaxel vs Mitoxantrone in mCRPC progressing after docetaxel (NCT00417079).</StudyDescription>
@@ -14,7 +14,7 @@
       <ItemRef ItemOID="IT.ADLB.AVAL.NEUT" Mandatory="No">
         <def:WhereClauseRef WhereClauseOID="WC.ADLB.PARAMCD.EQ.NEUT"/>
       </ItemRef>
-      <ItemRef ItemOID="IT.ADLB.AVAL.ANCNADIR" Mandatory="No">
+      <ItemRef ItemOID="IT.ADLB.AVAL.ANCNADIR" Mandatory="No" MethodOID="MT.ANCNADIR">
         <def:WhereClauseRef WhereClauseOID="WC.ADLB.PARAMCD.EQ.ANCNADIR"/>
       </ItemRef>
       <ItemRef ItemOID="IT.ADLB.AVAL.PSA" Mandatory="No">
@@ -22,10 +22,10 @@
       </ItemRef>
     </def:ValueListDef>
     <def:ValueListDef OID="VL.ADEX.AVAL">
-      <ItemRef ItemOID="IT.ADEX.AVAL.RDI" Mandatory="No">
+      <ItemRef ItemOID="IT.ADEX.AVAL.RDI" Mandatory="No" MethodOID="MT.RDI">
         <def:WhereClauseRef WhereClauseOID="WC.ADEX.PARAMCD.EQ.RDI"/>
       </ItemRef>
-      <ItemRef ItemOID="IT.ADEX.AVAL.NCYCLE" Mandatory="No">
+      <ItemRef ItemOID="IT.ADEX.AVAL.NCYCLE" Mandatory="No" MethodOID="MT.NCYCLE">
         <def:WhereClauseRef WhereClauseOID="WC.ADEX.PARAMCD.EQ.NCYCLE"/>
       </ItemRef>
     </def:ValueListDef>
@@ -154,6 +154,8 @@
       <ItemRef ItemOID="IT.ADEX.AVAL" Mandatory="No" OrderNumber="10"/>
       <ItemRef ItemOID="IT.ADEX.AVALC" Mandatory="No" OrderNumber="11"/>
       <ItemRef ItemOID="IT.ADEX.AVISIT" Mandatory="Yes" OrderNumber="12"/>
+      <ItemRef ItemOID="IT.ADEX.PARAMN" Mandatory="No" OrderNumber="13"/>
+      <ItemRef ItemOID="IT.ADEX.AVISITN" Mandatory="No" OrderNumber="14"/>
       <def:Class Name="BASIC DATA STRUCTURE"/>
       <def:leaf ID="LF.ADEX" xlink:href="adex.xpt">
         <def:title>adex.xpt</def:title>
@@ -168,10 +170,10 @@
       <ItemRef ItemOID="IT.ADCM.CMDECOD" Mandatory="Yes" OrderNumber="3"/>
       <ItemRef ItemOID="IT.ADCM.CMCAT" Mandatory="Yes" OrderNumber="4"/>
       <ItemRef ItemOID="IT.ADCM.CMINDC" Mandatory="No" OrderNumber="5"/>
-      <ItemRef ItemOID="IT.ADCM.CMSTDT" Mandatory="No" OrderNumber="6"/>
-      <ItemRef ItemOID="IT.ADCM.CMENDT" Mandatory="No" OrderNumber="7"/>
+      <ItemRef ItemOID="IT.ADCM.ASTDT" Mandatory="No" OrderNumber="6"/>
+      <ItemRef ItemOID="IT.ADCM.AENDT" Mandatory="No" OrderNumber="7"/>
       <ItemRef ItemOID="IT.ADCM.CMTRT" Mandatory="Yes" OrderNumber="8"/>
-      <ItemRef ItemOID="IT.ADCM.CMSTDY" Mandatory="No" OrderNumber="9"/>
+      <ItemRef ItemOID="IT.ADCM.ASTDY" Mandatory="No" OrderNumber="9"/>
       <ItemRef ItemOID="IT.ADCM.GCSFFL" Mandatory="No" OrderNumber="10"/>
       <ItemRef ItemOID="IT.ADCM.GCSFPRFL" Mandatory="No" OrderNumber="11"/>
       <ItemRef ItemOID="IT.ADCM.NACTFL" Mandatory="No" OrderNumber="12"/>
@@ -525,6 +527,12 @@
     <ItemDef OID="IT.ADEX.AVISIT" Name="AVISIT" DataType="text" Length="40">
       <Description><TranslatedText xml:lang="en">Analysis Visit</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
     </ItemDef>
+    <ItemDef OID="IT.ADEX.PARAMN" Name="PARAMN" DataType="float" Length="8">
+      <Description><TranslatedText xml:lang="en">Parameter (N)</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
+    </ItemDef>
+    <ItemDef OID="IT.ADEX.AVISITN" Name="AVISITN" DataType="float" Length="8">
+      <Description><TranslatedText xml:lang="en">Analysis Visit (N)</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
+    </ItemDef>
     <ItemDef OID="IT.ADCM.STUDYID" Name="STUDYID" DataType="text" Length="40">
       <Description><TranslatedText xml:lang="en">Study Identifier</TranslatedText></Description><def:Origin Type="Protocol" Source="Sponsor"/>
     </ItemDef>
@@ -540,17 +548,17 @@
     <ItemDef OID="IT.ADCM.CMINDC" Name="CMINDC" DataType="text" Length="200">
       <Description><TranslatedText xml:lang="en">Indication</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
     </ItemDef>
-    <ItemDef OID="IT.ADCM.CMSTDT" Name="CMSTDT" DataType="date" Length="10">
-      <Description><TranslatedText xml:lang="en">Analysis Start Date</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
+    <ItemDef OID="IT.ADCM.ASTDT" Name="ASTDT" DataType="date" Length="10">
+      <Description><TranslatedText xml:lang="en">Analysis Start Date</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
     </ItemDef>
-    <ItemDef OID="IT.ADCM.CMENDT" Name="CMENDT" DataType="date" Length="10">
-      <Description><TranslatedText xml:lang="en">Analysis End Date</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
+    <ItemDef OID="IT.ADCM.AENDT" Name="AENDT" DataType="date" Length="10">
+      <Description><TranslatedText xml:lang="en">Analysis End Date</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADCM.CMTRT" Name="CMTRT" DataType="text" Length="200">
       <Description><TranslatedText xml:lang="en">Reported Name of Drug, Med, or Therapy</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
     </ItemDef>
-    <ItemDef OID="IT.ADCM.CMSTDY" Name="CMSTDY" DataType="float" Length="8">
-      <Description><TranslatedText xml:lang="en">Analysis Start Day</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
+    <ItemDef OID="IT.ADCM.ASTDY" Name="ASTDY" DataType="float" Length="8">
+      <Description><TranslatedText xml:lang="en">Analysis Start Day</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADCM.GCSFFL" Name="GCSFFL" DataType="text" Length="1">
       <Description><TranslatedText xml:lang="en">G-CSF Concomitant Med Flag</TranslatedText></Description><CodeListRef CodeListOID="CL.NY"/>
@@ -862,7 +870,7 @@
     <ItemDef OID="IT.ADLB.AVAL.NEUT" Name="AVAL" DataType="float" Length="8">
       <Description><TranslatedText xml:lang="en">Absolute Neutrophil Count (x10^3/uL)</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
     </ItemDef>
-    <ItemDef OID="IT.ADLB.AVAL.ANCNADIR" Name="AVAL" DataType="float" Length="8">
+    <ItemDef OID="IT.ADLB.AVAL.ANCNADIR" Name="AVAL" DataType="float" Length="8" def:CommentOID="COM.ANCNADIR">
       <Description><TranslatedText xml:lang="en">Minimum Cycle 1 ANC Nadir (x10^3/uL)</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADLB.AVAL.PSA" Name="AVAL" DataType="float" Length="8">
@@ -1243,11 +1251,6 @@
     <MethodDef OID="MT.RDI" Name="Method for RDI" Type="Computation">
       <Description>
         <TranslatedText xml:lang="en">Relative Dose Intensity, calculated as (Actual cumulative dose administered / Planned cumulative dose) * 100.</TranslatedText>
-      </Description>
-    </MethodDef>
-    <MethodDef OID="MT.RDIDL" Name="Method for RDIDL" Type="Computation">
-      <Description>
-        <TranslatedText xml:lang="en">Relative Dose Intensity Category, classified as &gt;=85%, 65-&lt;85%, or &lt;65% based on RDI.</TranslatedText>
       </Description>
     </MethodDef>
     <MethodDef OID="MT.NCYCLE" Name="Method for NCYCLE" Type="Computation">

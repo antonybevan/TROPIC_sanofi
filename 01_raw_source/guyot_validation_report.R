@@ -100,8 +100,9 @@ md <- c(
   "",
   "| Gate | Value | Target | Result |",
   "|---|---|---|---|",
-  apply(gates, 1, function(r)
-    sprintf("| %s | %s | %s | %s |", r["Gate"], r["Value"], r["Target"], r["Result"])),
+  apply(gates, 1, function(r) {
+    sprintf("| %s | %s | %s | %s |", r["Gate"], r["Value"], r["Target"], r["Result"])
+  }),
   "",
   sprintf("**Overall: %s** — provenance %s.",
           ifelse(all_pass, "ALL GATES PASSED", "SOME GATES FAILED"),
@@ -110,10 +111,10 @@ md <- c(
 )
 if (!verified) {
   md <- c(md,
-    "> [!WARNING]",
-    "> Coordinates are placeholder (not figure-digitised). Gate results are",
-    "> mechanical only and do not certify the reconstruction. Supply genuinely",
-    "> digitised CSVs and set `PROVENANCE` to `DIGITISED`, then re-run.", "")
+          "> [!WARNING]",
+          "> Coordinates are placeholder (not figure-digitised). Gate results are",
+          "> mechanical only and do not certify the reconstruction. Supply genuinely",
+          "> digitised CSVs and set `PROVENANCE` to `DIGITISED`, then re-run.", "")
 }
 writeLines(md, "01_raw_source/guyot_validation_report.md")
 cat("  [VALIDATION] Wrote 01_raw_source/guyot_validation_report.md\n")

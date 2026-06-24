@@ -428,7 +428,7 @@ de Bono JS, Oudard S, Ozguroglu M, et al. **Prednisone plus cabazitaxel or mitox
 
 ### Audit & review records
 
-- `06_telemetry/REPO_AUDIT_2026-06-21.md` — submission-lead repository audit (standards currency, pipeline DAG, reconciliation matrix, full orphan sweep).
+- `06_telemetry/REPO_AUDIT_2026-06-21.md` — submission-readiness repository audit (standards currency, pipeline DAG, reconciliation matrix, full orphan sweep).
 - `06_telemetry/FDA_REVIEWER_AUDIT_2026-06-20.md` — independent FDA-reviewer conformance audit (filing-risk perspective).
 - `06_telemetry/ADDITIVE_INTEGRATION_SCAN_2026-06-20.md` — emerging-standards additive-integration scan (ARS / USDM / Dataset-JSON / eCTD).
 - Reviewer guides: `08_reviewers_guides/{ADRG, SDRG, BDRG, SDSP, TRACEABILITY_MATRIX}.md`.

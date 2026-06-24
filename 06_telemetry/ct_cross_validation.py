@@ -61,8 +61,11 @@ def load_ct(packages, version):
     for pkg in packages:
         path = os.path.join(CACHE, f"{pkg}-{version}.pkl")
         if not os.path.exists(path):
-            sys.exit(f"No CDISC_LIBRARY_API_KEY and no offline cache at {path}. "
-                     f"Set the key or run 06_telemetry/run_core_conformance.sh once to seed it.")
+            # No CT source available (e.g. a bare CI checkout with no API key and no seeded cache).
+            # Return a sentinel so main() SKIPs cleanly (exit 0) rather than failing the build —
+            # set CDISC_LIBRARY_API_KEY (or seed the cache via run_core_conformance.sh) to gate.
+            return None, (f"unavailable: no CDISC_LIBRARY_API_KEY and no offline cache at {path} "
+                          f"(set the key or run 06_telemetry/run_core_conformance.sh once to seed it)")
         with open(path, "rb") as f:
             codelists += pickle.load(f).get("codelists", [])
     return codelists, f"core_offline_cache ({os.path.relpath(CACHE, ROOT)})"
@@ -201,6 +204,9 @@ def main():
     packages = [p.strip() for p in args.packages.split(",") if p.strip()]
 
     codelists, source = load_ct(packages, args.version)
+    if codelists is None:
+        print(f"CT cross-validation SKIPPED — {source}")
+        sys.exit(0)
     by_ccode, by_name, value_sets = index_ct(codelists)
     spec = load_spec_codelists(SPEC)
     results, summary = validate(spec, by_ccode, by_name, value_sets)

@@ -5,7 +5,7 @@
 # Requires: survival.
 
 # Stratified Cox proportional-hazards HR (+95% CI) and stratified log-rank p-value for a
-# two-arm time-to-event analysis, per SAP v3.0 §5.1. Input df must carry AVAL (days),
+# two-arm time-to-event analysis, per SAP v3.0 §4.3 (OS) / §5.1 (PFS). Input df must carry AVAL (days),
 # CNSR (0=event,1=censored), TRT01P ("MP"/"CbzP"), and the stratification factors
 # ECOGBL and MEASDISF. Returns list(hr, lcl, ucl, pval).
 compute_tte_stats <- function(df) {

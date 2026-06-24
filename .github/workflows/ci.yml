@@ -45,8 +45,12 @@ jobs:
 
     - name: Lint R sources (zero-warning gate)
       run: |
+        # Covers every R source dir EXCEPT 06_telemetry/ (audit F-13). The engine scripts there
+        # follow a compact style with ~290 purely-mechanical style lints (infix-spaces/commas/
+        # semicolons — zero real defects); they are slated for a dedicated styler pass rather than
+        # mass-reformatted here, so they are excluded from this gate, not silently un-linted.
         Rscript -e 'if (!requireNamespace("lintr", quietly = TRUE)) install.packages("lintr", repos = "https://cloud.r-project.org")'
-        Rscript -e 'files <- list.files(c("03_validation_r", "05_reconciliation", "09_tfl"), pattern = "[.]R$", full.names = TRUE); n <- sum(vapply(files, function(f) length(lintr::lint(f)), integer(1))); if (n > 0) { for (f in files) print(lintr::lint(f)); stop(sprintf("lintr gate failed: %d issue(s)", n)) }; cat(sprintf("lintr gate passed: 0 issues across %d files\n", length(files)))'
+        Rscript -e 'files <- list.files(c("00_specifications", "01_raw_source", "03_validation_r", "05_reconciliation", "07_define_xml", "09_tfl", "tests"), pattern = "[.]R$", full.names = TRUE); n <- sum(vapply(files, function(f) length(lintr::lint(f)), integer(1))); if (n > 0) { for (f in files) print(lintr::lint(f)); stop(sprintf("lintr gate failed: %d issue(s)", n)) }; cat(sprintf("lintr gate passed: 0 issues across %d files\n", length(files)))'
 
     - name: Install Python dependencies
       run: |
@@ -81,6 +85,19 @@ jobs:
         python3 07_define_xml/validate_define.py 07_define_xml/define.xml
         python3 07_define_xml/validate_define.py 07_define_xml/define_sdtm.xml
 
+    - name: eCTD package freshness gate (m5 == source)
+      run: |
+        # Audit F-01: the materialized m5/ submission copies must not drift in CONTENT from the
+        # governing source (this is how the CT-code regression slipped into the committed package).
+        # define.xml carries a build-time AsOfDateTime that write_telemetry restamps AFTER the
+        # packaging stage, so compare content with that volatile stamp stripped — a real content
+        # drift still fails the build; a pure restamp lag does not.
+        strip() { grep -v 'AsOfDateTime' "$1"; }
+        diff <(strip 07_define_xml/define.xml)      <(strip m5/datasets/tropic/analysis/adam/datasets/define.xml)
+        diff <(strip 07_define_xml/define_sdtm.xml) <(strip m5/datasets/tropic/tabulations/sdtm/datasets/define.xml)
+        diff 06_telemetry/conformance/spec_define_conformance.json m5/datasets/tropic/analysis/adam/spec_define_conformance.json
+        echo "eCTD freshness gate: m5 define/conformance content matches source."
+
     - name: ADaM specification conformance gates (C-4 inversion)
       run: |
         # The authoritative spec (00_specifications/ADaM_spec.xlsx) governs both
@@ -89,6 +106,16 @@ jobs:
         Rscript 07_define_xml/check_define_conformance.R
         Rscript 07_define_xml/check_define_conformance.R --self-test
         Rscript 03_validation_r/spec_data_checks.R
+
+    - name: CT cross-validation (spec Codelists vs CDISC CT)
+      run: |
+        # Validates the ADaM spec's NCI controlled-terminology codes against authoritative CDISC CT
+        # (audit F-13). Needs the CDISC Library API key (repo secret) or the offline CORE cache; a
+        # bare CI checkout has neither and the script SKIPs cleanly (exit 0). Set the secret below to
+        # turn this into a hard gate that fails on a non-extensible-codelist CT violation.
+        python3 06_telemetry/ct_cross_validation.py
+      env:
+        CDISC_LIBRARY_API_KEY: ${{ secrets.CDISC_LIBRARY_API_KEY }}
 
     - name: USDM study-definition build (data-free gate)
       run: |

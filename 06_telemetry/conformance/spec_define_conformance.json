@@ -2,9 +2,9 @@
   "check": "spec -> define conformance (C-4 inversion)",
   "spec": "ADaM_spec.xlsx",
   "define": "define.xml",
-  "timestamp": "2026-06-23T18:26:02",
+  "timestamp": "2026-06-24T12:12:05",
   "datasets_checked": 7,
-  "variables_checked": 157,
+  "variables_checked": 159,
   "findings": 0,
   "status": "PASS",
   "detail": []
