@@ -76,6 +76,12 @@ infrastructure_stages:
     - { name: "R SDTM Validation",        script: "03_validation_r/v_sdtm_validation.R", runner: logrx }
   post:
     - { name: "Cross-Language Audit Reconcile",              script: "05_reconciliation/cross_lang_audit.R",     runner: logrx,   gated: true }
+    # Synthetic comparator bridge integrity. The SAS production track reads <dom>_cbzp.xpt and the
+    # R reporting track reads <dom>_cbzp.rds; this step fails the build unless the .xpt is the current
+    # deterministic export of the .rds, so both tracks provably consume an identical comparator cohort.
+    # Non-gated: the script's own non-zero exit code gates the build. Runs before TFL compilation so a
+    # drifted bridge is caught before any figure is rendered from it.
+    - { name: "Synthetic Comparator Bridge Parity",       script: "01_raw_source/check_cbzp_bridge.R",        runner: rscript }
     - { name: "Efficacy & Safety TFL Suite Compilation",     script: "09_tfl/tfl_generation.R",                  runner: rscript, gated: true }
     - { name: "Numerical Results Reconciliation (SAS vs R)", script: "05_reconciliation/results_reconcile.R",    runner: logrx,   gated: true }
     - { name: "ADaM Spec to Define Conformance",             script: "07_define_xml/check_define_conformance.R", runner: rscript }
