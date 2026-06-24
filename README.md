@@ -208,7 +208,7 @@ TROPIC/
 │       │   ├── F-13-1_PSA_Waterfall.png
 │       │   ├── F-14-1_Swimmer_Plot.png
 │       │   ├── F-17-1_Optimus_Scatter.png
-│       │   └── sas/                # SAS-generated figures (OS/PFS/subgroup/Optimus)
+│       │   └── sas/                # SAS figures: KM OS/PFS, forest, PSA waterfall, swimmer, Optimus
 │       ├── tables/                 # Efficacy/safety text tables (T-11, T-17, T-20, T-21)
 │       └── listings/               # Subject listings (L-01-1)
 │
@@ -350,9 +350,14 @@ output to [`09_tfl/output/figures/sas/`](09_tfl/output/figures/sas/): KM OS & PF
 waterfall, exposure swimmer, and the Optimus exposure–response scatter.
 
 > This is a **capability demonstration**, not a duplicated deliverable: a regulatory submission
-> ships its TFLs in a single validated language. It also serves as an independent visual cross-check
-> that the SAS production analyses (Cox hazard ratios, Kaplan–Meier survival, subjects-at-risk)
-> concur with the R reporting track. CONSORT and the text tables are produced on the R track only.
+> ships its TFLs in a single validated language. The SAS figures are a supplementary visual
+> rendering of the production-track analyses, not an independent validation of them. A genuine
+> independent SAS-vs-R comparison holds for the real MP arm only — its ADaM is derived separately
+> in SAS (`00_master_driver.sas`) and R (admiral) from the common SDTM and reconciled **numerically**
+> in `05_reconciliation/`. The synthetic CbzP arm is reconstructed once (R, Guyot) and rendered on
+> both tracks from that same source (the SAS bridge XPT is a format conversion of the R `.rds`, gated
+> cell-for-cell by `check_cbzp_bridge.R`), so for that arm the figures show rendering fidelity, not an
+> independent derivation. CONSORT and the text tables are produced on the R track only.
 > The SAS figures are rendered on ODA via `python3 06_telemetry/_oda_render_tfl.py`.
 
 ---
