@@ -321,7 +321,10 @@ footnote j=l h=7pt c=&LRED. "&SYNTHFN.";
 proc sgplot data=_er nocycleattrs;
     styleattrs datacontrastcolors=(cx005A9C cxA6192E);
     scatter x=rdi y=anc / group=trt01p markerattrs=(symbol=circlefilled size=5) transparency=0.65;
-    loess x=rdi y=anc / group=trt01p nomarkers lineattrs=(thickness=3.5) smooth=1.0 clm;
+    /* degree=2 + smooth=1.0 mirrors R's loess(span=1.0, degree=2). No CLM: the
+       sparse low-RDI MP tail (p5 RDI=79) makes confidence bands fan out into
+       slashing artifacts; R's shaded ribbon is cosmetic and not reproduced. */
+    loess x=rdi y=anc / group=trt01p nomarkers lineattrs=(thickness=3.5) smooth=1.0 degree=2;
     refline 0.5 / axis=y lineattrs=(pattern=shortdash color=cxE74C3C)
         label="Grade 4 Neutropenia (< 0.5)" labelloc=inside labelpos=min;
     xaxis label="Relative Dose Intensity (%)" grid max=105;
