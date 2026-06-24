@@ -195,6 +195,14 @@ data forest;
     hrtext = catx(' ', put(hazardratio,4.2), cats('(',put(waldlower,4.2),'-',put(waldupper,4.2),')'));
 run;
 
+/* Export the figure's own forest HRs for numerical SAS<->R reconciliation
+   (05_reconciliation/forest_reconcile.R). Exporting the figure dataset (not an
+   independent re-derivation) makes the gate validate the actual deliverable. */
+proc export data=forest(keep=subgroup hazardratio waldlower waldupper)
+    outfile="&PROJ_ROOT.&PATH_SEP.04_adam&PATH_SEP.forest_hr_prod.csv"
+    dbms=csv replace;
+run;
+
 ods graphics on / reset=index imagename="F-12-1_Subgroup_Forest_SAS";
 title  j=l h=12pt c=cx111111 "F-12-1: OS Prognostic Subgroup Forest Plot - SAS Production Track";
 title2 j=l h=9pt  c=cx444444 "Univariate Cox hazard ratios (CbzP vs MP) with 95% Wald CIs";

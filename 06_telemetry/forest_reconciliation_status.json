@@ -1,0 +1,21 @@
+{
+  "overall": "PASS",
+  "scope": "F-12-1 subgroup forest HRs (CbzP vs MP), SAS PROC PHREG vs R coxph",
+  "hr_tol": 0.02,
+  "subgroups": {
+    "Age < 65": "PASS",
+    "Age >= 65": "PASS",
+    "All Patients": "PASS",
+    "Baseline Pain: No": "PASS",
+    "Baseline Pain: Yes": "PASS",
+    "Docetaxel Prog: After": "PASS",
+    "Docetaxel Prog: During": "PASS",
+    "ECOG 0": "PASS",
+    "ECOG 1": "PASS",
+    "Measurable Disease: No": "PASS",
+    "Measurable Disease: Yes": "PASS",
+    "Visceral Mets: No": "PASS",
+    "Visceral Mets: Yes": "PASS"
+  }
+}
+

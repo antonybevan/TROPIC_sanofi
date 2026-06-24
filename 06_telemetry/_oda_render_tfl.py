@@ -193,6 +193,16 @@ filename tfl "{PGMDIR_ODA}/T_tfl_generation.sas";
             fig_fail.append(fig)
         print(f"  {fig}.png: {'OK' if ok else 'FAILED'} ({size/1024:.0f} KB)", flush=True)
 
+    # Forest-HR CSV (figure's own dataset) for numerical reconciliation
+    # (05_reconciliation/forest_reconcile.R). Best-effort: absence degrades the
+    # reconciliation step to 'not_available', it does not fail the render.
+    try:
+        sas.download(os.path.join(PROJECT_ROOT, "04_adam", "forest_hr_prod.csv"),
+                     f"{ADAM_ODA}/forest_hr_prod.csv")
+        print("  forest_hr_prod.csv: OK", flush=True)
+    except Exception as e:
+        print(f"  forest_hr_prod.csv: download FAILED ({e})", flush=True)
+
     if errs2 or fig_fail:
         print(f"\nRESULT: PARTIAL — fig errors={bool(errs2)}, missing figs={fig_fail}", flush=True)
         sys.exit(2)
