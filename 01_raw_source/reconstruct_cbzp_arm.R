@@ -225,9 +225,15 @@ usubjid_raw <- paste0("006193-", subjid_raw)
 # Treatment dates: align with real trial (2007-2009 enrolment window)
 trtsdt_raw <- as.Date("2007-09-01") + sample(0:700, N_cbzp, replace = TRUE)
 
-# Duration: use the PH-scaled OS IPD to derive treatment duration
-# Approximate as 70% of OS time (exposure ends before death/progression)
-trtdurd_raw <- pmax(21, round(os_ipd$time * runif(N_cbzp, 0.45, 0.85)))
+# Cycles received (single source of truth for exposure): median 6, range 1-10.
+# Cabazitaxel is dosed every 3 weeks, so treatment duration is derived directly
+# from the cycle count: TRTDURD = ncycles * 21 days. This keeps ADSL exposure
+# consistent with the ADEX NCYCLE record and clinically realistic (max ~7 months).
+# (Previously TRTDURD was 45-85% of OS time, which produced implausible ~25-month
+# exposures that exceeded the 10-cycle ceiling and contradicted ADEX.)
+ncycles <- sample(1:10, N_cbzp, replace = TRUE,
+                  prob = c(0.08, 0.10, 0.12, 0.12, 0.13, 0.15, 0.10, 0.08, 0.06, 0.06))
+trtdurd_raw <- as.numeric(ncycles) * 21
 
 # Safety / per-protocol / GCSF-prophylaxis populations assigned to RANDOM subjects.
 # os_ipd is time-ordered, so a positional slice (e.g. seq_len <= 371) would tie
@@ -474,9 +480,8 @@ shuffle_idx <- sample(1:N_cbzp)
 rdi_vals <- rdi_vals[shuffle_idx]
 rdi_cats <- rdi_cats[shuffle_idx]
 
-# Cycles received: median 6 (range 1-10)
-ncycles <- sample(1:10, N_cbzp, replace = TRUE,
-                  prob = c(0.08, 0.10, 0.12, 0.12, 0.13, 0.15, 0.10, 0.08, 0.06, 0.06))
+# Cycles received: generated above as the single source of truth, so ADSL TRTDURD
+# (= ncycles * 21) and this ADEX NCYCLE record cannot disagree.
 
 adex_cbzp <- bind_rows(
   data.frame(
