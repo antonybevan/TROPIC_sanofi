@@ -318,7 +318,7 @@ render_km <- function(data, stats, x_max, title, subtitle_endpoint, y_lab, outfi
 
   final_km_plot <- km_plot / risk_table_plot + plot_layout(heights = c(4.1, 1))
   ggsave(outfile, final_km_plot, width = 8, height = 5.5, dpi = 300,
-    bg = "white")
+         bg = "white")
 }
 
 # ==============================================================================
@@ -1298,8 +1298,8 @@ consort <- ggplot() +
   annotate("text",
     x = 0.25, y = 0.532,
     label = sprintf("CbzP Safety Arm (Synthetic)\nn = %d; deaths = %d (%d%%)",
-      n_cbzp_safety, n_cbzp_deaths,
-      round(100 * n_cbzp_deaths / n_cbzp_safety)),
+                    n_cbzp_safety, n_cbzp_deaths,
+                    round(100 * n_cbzp_deaths / n_cbzp_safety)),
     size = 3, color = "#15803d", family = "serif"
   ) +
   # Branch right: MP safety arm
@@ -1317,8 +1317,8 @@ consort <- ggplot() +
   annotate("text",
     x = 0.75, y = 0.532,
     label = sprintf("MP Safety Arm (Real)\nn = %d; deaths = %d (%d%%)",
-      n_mp_safety, n_mp_deaths,
-      round(100 * n_mp_deaths / n_mp_safety)),
+                    n_mp_safety, n_mp_deaths,
+                    round(100 * n_mp_deaths / n_mp_safety)),
     size = 3, color = "#b91c1c", family = "serif"
   ) +
   # Aggregate outcome, explicitly downstream of both treatment arms.

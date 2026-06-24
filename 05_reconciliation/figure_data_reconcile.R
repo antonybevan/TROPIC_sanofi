@@ -53,7 +53,7 @@ risk_ok <- TRUE
 for (i in seq_len(nrow(sas_risk))) {
   z <- sas_risk[i, ]
   expected <- sum(adtte$PARAMCD == z$PARAMCD & adtte$TRT01P == z$TRT01P &
-                  adtte$AVAL / 30.4375 >= z$AVALM)
+                    adtte$AVAL / 30.4375 >= z$AVALM)
   if (expected != z$NRISK) risk_ok <- FALSE
 }
 if (risk_ok) pass("KM risk tables", sprintf("%d displayed counts identical", nrow(sas_risk))) else
@@ -106,12 +106,13 @@ if (swim_ok) pass("Swimmer", "60 subjects, durations, and death markers identica
   fail("Swimmer", "figure-driving records differ")
 
 # Exposure-response joined observations.
+nadir_er <- adlb |>
+  filter(PARAMCD == "ANCNADIR", AVISIT == "CYCLE 1") |>
+  select(USUBJID, ANC = AVAL)
 r_er <- adex |>
   filter(PARAMCD == "RDI", AVISIT == "ALL CYCLES") |>
   select(USUBJID, TRT01P, RDI = AVAL) |>
-  inner_join(adlb |>
-    filter(PARAMCD == "ANCNADIR", AVISIT == "CYCLE 1") |>
-    select(USUBJID, ANC = AVAL), by = "USUBJID") |>
+  inner_join(nadir_er, by = "USUBJID") |>
   arrange(USUBJID, TRT01P)
 s_er <- read.csv(required[5], stringsAsFactors = FALSE) |>
   rename_with(toupper) |>
