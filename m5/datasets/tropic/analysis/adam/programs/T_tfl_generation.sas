@@ -1,7 +1,7 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: T_tfl_generation.sas
-   Version: 1.1.0
+   Version: 1.2.0
    Author:  Antony Bevan, Clinical Programming
    Standard: ICH E3 TFL Catalogue / NEJM & Lancet publication style
    Description: SAS production-track statistical figures, rendered natively via ODS
@@ -42,9 +42,16 @@ run;
    STYLEATTRS / attribute map, so a custom style template is unnecessary. */
 ods listing gpath="&SASFIG." style=journal3 image_dpi=300;
 ods graphics on / reset=all imagefmt=png width=8in height=5.5in noborder antialiasmax=100000;
+/* Suppress the default numeric-missing dot.  The KM plotting dataset contains
+   curve rows with missing NRISK; otherwise XAXISTABLE prints one dot at every
+   event time and creates dotted artifacts between the actual risk counts. */
+options missing=' ';
+proc format;
+    value $trtlbl 'CbzP'='CbzP (Synthetic)' 'MP'='MP (Real)';
+run;
 
 %let LRED = cxA6192E;
-%let SYNTHFN = %str(CbzP is a SYNTHETIC, illustrative comparator (PH-scaled from the real MP arm); between-arm statistics are circular by construction - NOT clinical findings.);
+%let SYNTHFN = %str(CbzP is SYNTHETIC - NOT real patient data. OS/PFS use Guyot IPD reconstruction; secondary endpoints are PH-scaled and circular by construction.);
 
 /* ---- Bridge the synthetic CbzP arm. The XPORT engine does NOT expand _ALL_ in
    a SET statement, so reference the explicit member name written by haven, which
@@ -64,19 +71,32 @@ ods graphics on / reset=all imagefmt=png width=8in height=5.5in noborder antiali
 /* ============================================================================
    FIGURE F-11-1 / F-11-2 : Kaplan-Meier OS & PFS (with number-at-risk table)
    ============================================================================ */
+proc datasets lib=work nolist;
+    delete figure_km_stats figure_km_risk;
+quit;
 %macro km(paramcd, fig, xmax, ylab, title);
-    data _km;
+    data _km_tte;
         set adam.adtte(keep=usubjid trt01p paramcd aval cnsr)
             cbz_adtte(keep=usubjid trt01p paramcd aval cnsr);
         if paramcd = "&paramcd.";
         avalm = aval / 30.4375;
     run;
+    data _km_sl;
+        set adam.adsl(keep=usubjid ecogbl measdisf)
+            cbz_adsl(keep=usubjid ecogbl measdisf);
+    run;
+    proc sql;
+        create table _km as
+        select a.*, b.ecogbl, b.measdisf
+        from _km_tte a left join _km_sl b on a.usubjid=b.usubjid;
+    quit;
 
     %global _hr _lcl _ucl;
     %let _hr = .; %let _lcl = .; %let _ucl = .;
     proc phreg data=_km;
         class trt01p (ref='MP');
         model avalm*cnsr(1) = trt01p / ties=efron;
+        strata ecogbl measdisf;
         hazardratio 'CbzP vs MP' trt01p / cl=wald;
         ods output HazardRatios=_hr_ds;
     run;
@@ -86,6 +106,13 @@ ods graphics on / reset=all imagefmt=png width=8in height=5.5in noborder antiali
         call symputx('_lcl', put(WaldLower,   4.2));
         call symputx('_ucl', put(WaldUpper,   4.2));
     run;
+    data _kmstat_one;
+        length paramcd $8;
+        set _hr_ds;
+        paramcd = "&paramcd.";
+        keep paramcd hazardratio waldlower waldupper;
+    run;
+    proc append base=figure_km_stats data=_kmstat_one force; run;
 
     /* Survival estimates + censor points (SGPLOT gives full title/footnote control) */
     proc lifetest data=_km outsurv=_su noprint;
@@ -108,11 +135,24 @@ ods graphics on / reset=all imagefmt=png width=8in height=5.5in noborder antiali
         select t._t as avalm, k.trt01p, sum(k.avalm >= t._t) as nrisk
         from _tk t, _km k group by t._t, k.trt01p;
     quit;
-    data _plot; set _anchor _curve _ar; run;
+    data _ar_export;
+        length paramcd $8;
+        set _ar;
+        paramcd = "&paramcd.";
+    run;
+    proc append base=figure_km_risk data=_ar_export force; run;
+    data _plot;
+        length trt01p $8;
+        set _anchor(rename=(trt01p=_trt_anchor))
+            _curve(rename=(trt01p=_trt_curve))
+            _ar(rename=(trt01p=_trt_risk));
+        trt01p = coalescec(_trt_anchor, _trt_curve, _trt_risk);
+        drop _trt_anchor _trt_curve _trt_risk;
+    run;
 
     ods graphics on / reset=index imagename="&fig._SAS";
     title  j=l h=12pt  c=cx111111 "&title. - SAS Production Track";
-    title2 j=l h=9.5pt c=cx444444 "Cabazitaxel+Prednisone (CbzP, synthetic) vs Mitoxantrone+Prednisone (MP, real)   |   HR = &_hr. (95% CI &_lcl. - &_ucl.)";
+    title2 j=l h=9.5pt c=cx444444 "Cabazitaxel+Prednisone (CbzP, synthetic) vs Mitoxantrone+Prednisone (MP, real)   |   Stratified HR = &_hr. (95% CI &_lcl. - &_ucl.)";
     footnote j=l h=7.5pt c=&LRED. "&SYNTHFN.";
     proc sgplot data=_plot noautolegend nocycleattrs;
         styleattrs datacontrastcolors=(cx005A9C cxA6192E);
@@ -129,6 +169,15 @@ ods graphics on / reset=all imagefmt=png width=8in height=5.5in noborder antiali
 
 %km(OS,  F-11-1_KM_OS,  24, Overall Survival Probability,          %str(F-11-1: Kaplan-Meier Overall Survival (OS)))
 %km(PFS, F-11-2_KM_PFS, 18, Progression-Free Survival Probability, %str(F-11-2: Kaplan-Meier Progression-Free Survival (PFS)))
+
+proc export data=figure_km_stats
+    outfile="&PROJ_ROOT.&PATH_SEP.04_adam&PATH_SEP.figure_km_stats_prod.csv"
+    dbms=csv replace;
+run;
+proc export data=figure_km_risk
+    outfile="&PROJ_ROOT.&PATH_SEP.04_adam&PATH_SEP.figure_km_risk_prod.csv"
+    dbms=csv replace;
+run;
 
 /* ============================================================================
    FIGURE F-12-1 : OS Subgroup Forest Plot (univariate Cox HRs, CbzP vs MP)
@@ -204,14 +253,15 @@ proc export data=forest(keep=subgroup hazardratio waldlower waldupper)
 run;
 
 ods graphics on / reset=index imagename="F-12-1_Subgroup_Forest_SAS";
-title  j=l h=12pt c=cx111111 "F-12-1: OS Prognostic Subgroup Forest Plot - SAS Production Track";
-title2 j=l h=9pt  c=cx444444 "Univariate Cox hazard ratios (CbzP vs MP) with 95% Wald CIs";
+title  j=l h=12pt c=cx111111 "F-12-1: OS Treatment Effect Subgroup Forest Plot - SAS Production Track";
+title2 j=l h=9pt  c=cx444444 "Unadjusted within-subgroup Cox hazard ratios (CbzP vs MP) with 95% Wald CIs";
 footnote j=l h=7pt c=&LRED. "&SYNTHFN.";
 proc sgplot data=forest noautolegend nocycleattrs;
     refline 1 / axis=x lineattrs=(pattern=shortdash color=gray55);
     highlow y=subgroup low=waldlower high=waldupper / type=line lineattrs=(color=cx1A5276 thickness=2);
     scatter y=subgroup x=hazardratio / markerattrs=(symbol=squarefilled size=10 color=cx1A5276);
-    yaxistable hrtext / location=outside position=right valueattrs=(size=8pt) labelattrs=(size=8.5pt weight=bold) title="HR (95% CI)";
+    yaxistable hrtext / location=outside position=right valueattrs=(size=8pt)
+        labelattrs=(size=8.5pt weight=bold) title="HR (95% CI)" nolabel;
     xaxis type=log logbase=2 label="Hazard Ratio (Favors CbzP <-- | --> Favors MP)" values=(0.2 0.5 1 2 4) min=0.15 max=4.5;
     yaxis display=(noline noticks) label=' ';
 run;
@@ -241,6 +291,11 @@ data _psab;
     else respcat='PSA Increase';
 run;
 
+proc export data=_psab(keep=usubjid trt01p rank best respcat)
+    outfile="&PROJ_ROOT.&PATH_SEP.04_adam&PATH_SEP.figure_waterfall_prod.csv"
+    dbms=csv replace;
+run;
+
 /* Explicit category->color binding (alphabetical styleattrs would scramble it) */
 data _psamap;
     length id $5 value $26 fillcolor $9 linecolor $9;
@@ -252,9 +307,10 @@ run;
 
 ods graphics on / reset=index imagename="F-13-1_PSA_Waterfall_SAS";
 title  j=l h=12pt c=cx111111 "F-13-1: PSA Best % Change from Baseline (Waterfall) - SAS Production Track";
-title2 j=l h=9pt  c=cx444444 "Each bar = one subject's best PSA change; sorted within arm";
+title2 j=l h=9pt  c=cx444444 "Each bar = one subject's best PSA change, sorted within arm; dashed line = 50% decrease threshold";
 footnote j=l h=7pt c=&LRED. "&SYNTHFN.";
 proc sgpanel data=_psab dattrmap=_psamap;
+    format trt01p $trtlbl.;
     panelby trt01p / columns=2 novarname spacing=8 headerattrs=(weight=bold size=10pt);
     vbarparm category=rank response=best / group=respcat attrid=psa;
     refline -50 / lineattrs=(pattern=shortdash color=cx005A9C);
@@ -281,6 +337,7 @@ data _swim30;
     if k <= 30;
     death = (dthfl='Y');
 run;
+
 proc sort data=_swim30; by trt01p durm; run;
 /* Rank WITHIN arm (1..30 per panel), not a global 1..60 _n_: SGPANEL shares the
    row axis across panels, so a global index leaves each arm's 30 bars in only
@@ -291,12 +348,17 @@ data _swim30;
     if first.trt01p then row=0;
     row+1;
 run;
+proc export data=_swim30(keep=usubjid trt01p row durm death)
+    outfile="&PROJ_ROOT.&PATH_SEP.04_adam&PATH_SEP.figure_swimmer_prod.csv"
+    dbms=csv replace;
+run;
 
 ods graphics on / reset=index imagename="F-14-1_Swimmer_Plot_SAS";
-title  j=l h=12pt c=cx111111 "F-14-1: Treatment Exposure Duration (Swimmer) - SAS Production Track";
-title2 j=l h=9pt  c=cx444444 "Bar = months on treatment; X = death on study. Top 30 subjects per arm.";
+title  j=l h=12pt c=cx111111 "F-14-1: Treatment Exposure Duration - Swimmer Plot (30 Longest Exposures per Arm)";
+title2 j=l h=9pt  c=cx444444 "Bar = months on treatment; X = death on study. Subjects selected by descending exposure duration.";
 footnote j=l h=7pt c=&LRED. "&SYNTHFN.";
 proc sgpanel data=_swim30;
+    format trt01p $trtlbl.;
     panelby trt01p / columns=2 novarname spacing=8 headerattrs=(weight=bold size=10pt);
     styleattrs datacolors=(cx005A9C cxA6192E);
     hbarparm category=row response=durm / group=trt01p barwidth=0.85 nooutline;
@@ -332,21 +394,39 @@ proc sql;
     where a.rdi is not null and b.anc is not null;
 quit;
 
+/* Model and display ANC on the log10 scale. Nine MP observations exceed 6,
+   including a value of 71.9; the former fixed 0-6 axis silently clipped them. */
+data _er;
+    set _er;
+    if anc > 0 then loganc = log10(anc);
+run;
+proc export data=_er(keep=usubjid trt01p rdi anc loganc)
+    outfile="&PROJ_ROOT.&PATH_SEP.04_adam&PATH_SEP.figure_er_prod.csv"
+    dbms=csv replace;
+run;
+proc format;
+    value loganc
+      -1.30103='0.05' -1='0.10' -0.69897='0.20' -0.30103='0.50'
+       0='1.00' 0.30103='2.00' 0.69897='5.00' 1='10.00'
+       1.30103='20.00' 1.69897='50.00' 2='100.00';
+run;
+
 ods graphics on / reset=index imagename="F-17-1_Optimus_Scatter_SAS";
 title  j=l h=12pt c=cx111111 "F-17-1: Project Optimus Exposure-Response - SAS Production Track";
-title2 j=l h=9pt  c=cx444444 "Continuous ANC nadir (Cycle 1) vs Relative Dose Intensity, LOESS fit by arm";
+title2 j=l h=9pt  c=cx444444 "Continuous ANC nadir vs RDI; descriptive LOESS fit on the log10 ANC scale";
 footnote j=l h=7pt c=&LRED. "&SYNTHFN.";
 proc sgplot data=_er nocycleattrs;
     styleattrs datacontrastcolors=(cx005A9C cxA6192E);
-    scatter x=rdi y=anc / group=trt01p markerattrs=(symbol=circlefilled size=5) transparency=0.65;
+    scatter x=rdi y=loganc / group=trt01p markerattrs=(symbol=circlefilled size=5) transparency=0.65;
     /* degree=2 + smooth=1.0 mirrors R's loess(span=1.0, degree=2). No CLM: the
-       sparse low-RDI MP tail (p5 RDI=79) makes confidence bands fan out into
-       slashing artifacts; R's shaded ribbon is cosmetic and not reproduced. */
-    loess x=rdi y=anc / group=trt01p nomarkers lineattrs=(thickness=3.5) smooth=1.0 degree=2;
-    refline 0.5 / axis=y lineattrs=(pattern=shortdash color=cxE74C3C)
+       sparse low-RDI MP tail makes confidence bands imply unsupported precision. */
+    loess x=rdi y=loganc / group=trt01p nomarkers lineattrs=(thickness=3.5) smooth=1.0 degree=2;
+    refline -0.30103 / axis=y lineattrs=(pattern=shortdash color=cxE74C3C)
         label="Grade 4 Neutropenia (< 0.5)" labelloc=inside labelpos=min;
     xaxis label="Relative Dose Intensity (%)" grid max=105;
-    yaxis label="ANC Nadir Value (x10^3/uL)" min=0 max=6 grid;
+    yaxis label="ANC Nadir Value (x10^3/uL; log scale)" grid
+        values=(-1.30103 -1 -0.69897 -0.30103 0 0.30103 0.69897 1 1.30103 1.69897 2)
+        valuesformat=loganc.;
     keylegend / position=top title='Treatment Group:';
 run;
 title; title2; footnote;

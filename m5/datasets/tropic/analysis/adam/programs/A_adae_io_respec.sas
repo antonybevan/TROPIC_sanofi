@@ -32,7 +32,9 @@ proc sql;
         adsl.trt01a as TRTA length=20,
         adsl.trt01an as TRTAN,
         adsl.trtsdt,
-        ae.aeseq,            /* retained end-to-end as the unique reconcile key (USUBJID+AESEQ) and a deterministic sort tie-breaker */
+        /* Retained as the unique reconcile key (USUBJID+AESEQ) and a
+           deterministic sort tie-breaker. */
+        ae.aeseq,
         ae.aedecod,
         ae.aebodsys,
         ae.aehlt,

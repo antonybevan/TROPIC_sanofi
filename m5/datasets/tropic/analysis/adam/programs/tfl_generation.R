@@ -1,4 +1,4 @@
-# Program: tfl_generation.R | Version: 3.5.0
+# Program: tfl_generation.R | Version: 3.6.0
 # Author: Antony Bevan, Clinical Programming | Date: 2026-06-12
 # Standard: ICH E3 TFL Catalogue / NEJM & Lancet Style Guides
 # renv.lock hash: locked
@@ -236,9 +236,25 @@ render_km <- function(data, stats, x_max, title, subtitle_endpoint, y_lab, outfi
   }
   plot_data <- bind_rows(plot_list)
 
+  # Censoring marks are part of the statistical display, not decoration.  They
+  # must be taken from the same survfit rows as the step curve so their time and
+  # survival ordinate cannot drift from the estimate.
+  censor_data <- data.frame(
+    time = fit$time,
+    surv = fit$surv,
+    n_censor = fit$n.censor,
+    TRT01P = gsub("TRT01P=", "", rep(names(fit$strata), fit$strata))
+  ) |>
+    filter(.data$n_censor > 0)
+
   # Main KM Plot Panel
   km_plot <- ggplot(plot_data, aes(x = time, y = surv, color = TRT01P)) +
     geom_step(linewidth = 1.0) +
+    geom_point(
+      data = censor_data,
+      aes(x = time, y = surv, color = TRT01P),
+      shape = 3, size = 1.6, stroke = 0.55, show.legend = FALSE
+    ) +
     scale_color_manual(
       values = c("CbzP" = "#005A9C", "MP" = "#A6192E"),
       labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")
@@ -248,7 +264,7 @@ render_km <- function(data, stats, x_max, title, subtitle_endpoint, y_lab, outfi
     coord_cartesian(xlim = c(0, x_max), ylim = c(0, 1.02)) +
     labs(
       title = title,
-      subtitle = subtitle_endpoint,
+      subtitle = paste0(subtitle_endpoint, "\nVertical ticks denote censored observations."),
       x = "Months from Randomization",
       y = y_lab,
       color = "Treatment Group:",
@@ -301,7 +317,8 @@ render_km <- function(data, stats, x_max, title, subtitle_endpoint, y_lab, outfi
     )
 
   final_km_plot <- km_plot / risk_table_plot + plot_layout(heights = c(4.1, 1))
-  ggsave(outfile, final_km_plot, width = 8, height = 5.5, dpi = 300)
+  ggsave(outfile, final_km_plot, width = 8, height = 5.5, dpi = 300,
+    bg = "white")
 }
 
 # ==============================================================================
@@ -346,25 +363,30 @@ er_data <- rdi_data |>
 er_plot <- ggplot(er_data, aes(x = RDI, y = ANC, color = TRT01P)) +
   # Styled points with white fill, transparency, and clinical palette borders
   geom_point(alpha = 0.5, size = 2.0, shape = 21, stroke = 0.6, fill = "white", aes(color = TRT01P)) + # nolint
-  geom_smooth(method = "loess", span = 1.0, se = TRUE, linewidth = 1.2, aes(fill = TRT01P, color = TRT01P), alpha = 0.15) + # nolint
+  # Descriptive smoother only.  A pointwise LOESS ribbon is not shown because
+  # the sparse low-RDI tail makes it explode and imply unsupported precision.
+  # Formal exposure-response inference belongs in a pre-specified model/table.
+  geom_smooth(method = "loess", span = 1.0, se = FALSE, linewidth = 1.2,
+    aes(color = TRT01P)) + # nolint
   scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"),
-    labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) + # nolint
-  scale_fill_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"),
     labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) + # nolint
   labs(
     title = "F-17-1: Project Optimus Exposure-Response Analysis",
-    subtitle = "Continuous ANC Nadir (Cycle 1) vs Relative Dose Intensity (RDI) by Arm\nFitted with LOWESS smoothing local regression curves", # nolint
+    subtitle = "Continuous ANC Nadir (Cycle 1) vs Relative Dose Intensity (RDI) by Arm\nDescriptive LOESS curves fitted on the log10 ANC scale", # nolint
     x = "Relative Dose Intensity (%)",
-    y = "ANC Nadir Value (x10^3/uL)",
+    y = "ANC Nadir Value (x10^3/uL; log scale)",
     color = "Treatment Group:",
-    fill = "95% Confidence Interval:",
     caption = synth_cap
   ) +
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "#e74c3c", linewidth = 0.8) + # nolint
   annotate("text", x = 43, y = 0.72, label = "Grade 4 Neutropenia Limit (< 0.5 x 10^3/uL)", # nolint
     color = "#e74c3c", # nolint
     size = 3.2, fontface = "bold", family = "serif", hjust = 0) +
-  coord_cartesian(ylim = c(0, 6.0)) +
+  scale_y_log10(
+    limits = c(0.05, 100),
+    breaks = c(0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100),
+    labels = scales::label_number(accuracy = 0.01)
+  ) +
   theme_nejm_custom() +
   theme(
     panel.grid.major.x = element_line(color = "#eaeaea", linewidth = 0.3),
@@ -372,7 +394,7 @@ er_plot <- ggplot(er_data, aes(x = RDI, y = ANC, color = TRT01P)) +
   )
 
 ggsave("09_tfl/output/figures/F-17-1_Optimus_Scatter.png", er_plot,
-  width = 8, height = 5.5, dpi = 300) # nolint
+  width = 8, height = 5.5, dpi = 300, bg = "white") # nolint
 
 # ==============================================================================
 # FIGURE F-12-1: Statistical Subgroup Forest Plot (OS Subgroups)
@@ -450,16 +472,16 @@ bg_rects <- data.frame(
 # Left Panel: Forest Plot Graphical curves
 forest_left <- ggplot(subgroups) +
   # Alternating row bands
-  geom_rect(data = bg_rects, aes(xmin = 0.1, xmax = 2.7, ymin = ymin, ymax = ymax), fill = "#f5f7f8", alpha = 0.8, # nolint
+  geom_rect(data = bg_rects, aes(xmin = 0.2, xmax = 4, ymin = ymin, ymax = ymax), fill = "#f5f7f8", alpha = 0.8, # nolint
     inherit.aes = FALSE) + # nolint
   geom_vline(xintercept = 1.0, linetype = "dashed", color = "#7f8c8d", linewidth = 0.5) + # nolint
   geom_errorbar(aes(y = Subgroup, xmin = LCL, xmax = UCL), orientation = "y", width = 0.15, color = "#1a5276", linewidth = 0.8) + # nolint
   geom_point(aes(y = Subgroup, x = HR), shape = 22, size = 3.2, fill = "#1a5276", color = "#0f324a") + # Clinical square symbol # nolint
-  scale_x_continuous(limits = c(0.1, 2.7), breaks = c(0.2, 0.5, 1.0, 1.5, 2.0, 2.5)) + # nolint
+  scale_x_log10(limits = c(0.2, 4), breaks = c(0.2, 0.5, 1, 2, 4)) +
   labs(
-    title = "F-12-1: Prognostic Subgroup Forest Plot for Overall Survival",
-    subtitle = "Univariate Hazard Ratios (Cox Proportional Hazards model of CbzP (Synthetic) vs MP (Real)) and 95% Wald CIs", # nolint
-    x = "Hazard Ratio (Favors CbzP (Synthetic) <-- | --> Favors MP (Real))",
+    title = "F-12-1: Treatment Effect Subgroup Forest Plot for Overall Survival",
+    subtitle = "Unadjusted within-subgroup Cox hazard ratios (CbzP (Synthetic) vs MP (Real)) and 95% Wald CIs", # nolint
+    x = "Hazard Ratio (Favors CbzP (Synthetic) <- 1 -> Favors MP (Real); log scale)",
     y = "",
     caption = synth_cap
   ) +
@@ -498,7 +520,7 @@ table_right <- ggplot(subgroups, aes(y = Subgroup)) +
 final_forest <- forest_left + table_right + plot_layout(widths = c(3.5, 2))
 
 ggsave("09_tfl/output/figures/F-12-1_Subgroup_Forest.png", final_forest,
-  width = 8, height = 5.5, dpi = 300) # nolint
+  width = 8, height = 5.5, dpi = 300, bg = "white") # nolint
 
 # ==============================================================================
 # TABLES T-17-1 / T-17-2 / T-17-4: Text-based summary table exports
@@ -828,6 +850,7 @@ psa_lb <- adlb |>
 
 psa_lb <- psa_lb |>
   arrange(TRT01P, best_pchg) |>
+  group_by(TRT01P) |>
   mutate(
     subj_rank = row_number(),
     TRT_LABEL = if_else(TRT01P == "CbzP", "CbzP (Synthetic)", "MP (Real)"),
@@ -836,35 +859,37 @@ psa_lb <- psa_lb |>
       best_pchg < 0 ~ "PSA Decrease (<50%)",
       TRUE ~ "PSA Increase"
     )
-  )
+  ) |>
+  ungroup()
 
 waterfall_plot <- ggplot(psa_lb, aes(
   x = subj_rank, y = best_pchg, fill = response_color
 )) +
-  geom_col(width = 0.85) +
+  geom_col(width = 1.0) +
   geom_hline(
     yintercept = -50, linetype = "dashed", color = "#005A9C", linewidth = 0.7
   ) +
   geom_hline(yintercept = 0, color = "#333333", linewidth = 0.4) +
-  annotate("text",
-    x = max(psa_lb$subj_rank) * 0.05, y = -54, label = "50% decrease threshold",
-    color = "#005A9C", size = 3, fontface = "bold", hjust = 0, family = "serif"
-  ) +
   scale_fill_manual(values = c(
     "PSA Response (>=50% decrease)" = "#005A9C",
     "PSA Decrease (<50%)"           = "#7fb3d3",
     "PSA Increase"                  = "#A6192E"
+  ), breaks = c(
+    "PSA Response (>=50% decrease)",
+    "PSA Decrease (<50%)",
+    "PSA Increase"
   )) +
   scale_y_continuous(
     labels = function(x) paste0(x, "%"),
-    limits = c(-105, min(max(psa_lb$best_pchg, na.rm = TRUE) + 20, 300))
+    limits = c(-105, 200),
+    breaks = seq(-100, 200, by = 50)
   ) +
   facet_wrap(~TRT_LABEL, scales = "free_x", ncol = 2) +
   labs(
     title = "F-13-1: PSA Best Percentage Change from Baseline — Waterfall Plot",
     subtitle = paste0(
-      "Each bar represents one subject's maximum PSA decrease \n",
-      "(or increase). Sorted within arm."
+      "Each bar represents one subject's maximum PSA decrease (or increase), sorted within arm.\n",
+      "Dashed line denotes the 50% decrease response threshold."
     ),
     x = "Subjects (ranked by PSA response within arm)",
     y = "Best PSA % Change from Baseline",
@@ -880,7 +905,7 @@ waterfall_plot <- ggplot(psa_lb, aes(
   )
 
 ggsave("09_tfl/output/figures/F-13-1_PSA_Waterfall.png", waterfall_plot,
-       width = 9, height = 5.5, dpi = 300)
+       width = 8, height = 5.5, dpi = 300, bg = "white")
 
 # ==============================================================================
 # FIGURE F-14-1: Treatment Exposure Swimmer Plot
@@ -914,11 +939,11 @@ x_max <- ceiling(max(swimmer_data$duration_months, na.rm = TRUE) / 3) * 3
 swimmer_plot <- ggplot(swimmer_data, aes(
   y = subj_label, x = duration_months, fill = TRT01P
 )) +
-  geom_col(width = 0.85, alpha = 0.85) +
+  geom_col(width = 0.85) +
   geom_point(
     data = swimmer_data |> filter(death_event),
     aes(x = duration_months, y = subj_label, shape = "Death on study"),
-    size = 2.5, color = "#111111", stroke = 1.2
+    size = 1.8, color = "#111111", stroke = 0.8
   ) +
   scale_fill_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"),
     labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) + # nolint
@@ -934,9 +959,9 @@ swimmer_plot <- ggplot(swimmer_data, aes(
   labs(
     title = paste0(
       "F-14-1: Treatment Exposure Duration \n",
-      "— Swimmer Plot (Representative Sample)"
+      "— Swimmer Plot (30 Longest Exposures per Arm)"
     ),
-    subtitle = "Bar length = treatment duration. \nX = death event on study. Top 30 subjects per arm shown.", # nolint
+    subtitle = "Bar length = treatment duration. \nX = death event on study. Subjects were selected by descending exposure duration.", # nolint
     x = "Months on Treatment",
     y = "Subjects (ranked by duration)",
     fill = "Treatment Arm:",
@@ -950,12 +975,13 @@ swimmer_plot <- ggplot(swimmer_data, aes(
   theme(
     axis.text.y = element_blank(),
     axis.ticks.y = element_blank(),
+    panel.grid.major.y = element_blank(),
     strip.text = element_text(face = "bold", size = 9.5),
     legend.position = "bottom"
   )
 
 ggsave("09_tfl/output/figures/F-14-1_Swimmer_Plot.png", swimmer_plot,
-       width = 9, height = 5.5, dpi = 300)
+       width = 8, height = 5.5, dpi = 300, bg = "white")
 
 # ==============================================================================
 # TABLE T-20-1: Adverse Event Summary Table (Safety Population)
@@ -1203,20 +1229,22 @@ writeLines(paste0(synth_banner, shift_output),
            "09_tfl/output/tables/T-21-Lab_Shift_Tables.txt")
 
 # ==============================================================================
-# FIGURE F-01-1: CONSORT Patient Disposition Flow Diagram
+# FIGURE F-01-1: Patient Population Flow Diagram
 # ==============================================================================
-cat("  [TFL] Rendering CONSORT Patient Disposition Diagram...\n")
+cat("  [TFL] Rendering Patient Population Flow Diagram...\n")
 
-# Derive disposition numbers from ADSL. The diagram is the Safety Population,
-# so disposition counts and percentages are within SAFFL == "Y" (742), which
-# is smaller than the ITT set (749); the two are not interchangeable.
+# Derive only populations and outcomes that are explicitly represented in ADSL.
+# ADSL has no completion/discontinuation status, so treatment duration must not
+# be used as a surrogate for disposition (for example, TRTDURD >= 60 days).
 n_total <- nrow(adsl)
 n_itt <- nrow(adsl |> filter(ITTFL == "Y"))
 saf <- adsl |> filter(SAFFL == "Y")
 n_safety <- nrow(saf)
 n_deaths <- nrow(saf |> filter(DTHFL == "Y"))
-n_completed <- nrow(saf |> filter(TRTDURD >= 60))
-n_disc <- n_safety - n_completed
+n_cbzp_safety <- nrow(saf |> filter(TRT01P == "CbzP"))
+n_mp_safety <- nrow(saf |> filter(TRT01P == "MP"))
+n_cbzp_deaths <- nrow(saf |> filter(TRT01P == "CbzP", DTHFL == "Y"))
+n_mp_deaths <- nrow(saf |> filter(TRT01P == "MP", DTHFL == "Y"))
 
 # Build diagram as a ggplot canvas with annotated boxes and arrows
 consort <- ggplot() +
@@ -1255,7 +1283,7 @@ consort <- ggplot() +
     arrow = arrow(length = unit(0.025, "npc")),
     color = "#333333", linewidth = 0.5
   ) +
-  # Branch left: Completed
+  # Branch left: CbzP safety arm
   annotate("segment", x = 0.5, xend = 0.25, y = 0.63, yend = 0.63,
            color = "#333333", linewidth = 0.5) +
   annotate("segment",
@@ -1269,13 +1297,12 @@ consort <- ggplot() +
   ) +
   annotate("text",
     x = 0.25, y = 0.532,
-    label = sprintf(
-      "Completed >=60 days\nn = %d (%d%%)", n_completed,
-      round(100 * n_completed / n_safety)
-    ),
+    label = sprintf("CbzP Safety Arm (Synthetic)\nn = %d; deaths = %d (%d%%)",
+      n_cbzp_safety, n_cbzp_deaths,
+      round(100 * n_cbzp_deaths / n_cbzp_safety)),
     size = 3, color = "#15803d", family = "serif"
   ) +
-  # Branch right: Discontinued
+  # Branch right: MP safety arm
   annotate("segment", x = 0.5, xend = 0.75, y = 0.63, yend = 0.63,
            color = "#333333", linewidth = 0.5) +
   annotate("segment",
@@ -1289,14 +1316,12 @@ consort <- ggplot() +
   ) +
   annotate("text",
     x = 0.75, y = 0.532,
-    label = sprintf(
-      "Discontinued early\nn = %d (%d%%)", n_disc,
-      round(100 * n_disc / n_safety)
-    ),
+    label = sprintf("MP Safety Arm (Real)\nn = %d; deaths = %d (%d%%)",
+      n_mp_safety, n_mp_deaths,
+      round(100 * n_mp_deaths / n_mp_safety)),
     size = 3, color = "#b91c1c", family = "serif"
   ) +
-  # Deaths merge from BOTH branches: deaths occur among completers and
-  # discontinuers alike, so the box is not subordinate to either branch.
+  # Aggregate outcome, explicitly downstream of both treatment arms.
   annotate("segment", x = 0.25, xend = 0.25, y = 0.49, yend = 0.45,
            color = "#333333", linewidth = 0.5) +
   annotate("segment", x = 0.75, xend = 0.75, y = 0.49, yend = 0.45,
@@ -1324,7 +1349,7 @@ consort <- ggplot() +
   annotate("text",
     x = 0.5, y = 1.02,
     label = paste0(
-      "F-01-1: CONSORT Patient Disposition Flow Diagram \n",
+      "F-01-1: Analysis Population and Mortality Overview \n",
       "— Safety Population"
     ),
     size = 4, fontface = "bold", color = "#111111", family = "serif"
@@ -1347,7 +1372,7 @@ consort <- ggplot() +
   theme(plot.margin = margin(10, 20, 10, 20))
 
 ggsave("09_tfl/output/figures/F-01-1_CONSORT_Disposition.png", consort,
-       width = 8, height = 7, dpi = 300)
+       width = 8, height = 7, dpi = 300, bg = "white")
 
 # Byte-stability pass: strip embedded timestamps/text from the R-track figures so the
 # committed PNGs are identical across rebuilds and graphics devices (the SAS-track
