@@ -917,11 +917,14 @@ swimmer_plot <- ggplot(swimmer_data, aes(
   geom_col(width = 0.85, alpha = 0.85) +
   geom_point(
     data = swimmer_data |> filter(death_event),
-    aes(x = duration_months, y = subj_label), shape = 4, size = 2.5,
-    color = "#111111", stroke = 1.2
+    aes(x = duration_months, y = subj_label, shape = "Death on study"),
+    size = 2.5, color = "#111111", stroke = 1.2
   ) +
   scale_fill_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"),
     labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) + # nolint
+  # Death marker as its own legend key (matches the SAS standalone "Death on
+  # study" entry); override.aes below strips the X from the arm colour swatches.
+  scale_shape_manual(name = NULL, values = c("Death on study" = 4)) +
   scale_x_continuous(
     breaks = seq(0, x_max, by = 3),
     limits = c(0, x_max),
@@ -938,6 +941,10 @@ swimmer_plot <- ggplot(swimmer_data, aes(
     y = "Subjects (ranked by duration)",
     fill = "Treatment Arm:",
     caption = synth_cap
+  ) +
+  guides(
+    fill = guide_legend(order = 1, override.aes = list(shape = NA)),
+    shape = guide_legend(order = 2)
   ) +
   theme_nejm_custom() +
   theme(
