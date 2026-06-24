@@ -5,7 +5,7 @@
    Author: Antony Bevan, Clinical Programming
    Date: 2026-06-12
    Standard: ADaMIG v1.3
-   Input: sdtm.dm, sdtm.ex, sdtm.ds
+   Input: sdtm.dm, sdtm.ex, sdtm.ds, sdtm.vs; staging.ls, staging.pn, staging.lb, staging.cm
    Output: adam.adsl
    Description: Generates Subject-Level Analysis Dataset (ADSL) including
                 demographics, population flags, baseline covariates, and survival.

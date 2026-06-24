@@ -34,7 +34,7 @@ To support dose-toxicity modeling, two continuous parameters were derived per cy
 ---
 
 ## 4. Efficacy Censoring Rules (ADTTE)
-For Progression-Free Survival (PFS), progression is defined as radiological progression (RECIST v1.0 — the trial-era standard per SAP v3.0 §5.3 and de Bono 2010), PSA progression (PCWG2-era criteria), bone scan progression, or death.
+For Progression-Free Survival (PFS), progression is defined as radiological progression (RECIST v1.0 — the trial-era standard per SAP v3.0 §5.3 and de Bono 2010), PSA progression (PCWG3 criteria; see §4A), bone scan progression, or death.
 * **Censoring Hierarchy:**
   1. If a patient starts a new systemic anti-cancer therapy (`NACTDT`) prior to a documented PFS event, the time-to-event is censored at **`NACTDT - 1 day`** (`CNSDTDSC = 'NEW ANTI-CANCER THERAPY START'`).
   2. If no event or NACT occurs, the time-to-event is censored at the last evaluable tumor assessment or last known alive date.
@@ -73,7 +73,7 @@ Several baseline laboratory variables are carried on ADSL to satisfy the ADaM sc
 
 | Variable | Stored Value | Units | Source patient-level data available? |
 |----------|--------------|-------|--------------------------------------|
-| `PSABL` | 110.0 | ng/mL | Yes (real, per subject) — constant used only as fallback |
+| `PSABL` | 110.0 | µg/L | Yes (real, per subject) — constant used only as fallback |
 | `ALPBL` | 140.0 | U/L | Yes (real, per subject) — constant used only as fallback |
 | `HGBBL` | 11.5 | g/dL | Yes (real, per subject) — constant used only as fallback |
 | `ALBBL` | 38.0 | g/L | **No** — single constant for all subjects (placeholder) |

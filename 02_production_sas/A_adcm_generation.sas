@@ -62,7 +62,8 @@ proc sort data=work.nact_dates;
 run;
 
 /* Derive CM flags and merge NACTDT */
-data adam.adcm(keep=STUDYID USUBJID CMDECOD CMCAT CMINDC CMSTDT CMENDT CMTRT CMSTDY GCSFFL GCSFPRFL NACTFL NACTDT PREDNFL TRTEMFL);
+data adam.adcm(keep=STUDYID USUBJID CMDECOD CMCAT CMINDC CMSTDT CMENDT CMTRT CMSTDY GCSFFL GCSFPRFL NACTFL NACTDT PREDNFL TRTEMFL
+                    rename=(CMSTDT=ASTDT CMENDT=AENDT CMSTDY=ASTDY));  /* audit F-10: OCCDS analysis-date naming */
     merge work.cm_base work.nact_dates;
     by usubjid;
     
@@ -98,7 +99,7 @@ data adam.adcm(keep=STUDYID USUBJID CMDECOD CMCAT CMINDC CMSTDT CMENDT CMTRT CMS
 run;
 
 proc sort data=adam.adcm;
-    by usubjid cmstdt cmdecod;
+    by usubjid ASTDT cmdecod;
 run;
 
 /* Clean up work library */

@@ -116,7 +116,7 @@ read_define_grid <- function(path) {
     }
     bind_rows(lapply(items, function(it) {
       tibble(codelist = oid, term = xml_attr(it, "CodedValue"),
-        cl_code = clc, term_code = alias_code(it))
+             cl_code = clc, term_code = alias_code(it))
     }))
   }))
   list(vars = vars, ds = ds, cl = cl)

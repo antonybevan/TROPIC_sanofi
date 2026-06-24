@@ -12,7 +12,9 @@
 #
 # Run: Rscript 01_raw_source/export_cbzp_xpt.R   (from project root)
 # ==============================================================================
-suppressMessages({ library(haven) })
+suppressMessages({
+  library(haven)
+})
 
 dir  <- "01_raw_source/cbzp_reconstructed"
 doms <- c("adsl", "adtte", "adae", "adlb", "adex", "adrs")

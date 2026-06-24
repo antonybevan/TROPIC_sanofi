@@ -71,12 +71,13 @@ cat("      Algorithm: Guyot et al., BMC Med Res Methodol 2012;12:9\n\n")
   if (file.exists(pf)) toupper(trimws(readLines(pf, n = 1L, warn = FALSE))) else "MISSING"
 }
 if (!identical(.provenance, "DIGITISED")) {
-  warning(sprintf(
-    paste0("[GUYOT] Digitised-curve provenance is '%s', not 'DIGITISED'. ",
-           "The reconstruction will RUN but its accuracy is unverified until ",
-           "genuinely digitised coordinates from the Lancet figure are supplied. ",
-           "See %s/README.md."),
-    .provenance, .GUYOT_DIR), call. = FALSE)
+  msg <- paste0(
+    "[GUYOT] Digitised-curve provenance is '%s', not 'DIGITISED'. ",
+    "The reconstruction will RUN but its accuracy is unverified until ",
+    "genuinely digitised coordinates from the Lancet figure are supplied. ",
+    "See %s/README.md."
+  )
+  warning(sprintf(msg, .provenance, .GUYOT_DIR), call. = FALSE)
   cat(sprintf("WARN: [GUYOT] *** PROVENANCE=%s — coordinates are NOT verified-digitised ***\n\n",
               .provenance))
 }
@@ -139,9 +140,8 @@ reconstruct_guyot <- function(dig_csv, nrisk_csv, total_pts, tot_events, label) 
   max_dev  <- max(abs(s_hat - dig$surv))   # Kolmogorov-Smirnov style supremum
 
   tgt <- if (is.null(tot_events)) "curve-derived" else as.character(tot_events)
-  cat(sprintf(
-    "  [GUYOT] %s: N=%d, events=%d (target %s), median=%.1f mo | fit RMSE=%.4f, max|dev|=%.4f\n",
-    label, nrow(ipd), recon_events, tgt, recon_median, rmse, max_dev))
+  fmt <- "  [GUYOT] %s: N=%d, events=%d (target %s), median=%.1f mo | fit RMSE=%.4f, max|dev|=%.4f\n"
+  cat(sprintf(fmt, label, nrow(ipd), recon_events, tgt, recon_median, rmse, max_dev))
 
   list(IPD = ipd, prep = prep, fit = fit, dig = dig,
        median = recon_median, events = recon_events,

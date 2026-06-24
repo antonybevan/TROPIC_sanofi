@@ -832,6 +832,13 @@ def write_telemetry(results, sas_mode="sim"):
     # is byte-identical to (or missing vs) its R validation pair, the asserted evidence is not
     # present, so we refuse to record a clean real-SAS GREEN and flip the health to RED. This
     # makes the flag uncheatable by a restamped green snapshot.
+    #
+    # NOTE (audit F-14): this is a RUNTIME control, evaluated against the on-disk XPT produced by
+    # THIS run. On a data-free clone (no 04_adam/*_prod.xpt or *_v.xpt present) the byte-distinct
+    # check skips every dataset and _sdtm_manifest_binding accepts "not recomputable", so the guard
+    # passes VACUOUSLY. It therefore is not a re-verifiable static attestation of an already-committed
+    # pipeline_health.json; the durable, independently-checkable artifact is the committed
+    # 06_telemetry/evidence/xpt_md5_manifest.txt (per-dataset md5 of the proved byte-distinct run).
     effective_mode = health["sas_execution_mode"]
     if effective_mode in ("oda", "local"):
         offenders = _prod_v_byte_identical(STUDY_DATASETS)

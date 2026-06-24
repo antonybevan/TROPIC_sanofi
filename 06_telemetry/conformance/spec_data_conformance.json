@@ -2,7 +2,7 @@
   "check": "spec -> data conformance (metacore/metatools/xportr)",
   "spec": "ADaM_spec.xlsx",
   "data": "04_adam/*_prod.xpt",
-  "timestamp": "2026-06-23T10:56:59",
+  "timestamp": "2026-06-24T12:09:38",
   "status": "PASS",
   "datasets": [
     {
@@ -21,8 +21,8 @@
     },
     {
       "dataset": "ADEX",
-      "n_data_vars": 12,
-      "n_spec_vars": 12,
+      "n_data_vars": 14,
+      "n_spec_vars": 14,
       "missing_in_data": [],
       "extra_in_data": [],
       "ct_violations": 0,

@@ -5,7 +5,7 @@
    Author: Antony Bevan, Clinical Programming
    Date: 2026-05-23
    Standard: CDISC ADaMIG v1.3 BDS
-   Input: sdtm.rs, sdtm.lb, adam.adsl
+   Input: staging.ls, sdtm.rs, sdtm.lb, adam.adsl
    Output: adam.adrs
    Description: Efficacy response ADaM (ADRS) combining progression and
                 death milestones with PSA progression metrics.

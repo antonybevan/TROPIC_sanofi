@@ -1,6 +1,13 @@
-# TROPIC Repository Audit — Submission-Lead Review (2026-06-21)
+# TROPIC Repository Audit — Submission-Readiness Review (2026-06-21)
 
-Principal clinical-data-engineer / FDA-submission-lead audit. Audit-first, evidence-based;
+> [!NOTE]
+> **Status (as of 2026-06-23):** Point-in-time record. Its open items are now closed —
+> F2 (CORE run aligned to the SDTMIG 3.4 layer) and F3 (the eCTD backbone + materialize
+> steps wired into the DAG; pipeline now **22 stages**) were resolved in commits
+> 49464a9 / 6f0dac4. References below to a "17-stage" pipeline / "standalone, not in CI"
+> additive layer reflect the 2026-06-21 state. Body retained as-authored.
+
+Submission-readiness audit of the repository against FDA/CDISC standards. Audit-first, evidence-based;
 only unambiguous doc-only fixes applied this pass (listed in §8); nothing substantive
 touched. Honest-disclosure caveats (synthetic arm, single-author validation, sim-vs-real
 SAS) are preserved, not polished away.

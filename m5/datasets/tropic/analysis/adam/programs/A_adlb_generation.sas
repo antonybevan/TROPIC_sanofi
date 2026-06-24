@@ -35,13 +35,9 @@ proc sql;
         lb.lbseq,
         lb.lbtestcd as PARAMCD length=8,
         lb.lbtest as PARAM length=40,
-        case 
-            when lb.lbtestcd = 'NEUT' then 1
-            when lb.lbtestcd = 'PSA' then 2
-            when lb.lbtestcd = 'HGB' then 3
-            else 4
-        end as PARAMN,
-        case 
+        /* PARAMN is assigned 1:1 over the full PARAMCD set at the end of the program (audit F-02);
+           the old NEUT/PSA/HGB/else=4 scheme collided across analytes and left ANCNADIR/ANCRECDY unset. */
+        case
             when lb.lbtestcd = 'PSA' then 'TUMOR MARKER'
             else 'HEMATOLOGY'
         end as PARCAT1 length=20,
@@ -259,12 +255,34 @@ quit;
    censoring) can source the last PSA assessment date from ADLB rather than reaching
    back into raw SDTM/staging (traceability, roadmap #3). Derived Optimus rows have
    no single assessment date and carry ADT missing. */
-data adam.adlb(keep=STUDYID USUBJID SUBJID TRT01P TRTSDT PARAMCD PARAM PARAMN PARCAT1 ADT
-                    AVAL AVALC LBNRLO LBNRHI LBNRIND AVISIT AVISITN AWDIST ATOXGR BASE BASEC
-                    BTOXGR CHG PCHG ANL01FL BASEFL LBDY);
+data work.adlb_all(keep=STUDYID USUBJID SUBJID TRT01P TRTSDT PARAMCD PARAM PARCAT1 ADT
+                        AVAL AVALC LBNRLO LBNRHI LBNRIND AVISIT AVISITN AWDIST ATOXGR BASE BASEC
+                        BTOXGR CHG PCHG ANL01FL BASEFL LBDY);
     set work.lb_anl01(rename=(ADY=LBDY)) work.optimus_nadir work.optimus_rec;
     format ADT yymmdd10.;
 run;
+
+/* Deterministic 1:1 PARAMN over the sorted distinct PARAMCD set (audit F-02). Replaces the old
+   NEUT/PSA/HGB/else=4 scheme (collided across analytes; ANCNADIR/ANCRECDY unset). The sort is
+   ASCII-ascending on the uppercase PARAMCD tokens, identical to the R track's
+   distinct(PARAMCD) |> arrange(PARAMCD) |> row_number(). */
+proc sort data=work.adlb_all out=work._pc(keep=PARAMCD) nodupkey;
+    by PARAMCD;
+run;
+data work._pnmap;
+    set work._pc;
+    PARAMN = _n_;
+run;
+
+proc sql;
+    create table adam.adlb as
+    select a.STUDYID, a.USUBJID, a.SUBJID, a.TRT01P, a.TRTSDT, a.PARAMCD, a.PARAM,
+           m.PARAMN, a.PARCAT1, a.ADT, a.AVAL, a.AVALC, a.LBNRLO, a.LBNRHI, a.LBNRIND,
+           a.AVISIT, a.AVISITN, a.AWDIST, a.ATOXGR, a.BASE, a.BASEC, a.BTOXGR, a.CHG, a.PCHG,
+           a.ANL01FL, a.BASEFL, a.LBDY
+    from work.adlb_all as a
+    left join work._pnmap as m on a.PARAMCD = m.PARAMCD;
+quit;
 
 proc sort data=adam.adlb;
     by usubjid PARAMCD AVISITN lbdy;
@@ -273,6 +291,7 @@ run;
 /* Clean up work library */
 proc delete data=work.lb_base work.lb_windows work.lb_base_pre work.baselines
             work.lb_base_merged work.lb_anl01 work.anc_records work.anc_nadir_val
-            work.anc_nadir_summary work.anc_recovery work.optimus_nadir work.optimus_rec;
+            work.anc_nadir_summary work.anc_recovery work.optimus_nadir work.optimus_rec
+            work.adlb_all work._pc work._pnmap;
 run;
 quit;
