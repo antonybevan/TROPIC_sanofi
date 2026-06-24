@@ -1,7 +1,14 @@
 # Upstream contribution: cdisc-org/cdisc-rules-engine
 
-**Status: SUBMITTED — [PR #1770](https://github.com/cdisc-org/cdisc-rules-engine/pull/1770)**
-(branch `fix/standardtypes-adam-products`, base `main`, author antonybevan, DCO signed).
+**Status:** Merged. Submitted as [PR #1770](https://github.com/cdisc-org/cdisc-rules-engine/pull/1770)
+(branch `fix/standardtypes-adam-products`, base `main`; DCO signed) and merged into
+`cdisc-org/cdisc-rules-engine:main` on 2026-06-22. The six ADaM products are now present in
+`StandardTypes` upstream.
+
+The patch and write-up retained in this directory constitute the provenance record of the
+contribution. The local CORE runner continues to patch `enums/standard_types.py` because this
+project pins cdisc-rules-engine v0.16.0, which precedes the fix; that patch is removed once the
+pinned version is advanced to a release incorporating PR #1770.
 
 ## What it fixes
 
@@ -36,4 +43,4 @@ completing the normalization begun in PR #1733.
 The seven local rules in `../conformance_rules/adam/` are a seed pack (key-variable
 population) with placeholder IDs. They are not upstream-contributable: CDISC authors
 its rule pack from the official ADaM Conformance Rules spreadsheet under governed
-`AD####` IDs. The engine fix in PR #1770 is the contribution.
+`AD####` IDs. The engine fix in PR #1770 is the contribution; it was merged upstream on 2026-06-22.

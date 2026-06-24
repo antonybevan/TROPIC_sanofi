@@ -1,5 +1,8 @@
 # PR: sync remaining ADaM product standards into `StandardTypes` (follow-up to #1733)
 
+> **Status:** Merged. Submitted as [PR #1770](https://github.com/cdisc-org/cdisc-rules-engine/pull/1770)
+> and merged into `main` on 2026-06-22. The original PR body is reproduced below as authored.
+
 **Target repo:** `cdisc-org/cdisc-rules-engine`
 **Base:** `main`
 **Patch:** [`0001-sync-adam-products-into-standardtypes.patch`](./0001-sync-adam-products-into-standardtypes.patch)
