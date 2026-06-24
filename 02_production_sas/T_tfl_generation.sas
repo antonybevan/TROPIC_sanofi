@@ -294,7 +294,9 @@ proc sgpanel data=_swim30;
     hbarparm category=row response=durm / group=trt01p barwidth=0.85 nooutline;
     scatter x=durm y=row / markerattrs=(symbol=x size=9 color=cx111111) freq=death
         name='death' legendlabel='Death on study';
-    colaxis label="Months on Treatment" grid;
+    /* Fix the months axis to the data range (~9 mo) so bars fill the panel as in
+       the R figure; the default auto-range stretched to ~60 and shrank the bars. */
+    colaxis label="Months on Treatment" grid values=(0 to 9 by 3);
     rowaxis display=none;
     keylegend / position=bottom title='Treatment Arm:';
 run;

@@ -172,6 +172,11 @@ if (!os_significant) {
 theme_nejm_custom <- function() {
   theme_minimal(base_family = "serif") +
     theme(
+      # Anchor title/subtitle/caption to the whole-plot left edge (not the panel
+      # edge) so they sit flush-left like the SAS ODS titles, instead of indented
+      # past the y-axis labels.
+      plot.title.position = "plot",
+      plot.caption.position = "plot",
       plot.title = element_text(face = "bold", size = 12, color = "#111111",
         hjust = 0, margin = margin(b = 4)), # nolint
       plot.subtitle = element_text(size = 9, color = "#444444",
