@@ -56,13 +56,15 @@ subgroup_defs <- list(
 )
 
 write_status <- function(overall, rows = list()) {
-  body <- vapply(names(rows), function(k)
-    sprintf('    "%s": "%s"', k, rows[[k]]), character(1))
+  body <- vapply(names(rows), function(k) {
+    sprintf('    "%s": "%s"', k, rows[[k]])
+  }, character(1))
   json <- paste0(
     '{\n  "overall": "', overall, '",\n',
     '  "scope": "F-12-1 subgroup forest HRs (CbzP vs MP), SAS PROC PHREG vs R coxph",\n',
     '  "hr_tol": ', HR_TOL, ',\n  "subgroups": {\n',
-    paste(body, collapse = ",\n"), "\n  }\n}\n")
+    paste(body, collapse = ",\n"), "\n  }\n}\n"
+  )
   writeLines(json, status_path)
 }
 
@@ -137,14 +139,14 @@ for (i in seq_len(nrow(cmp))) {
   if (!startsWith(res, "PASS")) any_fail <- TRUE
   results[[row$subgroup]] <- res
   cat(sprintf("NOTE: [FOREST-RECON] %-26s R=%s SAS=%s -> %s\n", row$subgroup,
-      ifelse(is.na(row$R_HR), "NA", sprintf("%.2f", row$R_HR)),
-      ifelse(is.na(row$SAS_HR), "NA", sprintf("%.2f", row$SAS_HR)), res))
+              ifelse(is.na(row$R_HR), "NA", sprintf("%.2f", row$R_HR)),
+              ifelse(is.na(row$SAS_HR), "NA", sprintf("%.2f", row$SAS_HR)), res))
 }
 
 write_status(if (any_fail) "FAIL" else "PASS", results)
 if (any_fail) {
   failed <- names(Filter(function(s) !startsWith(s, "PASS"), results))
   stop(sprintf("FOREST RECONCILIATION FAILED: SAS PROC PHREG vs R coxph disagree for %s.",
-       paste(failed, collapse = ", ")))
+               paste(failed, collapse = ", ")))
 }
 cat("NOTE: [FOREST-RECON] PASS - all 13 subgroup HRs agree (SAS figure vs R).\n")
