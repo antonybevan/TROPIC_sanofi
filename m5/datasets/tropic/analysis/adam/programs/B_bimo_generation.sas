@@ -51,16 +51,27 @@ proc sql;
 quit;
 
 /* Site-level safety counts from ADAE. ADAE carries no SITEID, so subjects are routed
-   to their site via ADSL; COUNT(DISTINCT ... CASE) counts unique subjects per site. */
+   to their site via ADSL. Derive one subject-level flag row first so PROC SQL does
+   not emit CASE-without-ELSE notes and site counts remain unique-subject counts. */
 proc sql;
-    create table work.bimo_ae as
+    create table work.bimo_ae_subject as
     select a.siteid as SITEID length=10,
-           count(distinct case when b.aeser   = 'Y' then b.usubjid end) as N_SAE,
-           count(distinct case when b.trtemfl = 'Y' then b.usubjid end) as N_TEAE
+           a.usubjid as USUBJID length=40,
+           max(case when b.aeser   = 'Y' then 1 else 0 end) as HAS_SAE,
+           max(case when b.trtemfl = 'Y' then 1 else 0 end) as HAS_TEAE
     from adam.adsl a
     left join adam.adae b
         on a.usubjid = b.usubjid
-    group by a.siteid;
+    group by a.siteid, a.usubjid;
+quit;
+
+proc sql;
+    create table work.bimo_ae as
+    select SITEID,
+           sum(HAS_SAE) as N_SAE,
+           sum(HAS_TEAE) as N_TEAE
+    from work.bimo_ae_subject
+    group by SITEID;
 quit;
 
 /* Final CLINSITE: merge populations + safety; attach BIMO labels. */

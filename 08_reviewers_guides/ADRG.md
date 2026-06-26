@@ -7,6 +7,11 @@
 
 ---
 
+> **SAP v4.0 lock note (2026-06-25):** `TROPIC_SAP_v4.0_industry_grade.docx` is the current
+> programming authority. This ADRG documents the implementation state and known limitations;
+> it is not itself the source for new analysis decisions. Synthetic/reconstructed CbzP outputs
+> are non-confirmatory demonstrations unless official patient-level CbzP source data are obtained.
+
 ## 1. Study & Re-Analysis Overview
 The **TROPIC Phase III Trial (NCT00417079)** evaluated the efficacy and safety of cabazitaxel (25 mg/m² IV q3w) + prednisone against mitoxantrone (12 mg/m² IV q3w) + prednisone in metastatic castration-resistant prostate cancer (mCRPC) previously treated with docetaxel. 
 
@@ -34,7 +39,7 @@ To support dose-toxicity modeling, two continuous parameters were derived per cy
 ---
 
 ## 4. Efficacy Censoring Rules (ADTTE)
-For Progression-Free Survival (PFS), progression is defined as radiological progression (RECIST v1.0 — the trial-era standard per SAP v3.0 §5.3 and de Bono 2010), PSA progression (PCWG3 criteria; see §4A), bone scan progression, or death.
+For Progression-Free Survival (PFS), progression is defined using the SAP v4.0 locked hierarchy: trial-era RECIST v1.0 radiological progression, SAP-supported PSA progression where source data permit, and death. Post-2010 PCWG3 bone-scan logic remains an exploratory/methodological extension unless explicitly promoted by SAP v4.0 and revalidated.
 * **Censoring Hierarchy:**
   1. If a patient starts a new systemic anti-cancer therapy (`NACTDT`) prior to a documented PFS event, the time-to-event is censored at **`NACTDT - 1 day`** (`CNSDTDSC = 'NEW ANTI-CANCER THERAPY START'`).
   2. If no event or NACT occurs, the time-to-event is censored at the last evaluable tumor assessment or last known alive date.
@@ -62,7 +67,7 @@ To pre-empt reviewer challenge on the response rates, the exact derivation of th
 * **PSA Response (`PARAMCD = PSARESP`):** Responder = ≥50% confirmed decline in PSA from baseline (PCWG3) (`AVALC = 'Y'`); denominator = subjects with a baseline and ≥1 post-baseline PSA. MP arm: **69/371 = 18.6%**.
 * **Bone Scan Progression (`PARAMCD = BSGRESP`) — PCWG3 2+2 rule (methodological demonstration).** Bone is the dominant mCRPC metastatic site and is largely non-measurable by RECIST, so progression is tracked separately from new bone lesions (`LSTESTCD='NEWLES' & LSLOC='BONE'`, scintigraphy). A first post-baseline scan with `≥ BONE_PROG_MIN_NEW` (2) new bone lesions is **PDu** (`AVALC='PROGRESSION UNCONFIRMED'`); it is **confirmed** (`AVALC='PROGRESSION'`, the only state that feeds TTUMOR) when a later scan adds `≥ BONE_PROG_CONFIRM_NEW` (2) further new bone lesions, with the PD date backdated to the PDu scan; otherwise `AVALC='NO PROGRESSION'`. This rule (Scher 2016, PCWG3) post-dates the 2010 trial and is **not in the trial-era SAP** — it is a clearly-labelled methodological demonstration, consistent with how `PSPROG` already applies PCWG3 here. On the real MP arm the strict 2+2 is **stringent relative to the source granularity**: **5 subjects reach PDu, 0 are confirmed** — reported honestly rather than tuning the thresholds to manufacture events.
 
-All response counts/percentages are emitted by `09_tfl/tfl_generation.R` to `09_tfl/output/tables/T-11-Efficacy_Tables.txt` (single source of truth).
+All response counts/percentages are emitted by `09_tfl/tfl_generation.R` to `09_tfl/output/tables/T-11-Efficacy_Tables.txt` for the current implementation. SAP v4.0 remains the authority for what is planned; generated TFLs are evidence of implementation, not the source of analysis requirements.
 
 ---
 
@@ -119,7 +124,7 @@ Each ADaM dataset is produced by two independent **cross-language implementation
 
 ### 6.1 Specification as the Single Source of Truth (audit C-4 inversion)
 
-The authoritative analysis-dataset specification is `00_specifications/ADaM_spec.xlsx`, authored in the CDISC / Pinnacle-21 **metacore** workbook format (Datasets, Variables, ValueLevel, WhereClauses, Codelists, Methods sheets). It is the **single source of truth** from which the rest of the metadata layer is governed — reversing the previous direction, in which a reviewer workbook (`ADaM_Define_Extract.xlsx`) was rendered *from* `define.xml`, a circular dependency that could never disagree with the define it was meant to govern (audit finding C-4). The spec was bootstrapped once from the existing define content (`00_specifications/build_spec_seed.R`, a documented one-time migration) and is the human-edited master from then on; the old `generate_adam_specs.py` (define → extract) generator is retired.
+The authoritative analysis-dataset metadata specification is `00_specifications/ADaM_spec.xlsx`, authored in the CDISC / Pinnacle-21 **metacore** workbook format (Datasets, Variables, ValueLevel, WhereClauses, Codelists, Methods sheets). It is the metadata control source from which the rest of the metadata layer is governed — while SAP v4.0 governs analysis intent — reversing the previous direction, in which a reviewer workbook (`ADaM_Define_Extract.xlsx`) was rendered *from* `define.xml`, a circular dependency that could never disagree with the define it was meant to govern (audit finding C-4). The spec was bootstrapped once from the existing define content (`00_specifications/build_spec_seed.R`, a documented one-time migration) and is the human-edited metadata master from then on; the old `generate_adam_specs.py` (define → extract) generator is retired.
 
 Two automated gates enforce conformance to the spec — both run in the pipeline (cibuild Stages 15–16) and in CI:
 
@@ -212,4 +217,3 @@ Reconstructed using proportional-hazards scaling of the real MP event times (t_C
 ### 7.6 Laboratory (ADLB) & Concomitant Medications (ADCM)
 * **Laboratory Findings**: Simulated longitudinal laboratory rows (baseline and post-baseline cycles) for PSA, Haemoglobin, Platelets, and ANC. Platelet profiles and baseline-to-worst post-baseline CTCAE grade shifts are fully populated, with ~82% of patients having Grade 3/4 ANC nadirs and ~3.5% having Grade 3/4 anemia.
 * **Concomitant Medications**: Populated with G-CSF prophylaxis usage (~8% primary, ~22% secondary prophylaxis) and post-progression starts of new anti-cancer therapies.
-

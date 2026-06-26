@@ -1,0 +1,58 @@
+source,target,relationship,status,evidence
+01_raw_source/real_sdtm/*.sas7bdat,02_production_sas/L_staging_ingest.sas,read by SAS staging,CONFIRMED,02_production_sas/L_staging_ingest.sas
+01_raw_source/real_sdtm/*.sas7bdat,03_validation_r/v_staging_ingest.R,read by R staging,CONFIRMED,03_validation_r/v_staging_ingest.R
+02_production_sas/L_staging_ingest.sas,02_production_sas/A_adsl_generation.sas,staging inputs,CONFIRMED,02_production_sas/00_master_driver.sas
+02_production_sas/L_staging_ingest.sas,02_production_sas/A_adex_generation.sas,staging inputs,CONFIRMED,02_production_sas/00_master_driver.sas
+02_production_sas/L_staging_ingest.sas,02_production_sas/A_adcm_generation.sas,staging inputs,CONFIRMED,02_production_sas/00_master_driver.sas
+02_production_sas/L_staging_ingest.sas,02_production_sas/A_adae_io_respec.sas,staging inputs,CONFIRMED,02_production_sas/00_master_driver.sas
+02_production_sas/L_staging_ingest.sas,02_production_sas/A_adlb_generation.sas,staging inputs,CONFIRMED,02_production_sas/00_master_driver.sas
+02_production_sas/L_staging_ingest.sas,02_production_sas/A_adrs_generation.sas,staging inputs,CONFIRMED,02_production_sas/00_master_driver.sas
+02_production_sas/L_staging_ingest.sas,02_production_sas/A_adtte_generation.sas,staging inputs,CONFIRMED,02_production_sas/00_master_driver.sas
+03_validation_r/v_staging_ingest.R,03_validation_r/v_adsl_validation.R,R validation staging,CONFIRMED,03_validation_r/v_adsl_validation.R
+03_validation_r/v_staging_ingest.R,03_validation_r/v_adex_validation.R,R validation staging,CONFIRMED,03_validation_r/v_adex_validation.R
+03_validation_r/v_staging_ingest.R,03_validation_r/v_adcm_validation.R,R validation staging,CONFIRMED,03_validation_r/v_adcm_validation.R
+03_validation_r/v_staging_ingest.R,03_validation_r/v_adae_io_validation.R,R validation staging,CONFIRMED,03_validation_r/v_adae_io_validation.R
+03_validation_r/v_staging_ingest.R,03_validation_r/v_adlb_validation.R,R validation staging,CONFIRMED,03_validation_r/v_adlb_validation.R
+03_validation_r/v_staging_ingest.R,03_validation_r/v_adrs_validation.R,R validation staging,CONFIRMED,03_validation_r/v_adrs_validation.R
+03_validation_r/v_staging_ingest.R,03_validation_r/v_adtte_validation.R,R validation staging,CONFIRMED,03_validation_r/v_adtte_validation.R
+02_production_sas/A_*_generation.sas,04_adam/*_prod.xpt,SAS production output,CONFIRMED,02_production_sas/U_xpt_export.sas
+03_validation_r/v_*_validation.R,04_adam/*_v.xpt,R validation output,CONFIRMED,study_manifest.yaml
+04_adam/*_prod.xpt,05_reconciliation/cross_lang_audit.R,SAS side of dual-language comparison,CONFIRMED,05_reconciliation/cross_lang_audit.R
+04_adam/*_v.xpt,05_reconciliation/cross_lang_audit.R,R side of dual-language comparison,CONFIRMED,05_reconciliation/cross_lang_audit.R
+05_reconciliation/cross_lang_audit.R,06_telemetry/reconciliation_status.json,reconciliation verdict,CONFIRMED,05_reconciliation/cross_lang_audit.R
+00_specifications/ADaM_spec.xlsx,07_define_xml/define.xml,spec-to-Define check,CONFIRMED,07_define_xml/check_define_conformance.R
+00_specifications/ADaM_spec.xlsx,04_adam/*_prod.xpt,spec-to-data check,CONFIRMED,03_validation_r/spec_data_checks.R
+00_specifications/ADaM_spec.xlsx,02_production_sas/_adam_labels.sas,label generation intended but not orchestrated,STALE/BROKEN,06_telemetry/gen_adam_labels.R; 08_reviewers_guides/TRACEABILITY_MATRIX.md:55-62
+04_adam/adsl_prod.xpt,09_tfl/tfl_generation.R,populations and covariates,CONFIRMED,08_reviewers_guides/TRACEABILITY_MATRIX.md:73-83
+04_adam/adex_prod.xpt,09_tfl/tfl_generation.R,exposure analyses,CONFIRMED,08_reviewers_guides/TRACEABILITY_MATRIX.md:73-83
+04_adam/adae_prod.xpt,09_tfl/tfl_generation.R,safety summaries,CONFIRMED,08_reviewers_guides/TRACEABILITY_MATRIX.md:73-83
+04_adam/adlb_prod.xpt,09_tfl/tfl_generation.R,PSA and laboratory analyses,CONFIRMED,08_reviewers_guides/TRACEABILITY_MATRIX.md:73-83
+04_adam/adrs_prod.xpt,09_tfl/tfl_generation.R,response analyses,CONFIRMED,09_tfl/tfl_generation.R:135-163
+04_adam/adtte_prod.xpt,09_tfl/tfl_generation.R,time-to-event analyses,CONFIRMED,08_reviewers_guides/TRACEABILITY_MATRIX.md:73-83
+09_tfl/tfl_generation.R,09_tfl/output/**,R reporting outputs,CONFIRMED,09_tfl/tfl_generation.R
+09_tfl/output/**,ANALYSIS_REPORT.md,numerical transcription / CSR content,CLAIMED,08_reviewers_guides/TRACEABILITY_MATRIX.md:68-71
+04_adam/*_prod.xpt,06_telemetry/export_datasetjson.py,ADaM Dataset-JSON export,CONFIRMED,06_telemetry/export_datasetjson.py:258-265
+m5/datasets/tropic/tabulations/sdtm/datasets/*.xpt,06_telemetry/export_datasetjson.py,SDTM Dataset-JSON export,CONFIRMED BUT CURRENTLY EMPTY INPUT,06_telemetry/export_datasetjson.py:267-281
+06_telemetry/export_datasetjson.py,10_datasetjson/**/*.json,Dataset-JSON output,CONFIRMED,06_telemetry/export_datasetjson.py:216-234
+06_telemetry/export_datasetjson.py,10_datasetjson/**/*.ndjson,NDJSON output only with --ndjson flag,OUT-OF-BAND/STALE,06_telemetry/export_datasetjson.py:202-227
+04_adam/adtte_prod.xpt,06_telemetry/build_ars.py,ARS source dataset,CONFIRMED,06_telemetry/build_ars.py:42-53
+06_telemetry/build_ars.py,12_ars/*,ARS output,CONFIRMED,study_manifest.yaml
+12_ars/*,m5/**,regulatory packaging consumer,NONE/ORPHAN,06_telemetry/package_ectd.py:286-316
+TROPIC_SAP_v3.0.docx,06_telemetry/build_usdm.py,manually transcribed study design,UNVERIFIED MANUAL TRANSCRIPTION,06_telemetry/build_usdm.py
+06_telemetry/build_usdm.py,13_usdm/tropic_usdm.json,USDM output,CONFIRMED,study_manifest.yaml
+13_usdm/tropic_usdm.json,m5/**,regulatory packaging consumer,NONE/ORPHAN,06_telemetry/package_ectd.py:286-316
+01_raw_source/real_sdtm/*.sas7bdat,06_telemetry/package_ectd.py,raw SDTM conversion to XPT,CONFIRMED,06_telemetry/package_ectd.py:232-260;335-341
+.core_run/sdtm34/*.xpt,06_telemetry/package_ectd.py,intended uplifted SDTM package input,NO EDGE/DANGLING LAYER,06_telemetry/package_ectd.py:232-260;335-341
+04_adam/*_prod.xpt,06_telemetry/package_ectd.py,ADaM package copy,CONFIRMED,06_telemetry/package_ectd.py:343-358
+06_telemetry/package_ectd.py,m5/**,Module 5 tree generation,CONFIRMED,06_telemetry/package_ectd.py:286-360
+06_telemetry/uplift_sdtm_34.R,.core_run/sdtm34/*.xpt,SDTMIG 3.4 derived layer,CONFIRMED,06_telemetry/run_core_conformance.sh:54-63
+06_telemetry/gen_adam_labels.R,02_production_sas/_adam_labels.sas,SAS label artifact generation,UNORCHESTRATED,06_telemetry/gen_adam_labels.R
+06_telemetry/gen_adam_labels.R,03_validation_r/adam_var_labels.csv,R label artifact generation,UNORCHESTRATED,06_telemetry/gen_adam_labels.R
+07_define_xml/define.xml,m5/datasets/tropic/analysis/adam/define.xml,package metadata copy,CONFIRMED,06_telemetry/package_ectd.py
+07_define_xml/define_sdtm.xml,m5/datasets/tropic/tabulations/sdtm/define.xml,package metadata copy,CONFIRMED,06_telemetry/package_ectd.py
+m5/**,06_telemetry/build_ectd_backbone.py,eCTD leaf enumeration,CONFIRMED,11_ectd/RUN_RECORD.md:7-12
+06_telemetry/build_ectd_backbone.py,11_ectd/0000/index.xml,eCTD backbone generation,CONFIRMED,11_ectd/RUN_RECORD.md:14-25
+11_ectd/0000/index.xml,06_telemetry/materialize_ectd.py,manifest controlling payload copy,CONFIRMED,06_telemetry/materialize_ectd.py:31-65
+06_telemetry/materialize_ectd.py,11_ectd/0000/m5/**,payload materialization without stale-file deletion,BROKEN,06_telemetry/materialize_ectd.py:31-65
+09_tfl/output/listings/L-01-1_Discontinuations.txt,L_discon.sas,claimed producer reference,DANGLING PROGRAM,09_tfl/output/listings/L-01-1_Discontinuations.txt:19
+07_define_xml/define.xml,09_tfl/output/**,ARM display-to-file linkage,INCOMPLETE,07_define_xml/define.xml ARM section

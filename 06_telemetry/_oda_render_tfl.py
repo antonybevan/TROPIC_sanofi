@@ -22,7 +22,7 @@ os.chdir(PROJECT_ROOT)
 sys.path.insert(0, PROJECT_ROOT)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # 06_telemetry/, for oda_broker
 
-import oda_broker  # noqa: E402 — single source of truth for ODA connect/teardown (slot hygiene)
+import oda_broker  # noqa: E402 — governed helper for ODA connect/teardown (slot hygiene)
 
 # No developer account id is hard-coded (roadmap #10): default to a ~/TROPIC layout that is
 # resolved against the connected account's $HOME after login; override via TROPIC_ODA_PROJ_ROOT.
@@ -37,7 +37,7 @@ def _oda_paths(root):
 
 PGMDIR_ODA, CBZ_ODA, ADAM_ODA, SASFIG_ODA = _oda_paths(PROJ_ROOT_ODA)
 
-# Reconciled datasets come from the study manifest (single source of truth shared
+# Reconciled datasets come from the study manifest (governed control source shared
 # with cibuild.py); fall back to the legacy TROPIC list if the manifest is absent.
 try:
     import manifest as _manifest_mod  # noqa: E402 — 06_telemetry/ already on sys.path

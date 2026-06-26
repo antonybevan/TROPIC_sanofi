@@ -74,8 +74,8 @@
     options ls=120 ps=60 validvarname=upcase missing='' mergenoby=WARN;
 
     /* ============================================================
-       PROTOCOL CONSTANTS — single source of truth for all programs
-       Reference: TROPIC SAP v3.0 (EFC6193 / XRP6258)
+       PROTOCOL CONSTANTS — governed study configuration for all programs
+       Reference: TROPIC SAP v4.0 controlled draft (EFC6193 / XRP6258)
        ============================================================ */
 
     %include "&PGMDIR.&PATH_SEP.00_config_generated.sas";

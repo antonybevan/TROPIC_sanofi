@@ -87,11 +87,13 @@ The synthetic comparator arm is regenerated (deterministically, fixed seeds) by
 - **Real (MP arm, N=371):** official Sanofi de-identified SDTM public release (2013),
   SAS transport (`*.sas7bdat`) datasets accessed via the Project Data Sphere (PDS)
   repository, for TROPIC / de Bono et al., *Lancet* 2010;376:1147–1154.
-- **Synthetic (CbzP arm, N=378):** generated in-repo by proportional-hazards time-scaling
-  of the real MP arm + fixed-seed sampling from published Table 1/Table 2 marginals. It is
-  **not real data**, does not reproduce published cabazitaxel efficacy, and is used only to
-  exercise comparative TFLs. See [ANALYSIS_REPORT.md](ANALYSIS_REPORT.md) §8 and
-  [08_reviewers_guides/ADRG.md](08_reviewers_guides/ADRG.md) §7.
+- **Synthetic/reconstructed (CbzP arm, N=378):** generated in-repo from public literature
+  inputs. OS and PFS use Guyot (2012) Kaplan-Meier IPD reconstruction from the published
+  curves and numbers-at-risk tables; secondary time-to-event endpoints remain proportional-
+  hazards scaled from the real MP arm; non-TTE domains use fixed-seed sampling from
+  published Table 1/Table 2 marginals. It is **not real patient data**, is non-confirmatory,
+  and is used only to exercise comparative TFLs. See [ANALYSIS_REPORT.md](ANALYSIS_REPORT.md)
+  §8 and [08_reviewers_guides/ADRG.md](08_reviewers_guides/ADRG.md) §7.
 
 ## 6. Known limitations & deferred items
 
@@ -114,7 +116,11 @@ The following items are explicitly deferred or represent documented limitations 
   mature ADaM rule pack. (The 3.2 *baseline* run is caveated by the SDTMIG 3.1.1-vs-3.2 version gap; the
   authoritative SDTM run validates the uplifted **3.4** layer, the version the package describes.)
 - **Real ODA SAS Run Evidence:** Local execution default is simulated (`sim`) mode. Executing a genuine SAS run requires a SAS engine license or SAS OnDemand for Academics (ODA) credentials (which cannot be shared in a public repository).
-- **Guyot (2012) KM Reconstruction of CbzP:** The synthetic arm is honestly labeled as illustrative and constructed by time-scaling. Using the Guyot (2012) KM reconstruction method for the comparator arm is deferred and recommended as a future upgrade if a true two-arm comparison is desired, as the current divide-by-HR method is circular.
+- **CbzP reconstruction limits:** Guyot (2012) KM reconstruction is implemented for OS/PFS
+  only and remains a literature-derived pseudo-IPD approximation, not regulatory source
+  evidence. Secondary CbzP time-to-event endpoints remain PH-scaled and circular by
+  construction. Any confirmatory two-arm claim would require official patient-level CbzP
+  source data and independent validation.
 - **Week-Precision Event Dates:** Week-precision dates (±3.5 days) are inherent to the source data and are disclosed as a dataset limitation.
 
 ## 7. Reproducing the CDISC CORE conformance run
@@ -137,4 +143,3 @@ The runner builds a Py 3.12 venv (`.core_venv`), clones CORE v0.16.0 (`.core_run
 - **Ephemeral (git-ignored):** the CORE engine clone, the Py 3.12 venv, the rule cache, and any converted XPT.
 - **Determinism:** CORE is deterministic for fixed inputs (engine version + rule cache + datasets + rules). The rule cache is fetched live from the CDISC Library, so published-rule *content* can drift over time; the engine (0.16.0) and the local rule pack are pinned. Use **`-ps 1`** (the runner does) — CORE's default multiprocessing can deadlock on large datasets on macOS.
 - **CI** runs only the dependency-light rule-pack well-formedness gate (`validate_core_rules.py`); the full engine run is this local/secret-gated step.
-

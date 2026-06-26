@@ -28,12 +28,51 @@ def md5(path):
             h.update(chunk)
     return h.hexdigest()
 
+def purge_unindexed_m5_payloads(leaves):
+    """Remove stale materialized Module 5 payloads not referenced by index.xml."""
+    indexed = {
+        os.path.normpath(os.path.join(SEQ, href))
+        for href, _recorded in leaves
+        if href.startswith("m5/")
+    }
+    m5_dir = os.path.join(SEQ, "m5")
+    if not os.path.isdir(m5_dir):
+        return []
+    purged = []
+    for root, _dirs, files in os.walk(m5_dir):
+        for name in files:
+            path = os.path.normpath(os.path.join(root, name))
+            if path not in indexed:
+                os.remove(path)
+                purged.append(os.path.relpath(path, SEQ))
+    return sorted(purged)
+
+def indexed_leaves(index_xml):
+    """Return (href, checksum) for every indexed leaf with an MD5 checksum.
+
+    Leaf attributes are not ordered in the eCTD backbone.  In particular, the
+    Study Tagging File leaf carries a `version` attribute between `xlink:href`
+    and `checksum-type`; parsing each leaf block avoids silently missing that
+    sequence-authored file.
+    """
+    leaves = []
+    for attrs in re.findall(r"<leaf\b([^>]*)>", index_xml, flags=re.S):
+        href = re.search(r'xlink:href="([^"]+)"', attrs)
+        ctype = re.search(r'checksum-type="MD5"', attrs)
+        checksum = re.search(r'checksum="([0-9a-fA-F]+)"', attrs)
+        if href and ctype and checksum:
+            leaves.append((href.group(1), checksum.group(1)))
+    return leaves
+
+
 def main():
     idx = open(INDEX, encoding="utf-8").read()
-    leaves = re.findall(
-        r'xlink:href="([^"]+)"\s+checksum-type="MD5"\s+checksum="([0-9a-fA-F]+)"', idx)
+    leaves = indexed_leaves(idx)
     if not leaves:
         sys.exit("No leaves with checksums found in index.xml")
+    purged = purge_unindexed_m5_payloads(leaves)
+    if purged:
+        print("REMOVED UNINDEXED M5 PAYLOADS:", *purged, sep="\n  ")
     copied = verified = in_place = 0
     missing, mismatch = [], []
     for href, recorded in leaves:

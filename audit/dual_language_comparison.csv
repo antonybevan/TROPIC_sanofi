@@ -1,0 +1,9 @@
+dataset,prod_rows,validation_rows,same_column_set,exact_multiset_match,prod_only_records,validation_only_records,difference_columns,match_after_current_lossy_NA_normalization,production_rows_with_nonunique_business_key,method
+ADSL,371,371,YES,YES,0,0,,YES,0,Full XPT read; canonical full-row multiset; numeric 15-significant-digit representation; missing distinct from literal NA
+ADEX,13052,13052,YES,NO,1746,1746,AVALC,YES,0,Full XPT read; canonical full-row multiset; numeric 15-significant-digit representation; missing distinct from literal NA
+ADCM,24534,24534,YES,YES,0,0,,YES,15169,Full XPT read; canonical full-row multiset; numeric 15-significant-digit representation; missing distinct from literal NA
+ADAE,5428,5428,YES,YES,0,0,,YES,0,Full XPT read; canonical full-row multiset; numeric 15-significant-digit representation; missing distinct from literal NA
+ADLB,78619,78619,YES,YES,0,0,,YES,1497,Full XPT read; canonical full-row multiset; numeric 15-significant-digit representation; missing distinct from literal NA
+ADRS,3275,3275,YES,YES,0,0,,YES,737,Full XPT read; canonical full-row multiset; numeric 15-significant-digit representation; missing distinct from literal NA
+ADTTE,2058,2058,YES,YES,0,0,,YES,0,Full XPT read; canonical full-row multiset; numeric 15-significant-digit representation; missing distinct from literal NA
+CLINSITE,69,69,YES,YES,0,0,,YES,0,Full XPT read; canonical full-row multiset; numeric 15-significant-digit representation; missing distinct from literal NA

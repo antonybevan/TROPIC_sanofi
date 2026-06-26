@@ -1,5 +1,5 @@
 """
-oda_broker.py — single source of truth for connecting to SAS OnDemand for Academics (ODA).
+oda_broker.py — governed helper for connecting to SAS OnDemand for Academics (ODA).
 
 ODA's load-balancing object spawner intermittently times out under load (free, oversubscribed
 tier). A naive retry loop hammers the cluster and orphans workspace-session slots. This broker

@@ -9,7 +9,7 @@
 #                                              U_xpt_export.sas (SAS track)
 #
 # This REPLACES the previous 06_telemetry/gen_adam_labels.py, which sourced the
-# same artifacts FROM define.xml. The spec is now the single source of truth and
+# same artifacts FROM define.xml. The spec is now the metadata control source and
 # define.xml is checked against it (audit C-4 inversion). Regenerate after
 # editing the spec:   Rscript 06_telemetry/gen_adam_labels.R
 # =============================================================================

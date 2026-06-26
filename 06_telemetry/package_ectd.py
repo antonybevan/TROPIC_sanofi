@@ -215,19 +215,19 @@ def md_to_pdf(md_path, pdf_path):
             
     pdf.output(pdf_path)
 
-def generate_blank_crf(pdf_path):
-    """Generates a placeholder case report form PDF."""
-    from fpdf import FPDF
-    print(f"Generating Blank CRF: {pdf_path}")
-    pdf = FPDF()
-    pdf.creation_date = _PDF_DATE
-    pdf.add_page()
-    pdf.set_font("helvetica", "B", 16)
-    pdf.cell(0, 20, "TROPIC Study - Blank Case Report Form (CRF)", align="C")
-    pdf.ln(20)
-    pdf.set_font("helvetica", "", 12)
-    pdf.multi_cell(0, 10, "This is a placeholder for the blank Case Report Form (CRF) for Study EFC6193 / XRP6258.\n\nIn a standard regulatory submission, this PDF would contain the annotated Case Report Forms used during the clinical trial to collect patient-level data.", align="C")
-    pdf.output(pdf_path)
+def copy_source_crf(pdf_path):
+    """Copy the available source CRF; never generate a fabricated CRF placeholder."""
+    src = "01_raw_source/Sanofi CRF Tropic.pdf"
+    if not os.path.exists(src):
+        sys.exit(
+            "Missing source CRF: 01_raw_source/Sanofi CRF Tropic.pdf. "
+            "The package refuses to create a placeholder CRF."
+        )
+    shutil.copy2(src, pdf_path)
+    print(
+        "Copied source CRF to blankcrf.pdf. "
+        "Release note: this is not an annotated CRF unless annotation evidence is supplied."
+    )
 
 def convert_sdtm_to_xpt(sdtm_src_dir, out_dir):
     """Convert the source SDTM SAS7BDAT files to SAS Transport (XPORT v5) via R/haven."""
@@ -262,6 +262,21 @@ cat("SDTM conversion completed successfully.\\n")
             os.remove(r_converter_script)
 
 
+def copy_uplifted_sdtm34_xpts(sdtm34_dir, out_dir):
+    """Copy the SDTMIG 3.4 XPT layer that matches define_sdtm.xml."""
+    xpts = sorted(glob.glob(os.path.join(sdtm34_dir, "*.xpt")))
+    if not xpts:
+        sys.exit(
+            "Missing uplifted SDTMIG 3.4 XPT layer at .core_run/sdtm34/*.xpt. "
+            "Run: Rscript 06_telemetry/uplift_sdtm_34.R before building a full package. "
+            "Raw SDTMIG 3.1.1 conversion is not allowed when define_sdtm.xml declares SDTMIG 3.4."
+        )
+    os.makedirs(out_dir, exist_ok=True)
+    for f in xpts:
+        shutil.copy2(f, os.path.join(out_dir, os.path.basename(f)))
+    print(f"Copied {len(xpts)} uplifted SDTMIG 3.4 XPT datasets from {sdtm34_dir}.")
+
+
 def write_dataset_placeholder(folder):
     """In data-free preview mode, drop a note where the patient-level *.xpt would sit."""
     os.makedirs(folder, exist_ok=True)
@@ -289,6 +304,7 @@ def main(data_free=False):
     
     # 1. Define paths
     sdtm_src_dir = "01_raw_source/real_sdtm"
+    sdtm34_xpt_dir = ".core_run/sdtm34"
     adam_src_dir = "04_adam"
     define_src_dir = "07_define_xml"
     guides_src_dir = "08_reviewers_guides"
@@ -332,13 +348,16 @@ def main(data_free=False):
     
     print("Created target folder structure under m5/.")
     
-    # 3. SDTM tabulation datasets (XPORT v5) — converted from source SAS7BDAT via R.
+    # 3. SDTM tabulation datasets (XPORT v5). The full package must use the
+    # SDTMIG 3.4 uplifted layer that matches define_sdtm.xml. Raw source SDTMIG
+    # 3.1.1 conversion is retained as a utility function, but is not an allowed
+    # packaging fallback because it creates metadata/data drift.
     if data_free:
         print("Preview mode: skipping SDTM dataset conversion (patient-level data excluded).")
         write_dataset_placeholder(m5_sdtm_datasets_dir)
     else:
-        print("Converting SDTM datasets to Version 5 XPT format...")
-        convert_sdtm_to_xpt(sdtm_src_dir, m5_sdtm_datasets_dir)
+        print("Copying uplifted SDTMIG 3.4 datasets to Version 5 XPT package folder...")
+        copy_uplifted_sdtm34_xpts(sdtm34_xpt_dir, m5_sdtm_datasets_dir)
             
     # 4. Copy ADaM Datasets and strip '_prod' suffix (skipped in data-free preview)
     if data_free:
@@ -374,8 +393,8 @@ def main(data_free=False):
         print("  Generated BIMO data reviewer's guide (bdrg.pdf).")
 
     # 4c. Copy the authoritative ADaM specification (audit C-4 inversion): ADaM_spec.xlsx
-    # is the upstream single source of truth (CDISC/Pinnacle-21 metacore format) that
-    # GOVERNS define.xml -- not a rendering derived from it. Ship it alongside the
+    # is the upstream metadata control source (CDISC/Pinnacle-21 metacore format) that
+    # governs define.xml -- not a rendering derived from it. Ship it alongside the
     # spec->define conformance report that proves define.xml matches the spec.
     print("Copying authoritative ADaM specification + conformance evidence...")
     spec_file = "00_specifications/ADaM_spec.xlsx"
@@ -409,8 +428,8 @@ def main(data_free=False):
     shutil.copy(os.path.join(m5_csr_dir, "csr.pdf"), os.path.join(m5_csr_dir, "tropic.pdf"))
     print("  Successfully generated SDRG, ADRG, and CSR PDFs.")
     
-    # 7. Generate Blank CRF placeholder
-    generate_blank_crf(os.path.join(m5_sdtm_dir, "blankcrf.pdf"))
+    # 7. Copy the available source CRF. Do not fabricate a placeholder CRF.
+    copy_source_crf(os.path.join(m5_sdtm_dir, "blankcrf.pdf"))
     
     # 8. Copy programs (SAS, R, TFL source codes)
     print("Copying analysis and validation programs to m5/datasets/tropic/analysis/adam/programs/...")

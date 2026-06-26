@@ -1,7 +1,7 @@
-# config_study.R — read from single source of truth study_config.yaml
+# config_study.R — read from governed study_config.yaml
 # Version: 3.5.0
 # Date: 2026-06-12
-# Reference: TROPIC SAP v3.0 (EFC6193 / XRP6258)
+# Reference: TROPIC SAP v4.0 controlled draft (EFC6193 / XRP6258)
 
 config_file <- "study_config.yaml"
 if (!file.exists(config_file)) {
@@ -31,7 +31,7 @@ HGBBL_DEFAULT     <- as.numeric(cfg$HGBBL_DEFAULT)
 ALBBL_DEFAULT     <- as.numeric(cfg$ALBBL_DEFAULT)
 LDHBL_DEFAULT     <- as.numeric(cfg$LDHBL_DEFAULT)
 
-# RECIST v1.0 response thresholds (SAP §5.3)
+# RECIST v1.0 response thresholds (SAP v4.0 §10.3)
 RECIST_PD_PCT     <- as.numeric(cfg$RECIST_PD_PCT)
 RECIST_PD_ABS     <- as.numeric(cfg$RECIST_PD_ABS)
 RECIST_PR_PCT     <- as.numeric(cfg$RECIST_PR_PCT)
@@ -41,7 +41,7 @@ RECIST_CONFIRM_DAYS <- as.integer(cfg$RECIST_CONFIRM_DAYS)
 BONE_PROG_MIN_NEW     <- as.integer(cfg$BONE_PROG_MIN_NEW)
 BONE_PROG_CONFIRM_NEW <- as.integer(cfg$BONE_PROG_CONFIRM_NEW)
 
-# PCWG3 PSA thresholds (SAP §5.2 — response §5.2.1, progression §5.2.2)
+# PSA thresholds (SAP v4.0 §10.2)
 PSA_RESP_THRESHOLD   <- as.numeric(cfg$PSA_RESP_THRESHOLD)
 PSA_RESP_CONFIRM     <- as.integer(cfg$PSA_RESP_CONFIRM)
 PSA_PROG_MULT_RESP   <- as.numeric(cfg$PSA_PROG_MULT_RESP)
@@ -52,10 +52,10 @@ PSA_PROG_CONFIRM     <- as.integer(cfg$PSA_PROG_CONFIRM)
 # OCCDS v1.0 continuous episode merging (SAP §7.7, Custom Query 02)
 EPISODE_GAP_DAYS  <- as.integer(cfg$EPISODE_GAP_DAYS)
 
-# Project Optimus ANC kinetics (SAP §10)
+# Project Optimus ANC kinetics (SAP v4.0 §12)
 ANC_RECOVERY_THRESHOLD <- as.numeric(cfg$ANC_RECOVERY_THRESHOLD)
 
-# LB analysis windows — study days from TRTSDT (SAP §11.1.3)
+# LB analysis windows — study days from TRTSDT (SAP v4.0 §14)
 W_BL_HI    <- as.integer(cfg$W_BL_HI)
 W_C1D1_LO  <- as.integer(cfg$W_C1D1_LO)
 W_C1D1_HI  <- as.integer(cfg$W_C1D1_HI)

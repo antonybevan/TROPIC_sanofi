@@ -51,7 +51,7 @@ proc format;
 run;
 
 %let LRED = cxA6192E;
-%let SYNTHFN = %str(CbzP is SYNTHETIC - NOT real patient data. OS/PFS use Guyot IPD reconstruction; secondary endpoints are PH-scaled and circular by construction.);
+%let SYNTHFN = %str(CbzP is SYNTHETIC - NOT real patient data. NON-CONFIRMATORY DEMONSTRATION OUTPUT - not study results or submission evidence. OS/PFS use Guyot IPD reconstruction; secondary endpoints are PH-scaled and circular by construction.);
 
 /* ---- Bridge the synthetic CbzP arm. The XPORT engine does NOT expand _ALL_ in
    a SET statement, so reference the explicit member name written by haven, which

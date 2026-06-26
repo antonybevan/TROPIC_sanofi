@@ -1,6 +1,10 @@
 # TROPIC Clinical Analysis Report
 ## Study EFC6193 / XRP6258 — Abbreviated Clinical Study Summary
 
+> **SAP v4.0 lock note (2026-06-25):** This report is a generated demonstration output under
+> remediation control. It is not a clinical study report for submission and it is not a source
+> of analysis requirements. The governing analysis plan is `TROPIC_SAP_v4.0_industry_grade.docx`.
+
 **Study Title:** Prednisone plus Cabazitaxel or Mitoxantrone for mCRPC Progressing After Docetaxel
 **Sponsor:** Sanofi-Aventis | **Phase:** III, Open-Label RCT | **NCT:** 00417079
 **Publication:** de Bono JS et al., *Lancet* 2010;376(9747):1147–1154
@@ -150,5 +154,4 @@ FDA Project Optimus alignment: RDI in Cycle 1 was used as the E-R exposure proxy
 
 de Bono JS, Oudard S, Ozguroglu M, et al. **Prednisone plus cabazitaxel or mitoxantrone for metastatic castration-resistant prostate cancer progressing after docetaxel treatment: a randomised open-label trial.** *Lancet.* 2010;376(9747):1147–1154.
 * Local Copy: [de_bono_lancet_2010.pdf](file:///Users/apple/Desktop/TROPIC/01_raw_source/reference_literature/de_bono_lancet_2010.pdf)
-
 

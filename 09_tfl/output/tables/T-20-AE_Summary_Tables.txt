@@ -1,5 +1,6 @@
 ============================================================================
  NOTICE: The CbzP (Cabazitaxel) arm shown below is a SYNTHETIC, illustrative cohort.
+ NON-CONFIRMATORY DEMONSTRATION OUTPUT: not study results or submission evidence.
  Primary endpoints (OS, PFS) are reconstructed via Guyot (2012) IPD reconstruction from
  the published Kaplan-Meier curves; secondary endpoints (TTPSA/TTPAIN/TTUMOR) are PH-scaled
  from the real MP arm and are circular by construction. All Mitoxantrone (MP) arm

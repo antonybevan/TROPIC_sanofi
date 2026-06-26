@@ -12,9 +12,10 @@
 # Rules implemented (must match A_adtte_generation.sas exactly):
 #   Rule 4  Population per parameter, carried on-record (ITTFL + SAFFL):
 #         OS, PFS        -> ITT  (ITTFL is "Y")
-#         TTSAE, TTPAIN,
-#         TTPSA          -> Safety (SAFFL is "Y")
-#         TTUMOR         -> Safety and MEASDISF is "Y"
+#         TTPAIN         -> ITT with diary evaluability (ITTFL is "Y")
+#         TTPSA          -> ITT  (ITTFL is "Y")
+#         TTSAE          -> Safety (SAFFL is "Y")
+#         TTUMOR         -> ITT and MEASDISF is "Y"
 #   Rule 3  PSA-progression censoring date read from ADLB (adlb_v.xpt,
 #       where PARAMCD is "PSA"), an ADaM input -- not raw staging LB.
 #   Rule 2  Same-day pain scores aggregated with min() (order-independent;
@@ -107,6 +108,84 @@ first_nact <- adcm |>
     .groups = "drop"
   )
 
+# SAP v4.0 PFS component: pain progression can contribute to composite PFS, but
+# visit-level diary summaries require at least 5 distinct daily records out of
+# the expected 7-day window before a pain progression event is eligible.
+pn <- readRDS("01_raw_source/real_sdtm/staging/pn.rds")
+
+pn_anchored_pfs <- pn |>
+  inner_join(
+    df_adsl |> select(USUBJID, TRTSDT, RANDDT, LSTALVDT, ITTFL),
+    by = "USUBJID"
+  ) |>
+  filter(ITTFL == "Y") |>
+  mutate(
+    PNDT = if_else(
+      grepl("^\\d{4}-\\d{1,2}-\\d{1,2}", trimws(PNDTC)),
+      ymd(trimws(PNDTC), quiet = TRUE),
+      as.Date(NA)
+    ),
+    PNSTRESN = as.numeric(PNSTRESN)
+  )
+
+pain_baseline_pfs <- pn_anchored_pfs |>
+  filter(PNDT <= TRTSDT & !is.na(PNSTRESN)) |>
+  group_by(USUBJID, PNTESTCD) |>
+  summarise(base_val = median(PNSTRESN, na.rm = TRUE), .groups = "drop") |>
+  pivot_wider(
+    id_cols = USUBJID,
+    names_from = PNTESTCD,
+    values_from = base_val
+  ) |>
+  rename(base_ppi = PAININT, base_an = ANSCORE)
+
+pain_days_pfs <- pn_anchored_pfs |>
+  filter(PNDT > TRTSDT & !is.na(PNSTRESN)) |>
+  group_by(USUBJID, VISITNUM, VISIT) |>
+  filter(n_distinct(PNDT) >= 5) |>
+  ungroup() |>
+  group_by(USUBJID, VISITNUM, VISIT, PNDT, PNTESTCD) |>
+  summarise(day_val = min(PNSTRESN, na.rm = TRUE), .groups = "drop")
+
+cycle_dates_pfs <- pain_days_pfs |>
+  group_by(USUBJID, VISITNUM, VISIT) |>
+  summarise(cycle_date = min(PNDT, na.rm = TRUE), .groups = "drop")
+
+cycle_vals_pfs <- pain_days_pfs |>
+  group_by(USUBJID, VISITNUM, VISIT, PNTESTCD) |>
+  summarise(cycle_val = median(day_val, na.rm = TRUE), .groups = "drop") |>
+  pivot_wider(
+    id_cols = c(USUBJID, VISITNUM, VISIT),
+    names_from = PNTESTCD,
+    values_from = cycle_val
+  ) |>
+  rename(cycle_ppi = PAININT, cycle_an = ANSCORE)
+
+pain_triggers_pfs <- cycle_vals_pfs |>
+  left_join(cycle_dates_pfs, by = c("USUBJID", "VISITNUM", "VISIT")) |>
+  left_join(pain_baseline_pfs, by = "USUBJID") |>
+  arrange(USUBJID, VISITNUM) |>
+  mutate(
+    base_ppi = coalesce(base_ppi, 0),
+    base_an = coalesce(base_an, 0),
+    trig = if_else(
+      (!is.na(cycle_ppi - base_ppi) & (cycle_ppi - base_ppi) >= 2) |
+        (!is.na(cycle_an - base_an) & (cycle_an - base_an) >= 10),
+      1, 0
+    )
+  )
+
+pain_prog_pfs <- pain_triggers_pfs |>
+  group_by(USUBJID) |>
+  mutate(
+    confirmed = if_else(
+      trig == 1 & (coalesce(lead(trig), 0) == 1 | row_number() == n()),
+      1, 0
+    )
+  ) |>
+  filter(confirmed == 1) |>
+  summarise(pain_prog_dt = min(cycle_date), .groups = "drop")
+
 # ------------------------------------------------------------------------------
 # OS — Overall Survival (ITT, anchored at randomisation)
 # ------------------------------------------------------------------------------
@@ -149,15 +228,22 @@ ttsae <- df_adsl |>
 pfs <- df_adsl |>
   filter(ITTFL == "Y") |>
   left_join(first_pd, by = "USUBJID") |>
+  left_join(pain_prog_pfs, by = "USUBJID") |>
   left_join(first_nact, by = "USUBJID") |>
   mutate(
     PARAMCD = "PFS", PARAM = "Progression Free Survival", PARAMN = 2,
     PARCAT1 = "EFFICACY",
     STARTDT = RANDDT,
-    pd_found   = !is.na(pd_dt),
+    prog_dt = case_when(
+      !is.na(pd_dt) & !is.na(pain_prog_dt) ~ pmin(pd_dt, pain_prog_dt),
+      !is.na(pd_dt)                        ~ pd_dt,
+      !is.na(pain_prog_dt)                 ~ pain_prog_dt,
+      TRUE                                 ~ as.Date(NA)
+    ),
+    pd_found   = !is.na(prog_dt),
     nact_found = !is.na(nactdt),
     branch = case_when(
-      pd_found & nact_found & nactdt < pd_dt            ~ "NACT_PRE_PD",
+      pd_found & nact_found & nactdt < prog_dt          ~ "NACT_PRE_PD",
       pd_found                                          ~ "PD",
       DTHFL == "Y" & nact_found & nactdt < DTHDT        ~ "NACT_PRE_DEATH",
       DTHFL == "Y"                                      ~ "DEATH",
@@ -165,7 +251,7 @@ pfs <- df_adsl |>
       TRUE                                              ~ "CENSOR_LASTEVAL"
     ),
     ADT = case_when(
-      branch == "PD"    ~ pd_dt,
+      branch == "PD"    ~ prog_dt,
       branch == "DEATH" ~ DTHDT,
       branch %in% c("NACT_PRE_PD", "NACT_PRE_DEATH", "NACT_ONLY") ~
         nactdt - days(1),
@@ -173,7 +259,7 @@ pfs <- df_adsl |>
     ),
     CNSR     = if_else(branch %in% c("PD", "DEATH"), 0, 1),
     EVNTDESC = case_when(
-      branch == "PD"    ~ "TUMOR OR PSA PROGRESSION",
+      branch == "PD"    ~ "DISEASE PROGRESSION",
       branch == "DEATH" ~ "DEATH",
       TRUE ~ ""
     ),
@@ -187,18 +273,18 @@ pfs <- df_adsl |>
   finalize_tte()
 
 # ------------------------------------------------------------------------------
-# TTPAIN — Time to Pain Progression (Safety). PN has no ADaM intermediate; both
-# tracks derive from the same reconciled staging PN (documented in ADRG/SDRG).
-# Same-day scores aggregated with min() (#2).
+# TTPAIN — Time to Pain Progression (ITT with diary evaluability). PN has no ADaM
+# intermediate; both tracks derive from the same reconciled staging PN
+# (documented in ADRG/SDRG). Same-day scores aggregated with min() (#2).
 # ------------------------------------------------------------------------------
 pn <- readRDS("01_raw_source/real_sdtm/staging/pn.rds")
 
 pn_anchored <- pn |>
   inner_join(
-    df_adsl |> select(USUBJID, TRTSDT, RANDDT, LSTALVDT, SAFFL),
+    df_adsl |> select(USUBJID, TRTSDT, RANDDT, LSTALVDT, ITTFL, SAFFL),
     by = "USUBJID"
   ) |>
-  filter(SAFFL == "Y") |>
+  filter(ITTFL == "Y") |>
   mutate(
     PNDT     = if_else(
       grepl("^\\d{4}-\\d{1,2}-\\d{1,2}", trimws(PNDTC)),
@@ -221,6 +307,9 @@ pain_baseline <- pn_anchored |>
 
 pain_days <- pn_anchored |>
   filter(PNDT > TRTSDT & !is.na(PNSTRESN)) |>
+  group_by(USUBJID, VISITNUM, VISIT) |>
+  filter(n_distinct(PNDT) >= 5) |>
+  ungroup() |>
   group_by(USUBJID, VISITNUM, VISIT, PNDT, PNTESTCD) |>
   summarise(day_val = min(PNSTRESN, na.rm = TRUE), .groups = "drop")
 
@@ -272,7 +361,7 @@ pain_lastassess <- pn_anchored |>
   summarise(last_pn_dt = max(PNDT, na.rm = TRUE), .groups = "drop")
 
 ttpain <- df_adsl |>
-  filter(SAFFL == "Y") |>
+  filter(ITTFL == "Y") |>
   left_join(pain_prog, by = "USUBJID") |>
   left_join(pain_lastassess, by = "USUBJID") |>
   mutate(
@@ -299,7 +388,7 @@ ttpain <- df_adsl |>
   finalize_tte()
 
 # ------------------------------------------------------------------------------
-# TTPSA — Time to PSA Progression (Safety). Censor date from ADLB (#3).
+# TTPSA — Time to PSA Progression (ITT, anchored at randomization). Censor date from ADLB (#3).
 # ------------------------------------------------------------------------------
 psa_event <- adrs |>
   filter(PARAMCD == "PSPROG" & AVALC == "Y") |>
@@ -314,13 +403,13 @@ psa_lastassess <- adlb |>
   )
 
 ttpsa <- df_adsl |>
-  filter(SAFFL == "Y") |>
+  filter(ITTFL == "Y") |>
   left_join(psa_event, by = "USUBJID") |>
   left_join(psa_lastassess, by = "USUBJID") |>
   mutate(
     PARAMCD = "TTPSA", PARAM = "Time to PSA Progression", PARAMN = 3,
     PARCAT1 = "EFFICACY",
-    STARTDT  = TRTSDT,
+    STARTDT  = RANDDT,
     progressed = !is.na(psa_prog_dt),
     ADT = case_when(
       progressed           ~ psa_prog_dt,
@@ -341,7 +430,7 @@ ttpsa <- df_adsl |>
   finalize_tte()
 
 # ------------------------------------------------------------------------------
-# TTUMOR — Time to Tumor Progression (Safety & measurable-disease subpopulation)
+# TTUMOR — Time to Tumor Progression (ITT & measurable-disease subpopulation)
 # ------------------------------------------------------------------------------
 tumor_event <- adrs |>
   filter(PARAMCD == "OVRLRESP" & AVALC == "PD") |>
@@ -360,18 +449,18 @@ tumor_lastassess <- adrs |>
   )
 
 ttumor <- df_adsl |>
-  filter(SAFFL == "Y" & MEASDISF == "Y") |>
+  filter(ITTFL == "Y" & MEASDISF == "Y") |>
   left_join(tumor_event, by = "USUBJID") |>
   left_join(tumor_lastassess, by = "USUBJID") |>
   mutate(
     PARAMCD = "TTUMOR", PARAM = "Time to Tumor Progression", PARAMN = 4,
     PARCAT1 = "EFFICACY",
-    STARTDT  = TRTSDT,
+    STARTDT  = RANDDT,
     progressed = !is.na(tumor_prog_dt),
     ADT = case_when(
       progressed             ~ tumor_prog_dt,
       !is.na(last_tumor_dt)  ~ pmin(last_tumor_dt, STUDY_CUTOFF_DT),
-      TRUE                   ~ TRTSDT
+      TRUE                   ~ RANDDT
     ),
     CNSR     = if_else(progressed, 0, 1),
     EVNTDESC = if_else(progressed, "TUMOR PROGRESSION", ""),

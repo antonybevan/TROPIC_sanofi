@@ -52,6 +52,7 @@ dir.create("09_tfl/output/listings", showWarnings = FALSE, recursive = TRUE)
 # mistaken for a real result.
 synth_cap <- paste0(
   "CbzP is a SYNTHETIC, illustrative comparator — NOT real patient data; the MP arm is real.\n",
+  "NON-CONFIRMATORY DEMONSTRATION OUTPUT — not study results or submission evidence.\n",
   "Primary endpoints (OS, PFS): Guyot (2012) IPD reconstruction from the published KM curves.\n",
   "Secondary endpoints (TTPSA/TTPAIN/TTUMOR): PH-scaled from MP — circular by construction."
 )
@@ -61,6 +62,7 @@ synth_banner <- paste0(
   "==================\n",
   " NOTICE: The CbzP (Cabazitaxel) arm shown below is a ",
   "SYNTHETIC, illustrative cohort.\n",
+  " NON-CONFIRMATORY DEMONSTRATION OUTPUT: not study results or submission evidence.\n",
   " Primary endpoints (OS, PFS) are reconstructed via Guyot (2012) IPD ",
   "reconstruction from\n",
   " the published Kaplan-Meier curves; secondary endpoints (TTPSA/TTPAIN/TTUMOR) ",
@@ -204,22 +206,15 @@ theme_nejm_custom <- function() {
 # KAPLAN-MEIER PLOT GENERATION HELPER (Deduplicated, fits once, vectorized risk table) # nolint
 # ==============================================================================
 render_km <- function(data, stats, x_max, title, subtitle_endpoint, y_lab, outfile) { # nolint
-  # Fit survfit once (Issue 5)
+  # Fit survfit once and use the raw fit arrays for step curves/censor ticks.
   fit <- survfit(Surv(AVAL / 30.4375, 1 - CNSR) ~ TRT01P, data = data)
 
-  # Extract true KM step-plot data.
-  # NB: index the RAW fit arrays (fit$time/$surv) by their own strata layout via
-  # rep(names, fit$strata). Do NOT use which(summary(fit)$strata==...): summary()
-  # drops censoring-only rows, so its indices are shorter than fit$time and would
-  # mis-map strata onto the wrong rows (scrambled curves / spurious vertical drops).
   plot_list <- list()
   if (!is.null(fit$strata)) {
     strata_of_row <- rep(names(fit$strata), fit$strata)
     for (stratum in names(fit$strata)) {
       stratum_clean <- gsub("TRT01P=", "", stratum)
       sel <- strata_of_row == stratum
-
-      # Ensure curves start at time 0 with 100% survival
       plot_list[[stratum_clean]] <- data.frame(
         time = c(0, fit$time[sel]),
         surv = c(1.0, fit$surv[sel]),
@@ -236,49 +231,19 @@ render_km <- function(data, stats, x_max, title, subtitle_endpoint, y_lab, outfi
   }
   plot_data <- bind_rows(plot_list)
 
-  # Censoring marks are part of the statistical display, not decoration.  They
-  # must be taken from the same survfit rows as the step curve so their time and
-  # survival ordinate cannot drift from the estimate.
+  if (!is.null(fit$strata)) {
+    censor_strata <- gsub("TRT01P=", "", rep(names(fit$strata), fit$strata))
+  } else {
+    censor_strata <- rep(unique(data$TRT01P)[1], length(fit$time))
+  }
   censor_data <- data.frame(
     time = fit$time,
     surv = fit$surv,
     n_censor = fit$n.censor,
-    TRT01P = gsub("TRT01P=", "", rep(names(fit$strata), fit$strata))
+    TRT01P = censor_strata
   ) |>
     filter(.data$n_censor > 0)
 
-  # Main KM Plot Panel
-  km_plot <- ggplot(plot_data, aes(x = time, y = surv, color = TRT01P)) +
-    geom_step(linewidth = 1.0) +
-    geom_point(
-      data = censor_data,
-      aes(x = time, y = surv, color = TRT01P),
-      shape = 3, size = 1.6, stroke = 0.55, show.legend = FALSE
-    ) +
-    scale_color_manual(
-      values = c("CbzP" = "#005A9C", "MP" = "#A6192E"),
-      labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")
-    ) +
-    scale_y_continuous(labels = scales::percent, expand = c(0, 0)) +
-    scale_x_continuous(breaks = seq(0, x_max, by = 3), expand = c(0, 0)) +
-    coord_cartesian(xlim = c(0, x_max), ylim = c(0, 1.02)) +
-    labs(
-      title = title,
-      subtitle = paste0(subtitle_endpoint, "\nVertical ticks denote censored observations."),
-      x = "Months from Randomization",
-      y = y_lab,
-      color = "Treatment Group:",
-      caption = synth_cap
-    ) +
-    theme_nejm_custom() +
-    theme(
-      legend.position = c(0.78, 0.85),
-      legend.background = element_rect(fill = "white", color = "#eaeaea", linewidth = 0.4), # nolint
-      legend.key = element_blank(),
-      plot.margin = margin(t = 10, r = 15, b = 5, l = 30)
-    )
-
-  # Vectorized risk table counts query (Issue 4 & 5)
   times <- seq(0, x_max, by = 3)
   sum_fit <- summary(fit, times = times, extend = TRUE)
   risk_data <- data.frame(
@@ -288,37 +253,84 @@ render_km <- function(data, stats, x_max, title, subtitle_endpoint, y_lab, outfi
   )
 
   active_trts <- c("CbzP", "MP")
-  risk_data$TRT01P <- factor(risk_data$TRT01P, levels = active_trts)
+  pal <- c("CbzP" = "#005A9C", "MP" = "#A6192E")
 
-  risk_table_plot <- ggplot(risk_data, aes(x = .data$Time, y = factor(TRT01P, levels = rev(active_trts)), label = .data$n.risk)) + # nolint
-    geom_text(size = 3.2, fontface = "bold", aes(color = TRT01P), family = "serif") + # nolint
-    scale_color_manual(
-      values = c("CbzP" = "#005A9C", "MP" = "#A6192E"),
-      labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)"),
-      guide = "none"
-    ) +
-    scale_y_discrete(labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) + # nolint
-    # right-side room so the final at-risk labels (e.g. month-24 "28") are not clipped
-    scale_x_continuous(limits = c(0, x_max), breaks = times,
-                       expand = expansion(mult = c(0.02, 0.04))) +
-    labs(
-      x = NULL,
-      y = "Number at risk:"
-    ) +
-    theme_minimal(base_family = "serif") +
-    theme(
-      panel.grid = element_blank(),
-      axis.text.x = element_blank(),
-      axis.ticks = element_blank(),
-      axis.title.y = element_text(face = "bold", size = 8.5, color = "#111111",
-        angle = 0, vjust = 0.5), # nolint
-      axis.text.y = element_text(face = "bold", size = 8.5, color = "#222222"),
-      plot.margin = margin(t = -5, r = 15, b = 5, l = 30)
-    )
+  # Explicit journal-style page layout.  The KM body, disclosure, and risk table
+  # are drawn in fixed regions so no risk-table label can push the curve panel
+  # rightward.  This deliberately avoids patchwork/gtable post-alignment.
+  png(outfile, width = 2400, height = 1650, res = 300, bg = "white")
+  op <- par(no.readonly = TRUE)
+  on.exit({
+    par(op)
+    dev.off()
+  }, add = TRUE)
 
-  final_km_plot <- km_plot / risk_table_plot + plot_layout(heights = c(4.1, 1))
-  ggsave(outfile, final_km_plot, width = 8, height = 5.5, dpi = 300,
-    bg = "white")
+  par(fig = c(0, 1, 0, 1), mar = c(0, 0, 0, 0), family = "serif")
+  plot.new()
+  text(0.055, 0.965, title, adj = c(0, 1), font = 2, cex = 0.92, col = "#111111")
+  subtitle_lines <- strsplit(
+    paste0(subtitle_endpoint, "\nVertical ticks denote censored observations."),
+    "\n",
+    fixed = TRUE
+  )[[1]]
+  sub_y <- 0.918
+  for (line in subtitle_lines) {
+    text(0.055, sub_y, line, adj = c(0, 1), cex = 0.62, col = "#444444")
+    sub_y <- sub_y - 0.026
+  }
+
+  plot_fig <- c(0.045, 0.985, 0.375, 0.805)
+  par(fig = plot_fig, mar = c(3.0, 3.8, 0.15, 0.35), mgp = c(1.95, 0.55, 0),
+      tcl = -0.25, new = TRUE, family = "serif")
+  plot(NA, xlim = c(0, x_max), ylim = c(0, 102), xaxs = "i", yaxs = "i",
+       xlab = "Months from Randomization", ylab = y_lab, xaxt = "n", yaxt = "n",
+       bty = "l", cex.lab = 0.72, font.lab = 2)
+  axis(1, at = times, lwd = 1.05, cex.axis = 0.64)
+  y_ticks <- seq(0, 100, by = 20)
+  axis(2, at = y_ticks, labels = y_ticks, las = 1, lwd = 1.05, cex.axis = 0.64)
+  abline(h = y_ticks, col = "#e5e7eb", lwd = 0.8)
+  for (trt in active_trts) {
+    d <- plot_data[plot_data$TRT01P == trt, ]
+    lines(d$time, d$surv * 100, type = "s", lwd = 2.6, col = pal[trt])
+    cd <- censor_data[censor_data$TRT01P == trt, ]
+    if (nrow(cd)) points(cd$time, cd$surv * 100, pch = 3, cex = 0.65, lwd = 1.0,
+                         col = pal[trt])
+  }
+  legend("topright",
+    title = "Treatment Group:",
+    legend = c("CbzP (Synthetic)", "MP (Real)"),
+    col = pal[active_trts], lwd = 2.6, bty = "o", bg = "white", box.col = "white",
+    cex = 0.62, title.adj = 0)
+  plot_plt <- par("plt")
+  axis_left <- plot_fig[1] + plot_plt[1] * (plot_fig[2] - plot_fig[1])
+  axis_right <- plot_fig[1] + plot_plt[2] * (plot_fig[2] - plot_fig[1])
+  risk_x <- axis_left + (axis_right - axis_left) * (times / x_max)
+
+  par(fig = c(0, 1, 0, 1), mar = c(0, 0, 0, 0), new = TRUE, family = "serif")
+  plot.new()
+  risk_label_x <- axis_left - 0.030
+  text(0.055, 0.275, "Number at risk:", adj = c(0, 0.5), font = 2, cex = 0.68)
+  row_y <- c("CbzP" = 0.232, "MP" = 0.192)
+  text(risk_label_x, row_y["CbzP"], "CbzP (Synthetic)", adj = c(1, 0.5),
+       font = 2, cex = 0.62)
+  text(risk_label_x, row_y["MP"], "MP (Real)", adj = c(1, 0.5),
+       font = 2, cex = 0.62)
+  for (trt in active_trts) {
+    vals <- risk_data |>
+      filter(as.character(TRT01P) == trt) |>
+      arrange(Time) |>
+      pull(n.risk)
+    text(risk_x, row_y[trt], vals, col = pal[trt], font = 2, cex = 0.66)
+  }
+
+  cap_y <- 0.105
+  for (line in strsplit(synth_cap, "\n", fixed = TRUE)[[1]]) {
+    text(0.055, cap_y, line, adj = c(0, 1), cex = 0.44, font = 2,
+         col = "#A6192E")
+    cap_y <- cap_y - 0.017
+  }
+
+  invisible(outfile)
 }
 
 # ==============================================================================
@@ -1298,8 +1310,8 @@ consort <- ggplot() +
   annotate("text",
     x = 0.25, y = 0.532,
     label = sprintf("CbzP Safety Arm (Synthetic)\nn = %d; deaths = %d (%d%%)",
-      n_cbzp_safety, n_cbzp_deaths,
-      round(100 * n_cbzp_deaths / n_cbzp_safety)),
+                    n_cbzp_safety, n_cbzp_deaths,
+                    round(100 * n_cbzp_deaths / n_cbzp_safety)),
     size = 3, color = "#15803d", family = "serif"
   ) +
   # Branch right: MP safety arm
@@ -1317,8 +1329,8 @@ consort <- ggplot() +
   annotate("text",
     x = 0.75, y = 0.532,
     label = sprintf("MP Safety Arm (Real)\nn = %d; deaths = %d (%d%%)",
-      n_mp_safety, n_mp_deaths,
-      round(100 * n_mp_deaths / n_mp_safety)),
+                    n_mp_safety, n_mp_deaths,
+                    round(100 * n_mp_deaths / n_mp_safety)),
     size = 3, color = "#b91c1c", family = "serif"
   ) +
   # Aggregate outcome, explicitly downstream of both treatment arms.
@@ -1374,13 +1386,14 @@ consort <- ggplot() +
 ggsave("09_tfl/output/figures/F-01-1_CONSORT_Disposition.png", consort,
        width = 8, height = 7, dpi = 300, bg = "white")
 
-# Byte-stability pass: strip embedded timestamps/text from the R-track figures so the
-# committed PNGs are identical across rebuilds and graphics devices (the SAS-track
-# figures under figures/sas/ are rendered separately and are not touched here).
-invisible(lapply(
-  list.files("09_tfl/output/figures", pattern = "[.]png$", full.names = TRUE),
-  strip_png_metadata
-))
+# Byte-stability pass for the R-track figures. The SAS-track figures under
+# figures/sas/ are rendered separately and are not touched here.
+r_figure_files <- list.files(
+  "09_tfl/output/figures",
+  pattern = "^F-[0-9].*[.]png$",
+  full.names = TRUE
+)
+invisible(lapply(r_figure_files, strip_png_metadata))
 
 cat(
   "NOTE: [TFL] TFL suites compiled successfully.\n",

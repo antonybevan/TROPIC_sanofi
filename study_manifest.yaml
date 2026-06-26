@@ -1,5 +1,5 @@
 # ==============================================================================
-# study_manifest.yaml — pipeline STRUCTURE (single source of truth).
+# study_manifest.yaml — pipeline STRUCTURE (governed control source).
 #
 # Companion to study_config.yaml: that file holds clinical PARAMETERS (thresholds,
 # windows, imputation defaults); this file holds STRUCTURE — which datasets exist,

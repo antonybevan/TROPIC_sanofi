@@ -2,8 +2,13 @@
 
 **Study:** TROPIC (EFC6193 / XRP6258) · NCT00417079
 **Compound:** Cabazitaxel (XRP6258) vs Mitoxantrone, mCRPC post-docetaxel
-**Plan version / date:** 1.0 · 2026-06-20
-**Basis:** FDA Study Data Technical Conformance Guide v6.0 (March 2025); CDISC standards.
+**Plan version / date:** 1.1 · 2026-06-25
+**Basis:** SAP v4.0 lock review; current FDA Study Data Technical Conformance Guide and CDISC standards.
+
+> **Current lock status:** `TROPIC_SAP_v4.0_industry_grade.docx` is the programming authority.
+> This SDSP is a remediation-control plan, not a final submission plan. The SAP lock memo
+> (`audit/SAP_LOCK_REVIEW_MEMO.md`) still blocks submission release until SDTM package-source
+> drift, eCTD stale-payload controls, CRF provenance, and final conformance evidence are closed.
 
 The SDSP describes the data standards, versions, and conformance approach used for the
 study's tabulation and analysis data, and discloses planned exceptions — the single
@@ -29,16 +34,18 @@ two Define-XML files, and the traceability matrix.
 
 - **Define-XML:** XSD-valid (CDISC 2.1 + ARM schema) and parses in the CDISC CORE
   reference engine; referential integrity gated by `validate_define.py`.
-- **Spec governance:** `ADaM_spec.xlsx` (metacore) is the master; `spec→define` and
-  `spec→data` gates run in CI (both PASS).
-- **SDTM:** validated with CDISC CORE at **SDTMIG 3.4** (CT 2026-03-27); all targeted
-  structural rules cleared, residual findings classified (`06_telemetry/conformance/CORE_SDTM34_RUN_RECORD.md`).
+- **Spec governance:** `ADaM_spec.xlsx` (metacore) is the intended metadata control source;
+  `spec→define` and `spec→data` gates are release gates and must be rerun after SAP v4.0
+  remediation.
+- **SDTM:** target package standard is **SDTMIG 3.4** (CT 2026-03-27). The full package must
+  use the uplifted SDTM 3.4 XPT layer described by `define_sdtm.xml`; raw SDTMIG 3.1.1
+  conversion is not acceptable for a release package.
 - **ADaM:** CORE ships no executable ADaM rules yet; interim coverage via project custom
   CORE rules (`conformance_rules/adam/`) + `adam_conf_check.R`.
 - **Pinnacle 21 / Certara:** the authoritative business-rule run remains **pending** a
   non-expired engine licence (terminal-session item).
-- **Dataset-JSON:** every file schema-validated against the CORE Dataset-JSON schema and
-  round-trip reconciled lossless to XPT.
+- **Dataset-JSON:** treated as an auxiliary machine-readable layer. Schema and round-trip
+  evidence must be regenerated after the final SAP v4.0 data/metadata lock.
 
 ## 3. Declared exceptions and deviations
 

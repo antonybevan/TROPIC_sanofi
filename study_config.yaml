@@ -15,12 +15,12 @@ HGBBL_DEFAULT: 11.5
 ALBBL_DEFAULT: 38.0
 LDHBL_DEFAULT: 220.0
 
-# RECIST v1.0 response thresholds (SAP §5.3)
+# RECIST v1.0 response thresholds (SAP v4.0 §10.3)
 RECIST_PD_PCT: 20.0
 RECIST_PD_ABS: 5.0
 RECIST_PR_PCT: -30.0
 # Confirmed-response window: a CR/PR must be confirmed by a later CR/PR at least
-# this many days afterwards (RECIST v1.0 "no less than 4 weeks"), SAP §5.3.
+# this many days afterwards (RECIST v1.0 "no less than 4 weeks"), SAP v4.0 §10.3.
 RECIST_CONFIRM_DAYS: 28
 
 # PCWG3 bone-scan 2+2 progression (Scher 2016) — methodological demonstration, not
@@ -28,7 +28,7 @@ RECIST_CONFIRM_DAYS: 28
 BONE_PROG_MIN_NEW: 2      # new bone lesions on first post-baseline scan => PDu
 BONE_PROG_CONFIRM_NEW: 2  # additional new bone lesions on a later scan to confirm
 
-# PCWG3 PSA thresholds (SAP §5.2 — response §5.2.1, progression §5.2.2)
+# PSA thresholds (SAP v4.0 §10.2)
 PSA_RESP_THRESHOLD: 0.5
 PSA_RESP_CONFIRM: 21
 PSA_PROG_MULT_RESP: 1.5
@@ -40,10 +40,10 @@ PSA_PROG_CONFIRM: 7
 # Query 02). NB: there is no CDISC "OCCDS v1.1"; the merging rule is a TROPIC extension.
 EPISODE_GAP_DAYS: 3
 
-# Project Optimus ANC kinetics (SAP §10)
+# Project Optimus ANC kinetics (SAP v4.0 §12)
 ANC_RECOVERY_THRESHOLD: 1.5
 
-# LB analysis windows — study days from TRTSDT (SAP §11.1.3)
+# LB analysis windows — study days from TRTSDT (SAP v4.0 §14)
 W_BL_HI: 0
 W_C1D1_LO: 1
 W_C1D1_HI: 3

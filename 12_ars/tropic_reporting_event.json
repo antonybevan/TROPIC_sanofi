@@ -219,8 +219,8 @@
               "groupId": "G.MP"
             }
           ],
-          "rawValue": 326,
-          "formattedValue": "326"
+          "rawValue": 330,
+          "formattedValue": "330"
         },
         {
           "operationId": "OP.MEDD",
@@ -230,8 +230,8 @@
               "groupId": "G.MP"
             }
           ],
-          "rawValue": 43.0,
-          "formattedValue": "43.0"
+          "rawValue": 41.0,
+          "formattedValue": "41.0"
         },
         {
           "operationId": "OP.MEDM",
@@ -241,8 +241,8 @@
               "groupId": "G.MP"
             }
           ],
-          "rawValue": 1.41,
-          "formattedValue": "1.41"
+          "rawValue": 1.35,
+          "formattedValue": "1.35"
         }
       ]
     },

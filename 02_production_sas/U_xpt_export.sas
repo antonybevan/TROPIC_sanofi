@@ -21,7 +21,7 @@
 %set_pgmdir;
 %include "&PGMDIR./00_config.sas";
 /* spec-sourced variable labels (GENERATED: 06_telemetry/gen_adam_labels.R from
-   00_specifications/ADaM_spec.xlsx, the single source of truth -- audit C-4 inversion).
+   00_specifications/ADaM_spec.xlsx, the metadata control source -- audit C-4 inversion).
    Applies %lbl_<ds> so every ADaM variable carries its spec label (ADaMIG conformance). */
 %include "&PGMDIR./_adam_labels.sas";
 

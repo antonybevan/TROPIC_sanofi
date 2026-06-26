@@ -7,7 +7,7 @@
 #
 # This is the INVERTED C-4 direction. Previously generate_adam_specs.py rendered
 # a "spec" FROM the define (circular: the spec could never disagree). Now the
-# spec is the single source of truth and the define is the artifact UNDER TEST:
+# spec is the metadata control source and the define is the artifact UNDER TEST:
 # every dataset / variable / attribute / codelist in the define must match the
 # spec, or this script reports the drift and exits non-zero (so it can gate the
 # build and CI).

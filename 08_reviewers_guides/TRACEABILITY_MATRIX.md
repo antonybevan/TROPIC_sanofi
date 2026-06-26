@@ -1,5 +1,9 @@
 # Analysis Traceability Matrix
 
+> **SAP v4.0 lock note (2026-06-25):** This matrix is retained as current implementation
+> traceability. It must be regenerated after SAP v4.0 remediation and final metadata lock
+> before it can be treated as release traceability. The SAP and lock memo govern any conflict.
+
 **Study:** TROPIC (EFC6193 / XRP6258) · NCT00417079
 **Standards:** SDTMIG v3.1.1 source → v3.4 uplift · ADaMIG v1.3 / OCCDS v1.0 + custom episode-merging (analysis)
 **Purpose:** End-to-end traceability from source SDTM → ADaM (dual-programmed) → Define-XML
@@ -37,8 +41,8 @@ OS / PFS / TTSAE / TTPSA / TTUMOR inherit this limitation (SDRG §2).
 | **ADCM** | `A_adcm_generation.sas` | `v_adcm_validation.R` | `IG.ADCM` | Prior/concomitant meds; NACTDT (new anti-cancer therapy); docetaxel history | `USUBJID,CMSTDT,CMDECOD` (multiset) | ″ |
 | **ADAE** | `A_adae_io_respec.sas` | `v_adae_io_validation.R` | `IG.ADAE` | TRTEMFL; **custom continuous-episode merging** (OCCDS v1.0 base; CQ02 hematologic irAE, ≤3-day gap, §7.7); AEOCCFL denominator flag; ATOXGR | `USUBJID,AESEQ` (unique) | ″ |
 | **ADLB** | `A_adlb_generation.sas` | `v_adlb_validation.R` | `IG.ADLB` | Analysis windows (§11.1.3); ATOXGR baseline→worst shift; ANL01FL; ANCNADIR / ANCRECDY (§10) | `USUBJID,PARAMCD,AVISITN,LBDY` (multiset) | ″ |
-| **ADRS** | `A_adrs_generation.sas` | `v_adrs_validation.R` | `IG.ADRS` | OVRLRESP (integrated RECIST v1.0 target+non-target+new-lesion, §4A/§5.3); BSGRESP (PCWG3 bone 2+2 — demonstration, §4A); PSPROG (PCWG3, §5.2.2); OBJRESP / PSARESP (§5.3.3 / §5.2.1) | `USUBJID,PARAMCD,AVISIT` (multiset) | ″ |
-| **ADTTE** | `A_adtte_generation.sas` | `v_adtte_validation.R` | `IG.ADTTE` | OS; PFS (NACT censoring hierarchy); **TTSAE** (was `TTOS`); TTPAIN; TTPSA; TTUMOR (measurable-disease subpop) | `USUBJID,PARAMCD` (multiset) | ″ |
+| **ADRS** | `A_adrs_generation.sas` | `v_adrs_validation.R` | `IG.ADRS` | OVRLRESP (integrated RECIST v1.0 target+non-target+new-lesion, SAP v4.0 §10.3); BSGRESP (PCWG3 bone 2+2 — exploratory demonstration unless promoted by SAP amendment); PSPROG / PSARESP (SAP v4.0 §10.2); OBJRESP (SAP v4.0 §10.3) | `USUBJID,PARAMCD,AVISIT` (multiset) | ″ |
+| **ADTTE** | `A_adtte_generation.sas` | `v_adtte_validation.R` | `IG.ADTTE` | OS; PFS composite includes tumour, PSA, pain progression and death with NACT censoring; **TTSAE** (was `TTOS`); TTPAIN uses ITT + 5-of-7 diary evaluability; TTPSA uses ITT/randomization origin; TTUMOR uses ITT measurable-disease/randomization origin | `USUBJID,PARAMCD` (multiset) | ″ |
 | **CLINSITE** (BIMO) | `B_bimo_generation.sas` | `v_bimo_validation.R` | *(BIMO — not in ADaM define; documented in [BDRG](BDRG.md))* | Site-level roll-up of ADSL populations + ADAE safety: `N_RAND/N_SAF/N_ITT/N_PPROT/N_DEATH/N_SAE/N_TEAE` (per FDA BIMO TCG subset) | `STUDYID,SITEID` (unique) | ″ |
 
 **Reconciliation engine:** `05_reconciliation/cross_lang_audit.R` (diffdf), **8 domains**.
@@ -52,7 +56,7 @@ also checked by `06_telemetry/adam_conf_check.R` and the executable CORE rules i
 `06_telemetry/conformance_rules/adam/` (traceable to ADaMIG; CORE_RUN_RECORD.md). `CLINSITE` is a
 BIMO deliverable outside the ADaM define — its schema is asserted in `v_bimo_validation.R`.
 
-**Single source of truth (audit C-4 inversion).** The authoring-format ADaM specification
+**Metadata control source (audit C-4 inversion).** The authoring-format ADaM specification
 `00_specifications/ADaM_spec.xlsx` (metacore/Pinnacle-21 workbook) is the upstream master that
 *governs* the define and the data — not a rendering derived from the define. Two gates enforce the
 direction: `07_define_xml/check_define_conformance.R` (**spec → define**, with a drift-detecting
@@ -66,14 +70,15 @@ variable-label artifacts for both tracks (`06_telemetry/gen_adam_labels.R`).
 ## 3. TFL Outputs → SAP Section → Generator → ADaM Inputs
 
 All TFLs are produced by `09_tfl/tfl_generation.R` (R / pharmaverse track, the reporting
-deliverable). The numbers are the single source of truth; `ANALYSIS_REPORT.md` transcribes
+deliverable). The generated numbers are implementation evidence; SAP v4.0 remains the
+planning authority. `ANALYSIS_REPORT.md` transcribes
 them. SAS production-track copies of the statistical figures are rendered separately by
 `02_production_sas/T_tfl_generation.sas` → `09_tfl/output/figures/sas/` (capability demo / visual QC).
 
 | Output | SAP § | Generator function (`tfl_generation.R`) | Primary ADaM input(s) |
 |---|---|---|---|
 | `F-01-1_CONSORT_Disposition.png` | 3 | Analysis-population/mortality overview builder | ADSL (ITTFL, SAFFL, TRT01P, DTHFL) |
-| `F-11-1_KM_OS.png` / `F-11-2_KM_PFS.png` | 4.3 (OS), 5.1 (PFS) | `compute_tte_stats()` → KM/Cox | ADTTE (OS, PFS) |
+| `F-11-1_KM_OS.png` / `F-11-2_KM_PFS.png` | SAP v4.0 §9 (OS), §10.1 (PFS) | `compute_tte_stats()` → KM/Cox | ADTTE (OS, PFS) |
 | `F-12-1_Subgroup_Forest.png` | 8.2 | per-subgroup Cox (`coxph(Surv(AVAL,1-CNSR) ~ TRT)` within each level) | ADTTE (OS) + ADSL covariates |
 | `F-13-1_PSA_Waterfall.png` | 5.2 | PSA best-change (`min(PCHG)` per subject) | ADLB (PSA `PCHG`), ADSL (arm) |
 | `F-14-1_Swimmer_Plot.png` | 7.8 | exposure swimmer | ADEX, ADSL |

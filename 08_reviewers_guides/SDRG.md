@@ -26,7 +26,7 @@ To guarantee database integrity and prevent raw data corruption during pipeline 
 ---
 
 ## 2. SDTM Domain Mapping Summary
-Standard SDTM mapping structures were built in `S_sdtm_mapping.sas` under the trial-era **SDTM-IG 3.1.1** standard (per SAP v3.0 §1; the source data predates later IG versions):
+Standard SDTM mapping structures were built in `S_sdtm_mapping.sas` from trial-era **SDTM-IG 3.1.1** source data; SAP v4.0 treats this as source provenance and requires the release package to use the governed SDTMIG 3.4 uplift layer:
 * **DM (Demographics):** Unique subject identifier `USUBJID` constructed via `STUDYID || '-' || SITEID || '-' || SUBJID`. Randomization date `RANDDT` and treatment start date `TRTSDT` mapped to standard ISO 8601 date fields.
 * **EX (Exposure):** Normalised cycle-level actual administered doses (`EXDOSE` in mg).
 * **AE (Adverse Events):** Coded utilizing MedDRA dictionaries into `AEDECOD`, `AEBODSYS`, and standard CTCAE toxicity grades. **Date Precision Note:** The source PDS dataset contains AE timing as week-offset integers (`AESTWK`, `AEENWK`). AE start/end dates are reconstructed as `RFSTDTC + (AESTWK - 1) * 7` and `RFSTDTC + (AEENWK - 1) * 7`. This reconstruction yields calendar-week accuracy (±3.5 days) rather than exact calendar dates. This precision level was present in the source data and is not a programming artefact. All safety analyses using AE dates (ADAE, ADTTE TTSAE) inherit this limitation.
@@ -52,13 +52,13 @@ For subjects with missing baseline laboratory values (PSABL, ALPBL, HGBBL), popu
 - `ALBBL` fixed: 38.0 g/L (no subject-level source available)
 - `LDHBL` fixed: 220.0 U/L (no subject-level source available)
 
-This imputation strategy has no formal SAP section (the SAP v3.0 specifies no missing-data imputation method); it is a documented design choice per ADRG §5.1. **These imputed baseline laboratory constants are schema placeholders and are NOT used as covariates or stratification factors in any efficacy model**, consistent with [ADRG](file:///Users/apple/Desktop/TROPIC/08_reviewers_guides/ADRG.md) §5.1. The primary and secondary Cox / log-rank analyses stratify **only** on `ECOGBL` and `MEASDISF` (see `09_tfl/tfl_generation.R`, `compute_tte_stats()` → `strata(ECOGBL, MEASDISF)`). `ALBBL` and `LDHBL` in particular are single constants for all subjects (no subject-level source available) and therefore carry no subject-level information; they are retained purely to satisfy the ADaM schema and should be read as "not available," not as analysis inputs.
+This imputation strategy is retained as a documented implementation limitation under SAP v4.0 §14 / §18. **These imputed baseline laboratory constants are schema placeholders and are NOT used as covariates or stratification factors in any efficacy model**, consistent with [ADRG](file:///Users/apple/Desktop/TROPIC/08_reviewers_guides/ADRG.md) §5.1. The primary and secondary Cox / log-rank analyses stratify **only on the protocol randomization strata** (`ECOGBL` and `MEASDISF`; see `09_tfl/tfl_generation.R`, `compute_tte_stats()` → `strata(ECOGBL, MEASDISF)`). `ALBBL` and `LDHBL` in particular are single constants for all subjects (no subject-level source available) and therefore carry no subject-level information; they are retained purely to satisfy the ADaM schema and should be read as "not available," not as analysis inputs.
 
 ### 4.2 Supplemental Domain Ingestion
 Domains `LS` (Lesion) and `PN` (Pain/Numeric) do not have supplemental (`SUPPLS`, `SUPPPN`) datasets in the PDS source data. The `%transpose_supp()` macro gracefully handles this via the `supp_exists = 0` guard path, copying the primary domain directly without SUPP merge.
 
 ### 4.3 Country and Region Assignment
-The DM domain in the source data does not contain country-of-study-site information. `COUNTRY` is assigned `'IND'` and `REGION` as `'REST OF WORLD'` for all subjects. Geographic subgroup analyses were not pre-specified in SAP v3.0 and are not reported.
+The DM domain in the source data does not contain country-of-study-site information. `COUNTRY` is assigned `'IND'` and `REGION` as `'REST OF WORLD'` for all subjects. Geographic subgroup analyses are not part of SAP v4.0 reporting and are not reported.
 
 ### 4.4 Hardcoded Demographic Constant (SEX = 'M')
 The demographics domain (`DM`) contains a hardcoded variable `SEX = 'M'` assigned to all subjects in `A_adsl_generation.sas`. This is a clinical decision consistent with the trial protocol for metastatic castration-resistant prostate cancer (mCRPC), which is an exclusively male patient population. To ensure metadata conformity, the Define-XML codelist references are maintained; however, no female subjects are present in the analysis dataset.

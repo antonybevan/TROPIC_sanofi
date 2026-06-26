@@ -1,5 +1,5 @@
 # =============================================================================
-# load_spec.R -- single source of truth loader for the ADaM specification.
+# load_spec.R -- metadata control loader for the ADaM specification.
 #
 # The authoritative ADaM metadata specification is
 #     00_specifications/ADaM_spec.xlsx   (CDISC / Pinnacle-21 metacore format)

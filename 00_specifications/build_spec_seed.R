@@ -14,7 +14,7 @@
 #   verification inversion -- the spec could never disagree with the define it
 #   was meant to govern). This script runs ONCE to bootstrap a real upstream
 #   spec from the define content, after which:
-#       * ADaM_spec.xlsx becomes the human-edited single source of truth;
+#       * ADaM_spec.xlsx becomes the human-edited metadata control source;
 #       * the define -> spec generator (generate_adam_specs.py) is RETIRED;
 #       * define.xml is CHECKED AGAINST the spec (07_define_xml/
 #         check_define_conformance.R), not the other way round;
