@@ -110,9 +110,9 @@ jobs:
     - name: CT cross-validation (spec Codelists vs CDISC CT)
       run: |
         # Validates the ADaM spec's NCI controlled-terminology codes against authoritative CDISC CT
-        # (audit F-13). Needs the CDISC Library API key (repo secret) or the offline CORE cache; a
-        # bare CI checkout has neither and the script SKIPs cleanly (exit 0). Set the secret below to
-        # turn this into a hard gate that fails on a non-extensible-codelist CT violation.
+        # (audit F-13). Needs the CDISC Library API key (repo secret) or the offline CORE cache.
+        # If neither is available, the script exits with a distinct SKIPPED code rather than
+        # silently passing the gate.
         python3 06_telemetry/ct_cross_validation.py
       env:
         CDISC_LIBRARY_API_KEY: ${{ secrets.CDISC_LIBRARY_API_KEY }}
@@ -124,3 +124,14 @@ jobs:
         # run in the data-free CI. Construction IS validation: a non-zero exit fails here.
         # (Dataset-JSON/ARS are data-dependent and are gated in the full pipeline instead.)
         python3 06_telemetry/build_usdm.py
+
+    - name: Verify committed GREEN-ODA evidence badge (static re-check)
+      run: |
+        # The evidence/ snapshot (audit C-1) is the durable double-programming proof, committed
+        # separately from live telemetry so a sim/--demo run can never clobber it. A committed
+        # snapshot nobody re-checks is just an assertion — this independently re-verifies its
+        # internal consistency (DISTINCT tags aren't contradicted by identical hashes) and its
+        # cross-consistency with the other three evidence files, entirely from data already in
+        # the checkout (audit F-14: real *.xpt are gitignored, so this is what IS staticly
+        # checkable without a data-bearing checkout).
+        python3 06_telemetry/verify_evidence.py

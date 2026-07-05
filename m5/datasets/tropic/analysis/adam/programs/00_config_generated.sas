@@ -1,13 +1,13 @@
 /* ==============================================================================
    Generated automatically from study_config.yaml. Do not edit directly.
-   Generated on: 2026-06-25T21:29:21.345454
+   Content-stable output: rewritten only when parsed config changes.
    ============================================================================== */
 
 %global STUDYID;
-%let STUDYID = TROPIC-NCT00417079;
+%let STUDYID = %nrstr(TROPIC-NCT00417079);
 
 %global TRT01P_CODE;
-%let TRT01P_CODE = MP;
+%let TRT01P_CODE = %nrstr(MP);
 
 %global TRT01PN_CODE;
 %let TRT01PN_CODE = 2;
@@ -121,5 +121,4 @@
 %let W_C3D1_HI = 45;
 
 %global STAGING_PATH;
-%let STAGING_PATH = 01_raw_source/real_sdtm/staging;
-
+%let STAGING_PATH = %nrstr(01_raw_source/real_sdtm/staging);

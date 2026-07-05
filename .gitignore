@@ -99,6 +99,9 @@ scratch/
 06_telemetry/oda_status.json
 06_telemetry/.oda_singleflight.lock
 06_telemetry/.oda_session.json
+06_telemetry/pipeline_health_log.jsonl
+06_telemetry/stage_cache.json
+06_telemetry/.materialize_ectd_cache.json
 
 # --- Roadmap #6: surface portfolio deliverables + honest execution evidence on GitHub ---
 # Re-include the rendered TFL gallery (figures + text tables) and the pipeline-health /
@@ -138,6 +141,7 @@ m5/**/*.sas7bdat
 11_ectd/0000/m5/**/*.pdf
 11_ectd/0000/m5/**/*.png
 11_ectd/0000/m5/**/*.xlsx
+11_ectd/0000/m5/**/*.txt
 # eCTD util/dtd: track the official .dtd files (enable DTD-valid checks); ignore download cruft
 # (the ICH zip + its index.htm; FDA spec PDFs are already covered by the global *.pdf rule).
 11_ectd/0000/util/dtd/*.zip

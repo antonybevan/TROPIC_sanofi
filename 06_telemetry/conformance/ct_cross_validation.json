@@ -1,5 +1,5 @@
 {
-  "generated": "2026-06-26T11:18:50.049636",
+  "generated": "2026-07-05T20:00:37.468417",
   "ct_version": "2026-03-27",
   "ct_packages": [
     "sdtmct",
@@ -10,9 +10,11 @@
     "total": 7,
     "cdisc_linked": 2,
     "ambiguous_cdisc": 0,
-    "sponsor_defined": 5,
+    "sponsor_defined": 3,
+    "possible_cdisc_mismatch": 0,
+    "unverifiable_numeric": 2,
     "violations": 0,
-    "traceability_gaps": 0
+    "traceability_gaps": 2
   },
   "codelists": [
     {
@@ -50,8 +52,10 @@
       "id": "CL.TRT01PN",
       "name": "Treatment Numeric Codelist",
       "n_terms": 2,
-      "classification": "sponsor-defined",
-      "note": "no corresponding CDISC CT codelist (study-specific; expected)"
+      "classification": "unverifiable-numeric",
+      "link_method": "numeric_value_set",
+      "status": "review",
+      "note": "numeric-only value set cannot be safely inferred as sponsor-defined or CDISC-controlled without an NCI Codelist Code"
     },
     {
       "id": "CL.AGEGR",
@@ -64,8 +68,10 @@
       "id": "CL.CNSR",
       "name": "Censoring Codelist",
       "n_terms": 2,
-      "classification": "sponsor-defined",
-      "note": "no corresponding CDISC CT codelist (study-specific; expected)"
+      "classification": "unverifiable-numeric",
+      "link_method": "numeric_value_set",
+      "status": "review",
+      "note": "numeric-only value set cannot be safely inferred as sponsor-defined or CDISC-controlled without an NCI Codelist Code"
     },
     {
       "id": "CL.PARAMCD",

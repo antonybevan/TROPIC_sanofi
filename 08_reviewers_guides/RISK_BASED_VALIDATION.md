@@ -95,3 +95,5 @@ of these change the *tiering*; they raise the independence of the highest tiers 
 - PHUSE / medRxiv 2025 — risk-based validation & automation-in-statistical-programming reviews.
 - ADRG §6 — validation mechanics, single-author disclosure, reconciliation scope.
 - `06_telemetry/ADMIRAL_RECONCILIATION.md` — the T1 third-engine track (Finding #4).
+- [ORCHESTRATOR_ASSURANCE_RATIONALE.md](ORCHESTRATOR_ASSURANCE_RATIONALE.md) — the engineering
+  counterpart: why each pipeline-orchestrator control exists, proportionate to GAMP 5 risk.

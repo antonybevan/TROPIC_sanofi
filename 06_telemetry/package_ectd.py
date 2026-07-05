@@ -277,6 +277,19 @@ def copy_uplifted_sdtm34_xpts(sdtm34_dir, out_dir):
     print(f"Copied {len(xpts)} uplifted SDTMIG 3.4 XPT datasets from {sdtm34_dir}.")
 
 
+def copy_if_present(src, action, label):
+    """Run `action()` (a copy/render) if `src` exists; otherwise print an explicit
+    '[WARNING] ... omitted' line, so a maintainer sees a missing optional full-mode artifact in
+    the console log instead of needing to diff directory listings against expectations. These
+    are optional-if-present artifacts (BDRG render, ADaM spec, spec->define conformance report)
+    -- not hard requirements like the ADaM/BIMO datasets, so a missing one warns, not fails."""
+    if os.path.exists(src):
+        action()
+        return True
+    print(f"  [WARNING] {label} not found at '{src}' — omitted from the package.")
+    return False
+
+
 def write_dataset_placeholder(folder):
     """In data-free preview mode, drop a note where the patient-level *.xpt would sit."""
     os.makedirs(folder, exist_ok=True)
@@ -385,11 +398,19 @@ def main(data_free=False):
     elif os.path.exists(bimo_prod_file):
         shutil.copy(bimo_prod_file, os.path.join(m5_bimo_dir, "clinsite.xpt"))
         print("  Copied BIMO clinsite.xpt.")
+    else:
+        # clinsite is a required BIMO deliverable (per the BIMO TCG comment above), not an
+        # optional one -- mirrors the ADaM '*_prod.xpt' guard three lines above this block,
+        # which correctly hard-fails on the exact same shape of missing input.
+        print("Error: Missing BIMO 'clinsite_prod.xpt' in 04_adam/. Ensure pipeline has run "
+              "successfully.")
+        sys.exit(1)
     bdrg_file = "08_reviewers_guides/BDRG.md"
-    if os.path.exists(bdrg_file):
-        # Render to PDF for parity with the SDRG/ADRG reviewer guides (a submission
-        # package ships rendered guides, not raw Markdown).
-        md_to_pdf(bdrg_file, os.path.join(m5_bimo_dir, "bdrg.pdf"))
+    # Rendered to PDF for parity with the SDRG/ADRG reviewer guides (a submission package
+    # ships rendered guides, not raw Markdown).
+    if copy_if_present(bdrg_file,
+                        lambda: md_to_pdf(bdrg_file, os.path.join(m5_bimo_dir, "bdrg.pdf")),
+                        "BDRG (08_reviewers_guides/BDRG.md)"):
         print("  Generated BIMO data reviewer's guide (bdrg.pdf).")
 
     # 4c. Copy the authoritative ADaM specification (audit C-4 inversion): ADaM_spec.xlsx
@@ -398,12 +419,15 @@ def main(data_free=False):
     # spec->define conformance report that proves define.xml matches the spec.
     print("Copying authoritative ADaM specification + conformance evidence...")
     spec_file = "00_specifications/ADaM_spec.xlsx"
-    if os.path.exists(spec_file):
-        shutil.copy(spec_file, os.path.join(m5_adam_dir, "ADaM_spec.xlsx"))
+    if copy_if_present(spec_file,
+                        lambda: shutil.copy(spec_file, os.path.join(m5_adam_dir, "ADaM_spec.xlsx")),
+                        "ADaM specification (00_specifications/ADaM_spec.xlsx)"):
         print("  Copied ADaM_spec.xlsx (governing specification).")
     conf_file = "06_telemetry/conformance/spec_define_conformance.json"
-    if os.path.exists(conf_file):
-        shutil.copy(conf_file, os.path.join(m5_adam_dir, "spec_define_conformance.json"))
+    if copy_if_present(
+            conf_file,
+            lambda: shutil.copy(conf_file, os.path.join(m5_adam_dir, "spec_define_conformance.json")),
+            "spec->define conformance report (06_telemetry/conformance/spec_define_conformance.json)"):
         print("  Copied spec->define conformance report.")
         
     # 5. Co-locate Define-XML metadata

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-25T21:33:02.169427",
+  "timestamp": "2026-07-05T21:05:34.573104",
   "runner": "apple (System Agent)",
   "pipeline_health_status": "GREEN",
   "sas_execution_mode": "oda",
@@ -29,12 +29,44 @@
     "eCTD Backbone + STF (sequence 0000)": "PASS",
     "Materialize eCTD Sequence": "PASS"
   },
+  "r_version": "R version 4.6.0 (2026-04-24)",
+  "renv_lock_sha256": "9e4cc0f712a03cddbae45581844cc42042173b6e17aad03efcc258a4946126e8",
   "oda_endpoint": "odaws01-apse1-2.oda.sas.com",
   "oda_attempts": 1,
-  "oda_total_wait_s": 8.0,
+  "oda_total_wait_s": 23.8,
   "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007",
   "reconciliation": "SAS_vs_R",
   "probe_nonce_echoed": true,
+  "sas_version": "9.04.01M8P022223",
+  "oda_preflight_ok": true,
+  "oda_preflight_missing": [],
+  "oda_preflight_required": {
+    "java": true,
+    "saspy": true,
+    "cfg_file": true,
+    "iomhost": true,
+    "authkey": true,
+    "authinfo": true,
+    "authinfo_mode_600": true
+  },
+  "oda_preflight_advisory": {
+    "java_path": "/opt/homebrew/opt/openjdk/bin/java",
+    "java_version": "openjdk version \"26.0.1\" 2026-04-21",
+    "saspy_version": "5.107.1",
+    "authinfo_path": "/Users/apple/.authinfo",
+    "authinfo_mode": "0o600"
+  },
+  "oda_region": "apse1-2",
+  "oda_configured_hosts": [
+    "odaws01-apse1-2.oda.sas.com",
+    "odaws02-apse1-2.oda.sas.com"
+  ],
+  "oda_recommended_hosts": [
+    "odaws01-apse1-2.oda.sas.com",
+    "odaws02-apse1-2.oda.sas.com"
+  ],
+  "oda_missing_failover_hosts": [],
+  "oda_failover_configured": true,
   "sas_results_stats": "downloaded",
   "reconciliation_status": "PASS",
   "results_reconciliation_status": "PASS",

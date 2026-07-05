@@ -21,12 +21,13 @@ Additive only — nothing in `m5/` or elsewhere was modified.
 11_ectd/0000/util/dtd/README...           which official DTDs to drop in
 ```
 
-- Current committed data-free preview: 46 content leaves (44 STF-tagged + 2 untagged
-  support stylesheets), plus the STF and US-regional leaves (48 total).
+- Current committed data-free preview: 82 content leaves (80 STF-tagged + 2 untagged
+  support stylesheets), plus the STF and US-regional leaves (84 total).
 - File-tag distribution: analysis-program 35, analysis-data-definition 2,
-  data-tabulation-data-reviewers-guide 2, study-report-body 2,
+  data-tabulation-data-reviewers-guide 2, study-report-body 19,
   analysis-data-reviewers-guide 1, annotated-crf 1, and
-  data-tabulation-data-definition 1, plus 2 untagged support stylesheets.
+  data-tabulation-data-definition 1, data-tabulation-dataset 11, analysis-dataset 8,
+  plus 2 untagged support stylesheets.
 
 ## Standards basis (researched)
 
@@ -38,16 +39,18 @@ Additive only — nothing in `m5/` or elsewhere was modified.
   heading element `m5-3-5-1-study-reports-of-controlled-clinical-studies-pertinent-to-
   the-claimed-indication`, and the 53-clin-stud-rep / 535-rep-effic-safety-stud /
   5351-stud-rep-contr folder layout (matches the existing `m5/` tree).
-- **FDA us-stf v2.3** file-tags for datasets, defines, and reviewer guides.
+- **FDA us-stf v2.3** file-tags for datasets, defines, programs, reviewer guides, and
+  study-report-body leaves. The generator now fails closed if a dataset XPT, Define-XML,
+  program, or controlled-study-report body/appendix file would be emitted untagged.
 
 ## QC (all PASS)
 
 - Well-formed XML — `index.xml`, `us-regional.xml`, `stf-tropic.xml` parse cleanly
   under both Python ElementTree and `xmllint`.
-- Checksums — all 47 checksum-bearing leaves re-verified against the real MD5
+- Checksums — all 84 checksum-bearing leaves re-verified against the real MD5
   of the corresponding source/in-sequence file: **0 mismatches**.
 - `index-md5.txt` equals the MD5 of `index.xml`.
-- Leaf IDs unique; all **44** STF `doc-content` references resolve to index leaf IDs.
+- Leaf IDs unique; all **80** STF `doc-content` references resolve to index leaf IDs.
 
 ## Scope / honest limits
 
@@ -59,9 +62,9 @@ Additive only — nothing in `m5/` or elsewhere was modified.
   "DTD validation" section below.
 - `us-regional.xml` carries clearly-labelled **EXAMPLE** application metadata (`000000`) —
   supply the real FDA application/submission identifiers before submission.
-- TFL appendix files (figures/tables/listings) are intentionally excluded from leaves
-  (they are part of the CSR body); datasets, programs, defines, reviewer guides,
-  annotated CRF, and the CSR are all wired and tagged.
+- TFL appendix files under the controlled-study-report folder (figures/tables/listings)
+  are included as study-report-body leaves; datasets, programs, defines, reviewer guides,
+  annotated CRF, CSR PDFs, and CSR appendices are all wired and tagged.
 - First submission ⇒ every leaf `operation="new"`. Lifecycle (`replace`/`append`/
   `delete`) applies to later sequences per the ICH STF spec §IV–V.
 
@@ -69,15 +72,15 @@ Additive only — nothing in `m5/` or elsewhere was modified.
 
 `06_telemetry/materialize_ectd.py` reads the `index.xml` manifest and copies each leaf's
 source file to its `xlink:href` location under `11_ectd/0000/`, then re-verifies the copy's
-MD5 against the recorded `checksum`. Current data-free-preview result: **47/47
-checksum-bearing leaves verified**, and all **48** referenced hrefs resolve on disk. A full
+MD5 against the recorded `checksum`. Current data-free-preview result: **84/84
+checksum-bearing leaves verified**, and all **84** referenced hrefs resolve on disk. A full
 licensed-data build adds the patient XPT leaves; its counts are intentionally larger than
 this committed preview.
 
 Git hygiene: the materialized **payload is a reproducible copy of `m5/`** and is git-ignored
-(datasets, `*.xpt`/`*.sas7bdat`/`*.json`, `*.pdf`/`*.png`/`*.xlsx`); only the backbone
-(`index.xml`, `index-md5.txt`), the Study Tagging File, the regional metadata, the `.txt`
-listings, and `util/` are tracked. Verified: **zero patient-data files are stageable**.
+(datasets, `*.xpt`/`*.sas7bdat`/`*.json`, `*.pdf`/`*.png`/`*.xlsx`/`*.txt`); only the
+backbone (`index.xml`, `index-md5.txt`), the Study Tagging File, the regional metadata,
+and `util/` are tracked. Verified: **zero patient-data files are stageable**.
 
 ## DTD validation (2026-06-20) — all three backbone files DTD-VALID
 

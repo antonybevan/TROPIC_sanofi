@@ -132,6 +132,12 @@
           "groupingId": "GF.TRT"
         }
       ],
+      "sourceRecordCount": 371,
+      "analyzedRecordCount": 371,
+      "excludedRecordCounts": {
+        "missingAVALOrCNSR": 0,
+        "notMatchingDeclaredConditions": 0
+      },
       "results": [
         {
           "operationId": "OP.N",
@@ -199,6 +205,12 @@
           "groupingId": "GF.TRT"
         }
       ],
+      "sourceRecordCount": 371,
+      "analyzedRecordCount": 371,
+      "excludedRecordCounts": {
+        "missingAVALOrCNSR": 0,
+        "notMatchingDeclaredConditions": 0
+      },
       "results": [
         {
           "operationId": "OP.N",
@@ -266,6 +278,12 @@
           "groupingId": "GF.TRT"
         }
       ],
+      "sourceRecordCount": 371,
+      "analyzedRecordCount": 371,
+      "excludedRecordCounts": {
+        "missingAVALOrCNSR": 0,
+        "notMatchingDeclaredConditions": 0
+      },
       "results": [
         {
           "operationId": "OP.N",
@@ -333,6 +351,12 @@
           "groupingId": "GF.TRT"
         }
       ],
+      "sourceRecordCount": 203,
+      "analyzedRecordCount": 203,
+      "excludedRecordCounts": {
+        "missingAVALOrCNSR": 0,
+        "notMatchingDeclaredConditions": 0
+      },
       "results": [
         {
           "operationId": "OP.N",
@@ -380,5 +404,9 @@
         }
       ]
     }
-  ]
+  ],
+  "validationStatus": {
+    "status": "PASS",
+    "errors": []
+  }
 }

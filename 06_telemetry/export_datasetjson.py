@@ -21,8 +21,9 @@ CONFORMANCE
 Each emitted file is validated in-process against the CDISC Dataset-JSON schema
 bundled with the project's CORE engine
 (.core_run/engine/resources/schema/dataset.schema.json, draft 2019-09) - the same
-schema CORE's DatasetJSONReader enforces. Record/column counts are reconciled
-against the source XPT so the conversion is provably lossless.
+schema CORE's DatasetJSONReader enforces. Emitted files are then read back and
+reconciled to the source XPT for record count, column order, and canonical cell
+values.
 
 USAGE
 -----
@@ -30,7 +31,7 @@ USAGE
   python3 06_telemetry/export_datasetjson.py --adam     # ADaM only
   python3 06_telemetry/export_datasetjson.py --sdtm     # SDTM only
 
-Requires: pyreadstat, jsonschema  (pip install pyreadstat jsonschema)
+Requires: pyreadstat, jsonschema>=4  (pip install pyreadstat 'jsonschema>=4')
 
 Author: generated for Antony Bevan, Clinical Programming
 Standard: CDISC Dataset-JSON v1.1
@@ -43,6 +44,7 @@ import json
 import math
 import os
 import sys
+from typing import Any
 
 import pyreadstat
 import jsonschema
@@ -62,7 +64,7 @@ DATASETJSON_VERSION = "1.1.0"
 KEYS = {
     "adsl": ["USUBJID"],
     "adex": ["USUBJID", "PARAMCD", "AVISIT"],
-    "adcm": ["USUBJID", "CMSTDT", "CMDECOD"],
+    "adcm": ["USUBJID", "CMDECOD", "ASTDT"],
     "adae": ["USUBJID", "AESEQ"],
     "adlb": ["USUBJID", "PARAMCD", "AVISITN", "LBDY"],
     "adrs": ["USUBJID", "PARAMCD", "AVISIT"],
@@ -97,53 +99,79 @@ def _clean_cell(v):
     """Map a pandas cell to a JSON-safe scalar (None for any missing)."""
     if v is None:
         return None
+    if hasattr(v, "item"):
+        v = v.item()
     if isinstance(v, float):
         if math.isnan(v) or math.isinf(v):
             return None
-        # integral float -> int (XPT stores everything as double)
-        if v.is_integer():
-            return int(v)
-        return round(v, 15)
+        return v
     return v
 
 
-def _column_is_integer(series_vals) -> bool:
-    """True if every non-null numeric value is integral."""
-    for v in series_vals:
-        if v is None:
-            continue
-        if isinstance(v, bool):
-            return False
-        if isinstance(v, (int,)):
-            continue
-        if isinstance(v, float):
-            if math.isnan(v):
-                continue
-            if not v.is_integer():
-                return False
-        else:
-            return False
-    return True
-
-
-def build_dataset_json(xpt_path: str, ds_name: str, mdv_oid: str,
-                       meta_ref: str) -> dict:
+def _read_xpt(xpt_path: str):
     # disable_datetime_conversion: keep SAS date/time variables as their raw stored
     # numeric (days/seconds since 1960-01-01) rather than Python date objects. This is
     # lossless and round-trips through XPT; the SAS format is carried in displayFormat.
-    df, meta = pyreadstat.read_xport(xpt_path, disable_datetime_conversion=True)
+    return pyreadstat.read_xport(xpt_path, disable_datetime_conversion=True)
+
+
+def _format_map(meta, names: list[str]) -> dict[str, str]:
+    """Return SAS display formats from pyreadstat metadata or fail loudly."""
+    raw = getattr(meta, "original_variable_types", None)
+    if isinstance(raw, dict):
+        return {n: (raw.get(n) or "") for n in names}
+    raw = getattr(meta, "variable_format", None)
+    if isinstance(raw, (list, tuple)) and len(raw) == len(names):
+        return dict(zip(names, (fmt or "" for fmt in raw)))
+    raw = getattr(meta, "variable_formats", None)
+    if isinstance(raw, dict):
+        return {n: (raw.get(n) or "") for n in names}
+    raise RuntimeError("pyreadstat metadata did not expose SAS variable formats")
+
+
+def _derive_key_sequence(ds_name: str, names: list[str], mdv_oid: str) -> dict[str, int]:
+    declared = KEYS.get(ds_name.lower())
+    if declared is None and mdv_oid == SDTM_MDV:
+        ds = ds_name.upper()
+        if ds.startswith("SUPP"):
+            declared = ["STUDYID", "RDOMAIN", "USUBJID", "IDVAR", "IDVARVAL", "QNAM"]
+        elif f"{ds}SEQ" in names and "USUBJID" in names:
+            declared = ["STUDYID", "USUBJID", f"{ds}SEQ"]
+        elif f"{ds}SEQ" in names:
+            declared = ["STUDYID", f"{ds}SEQ"]
+        elif ds == "TA":
+            declared = ["STUDYID", "ARMCD", "TAETORD", "ETCD"]
+        else:
+            declared = [n for n in ("STUDYID", "DOMAIN", "USUBJID") if n in names]
+    declared = declared or []
+    missing = [k for k in declared if k not in names]
+    if missing:
+        raise RuntimeError(
+            f"{ds_name.upper()} keySequence references missing variable(s): "
+            + ", ".join(missing)
+        )
+    return {k: i + 1 for i, k in enumerate(declared)}
+
+
+def _canonical_rows(df, names: list[str]) -> tuple[dict[str, list[Any]], list[list[Any]]]:
+    col_vals = {n: [_clean_cell(v) for v in df[n].tolist()] for n in names}
+    rows = [[col_vals[n][i] for n in names] for i in range(len(df))]
+    return col_vals, rows
+
+
+def build_dataset_json(xpt_path: str, ds_name: str, mdv_oid: str,
+                       meta_ref: str) -> tuple[dict[str, Any], int, int]:
+    df, meta = _read_xpt(xpt_path)
     ds = ds_name.upper()
     names = list(meta.column_names)
     labels = dict(zip(meta.column_names, meta.column_labels))
     rtypes = dict(zip(meta.column_names, meta.readstat_variable_types))
     widths = dict(zip(meta.column_names,
                       getattr(meta, "variable_storage_width", [None] * len(names))))
-    formats = dict(zip(meta.column_names,
-                       getattr(meta, "variable_format", [""] * len(names))))
-    keyseq = {k: i + 1 for i, k in enumerate(KEYS.get(ds_name.lower(), []))}
+    formats = _format_map(meta, names)
+    keyseq = _derive_key_sequence(ds_name, names, mdv_oid)
 
-    # Per-column python value lists (with cleaned cells) for type inference + rows.
-    col_vals = {n: [_clean_cell(v) for v in df[n].tolist()] for n in names}
+    col_vals, rows = _canonical_rows(df, names)
 
     columns = []
     for n in names:
@@ -163,18 +191,13 @@ def build_dataset_json(xpt_path: str, ds_name: str, mdv_oid: str,
                         default=1) or 1
             col["length"] = int(w)
         else:
-            if _column_is_integer(col_vals[n]):
-                col["dataType"] = "integer"
-            else:
-                col["dataType"] = "double"
+            col["dataType"] = "double"
             fmt = (formats.get(n) or "").strip()
             if _is_temporal_format(fmt):
                 col["displayFormat"] = fmt
         if n in keyseq:
             col["keySequence"] = keyseq[n]
         columns.append(col)
-
-    rows = [[col_vals[n][i] for n in names] for i in range(len(df))]
 
     doc = {
         "datasetJSONCreationDateTime": _iso_now(),
@@ -196,7 +219,9 @@ def build_dataset_json(xpt_path: str, ds_name: str, mdv_oid: str,
 
 
 def _validate(doc: dict, schema: dict) -> None:
-    jsonschema.validate(doc, schema)
+    validator_cls = jsonschema.validators.validator_for(schema)
+    validator_cls.check_schema(schema)
+    validator_cls(schema).validate(doc)
 
 
 def _write_ndjson(doc, path, ndjson_schema):
@@ -204,13 +229,43 @@ def _write_ndjson(doc, path, ndjson_schema):
     array per row. Matches CORE's DatasetNDJSONReader."""
     meta = {k: v for k, v in doc.items() if k != "rows"}
     if ndjson_schema is not None:
-        jsonschema.validate(meta, ndjson_schema)  # raises on non-conformance
+        _validate(meta, ndjson_schema)  # raises on non-conformance
     with open(path, "w", encoding="utf-8") as fh:
         fh.write(json.dumps(meta, ensure_ascii=False, allow_nan=False,
                             separators=(",", ":")) + "\n")
         for row in doc["rows"]:
             fh.write(json.dumps(row, ensure_ascii=False, allow_nan=False,
                                 separators=(",", ":")) + "\n")
+
+
+def _read_dataset_output(path: str, ndjson: bool) -> dict[str, Any]:
+    if not ndjson:
+        with open(path, encoding="utf-8") as fh:
+            return json.load(fh)
+    with open(path, encoding="utf-8") as fh:
+        first = fh.readline()
+        if not first:
+            raise RuntimeError(f"{path} is empty")
+        doc = json.loads(first)
+        doc["rows"] = [json.loads(line) for line in fh if line.strip()]
+        return doc
+
+
+def _reconcile_output(path: str, xpt_path: str, ndjson: bool) -> None:
+    out_doc = _read_dataset_output(path, ndjson)
+    df, meta = _read_xpt(xpt_path)
+    source_names = list(meta.column_names)
+    _, source_rows = _canonical_rows(df, source_names)
+    output_names = [col["name"] for col in out_doc.get("columns", [])]
+    if out_doc.get("records") != len(df):
+        raise RuntimeError(
+            f"{os.path.basename(path)} record mismatch: "
+            f"{out_doc.get('records')} != {len(df)}"
+        )
+    if output_names != source_names:
+        raise RuntimeError(f"{os.path.basename(path)} column order does not match source XPT")
+    if out_doc.get("rows") != source_rows:
+        raise RuntimeError(f"{os.path.basename(path)} row values do not reconcile to source XPT")
 
 
 def convert_set(items, out_dir, mdv_oid, meta_ref, schema, ndjson_schema=None):
@@ -221,15 +276,16 @@ def convert_set(items, out_dir, mdv_oid, meta_ref, schema, ndjson_schema=None):
             results.append((ds_name, "MISSING", 0, 0, os.path.basename(xpt_path)))
             continue
         doc, nrec, ncol = build_dataset_json(xpt_path, ds_name, mdv_oid, meta_ref)
+        _validate(doc, schema)  # raises on non-conformance
         if ndjson_schema is not None:
             out_path = os.path.join(out_dir, f"{ds_name.lower()}.ndjson")
             _write_ndjson(doc, out_path, ndjson_schema)
         else:
-            _validate(doc, schema)  # raises on non-conformance
             out_path = os.path.join(out_dir, f"{ds_name.lower()}.json")
             with open(out_path, "w", encoding="utf-8") as fh:
                 json.dump(doc, fh, ensure_ascii=False, allow_nan=False,
                           separators=(",", ":"))
+        _reconcile_output(out_path, xpt_path, ndjson_schema is not None)
         size = os.path.getsize(out_path)
         results.append((ds_name.upper(), "VALID", nrec, ncol, f"{size/1024:.0f} KB"))
     return results
@@ -274,11 +330,14 @@ def main():
                 os.path.splitext(f)[0]
                 for f in os.listdir(sdtm_dir) if f.endswith(".xpt")
             )
-        items = [(os.path.join(sdtm_dir, f"{n}.xpt"), n) for n in sdtm_names]
-        out = os.path.join(ROOT, "10_datasetjson", "sdtm")
-        res = convert_set(items, out, SDTM_MDV, "../../07_define_xml/define_sdtm.xml",
-                          schema, ndjson_schema)
-        all_results += [("SDTM", *r) for r in res]
+        if not sdtm_names:
+            all_results.append(("SDTM", "<none>", "MISSING", 0, 0, "no SDTM XPT inputs"))
+        else:
+            items = [(os.path.join(sdtm_dir, f"{n}.xpt"), n) for n in sdtm_names]
+            out = os.path.join(ROOT, "10_datasetjson", "sdtm")
+            res = convert_set(items, out, SDTM_MDV, "../../07_define_xml/define_sdtm.xml",
+                              schema, ndjson_schema)
+            all_results += [("SDTM", *r) for r in res]
 
     print(f"{'Std':5} {'Dataset':10} {'Status':8} {'Records':>9} {'Cols':>5}  Size")
     print("-" * 56)
@@ -290,7 +349,7 @@ def main():
     print("-" * 56)
     print(f"{ok}/{len(all_results)} datasets exported and schema-VALID "
           f"(CDISC Dataset-JSON v{DATASETJSON_VERSION})")
-    return 0 if ok == len([r for r in all_results if r[2] != 'MISSING']) else 1
+    return 0 if all_results and ok == len(all_results) else 1
 
 
 if __name__ == "__main__":

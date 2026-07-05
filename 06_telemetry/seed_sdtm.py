@@ -7,8 +7,9 @@ timeout magnet, and a presence-only check lets a half-uploaded library masquerad
 Design (brief §4):
   1. Compute a LOCAL manifest: per dataset {sha256 (of bytes), nrows (best-effort)}.
   2. If a matching manifest is already on ODA -> ZERO upload, exit 0 (idempotent).
-  3. Otherwise upload, RE-READ row counts back from ODA, verify, and only THEN write the manifest
-     sentinel LAST (transactional: a partial upload leaves no/old manifest, so it fails verify).
+  3. Otherwise upload, RE-READ row counts back from ODA, verify row-count parity, and only THEN
+     write the manifest sentinel LAST (transactional: a partial upload leaves no/old manifest,
+     so it fails verify). The remote check is row-count parity, not a byte-level re-hash.
 
 The pure manifest logic (compute/compare) is independent of saspy so it is unit-testable; the ODA
 I/O (download/submit/upload) is reached only through a session object and is injectable.
@@ -123,16 +124,18 @@ def read_remote_manifest(sas, remote_dir=SDTM_ODA):
     """Download the ODA manifest sentinel and parse it. None if absent/unreadable."""
     remote_dir = _resolve_oda_home(sas, remote_dir)
     remote = f"{remote_dir}/{MANIFEST_NAME}"
-    tmp = os.path.join(tempfile.gettempdir(), MANIFEST_NAME)
+    tmp = tempfile.NamedTemporaryFile(prefix="tropic_sdtm_manifest_", suffix=".json", delete=False)
+    tmp_path = tmp.name
+    tmp.close()
     try:
-        sas.download(tmp, remote)
-        with open(tmp, "r", encoding="utf-8") as f:
+        sas.download(tmp_path, remote)
+        with open(tmp_path, "r", encoding="utf-8") as f:
             return json.load(f)
     except Exception:
         return None
     finally:
         try:
-            os.remove(tmp)
+            os.remove(tmp_path)
         except OSError:
             pass
 
@@ -151,7 +154,7 @@ def verify_resident(sas, sdtm_dir=SDTM_LOCAL, remote_dir=SDTM_ODA, local=None):
 
 
 def _remote_nobs(sas, remote_dir=SDTM_ODA):
-    """Re-read observation counts per member from ODA (post-upload integrity). {name: nobs}."""
+    """Re-read observation counts per member from ODA. Row-count parity only, not byte equality."""
     remote_dir = _resolve_oda_home(sas, remote_dir)
     code = f"""
 libname _seed "{remote_dir}";
@@ -172,6 +175,30 @@ data _null_; set _nobs; put "SEEDNOBS|" memname "|" nobs; run;
             if len(parts) >= 3 and parts[2].isdigit():
                 out[parts[1].lower() + ".sas7bdat"] = int(parts[2])
     return out
+
+
+def verify_remote_nobs(local, nobs):
+    """Positive ODA row-count check.
+
+    Every local dataset with a known row count must appear in the ODA dictionary.tables result
+    with the same count. Names are case-normalized because SAS MEMNAME is uppercase while local
+    filesystem case is not guaranteed.
+    """
+    expected = {name.lower(): d["nrows"] for name, d in local["datasets"].items()
+                if d.get("nrows") is not None}
+    if not expected:
+        return ["VERIFY_SKIPPED: no local row counts available; install pyreadstat/readable "
+                "sas7bdat metadata before writing the ODA manifest"]
+    observed = {name.lower(): rows for name, rows in nobs.items()}
+    problems = []
+    display = {name.lower(): name for name in local["datasets"]}
+    for name, rows in sorted(expected.items()):
+        label = display.get(name, name)
+        if name not in observed:
+            problems.append(f"{label}: missing from ODA row-count re-read")
+        elif observed[name] != rows:
+            problems.append(f"{label}: local {rows} != ODA {observed[name]}")
+    return problems
 
 
 def stale_members(local, remote, force=False):
@@ -210,31 +237,35 @@ def seed(sas, sdtm_dir=SDTM_LOCAL, remote_dir=SDTM_ODA, force=False):
               flush=True)
         sas.upload(f, f"{remote_dir}/{name}")
 
-    # Integrity re-read: confirm row counts across the FULL library where known locally
-    # (covers resident members too, not just this run's delta).
+    # Integrity re-read: confirm row-count parity across the FULL library (covers resident
+    # members too, not just this run's delta). This deliberately fails closed if local row
+    # counts are unavailable or any expected member is absent remotely.
     nobs = _remote_nobs(sas, remote_dir)
-    mismatches = []
-    for name, d in local["datasets"].items():
-        if d.get("nrows") is not None and name in nobs and nobs[name] != d["nrows"]:
-            mismatches.append(f"{name}: local {d['nrows']} != ODA {nobs[name]}")
+    mismatches = verify_remote_nobs(local, nobs)
     if mismatches:
         return {"uploaded": len(stale), "status": "VERIFY_FAILED",
                 "manifest_sha": local["manifest_sha"], "mismatches": mismatches}
 
     # Write the manifest sentinel LAST (transactional completeness marker).
-    tmp = os.path.join(tempfile.gettempdir(), MANIFEST_NAME)
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(local, f, indent=2)
-    sas.upload(tmp, f"{remote_dir}/{MANIFEST_NAME}")
+    tmp = tempfile.NamedTemporaryFile(prefix="tropic_sdtm_manifest_", suffix=".json", delete=False)
+    tmp_path = tmp.name
+    tmp.close()
     try:
-        os.remove(tmp)
-    except OSError:
-        pass
+        with open(tmp_path, "w", encoding="utf-8") as f:
+            json.dump(local, f, indent=2)
+        sas.upload(tmp_path, f"{remote_dir}/{MANIFEST_NAME}")
+    finally:
+        try:
+            os.remove(tmp_path)
+        except OSError:
+            pass
     return {"uploaded": len(stale), "skipped": len(local["datasets"]) - len(stale),
             "manifest_sha": local["manifest_sha"], "status": "seeded"}
 
 
 def main(argv=None):
+    if HERE not in sys.path:
+        sys.path.insert(0, HERE)  # allow `import oda_broker` when main() is called after import
     import oda_broker
     argv = argv if argv is not None else sys.argv[1:]
     force = "--force" in argv or "--force-upload-sdtm" in argv
@@ -261,5 +292,4 @@ def main(argv=None):
 
 
 if __name__ == "__main__":
-    sys.path.insert(0, HERE)  # allow `import oda_broker` when run as a script
     sys.exit(main())

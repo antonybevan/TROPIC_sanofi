@@ -7,6 +7,7 @@ import argparse
 import shutil
 import getpass
 import re
+import signal
 from datetime import datetime
 
 # Resolve Rscript: prefer PATH, then the TROPIC_RSCRIPT env override, then common
@@ -33,9 +34,49 @@ if not RSCRIPT_PATH:
     if not RSCRIPT_PATH:
         RSCRIPT_PATH = "Rscript"  # last resort: rely on PATH at call time
 
+def _env_int(name, default):
+    """int(os.environ[name]) with a safe fallback + warning on a malformed override, so a typo
+    (e.g. TROPIC_ODA_MAX_WAIT=foo) surfaces as a clear message instead of an uncaught ValueError
+    crashing the run before it starts."""
+    raw = os.environ.get(name)
+    if not raw:
+        return default
+    try:
+        return int(raw)
+    except ValueError:
+        print(f"  [WARNING] {name}={raw!r} is not a valid integer; using default {default}.")
+        return default
+
+
+# Wall-clock cap for a single stage's subprocess (a hung logrx::axecute/Rscript otherwise blocks
+# the whole pipeline, or one parallel-pool worker, forever -- the local-stage counterpart to the
+# ODA side's OdaExecTimeout/force-reap discipline).
+STAGE_TIMEOUT_S = _env_int("TROPIC_STAGE_TIMEOUT", 3600)
+
 BACKUP_DIR = "backup_adam"
+TFL_OUTPUT_DIR = "09_tfl/output"
+TFL_BACKUP_DIR = "backup_tfl_output"
+ECTD_SEQ_DIR = "11_ectd/0000"
+ECTD_BACKUP_DIR = "backup_ectd_backbone"
+
+# Scope of the pre-run snapshot (deliberately narrow, stated here once so every caller-facing
+# message below can quote it instead of implying broader coverage than actually exists): the
+# ADaM production XPTs, the TFL suite's rendered tables/figures/listings, and the eCTD backbone
+# (index.xml, index-md5.txt, us-regional.xml, the STF) EXCLUDING 11_ectd/0000/m5/ -- that payload
+# subtree is materialize_ectd.py's own responsibility, with its own purge_unindexed_m5_payloads()
+# staleness mechanism, and can hold large XPT copies that would be wasteful to snapshot twice.
+# NOT covered: 07_define_xml/ metadata, or m5/ (the top-level one) -- package_ectd.py already
+# does its own shutil.rmtree(m5_root) before every rebuild, so a fresh successful run self-heals
+# that tree regardless of what this backup covers.
+BACKUP_SCOPE = "04_adam/*.xpt, 09_tfl/output/, and 11_ectd/0000/ (excl. its m5/ payload)"
 
 def create_backup():
+    """Snapshot 04_adam/*.xpt, 09_tfl/output/, and 11_ectd/0000/ (excl. m5/) before a run. TFL
+    output and the eCTD backbone matter here because tfl_generation.R and build_ectd_backbone.py
+    both overwrite a fixed set of named files rather than wiping their directory first, so a run
+    that fails its own gate can leave a corrupted/partial file sitting on disk, indistinguishable
+    from a good one, until the next successful run happens to overwrite that exact filename
+    again."""
     if os.path.exists(BACKUP_DIR):
         shutil.rmtree(BACKUP_DIR)
     os.makedirs(BACKUP_DIR, exist_ok=True)
@@ -44,21 +85,94 @@ def create_backup():
             if f.endswith(".xpt"):
                 shutil.copy(os.path.join("04_adam", f), os.path.join(BACKUP_DIR, f))
 
+    if os.path.exists(TFL_BACKUP_DIR):
+        shutil.rmtree(TFL_BACKUP_DIR)
+    if os.path.exists(TFL_OUTPUT_DIR):
+        shutil.copytree(TFL_OUTPUT_DIR, TFL_BACKUP_DIR)
+
+    if os.path.exists(ECTD_BACKUP_DIR):
+        shutil.rmtree(ECTD_BACKUP_DIR)
+    if os.path.exists(ECTD_SEQ_DIR):
+        shutil.copytree(ECTD_SEQ_DIR, ECTD_BACKUP_DIR, ignore=shutil.ignore_patterns("m5"))
+
 def restore_backup():
+    """Restore 04_adam/*.xpt, 09_tfl/output/, and 11_ectd/0000/ (excl. m5/) -- see BACKUP_SCOPE
+    -- from the pre-run snapshot. Returns True if ANY backup existed and was restored, False if
+    there was nothing to restore at all -- callers must not report success on False, since no
+    snapshot existing means nothing was reverted, not that there was nothing to revert. The TFL
+    and eCTD-backbone restores are a full wipe-then-copy-back (not a per-file merge like the
+    ADaM restore below them): a corrupted run may have written files that were never part of the
+    original snapshot at all, and those must not survive a rollback either."""
+    restored = False
     if os.path.exists(BACKUP_DIR):
         for f in os.listdir(BACKUP_DIR):
             if f.endswith(".xpt"):
                 shutil.copy(os.path.join(BACKUP_DIR, f), os.path.join("04_adam", f))
         shutil.rmtree(BACKUP_DIR)
+        restored = True
+    if os.path.exists(TFL_BACKUP_DIR):
+        if os.path.exists(TFL_OUTPUT_DIR):
+            shutil.rmtree(TFL_OUTPUT_DIR)
+        shutil.copytree(TFL_BACKUP_DIR, TFL_OUTPUT_DIR)
+        shutil.rmtree(TFL_BACKUP_DIR)
+        restored = True
+    if os.path.exists(ECTD_BACKUP_DIR):
+        # m5/ is excluded from this snapshot (materialize_ectd.py owns its own staleness), so
+        # it is left untouched here rather than wiped along with the rest of the sequence dir.
+        os.makedirs(ECTD_SEQ_DIR, exist_ok=True)
+        for entry in os.listdir(ECTD_SEQ_DIR):
+            if entry == "m5":
+                continue
+            full = os.path.join(ECTD_SEQ_DIR, entry)
+            shutil.rmtree(full) if os.path.isdir(full) else os.remove(full)
+        for entry in os.listdir(ECTD_BACKUP_DIR):
+            src = os.path.join(ECTD_BACKUP_DIR, entry)
+            dst = os.path.join(ECTD_SEQ_DIR, entry)
+            shutil.copytree(src, dst) if os.path.isdir(src) else shutil.copy2(src, dst)
+        shutil.rmtree(ECTD_BACKUP_DIR)
+        restored = True
+    return restored
 
 def clean_backup():
     if os.path.exists(BACKUP_DIR):
         shutil.rmtree(BACKUP_DIR)
+    if os.path.exists(TFL_BACKUP_DIR):
+        shutil.rmtree(TFL_BACKUP_DIR)
+    if os.path.exists(ECTD_BACKUP_DIR):
+        shutil.rmtree(ECTD_BACKUP_DIR)
 
-def run_command(cmd, cwd=None):
+def run_command(cmd, cwd=None, timeout=None):
+    """Run `cmd`, returning (returncode, stdout, stderr). On a timeout, kills the WHOLE process
+    GROUP, not just the immediate child: subprocess.run()'s own built-in timeout handling only
+    ever kills the one process it directly spawned, so a wedged `Rscript -e "logrx::axecute(...)"`
+    that itself forked a descendant (R's own parallel workers, a shelled-out subprocess) would
+    otherwise survive as an orphan after the timeout fires -- the exact zombie-process failure
+    mode oda_broker.py's own force-reap discipline exists to prevent on the ODA side."""
     try:
-        res = subprocess.run(cmd, capture_output=True, text=True, cwd=cwd)
-        return res.returncode, res.stdout, res.stderr
+        popen_kwargs = {"cwd": cwd, "stdout": subprocess.PIPE, "stderr": subprocess.PIPE,
+                        "text": True}
+        if sys.platform != "win32":
+            # New session/process group so a timeout can signal the whole tree via killpg,
+            # not just this one PID. Windows has no equivalent POSIX process-group model here;
+            # falls back to single-process kill below (matching the prior behavior on Windows).
+            popen_kwargs["start_new_session"] = True
+        proc = subprocess.Popen(cmd, **popen_kwargs)
+    except Exception as e:
+        return -1, "", str(e)
+    try:
+        stdout, stderr = proc.communicate(timeout=timeout)
+        return proc.returncode, stdout, stderr
+    except subprocess.TimeoutExpired:
+        if sys.platform != "win32":
+            try:
+                os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+            except (ProcessLookupError, PermissionError, OSError):
+                pass
+        else:
+            proc.kill()
+        proc.communicate()  # reap the now-killed process; avoid leaving a zombie
+        return -9, "", (f"Stage exceeded its {timeout}s wall-clock timeout and was killed "
+                        f"as a process group (set TROPIC_STAGE_TIMEOUT to adjust).")
     except Exception as e:
         return -1, "", str(e)
 
@@ -72,8 +186,10 @@ def dry_run():
         status = "OK" if os.path.isdir(d) else "MISSING (Will be created)"
         print(f"  Directory: {d:20} -> {status}")
         
-    # Check Rscript Executable
-    if os.path.exists(RSCRIPT_PATH):
+    # Check Rscript Executable. os.path.exists() alone is wrong for a bare command name like
+    # "Rscript" (the PATH-reliant fallback) -- it checks cwd-relative existence, not PATH
+    # resolution, so shutil.which() must be tried first.
+    if shutil.which(RSCRIPT_PATH) or os.path.exists(RSCRIPT_PATH):
         print(f"  R Compiler: {RSCRIPT_PATH} -> FOUND")
     else:
         print(f"  R Compiler: {RSCRIPT_PATH} -> NOT FOUND")
@@ -90,10 +206,17 @@ def dry_run():
 
 def rollback():
     print("=== PIPELINE ROLLBACK ===")
-    print("Reverting XPT outputs to backup state...")
+    print(f"Reverting {BACKUP_SCOPE} to pre-run backup state...")
     try:
-        restore_backup()
-        print("Rollback executed successfully!")
+        if restore_backup():
+            print(f"Rollback executed successfully ({BACKUP_SCOPE} reverted). "
+                  "NOTE: this does not cover 07_define_xml/ or the top-level m5/ -- "
+                  "package_ectd.py rebuilds m5/ from scratch on its next successful run "
+                  "regardless of what this backup covers.")
+        else:
+            print(f"  [WARNING] No backup snapshot found; nothing to restore. {BACKUP_SCOPE} "
+                  "are UNCHANGED from before this call, NOT reverted to a prior state -- "
+                  "this is not the same as a successful rollback.")
     except Exception as e:
         print(f"Rollback failed: {e}")
 
@@ -162,6 +285,22 @@ def _activate_study(study):
     ODA_DATASETS = STUDY_DATASETS
 
 
+def _probe_sas_version(sas):
+    """Resolved SAS version string via &sysvlong, the same %put-probe pattern as
+    _resolve_oda_root right below. sas.submit()'s LOG only ever contains the output of the
+    code just submitted, never the session's own startup banner -- so a log-banner regex (as
+    used for 'local' mode, where SAS is launched fresh as a subprocess and the banner genuinely
+    appears in its own log) can never work for an already-open 'oda' session. This is the only
+    reliable way to capture the SAS version actually used for an oda run (roadmap item 5)."""
+    log = sas.submit("%put TROPIC_SAS_VER=&sysvlong.;").get("LOG", "")
+    for line in log.splitlines():
+        if "TROPIC_SAS_VER=" in line and "%put" not in line and "&sysvlong" not in line:
+            ver = line.split("TROPIC_SAS_VER=", 1)[1].strip()
+            if ver:
+                return ver
+    return None
+
+
 def _resolve_oda_root(sas, template):
     """Expand a leading '~' in the ODA project root against the connected account's $HOME,
     so no per-user absolute path needs to be committed. Returns template unchanged if it is
@@ -182,8 +321,10 @@ def _sim_byte_copy(datasets):
     for ds in datasets:
         val_file, prod_file = f"04_adam/{ds}_v.xpt", f"04_adam/{ds}_prod.xpt"
         if os.path.exists(val_file):
-            with open(val_file, "rb") as fs, open(prod_file, "wb") as fd:
+            tmp_file = prod_file + ".part"
+            with open(val_file, "rb") as fs, open(tmp_file, "wb") as fd:
                 fd.write(fs.read())
+            os.replace(tmp_file, prod_file)  # atomic promotion: never leave a truncated *_prod.xpt
             print(f"    Simulated {ds}_prod.xpt generated.")
 
 
@@ -232,10 +373,29 @@ def _sdtm_manifest_binding(recorded_sha):
 
 def _oda_max_wait():
     """Connection budget (seconds). TROPIC_ODA_RETRIES is a back-compat alias mapped onto a
-    wall-clock budget (~60 s expected/attempt); TROPIC_ODA_MAX_WAIT sets it directly."""
-    if os.environ.get("TROPIC_ODA_RETRIES"):
-        return max(60, int(os.environ["TROPIC_ODA_RETRIES"]) * 60)
-    return int(os.environ.get("TROPIC_ODA_MAX_WAIT", 3600))
+    wall-clock budget (~60 s expected/attempt); TROPIC_ODA_MAX_WAIT sets it directly. A malformed
+    override falls back to TROPIC_ODA_MAX_WAIT/default with a warning, not an uncaught crash."""
+    retries_raw = os.environ.get("TROPIC_ODA_RETRIES")
+    if retries_raw:
+        try:
+            return max(60, int(retries_raw) * 60)
+        except ValueError:
+            print(f"  [WARNING] TROPIC_ODA_RETRIES={retries_raw!r} is not a valid integer; "
+                  "ignoring and falling back to TROPIC_ODA_MAX_WAIT/default.")
+    return _env_int("TROPIC_ODA_MAX_WAIT", 3600)
+
+
+def _atomic_download(sas, local_path, remote_path):
+    """sas.download() into a .part sibling, then os.replace() into local_path (roadmap Move 3).
+
+    saspy's .download() writes directly to local_path; a killed transfer (network drop, exec
+    timeout, SIGKILL teardown) can leave a truncated file there that the provenance guard's
+    byte-distinctness check cannot tell apart from a genuine, complete download. os.replace() is
+    atomic on both POSIX and Windows, so local_path only ever exists as the old file or the
+    complete new one, never a partial write."""
+    tmp_path = local_path + ".part"
+    sas.download(tmp_path, remote_path)
+    os.replace(tmp_path, local_path)
 
 
 def _run_saspy_stage10():
@@ -249,6 +409,12 @@ def _run_saspy_stage10():
     import oda_broker
     import seed_sdtm
 
+    preflight = oda_broker.preflight()
+    if not preflight["oda_preflight_ok"]:
+        missing = ", ".join(preflight["oda_preflight_missing"])
+        return 1, "", f"ODA preflight failed: {missing}", {
+            "oda_last_error_class": "PREFLIGHT", "reconciliation": "none", **preflight}
+
     # ---- Resilient, probe-verified connect (broker rides spawner timeouts) ----
     try:
         conn = oda_broker.connect(max_wait_s=_oda_max_wait())
@@ -256,20 +422,23 @@ def _run_saspy_stage10():
         return 1, "", f"ODA fatal ({e.error_class}): {e}", {
             "oda_last_error_class": e.error_class, "reconciliation": "none"}
     except oda_broker.OdaExhausted as e:
-        return 0, "ODA exhausted; honest sim fallback", "", {
+        meta = {
             "fell_back_to_sim": True, "oda_last_error_class": e.last_class,
             "oda_attempts": e.attempts,
             "next_recommended_window": oda_broker.recommend_window(),
             "reconciliation": "sim_only"}
+        meta.update(preflight)
+        return 0, "ODA exhausted; honest sim fallback", "", meta
 
     sas = conn.sas
     proj_root_oda = _resolve_oda_root(sas, PROJ_ROOT_ODA)
+    sas_version = _probe_sas_version(sas)  # roadmap item 5; best-effort, never gates the run
     PGMDIR_ODA = f"{proj_root_oda}/02_production_sas"
     ADAM_ODA = f"{proj_root_oda}/04_adam"
     # Execution-phase deadline: connect()'s budget only covers the spawn; a wedged server-side
     # workspace would otherwise block submit() forever. On a hit we force-reap (SIGKILL) the
     # local gateway instead of leaking a CPU-burning zombie. Default 30 min for the full suite.
-    exec_timeout = int(os.environ.get("TROPIC_ODA_EXEC_TIMEOUT", "1800"))
+    exec_timeout = _env_int("TROPIC_ODA_EXEC_TIMEOUT", 1800)
     force_teardown = False
     try:
         # ---- Guarantee the SDTM library on ODA is the verified-correct one ----
@@ -332,7 +501,7 @@ filename drv "{PGMDIR_ODA}/00_master_driver.sas";
         # ---- Download the 7 *_prod.xpt ----
         print("  [ODA] Downloading *_prod.xpt...")
         for ds in ODA_DATASETS:
-            sas.download(f"04_adam/{ds}_prod.xpt", f"{ADAM_ODA}/{ds}_prod.xpt")
+            _atomic_download(sas, f"04_adam/{ds}_prod.xpt", f"{ADAM_ODA}/{ds}_prod.xpt")
 
         # ---- M-1: independent SAS analysis RESULTS (PROC LIFETEST), MP arm ----
         # Extends double-programming from the ADaM dataset layer to the analysis-
@@ -374,13 +543,16 @@ proc export data=work.tte_stats outfile="{ADAM_ODA}/tte_stats_prod.csv" dbms=csv
             if os.path.exists("04_adam/tte_stats_prod.csv"):
                 os.remove("04_adam/tte_stats_prod.csv")
         else:
-            sas.download("04_adam/tte_stats_prod.csv", f"{ADAM_ODA}/tte_stats_prod.csv")
+            _atomic_download(sas, "04_adam/tte_stats_prod.csv", f"{ADAM_ODA}/tte_stats_prod.csv")
             print("  [ODA] Downloaded SAS analysis statistics (tte_stats_prod.csv).")
 
         meta_out = {
             "oda_endpoint": conn.endpoint, "oda_attempts": conn.attempts,
             "oda_total_wait_s": conn.total_wait_s, "sdtm_manifest_sha": manifest_sha,
-            "reconciliation": "SAS_vs_R", "probe_nonce_echoed": conn.probe_nonce_echoed}
+            "reconciliation": "SAS_vs_R", "probe_nonce_echoed": conn.probe_nonce_echoed,
+            "sas_version": sas_version}
+        meta_out.update(preflight)
+        meta_out.update(conn.failover_status)
         meta_out.update(stats_extra)
         return 0, "SASPy/ODA execution complete.", "", meta_out
     finally:
@@ -413,7 +585,7 @@ def _resolve_sas_mode(real_sas, use_cached_sas):
 
 
 def run_stage_parallel_worker(stage):
-    rc, stdout, stderr = run_command(stage["cmd"])
+    rc, stdout, stderr = run_command(stage["cmd"], timeout=STAGE_TIMEOUT_S)
     return stage, rc, stdout, stderr
 
 def run_stage_execution(stage, sas_mode):
@@ -440,7 +612,7 @@ def run_stage_execution(stage, sas_mode):
             print(f"  [REAL SAS] Located local SAS engine at: {sas_exe}")
             print("  [REAL SAS] Compiling SAS production master suite (02_production_sas/00_master_driver.sas)...")
             sas_cmd = [sas_exe, "-sysin", "02_production_sas/00_master_driver.sas", "-log", "02_production_sas/00_master_driver.log", "-print", "02_production_sas/00_master_driver.lst"]
-            rc, stdout, stderr = run_command(sas_cmd)
+            rc, stdout, stderr = run_command(sas_cmd, timeout=STAGE_TIMEOUT_S)
             if rc == 0:
                 print("  [REAL SAS] Master driver executed successfully. Actual SAS XPTs generated.")
             else:
@@ -474,7 +646,7 @@ def run_stage_execution(stage, sas_mode):
             rc, stdout, stderr = 0, "Simulated SAS compilation (byte-copy) complete.", ""
             return rc, stdout, stderr
     else:
-        return run_command(stage["cmd"])
+        return run_command(stage["cmd"], timeout=STAGE_TIMEOUT_S)
 
 def run_single_stage(stage, from_stage, sas_mode, results):
     if stage["id"] < from_stage:
@@ -482,9 +654,7 @@ def run_single_stage(stage, from_stage, sas_mode, results):
         return True
 
     print(f"Executing Stage {stage['id']}: {stage['name']}...")
-    
-    if stage["id"] == 1:
-        create_backup()
+    _cache_dry_run_check(stage)
 
     rc, stdout, stderr = run_stage_execution(stage, sas_mode)
 
@@ -580,9 +750,11 @@ def build_stages(manifest, engine_root=None, relocate=False):
                        "parallel": False, "gated": bool(s.get("gated"))})
     for d in manifest["datasets"]:
         label = d.get("val_stage", f"R {d['name'].upper()} Validation")
+        script_path = f"03_validation_r/{d['val']}"
         stages.append({"name": label,
-                       "cmd": _stage_cmd(f"03_validation_r/{d['val']}", "logrx"),
-                       "parallel": "parallel_group" in d, "gated": False})
+                       "cmd": _stage_cmd(script_path, "logrx"),
+                       "parallel": "parallel_group" in d, "gated": False,
+                       "script": script_path})  # roadmap Move 4: dry-run cache key input
     stages.append({"name": "SAS Production (ODA/Real/Simulated)", "cmd": "SIMULATE",
                    "parallel": False, "gated": False})
     for s in infra.get("post", []):
@@ -608,6 +780,9 @@ def run_parallel_batch(batch, from_stage, sas_mode, results):
     print(f"Fanning out Stage(s) {', '.join(str(s['id']) for s in parallel_stages)} in parallel...")
     for s in parallel_stages:
         print(f"Executing Stage {s['id']}: {s['name']} (parallel)...")
+        # Computed in the PARENT process: ProcessPoolExecutor workers are separate processes,
+        # so a cache key recorded inside the worker would never reach _STAGE_CACHE_KEYS here.
+        _cache_dry_run_check(s)
     failed_any = False
     temp_results = {}
     with concurrent.futures.ProcessPoolExecutor() as executor:
@@ -644,9 +819,24 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
     # Seed SDTM inline within the Stage-10 ODA session (single spawn) if it isn't resident.
     os.environ["TROPIC_ODA_SEED_INLINE"] = "TRUE" if seed_if_needed else "FALSE"
 
+    # The pipeline DAG is generated from study_manifest.yaml (I/J Phase 1) rather than
+    # hardcoded here. The manifest is required to run the pipeline; a load failure is a
+    # hard error (the soft fallback above only covers banner/ODA-path resilience). Computed
+    # here, ahead of the stale-file check below, so that check can use the SAS Production
+    # stage's REAL id instead of a hardcoded number that silently drifts for any manifest
+    # whose pre-infra/dataset count differs from the default TROPIC layout.
+    if _MANIFEST is None:
+        print("  [ERROR] study_manifest.yaml could not be loaded; cannot build the pipeline DAG.")
+        sys.exit(1)
+    stages = build_stages(_MANIFEST, _ENGINE_ROOT, _RELOCATE_ENGINE)
+
     # M-1: a stale SAS analysis-stats file must not pollute a non-ODA run's results
-    # reconciliation; it is (re)produced only by a real ODA Stage-10 execution.
-    if from_stage <= 10 and os.path.exists("04_adam/tte_stats_prod.csv"):
+    # reconciliation; it is (re)produced only by a real ODA Stage-10 execution. Compared
+    # against the SAS Production stage's actual id (not a hardcoded 10, which predates
+    # build_stages() and silently compares against the wrong number for any --study whose
+    # manifest has a different pre-infra/dataset count than the default TROPIC layout).
+    sas_stage_id = next(s["id"] for s in stages if s["cmd"] == "SIMULATE")
+    if from_stage <= sas_stage_id and os.path.exists("04_adam/tte_stats_prod.csv"):
         os.remove("04_adam/tte_stats_prod.csv")
 
     # Engine scripts (lint, config-gen) are invoked by absolute engine-root path so they
@@ -654,6 +844,7 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
     # active study root), so they remain per-study correct.
     lint_py = os.path.join(_ENGINE_ROOT, "06_telemetry", "lint_sas.py")
     config_py = os.path.join(_ENGINE_ROOT, "06_telemetry", "generate_config.py")
+    renv_check_py = os.path.join(_ENGINE_ROOT, "06_telemetry", "check_renv_lock.py")
 
     # Run SAS static-analysis pre-flight gate (advisory; blocks only on hardcoded paths).
     print("  [LINT] Running SAS static analysis...")
@@ -663,6 +854,15 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
         sys.exit(1)
     else:
         print("  [LINT] SAS static analysis passed (no blocking errors).")
+
+    # Run the renv.lock version-drift gate (blocking; activate_renv.R only installs a MISSING
+    # package, so it never catches a locally-installed package silently drifting from renv.lock).
+    print("  [RENV] Checking installed R packages against renv.lock...")
+    rc_renv, stdout_renv, stderr_renv = run_command([sys.executable, renv_check_py, RSCRIPT_PATH])
+    print(stdout_renv, end="")
+    if rc_renv != 0:
+        print(f"  [RENV FAILED] {stderr_renv}")
+        sys.exit(1)
 
     # Run the configuration generator
     print("  [CONFIG] Generating configuration from study_config.yaml...")
@@ -680,14 +880,6 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
     os.environ["TROPIC_SAS_MODE"] = sas_mode
     print(f"  [SAS MODE] Stage 10 execution mode resolved to: {sas_mode.upper()}")
 
-    # The pipeline DAG is generated from study_manifest.yaml (I/J Phase 1) rather than
-    # hardcoded here. The manifest is required to run the pipeline; a load failure is a
-    # hard error (the soft fallback above only covers banner/ODA-path resilience).
-    if _MANIFEST is None:
-        print("  [ERROR] study_manifest.yaml could not be loaded; cannot build the pipeline DAG.")
-        sys.exit(1)
-    stages = build_stages(_MANIFEST, _ENGINE_ROOT, _RELOCATE_ENGINE)
-
     # F-6 guard: run_single_stage() implements post-execution QC gate logic keyed on
     # these exact stage names. A study legitimately may use a subset of them (e.g. a stub
     # study with no TFL/results-recon), so the check is: fail loudly if the manifest marks
@@ -704,6 +896,24 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
             "Gate wiring error: manifest marks stage(s) gated with no engine gate logic "
             f"(a rename detached a QC gate): {sorted(unimplemented_gates)}"
         )
+
+    # run_parallel_batch() has NONE of run_single_stage()'s name-keyed post-execution gate
+    # logic, so a stage marked BOTH gated and parallel would run through the pool and its gate
+    # would silently never fire -- exactly the C-3 regression class the check above guards
+    # against, from the other direction.
+    gated_and_parallel = sorted(s["name"] for s in stages if s.get("gated") and s.get("parallel"))
+    if gated_and_parallel:
+        raise RuntimeError(
+            "Gate wiring error: stage(s) marked BOTH gated and parallel -- run_parallel_batch() "
+            f"has no gate logic to run them through, so the gate would silently never fire: "
+            f"{gated_and_parallel}"
+        )
+
+    # Taken unconditionally, regardless of --from-stage: a backup keyed to "only if stage 1
+    # actually runs" silently never fires on a partial (--from-stage N>1) run, so a later
+    # failure's rollback finds no BACKUP_DIR and no-ops -- the worst failure mode, a control
+    # that reports success while doing nothing.
+    create_backup()
 
     results = {}
 
@@ -762,6 +972,63 @@ def update_define_timestamp():
         print(f"  [METADATA WARNING] Failed to update define.xml timestamp: {e}")
 
 
+_STAGE_CACHE_FILE = "06_telemetry/stage_cache.json"
+_STAGE_CACHE_STAGING_DIR = "01_raw_source/real_sdtm/staging"
+_STAGE_CACHE_KEYS = {}   # this run's computed keys, merged into _STAGE_CACHE_FILE by write_telemetry
+_PRIOR_STAGE_CACHE = None  # lazily loaded once per process; see _get_prior_stage_cache()
+
+
+def _stage_cache_key(script_path):
+    """SHA256 over a validation script's own source + every staged SDTM .rds file it could read
+    + the shared config every validation script sources (roadmap Move 4, dry-run only).
+
+    Deliberately broad rather than parsing each script's own readRDS() calls to enumerate its
+    true inputs: any staging file changing invalidates every dataset's key. A false cache MISS
+    (a stage that would report unchanged, but doesn't, so it just re-runs) is always safe in a
+    regulated pipeline; a false cache HIT never is, so the key is over- not under-inclusive."""
+    import hashlib
+    h = hashlib.sha256()
+    paths = [script_path, "03_validation_r/config_study.R"]
+    if os.path.isdir(_STAGE_CACHE_STAGING_DIR):
+        paths += sorted(os.path.join(_STAGE_CACHE_STAGING_DIR, f)
+                        for f in os.listdir(_STAGE_CACHE_STAGING_DIR))
+    for p in paths:
+        if os.path.exists(p):
+            with open(p, "rb") as f:
+                h.update(f.read())
+        else:
+            h.update(b"MISSING:" + p.encode("utf-8"))
+    return h.hexdigest()
+
+
+def _get_prior_stage_cache(path=_STAGE_CACHE_FILE):
+    """Cache keys recorded for stages that PASSED on a previous run. Loaded once per process
+    (module-level, mirroring the _ODA_OUTCOME pattern already used in this file)."""
+    global _PRIOR_STAGE_CACHE
+    if _PRIOR_STAGE_CACHE is None:
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                _PRIOR_STAGE_CACHE = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            _PRIOR_STAGE_CACHE = {}
+    return _PRIOR_STAGE_CACHE
+
+
+def _cache_dry_run_check(stage):
+    """Roadmap Move 4 (DRY-RUN ONLY): report whether this stage's inputs are unchanged since its
+    last GREEN run, without skipping execution -- the stage always still runs. This only adds a
+    '[CACHE]' log line and records this run's key so a future authoritative mode has an accurate
+    baseline to validate against before it is ever allowed to actually skip a stage."""
+    script_path = stage.get("script")
+    if not script_path:
+        return
+    key = _stage_cache_key(script_path)
+    _STAGE_CACHE_KEYS[stage["name"]] = key
+    if _get_prior_stage_cache().get(stage["name"]) == key:
+        print(f"  [CACHE] Stage {stage['id']}: {stage['name']} -- inputs unchanged since last "
+              "GREEN run (dry-run only; executing anyway).")
+
+
 def output_sanity_check():
     """Audit M-4 gate: a published TFL table/listing must never contain code
     artifacts. A cosmetic linter pass once wrote ' # nolint' into T-11; this gate
@@ -787,6 +1054,73 @@ def output_sanity_check():
             continue
     return (len(problems) == 0, problems)
 
+HEALTH_LOG = "06_telemetry/pipeline_health_log.jsonl"
+
+
+def _append_health_log(record, log_path=HEALTH_LOG):
+    """Append a hash-chained entry to the append-only run log (roadmap Move 1).
+
+    pipeline_health.json is overwritten every run, so it carries no run history, and git log is
+    not a tamper-evident audit trail (a rebase/force-push can rewrite it). Each entry here embeds
+    sha256 of the previous entry's exact bytes, so editing or deleting any prior line breaks every
+    chain hash after it. Reuses the sha256 primitive already used by update_define_timestamp() and
+    the append-only JSONL pattern already used by oda_broker.log_attempt().
+    """
+    import hashlib
+    prev_hash = "0" * 64
+    try:
+        with open(log_path, "rb") as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    prev_hash = hashlib.sha256(line).hexdigest()
+    except OSError:
+        pass
+    entry = dict(record)
+    entry["prev_hash"] = prev_hash
+    line_bytes = json.dumps(entry, sort_keys=True).encode("utf-8")
+    with open(log_path, "ab") as f:
+        f.write(line_bytes + b"\n")
+
+
+def _r_version(rscript=None):
+    """Best-effort R version string via Rscript itself (roadmap item 5). R runs every session
+    regardless of sas_mode, so this is always available, unlike the SAS version below. Never
+    raises -- telemetry writing must not fail because the environment probe did."""
+    try:
+        out = subprocess.run([rscript or RSCRIPT_PATH, "-e", "cat(R.version.string)"],
+                             capture_output=True, text=True, timeout=30)
+        return out.stdout.strip() or None
+    except Exception:
+        return None
+
+
+def _renv_lock_sha(path="renv.lock"):
+    """SHA256 of the committed renv.lock content, so a per-run telemetry record can be checked
+    against a specific locked environment without re-parsing/re-diffing the whole file."""
+    import hashlib
+    try:
+        with open(path, "rb") as f:
+            return hashlib.sha256(f.read()).hexdigest()
+    except OSError:
+        return None
+
+
+def _sas_version_from_log(log_path):
+    """Best-effort SAS version extraction from the standard startup NOTE banner SAS itself
+    writes at the top of every log (e.g. 'NOTE: SAS (r) Proprietary Software Release 9.4
+    (TS1M8)'), so this works uniformly for both the oda and local execution logs without a
+    separate ODA round-trip. Returns None if the log is absent or the banner isn't found --
+    never raises."""
+    try:
+        with open(log_path, "r", encoding="utf-8", errors="replace") as f:
+            head = f.read(4000)  # the banner is always in the first few lines
+    except OSError:
+        return None
+    m = re.search(r"SAS \(r\) Proprietary Software Release ([^\r\n]+)", head)
+    return m.group(1).strip() if m else None
+
+
 def write_telemetry(results, sas_mode="sim"):
     import platform
     # A legitimately SKIPPED stage (e.g. results-reconciliation in sim/cached mode) does
@@ -804,6 +1138,13 @@ def write_telemetry(results, sas_mode="sim"):
         "sas_execution_mode": sas_mode,
         "stages": results
     }
+
+    # Environment capture (roadmap item 5): a reviewer's first question about any validation
+    # pipeline is "reproducible on what?". R runs every session, so its version + the locked
+    # environment's hash are always recorded here; sas_version is filled in below once the
+    # effective sas_mode (post ODA-fallback) is known.
+    health["r_version"] = _r_version()
+    health["renv_lock_sha256"] = _renv_lock_sha()
 
     # Merge the ODA Stage-10 outcome (brief §6): on a connection-budget exhaustion the mode is
     # honestly downgraded to 'sim'; on success we record endpoint/attempts/manifest/probe.
@@ -840,6 +1181,16 @@ def write_telemetry(results, sas_mode="sim"):
     # pipeline_health.json; the durable, independently-checkable artifact is the committed
     # 06_telemetry/evidence/xpt_md5_manifest.txt (per-dataset md5 of the proved byte-distinct run).
     effective_mode = health["sas_execution_mode"]
+
+    # SAS version (roadmap item 5): only obtainable when SAS actually ran this session.
+    # 'oda' mode already has it via _probe_sas_version() -> _ODA_OUTCOME -> merged above --
+    # do NOT touch it here, since sas.submit()'s LOG never contains the session's startup
+    # banner (that clobbered a correct value with None until this was caught on a real run).
+    # 'local' mode genuinely can use the log-banner approach: a fresh subprocess SAS writes
+    # its own startup banner into its own -log file from the first line.
+    if effective_mode == "local":
+        health["sas_version"] = _sas_version_from_log("02_production_sas/00_master_driver.log")
+
     if effective_mode in ("oda", "local"):
         offenders = _prod_v_byte_identical(STUDY_DATASETS)
         byte_ok = not offenders
@@ -873,6 +1224,20 @@ def write_telemetry(results, sas_mode="sim"):
     os.makedirs("06_telemetry", exist_ok=True)
     with open("06_telemetry/pipeline_health.json", "w", encoding="utf-8") as f:
         json.dump(health, f, indent=2)
+    _append_health_log(health)
+
+    # Roadmap Move 4 (dry-run only): carry forward this run's cache key ONLY for stages that
+    # actually PASSed. A FAILed stage's key is dropped, never carried forward -- a stale/failed
+    # key must never later read as "unchanged since last GREEN run".
+    if _STAGE_CACHE_KEYS:
+        stage_cache = _get_prior_stage_cache()
+        for name, key in _STAGE_CACHE_KEYS.items():
+            if results.get(name) == "PASS":
+                stage_cache[name] = key
+            else:
+                stage_cache.pop(name, None)
+        with open(_STAGE_CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(stage_cache, f, indent=2, sort_keys=True)
 
     # Report the track based on what ACTUALLY happened this run (audit F-5),
     # not on mere availability of a SAS engine.

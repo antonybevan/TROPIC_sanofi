@@ -15,12 +15,12 @@ adds that layer additively (new files only; the validated pipeline is untouched)
 SCOPE / HONESTY
 ---------------
 Results are the **real Mitoxantrone arm** time-to-event summary (the reviewable cohort),
-with N / events / KM-median computed here directly from `04_adam/adtte_prod.xpt` (same KM
-routine cross-validated in date_precision_sensitivity.py — MP OS median 12.68 mo matches
-the published ~12.7 mo). The synthetic comparator arm and two-arm hazard ratios are
-deliberately excluded (reviewer finding R-1: a synthetic arm carries no evidentiary
-weight); the grouping is modelled with the single real arm. Extending to two arms is a
-one-line change once real comparator data exists.
+with N / events / KM-median computed here directly from `04_adam/adtte_prod.xpt`.
+The analysis-set (`ITTFL = Y`) and grouping (`TRT01P = MP`) metadata conditions are the
+actual filters used for computation; they are not merely descriptive JSON. The synthetic
+comparator arm and two-arm hazard ratios are deliberately excluded (reviewer finding R-1:
+a synthetic arm carries no evidentiary weight); the grouping is modelled with the single
+real arm. Extending to two arms is a one-line change once real comparator data exists.
 
 OUTPUT  (additive)
 ------------------
@@ -39,6 +39,8 @@ import os
 import numpy as np
 import pyreadstat
 
+from tte_utils import km_median_days, tte_analysis_set
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ADTTE = os.path.join(ROOT, "04_adam", "adtte_prod.xpt")
 OUT_DIR = os.path.join(ROOT, "12_ars")
@@ -51,21 +53,6 @@ ANALYSES = [
     ("TTPSA",  "Time to PSA Progression",     "SECONDARY OUTCOME MEASURE"),
     ("TTUMOR", "Time to Tumor Progression",   "SECONDARY OUTCOME MEASURE"),
 ]
-
-
-def km_median_days(time, event):
-    order = np.argsort(time, kind="mergesort")
-    t, e = time[order], event[order]
-    surv, found = 1.0, float("nan")
-    for ut in np.unique(t):
-        at_risk = int(np.count_nonzero(t >= ut))
-        d = int(np.count_nonzero((t == ut) & (e == 1)))
-        if at_risk and d:
-            surv *= (1 - d / at_risk)
-            if surv <= 0.5:
-                found = float(ut)
-                break
-    return found
 
 
 def term(ct):
@@ -90,6 +77,10 @@ def build():
                     "condition": {"dataset": "ADSL", "variable": "TRT01P",
                                   "comparator": "EQ", "value": ["MP"]}}],
     }
+    declared_conditions = [
+        analysis_set["condition"],
+        grouping["groups"][0]["condition"],
+    ]
     operations = [
         {"id": "OP.N",    "name": "Number of subjects",   "order": 1, "resultPattern": "XXX"},
         {"id": "OP.EVNT", "name": "Number of events",     "order": 2, "resultPattern": "XXX"},
@@ -108,7 +99,7 @@ def build():
     analyses, ard_rows = [], []
     contents = []
     for i, (pcd, pname, purpose) in enumerate(ANALYSES, start=1):
-        sub = df[df["PARAMCD"] == pcd]
+        sub, counts = tte_analysis_set(df, pcd, declared_conditions)
         aval = sub["AVAL"].to_numpy(float)
         event = (sub["CNSR"].to_numpy(float) == 0).astype(int)
         n = int(len(sub)); nev = int(event.sum())
@@ -135,6 +126,12 @@ def build():
             "dataset": "ADTTE", "variable": "AVAL",
             "analysisSetId": "AS.ITT", "methodId": "MTH.KMTTE",
             "orderedGroupings": [{"order": 1, "groupingId": "GF.TRT"}],
+            "sourceRecordCount": counts.source_n,
+            "analyzedRecordCount": counts.analyzed_n,
+            "excludedRecordCounts": {
+                "missingAVALOrCNSR": counts.excluded_missing,
+                "notMatchingDeclaredConditions": counts.excluded_nonmatching,
+            },
             "results": results,
         })
         contents.append({"order": i, "analysisId": f"AN.{pcd}"})
@@ -144,6 +141,10 @@ def build():
             ard_rows.append({"reportingEventId": "RE.TROPIC", "analysisId": f"AN.{pcd}",
                              "analysis": pname, "analysisSetId": "AS.ITT",
                              "groupingId": "GF.TRT", "groupId": "G.MP",
+                             "sourceRecordCount": counts.source_n,
+                             "analyzedRecordCount": counts.analyzed_n,
+                             "excludedMissingAVALOrCNSR": counts.excluded_missing,
+                             "excludedNotMatchingDeclaredConditions": counts.excluded_nonmatching,
                              "operationId": op_id,
                              "rawValue": "" if raw is None or (isinstance(raw, float)
                                          and not np.isfinite(raw)) else raw,
@@ -208,12 +209,19 @@ def main():
     os.makedirs(OUT_DIR, exist_ok=True)
     re_obj, ard = build()
     errs = validate(re_obj)
+    re_obj["validationStatus"] = {
+        "status": "PASS" if not errs else "FAIL",
+        "errors": errs,
+    }
 
     with open(os.path.join(OUT_DIR, "tropic_reporting_event.json"), "w", encoding="utf-8") as fh:
         json.dump(re_obj, fh, indent=2, ensure_ascii=False)
     with open(os.path.join(OUT_DIR, "tropic_ard.csv"), "w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=["reportingEventId", "analysisId", "analysis",
                            "analysisSetId", "groupingId", "groupId", "operationId",
+                           "sourceRecordCount", "analyzedRecordCount",
+                           "excludedMissingAVALOrCNSR",
+                           "excludedNotMatchingDeclaredConditions",
                            "rawValue", "formattedValue"])
         w.writeheader()
         w.writerows(ard)

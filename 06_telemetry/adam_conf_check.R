@@ -15,6 +15,45 @@ F <- list()  # findings accumulator
 add <- function(rule, sev, ds, var, n, msg)
   F[[length(F) + 1]] <<- data.frame(rule, severity = sev, dataset = ds, variable = var,
                                     count = n, message = msg, stringsAsFactors = FALSE)
+codelist_values <- function(cl) {
+  if (is.null(cl)) return(character())
+  if (is.atomic(cl)) return(as.character(cl))
+  vals <- cl$values
+  if (is.null(vals)) return(character())
+  as.character(vals)
+}
+codelist_external <- function(cl) {
+  if (is.null(cl) || is.atomic(cl)) return(FALSE)
+  isTRUE(cl$external)
+}
+vlm_entries_for <- function(dv, i) {
+  vl <- dv$valuelist[i]
+  if (is.null(vl) || is.na(vl) || !nzchar(vl) || is.null(meta$value_lists[[vl]])) return(list())
+  items <- meta$value_lists[[vl]]$items
+  if (is.null(items)) return(list())
+  if (is.data.frame(items)) {
+    return(lapply(seq_len(nrow(items)), function(j) items[j, , drop = FALSE]))
+  }
+  items
+}
+where_mask <- function(d, clauses) {
+  mask <- rep(TRUE, nrow(d))
+  if (is.null(clauses)) return(mask)
+  clause_list <- if (is.data.frame(clauses)) lapply(seq_len(nrow(clauses)), function(i) clauses[i, , drop = FALSE]) else clauses
+  for (clause in clause_list) {
+    if (is.null(clause)) next
+    conds <- if (is.data.frame(clause)) lapply(seq_len(nrow(clause)), function(i) clause[i, , drop = FALSE]) else clause
+    for (cond in conds) {
+      var <- cond$variable
+      cmp <- cond$comparator
+      vals <- as.character(cond$values)
+      if (is.null(var) || is.na(var) || !var %in% names(d)) return(rep(FALSE, nrow(d)))
+      if (!identical(as.character(cmp), "EQ")) return(rep(FALSE, nrow(d)))
+      mask <- mask & as.character(d[[var]]) %in% vals
+    }
+  }
+  mask
+}
 
 ds_names <- names(meta$datasets)
 adsl_usubjid <- NULL
@@ -110,14 +149,35 @@ for (ds in ds_names) {
   # ---- Controlled Terminology (data vs define.xml codelists) ----------------------------------
   for (i in seq_len(nrow(dv))) {
     cl <- dv$codelist[i]; v <- dv$name[i]
-    if (is.na(cl) || !v %in% dn) next
-    allowed <- meta$codelists[[cl]]; if (is.null(allowed)) next
+    if (!v %in% dn) next
+    if (!(is.na(cl) || is.null(cl))) {
+    allowed_obj <- meta$codelists[[cl]]; if (is.null(allowed_obj)) next
+    if (codelist_external(allowed_obj)) next
+    allowed <- codelist_values(allowed_obj)
+    if (length(allowed) == 0) next
     vals <- as.character(d[[v]]); vals <- vals[!is.na(vals) & trimws(vals) != ""]
     bad <- unique(vals[!vals %in% allowed])
     if (length(bad) > 0)
       add("AD0201", "Error", ds, v, length(bad),
           sprintf("Value(s) not in codelist %s: %s", cl,
                   paste(utils::head(bad, 5), collapse = ", ")))
+    }
+    vl_items <- vlm_entries_for(dv, i)
+    for (vl_item in vl_items) {
+      vl_cl <- vl_item$codelist
+      if (is.null(vl_cl) || is.na(vl_cl) || !nzchar(vl_cl)) next
+      allowed_obj <- meta$codelists[[vl_cl]]; if (is.null(allowed_obj)) next
+      if (codelist_external(allowed_obj)) next
+      allowed <- codelist_values(allowed_obj)
+      if (length(allowed) == 0) next
+      mask <- where_mask(d, vl_item$where_clauses)
+      vals <- as.character(d[[v]][mask]); vals <- vals[!is.na(vals) & trimws(vals) != ""]
+      bad <- unique(vals[!vals %in% allowed])
+      if (length(bad) > 0)
+        add("AD0202", "Error", ds, v, length(bad),
+            sprintf("Value(s) not in VLM codelist %s: %s", vl_cl,
+                    paste(utils::head(bad, 5), collapse = ", ")))
+    }
   }
 }
 
@@ -167,6 +227,7 @@ desc <- c(AD0001="Dataset variable not described in define.xml", AD0002="define.
           AD0106="BDS missing PARAMCD/PARAM", AD0107="PARAMCD not 1:1 with PARAM",
           AD0108="BDS has neither AVAL nor AVALC", AD0109="PARAMCD has missing values",
           AD0110="USUBJID not present in ADSL", AD0201="Value not in define.xml codelist",
+          AD0202="Value not in define.xml VLM codelist",
           AD0111="PARAMN missing where PARAMCD populated", AD0112="PARAMN not 1:1 with PARAMCD",
           AD0000="Dataset XPT not found (data-free environment)")
 if (nrow(res)) {

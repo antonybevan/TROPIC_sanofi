@@ -21,11 +21,13 @@ STANDARDS BASIS (researched, not assumed)
 - ICH eCTD Specification v3.2.2 (2008-07-16): backbone `index.xml`, `index-md5.txt`,
   module-5 heading element names, folder layout (53-clin-stud-rep/535-rep-effic-
   safety-stud/.../5351-stud-rep-contr).
-- FDA regional STF (us-stf v2.3) file-tags for datasets, defines, and reviewer guides
+- FDA regional STF (us-stf v2.3) file-tags for datasets, defines, programs, and reviewer guides
   (`analysis-dataset`, `analysis-program`, `analysis-data-definition`,
   `analysis-data-reviewers-guide`, `data-tabulation-dataset`,
   `data-tabulation-data-definition`, `data-tabulation-data-reviewers-guide`,
-  `annotated-crf`, `study-report-body`).
+  `annotated-crf`, `study-report-body`). XLS/XLSX is an FDA-accepted eCTD format,
+  but the ADaM authoring workbook is a supporting specification artifact; the real
+  machine-readable data definitions remain the Define-XML leaves.
 
 OUTPUT  (new, additive - nothing existing is modified)
 -----------------------------------------------------
@@ -104,9 +106,10 @@ def classify(rel: str):
         return ("data-tabulation-data-reviewers-guide", "us")
     if base == "blankcrf.pdf":
         return ("annotated-crf", "us")
-    if base == "define.xml" and "/analysis/adam/" in p:
+    is_define_xml = base.startswith("define") and ext == ".xml"
+    if is_define_xml and "/analysis/adam/" in p:
         return ("analysis-data-definition", "us")
-    if base == "define.xml" and "/tabulations/sdtm/" in p:
+    if is_define_xml and "/tabulations/sdtm/" in p:
         return ("data-tabulation-data-definition", "us")
     if base == "adam_spec.xlsx":
         return ("analysis-data-definition", "us")
@@ -118,21 +121,43 @@ def classify(rel: str):
         return ("data-tabulation-dataset", "us")
     if ext in (".sas", ".r") and "/programs/" in p:
         return ("analysis-program", "us")
-    if ext == ".pdf" and "/5351-stud-rep-contr/" in p:
+    if "/5351-stud-rep-contr/" in p and ext in (".pdf", ".png", ".txt"):
         return ("study-report-body", "ich")
     return (None, None)
 
 
+def required_tag_reason(rel: str):
+    """Return why a content leaf must receive an STF tag, or None if untagged is allowed."""
+    p = rel.lower()
+    base = os.path.basename(p)
+    ext = os.path.splitext(p)[1]
+    if ext == ".xpt":
+        return "dataset transport file"
+    if base.startswith("define") and ext == ".xml":
+        return "Define-XML data definition"
+    if ext in (".sas", ".r") and "/programs/" in p:
+        return "analysis program"
+    if "/5351-stud-rep-contr/" in p and ext in (".pdf", ".png", ".txt"):
+        return "controlled-study-report body/appendix file"
+    return None
+
+
+def assert_required_tags(items):
+    missing = [(it["href"], required_tag_reason(it["href"])) for it in items
+               if required_tag_reason(it["href"]) and not it["tag"]]
+    if missing:
+        msg = ["Required STF-tagged content leaf classified as untagged:"]
+        msg.extend(f"  - {href} ({reason})" for href, reason in missing)
+        raise RuntimeError("\n".join(msg))
+
+
 def collect():
-    """Walk m5/ and return ordered content items (skipping TFL appendices, json,
-    and anything data-free policy excludes from tagging noise)."""
-    skip_dirs = ("/figures", "/tables", "/listings")
-    keep_ext = {".xpt", ".sas", ".r", ".pdf", ".xml", ".xsl", ".xlsx"}
+    """Walk m5/ and return ordered content items, excluding only file types that are not
+    eCTD leaves for this package."""
+    keep_ext = {".xpt", ".sas", ".r", ".pdf", ".xml", ".xsl", ".xlsx", ".png", ".txt"}
     items = []
     for dirpath, _dirs, files in os.walk(M5_SRC):
         reldir = "/" + os.path.relpath(dirpath, ROOT).replace(os.sep, "/").lower()
-        if any(s in reldir for s in skip_dirs):
-            continue
         for f in files:
             ext = os.path.splitext(f)[1].lower()
             if ext not in keep_ext:
@@ -142,6 +167,7 @@ def collect():
             tag, info = classify(rel)
             items.append({"src": src, "href": rel, "tag": tag, "info": info,
                           "title": os.path.basename(rel)})
+    assert_required_tags(items)
     # deterministic order: category rank, then path
     rank = {"data-tabulation-data-definition": 0, "data-tabulation-dataset": 1,
             "annotated-crf": 2, "data-tabulation-data-reviewers-guide": 3,
