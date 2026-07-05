@@ -9,7 +9,6 @@ import os
 import sys
 import shutil
 import glob
-import subprocess
 import re
 import argparse
 from datetime import datetime, timezone
@@ -18,36 +17,13 @@ from datetime import datetime, timezone
 # The tracked data-free m5 preview must only change when content changes, not on every rebuild.
 _PDF_DATE = datetime(2026, 6, 17, tzinfo=timezone.utc)
 
-# Resolve Rscript path
-def resolve_rscript():
-    rscript = shutil.which("Rscript")
-    if rscript:
-        return rscript
-    # Environment override
-    rscript = os.environ.get("TROPIC_RSCRIPT")
-    if rscript:
-        return rscript
-    # Common locations
-    if sys.platform == "win32":
-        candidates = [
-            os.path.join(os.environ.get("ProgramFiles", r"C:\Program Files"), "R"),
-            os.path.join(os.environ.get("LOCALAPPDATA", ""), r"Programs\R"),
-        ]
-        for base in candidates:
-            hits = glob.glob(os.path.join(base, "R-*", "bin", "Rscript.exe")) if base else []
-            if hits:
-                return sorted(hits)[-1]
-    else:
-        for path in ["/usr/local/bin/Rscript", "/opt/homebrew/bin/Rscript",
-                     "/Library/Frameworks/R.framework/Resources/bin/Rscript"]:
-            if os.path.exists(path):
-                return path
-    return "Rscript"
+def clean_text(text, counter=None):
+    """Replaces Unicode characters not supported by standard latin-1/Helvetica in FPDF.
 
-RSCRIPT_PATH = resolve_rscript()
-
-def clean_text(text):
-    """Replaces Unicode characters not supported by standard latin-1/Helvetica in FPDF."""
+    `counter`, if given a single-element list, has [0] incremented once per character silently
+    substituted with '?' -- a rendered reviewer's guide/CSR is meant to accurately represent its
+    markdown source, so a caller can report how many characters were altered instead of that
+    substitution being completely invisible."""
     text = text.replace('\u2013', '-')
     text = text.replace('\u2014', '--')
     text = text.replace('\u201c', '"')
@@ -69,6 +45,8 @@ def clean_text(text):
             cleaned.append(char)
         except UnicodeEncodeError:
             cleaned.append('?')
+            if counter is not None:
+                counter[0] += 1
     return "".join(cleaned)
 
 def md_to_pdf(md_path, pdf_path):
@@ -99,6 +77,7 @@ def md_to_pdf(md_path, pdf_path):
     in_table = False
     table_data = []
     bold_font = FontFace(emphasis="BOLD")
+    replaced = [0]  # count of non-latin-1 chars silently '?'-substituted by clean_text below
     
     for line in lines:
         line_str = line.strip()
@@ -108,7 +87,7 @@ def md_to_pdf(md_path, pdf_path):
             is_sep = all(c in '|- :+*' for c in line_str) and len(line_str.replace('|', '').strip()) > 0
             if is_sep:
                 continue
-            cells = [clean_text(c.strip()) for c in line_str.split('|')[1:-1]]
+            cells = [clean_text(c.strip(), replaced) for c in line_str.split('|')[1:-1]]
             table_data.append(cells)
             in_table = True
             continue
@@ -144,36 +123,44 @@ def md_to_pdf(md_path, pdf_path):
         # Handle markdown blocks and headers
         if line_str.startswith('>'):
             line_str = line_str.lstrip('>').strip()
-            if line_str.startswith('[!'):
-                continue
+            # GFM alert marker (> [!WARNING]/[!NOTE]/etc). Every real source in this repo puts
+            # the marker on its own line with the body on the NEXT '>' line, so stripping just
+            # the marker leaves nothing here and the `continue` below is a no-op change from
+            # before -- but if a marker and body ever DO share one line, the body text now
+            # survives and renders instead of being silently discarded along with the marker.
+            admonition = re.match(r'^\[!\w+\]\s*(.*)$', line_str)
+            if admonition:
+                line_str = admonition.group(1)
+                if not line_str:
+                    continue
             pdf.set_font("helvetica", "I", size=9)
-            pdf.multi_cell(0, 5, clean_text(line_str))
+            pdf.multi_cell(0, 5, clean_text(line_str, replaced))
             pdf.set_font("helvetica", size=10)
             pdf.ln(2)
             continue
-            
+
         if line_str.startswith('# '):
             pdf.ln(4)
             pdf.set_font("helvetica", "B", size=15)
-            pdf.multi_cell(0, 8, clean_text(line_str[2:]))
+            pdf.multi_cell(0, 8, clean_text(line_str[2:], replaced))
             pdf.set_font("helvetica", size=10)
             pdf.ln(2)
         elif line_str.startswith('## '):
             pdf.ln(3)
             pdf.set_font("helvetica", "B", size=12)
-            pdf.multi_cell(0, 7, clean_text(line_str[3:]))
+            pdf.multi_cell(0, 7, clean_text(line_str[3:], replaced))
             pdf.set_font("helvetica", size=10)
             pdf.ln(2)
         elif line_str.startswith('### '):
             pdf.ln(2)
             pdf.set_font("helvetica", "B", size=11)
-            pdf.multi_cell(0, 6, clean_text(line_str[4:]))
+            pdf.multi_cell(0, 6, clean_text(line_str[4:], replaced))
             pdf.set_font("helvetica", size=10)
             pdf.ln(2)
         elif line_str.startswith('#### '):
             pdf.ln(2)
             pdf.set_font("helvetica", "B", size=10)
-            pdf.multi_cell(0, 5, clean_text(line_str[5:]))
+            pdf.multi_cell(0, 5, clean_text(line_str[5:], replaced))
             pdf.set_font("helvetica", size=10)
             pdf.ln(1)
         elif line_str.startswith('---'):
@@ -183,10 +170,10 @@ def md_to_pdf(md_path, pdf_path):
             pdf.line(x, y + 2, x + 190, y + 2)
             pdf.ln(4)
         elif line_str.startswith('* ') or line_str.startswith('- '):
-            pdf.multi_cell(0, 5, " * " + clean_text(line_str[2:]))
+            pdf.multi_cell(0, 5, " * " + clean_text(line_str[2:], replaced))
             pdf.ln(1)
         else:
-            cleaned = clean_text(line_str)
+            cleaned = clean_text(line_str, replaced)
             # Remove markdown links [label](url) -> label
             cleaned = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', cleaned)
             cleaned = cleaned.replace('**', '').replace('*', '').replace('`', '')
@@ -212,7 +199,9 @@ def md_to_pdf(md_path, pdf_path):
                 pdf.multi_cell(0, 6, row_str)
                 pdf.set_font("helvetica", "", 9)
             pdf.ln(2)
-            
+
+    if replaced[0]:
+        print(f"  {replaced[0]} character(s) replaced with '?' (non-latin-1) in {md_path}")
     pdf.output(pdf_path)
 
 def copy_source_crf(pdf_path):
@@ -229,39 +218,6 @@ def copy_source_crf(pdf_path):
         "Release note: this is not an annotated CRF unless annotation evidence is supplied."
     )
 
-def convert_sdtm_to_xpt(sdtm_src_dir, out_dir):
-    """Convert the source SDTM SAS7BDAT files to SAS Transport (XPORT v5) via R/haven."""
-    r_converter_script = "sdtm_to_xpt.R"
-    r_converter_content = f"""
-suppressMessages({{ library(haven) }})
-files <- list.files("{sdtm_src_dir}", pattern = "\\\\.sas7bdat$", full.names = TRUE)
-out_dir <- "{out_dir}"
-dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
-for (f in files) {{
-  dom <- tools::file_path_sans_ext(basename(f))
-  out_path <- file.path(out_dir, paste0(dom, ".xpt"))
-  df <- as.data.frame(read_sas(f))
-  for (col in names(df)) {{
-    if (inherits(df[[col]], "Date")) df[[col]] <- as.numeric(df[[col]]) + 3653
-  }}
-  write_xpt(df, out_path, version = 5, name = toupper(dom))
-}}
-cat("SDTM conversion completed successfully.\\n")
-"""
-    with open(r_converter_script, "w", encoding="utf-8") as rf:
-        rf.write(r_converter_content)
-    try:
-        res = subprocess.run([RSCRIPT_PATH, r_converter_script], capture_output=True, text=True)
-        if res.returncode != 0:
-            print("Error: SDTM to XPT conversion via R failed.")
-            print(res.stderr)
-            sys.exit(1)
-        print("Successfully converted all SDTM SAS7BDAT datasets to XPT.")
-    finally:
-        if os.path.exists(r_converter_script):
-            os.remove(r_converter_script)
-
-
 def copy_uplifted_sdtm34_xpts(sdtm34_dir, out_dir):
     """Copy the SDTMIG 3.4 XPT layer that matches define_sdtm.xml."""
     xpts = sorted(glob.glob(os.path.join(sdtm34_dir, "*.xpt")))
@@ -275,6 +231,16 @@ def copy_uplifted_sdtm34_xpts(sdtm34_dir, out_dir):
     for f in xpts:
         shutil.copy2(f, os.path.join(out_dir, os.path.basename(f)))
     print(f"Copied {len(xpts)} uplifted SDTMIG 3.4 XPT datasets from {sdtm34_dir}.")
+
+
+def _require_exists(path, what):
+    """Fail with a clear, actionable message -- matching copy_source_crf/copy_uplifted_sdtm34_xpts's
+    existing style -- instead of a raw FileNotFoundError traceback when a file this packaging
+    step depends on (but doesn't itself copy/render) is missing. Used ahead of a bare shutil.copy
+    or md_to_pdf call for a file that's required, not merely optional-if-present."""
+    if not os.path.exists(path):
+        sys.exit(f"Missing required file for eCTD packaging: {path} ({what}). "
+                  "Ensure the pipeline has run successfully before packaging.")
 
 
 def copy_if_present(src, action, label):
@@ -433,23 +399,29 @@ def main(data_free=False):
     # 5. Co-locate Define-XML metadata
     print("Copying Define-XML metadata...")
     # SDTM Define
+    _require_exists(os.path.join(define_src_dir, "define_sdtm.xml"), "SDTM Define-XML")
     shutil.copy(os.path.join(define_src_dir, "define_sdtm.xml"), os.path.join(m5_sdtm_datasets_dir, "define.xml"))
+    _require_exists(os.path.join(define_src_dir, "define2-1.xsl"), "Define-XML stylesheet")
     shutil.copy(os.path.join(define_src_dir, "define2-1.xsl"), os.path.join(m5_sdtm_datasets_dir, "define2-1.xsl"))
     print("  Copied SDTM define.xml and define2-1.xsl.")
     # ADaM Define
+    _require_exists(os.path.join(define_src_dir, "define.xml"), "ADaM Define-XML")
     shutil.copy(os.path.join(define_src_dir, "define.xml"), os.path.join(m5_adam_datasets_dir, "define.xml"))
+    _require_exists(os.path.join(define_src_dir, "define2-1.xsl"), "Define-XML stylesheet")
     shutil.copy(os.path.join(define_src_dir, "define2-1.xsl"), os.path.join(m5_adam_datasets_dir, "define2-1.xsl"))
     print("  Copied ADaM define.xml and define2-1.xsl.")
-    
+
     # 6. Generate PDFs for Reviewer's Guides and CSR
     print("Generating Reviewer's Guides and CSR PDFs...")
     # SDRG
+    _require_exists(os.path.join(guides_src_dir, "SDRG.md"), "SDRG (Study Data Reviewer's Guide)")
     md_to_pdf(os.path.join(guides_src_dir, "SDRG.md"), os.path.join(m5_sdtm_dir, "sdrg.pdf"))
     # ADRG
+    _require_exists(os.path.join(guides_src_dir, "ADRG.md"), "ADRG (Analysis Data Reviewer's Guide)")
     md_to_pdf(os.path.join(guides_src_dir, "ADRG.md"), os.path.join(m5_adam_dir, "adrg.pdf"))
-    # CSR (both csr.pdf and tropic.pdf for maximal path safety)
+    # CSR
+    _require_exists(csr_src_file, "Clinical Study Report source")
     md_to_pdf(csr_src_file, os.path.join(m5_csr_dir, "csr.pdf"))
-    shutil.copy(os.path.join(m5_csr_dir, "csr.pdf"), os.path.join(m5_csr_dir, "tropic.pdf"))
     print("  Successfully generated SDRG, ADRG, and CSR PDFs.")
     
     # 7. Copy the available source CRF. Do not fabricate a placeholder CRF.
