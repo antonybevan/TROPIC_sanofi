@@ -212,6 +212,13 @@ class TestDatePrecisionSensitivity(unittest.TestCase):
             )
 
     def test_build_ars_records_condition_audit_counts(self):
+        # ARS.build() reads the real, licensed ADTTE production XPT directly (by design -- see
+        # build_ars.py's own docstring); a bare CI checkout never has it (patient-level data is
+        # gitignored, never committed). Skip cleanly rather than fail, matching the same
+        # real-data-prerequisite pattern ct_cross_validation.py already uses for its CDISC
+        # Library dependency.
+        if not os.path.exists(ARS.ADTTE):
+            self.skipTest(f"requires real ADaM data not present in CI: {ARS.ADTTE}")
         re_obj, ard_rows = ARS.build()
         first = re_obj["analyses"][0]
         self.assertIn("sourceRecordCount", first)
