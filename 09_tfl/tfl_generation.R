@@ -297,10 +297,10 @@ render_km <- function(data, stats, x_max, title, subtitle_endpoint, y_lab, outfi
                          col = pal[trt])
   }
   legend("topright",
-    title = "Treatment Group:",
-    legend = c("CbzP (Synthetic)", "MP (Real)"),
-    col = pal[active_trts], lwd = 2.6, bty = "o", bg = "white", box.col = "white",
-    cex = 0.62, title.adj = 0)
+         title = "Treatment Group:",
+         legend = c("CbzP (Synthetic)", "MP (Real)"),
+         col = pal[active_trts], lwd = 2.6, bty = "o", bg = "white", box.col = "white",
+         cex = 0.62, title.adj = 0)
   plot_plt <- par("plt")
   axis_left <- plot_fig[1] + plot_plt[1] * (plot_fig[2] - plot_fig[1])
   axis_right <- plot_fig[1] + plot_plt[2] * (plot_fig[2] - plot_fig[1])
