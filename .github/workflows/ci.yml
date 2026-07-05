@@ -55,7 +55,7 @@ jobs:
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install pyreadstat lxml saspy pyyaml usdm==0.66.0
+        python -m pip install pyreadstat lxml saspy pyyaml usdm==0.66.0 "jsonschema>=4"
 
     - name: SAS static-analysis gate (blocks on hardcoded paths)
       run: |
