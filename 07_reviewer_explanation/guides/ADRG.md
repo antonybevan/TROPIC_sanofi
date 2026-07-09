@@ -1,37 +1,50 @@
 # Analysis Data Reviewer's Guide (ADRG)
 
-**Study Name:** TROPIC Re-Analysis  
-**Compound:** Cabazitaxel (CbzP) vs. Mitoxantrone (MP)  
-**Standard:** CDISC ADaMIG v1.3 / OCCDS v1.0 (+ custom episode-merging extension)  
-**Created:** 2026-05-23  
+| Field | Value |
+|---|---|
+| **Document** | Analysis Data Reviewer's Guide (ADRG) |
+| **Study** | TROPIC / EFC6193 / NCT00417079 |
+| **Compound** | Cabazitaxel (CbzP) vs Mitoxantrone (MP) |
+| **Standards** | CDISC ADaMIG v1.3 · OCCDS v1.0 (+ custom episode-merge; **not** “OCCDS v1.1”) |
+| **Document version** | 1.1 (Path A hardened) |
+| **Effective** | 2026-07-09 |
+| **Supersedes** | ADRG narrative drafts prior to `v0.1.0-demo-rc.1` Path A freeze |
+| **Product claim** | **Path A only** — controlled non-submission demonstration |
 
 ---
 
-> **SAP v4.0 lock note (2026-06-25):** `02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx` is the current
-> programming authority. This ADRG documents the implementation state and known limitations;
-> it is not itself the source for new analysis decisions. Synthetic/reconstructed CbzP outputs
-> are non-confirmatory demonstrations unless official patient-level CbzP source data are obtained.
+## 0. What this package is / is not (read first)
 
-> **Controlled demo release-candidate (2026-07-09):** Machine seals and the reviewer narrative
-> for the current demo release-candidate PASS are tagged **`v0.1.0-demo-rc.1`**. Start with
-> [`docs/PRODUCT_CLAIM.md`](../docs/PRODUCT_CLAIM.md) (what this package may assert) and
-> [`docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md`](../docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md)
-> (seal anchors, re-check commands). Residual risks:
-> [`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md).
-> Operating board:
-> [`docs/WORKSTREAM_EXECUTION_BOARD.md`](../docs/WORKSTREAM_EXECUTION_BOARD.md).
-> Supporting seals: `platform/pipeline_health.json`,
-> `platform/release_run_manifest/release_run_manifest.json`,
-> `docs/RELEASE_CANDIDATE_CHECKLIST.md`,
-> `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md`.
-> This is **not** a submission or Part 11 claim.
+| This package **is** | This package **is not** |
+|---|---|
+| SDTM → ADaM → TFL → Define → eCTD-**style** programming demonstration | An FDA filing / NDA package |
+| Dual-language (SAS 9.4 / R) recon on **real MP** ADaM under a genuine SAS engine when seals say `oda`/`local` | Organizational GxP two-programmer double programming |
+| Risk-tiered **admiral** third engine for ADSL + OS/PFS | Full ADaM re-derived in admiral |
+| Controlled TFL catalog (18 in-scope IDs; 21 SAP IDs deferred) | Full SAP Appendix D TFL inventory |
+| Hash-sealed Path A demo RC | 21 CFR Part 11 validated system |
+| Comparative TFLs that may include **synthetic/reconstructed CbzP** | Independent clinical confirmation of CbzP efficacy |
 
-## 1. Study & Re-Analysis Overview
-The **TROPIC Phase III Trial (NCT00417079)** evaluated the efficacy and safety of cabazitaxel (25 mg/m² IV q3w) + prednisone against mitoxantrone (12 mg/m² IV q3w) + prednisone in metastatic castration-resistant prostate cancer (mCRPC) previously treated with docetaxel. 
+**Binding claim:** [`docs/PRODUCT_CLAIM.md`](../../docs/PRODUCT_CLAIM.md)  
+**Residual risks (ACCEPTED findings):** [`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)  
+**Sealed demo RC:** tag `v0.1.0-demo-rc.1` · [`docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md`](../../docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md) · `python3 scripts/verify_release.py`  
+**Review package face:** [`08_submission_package/m5/`](../../08_submission_package/m5/) · [`08_submission_package/README.md`](../../08_submission_package/README.md)
 
-In the **published** trial, cabazitaxel carried a profound safety burden: ~82% Grade 3/4 neutropenia and ~8% febrile neutropenia (de Bono et al., Lancet 2010). *(Note: the synthetic CbzP arm in this repository realises ~86.5% (321/371) Grade 3/4 ANC nadir per the generated lab data — see `05_outputs/tfl/output/tables/T-21-Lab_Shift_Tables.txt`; it approximates, but does not exactly reproduce, the published rate.)*
+> **SAP v4.0 lock:** `02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx` is the **programming** authority for this demonstration (lock memo: `06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md`). It is **not** a sponsor-approved filing SAP. This ADRG explains implementation; it does not invent new analysis decisions.
 
-This **demonstration** rebuilds a synthetic comparator to retrospectively exercise modeling of the relationship between relative dose intensity (RDI), G-CSF prophylaxis, and absolute neutrophil count (ANC) nadir. This characterization supports the **FDA Project Optimus dose-optimization framework** by analyzing recovery kinetics and safety margins.
+---
+
+## 1. Study & demonstration overview
+
+The **TROPIC Phase III Trial (NCT00417079)** evaluated cabazitaxel (25 mg/m² IV q3w) + prednisone vs mitoxantrone (12 mg/m² IV q3w) + prednisone in mCRPC after docetaxel (de Bono et al., *Lancet* 2010).
+
+This repository is a **Path A programming demonstration** built on:
+
+- **Real MP arm (N=371)** de-identified SDTM (Sanofi 2013 / Project Data Sphere) → dual-language ADaM + recon  
+- **Synthetic / reconstructed CbzP (N=378)** merged **only at TFL** for comparative displays (non-confirmatory; F-003)
+
+In the **published** trial, cabazitaxel carried a substantial safety burden (~82% Grade 3/4 neutropenia; ~8% febrile neutropenia). Synthetic lab outputs in this package approximate published rates for pipeline exercise only (see T-21); they are **not** a re-analysis of trial safety.
+
+Comparative Optimus-style exposure–response displays (e.g. F-17) exercise dose–toxicity **methods** on disclosed synthetic/reconstructed comparator content. They must not be cited as independent clinical dose-optimization evidence.
 
 ---
 
@@ -118,19 +131,29 @@ All subjects are assigned `SEX = 'M'` in `A_adsl_generation.sas`. This demograph
 
 ## 6. Quality Control & SAS/R Parity (VAL-01)
 
-> **Validation is allocated by risk.** The depth of QC each output receives is set
-> deliberately by a risk tier — primary efficacy (OS, PFS) and ADSL get three
-> independent derivation engines, secondary/derived datasets two, and metadata is
-> covered by automated conformance only. See [`RISK_BASED_VALIDATION.md`](RISK_BASED_VALIDATION.md)
-> for the tier definitions and the output→tier→evidence map; this section documents the
-> mechanics those tiers draw on.
+### 6.0 Path A validation talk track (interview / reviewer)
 
-Each ADaM dataset is produced by two independent **cross-language implementations** — single-author, so this is *implementation* reconciliation, **not** two-programmer GxP double programming (see the disclosure note below):
-1. **Production Track (SAS 9.4):** Implemented in modular SAS programs (`04_analysis_datasets/programs/sas/`) utilizing standard SAS DATA steps, PROC SQL, and MACRO facilities.
-2. **Validation Track (R 4.6.0):** Independently re-implemented in R (`04_analysis_datasets/programs/r/`) utilizing the tidyverse (`dplyr`, `tidyr`, `lubridate`) and CDISC Pharmaverse standard libraries (`xportr`).
+| Layer | What we do | What we do **not** claim |
+|---|---|---|
+| Dual-language ADaM | Independent SAS 9.4 production + R validation on **real MP**; cell-level recon under `oda`/`local` | Org GxP double programming (two people) |
+| Third engine | **admiral** re-derivation for ADSL + OS/PFS (T1), reconciled to production | admiral for every domain |
+| Results / figures | SAS vs R numerical recon for MP stats; forest + figure-driving gates when SAS exports exist | Pixel-identical graphics; two-arm HR as dual-programmed (CbzP synthetic) |
+| TFL scope | Catalog-controlled in-scope set (`config/tfl_output_catalog.yaml`) | Full SAP Appendix D (21 IDs deferred with reasons) |
+| Metadata | Spec→define / spec→data gates; Define XSD; local CORE ADaM rules | Commercial full Pinnacle 21 clearance |
+| Seals | Hash-sealed Path A demo RC; `scripts/verify_release.py` | Part 11 e-signature / validated CSV system |
+
+**Always read residuals here:** [`WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md) (F-003, F-005, F-011, F-012, F-014, F-025, …).  
+**Machine re-check (no SAS required):** `python3 scripts/verify_release.py`  
+**Risk tiers:** [`RISK_BASED_VALIDATION.md`](RISK_BASED_VALIDATION.md) · `config/validation_strategy.yaml`
+
+> **Validation is allocated by risk.** Primary efficacy (OS, PFS) and ADSL get three derivation engines; supporting ADaM two; metadata automated conformance. This section documents the mechanics those tiers use.
+
+Each ADaM dataset is produced by two independent **cross-language implementations** — single-author, so this is *implementation* reconciliation, **not** two-programmer GxP double programming:
+1. **Production Track (SAS 9.4):** modular programs under `04_analysis_datasets/programs/sas/`
+2. **Validation Track (R 4.6.0):** independent re-implementation under `04_analysis_datasets/programs/r/`
 
 > [!NOTE]
-> **Single-Author Validation Disclosure:** Although the production (SAS) and validation (R) code bases were developed independently using different languages and structures, both tracks were authored by a single programmer (Antony Bevan). This lacks the organizational independence between producer and validator normally required by GxP double-programming guidelines (where validation is ideally performed by a separate programmer).
+> **Single-author disclosure (PRODUCT_CLAIM §2 non-claim):** Both tracks were authored by one programmer. Methodological independence (different language/structure) is **not** organizational independence. Do not describe this package as “GxP double programming complete.”
 
 **Define-XML conformance.** The analysis metadata (`03_metadata/define/define.xml`) **passes full XSD validation** against the official CDISC Define-XML 2.1 + ARM v1.0 schema — run `03_metadata/define/validate_xsd.sh` (wraps `xmllint` against the vendored `03_metadata/define/schema/` bundle) → *"XSD: VALID."* This covers the schema layer (structure, namespaces, required attributes, enumerations, element ordering) and includes Analysis Results Metadata (ARM) — **8 ResultDisplays / 10 AnalysisResults** spanning every analysis display (survival OS/PFS, secondary TTE, TEAE, OS prognostic-subgroup forest F-12, PSA waterfall F-13, exposure swimmer F-14, Project Optimus exposure-response F-17, and the lab-shift table T-21), each linking result → method → ADaM dataset/variables with its TFL ID named for traceability (referential integrity gated by `validate_define.py`). The deeper FDA/CDISC business-rule layer requires a Pinnacle 21 conformance run, and `validate_define.py` covers the core referential-integrity rules offline. **Business-rule engine status (re-verified 2026-06-17):** the open-source CDISC CORE engine (v0.16.0) was run end-to-end. CORE/CDISC Library still ships **no executable ADaM rules** — directly confirmed this run: the `adamig/1-0..1-3` rule sets are **empty (0 rules)** and `update-cache` fetched zero ADaM rules from the CDISC Library (only SDTMIG/SENDIG/TIG/USDM are populated, e.g. SDTMIG 3.2 = 392 rules). To obtain executable, scriptable ADaM conformance regardless, we authored ADaM rules in **CORE YAML format** and ran them through the real engine via `--local-rules` (`platform/conformance_rules/adam/`; latest run 7/7 SUCCESS — see `platform/conformance/CORE_RUN_RECORD.md`). A **CORE SDTM** run was also executed (392 rules; results in `platform/conformance/core_sdtm_report.json`, with a documented SDTMIG 3.1.1-vs-3.2 version-gap caveat). **Pinnacle 21** — with its mature ADaM rule pack — remains the authoritative engine for a full submission ADaM business-rule run. Both Define-XML files were also hardened to parse cleanly in the CORE reference engine (`Define_XML_Version 2.1.0`): the CORE run surfaced three defects the project's XSD check missed — an invalid `Role` on `ItemGroupDef`, empty `TranslatedText`, and a missing `def:Class` element — all fixed (def:Class added to every ItemGroupDef across both defines) while still passing XSD.
 
@@ -138,7 +161,7 @@ Each ADaM dataset is produced by two independent **cross-language implementation
 
 ### 6.1 Specification as the Single Source of Truth (audit C-4 inversion)
 
-The authoritative analysis-dataset metadata specification is `03_metadata/adam/ADaM_spec.xlsx`, authored in the CDISC / Pinnacle-21 **metacore** workbook format (Datasets, Variables, ValueLevel, WhereClauses, Codelists, Methods sheets). It is the metadata control source from which the rest of the metadata layer is governed — while SAP v4.0 governs analysis intent — reversing the previous direction, in which a reviewer workbook (`ADaM_Define_Extract.xlsx`) was rendered *from* `define.xml`, a circular dependency that could never disagree with the define it was meant to govern (audit finding C-4). The spec was bootstrapped once from the existing define content (`03_metadata/adam/build_spec_seed.R`, a documented one-time migration) and is the human-edited metadata master from then on; the old `generate_adam_specs.py` (define → extract) generator is retired.
+The authoritative analysis-dataset metadata specification is `03_metadata/adam/ADaM_spec.xlsx`, authored in the CDISC / Pinnacle-21 **metacore** workbook format (Datasets, Variables, ValueLevel, WhereClauses, Codelists, Methods sheets). It is the metadata control source from which the rest of the metadata layer is governed — while SAP v4.0 governs analysis intent — reversing the previous direction, in which a reviewer workbook (`ADaM_Define_Extract.xlsx`) was rendered *from* `define.xml`, a circular dependency that could never disagree with the define it was meant to govern (audit finding C-4). The spec was bootstrapped once from the existing define content (one-time migration script; archived under `tools/archive/migration/` — not a live generator) and is the human-edited metadata master from then on; the old define → extract generator is retired.
 
 Two automated gates enforce conformance to the spec — both run in the pipeline (cibuild Stages 15–16) and in CI:
 
@@ -148,12 +171,12 @@ Two automated gates enforce conformance to the spec — both run in the pipeline
 The spec also drives the variable-label artifacts applied by both tracks (`platform/gen_adam_labels.R` → `04_analysis_datasets/programs/r/adam_var_labels.csv` for R and `04_analysis_datasets/programs/sas/_adam_labels.sas` for SAS), so production and validation carry identical, spec-sourced labels. Together these close the loop **spec → {define, data}**.
 
 ### SAS Execution via SAS OnDemand for Academics (ODA)
-The SAS 9.4 production track (Stage 11 of the orchestrator, `cibuild.py`) executes on **SAS OnDemand for Academics** (ODA) via **SASPy IOM** — a live, cloud-hosted SAS 9.4 engine (Version 9.04.01M8P02222023, LIN X64) — **when the pipeline is invoked with `--real-sas`** (ODA), or when a `local` SAS engine is on `PATH`. In those modes the SAS programs are uploaded/compiled independently and are not copied from or influenced by the R validation outputs. The most recent verified `oda` run (**2026-06-18**, endpoint `odaws01-apse1-2`) is captured as a committed, immutable evidence badge in [`platform/evidence/`](file:///Users/apple/Desktop/TROPIC/platform/evidence/README.md).
+The SAS 9.4 production track (Stage 11 of the orchestrator, `cibuild.py`) executes on **SAS OnDemand for Academics** (ODA) via **SASPy IOM** — a live, cloud-hosted SAS 9.4 engine (Version 9.04.01M8P02222023, LIN X64) — **when the pipeline is invoked with `--real-sas`** (ODA), or when a `local` SAS engine is on `PATH`. In those modes the SAS programs are uploaded/compiled independently and are not copied from or influenced by the R validation outputs. A verified genuine `oda` snapshot is retained under [`platform/evidence/`](../../platform/evidence/README.md) (byte-distinct `*_prod` vs `*_v` proof). Live seal mode is always read from `platform/pipeline_health.json` (`sas_execution_mode`).
 
 > [!IMPORTANT]
 > **Execution mode is explicit and recorded.** Stage 11 resolves to exactly one of `local` / `oda` / `cached` / `sim` / `error` (`cibuild.py` → `_resolve_sas_mode`) and writes the chosen mode to `platform/pipeline_health.json` as `sas_execution_mode`. **Only `local` and `oda` constitute genuine, independent SAS↔R double-programming.** The *default* invocation (`python3 platform/cibuild.py` with no SAS engine present) runs in **`sim` mode** — a byte-copy of `*_v.xpt` → `*_prod.xpt` — for which a zero-difference reconciliation is **tautological** and is *not* evidence of independent parity. A reconciliation result is meaningful as double-programming evidence **only** for a run whose recorded `sas_execution_mode` is `oda` or `local`; a reviewer should confirm that field before citing the reconciliation.
 
-The execution sequence (in `oda` mode) is split into two jobs through a resilient connection broker (`platform/oda_broker.py`); see [`docs/runbooks/ODA_GUIDE.md`](file:///Users/apple/Desktop/TROPIC/docs/runbooks/ODA_GUIDE.md):
+The execution sequence (in `oda` mode) is split into two jobs through a resilient connection broker (`platform/oda_broker.py`); see [`docs/runbooks/ODA_GUIDE.md`](../../docs/runbooks/ODA_GUIDE.md):
 1. **Job A — seed (`seed_sdtm.py`, idempotent):** the 34 SDTM SAS7BDAT files are uploaded to the ODA workspace **once**, guarded by a per-dataset `sha256`/`nrows` manifest (zero upload when the resident library already matches; row counts are re-read from ODA to reject a half-upload; the manifest sentinel is written last, transactionally).
 2. **Connect:** the broker opens an IOM session with status-gated, full-jitter backoff (ODA's spawner times out under load) and **earns** the session via a live nonce probe — `sas_execution_mode='oda'` is recorded only after the workspace echoes a runtime token.
 3. **Job B — reconcile (`cibuild.py --real-sas`):** Stage 11 verifies the SDTM manifest is resident (else it fails with an instruction to run Job A — it does not silently simulate), uploads the 12 SAS programs, and submits `00_master_driver.sas` via `%include`. SAS processes the full SDTM → Staging → SDTM Mapping → ADaM → XPT chain independently.
@@ -187,10 +210,10 @@ To exercise the comparative-efficacy/safety TFLs (total N=749: 371 real MP + 378
 * **Non-TTE domains (ADSL, ADAE, ADEX, ADLB, ADRS):** Fixed-seed sampling from published Table 1/Table 2 marginal distributions.
 
 ### 7.1 Separation of Reconstruction Logic
-To prevent circular validation dependencies, the reconstruction program [reconstruct_cbzp_arm.R](file:///Users/apple/Desktop/TROPIC/01_source_data/reconstruct_cbzp_arm.R) operates independently. For OS and PFS, it sources `reconstruct_cbzp_guyot.R`, which generates the Guyot pseudo-IPD from the digitised published KM curves + transcribed at-risk tables only (no MP arm data is read for the primary endpoints). For secondary endpoints, it loads the validated MP ADaM datasets (`04_analysis_datasets/adam/adtte_v.xpt`) to perform PH scaling. Demographics and non-TTE domains are simulated from Table 1/2 baselines. All CbzP outputs are written as isolated RDS files to `01_source_data/cbzp_reconstructed/`.
+To prevent circular validation dependencies, the reconstruction program [`01_source_data/reconstruct_cbzp_arm.R`](../../01_source_data/reconstruct_cbzp_arm.R) operates independently. For OS and PFS, it sources `reconstruct_cbzp_guyot.R`, which generates the Guyot pseudo-IPD from the digitised published KM curves + transcribed at-risk tables only (no MP arm data is read for the primary endpoints). For secondary endpoints, it loads the validated MP ADaM datasets (`04_analysis_datasets/adam/adtte_v.xpt`) to perform PH scaling. Demographics and non-TTE domains are simulated from Table 1/2 baselines. All CbzP outputs are written as isolated RDS files to `01_source_data/cbzp_reconstructed/`.
 
 ### 7.2 Analysis-Step Merging
-In the final reporting step ([tfl_generation.R](file:///Users/apple/Desktop/TROPIC/05_outputs/tfl/tfl_generation.R)), the validated MP-only ADaMs are loaded from `04_analysis_datasets/adam/` and dynamically merged with the reconstructed CbzP RDS files. This combined dataset (N=749: 371 MP + 378 CbzP) is used to generate the TFLs and the exposure-response analysis.
+In the final reporting step ([`tfl_generation.R`](../../05_outputs/tfl/tfl_generation.R)), the validated MP-only ADaMs are loaded from `04_analysis_datasets/adam/` and dynamically merged with the reconstructed CbzP RDS files. This combined dataset (N=749: 371 MP + 378 CbzP) is used for **catalog-controlled** comparative TFLs only (F-012: not protocol ITT N=755). See known-differences memo F-003 / F-012.
 
 ### 7.3 Demographic Reconstitution (ADSL)
 Subject-level demographics for the CbzP cohort (N=378) were simulated using a fixed random seed to match baseline trial characteristics reported in Lancet 2010 Table 1:

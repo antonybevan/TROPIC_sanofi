@@ -1,10 +1,12 @@
 # TROPIC Workstream Execution Board
 
 **Status:** Active operating board — not a decorative architecture map  
-**As of:** 2026-07-09  
-**Pipeline seal:** `v0.1.0-demo-rc.1` · release-run `PASS` · RC checklist `PASS` · ODA `full_dag` 30/30  
-**Product claim in force:** **Controlled non-submission demonstration package** (`docs/PRODUCT_CLAIM.md`)  
-**Authority:** SAP v4.0 remediation lock · `06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md` · `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md`
+**As of:** 2026-07-09 (resume after portfolio surface)  
+**Branch tip:** `codex/repo-structure-phase2` (presentation + git surface hygiene pushed)  
+**Pipeline seal:** `v0.1.0-demo-rc.1` · release-run `PASS` · RC checklist `PASS` · `verify_release` 25/25  
+**Product claim in force:** **Path A controlled non-submission demonstration** (`docs/PRODUCT_CLAIM.md`)  
+**Authority:** SAP v4.0 remediation lock · `06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md` · `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md`  
+**Portfolio surface:** `docs/REPO_SURFACE_POLICY.md` · `docs/INTERVIEWER_GUIDE.md` · dual-surface README
 
 ---
 
@@ -84,7 +86,7 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | Field | Content |
 |---|---|
 | **Owned artifacts** | SAP v4.0 · `config/study_config.yaml` · CTQ/estimand register · ANALYSIS_REPORT · population rules (ITT/Safety/MEASDISF) · F-011 PSA denom residual |
-| **Current status** | **AMBER** — config and SAP exist; G02 is **not stage-gated** in orchestrator (doc-only); PSA eligibility shell residual (F-011) |
+| **Current status** | **AMBER** — config and SAP exist; G02 **is stage-gated** (executable); PSA eligibility shell residual (F-011) remains |
 | **Open risks** | Spec drift from SAP; G02 never machine-checked; PSA / ITT wording inconsistency under review pressure |
 | **Required evidence pack** | (1) Spec-to-config trace table · (2) Population/endpoint matrix · (3) Sensitivity list · (4) Explicit disposition of F-011 in ADRG + TFL footnotes if not coded |
 | **Release gate** | G02 before claiming SAP-complete TFLs |
@@ -140,11 +142,11 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | Field | Content |
 |---|---|
 | **Owned artifacts** | ADRG · SDRG · BDRG · TRACEABILITY_MATRIX · SDSP · ANALYSIS_REPORT · release note · limitation language · demo boundary |
-| **Current status** | **AMBER** — documents exist and point to tag; still read more as living repo docs than final controlled reviewer guides; G07 **not stage-gated** |
-| **Open risks** | Career risk if guides over-claim; inconsistency with disposition board; BDRG depth; shell-quality language |
-| **Required evidence pack** | (1) ADRG/SDRG/BDRG revision IDs · (2) Traceability matrix aligned to catalog · (3) Explicit “what this package is / is not” section (partially in release note) · (4) Signoff checklist for guide completeness |
-| **Release gate** | G07 before calling package “reviewer-ready” |
-| **Next action** | Hardening checklist filed (`docs/workstreams/WS6_REVIEWER_GUIDE_HARDENING_CHECKLIST.md`). **Execute S1–S3** (ADRG → SDRG → BDRG) against PRODUCT_CLAIM + known-differences memo |
+| **Current status** | **AMBER → improving** — G07 is executable in DAG; ADRG **S1 done** (v1.1 Path A front-matter + §6.0 talk track); SDRG/BDRG still need S2/S3 |
+| **Open risks** | Career risk if guides over-claim; SDRG/BDRG not yet same front-matter standard; PDF package copies lag markdown until re-package |
+| **Required evidence pack** | (1) ADRG/SDRG/BDRG revision IDs · (2) Traceability matrix aligned to catalog · (3) Explicit “what this package is / is not” · (4) Signoff checklist |
+| **Release gate** | G07 before calling package “reviewer-ready” (machine lock exists; narrative still AMBER until S2/S3) |
+| **Next action** | **S2 SDRG hardening** (same front-matter pattern + CORE residual honesty + WS-1 pack link) |
 
 ---
 
@@ -223,11 +225,14 @@ Not “another GREEN JSON.”
 
 ## 8. Immediate next command (continue operating)
 
-**P0 packs filed.** Next:
+**Done recently:** portfolio dual-surface + git surface policy · WS-6 **S1 ADRG** · seals still PASS  
 
-1. **WS-6 S1** — ADRG hardening vs PRODUCT_CLAIM + known-differences memo  
-2. **WS-1** — CORE residual matrix CSV  
-3. **WS-7** — wire `scripts/verify_release.py` into CI  
+**Next (resume order):**
+
+1. **WS-6 S2** — SDRG hardening (same §0 is/is-not + CORE residual honesty)  
+2. **WS-6 S3** — BDRG + TRACEABILITY_MATRIX catalog alignment  
+3. **WS-1** — `WS1_CORE_RESIDUAL_MATRIX.csv`  
+4. **WS-7** — wire `scripts/verify_release.py` into CI  
 
 ```bash
 python3 scripts/verify_release.py

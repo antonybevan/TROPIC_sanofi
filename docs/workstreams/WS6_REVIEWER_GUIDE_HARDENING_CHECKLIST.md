@@ -18,11 +18,11 @@ Make ADRG / SDRG / BDRG read like **controlled reviewer deliverables**, not engi
 
 Each of ADRG, SDRG, BDRG must contain—near the top:
 
-- [x] Link to **product claim** Path A (add if missing on next edit pass)  
-- [x] Link to tag / release note `v0.1.0-demo-rc.1` (ADRG/SDRG done)  
-- [ ] Explicit **document version + date + supersedes** line  
-- [ ] One paragraph: **what this package is / is not** (mirror PRODUCT_CLAIM §2)  
-- [ ] Pointer to **known-differences memo** `docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`
+- [x] Link to **product claim** Path A  
+- [x] Link to tag / release note `v0.1.0-demo-rc.1`  
+- [x] Explicit **document version + date + supersedes** line — **ADRG done (S1)**; SDRG/BDRG pending S2/S3  
+- [x] **what this package is / is not** — **ADRG done (S1)**  
+- [x] Pointer to **known-differences memo** — **ADRG done (S1)**  
 
 ---
 
@@ -30,16 +30,17 @@ Each of ADRG, SDRG, BDRG must contain—near the top:
 
 | Section theme | Required content | Status |
 |---|---|---|
-| Analysis authority | SAP v4.0 + lock memo; not sponsor filing SAP | Partial |
-| Data provenance | MP real / CbzP synthetic; Guyot vs PH | Present |
-| Populations | ITT/Safety/MEASDISF consistent with WS-2 table | Partial—cross-check |
-| Validation | Dual-lang + admiral + single-author disclosure | Present—must match PRODUCT_CLAIM §6 |
-| Residuals | F-003, F-011, F-012, F-014 language | Must cite known-differences memo |
-| TFL scope | Controlled catalog 18 IDs; deferred 21 | Must not claim full Appendix D |
+| Analysis authority | SAP v4.0 + lock memo; not sponsor filing SAP | **Done (S1)** |
+| Data provenance | MP real / CbzP synthetic; Guyot vs PH | **Done (S1)** §1 + §7 |
+| Populations | ITT/Safety/MEASDISF consistent with WS-2 table | Present §5.4 — recheck at S2 |
+| Validation | Dual-lang + admiral + single-author disclosure | **Done (S1)** §6.0 Path A talk track |
+| Residuals | F-003, F-011, F-012, F-014 language | **Done (S1)** — memo linked; F-003/012 in §7 |
+| TFL scope | Controlled catalog 18 IDs; deferred 21 | **Done (S1)** §6.0 table |
 | OCCDS | v1.0 + custom episode merge; no OCCDS v1.1 | Present |
-| Part 11 | Explicit non-claim | Required |
+| Part 11 | Explicit non-claim | **Done (S1)** §0 table |
 
-**Pass criterion:** A hostile reader cannot quote ADRG to claim filing readiness or confirmatory CbzP efficacy.
+**Pass criterion:** A hostile reader cannot quote ADRG to claim filing readiness or confirmatory CbzP efficacy.  
+**S1 self-check:** Met for ADRG 1.1 (2026-07-09).
 
 ---
 
@@ -92,11 +93,11 @@ Each of ADRG, SDRG, BDRG must contain—near the top:
 
 ## 8. Sprint plan (deep work, 2–3 sessions)
 
-| Session | Deliverable |
-|---|---|
-| S1 | ADRG: insert PRODUCT_CLAIM + known-differences; rewrite validation § to Path A talk track |
-| S2 | SDRG: CORE residual honesty + WS-1 pack link; precision § audit |
-| S3 | BDRG depth pass + TRACEABILITY_MATRIX catalog alignment |
+| Session | Deliverable | Status |
+|---|---|---|
+| S1 | ADRG: PRODUCT_CLAIM + known-differences; Path A validation talk track | **DONE 2026-07-09** (`ADRG.md` v1.1) |
+| S2 | SDRG: CORE residual honesty + WS-1 pack link; precision § audit | **Next** |
+| S3 | BDRG depth pass + TRACEABILITY_MATRIX catalog alignment | Pending |
 
 After S1–S3: file `docs/workstreams/reviews/WS6_review_YYYYMMDD.md` and move board toward GREEN.
 
