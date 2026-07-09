@@ -36,18 +36,18 @@ if discon_listing.exists():
             "CONFIRMED", "Remove placeholder listing or generate it from an existing, validated program.")
 
 manual = [
-    ("DEAD/UNREFERENCED CODE", "04_analysis_datasets/programs/sas/utilities/GIT_RESCUE.sas", "06_qc_evidence/audit/run_records/REPO_AUDIT_2026-06-21.md:154-158", "CONFIRMED MANUAL DEV SNIPPET", "Move to a documented developer-tools area or remove."),
-    ("DEAD/UNREFERENCED CODE", "platform/remediate_sdtm_define.py", "06_qc_evidence/audit/run_records/REPO_AUDIT_2026-06-21.md:154-158", "CONFIRMED HISTORICAL/MANUAL", "Archive outside the validated pipeline or document and test its intended use."),
+    ("ARCHIVED DEAD CODE", "tools/archive/dev_snippets/GIT_RESCUE.sas", "Moved from programs/sas/utilities/ during factory cleanup 2026-07-09", "ARCHIVED", "Keep out of active program paths; see tools/archive/README.md."),
+    ("ARCHIVED DEAD CODE", "tools/archive/dev_snippets/GIT_PUSH.sas", "Moved from programs/sas/utilities/ during factory cleanup 2026-07-09", "ARCHIVED", "Keep out of active program paths; see tools/archive/README.md."),
+    ("ARCHIVED HISTORICAL", "tools/archive/define_oneoffs/remediate_sdtm_define.py", "Moved from 03_metadata/define/ during factory cleanup 2026-07-09", "ARCHIVED", "Not on DAG; restore only for deliberate one-off define work."),
+    ("ARCHIVED MIGRATION", "tools/archive/migration/build_spec_seed.R", "Moved from 03_metadata/adam/; one-time ADaM_spec bootstrap", "ARCHIVED", "Do not re-run; would re-create define→spec circularity."),
 
-    ("UNORCHESTRATED QC", "06_qc_evidence/reconciliation/figure_data_reconcile.R", "README claim but no manifest/CI invocation", "CONFIRMED", "Invoke for every release or withdraw the QC claim."),
     ("MANUAL PREREQUISITE", "01_source_data/reconstruct_cbzp_arm.R", "00_governance/REPRODUCIBILITY.md:75; not in release DAG", "DOCUMENTED BUT UNORCHESTRATED", "Pin/run before release and bind output hashes to the release record."),
     ("MANUAL PREREQUISITE", "01_source_data/reconstruct_cbzp_guyot.R", "Sourced by reconstruct_cbzp_arm.R only", "DOCUMENTED BUT UNORCHESTRATED", "Pin digitization inputs and bind reconstructed output hashes."),
     ("MANUAL PREREQUISITE", "01_source_data/export_cbzp_xpt.R", "Invoked by _oda_render_tfl.py, not main DAG", "DOCUMENTED BUT OUT-OF-DAG", "Integrate the bridge into the validated release DAG."),
-    ("OUT-OF-DAG CAPABILITY DEMO", "platform/_oda_render_tfl.py", "Renders 05_outputs/tfl/output/figures/sas/* outside study_manifest; package_ectd copies companions", "CONFIRMED", "Integrate into DAG or keep classified as historical capability demo (not current-run release evidence)."),
-    ("ONE-TIME/HISTORICAL", "03_metadata/adam/build_spec_seed.R", "Header identifies one-time migration", "DOCUMENTED", "Archive as migration evidence; do not treat as an active generator."),
-    ("DELIVERY ORPHAN", "04_analysis_datasets/datasetjson/", "No package_ectd.py consumer", "CONFIRMED", "Classify as exploratory/pilot output or add a regulator-approved delivery route."),
-    ("DELIVERY ORPHAN", "05_outputs/ars/", "No package_ectd.py consumer", "CONFIRMED", "Add a defined delivery location and complete ARS coverage/schema validation."),
-    ("DELIVERY ORPHAN", "03_metadata/usdm/", "No package_ectd.py consumer", "CONFIRMED", "Classify as exploratory or add a defined delivery route and official schema validation."),
+    ("OUT-OF-DAG CAPABILITY DEMO", "platform/_oda_render_tfl.py", "Renders 05_outputs/tfl/output/figures/sas/* outside study_manifest; package_ectd copies companions", "CLASSIFIED_OUT_OF_DAG", "Keep as capability demo; not current-run release spine evidence. Documented in platform/README.md."),
+    ("DELIVERY ORPHAN", "04_analysis_datasets/datasetjson/", "No package_ectd.py consumer; built on DAG as additive layer", "CLASSIFIED_ADDITIVE", "Exploratory/pilot transport; not Module 5 primary package path. See folder README."),
+    ("DELIVERY ORPHAN", "05_outputs/ars/", "No package_ectd.py consumer; built on DAG as additive layer", "CLASSIFIED_ADDITIVE", "ARS pilot outputs; not eCTD primary path. See folder README."),
+    ("DELIVERY ORPHAN", "03_metadata/usdm/", "No package_ectd.py consumer; built on DAG as additive layer", "CLASSIFIED_ADDITIVE", "USDM pilot; not eCTD primary path. See folder README."),
     ("OUT-OF-BAND OUTPUT", "04_analysis_datasets/datasetjson/**/*.ndjson", "Requires --ndjson; pipeline invokes JSON path only", "CONFIRMED", "Orchestrate and validate NDJSON or remove stale files."),
     ("DEFERRED SAP FULL-CATALOG TFLS", "config/tfl_output_catalog.yaml deferred_not_in_scope (21 IDs)", "SAP v4 full catalog vs controlled release scope", "DISPOSITIONED_IN_CONTROLLED_CATALOG", "Implement under approved shells+QC or keep deferred; gate is bijective controlled scope, not silent absence."),
     ("APPROVED TFL EXTENSIONS", "config/tfl_output_catalog.yaml controlled_in_scope disposition=approved_extension", "Safety/disposition/PSA displays with SAP v4 section basis", "DISPOSITIONED_IN_CONTROLLED_CATALOG", "Keep extension basis current; do not add unlisted outputs."),
@@ -72,18 +72,19 @@ else:
         "Run it before SAS/R derivations and gate clean-tree/hash parity of generated labels.",
     )
 
-for path, label in [
-    ("04_analysis_datasets/programs/r/admiral_adsl.R", "Admiral ADSL Re-derivation"),
-    ("04_analysis_datasets/programs/r/admiral_adtte.R", "Admiral ADTTE Re-derivation (OS/PFS)"),
-    ("06_qc_evidence/reconciliation/admiral_reconcile.R", "Admiral Core Reconciliation"),
+for path, label, note in [
+    ("04_analysis_datasets/programs/r/admiral_adsl.R", "Admiral ADSL Re-derivation", "gated third-engine T1 track"),
+    ("04_analysis_datasets/programs/r/admiral_adtte.R", "Admiral ADTTE Re-derivation (OS/PFS)", "gated third-engine T1 track"),
+    ("06_qc_evidence/reconciliation/admiral_reconcile.R", "Admiral Core Reconciliation", "gated third-engine T1 track"),
+    ("06_qc_evidence/reconciliation/figure_data_reconcile.R", "Figure-Data Reconciliation (SAS vs R)", "non-gated; not_available if SAS figure CSVs absent"),
 ]:
     if path.split("/")[-1] in manifest_text or path in manifest_text:
         add(
             "ORCHESTRATED QC",
             path,
-            f"Invoked by config/study_manifest.yaml post-stage ({label}); gated third-engine T1 track",
+            f"Invoked by config/study_manifest.yaml post-stage ({label}); {note}",
             "RESOLVED_IN_DAG",
-            "Keep orchestrated; fail release on admiral recon non-PASS / stale evidence.",
+            "Keep orchestrated; fail release on recon non-PASS; treat not_available as incomplete SAS figure evidence, not PASS.",
         )
     else:
         add(
@@ -91,7 +92,7 @@ for path, label in [
             path,
             "Standalone only; absent from study_manifest DAG",
             "CONFIRMED",
-            "Add the third-track run and its reconciliation gate to the release DAG or remove readiness claims.",
+            "Add the run and its reconciliation gate to the release DAG or remove readiness claims.",
         )
 
 for item in manual:

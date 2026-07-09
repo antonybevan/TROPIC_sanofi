@@ -101,6 +101,9 @@ infrastructure_stages:
     # subgroup or wrong AVISIT filter) that the dataset/results gates above do not see.
     # Non-gated: own exit code gates it; absent forest CSV -> not_available, exit 0.
     - { name: "Forest-HR Reconciliation (SAS vs R)",         script: "06_qc_evidence/reconciliation/forest_reconcile.R",    runner: rscript }
+    # Figure-driving data gate (KM/waterfall/swimmer/ER exports from SAS TFL track).
+    # Non-gated; absent SAS figure CSVs -> not_available, exit 0 (see script header).
+    - { name: "Figure-Data Reconciliation (SAS vs R)",       script: "06_qc_evidence/reconciliation/figure_data_reconcile.R", runner: rscript }
     - { name: "ADaM Spec to Define Conformance",             script: "03_metadata/define/check_define_conformance.R", runner: rscript }
     - { name: "ADaM Spec to Data Conformance",               script: "04_analysis_datasets/programs/r/spec_data_checks.R",       runner: rscript }
     # G07 reviewer package lock: ADRG/SDRG/BDRG + residual/claim pointers must hold before

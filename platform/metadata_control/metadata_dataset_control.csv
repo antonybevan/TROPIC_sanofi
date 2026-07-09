@@ -1,8 +1,0 @@
-dataset,description,class,structure,spec_variables,data_variables,spec_data_status,missing_in_data,extra_in_data,ct_violations,type_mismatches,length_mismatches
-ADSL,"Subject-level characteristics, treatment allocations, survival, and baseline covariates.",SUBJECT LEVEL ANALYSIS DATASET,One record per subject,42,42,PASS,,,0,0,0
-ADEX,"Cycle-level actual dose performance, cumulative exposure, actual/planned dose intensities, and RDI calculations.",BASIC DATA STRUCTURE,One record per subject per parameter per visit,14,14,PASS,,,0,0,0
-ADCM,"Concomitant medication usage including G-CSF prophylaxis markers, prednisone compliance, and NACT timelines.",OCCURRENCE DATA STRUCTURE,One record per subject per medication,15,15,PASS,,,0,0,0
-ADAE,"Treatment-emergent adverse events, severity classifications, serious AEs, and custom myelosuppressive episode merging.",OCCURRENCE DATA STRUCTURE,One record per subject per adverse event,29,29,PASS,,,0,0,0
-ADLB,"Longitudinal absolute laboratory measurements, CTCAE grading, Worst-in-window flags (ANL01FL), and continuous nadir models.",BASIC DATA STRUCTURE,One record per subject per parameter per visit,27,27,PASS,,,0,0,0
-ADRS,"RECIST v1.0 soft-tissue assessments, bone-lesion scan progression tracking, objective responses, and PSA progressions.",BASIC DATA STRUCTURE,One record per subject per parameter per visit,13,13,PASS,,,0,0,0
-ADTTE,"Survival endpoints including Overall Survival (OS), Progression-Free Survival (PFS), TTPSA, and time-to-SAE endpoints.",BASIC DATA STRUCTURE,One record per subject per time-to-event parameter,19,19,PASS,,,0,0,0

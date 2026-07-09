@@ -49,6 +49,11 @@ python3 platform/export_datasetjson.py --sdtm   # SDTM only
 
 ## Scope notes
 
+> **Delivery class: ADDITIVE / PILOT** — built on the DAG (`export_datasetjson.py`) but **not**
+> the Module 5 primary package path (`package_ectd.py` does not consume this folder).
+> Review surface remains `08_submission_package/m5/` XPT + define. Do not present Dataset-JSON
+> as the filing package.
+
 - Values are preserved exactly as stored in XPT; this is a **format** modernization,
   not a content change. It does not alter the underlying SDTMIG/ADaMIG versions —
   see `06_qc_evidence/audit/run_records/SUBMISSION_STANDARDS_REMEDIATION.md`.

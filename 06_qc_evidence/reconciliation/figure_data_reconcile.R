@@ -1,11 +1,29 @@
 # Program: figure_data_reconcile.R
 # Purpose: Reconcile the exact data/statistics driving every shared R/SAS figure.
+#
+# Orchestration: study_manifest.yaml post-stage (after Forest-HR recon).
+# Graceful degradation: if SAS figure-driving CSVs are absent (sim / no ODA
+# figure render), record overall='not_available' and exit 0 — do not invent PASS.
+# Numeric disagreement exits 1 and fails the build (same pattern as forest_reconcile.R).
 
 suppressPackageStartupMessages({
   library(haven)
   library(dplyr)
+  library(jsonlite)
 })
 source("05_outputs/tfl/tfl_stats.R")
+
+status_path <- "platform/figure_data_reconciliation_status.json"
+dir.create("platform", showWarnings = FALSE)
+write_status <- function(overall, detail = NULL) {
+  payload <- list(
+    overall = overall,
+    detail = detail,
+    script = "06_qc_evidence/reconciliation/figure_data_reconcile.R",
+    generated_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%S%z")
+  )
+  writeLines(toJSON(payload, auto_unbox = TRUE, pretty = TRUE), status_path)
+}
 
 cat("========== R <-> SAS FIGURE-DATA RECONCILIATION ==========\n")
 ok <- TRUE
@@ -21,7 +39,14 @@ required <- file.path("04_analysis_datasets/adam", c(
   "figure_er_prod.csv"
 ))
 missing <- required[!file.exists(required)]
-if (length(missing)) stop("Missing SAS figure-data exports: ", paste(missing, collapse = ", "))
+if (length(missing)) {
+  msg <- paste(missing, collapse = ", ")
+  cat("  [SKIP] SAS figure-data exports absent — not_available\n")
+  cat("         ", msg, "\n", sep = "")
+  write_status("not_available", msg)
+  cat("FIGURE-DATA RECONCILIATION: NOT_AVAILABLE\n")
+  quit(save = "no", status = 0)
+}
 
 adsl <- bind_rows(read_xpt("04_analysis_datasets/adam/adsl_v.xpt"),
                   readRDS("01_source_data/cbzp_reconstructed/adsl_cbzp.rds"))
@@ -127,5 +152,9 @@ if (er_ok) pass("Exposure-response", sprintf("%d joined observations identical",
   fail("Exposure-response", "figure-driving records differ")
 
 cat("==========================================================\n")
-if (!ok) quit(save = "no", status = 1)
+if (!ok) {
+  write_status("FAIL", "one or more figure-driving checks failed")
+  quit(save = "no", status = 1)
+}
+write_status("PASS")
 cat("FIGURE-DATA RECONCILIATION: PASS\n")

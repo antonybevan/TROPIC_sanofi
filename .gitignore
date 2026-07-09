@@ -1,18 +1,14 @@
 # ==============================================================================
-# TROPIC-CDI-E2E-v2.0 eCTD Pipeline Gitignore Rules
+# TROPIC — Portfolio surface gitignore
+# Policy: docs/REPO_SURFACE_POLICY.md
+# Track: review face + spine source + sealed evidence + controlled narrative
+# Do NOT track: patient data, secrets, regenerable factory noise, dead archives
 # ==============================================================================
 
-# Clinical Data Protection (MANDATORY: Never commit patient data)
-# Ignore the CONTENTS of 01_source_data/ (note the /*, not /) so that the
-# negations below can re-include specific non-patient files. A bare
-# `01_source_data/` prunes the whole dir and git never evaluates the `!` rules.
+# ----- Clinical data (never) -------------------------------------------------
 01_source_data/*
 AllProvidedFiles_79.zip
-
-# Re-include reconstruction CODE, the validation report, and PUBLISHED aggregate
-# data (no patient data): (a) code that generates the synthetic CbzP arm, and
-# (b) digitised coordinates from the published de Bono 2010 Lancet figures.
-# This also addresses Finding D (untracked reconstruction dependency).
+# Re-include non-patient reconstruction code + published digitised KM inputs
 !01_source_data/reconstruct_cbzp_arm.R
 !01_source_data/reconstruct_cbzp_guyot.R
 !01_source_data/guyot_validation_report.R
@@ -22,118 +18,16 @@ AllProvidedFiles_79.zip
 !01_source_data/guyot_digitised/
 !01_source_data/guyot_digitised/**
 
-# Binary Outputs & Artifacts (MANDATORY: Never commit binary XPT outputs)
+# ADaM / native build outputs (regenerable; may contain patient-level data)
 04_analysis_datasets/adam/*.xpt
 04_analysis_datasets/adam/*.sas7bdat
 04_analysis_datasets/adam/*.csv
-05_outputs/tfl/output/
-
-# Telemetry and Health Audits
-platform/pipeline_health.json
-platform/health_dashboard.md
-platform/p21_report.json
-platform/reconciliation_report.html
-
-# Logs & Temporary Files
-backup_adam/
-*.log
-*.lst
-*.pdf
-*.rtf
-*.png
-.Rhistory
-.RData
-.Ruserdata
-.Rprofile
-
-# renv specific (except renv.lock which must be committed)
-.Rproj.user/
-renv/library/
-renv/local/
-renv/sandbox/
-renv/staging/
-
-# Python specific
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.ipynb_checkpoints/
-.venv/
-env/
-venv/
-
-# Node.js specific
-node_modules/
-
-# CDISC CORE conformance engine + isolated venv (large, re-downloadable per P21_RUNBOOK; never commit)
-.core_engine/
-.core_venv/
-# Pinnacle 21 Community + Java 8 runtime (large, re-downloadable per 06_qc_evidence/conformance/p21_adam_runrecord.md; never commit)
-.p21/
-platform/p21_out/
-# Staged domain-named ADaM XPT copies fed to the conformance engine (patient-derived — never commit)
-platform/_p21_datasets/
-# CORE conformance engine output (may reference dataset paths)
-platform/p21_report.*
-# Regenerable define.xml metadata flattening (intermediate for the ADaM conformance gate)
-platform/adam_conf_define_meta.json
-
-# SAS Connection & Credentials Profiles
-sascfg_personal.py
-_authinfo
-.authinfo
-# Dotenv secrets anywhere in the tree (audit M-3): .core_run/ is already ignored, but a
-# stray .env elsewhere must never be committable.
-.env
-*.env
-**/.env
-
-# Local IDE and temporary exploration folders
-.claude/
-scratch/
-platform/reconciliation_status.json
-
-# Generated from config/study_config.yaml by platform/generate_config.py (do not edit/commit)
-04_analysis_datasets/programs/sas/00_config_generated.sas
-platform/oda_status.json
-platform/.oda_singleflight.lock
-platform/.oda_session.json
-platform/pipeline_health_log.jsonl
-platform/stage_cache.json
-platform/.materialize_ectd_cache.json
-
-# --- Roadmap #6: surface portfolio deliverables + honest execution evidence on GitHub ---
-# Re-include the rendered TFL gallery (figures + text tables) and the pipeline-health /
-# reconciliation evidence so a reviewer browsing the repo sees them without a local run.
-# pipeline_health.json is committed as-is and transparently shows the current
-# sas_execution_mode (e.g. "sim" until a real oda/local run is recorded). Negations must
-# follow the broad *.png / output-dir ignores above; the directory is re-included first so
-# its contents can be re-included.
-!05_outputs/tfl/output/
-!05_outputs/tfl/output/**
-!platform/pipeline_health.json
-!platform/reconciliation_status.json
-
-# eCTD Module 5 package. The DATA-FREE preview (package_ectd.py --preview) is tracked for
-# portfolio visibility; patient-level transport/native data is NEVER tracked, even when the
-# full package is built locally with the licensed source data present.
-08_submission_package/m5/**/*.xpt
-08_submission_package/m5/**/*.sas7bdat
-# Re-include the rendered submission artifacts that the global *.pdf / *.png rules would ignore.
-!08_submission_package/m5/**/*.pdf
-!08_submission_package/m5/**/*.png
-
-# Dataset-JSON v1.1 export (04_analysis_datasets/datasetjson/) is patient-level data — same data-free
-# policy as the XPT above. The *.json data files are never tracked; README.md (markdown)
-# and any future docs remain tracked.
 04_analysis_datasets/datasetjson/**/*.json
 04_analysis_datasets/datasetjson/**/*.ndjson
 
-# eCTD sequence (08_submission_package/ectd/0000/): the backbone (index.xml, index-md5.txt), Study Tagging File,
-# regional metadata, and util/ are tracked. The materialized dataset + report-binary payload is a
-# reproducible copy of the m5/ tree (platform/materialize_ectd.py) and is NOT tracked.
-# Patient-level data is guarded unconditionally.
+# Package transport (never patient XPT in git)
+08_submission_package/m5/**/*.xpt
+08_submission_package/m5/**/*.sas7bdat
 08_submission_package/ectd/**/*.xpt
 08_submission_package/ectd/**/*.sas7bdat
 08_submission_package/ectd/**/*.json
@@ -142,30 +36,156 @@ platform/.materialize_ectd_cache.json
 08_submission_package/ectd/0000/m5/**/*.png
 08_submission_package/ectd/0000/m5/**/*.xlsx
 08_submission_package/ectd/0000/m5/**/*.txt
-# eCTD util/dtd: track the official .dtd files (enable DTD-valid checks); ignore download cruft
-# (the ICH zip + its index.htm; FDA spec PDFs are already covered by the global *.pdf rule).
 08_submission_package/ectd/0000/util/dtd/*.zip
 08_submission_package/ectd/0000/util/dtd/*.htm
 
+# ----- Secrets ---------------------------------------------------------------
+sascfg_personal.py
+_authinfo
+.authinfo
+.env
+*.env
+**/.env
+
+# ----- Tool installs / heavy engines -----------------------------------------
+.core_engine/
 .core_venv/
-
-# Ephemeral CDISC CORE run inputs (contain patient-data XPT)
 .core_run/
+.p21/
+platform/p21_out/
+platform/_p21_datasets/
+renv/library/
+renv/local/
+renv/sandbox/
+renv/staging/
+.Rproj.user/
+.venv/
+env/
+venv/
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.ipynb_checkpoints/
 
-# macOS
+# ----- Logs / OS / IDE -------------------------------------------------------
+*.log
+*.lst
+*.rtf
+.Rhistory
+.RData
+.Ruserdata
+.Rprofile
 .DS_Store
+.claude/
+scratch/
+backup_adam/
 
-# CORE conformance reports carry subject-level USUBJID rows — keep out of the data-free repo
-# (run records / classified summaries in *.md are safe and tracked).
-platform/conformance/core_*_report.json
+# ----- Global binary ignore (portfolio re-includes package + TFL gallery) ----
+*.pdf
+*.png
 
-# Generated per-study runtime work areas. Study templates and source code may be tracked later,
-# but generated datasets, telemetry, rendered reports, and generated SAS configs stay local.
+# Re-include review-face binaries (data-free package + TFL gallery)
+!08_submission_package/m5/**/*.pdf
+!08_submission_package/m5/**/*.png
+!05_outputs/tfl/output/
+!05_outputs/tfl/output/**
+!06_qc_evidence/audit/sap_v40_render/**
+
+# ----- Generated SAS config (from study_config.yaml) -------------------------
+04_analysis_datasets/programs/sas/00_config_generated.sas
+
+# ----- Factory runtime / regenerable telemetry (LOCAL ONLY) ------------------
+# Default: ignore status dumps and inventory CSVs. Sealed allowlist is re-included below.
+platform/**/*_status.json
+platform/**/*status.json
+platform/pipeline_health.json
+platform/pipeline_health_log.jsonl
+platform/stage_cache.json
+platform/.materialize_ectd_cache.json
+platform/.oda_singleflight.lock
+platform/.oda_session.json
+platform/oda_status.json
+platform/health_dashboard.md
+platform/reconciliation_report.html
+platform/p21_report.*
+platform/adam_conf_define_meta.json
+platform/define_content.sha
+platform/full_dag_proof_*.log
+platform/realsas_*.log
+
+# Regenerable control CSVs / side products under platform subfolders
+platform/ctq_traceability/
+platform/log_cleanliness/
+platform/metadata_control/
+platform/metadata_lineage/
+platform/orchestrator_gate_map/
+platform/source_profile/
+platform/tfl_output_index/
+platform/validation_strategy/
+platform/release_candidate/
+platform/release_run_manifest/
+platform/conformance/*.json
+
+# Intermediate recon statuses (not the seal allowlist)
+platform/cbzp_bridge_status.json
+platform/forest_reconciliation_status.json
+platform/figure_data_reconciliation_status.json
+platform/source_profile_status.json
+platform/tfl_output_index_status.json
+
+# ----- SEAL ALLOWLIST (committed Path A proof for bare-clone verify) ---------
+# Interviewers run: python3 scripts/verify_release.py
+!platform/pipeline_health.json
+!platform/reconciliation_status.json
+!platform/results_reconciliation_status.json
+!platform/admiral_reconciliation_status.json
+!platform/tfl_output_index_status.json
+!platform/validation_strategy/
+!platform/validation_strategy/validation_strategy_status.json
+!platform/log_cleanliness/
+!platform/log_cleanliness/log_cleanliness_status.json
+!platform/release_run_manifest/
+!platform/release_run_manifest/release_run_manifest.json
+!platform/release_candidate/
+!platform/release_candidate/release_candidate_status.json
+!platform/evidence/
+!platform/evidence/**
+
+# Keep gate status for G00/G02/G07 narrative (small; runtime locks)
+!06_qc_evidence/gates/
+!06_qc_evidence/gates/**
+
+# ----- Regenerable docs (control printers — not ADRG peers) ------------------
+docs/CTQ_TRACEABILITY_REPORT.md
+docs/DELIVERY_EVIDENCE_DASHBOARD.md
+docs/LOG_CLEANLINESS_REPORT.md
+docs/METADATA_CONTROL_REPORT.md
+docs/SOURCE_PROFILING_REPORT.md
+docs/VALIDATION_STRATEGY_CONTROL_REPORT.md
+docs/ORCHESTRATOR_GATE_MAP.md
+docs/TFL_OUTPUT_INDEX.md
+
+# ----- Regenerable QC inventory dumps (scripts remain tracked) ---------------
+06_qc_evidence/audit/file_inventory.csv
+06_qc_evidence/audit/inventory_summary.csv
+06_qc_evidence/audit/dataset_metadata.csv
+06_qc_evidence/audit/dependency_edges.csv
+06_qc_evidence/audit/dual_language_comparison.csv
+06_qc_evidence/audit/metadata_data_drift.csv
+06_qc_evidence/audit/rds_metadata.csv
+06_qc_evidence/audit/output_hash_binding.csv
+06_qc_evidence/audit/adam_variable_traceability.csv
+06_qc_evidence/conformance/adam_conformance_status.json
+06_qc_evidence/conformance/adam_conformance_report.csv
+
+# ----- Dead / one-off code (not portfolio surface) ---------------------------
+tools/archive/
+
+# ----- Multi-study runtime (templates may track; outputs never) --------------
 studies/*/04_adam/*.xpt
 studies/*/04_adam/*.sas7bdat
 studies/*/04_adam/*.csv
-studies/*/06_telemetry/*.json
-studies/*/06_telemetry/*.jsonl
-studies/*/06_telemetry/*.html
-studies/*/06_telemetry/*.md
+studies/*/06_telemetry/
 studies/*/02_production_sas/*_generated.sas

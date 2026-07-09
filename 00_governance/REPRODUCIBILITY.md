@@ -5,11 +5,14 @@ clone of this repository, and why. It exists because honest scope is more credib
 than a blanket "fully reproducible" claim.
 
 > **TL;DR** — A bare clone **cannot** re-run the *real* clinical pipeline (the source
-> SDTM and SAS/ODA credentials are deliberately excluded). It **can** run a
-> self-contained demo that proves the machinery works:
-> ```bash
-> python3 platform/cibuild.py --demo
-> ```
+> SDTM and SAS/ODA credentials are deliberately excluded — that is correct clinical
+> portfolio practice). It **can**:
+> 1. Inspect the Module 5–style package face (`08_submission_package/m5/`)
+> 2. Re-check Path A seals: `python3 scripts/verify_release.py`
+> 3. Run the data-free smoke: `python3 platform/cibuild.py --demo`
+>
+> What is allowed in git vs local-only: [`docs/REPO_SURFACE_POLICY.md`](../docs/REPO_SURFACE_POLICY.md).  
+> Interviewer walk: [`docs/INTERVIEWER_GUIDE.md`](../docs/INTERVIEWER_GUIDE.md).
 
 ---
 
