@@ -354,7 +354,9 @@ class TestAdamDefineParser(unittest.TestCase):
 
 class TestGenerateConfig(unittest.TestCase):
     def _yaml(self, text):
-        path = os.path.join(tempfile.mkdtemp(), "config/study_config.yaml")
+        # study_config lives under config/ in the real tree; tests use a temp copy.
+        path = os.path.join(tempfile.mkdtemp(), "config", "study_config.yaml")
+        os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "w", encoding="utf-8") as f:
             f.write(text)
         return path
