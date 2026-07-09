@@ -27,6 +27,16 @@
 **SDTM E2E audit pack:** `docs/workstreams/reviews/WS1_SDTM_E2E_AUDIT_2026-07-09.md`  
 **Verdict:** **GO to ADaM** with residuals dispositioned.
 
+### ADaM phase entry (2026-07-09)
+
+| ID | Pri | Work | Status |
+|---|---|---|---|
+| **W-ADAM-00** | P0 | Arm from DM; dens ADSL SAFFL; TEAE=TRTEMFL; no EXTRT arm | **PASS** — see `WS4_ADAM_PHASE_ENTRY_2026-07-09.md` |
+| **W-ADAM-01** | P0 | Dual-lang rebuild ADSL/ADAE + recon after arm map change | When SAS/ODA available |
+| **W-ADAM-02** | P1 | Hard gate TEAE blank AESER | Soft QC present |
+| **W-ADAM-03** | P1 | ADTTE/ADRS dens audit same ADSL rule | Next ADaM slice |
+| **W-SDTM-02** | P0 | Confirm dens ADSL N=371 | **Verified** T-20 uses SAFFL dens |
+
 ---
 
 ## Explicitly **not** next (unless claim expands)

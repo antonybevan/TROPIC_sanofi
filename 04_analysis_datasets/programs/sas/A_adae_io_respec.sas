@@ -211,8 +211,9 @@ proc sort data=adam.adae;
     by usubjid astdt aedecod aendt aeseq;
 run;
 
-/* QC (D-012 follow-on): TEAE rows must carry AESER. Baseline/non-TE skeleton
-   rows may have blank AESER (VISIT=BASELINE medical-history-like AEs in extract). */
+/* ADaM phase: TEAE = TRTEMFL='Y' only. TEAE dens for TFLs use ADSL SAFFL
+   (left-join), not distinct AE subjects (14 DM subjects have zero AE rows).
+   QC: TEAE rows should carry AESER; baseline skeleton may blank AESER. */
 data _null_;
     set adam.adae end=eof;
     retain n_teae_blank_aeser 0 n_nte_blank_aeser 0;

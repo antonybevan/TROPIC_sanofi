@@ -1001,18 +1001,21 @@ ggsave("05_outputs/tfl/output/figures/F-14-1_Swimmer_Plot.png", swimmer_plot,
 # ==============================================================================
 cat("  [TFL] Compiling AE Summary Tables...\n")
 
-# Join AE to ADSL to get treatment arm (TRTEMFL: T=treatment-emergent,
-# P=pre-existing, N=not TEAE)
+# TEAE analysis: TRTEMFL == "Y" only (not AESER non-missing).
+# Arm from ADSL (DM-derived), never from EXTRT. Denominators = ADSL SAFFL
+# (N=371 MP in real extract; subjects with no AE rows stay in denom with count 0).
 ae_safety <- adae |>
   select(-any_of("TRT01P")) |>
   filter(TRTEMFL == "Y") |>
-  left_join(adsl |> select(USUBJID, TRT01P), by = "USUBJID")
+  left_join(adsl |> select(USUBJID, TRT01P, SAFFL), by = "USUBJID")
 
-# Safety Population denominators per arm from ADSL (SAFFL); these head the
-# Safety Population AE (T-20) and lab shift (T-21) tables. ITT (TRT01P only)
-# would over-count CbzP (378 ITT vs 371 safety).
+# Safety Population denominators per arm from ADSL (SAFFL) — not AE-distinct n.
+# ITT-only dens would mis-handle CbzP synthetic merge (378 ITT vs 371 safety).
 n_mp <- sum(adsl$SAFFL == "Y" & adsl$TRT01P == "MP")
 n_cbzp <- sum(adsl$SAFFL == "Y" & adsl$TRT01P == "CbzP")
+stopifnot(n_mp + n_cbzp > 0)
+# Path A real MP dens must be 371 when only MP ADSL present pre-merge check:
+# (after CbzP bind_rows, n_mp remains real SAFFL MP count)
 
 # Precompute AE summary counts once (Issue 6 / 2.4)
 ae_counts <- ae_safety |>

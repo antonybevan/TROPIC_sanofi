@@ -1,18 +1,22 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: A_adsl_generation.sas
-   Version: 2.3.1
+   Version: 2.4.0
    Author: Antony Bevan, Clinical Programming
-   Date: 2026-06-12 (header fidelity update 2026-07-09)
+   Date: 2026-06-12 (ADaM phase 2026-07-09: DM-arm authority)
    Standard: ADaMIG v1.3
    Input: sdtm.dm, sdtm.ex, sdtm.ds, sdtm.vs; staging.ls, staging.pn, staging.lb, staging.cm
    Output: adam.adsl
    Description: Generates Subject-Level Analysis Dataset (ADSL) including
                 demographics, population flags, baseline covariates, and survival.
 
-   CRF grounding (D-012): ECOG is on the CRF VS panel (codes 0-4) and in PDS VS
-   (VSTESTCD=ECOG). DS disposition reasons are on EOT/EOS CRF forms and present
-   in PDS DS. See docs/workstreams/reviews/WS1_CRF_GROUNDING_D012_2026-07-09.md.
+   ADaM phase rules (WS1_SDTM_E2E + ADaM entry criteria):
+     - TRT01P/TRT01A from DM.ARM/ARMCD only (F-028: never EXTRT as arm).
+     - EX used only for TRTSDT/TRTEDT/TRTDURD (exposure timing).
+     - Row count must equal DM N (Path A: 371 MP).
+
+   CRF grounding (D-012): ECOG on CRF VS; DS reasons on EOT/EOS.
+     docs/workstreams/reviews/WS1_CRF_GROUNDING_D012_2026-07-09.md
    ============================================================================= */
 
 /* PGMDIR guard: define only when running standalone; master driver pre-defines this. */
@@ -25,7 +29,7 @@
 %set_pgmdir;
 %include "&PGMDIR./00_config.sas";
 
-/* Retrieve treatment dates, durations and populations */
+/* Exposure dates only — arm is NEVER taken from EXTRT (F-028). */
 proc sql;
     create table work.ex_dates as
     select 
@@ -217,10 +221,28 @@ proc sql;
         'NOT REPORTED' as ETHNIC length=40,
         'M' as SEX length=1,
 
-        "&TRT01P_CODE." as TRT01P length=20,
-        &TRT01PN_CODE. as TRT01PN,
-        "&TRT01P_CODE." as TRT01A length=20,
-        &TRT01PN_CODE. as TRT01AN,
+        /* Planned/actual analysis arm from DM only (F-028 / ADaM entry criteria).
+           Map study ARM labels to analysis codes; config is fallback only. */
+        case
+            when index(upcase(strip(dm.arm)), 'MITOX') > 0
+                 or strip(dm.armcd) = 'A'
+                then 'MP'
+            when index(upcase(strip(dm.arm)), 'CABAZ') > 0
+                 or index(upcase(strip(dm.arm)), 'XRP') > 0
+                then 'CbzP'
+            else "&TRT01P_CODE."
+        end as TRT01P length=20,
+        case
+            when index(upcase(strip(dm.arm)), 'MITOX') > 0
+                 or strip(dm.armcd) = 'A'
+                then 2
+            when index(upcase(strip(dm.arm)), 'CABAZ') > 0
+                 or index(upcase(strip(dm.arm)), 'XRP') > 0
+                then 1
+            else &TRT01PN_CODE.
+        end as TRT01PN,
+        calculated TRT01P as TRT01A length=20,
+        calculated TRT01PN as TRT01AN,
 
         dm.randdt as RANDDT format=yymmdd10.,
         ex.trtsdt as TRTSDT format=yymmdd10.,
@@ -269,11 +291,27 @@ proc sql;
     left join work.docetaxel_summary as doc on dm.usubjid = doc.usubjid;
 quit;
 
+/* ADaM QC: one row per DM subject; arm from DM map only */
+data _null_;
+    if 0 then set adam.adsl nobs=n_adsl;
+    if 0 then set sdtm.dm nobs=n_dm;
+    putlog "NOTE: [ADSL-QC] ADSL n=" n_adsl " DM n=" n_dm;
+    if n_adsl ne n_dm then
+        putlog "WARNING: [ADSL-QC] ADSL row count differs from DM — check joins.";
+run;
+proc freq data=adam.adsl noprint;
+    tables TRT01P / out=work.adsl_trt;
+run;
+data _null_;
+    set work.adsl_trt;
+    putlog "NOTE: [ADSL-QC] TRT01P=" TRT01P " n=" COUNT;
+run;
+
 /* Clean up work library */
 proc delete data=work.ex_dates work.survival_ds work.survival work.lstalv work.ecog
             work.meas work.visc work.pn_trt work.pn_base_daily work.pn_median
             work.ppi_med work.an_med work.pain_base work.labs_base work.labs_wide
             work.labs_ready work.docetaxel_recs work.docetaxel_resp work.docetaxel_prog
-            work.docetaxel_summary;
+            work.docetaxel_summary work.adsl_trt;
 run;
 quit;
