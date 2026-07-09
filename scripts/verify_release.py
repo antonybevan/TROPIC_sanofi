@@ -34,8 +34,10 @@ def main() -> int:
     add("health.mode_real_sas", h.get("sas_execution_mode") in {"oda", "local"}, str(h.get("sas_execution_mode")))
     add("health.full_dag", h.get("run_scope") == "full_dag", str(h.get("run_scope")))
     add(
-        "health.30_stages",
-        h.get("stages_expected") == 30 and len(stages) >= 30,
+        "health.full_stage_count",
+        # Phase-2 DAG is 33 stages (G00/G02/G07 + prior 30). Accept >=30 for forward/back compat.
+        int(h.get("stages_expected") or 0) >= 30 and len(stages) >= 30
+        and int(h.get("stages_expected") or 0) == len(stages),
         f"expected={h.get('stages_expected')} n={len(stages)}",
     )
     add("health.no_not_run", not (h.get("stages_not_run") or []), str(h.get("stages_not_run")))

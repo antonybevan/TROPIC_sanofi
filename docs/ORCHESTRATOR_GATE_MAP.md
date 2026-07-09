@@ -1,6 +1,6 @@
 # TROPIC Orchestrator Gate Map
 
-Generated: 2026-07-09 16:40:39 UTC
+Generated: 2026-07-09 16:41:59 UTC
 
 > Maps the actual `config/study_manifest.yaml` pipeline stages to the professional delivery gates in `config/delivery_workstreams.yaml`. This report shows what the runtime DAG controls directly and which delivery gates remain document/control-report governed.
 

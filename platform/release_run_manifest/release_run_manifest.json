@@ -2575,9 +2575,9 @@
     "sas_version": "9.04.01M8P022223",
     "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007"
   },
-  "evidence_grade": "remediation_partial_or_dirty",
-  "generated_at": "2026-07-09 16:41:31 UTC",
-  "manifest_sha256": "9efea28f496fb538faed6a44aa973a24f08056540f23637565fc248d44b3f7d3",
+  "evidence_grade": "release_candidate",
+  "generated_at": "2026-07-09 16:41:45 UTC",
+  "manifest_sha256": "efb3397c1dfbb4516cba08847a50938784469559487003ee45382a8a769560fa",
   "problems": [],
   "qc_statuses": {
     "cbzp_bridge": {
@@ -2680,9 +2680,7 @@
       "status": "PASS"
     }
   },
-  "remediation_reasons": [
-    "git worktree is dirty (4 porcelain entries); release-candidate lock requires a clean committed state"
-  ],
+  "remediation_reasons": [],
   "run_completeness": {
     "failed": [],
     "health_run_scope": "full_dag",
@@ -2742,34 +2740,14 @@
   },
   "source_control": {
     "branch": "codex/repo-structure-phase2",
-    "dirty": true,
-    "dirty_including_seal_outputs": true,
-    "head": "908c06a2eaac099d636e0046ab19b5f5f34ea352",
+    "dirty": false,
+    "dirty_including_seal_outputs": false,
+    "head": "60ccf0028ea0d3e8a5ed6b1d2bd00d2524bdd920",
     "staged_diff_paths": [],
-    "status_porcelain": [
-      "M 06_qc_evidence/gates/g00_governance_status.json",
-      " M 06_qc_evidence/gates/g02_specification_status.json",
-      " M 06_qc_evidence/gates/g07_reviewer_package_status.json",
-      " M platform/pipeline_health.json"
-    ],
-    "status_porcelain_all": [
-      "M 06_qc_evidence/gates/g00_governance_status.json",
-      " M 06_qc_evidence/gates/g02_specification_status.json",
-      " M 06_qc_evidence/gates/g07_reviewer_package_status.json",
-      " M docs/RELEASE_CANDIDATE_CHECKLIST.md",
-      " M docs/RELEASE_RUN_MANIFEST.md",
-      " M platform/pipeline_health.json",
-      " M platform/release_candidate/release_candidate_checklist.csv",
-      " M platform/release_candidate/release_candidate_status.json",
-      " M platform/release_run_manifest/release_run_manifest.json"
-    ],
-    "status_porcelain_sha256": "2d248f761b369c182ada74bb233e51174ed56007babf56e6c99c00197e5dfa02",
-    "tracked_diff_paths": [
-      "06_qc_evidence/gates/g00_governance_status.json",
-      "06_qc_evidence/gates/g02_specification_status.json",
-      "06_qc_evidence/gates/g07_reviewer_package_status.json",
-      "platform/pipeline_health.json"
-    ]
+    "status_porcelain": [],
+    "status_porcelain_all": [],
+    "status_porcelain_sha256": "",
+    "tracked_diff_paths": []
   },
-  "status": "REMEDIATION"
+  "status": "PASS"
 }
