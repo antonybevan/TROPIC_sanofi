@@ -225,14 +225,13 @@ Not “another GREEN JSON.”
 
 ## 8. Immediate next command (continue operating)
 
-**Done recently:** portfolio dual-surface + git surface policy · WS-6 **S1 ADRG** · seals still PASS  
+**Done recently:** portfolio surface · WS-6 **S1 ADRG** · WS-6 **S2 SDRG** · seals still PASS  
 
 **Next (resume order):**
 
-1. **WS-6 S2** — SDRG hardening (same §0 is/is-not + CORE residual honesty)  
-2. **WS-6 S3** — BDRG + TRACEABILITY_MATRIX catalog alignment  
-3. **WS-1** — `WS1_CORE_RESIDUAL_MATRIX.csv`  
-4. **WS-7** — wire `scripts/verify_release.py` into CI  
+1. **WS-6 S3** — BDRG + TRACEABILITY_MATRIX catalog alignment  
+2. **WS-1** — `WS1_CORE_RESIDUAL_MATRIX.csv`  
+3. **WS-7** — wire `scripts/verify_release.py` into CI  
 
 ```bash
 python3 scripts/verify_release.py

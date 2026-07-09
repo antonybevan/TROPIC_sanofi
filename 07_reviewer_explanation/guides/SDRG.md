@@ -1,36 +1,57 @@
 # Study Data Reviewer's Guide (SDRG)
 
-**Study Name:** TROPIC Re-Analysis  
-**Compound:** Cabazitaxel (CbzP) vs. Mitoxantrone (MP)  
-**Standard (submission):** CDISC SDTMIG v3.4 + CDISC/NCI CT 2026-03-27 (uplifted; see §5)  
-**Standard (source):** CDISC SDTMIG v3.1.1 (PDS 2013 release; pristine `01_source_data/real_sdtm/`)  
-**Created:** 2026-05-23 · **Uplifted:** 2026-06-20  
-
-> **Controlled demo release-candidate (2026-07-09):** Package/source integrity seals for the
-> current demo release-candidate PASS are tagged **`v0.1.0-demo-rc.1`**. Product claim:
-> [`docs/PRODUCT_CLAIM.md`](../docs/PRODUCT_CLAIM.md). Reviewer entry:
-> [`docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md`](../docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md).
-> Source intake pack: [`docs/workstreams/WS1_SOURCE_INTAKE_PACK.md`](../docs/workstreams/WS1_SOURCE_INTAKE_PACK.md).
-> Residuals (incl. date precision / CORE): [`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md).
-> SDTM-relevant controls include source profiling (`docs/SOURCE_PROFILING_REPORT.md`),
-> CORE SDTMIG 3.4 run records under `platform/conformance/`, and findings disposition
-> (`06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md`). **Not** a submission or Part 11 claim.
+| Field | Value |
+|---|---|
+| **Document** | Study Data Reviewer's Guide (SDRG) |
+| **Study** | TROPIC / EFC6193 / NCT00417079 |
+| **Compound** | Cabazitaxel (CbzP) vs Mitoxantrone (MP) |
+| **Standard (package layer)** | CDISC SDTMIG **v3.4** + CDISC/NCI CT 2026-03-27 (uplifted; §5) |
+| **Standard (pristine source)** | CDISC SDTMIG **v3.1.1** (PDS 2013; local `01_source_data/real_sdtm/`) |
+| **Document version** | 1.1 (Path A hardened) |
+| **Effective** | 2026-07-09 |
+| **Supersedes** | SDRG narrative drafts prior to `v0.1.0-demo-rc.1` Path A freeze |
+| **Product claim** | **Path A only** — controlled non-submission demonstration |
 
 ---
 
-## 1. Source Data Normalization & Integrity Controls
-Source data are the official **Sanofi de-identified SDTM datasets** for NCT00417079, released in 2013 and accessed via the **Project Data Sphere (PDS)** repository. The files are SAS transport datasets (`*.sas7bdat`); no other source format is used (this matches `README.md` *Data provenance* and `00_governance/REPRODUCIBILITY.md` §5).
+## 0. What this package is / is not (read first)
 
-The custom SAS staging compiler ([L_staging_ingest.sas](file:///Users/apple/Desktop/TROPIC/04_analysis_datasets/programs/sas/L_staging_ingest.sas)) ingests these SDTM `*.sas7bdat` files (`set realsdtm.<domain>`) and performs automated supplemental-qualifier (SUPP--) transposition and merge, coercing character-encoded continuous indicators (e.g. age, laboratory values, vital measurements) into standardized double-precision numeric values.
+| This package **is** | This package **is not** |
+|---|---|
+| Study-data explanation for a **submission-style** Module 5 tree | An FDA filing / real application sequence |
+| Real **MP-only** de-identified SDTM (N=371) as source for dual-language ADaM | Two-arm real patient-level IPD in git |
+| Uplifted SDTMIG 3.4 **package layer** + define co-located under `m5/.../tabulations/sdtm/` | Proof that commercial P21 cleared every residual |
+| CORE SDTM 3.4 run with **classified residuals** (F-015) | “Full CORE clean” / zero-finding claim |
+| Week-offset / partial-date source honesty (F-017) | Day-level AE timing precision that the source never had |
+| Path A demo with patient XPT **not redistributed** | Part 11 validated system |
+
+**Binding claim:** [`docs/PRODUCT_CLAIM.md`](../../docs/PRODUCT_CLAIM.md)  
+**Source intake pack (WS-1):** [`docs/workstreams/WS1_SOURCE_INTAKE_PACK.md`](../../docs/workstreams/WS1_SOURCE_INTAKE_PACK.md)  
+**Residual risks:** [`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)  
+**External validation slots:** [`docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md`](../../docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md)  
+**Sealed demo RC:** tag `v0.1.0-demo-rc.1` · [`docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md`](../../docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md) · `python3 scripts/verify_release.py`  
+**Review package face:** [`08_submission_package/m5/datasets/tropic/tabulations/sdtm/`](../../08_submission_package/m5/datasets/tropic/tabulations/sdtm/)  
+**Analysis narrative:** [`ADRG.md`](ADRG.md)  
+**Findings disposition:** `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md`
+
+> **Redistribution:** Real `*.sas7bdat` and package `*.xpt` are **not** in git (data rights + portfolio surface policy). Structure, define, SDRG/ADRG, and programs are.
+
+---
+
+## 1. Source data normalization & integrity controls
+
+Source data are the official **Sanofi de-identified SDTM** for NCT00417079 (2013), accessed via **Project Data Sphere (PDS)** as SAS `*.sas7bdat`. Provenance: root README · [`00_governance/REPRODUCIBILITY.md`](../../00_governance/REPRODUCIBILITY.md).
+
+Staging: [`L_staging_ingest.sas`](../../04_analysis_datasets/programs/sas/L_staging_ingest.sas) (and R twin `v_staging_ingest.R`) ingests `realsdtm.<domain>`, transpose-merges SUPP--, and coerces character continuous indicators to numeric where required.
 
 > [!IMPORTANT]
-> **Single-Arm Source Limitation:** The source Project Data Sphere (PDS) public dataset contains only the Mitoxantrone (MP) arm (N=371). The comparator Cabazitaxel (CbzP) arm (N=378) was not included in the public release. Consequently, the SDTM datasets only represent the MP cohort. In our pipeline, the core production (SAS) and validation (R) ADaM tracks process strictly the MP cohort (N=371) to establish a clean double-programming validation setup. The comparator Cabazitaxel cohort is reconstructed from published trial literature and merged dynamically at the final reporting/TFL compilation step in [tfl_generation.R](file:///Users/apple/Desktop/TROPIC/05_outputs/tfl/tfl_generation.R).
+> **Single-arm source limitation (Path A critical):** PDS public data here is **MP only (N=371)**. Cabazitaxel is **not** present as source SDTM. Dual-language ADaM recon is MP-only. Synthetic/reconstructed CbzP is merged only at TFL reporting ([`tfl_generation.R`](../../05_outputs/tfl/tfl_generation.R)) — non-confirmatory (F-003). Do not describe this as a clean two-arm double-programming of trial IPD.
 
-### Database Write-Protection Architecture
-To guarantee database integrity and prevent raw data corruption during pipeline executions:
-- The `realsdtm` SAS libref (pointing to `01_source_data/real_sdtm/`) is mounted with `access=readonly` in [00_config.sas](file:///Users/apple/Desktop/TROPIC/04_analysis_datasets/programs/sas/00_config.sas), preventing direct writes via that libref.
-- The `staging` SAS libref (same physical directory) is writable, allowing `L_staging_ingest.sas` to write transposed SUPP-merged domain outputs alongside source files during ODA cloud execution.
-- Intermediate mapped SDTM outputs generated during mapping runs are redirected to [sdtm_mapped](file:///Users/apple/Desktop/TROPIC/04_analysis_datasets/adam/sdtm_mapped/) inside the [04_analysis_datasets/adam](file:///Users/apple/Desktop/TROPIC/04_analysis_datasets/adam/) output folder.
+### Database write-protection architecture
+
+- `realsdtm` libref → `01_source_data/real_sdtm/` with `access=readonly` in [`00_config.sas`](../../04_analysis_datasets/programs/sas/00_config.sas)
+- `staging` libref writable for SUPP-merged intermediates during ODA runs
+- Mapped intermediates redirect under `04_analysis_datasets/adam/` (local build outputs; not the git portfolio face)
 
 
 ---
@@ -62,7 +83,7 @@ For subjects with missing baseline laboratory values (PSABL, ALPBL, HGBBL), popu
 - `ALBBL` fixed: 38.0 g/L (no subject-level source available)
 - `LDHBL` fixed: 220.0 U/L (no subject-level source available)
 
-This imputation strategy is retained as a documented implementation limitation under SAP v4.0 §14 / §18. **These imputed baseline laboratory constants are schema placeholders and are NOT used as covariates or stratification factors in any efficacy model**, consistent with [ADRG](file:///Users/apple/Desktop/TROPIC/07_reviewer_explanation/guides/ADRG.md) §5.1. The primary and secondary Cox / log-rank analyses stratify **only on the protocol randomization strata** (`ECOGBL` and `MEASDISF`; see `05_outputs/tfl/tfl_generation.R`, `compute_tte_stats()` → `strata(ECOGBL, MEASDISF)`). `ALBBL` and `LDHBL` in particular are single constants for all subjects (no subject-level source available) and therefore carry no subject-level information; they are retained purely to satisfy the ADaM schema and should be read as "not available," not as analysis inputs.
+This imputation strategy is retained as a documented implementation limitation under SAP v4.0 §14 / §18. **These imputed baseline laboratory constants are schema placeholders and are NOT used as covariates or stratification factors in any efficacy model**, consistent with [ADRG](ADRG.md) §5.1. The primary and secondary Cox / log-rank analyses stratify **only on the protocol randomization strata** (`ECOGBL` and `MEASDISF`; see `05_outputs/tfl/tfl_generation.R`, `compute_tte_stats()` → `strata(ECOGBL, MEASDISF)`). `ALBBL` and `LDHBL` in particular are single constants for all subjects (no subject-level source available) and therefore carry no subject-level information; they are retained purely to satisfy the ADaM schema and should be read as "not available," not as analysis inputs.
 
 ### 4.2 Supplemental Domain Ingestion
 Domains `LS` (Lesion) and `PN` (Pain/Numeric) do not have supplemental (`SUPPLS`, `SUPPPN`) datasets in the PDS source data. The `%transpose_supp()` macro gracefully handles this via the `supp_exists = 0` guard path, copying the primary domain directly without SUPP merge.
@@ -92,8 +113,25 @@ The pristine source SDTM (`01_source_data/real_sdtm/`, PDS 2013) was authored to
 - **TS** enriched with public NCT00417079 parameters (`NARMS=2`, `ACTSUB=371`, `SSTDTC=2007`, `AGEMIN=P18Y`). **TA** (Trial Arms) built from the public two-arm design.
 - Variable labels title-cased, leading/trailing whitespace stripped, variable order aligned to the CDISC SDTM library.
 
-**Authoritative conformance run.** Validated with **CDISC CORE** (`cdisc-rules-engine`) at `-s sdtmig -v 3.4` (CT 2026-03-27) — report `platform/conformance/core_sdtm34_report.json`, run record `CORE_SDTM34_RUN_RECORD.md`. All targeted structural rules cleared (CORE-000264 AESOC, -000453 AGE, -000701 EPOCH, -000776 EXENDY, -000550 non-standard→SUPP, -000852 variable order, -001082 type, -000594/398 labels, -000867 whitespace). Remaining findings are **not programming defects** and fall into four documented classes:
-1. **Inherent to de-identification (5):** expected/required variables removed by the PDS public release (`SITEID`, `COUNTRY`, MedDRA hierarchy codes `AELLT`/`AEPTCD`, exact `AESTDTC`/`AEENDTC`). Cannot be reconstructed.
-2. **Real source-data quality (CORE-000266/022 AESER consistency; CORE-000732 VSSTRESC/N):** present in the source safety data; **not** silently overwritten (doing so would falsify reported safety data).
-3. **Cross-domain (CORE-000767 RELREC/`FAOBJ`):** fires because no `FA` domain is in this analysis-scoped package; not applicable to the submitted domains.
-4. **CORE engine-internal** ("evaluation dataset failed to build").
+### 5.1 CORE SDTMIG 3.4 — honesty (F-015)
+
+**Run record:** [`platform/conformance/CORE_SDTM34_RUN_RECORD.md`](../../platform/conformance/CORE_SDTM34_RUN_RECORD.md)  
+**Engine:** cdisc-rules-engine (CORE) v0.16.0 · standard SDTMIG 3.4 · CT 2026-03-27  
+**Headline:** targeted **structural uplift rules cleared**; overall issue count is **not zero** and must not be marketed as “CORE clean.”
+
+| Class | Examples | Disposition (Path A) |
+|---|---|---|
+| **Structural targets fixed** | AESOC, AGE, EPOCH, EXENDY, non-standard→SUPP, labels/order/type | Accept as uplift success |
+| **Inherent de-identification** | SITEID / COUNTRY / MedDRA hierarchy codes / exact AE dates removed by PDS | **Accept** — cannot invent PII or lost codes |
+| **Real source-data quality** | AESER consistency (CORE-000266/022); VSSTRESC/N (CORE-000732) | **Accept** — do not overwrite true safety source to greenwash |
+| **Cross-domain N/A** | RELREC/FAOBJ (CORE-000767) without FA in analysis-scoped package | **Waive / N/A** for this package scope |
+| **Engine-internal** | CORE-000929 / CORE-001081 evaluation dataset failed to build | **Accept with note** — tool noise, not silent data fix |
+
+**Rule for reviewers:**  
+- **Do claim:** “Uplifted package layer; CORE run recorded; structural targets cleared; residuals classified.”  
+- **Do not claim:** “Full commercial conformance” or “zero CORE findings.”  
+- **Open engineering (WS-1):** rule-level CSV matrix still planned (`docs/workstreams/WS1_CORE_RESIDUAL_MATRIX.csv` — not yet filed). Until then, this section + run record + known-differences memo are the residual story.
+
+**Related residual:** week-offset / partial ISO dates — **F-017** (§2 AE note, §4.5). Never invent day precision.
+
+**Pinnacle 21 commercial ADaM/SDTM:** **NOT_AVAILABLE** under Path A (see WS-3 external validation index). Local CORE + dual-language ADaM recon are substitutes only.

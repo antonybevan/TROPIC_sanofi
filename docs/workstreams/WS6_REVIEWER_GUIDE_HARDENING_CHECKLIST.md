@@ -20,9 +20,9 @@ Each of ADRG, SDRG, BDRG must contain—near the top:
 
 - [x] Link to **product claim** Path A  
 - [x] Link to tag / release note `v0.1.0-demo-rc.1`  
-- [x] Explicit **document version + date + supersedes** line — **ADRG done (S1)**; SDRG/BDRG pending S2/S3  
-- [x] **what this package is / is not** — **ADRG done (S1)**  
-- [x] Pointer to **known-differences memo** — **ADRG done (S1)**  
+- [x] Explicit **document version + date + supersedes** line — **ADRG + SDRG done**; BDRG pending S3  
+- [x] **what this package is / is not** — **ADRG + SDRG done**  
+- [x] Pointer to **known-differences memo** — **ADRG + SDRG done**  
 
 ---
 
@@ -48,14 +48,16 @@ Each of ADRG, SDRG, BDRG must contain—near the top:
 
 | Section theme | Required content | Status |
 |---|---|---|
-| Source origin | PDS/Sanofi 2013; MP only | Present |
-| Precision | Week offsets / partial ISO (F-017) | Present |
-| Conformance | CORE 3.4 run + residual honesty (F-015) | Partial |
-| Uplift | 3.1.1 source → 3.4 package layer | Present |
-| Redistribution | No patient XPT in git | Present |
-| Release pointer | Tag + release note | Present |
+| Source origin | PDS/Sanofi 2013; MP only | **Done (S2)** §0–§1 |
+| Precision | Week offsets / partial ISO (F-017) | **Done (S2)** §2 / §4.5 / §5.1 |
+| Conformance | CORE 3.4 run + residual honesty (F-015) | **Done (S2)** §5.1 class table |
+| Uplift | 3.1.1 source → 3.4 package layer | **Done (S2)** §5 |
+| Redistribution | No patient XPT in git | **Done (S2)** §0 |
+| Release pointer | Tag + release note + WS-1 pack | **Done (S2)** §0 |
+| Path A is/is-not | Mirror PRODUCT_CLAIM | **Done (S2)** §0 |
 
-**Pass criterion:** Source limitations are complete enough that WS-1 pack and SDRG never conflict.
+**Pass criterion:** Source limitations are complete enough that WS-1 pack and SDRG never conflict.  
+**S2 self-check:** Met for SDRG 1.1 (2026-07-09).
 
 ---
 
@@ -95,9 +97,9 @@ Each of ADRG, SDRG, BDRG must contain—near the top:
 
 | Session | Deliverable | Status |
 |---|---|---|
-| S1 | ADRG: PRODUCT_CLAIM + known-differences; Path A validation talk track | **DONE 2026-07-09** (`ADRG.md` v1.1) |
-| S2 | SDRG: CORE residual honesty + WS-1 pack link; precision § audit | **Next** |
-| S3 | BDRG depth pass + TRACEABILITY_MATRIX catalog alignment | Pending |
+| S1 | ADRG: PRODUCT_CLAIM + known-differences; Path A validation talk track | **DONE** (`ADRG.md` v1.1) |
+| S2 | SDRG: CORE residual honesty + WS-1 pack link; precision § audit | **DONE** (`SDRG.md` v1.1) |
+| S3 | BDRG depth pass + TRACEABILITY_MATRIX catalog alignment | **Next** |
 
 After S1–S3: file `docs/workstreams/reviews/WS6_review_YYYYMMDD.md` and move board toward GREEN.
 
