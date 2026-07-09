@@ -63,6 +63,27 @@
 
 **Explicit non-claims:** full aCRF annotation package; day-true AE onset dates in public extract; commercial filing CRF provenance.
 
+### Package domain scope (analysis-scoped SDTM)
+
+| Layer | Content |
+|---|---|
+| **Pristine PDS (local)** | 34 `*.sas7bdat` domains (incl. EG, MH, PE, SV, IE, CD, CX, trial design fragments, etc.) |
+| **Package / `define_sdtm.xml`** | **18** datasets: DM, EX, AE, LB, CM, DS, VS, LS, PN + SUPPAE/CM/DM/DS/EX/LB/LS + **TA, TS** |
+
+Domains present in PDS but **not** packaged (by design for this Path A analysis package):  
+`CD, CX, EG, IE, MH, PE, PR, SC, SV, TE, TI, TV` (+ related SUPP*).  
+Do **not** claim the Module 5 SDTM folder is a full copy of every PDS domain.
+
+**Full E2E audit:** [`docs/workstreams/reviews/WS1_SDTM_E2E_AUDIT_2026-07-09.md`](../../docs/workstreams/reviews/WS1_SDTM_E2E_AUDIT_2026-07-09.md)
+
+### Material extract residuals (SDTM E2E)
+
+| ID | Finding | Honesty |
+|---|---|---|
+| **F-028** | One subject has `EXTRT=XRP6258` (10 rows) while **all** DM rows are `ARM=MITOXANTRONE/PREDNISONE` | Arm authority = **DM/ADSL**, not EXTRT alone; do not silently re-code EX |
+| **AE coverage** | AE subjects **357/371** (14 subjects with no AE rows) | Any-AE rates must use ADSL denominator |
+| **F-026** | ~1134 BASELINE AE skeleton rows (blank AESER) | TEAE analyses use `TRTEMFL` |
+
 ---
 
 ## 1. Source data normalization & integrity controls

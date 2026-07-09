@@ -8,15 +8,24 @@
 
 ## Active backlog
 
+### SDTM layer (complete E2E audit first — 2026-07-09)
+
 | ID | Pri | Owner | Work | Why it matters | Exit |
 |---|---|---|---|---|---|
-| **W-AE-01** | P0 | WS-4 / WS-5 | Baseline AE skeleton (blank AESER on ~1134 BASELINE rows) fully documented + TEAE AESER soft QC | Reviewer may count blank AESER as data quality failure; TEAE analysis must stay clean | ADRG §4B + ADAE `[ADAE-QC]` logs; optional hard gate after rebuild |
-| **W-AE-02** | P1 | WS-4 / WS-6 | Grade 5 / fatal mapping vs CRF grade 1–4 labels | Avoid “grade 5 not on CRF” false challenge | Documented ADRG §4B |
-| **W-LB-01** | P1 | WS-1 / WS-6 | ALB/LDH Class C (not on CRF lab panels; not in LB) | Stop wrong “PDS stripped albumin” story | Documented ADRG §5.1 + D-012 |
-| **W-AE-03** | P2 | WS-1 / WS-5 | CORE AESER residual disposition stays honest | No greenwashing source | Residual matrix + no overwrite |
-| **W-CRF-01** | P2 | WS-6 / WS-7 | Full aCRF + real app IDs | Filing simulation only | Path B PRODUCT_CLAIM |
-| **W-PKG-01** | P3 | WS-7 | Re-package ADRG/SDRG/BDRG PDFs into `m5/` | Markdown is source of truth; PDFs lag | Optional `package_ectd` |
-| **W-CI-01** | Done | WS-7 | Data-free CI green with portfolio surface | Done on `main` | CI success |
+| **W-SDTM-01** | **P0** | WS-1/WS-6 | Disclose **F-028**: EXTRT=XRP6258 (1 subj, 10 rows) vs DM all MITOXANTRONE arm | Arm must not be taken from EXTRT | SDRG + audit pack; no silent re-code |
+| **W-SDTM-02** | **P0** | WS-4 | ADaM: any-AE / safety dens use **ADSL N=371** (14 subj have no AE) | Wrong denominator if AE-distinct only | Verify in ADaM phase |
+| **W-SDTM-03** | P1 | WS-1/WS-6 | Package = **18** analysis-scoped domains vs **34** PDS | Avoid “full SDTM dump” claim | SDRG scope table (done in E2E pack) |
+| **W-SDTM-04** | P2 | WS-5 | Optional QC list EXTRT ∉ expected set | Catch arm/exposure drift | Listing or gate |
+| **W-AE-01** | P0 | WS-4 / WS-5 | Baseline AE skeleton + TEAE AESER soft QC | TEAE cleanliness | ADRG §4B + ADAE QC (done soft) |
+| **W-AE-02** | P1 | WS-4 / WS-6 | Grade 5 / fatal mapping vs CRF grade 1–4 labels | Documented ADRG §4B | Done docs |
+| **W-LB-01** | P1 | WS-1 / WS-6 | ALB/LDH Class C | Documented ADRG §5.1 | Done docs |
+| **W-AE-03** | P2 | WS-1 / WS-5 | CORE AESER residual | No overwrite | Residual matrix |
+| **W-CRF-01** | P2 | WS-6 / WS-7 | Full aCRF + real app IDs | Path B | Deferred |
+| **W-PKG-01** | P3 | WS-7 | Re-package guide PDFs into `m5/` | Optional | Optional |
+| **W-CI-01** | Done | WS-7 | Data-free CI green | Done | CI success |
+
+**SDTM E2E audit pack:** `docs/workstreams/reviews/WS1_SDTM_E2E_AUDIT_2026-07-09.md`  
+**Verdict:** **GO to ADaM** with residuals dispositioned.
 
 ---
 
