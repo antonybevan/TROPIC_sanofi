@@ -137,19 +137,30 @@ platform/tfl_output_index_status.json
 
 # ----- SEAL ALLOWLIST (committed Path A proof for bare-clone verify) ---------
 # Interviewers run: python3 scripts/verify_release.py
+# Pattern: un-ignore the dir, ignore all contents, then un-ignore ONLY the seal file.
+# (A bare !dir/ re-opens the whole folder → green untracked CSVs in the IDE.)
 !platform/pipeline_health.json
 !platform/reconciliation_status.json
 !platform/results_reconciliation_status.json
 !platform/admiral_reconciliation_status.json
 !platform/tfl_output_index_status.json
+
 !platform/validation_strategy/
+platform/validation_strategy/**
 !platform/validation_strategy/validation_strategy_status.json
+
 !platform/log_cleanliness/
+platform/log_cleanliness/**
 !platform/log_cleanliness/log_cleanliness_status.json
+
 !platform/release_run_manifest/
+platform/release_run_manifest/**
 !platform/release_run_manifest/release_run_manifest.json
+
 !platform/release_candidate/
+platform/release_candidate/**
 !platform/release_candidate/release_candidate_status.json
+
 !platform/evidence/
 !platform/evidence/**
 
