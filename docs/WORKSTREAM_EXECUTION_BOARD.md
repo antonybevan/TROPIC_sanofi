@@ -225,13 +225,13 @@ Not “another GREEN JSON.”
 
 ## 8. Immediate next command (continue operating)
 
-**Done recently:** portfolio surface · WS-6 S1–S3 · WS-1 CORE matrix · **WS-7 CI verify_release** · seals still PASS  
+**Done recently:** portfolio surface · WS-6 guides · CORE matrix · CI green · **D-012 CRF grounding audit**  
 
 **Next (optional polish):**
 
-1. Open PR `codex/repo-structure-phase2` → `main` (CI will run seal verify + full suite)  
-2. Re-package guide PDFs into `m5/` when convenient  
-3. WS-2 review note if population/endpoint narrative drifts  
+1. Re-package guide PDFs into `m5/` when convenient  
+2. WS-2 review note if population/endpoint narrative drifts  
+3. Extend CRF grounding to additional domains only if claimed in programming 
 
 ```bash
 python3 scripts/verify_release.py   # local

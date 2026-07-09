@@ -1,14 +1,18 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: A_adsl_generation.sas
-   Version: 2.3.0
+   Version: 2.3.1
    Author: Antony Bevan, Clinical Programming
-   Date: 2026-06-12
+   Date: 2026-06-12 (header fidelity update 2026-07-09)
    Standard: ADaMIG v1.3
    Input: sdtm.dm, sdtm.ex, sdtm.ds, sdtm.vs; staging.ls, staging.pn, staging.lb, staging.cm
    Output: adam.adsl
    Description: Generates Subject-Level Analysis Dataset (ADSL) including
                 demographics, population flags, baseline covariates, and survival.
+
+   CRF grounding (D-012): ECOG is on the CRF VS panel (codes 0-4) and in PDS VS
+   (VSTESTCD=ECOG). DS disposition reasons are on EOT/EOS CRF forms and present
+   in PDS DS. See docs/workstreams/reviews/WS1_CRF_GROUNDING_D012_2026-07-09.md.
    ============================================================================= */
 
 /* PGMDIR guard: define only when running standalone; master driver pre-defines this. */

@@ -62,15 +62,16 @@ Machine gates can be green while **residual risks** remain. This memo is the hum
 
 ### 3.2 Package / regulatory structure
 
-#### F-005 — EXAMPLE eCTD metadata / placeholder CRF (Critical) · **ACCEPTED**  
+#### F-005 — EXAMPLE eCTD metadata / incomplete aCRF package (Critical) · **ACCEPTED**  
 **Class:** `external_dependency` + `non_submission_demo_limit` · **Owner:** WS-7 + WS-6  
 
 | | |
 |---|---|
-| **Difference** | `us-regional.xml` uses EXAMPLE/000000; CRF is not a true annotated CRF with page-level origins. |
-| **Impact if ignored** | “We built a real FDA sequence” overclaim |
-| **Why Path A holds** | Structure demonstration only; PRODUCT_CLAIM forbids submission claim |
+| **Difference** | `us-regional.xml` uses EXAMPLE/000000 (not a real FDA application). **Source CRF PDF exists** and is packaged as `blankcrf.pdf`, but Path A does **not** claim a complete annotated CRF (aCRF) with page-level define origins for every variable. |
+| **Impact if ignored** | “We built a real FDA sequence / full aCRF package” overclaim — or the opposite error of saying “we have no CRF” |
+| **Why Path A holds** | Structure + source CRF copy demonstrated; filing identity and full aCRF annotation not claimed |
 | **Close condition** | Assigned application IDs + true aCRF + origin links |
+| **Related** | CRF **domain grounding** for programming honesty is D-012 (`WS1_CRF_GROUNDING_D012_2026-07-09.md`) — separate from aCRF package completeness |
 
 #### F-025 — Part 11 controls (Major) · **ACCEPTED**  
 **Class:** `non_submission_demo_limit` · **Owner:** WS-0 + WS-7  
@@ -131,12 +132,12 @@ Machine gates can be green while **residual risks** remain. This memo is the hum
 | **Why Path A holds** | Explicitly not claimed |
 | **Close condition** | Tool access + full report + disposition |
 
-#### F-017 — Partial ISO dates / TSSEQ (Major) · **ACCEPTED**  
+#### F-017 — Partial ISO dates / week-offset AE timing (Major) · **ACCEPTED**  
 **Class:** `scope_out_with_disclosure` · **Owner:** WS-1  
 
 | | |
 |---|---|
-| **Difference** | Source PDS date precision yields partial ISO and related warnings; week-offset reconstruction ±3.5 days for some domains. |
+| **Difference** | **CRF collected calendar dates** (day/month/year on AE and lab forms). Public PDS extract reduces AE timing to **week offsets** (`AESTWK`/`AEENWK`) and shows partial ISO on some other domains — Class B extract reduction (D-012), not “trial never collected dates.” Reconstruction ±3.5 days for week-based AE timing. |
 | **Impact if ignored** | Treated as programming bug rather than source limitation |
 | **Why Path A holds** | SDRG documents source precision; analysis does not invent day precision |
 | **Close condition** | Only with better source dates (usually impossible on PDS) or formal imputation SAP |

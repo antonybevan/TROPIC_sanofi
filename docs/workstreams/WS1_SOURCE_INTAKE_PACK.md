@@ -25,8 +25,10 @@ Prove we know **what source data we have**, **what we may redistribute**, **what
 | Source profile | Aggregate inventory (patient-safe) | `docs/SOURCE_PROFILING_REPORT.md` · `platform/source_profile*` | PASS at seal |
 | SDTMIG 3.4 uplift | Package source layer | `platform/uplift_sdtm_34.R` | In package path |
 | CORE SDTM 3.4 run | Open conformance evidence | `platform/conformance/CORE_SDTM34_RUN_RECORD.md` | Present (partial residual story) |
-| SDRG | Human source explanation | `07_reviewer_explanation/guides/SDRG.md` | Present; hardening continues |
-| Disposition | F-015, F-017 | findings register + known-differences memo | ACCEPTED on record |
+| SDRG | Human source explanation | `07_reviewer_explanation/guides/SDRG.md` | Present; §0A CRF grounding (D-012) |
+| CRF PDF | Source form booklet | `01_source_data/Sanofi CRF Tropic.pdf` · package `blankcrf.pdf` | Present (not full aCRF claim) |
+| CRF grounding decision | Form vs PDS classification | `docs/workstreams/reviews/WS1_CRF_GROUNDING_D012_2026-07-09.md` | Filed 2026-07-09 |
+| Disposition | F-015, F-017, F-005 (CRF/aCRF precision) | findings register + known-differences memo | ACCEPTED on record |
 
 ---
 

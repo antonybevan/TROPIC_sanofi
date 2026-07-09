@@ -1,15 +1,22 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: A_adae_io_respec.sas
-   Version: 2.2.0
+   Version: 2.2.1
    Author: Antony Bevan, Clinical Programming
-   Date: 2026-05-27
+   Date: 2026-05-27 (header fidelity update 2026-07-09)
    Standard: ADaMIG v1.3 OCCDS v1.0
    Input: sdtm.ae, adam.adsl
    Output: adam.adae
    Description: Generates Adverse Events ADaM (ADAE) under OCCDS v1.0.
                 Implements custom sponsor-defined continuous episode merging (gap <= 3 days)
                 with corrected AEOCCFL occurrence denominator flags.
+
+   CRF grounding (D-012 — Sanofi CRF O.1_AE_1):
+     Form collected: seriousness, relationship to study treatment, action taken,
+     corrective therapy, outcome (incl. fatal), seriousness criteria, calendar dates.
+     PDS extract largely retains AESER/AEREL/AEACN/AEOUT/AESxxx; timing is week-offset
+     (AESTWK/AEENWK), not day-true ISO. Do not claim "trial never collected seriousness."
+     See docs/workstreams/reviews/WS1_CRF_GROUNDING_D012_2026-07-09.md and SDRG §0A.
    ============================================================================= */
 
 /* PGMDIR guard: define only when running standalone; master driver pre-defines this. */

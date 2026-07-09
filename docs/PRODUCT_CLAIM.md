@@ -125,7 +125,8 @@ Claiming “full SAP Appendix D TFL package” is **false** under Path A.
 |---|---|
 | Module 5–style tree, co-located define, backbone/STF | Demonstrated |
 | Application identifiers | **EXAMPLE / 000000** — not real |
-| Annotated CRF | Placeholder / not true aCRF |
+| CRF PDF | **Source CRF present** (`Sanofi CRF Tropic.pdf` / package `blankcrf.pdf`) |
+| Annotated CRF (aCRF) | **Not claimed** as full page-level SDTM annotation package (Path A) |
 | FDA eCTD validator commercial pass | Not claimed |
 | Patient XPT in git | Never |
 

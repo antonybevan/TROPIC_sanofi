@@ -38,6 +38,33 @@
 
 ---
 
+## 0A. CRF grounding (principal source-fidelity rule)
+
+**CRF PDF (source):** `01_source_data/Sanofi CRF Tropic.pdf` (EFC6193, FINAL 21-Nov-2006)  
+**In package:** `blankcrf.pdf` under tabulations/sdtm (source CRF copy — **not** claimed as a complete annotated aCRF with page-level define origins)  
+**Decision record:** [`docs/workstreams/reviews/WS1_CRF_GROUNDING_D012_2026-07-09.md`](../../docs/workstreams/reviews/WS1_CRF_GROUNDING_D012_2026-07-09.md)
+
+### Rule
+
+| Do | Do not |
+|---|---|
+| State what the **form collected** | Imply “trial never collected X” when the CRF has a field for X |
+| State what **PDS retains** (and at what precision) | Blame study design for public-extract reductions |
+| Split gaps: CRF non-collection vs extract reduction vs programming scope | Invent values for null/stripped fields |
+
+### Domain grounding summary (audit D-012)
+
+| Domain | CRF form (examples) | What sponsor collected | What PDS extract retains | Limitation class |
+|---|---|---|---|---|
+| **AE** | Adverse Event Form `O.1_AE_1` | Diagnosis; status; grade; relationship to study treatment; action taken; corrective therapy; outcome (incl. fatal); seriousness Y/N + seriousness criteria | Terms/MedDRA; `AETOXGR` (incl. grade 5 fatal); `AEREL`/`AEACN`/`AECONTRT`/`AEOUT` largely populated; `AESER` + criteria flags largely present | **Class A** (core safety retained). **Class B** for **date precision** (CRF day/month/year → PDS week offsets `AESTWK`/`AEENWK`). Residual blank `AESER` on a minority of rows = null/incomplete, not “column never collected” |
+| **LB** | Hematology `LABH_1`, Biochemistry `LABB_1`, PSA | CBC panel; electrolytes (Na/K/Cl/bicarb); LFTs; creat/BUN; glucose; testosterone; PSA | Matching `LBTESTCD` set including `SODIUM`,`K`,`CL`,`BICARB`,`ALP`,`CREAT`,`PSA`, etc. | **Class A** — electrolytes are **on CRF and in extract** (not a TROPIC “electrolyte never collected” story) |
+| **ECOG** | VS panel ECOG 0–4 | Performance status 0–4 | `VSTESTCD=ECOG` with observed 0–4 | **Class A** |
+| **DS** | End of Treatment `O.ENDTT_2`; End of Study `O.ENDST_1` | Main reason for stopping treatment/study (progression, AE, completed, LTFU, subject request, death, other, …) | `DSCAT`/`DSSCAT`/`DSDECOD`/`DSTERM` carry those concepts | **Class A** for reason concepts present in extract |
+
+**Explicit non-claims:** full aCRF annotation package; day-true AE onset dates in public extract; commercial filing CRF provenance.
+
+---
+
 ## 1. Source data normalization & integrity controls
 
 Source data are the official **Sanofi de-identified SDTM** for NCT00417079 (2013), accessed via **Project Data Sphere (PDS)** as SAS `*.sas7bdat`. Provenance: root README · [`00_governance/REPRODUCIBILITY.md`](../../00_governance/REPRODUCIBILITY.md).
@@ -60,7 +87,7 @@ Staging: [`L_staging_ingest.sas`](../../04_analysis_datasets/programs/sas/L_stag
 Standard SDTM mapping structures were built in `S_sdtm_mapping.sas` from trial-era **SDTM-IG 3.1.1** source data; SAP v4.0 treats this as source provenance and requires the release package to use the governed SDTMIG 3.4 uplift layer:
 * **DM (Demographics):** Unique subject identifier `USUBJID` constructed via `STUDYID || '-' || SITEID || '-' || SUBJID`. Randomization date `RANDDT` and treatment start date `TRTSDT` mapped to standard ISO 8601 date fields.
 * **EX (Exposure):** Normalised cycle-level actual administered doses (`EXDOSE` in mg).
-* **AE (Adverse Events):** Coded utilizing MedDRA dictionaries into `AEDECOD`, `AEBODSYS`, and standard CTCAE toxicity grades. **Date Precision Note:** The source PDS dataset contains AE timing as week-offset integers (`AESTWK`, `AEENWK`). AE start/end dates are reconstructed as `RFSTDTC + (AESTWK - 1) * 7` and `RFSTDTC + (AEENWK - 1) * 7`. This reconstruction yields calendar-week accuracy (±3.5 days) rather than exact calendar dates. This precision level was present in the source data and is not a programming artefact. All safety analyses using AE dates (ADAE, ADTTE TTSAE) inherit this limitation.
+* **AE (Adverse Events):** Coded utilizing MedDRA dictionaries into `AEDECOD`, `AEBODSYS`, and CTCAE-style grades (`AETOXGR`). **CRF grounding (D-012):** the Adverse Event form collected seriousness, relationship to study treatment, action taken, outcome (incl. fatal), and seriousness criteria — and those concepts are **largely present** in the PDS extract (`AESER`, `AEREL`, `AEACN`, `AEOUT`, `AESxxx` flags). Do **not** narrate “trial never collected seriousness.” **Date Precision Note (Class B reduction):** CRF collected calendar day/month/year; the public extract carries week-offset integers (`AESTWK`, `AEENWK`). Dates are reconstructed as `RFSTDTC + (AESTWK - 1) * 7` (±3.5 days). That precision limit is an **extract design / de-identification property**, not a programming artefact. ADAE and TTSAE inherit it.
 * **LB (Laboratory):** Mapped continuous Absolute Neutrophil Count (ANC) and Prostate Specific Antigen (PSA) measurements.
 * **DS (Disposition):** Captured study completion reasons, trial exits, and survival follow-up records.
 * **RS (Response / Efficacy Fallback):** Derived from `DS` domain where `DSDECOD` indicates progression or death. Death records are mapped to standard RS structures with `RSSTRESC = 'DEATH'` to capture survival outcomes cleanly as efficacy checkpoints.
