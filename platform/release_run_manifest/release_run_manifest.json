@@ -2576,8 +2576,8 @@
     "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007"
   },
   "evidence_grade": "release_candidate",
-  "generated_at": "2026-07-09 16:41:45 UTC",
-  "manifest_sha256": "efb3397c1dfbb4516cba08847a50938784469559487003ee45382a8a769560fa",
+  "generated_at": "2026-07-09 16:41:59 UTC",
+  "manifest_sha256": "dfacf2893da1bc90eb9b1a91ee78c1b5350ce20e2382a352943e50e65c89d611",
   "problems": [],
   "qc_statuses": {
     "cbzp_bridge": {
@@ -2742,7 +2742,7 @@
     "branch": "codex/repo-structure-phase2",
     "dirty": false,
     "dirty_including_seal_outputs": false,
-    "head": "60ccf0028ea0d3e8a5ed6b1d2bd00d2524bdd920",
+    "head": "82a63a9e4f6a65512eca60aedfc89dc741b7e0cd",
     "staged_diff_paths": [],
     "status_porcelain": [],
     "status_porcelain_all": [],
