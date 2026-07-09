@@ -2,11 +2,33 @@ name: TROPIC Clinical Pipeline CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, 'codex/**' ]
   pull_request:
     branches: [ main ]
 
 jobs:
+  # Path A seal re-check: no SAS, no patient data, no renv.
+  # Proves committed seals + claim docs still pass scripts/verify_release.py.
+  path-a-seal-verify:
+    name: Path A seal verify (verify_release)
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v5
+
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.10'
+
+    - name: Path A release verification
+      run: |
+        # WS-7 release gate: re-check sealed control JSONs, product claim, findings.
+        # Does not re-run ODA/SAS. Exit non-zero fails CI.
+        python3 scripts/verify_release.py
+        # shell wrapper parity
+        bash scripts/verify_release.sh
+
   validate:
     name: Run Tests & Conformance Gates
     runs-on: ubuntu-latest
@@ -146,3 +168,9 @@ jobs:
         # the checkout (audit F-14: real *.xpt are gitignored, so this is what IS staticly
         # checkable without a data-bearing checkout).
         python3 platform/verify_evidence.py
+
+    - name: Path A release verification (seal pack)
+      run: |
+        # Same gate as path-a-seal-verify job; kept at end of full suite so a full CI green
+        # implies seals still PASS after other steps (no ODA re-run).
+        python3 scripts/verify_release.py

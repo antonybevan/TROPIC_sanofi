@@ -156,11 +156,11 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | Field | Content |
 |---|---|
 | **Owned artifacts** | cibuild · study_manifest · renv.lock · delivery controls · evidence layers · release-run manifest · RC checklist · eCTD package/backbone · tag · CI |
-| **Current status** | **GREEN for pipeline seal** — full_dag ODA, seals PASS, clean tree at seal, tag published |
-| **Open risks** | Seal ≠ submission; EXAMPLE eCTD; no one-command external verify; CI not a “release job” product |
-| **Required evidence pack** | (1) pipeline_health · (2) release_run_manifest · (3) RC status · (4) tag · (5) release note · (6) CI status · (7) verify script (missing) |
+| **Current status** | **GREEN for Path A release ops** — seals PASS; `scripts/verify_release.py` + `.sh`; **CI job `path-a-seal-verify`** + full-suite step |
+| **Open risks** | Seal ≠ submission; EXAMPLE eCTD; CI does not re-run ODA (by design) |
+| **Required evidence pack** | (1) pipeline_health · (2) release_run_manifest · (3) RC status · (4) tag · (5) release note · (6) CI `path-a-seal-verify` · (7) `scripts/verify_release.py` |
 | **Release gate** | G09 — **PASS for demo RC** |
-| **Next action** | Maintain seal; **`scripts/verify_release.py` exists** — wire CI release job to it; optional immutable evidence snapshot under `platform/evidence/` |
+| **Next action** | Maintain seal allowlist; watch CI on PR to main; optional PDF re-package |
 
 ---
 
@@ -190,7 +190,7 @@ WS-7 Release ──G08/G09──► tagged package (v0.1.0-demo-rc.1 done for de
 | **P1** | WS-6 | ADRG/SDRG/BDRG hardening against board + claim | Reviewer package is the human product |
 | **P1** | WS-1 + WS-3 | External validation evidence index (CORE residual + P21 slot + XSD + eCTD validate) | Industry-grade package layer |
 | **P2** | WS-2 | Spec/config/TFL control table | Closes G02 gap |
-| **P2** | WS-7 | `verify_release.sh` + CI release job | Operational polish without reopening science |
+| **Done** | WS-7 | `verify_release` + CI `path-a-seal-verify` | Operational polish without reopening science |
 | **P3** | WS-4 | Deferred TFL backlog only if claim expands | Do not explode scope on GREEN programming |
 
 ---
@@ -225,14 +225,15 @@ Not “another GREEN JSON.”
 
 ## 8. Immediate next command (continue operating)
 
-**Done recently:** portfolio surface · WS-6 S1–S3 · **WS-1 CORE residual matrix** · seals still PASS  
+**Done recently:** portfolio surface · WS-6 S1–S3 · WS-1 CORE matrix · **WS-7 CI verify_release** · seals still PASS  
 
-**Next (resume order):**
+**Next (optional polish):**
 
-1. **WS-7** — wire `scripts/verify_release.py` into CI  
-2. Optional — re-package guide PDFs into `m5/` when convenient  
-3. Optional — WS-2 review note / maintain guides on claim drift
+1. Open PR `codex/repo-structure-phase2` → `main` (CI will run seal verify + full suite)  
+2. Re-package guide PDFs into `m5/` when convenient  
+3. WS-2 review note if population/endpoint narrative drifts  
 
 ```bash
-python3 scripts/verify_release.py
+python3 scripts/verify_release.py   # local
+# CI: job path-a-seal-verify + validate step "Path A release verification"
 ```

@@ -100,6 +100,7 @@ Everything else regenerable is **local only**.
 | Who | What they can do |
 |---|---|
 | **Any interviewer (bare clone)** | Read `m5/` + guides; run `scripts/verify_release.py`; run `python3 platform/cibuild.py --demo` |
+| **GitHub Actions** | Job `path-a-seal-verify` re-runs `scripts/verify_release.py` on push/PR (no SAS/data) |
 | **You with SDTM + ODA/local SAS** | Full dual-language DAG; re-seal; refresh package |
 | **Nobody from public git alone** | Re-derive real MP patient-level ADaM without licensed source |
 
