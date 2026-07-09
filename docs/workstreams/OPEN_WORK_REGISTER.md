@@ -13,7 +13,7 @@
 | ID | Pri | Owner | Work | Why it matters | Exit |
 |---|---|---|---|---|---|
 | **W-SDTM-01** | **P0** | WS-1/WS-6 | Disclose **F-028**: EXTRT=XRP6258 (1 subj, 10 rows) vs DM all MITOXANTRONE arm | Arm must not be taken from EXTRT | SDRG + audit pack; no silent re-code |
-| **W-SDTM-02** | **P0** | WS-4 | ADaM: any-AE / safety dens use **ADSL N=371** (14 subj have no AE) | Wrong denominator if AE-distinct only | Verify in ADaM phase |
+| **W-SDTM-02** | **P0** | WS-4 | ADaM: any-AE / safety dens use **ADSL N=371** (14 subj have no AE) | Wrong denominator if AE-distinct only | **DONE** — T-20 + dens audit |
 | **W-SDTM-03** | P1 | WS-1/WS-6 | Package = **18** analysis-scoped domains vs **34** PDS | Avoid “full SDTM dump” claim | SDRG scope table (done in E2E pack) |
 | **W-SDTM-04** | P2 | WS-5 | Optional QC list EXTRT ∉ expected set | Catch arm/exposure drift | Listing or gate |
 | **W-AE-01** | P0 | WS-4 / WS-5 | Baseline AE skeleton + TEAE AESER soft QC | TEAE cleanliness | ADRG §4B + ADAE QC (done soft) |
@@ -22,6 +22,7 @@
 | **W-AE-03** | P2 | WS-1 / WS-5 | CORE AESER residual | No overwrite | Residual matrix |
 | **W-CRF-01** | P2 | WS-6 / WS-7 | Full aCRF + real app IDs | Path B | Deferred |
 | **W-PKG-01** | P3 | WS-7 | Re-package guide PDFs into `m5/` | Optional | Optional |
+| **W-PKG-02** | **P0** | WS-7 | Sync git-tracked **m5 programs** from factory (arm map + dens) | Review face shows pre-arm-map ADSL | Meta-audit M-01 |
 | **W-CI-01** | Done | WS-7 | Data-free CI green | Done | CI success |
 
 **SDTM E2E audit pack:** `docs/workstreams/reviews/WS1_SDTM_E2E_AUDIT_2026-07-09.md`  
@@ -56,9 +57,11 @@
 
 ## Priority order for next session
 
-1. **W-ADAM-01** — dual-lang rebuild when SAS/ODA available (seals post arm-map change)  
-2. **W-ADAM-02** — promote TEAE AESER soft QC after rebuild  
-3. **W-PKG-01** — PDF refresh if demoing package face  
-4. Otherwise hold Path A with dens pack + D-012  
+1. **W-PKG-02** — sync m5 programs from factory (no ODA required; closes review-face drift)  
+2. **W-ADAM-01** — dual-lang rebuild when SAS/ODA available (seals post arm-map change)  
+3. **W-ADAM-02** — promote TEAE AESER soft QC after rebuild  
+4. **W-PKG-01** — PDF refresh if demoing package face  
+5. Otherwise hold Path A with meta-audit + dens + D-012  
 
+**Meta-audit (2026-07-09):** `docs/workstreams/reviews/WS_META_AUDIT_PATH_A_2026-07-09.md`  
 Source decision: `WS1_CRF_GROUNDING_D012_2026-07-09.md` · dens: `WS4_ADAM_DENS_AUDIT_2026-07-09.md`
