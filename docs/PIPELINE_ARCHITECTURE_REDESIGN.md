@@ -133,45 +133,45 @@ TROPIC/
 │
 ├── 08_submission_package/
 │   ├── m5/
-│   └── ectd_sequence/
+│   └── ectd/
 │
 ├── platform/
-│   ├── orchestrator/
-│   ├── reconciliation/
-│   ├── conformance/
-│   ├── packaging/
-│   └── templates/
+│   ├── cibuild.py
+│   ├── package_ectd.py
+│   ├── build_ectd_backbone.py
+│   ├── materialize_ectd.py
+│   └── status_emitters/
 │
 └── studies/
     └── DEMO02/
 ```
 
-This is a target operating model, not an instruction to move files immediately.
-The current numbered structure can remain operational while manifests and
-documentation introduce this control model.
+This is now the physical operating model. The repository root is organized by
+evidence ownership; remaining substructure changes should be made only when they
+reduce real handoff ambiguity or validation risk.
 
 ## 4. Current-to-Target Mapping
 
 | Current asset | Target layer | Notes |
 |---|---|---|
-| `study_manifest.yaml` | `platform/orchestrator` plus study control manifest | Keep at root during transition; later split into reusable engine config and study-specific declarations. |
-| `study_config.yaml` | `02_specifications/` | Clinical parameters belong with the analysis specification layer. |
-| `00_specifications/ADaM_spec.xlsx` | `03_metadata/adam/ADaM_spec.xlsx` | The ADaM spec is metadata control, even though it is specification-adjacent. |
-| `01_raw_source/` | `01_source_data/` | Preserve raw data exclusion rules and data-use documentation. |
-| `02_production_sas/` | `platform/programs/sas/` or `studies/TROPIC/programs/sas/` | Decide after platform extraction; avoid premature relocation. |
-| `03_validation_r/` | `studies/TROPIC/programs/r_validation/` | R validation remains study-specific unless helpers are extracted. |
-| `04_adam/` | `04_analysis_datasets/adam/` | Build outputs only; should remain regenerable. |
-| `05_reconciliation/` | `platform/reconciliation/` plus `06_qc_evidence/reconciliation/` | Separate reusable reconciliation code from produced evidence. |
-| `06_telemetry/` | `platform/orchestrator`, `platform/conformance`, `06_qc_evidence/` | This is currently mixed code, evidence, and run telemetry. Split by responsibility later. |
-| `07_define_xml/` | `03_metadata/define/` | Define-XML is the machine-readable metadata delivery layer. |
-| `08_reviewers_guides/` | `07_reviewer_explanation/` | ADRG/SDRG/BDRG explain, contextualize, and disclose limitations. |
-| `09_tfl/` | `05_outputs/` | Separate output source programs, output shells, rendered tables, figures, and listings. |
-| `10_datasetjson/` | `04_analysis_datasets/datasetjson/` | Dataset-JSON is an exchange representation of datasets. |
-| `11_ectd/`, `m5/` | `08_submission_package/` | Package materialization belongs after reviewer explanation and QC gates. |
-| `12_ars/` | `05_outputs/analysis_results_metadata/` | ARS/ARM belongs to output traceability. |
-| `13_usdm/` | `03_metadata/` or `08_submission_package/` | Keep as study-level structured metadata until submission use is clearer. |
-| `14_shiny/` | `platform/reviewer_tools/` or `07_reviewer_explanation/tools/` | Treat as optional review aid, not a source of record. |
-| `audit/` | `06_qc_evidence/audit/` | Audit files are evidence and should be indexed by run/version. |
+| `config/study_manifest.yaml` | `config/` plus platform consumers | Keep as a governed control source; split only if the multi-study engine needs a reusable package boundary. |
+| `config/study_config.yaml` | `config/` | Clinical parameters remain a governed control source consumed by programs and metadata checks. |
+| `03_metadata/adam/ADaM_spec.xlsx` | `03_metadata/adam/ADaM_spec.xlsx` | The ADaM spec is metadata control, even though it is specification-adjacent. |
+| `01_source_data/` | `01_source_data/` | Preserve raw data exclusion rules and data-use documentation. |
+| `04_analysis_datasets/programs/sas/` | `04_analysis_datasets/programs/sas/` | Production programs are owned by the analysis-dataset layer. |
+| `04_analysis_datasets/programs/r/` | `04_analysis_datasets/programs/r/` | Independent validation programs are owned beside the dataset layer they validate. |
+| `04_analysis_datasets/adam/` | `04_analysis_datasets/adam/` | Build outputs only; should remain regenerable. |
+| `06_qc_evidence/reconciliation/` | `06_qc_evidence/reconciliation/` | Reconciliation programs and their records are QC evidence. |
+| `platform/` | `platform/` | Platform is now reserved for orchestration/build logic and machine status emitters. |
+| `03_metadata/define/` | `03_metadata/define/` | Define-XML is the machine-readable metadata delivery layer. |
+| `07_reviewer_explanation/guides/` | `07_reviewer_explanation/` | ADRG/SDRG/BDRG explain, contextualize, and disclose limitations. |
+| `05_outputs/tfl/` | `05_outputs/` | Separate output source programs, output shells, rendered tables, figures, and listings. |
+| `04_analysis_datasets/datasetjson/` | `04_analysis_datasets/datasetjson/` | Dataset-JSON is an exchange representation of datasets. |
+| `08_submission_package/ectd/`, `08_submission_package/m5/` | `08_submission_package/` | Package materialization belongs after reviewer explanation and QC gates. |
+| `05_outputs/ars/` | `05_outputs/analysis_results_metadata/` | ARS/ARM belongs to output traceability. |
+| `03_metadata/usdm/` | `03_metadata/` or `08_submission_package/` | Keep as study-level structured metadata until submission use is clearer. |
+| `07_reviewer_explanation/tools/shiny/` | `platform/reviewer_tools/` or `07_reviewer_explanation/tools/` | Treat as optional review aid, not a source of record. |
+| `06_qc_evidence/audit/` | `06_qc_evidence/audit/` | Audit files are evidence and should be indexed by run/version. |
 
 ## 5. Gated Orchestration Model
 
@@ -218,8 +218,8 @@ Every clinically meaningful output should be traceable across seven objects:
 | Reviewer explanation | ADRG/SDRG/BDRG section explaining source, methods, conformance, limitations |
 
 This contract should eventually be represented in a machine-readable manifest, not
-only prose. The existing `study_manifest.yaml`, `audit/adam_variable_traceability.csv`,
-and `08_reviewers_guides/TRACEABILITY_MATRIX.md` are the starting point.
+only prose. The existing `config/study_manifest.yaml`, `06_qc_evidence/audit/adam_variable_traceability.csv`,
+and `07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md` are the starting point.
 
 ## 7. Risk-Based Validation Model
 
@@ -263,24 +263,24 @@ git diff -- docs/PIPELINE_ARCHITECTURE_REDESIGN.md README.md
 
 ### Phase 1: Introduce evidence-layer manifests
 
-- Add `evidence_layers.yaml` describing source, specification, metadata, datasets,
+- Add `config/evidence_layers.yaml` describing source, specification, metadata, datasets,
   outputs, QC evidence, reviewer docs, and submission package assets. **Initial
   index implemented.**
 - Link existing files without moving them.
 - Add a lightweight check that all referenced artifacts exist or are explicitly
   marked generated, external, optional, or planned. **Initial verifier
-  implemented as `06_telemetry/check_evidence_layers.py`.**
+  implemented as `platform/check_evidence_layers.py`.**
 
 Verification:
 
 ```bash
-python3 06_telemetry/check_evidence_layers.py
+python3 platform/check_evidence_layers.py
 ```
 
 ### Phase 2: Split code from evidence
 
-- Keep `study_manifest.yaml` as the execution source of truth.
-- Move or alias reusable code from `06_telemetry/` and `05_reconciliation/` into
+- Keep `config/study_manifest.yaml` as the execution source of truth.
+- Move or alias reusable code from `platform/` and `06_qc_evidence/reconciliation/` into
   `platform/`.
 - Move produced run evidence into `06_qc_evidence/` or generate an indexed view
   there.
@@ -289,8 +289,8 @@ python3 06_telemetry/check_evidence_layers.py
 Verification:
 
 ```bash
-python3 06_telemetry/cibuild.py --demo
-python3 06_telemetry/verify_evidence.py
+python3 platform/cibuild.py --demo
+python3 platform/verify_evidence.py
 ```
 
 ### Phase 3: Align deliverable folders
@@ -303,8 +303,8 @@ python3 06_telemetry/verify_evidence.py
 Verification:
 
 ```bash
-python3 06_telemetry/cibuild.py --dry-run
-python3 06_telemetry/cibuild.py --demo
+python3 platform/cibuild.py --dry-run
+python3 platform/cibuild.py --demo
 ```
 
 ### Phase 4: Submission package hardening
@@ -318,8 +318,8 @@ python3 06_telemetry/cibuild.py --demo
 Verification:
 
 ```bash
-python3 06_telemetry/cibuild.py --use-cached-sas
-python3 06_telemetry/verify_evidence.py
+python3 platform/cibuild.py --use-cached-sas
+python3 platform/verify_evidence.py
 ```
 
 ## 9. Non-Overclaiming Rules
@@ -354,8 +354,8 @@ independent clinical re-analysis
 
 The no-move architecture report is now implemented as
 [DELIVERY_EVIDENCE_DASHBOARD.md](DELIVERY_EVIDENCE_DASHBOARD.md), generated by
-`06_telemetry/build_delivery_dashboard.py` from `evidence_layers.yaml` and
-`delivery_workstreams.yaml`. The next implementation step should be to add
+`platform/build_delivery_dashboard.py` from `config/evidence_layers.yaml` and
+`config/delivery_workstreams.yaml`. The next implementation step should be to add
 domain-specific control reports under this same model, starting with:
 
 ```text

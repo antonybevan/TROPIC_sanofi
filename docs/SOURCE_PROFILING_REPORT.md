@@ -1,6 +1,6 @@
 # TROPIC Source Profiling Report
 
-Generated: 2026-07-09 14:50:38 UTC
+Generated: 2026-07-09 16:35:12 UTC
 
 > Aggregate-only source profiling evidence. This report does not print patient-level records or subject identifiers.
 
@@ -8,7 +8,7 @@ Generated: 2026-07-09 14:50:38 UTC
 
 | Item | Value |
 | --- | --- |
-| Source directory | 01_raw_source/real_sdtm |
+| Source directory | 01_source_data/real_sdtm |
 | Status | pass |
 | SAS7BDAT domains | 34 |
 | Total records across domains | 458333 |
@@ -78,6 +78,6 @@ Week-precision variables should continue to be disclosed in reviewer documentati
 
 ## Machine-Readable Outputs
 
-- `06_telemetry/source_profile_status.json`
-- `06_telemetry/source_profile/domain_inventory.csv`
-- `06_telemetry/source_profile/variable_profile.csv`
+- `platform/source_profile_status.json`
+- `platform/source_profile/domain_inventory.csv`
+- `platform/source_profile/variable_profile.csv`

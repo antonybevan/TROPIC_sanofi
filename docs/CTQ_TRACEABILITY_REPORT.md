@@ -1,8 +1,8 @@
 # TROPIC CTQ and Estimand Traceability Report
 
-Generated: 2026-07-09 14:50:44 UTC
+Generated: 2026-07-09 16:35:17 UTC
 
-> This report evaluates `ctq_traceability.yaml`, linking clinical questions to estimand-style attributes, ADaM inputs, TFL/ARS outputs, reviewer guides, and validation-strategy artifacts.
+> This report evaluates `config/ctq_traceability.yaml`, linking clinical questions to estimand-style attributes, ADaM inputs, TFL/ARS outputs, reviewer guides, and validation-strategy artifacts.
 
 ## Verdict
 
@@ -42,5 +42,5 @@ Generated: 2026-07-09 14:50:44 UTC
 
 ## Machine-Readable Outputs
 
-- `06_telemetry/ctq_traceability/ctq_traceability_status.json`
-- `06_telemetry/ctq_traceability/ctq_traceability_checks.csv`
+- `platform/ctq_traceability/ctq_traceability_status.json`
+- `platform/ctq_traceability/ctq_traceability_checks.csv`

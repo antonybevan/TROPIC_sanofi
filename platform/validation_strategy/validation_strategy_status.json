@@ -1,0 +1,615 @@
+{
+  "status": "PASS",
+  "generated_at": "2026-07-09 16:35:17 UTC",
+  "artifacts": 11,
+  "pass": 11,
+  "blocked": 0,
+  "strategy": "config/validation_strategy.yaml",
+  "items": [
+    {
+      "id": "source_profile",
+      "name": "Source intake profile",
+      "risk_tier": "high",
+      "gate": "G01",
+      "owner": "clinical_data_management",
+      "status": "PASS",
+      "decision_impact": "Controls source inventory, subject count, critical variable presence, and intake readiness.",
+      "traceability": "source data -> source profiling -> analysis specification",
+      "checks": [
+        {
+          "check_id": "source_profile_pass",
+          "status": "PASS",
+          "evidence": "Source profile completed without findings.",
+          "file": "platform/source_profile_status.json",
+          "field": "status",
+          "actual": "pass",
+          "expected": "pass",
+          "freshness_failure": null
+        }
+      ]
+    },
+    {
+      "id": "adsl",
+      "name": "ADSL subject-level analysis dataset",
+      "risk_tier": "critical",
+      "gate": "G04",
+      "owner": "statistical_programming",
+      "status": "PASS",
+      "decision_impact": "Defines populations, treatment anchors, demographics, and subject-level covariates used across all analyses.",
+      "traceability": "SDTM DM/SV/EX -> SAP populations/windows -> ADaM spec -> ADSL -> TFLs/ADRG",
+      "checks": [
+        {
+          "check_id": "current_real_sas",
+          "status": "PASS",
+          "evidence": "Current live run used an independent SAS engine.",
+          "file": "platform/pipeline_health.json",
+          "field": "sas_execution_mode",
+          "actual": "oda",
+          "expected": [
+            "oda",
+            "local"
+          ],
+          "freshness_failure": null
+        },
+        {
+          "check_id": "dataset_reconciliation_pass",
+          "status": "PASS",
+          "evidence": "Dataset-level reconciliation passed.",
+          "file": "platform/reconciliation_status.json",
+          "field": "overall",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        },
+        {
+          "check_id": "dataset_reconciliation_not_simulated",
+          "status": "PASS",
+          "evidence": "Dataset-level reconciliation is not a byte-copy simulation.",
+          "file": "platform/reconciliation_status.json",
+          "field": "simulated",
+          "actual": false,
+          "expected": false,
+          "freshness_failure": null
+        },
+        {
+          "check_id": "admiral_adsl_pass",
+          "status": "PASS",
+          "evidence": "Third-engine ADSL reconciliation passed.",
+          "file": "platform/admiral_reconciliation_status.json",
+          "field": "domains.ADSL.status",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        },
+        {
+          "check_id": "spec_data_pass",
+          "status": "PASS",
+          "evidence": "ADaM specification matches produced data.",
+          "file": "platform/conformance/spec_data_conformance.json",
+          "field": "status",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        }
+      ]
+    },
+    {
+      "id": "adtte_primary",
+      "name": "ADTTE primary efficacy parameters OS/PFS",
+      "risk_tier": "critical",
+      "gate": "G04",
+      "owner": "statistical_programming",
+      "status": "PASS",
+      "decision_impact": "Primary efficacy interpretation and headline time-to-event evidence.",
+      "traceability": "SDTM dates/events -> SAP estimand/censoring -> ADTTE -> KM/HR outputs -> CSR/ADRG",
+      "checks": [
+        {
+          "check_id": "current_real_sas",
+          "status": "PASS",
+          "evidence": "Current live run used an independent SAS engine.",
+          "file": "platform/pipeline_health.json",
+          "field": "sas_execution_mode",
+          "actual": "oda",
+          "expected": [
+            "oda",
+            "local"
+          ],
+          "freshness_failure": null
+        },
+        {
+          "check_id": "dataset_reconciliation_pass",
+          "status": "PASS",
+          "evidence": "Dataset-level reconciliation passed.",
+          "file": "platform/reconciliation_status.json",
+          "field": "overall",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        },
+        {
+          "check_id": "dataset_reconciliation_not_simulated",
+          "status": "PASS",
+          "evidence": "Dataset-level reconciliation is not a byte-copy simulation.",
+          "file": "platform/reconciliation_status.json",
+          "field": "simulated",
+          "actual": false,
+          "expected": false,
+          "freshness_failure": null
+        },
+        {
+          "check_id": "results_reconciliation_pass",
+          "status": "PASS",
+          "evidence": "Numerical results reconciliation passed.",
+          "file": "platform/results_reconciliation_status.json",
+          "field": "overall",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        },
+        {
+          "check_id": "admiral_os_pass",
+          "status": "PASS",
+          "evidence": "Third-engine OS reconciliation passed.",
+          "file": "platform/admiral_reconciliation_status.json",
+          "field": "domains.ADTTE.OS.status",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        },
+        {
+          "check_id": "admiral_pfs_pass",
+          "status": "PASS",
+          "evidence": "Third-engine PFS reconciliation passed.",
+          "file": "platform/admiral_reconciliation_status.json",
+          "field": "domains.ADTTE.PFS.status",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        },
+        {
+          "check_id": "spec_data_pass",
+          "status": "PASS",
+          "evidence": "ADaM specification matches produced data.",
+          "file": "platform/conformance/spec_data_conformance.json",
+          "field": "status",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        }
+      ]
+    },
+    {
+      "id": "adtte_secondary",
+      "name": "ADTTE secondary/supportive TTE parameters",
+      "risk_tier": "high",
+      "gate": "G04",
+      "owner": "statistical_programming",
+      "status": "PASS",
+      "decision_impact": "Important supportive efficacy interpretation.",
+      "traceability": "SDTM dates/events -> SAP secondary endpoints -> ADTTE -> TFL outputs",
+      "checks": [
+        {
+          "check_id": "current_real_sas",
+          "status": "PASS",
+          "evidence": "Current live run used an independent SAS engine.",
+          "file": "platform/pipeline_health.json",
+          "field": "sas_execution_mode",
+          "actual": "oda",
+          "expected": [
+            "oda",
+            "local"
+          ],
+          "freshness_failure": null
+        },
+        {
+          "check_id": "dataset_reconciliation_pass",
+          "status": "PASS",
+          "evidence": "Dataset-level reconciliation passed.",
+          "file": "platform/reconciliation_status.json",
+          "field": "overall",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        },
+        {
+          "check_id": "dataset_reconciliation_not_simulated",
+          "status": "PASS",
+          "evidence": "Dataset-level reconciliation is not a byte-copy simulation.",
+          "file": "platform/reconciliation_status.json",
+          "field": "simulated",
+          "actual": false,
+          "expected": false,
+          "freshness_failure": null
+        },
+        {
+          "check_id": "results_reconciliation_pass",
+          "status": "PASS",
+          "evidence": "Numerical results reconciliation passed.",
+          "file": "platform/results_reconciliation_status.json",
+          "field": "overall",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        },
+        {
+          "check_id": "spec_data_pass",
+          "status": "PASS",
+          "evidence": "ADaM specification matches produced data.",
+          "file": "platform/conformance/spec_data_conformance.json",
+          "field": "status",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        }
+      ]
+    },
+    {
+      "id": "safety_adam",
+      "name": "Safety ADaM datasets ADAE/ADEX/ADLB",
+      "risk_tier": "high",
+      "gate": "G04",
+      "owner": "statistical_programming",
+      "status": "PASS",
+      "decision_impact": "Safety summaries, exposure context, adverse-event interpretation, and labeling-relevant review.",
+      "traceability": "SDTM AE/EX/LB -> ADaM spec -> safety ADaM -> safety TFLs/reviewer guides",
+      "checks": [
+        {
+          "check_id": "current_real_sas",
+          "status": "PASS",
+          "evidence": "Current live run used an independent SAS engine.",
+          "file": "platform/pipeline_health.json",
+          "field": "sas_execution_mode",
+          "actual": "oda",
+          "expected": [
+            "oda",
+            "local"
+          ],
+          "freshness_failure": null
+        },
+        {
+          "check_id": "dataset_reconciliation_pass",
+          "status": "PASS",
+          "evidence": "Dataset-level reconciliation passed.",
+          "file": "platform/reconciliation_status.json",
+          "field": "overall",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        },
+        {
+          "check_id": "dataset_reconciliation_not_simulated",
+          "status": "PASS",
+          "evidence": "Dataset-level reconciliation is not a byte-copy simulation.",
+          "file": "platform/reconciliation_status.json",
+          "field": "simulated",
+          "actual": false,
+          "expected": false,
+          "freshness_failure": null
+        },
+        {
+          "check_id": "spec_data_pass",
+          "status": "PASS",
+          "evidence": "ADaM specification matches produced data.",
+          "file": "platform/conformance/spec_data_conformance.json",
+          "field": "status",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        }
+      ]
+    },
+    {
+      "id": "response_adam",
+      "name": "ADRS response analysis dataset",
+      "risk_tier": "high",
+      "gate": "G04",
+      "owner": "statistical_programming",
+      "status": "PASS",
+      "decision_impact": "Response endpoint interpretation and responder evidence.",
+      "traceability": "SDTM response source -> ADaM spec -> ADRS -> response outputs",
+      "checks": [
+        {
+          "check_id": "current_real_sas",
+          "status": "PASS",
+          "evidence": "Current live run used an independent SAS engine.",
+          "file": "platform/pipeline_health.json",
+          "field": "sas_execution_mode",
+          "actual": "oda",
+          "expected": [
+            "oda",
+            "local"
+          ],
+          "freshness_failure": null
+        },
+        {
+          "check_id": "dataset_reconciliation_pass",
+          "status": "PASS",
+          "evidence": "Dataset-level reconciliation passed.",
+          "file": "platform/reconciliation_status.json",
+          "field": "overall",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        },
+        {
+          "check_id": "dataset_reconciliation_not_simulated",
+          "status": "PASS",
+          "evidence": "Dataset-level reconciliation is not a byte-copy simulation.",
+          "file": "platform/reconciliation_status.json",
+          "field": "simulated",
+          "actual": false,
+          "expected": false,
+          "freshness_failure": null
+        },
+        {
+          "check_id": "spec_data_pass",
+          "status": "PASS",
+          "evidence": "ADaM specification matches produced data.",
+          "file": "platform/conformance/spec_data_conformance.json",
+          "field": "status",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        }
+      ]
+    },
+    {
+      "id": "tfl_primary_secondary",
+      "name": "Primary and secondary TFL outputs",
+      "risk_tier": "critical",
+      "gate": "G05",
+      "owner": "statistical_programming",
+      "status": "PASS",
+      "decision_impact": "Reviewer-facing efficacy/safety results.",
+      "traceability": "ADaM -> TFL programs -> output index/hash binding -> ADRG/CSR",
+      "checks": [
+        {
+          "check_id": "tfl_index_pass",
+          "status": "PASS",
+          "evidence": "TFL output index is complete for controlled catalog scope (config/tfl_output_catalog.yaml).",
+          "file": "platform/tfl_output_index_status.json",
+          "field": "status",
+          "actual": "pass",
+          "expected": "pass",
+          "freshness_failure": null
+        },
+        {
+          "check_id": "ctq_traceability_pass",
+          "status": "PASS",
+          "evidence": "CTQ/estimand traceability links clinical questions to ADaM, outputs, reviewer guides, and validation evidence.",
+          "file": "platform/ctq_traceability/ctq_traceability_status.json",
+          "field": "status",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        },
+        {
+          "check_id": "results_reconciliation_pass",
+          "status": "PASS",
+          "evidence": "Numerical results reconciliation passed.",
+          "file": "platform/results_reconciliation_status.json",
+          "field": "overall",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        },
+        {
+          "check_id": "forest_reconciliation_pass",
+          "status": "PASS",
+          "evidence": "Forest HR result reconciliation passed.",
+          "file": "platform/forest_reconciliation_status.json",
+          "field": "overall",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        },
+        {
+          "check_id": "cbzp_bridge_pass",
+          "status": "PASS",
+          "evidence": "Synthetic comparator bridge parity passed.",
+          "file": "platform/cbzp_bridge_status.json",
+          "field": "overall",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        }
+      ]
+    },
+    {
+      "id": "metadata_package",
+      "name": "ADaM/SDTM metadata package",
+      "risk_tier": "critical",
+      "gate": "G03",
+      "owner": "standards_metadata",
+      "status": "PASS",
+      "decision_impact": "Controls reviewer ability to understand, navigate, and reproduce submitted datasets.",
+      "traceability": "specification -> Define-XML/ARM/controlled terminology -> data/reviewer guides",
+      "checks": [
+        {
+          "check_id": "spec_define_pass",
+          "status": "PASS",
+          "evidence": "ADaM specification matches Define-XML.",
+          "file": "platform/conformance/spec_define_conformance.json",
+          "field": "status",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        },
+        {
+          "check_id": "spec_data_pass",
+          "status": "PASS",
+          "evidence": "ADaM specification matches produced data.",
+          "file": "platform/conformance/spec_data_conformance.json",
+          "field": "status",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        },
+        {
+          "check_id": "ctq_traceability_pass",
+          "status": "PASS",
+          "evidence": "CTQ/estimand traceability links clinical questions to ADaM, outputs, reviewer guides, and validation evidence.",
+          "file": "platform/ctq_traceability/ctq_traceability_status.json",
+          "field": "status",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        },
+        {
+          "check_id": "metadata_control_pass",
+          "status": "PASS",
+          "evidence": "Metadata control has no unresolved warning/blocking findings.",
+          "file": "platform/metadata_control/metadata_control_status.json",
+          "field": "status",
+          "actual": "pass",
+          "expected": "pass",
+          "freshness_failure": null
+        }
+      ]
+    },
+    {
+      "id": "reviewer_explanation",
+      "name": "Reviewer guides and traceability narrative",
+      "risk_tier": "high",
+      "gate": "G07",
+      "owner": "medical_writing_regulatory",
+      "status": "PASS",
+      "decision_impact": "Explains methods, limitations, conformance findings, and review path.",
+      "traceability": "all upstream evidence -> ADRG/SDRG/BDRG/SDSP/traceability matrix",
+      "checks": [
+        {
+          "check_id": "ctq_traceability_pass",
+          "status": "PASS",
+          "evidence": "CTQ/estimand traceability links clinical questions to ADaM, outputs, reviewer guides, and validation evidence.",
+          "file": "platform/ctq_traceability/ctq_traceability_status.json",
+          "field": "status",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        },
+        {
+          "check_id": "file:07_reviewer_explanation/guides/ADRG.md",
+          "status": "PASS",
+          "evidence": "Required reviewer/documentation artifact is present.",
+          "file": "07_reviewer_explanation/guides/ADRG.md",
+          "field": "",
+          "actual": "present",
+          "expected": "present"
+        },
+        {
+          "check_id": "file:07_reviewer_explanation/guides/SDRG.md",
+          "status": "PASS",
+          "evidence": "Required reviewer/documentation artifact is present.",
+          "file": "07_reviewer_explanation/guides/SDRG.md",
+          "field": "",
+          "actual": "present",
+          "expected": "present"
+        },
+        {
+          "check_id": "file:07_reviewer_explanation/guides/BDRG.md",
+          "status": "PASS",
+          "evidence": "Required reviewer/documentation artifact is present.",
+          "file": "07_reviewer_explanation/guides/BDRG.md",
+          "field": "",
+          "actual": "present",
+          "expected": "present"
+        },
+        {
+          "check_id": "file:07_reviewer_explanation/guides/SDSP.md",
+          "status": "PASS",
+          "evidence": "Required reviewer/documentation artifact is present.",
+          "file": "07_reviewer_explanation/guides/SDSP.md",
+          "field": "",
+          "actual": "present",
+          "expected": "present"
+        },
+        {
+          "check_id": "file:07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md",
+          "status": "PASS",
+          "evidence": "Required reviewer/documentation artifact is present.",
+          "file": "07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md",
+          "field": "",
+          "actual": "present",
+          "expected": "present"
+        }
+      ]
+    },
+    {
+      "id": "log_cleanliness",
+      "name": "SAS/R log cleanliness gate",
+      "risk_tier": "high",
+      "gate": "G06",
+      "owner": "qc_validation",
+      "status": "PASS",
+      "decision_impact": "Prevents unapproved execution-log warnings or data-conversion notes from being hidden beneath passing reconciliation telemetry.",
+      "traceability": "program execution -> SAS/R logs -> log-cleanliness evidence -> QC signoff/release manifest",
+      "checks": [
+        {
+          "check_id": "log_cleanliness_pass",
+          "status": "PASS",
+          "evidence": "SAS/R execution logs contain no unapproved errors, warnings, invalid-input notes, uninitialized variables, or risky conversion/merge notes.",
+          "file": "platform/log_cleanliness/log_cleanliness_status.json",
+          "field": "status",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        }
+      ]
+    },
+    {
+      "id": "platform_release_controls",
+      "name": "Platform execution and release controls",
+      "risk_tier": "critical",
+      "gate": "G09",
+      "owner": "platform_release",
+      "status": "PASS",
+      "decision_impact": "Determines whether the current run can be treated as a release candidate.",
+      "traceability": "pipeline execution -> telemetry -> release checklist -> package materialization",
+      "checks": [
+        {
+          "check_id": "pipeline_green",
+          "status": "PASS",
+          "evidence": "Current pipeline health is green.",
+          "file": "platform/pipeline_health.json",
+          "field": "pipeline_health_status",
+          "actual": "GREEN",
+          "expected": "GREEN",
+          "freshness_failure": null
+        },
+        {
+          "check_id": "current_real_sas",
+          "status": "PASS",
+          "evidence": "Current live run used an independent SAS engine.",
+          "file": "platform/pipeline_health.json",
+          "field": "sas_execution_mode",
+          "actual": "oda",
+          "expected": [
+            "oda",
+            "local"
+          ],
+          "freshness_failure": null
+        },
+        {
+          "check_id": "dataset_reconciliation_not_simulated",
+          "status": "PASS",
+          "evidence": "Dataset-level reconciliation is not a byte-copy simulation.",
+          "file": "platform/reconciliation_status.json",
+          "field": "simulated",
+          "actual": false,
+          "expected": false,
+          "freshness_failure": null
+        },
+        {
+          "check_id": "log_cleanliness_pass",
+          "status": "PASS",
+          "evidence": "SAS/R execution logs contain no unapproved errors, warnings, invalid-input notes, uninitialized variables, or risky conversion/merge notes.",
+          "file": "platform/log_cleanliness/log_cleanliness_status.json",
+          "field": "status",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        }
+      ]
+    }
+  ]
+}

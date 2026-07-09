@@ -34,16 +34,16 @@
 
 | Artifact | Role |
 |---|---|
-| `06_telemetry/pipeline_health.json` | Run telemetry: `schema_version=run_scope_v1`, `GREEN`, `oda`, `full_dag`, 30/30 PASS |
-| `06_telemetry/release_run_manifest/release_run_manifest.json` | Hash seal: `PASS`, `evidence_grade=release_candidate`, seal `c01e744fe5ba3a1e70fbe4a0b4304da1a8f211edb21cc5ba76f85db3f6ed0201` |
+| `platform/pipeline_health.json` | Run telemetry: `schema_version=run_scope_v1`, `GREEN`, `oda`, `full_dag`, 30/30 PASS |
+| `platform/release_run_manifest/release_run_manifest.json` | Hash seal: `PASS`, `evidence_grade=release_candidate`, seal `c01e744fe5ba3a1e70fbe4a0b4304da1a8f211edb21cc5ba76f85db3f6ed0201` |
 | `docs/RELEASE_RUN_MANIFEST.md` | Human-readable seal summary |
-| `06_telemetry/release_candidate/release_candidate_status.json` | RC go/no-go: `PASS`, 16 checks, 0 blockers |
+| `platform/release_candidate/release_candidate_status.json` | RC go/no-go: `PASS`, 16 checks, 0 blockers |
 | `docs/RELEASE_CANDIDATE_CHECKLIST.md` | Reviewer checklist |
-| `tfl_output_catalog.yaml` | Controlled output universe (in-scope vs deferred) |
-| `audit/FINDINGS_DISPOSITION_BOARD.md` | Crit/Major disposition classes and honesty boundary |
-| `audit/findings_register.csv` | Machine register (ACCEPTED/RESOLVED) |
-| `validation_strategy.yaml` + `docs/VALIDATION_STRATEGY_CONTROL_REPORT.md` | Risk-based validation control |
-| `08_reviewers_guides/ADRG.md` / `SDRG.md` / `BDRG.md` | Reviewer explanation layer |
+| `config/tfl_output_catalog.yaml` | Controlled output universe (in-scope vs deferred) |
+| `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md` | Crit/Major disposition classes and honesty boundary |
+| `06_qc_evidence/audit/findings_register.csv` | Machine register (ACCEPTED/RESOLVED) |
+| `config/validation_strategy.yaml` + `docs/VALIDATION_STRATEGY_CONTROL_REPORT.md` | Risk-based validation control |
+| `07_reviewer_explanation/guides/ADRG.md` / `SDRG.md` / `BDRG.md` | Reviewer explanation layer |
 
 ---
 
@@ -78,7 +78,7 @@ worktree at seal:       clean
 ## What changed in this release train
 
 - Manifest-driven 30-stage DAG including **admiral** third engine (gated).
-- **TFL catalog control** (`tfl_output_catalog.yaml`) + index gate.
+- **TFL catalog control** (`config/tfl_output_catalog.yaml`) + index gate.
 - **Findings disposition board** → no active CONFIRMED Crit/Major for RC gate.
 - Delivery controls: evidence layers, validation strategy, log cleanliness, release-run seal, RC checklist.
 - Full **ODA** proof run sealed as `full_dag` with `schema_version=run_scope_v1`.
@@ -89,15 +89,15 @@ worktree at seal:       clean
 
 ```bash
 # Machine seals (local clone with artifacts)
-python3 -c "import json; print(json.load(open('06_telemetry/release_run_manifest/release_run_manifest.json'))['status'])"
-python3 -c "import json; print(json.load(open('06_telemetry/release_candidate/release_candidate_status.json'))['status'])"
-python3 -c "import json; h=json.load(open('06_telemetry/pipeline_health.json')); print(h['schema_version'], h['run_scope'], h['sas_execution_mode'], h['pipeline_health_status'])"
+python3 -c "import json; print(json.load(open('platform/release_run_manifest/release_run_manifest.json'))['status'])"
+python3 -c "import json; print(json.load(open('platform/release_candidate/release_candidate_status.json'))['status'])"
+python3 -c "import json; h=json.load(open('platform/pipeline_health.json')); print(h['schema_version'], h['run_scope'], h['sas_execution_mode'], h['pipeline_health_status'])"
 
 # Demo smoke (no SDTM / no SAS)
-python3 06_telemetry/cibuild.py --demo
+python3 platform/cibuild.py --demo
 ```
 
-Full real re-run requires licensed SDTM placement + ODA/local SAS (see `REPRODUCIBILITY.md`).
+Full real re-run requires licensed SDTM placement + ODA/local SAS (see `00_governance/REPRODUCIBILITY.md`).
 
 ---
 
@@ -117,7 +117,7 @@ Pipeline seal ≠ department operating model. Post-seal work is run through the
 **Workstream Execution Board**:
 
 - [`docs/WORKSTREAM_EXECUTION_BOARD.md`](WORKSTREAM_EXECUTION_BOARD.md)
-- [`workstream_execution_board.yaml`](../workstream_execution_board.yaml)
+- [`config/workstream_execution_board.yaml`](../config/workstream_execution_board.yaml)
 
 Priority is team-by-team evidence packs (source, standards, programming, QC,
 writing, release) — not another DAG re-run without a regression.

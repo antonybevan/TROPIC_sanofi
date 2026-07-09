@@ -6,7 +6,7 @@
 #          reproducibility) by giving any reviewer something they can actually run:
 #
 #            git clone <repo> && cd TROPIC
-#            python3 06_telemetry/cibuild.py --demo
+#            python3 platform/cibuild.py --demo
 #
 #          What it proves:
 #            1. The pinned R environment loads (haven, dplyr, diffdf).
@@ -21,7 +21,7 @@
 #          This is a fixture/unit demonstration of the reconciliation engine — the
 #          heart of the validation claim — not the full 7-domain clinical run
 #          (which requires the licensed SDTM source + a SAS 9.4 engine; see
-#          REPRODUCIBILITY.md). No real data is read or written.
+#          00_governance/REPRODUCIBILITY.md). No real data is read or written.
 # ==============================================================================
 
 cat("================ TROPIC SELF-CONTAINED SMOKE TEST ================\n")
@@ -43,7 +43,7 @@ suppressMessages({ library(haven); library(dplyr); library(diffdf) })
 
 # ---- 2. Static parse of all pipeline R scripts -------------------------------
 cat("\n[2/3] Static parse of pipeline R scripts\n")
-r_scripts <- list.files(c("03_validation_r", "05_reconciliation", "09_tfl", "01_raw_source"),
+r_scripts <- list.files(c("04_analysis_datasets/programs/r", "06_qc_evidence/reconciliation", "05_outputs/tfl", "01_source_data"),
                         pattern = "\\.R$", full.names = TRUE)
 for (f in r_scripts) {
   res <- tryCatch({ parse(f); TRUE }, error = function(e) { fail(sprintf("%s: %s", f, conditionMessage(e))); FALSE })
@@ -76,7 +76,7 @@ tdir <- tempfile("tropic_demo_"); dir.create(tdir)
 write_xpt(prod_fx, file.path(tdir, "demo_prod.xpt"))
 write_xpt(val_fx,  file.path(tdir, "demo_v.xpt"))
 
-# Keyed reconciliation, mirroring 05_reconciliation/cross_lang_audit.R methodology:
+# Keyed reconciliation, mirroring 06_qc_evidence/reconciliation/cross_lang_audit.R methodology:
 # align on the unique business key (USUBJID + AESEQ) and compare cell values.
 reconcile <- function(prod_path, val_path, keys) {
   p <- read_xpt(prod_path); v <- read_xpt(val_path)
@@ -102,7 +102,7 @@ if (length(issues_b) > 0) pass(sprintf("injected 1-cell difference correctly DET
 
 # ---- Keyless multiset path (the branch used for ADCM/ADLB/ADRS/ADEX) ----------
 # The four BDS/OCCDS domains above carry NO unique within-subject record id, so
-# 05_reconciliation/cross_lang_audit.R aligns them by business keys + within-key
+# 06_qc_evidence/reconciliation/cross_lang_audit.R aligns them by business keys + within-key
 # row_number() over content-sorted rows. Cases A/B only exercised the unique-key
 # path; this helper mirrors the keyless methodology verbatim so the demo covers it.
 reconcile_multiset <- function(prod, val, sort_keys) {

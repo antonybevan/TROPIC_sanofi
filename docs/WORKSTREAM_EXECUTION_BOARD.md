@@ -4,7 +4,7 @@
 **As of:** 2026-07-09  
 **Pipeline seal:** `v0.1.0-demo-rc.1` · release-run `PASS` · RC checklist `PASS` · ODA `full_dag` 30/30  
 **Product claim in force:** **Controlled non-submission demonstration package** (`docs/PRODUCT_CLAIM.md`)  
-**Authority:** SAP v4.0 remediation lock · `audit/SAP_LOCK_REVIEW_MEMO.md` · `audit/FINDINGS_DISPOSITION_BOARD.md`
+**Authority:** SAP v4.0 remediation lock · `06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md` · `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md`
 
 ---
 
@@ -69,7 +69,7 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 
 | Field | Content |
 |---|---|
-| **Owned artifacts** | `01_raw_source/` (governed, not redistributed) · staging ingest · SDTM validation · source profile report · SDTM CORE run records · SDRG source sections · F-017 timing residuals |
+| **Owned artifacts** | `01_source_data/` (governed, not redistributed) · staging ingest · SDTM validation · source profile report · SDTM CORE run records · SDRG source sections · F-017 timing residuals |
 | **Current status** | **AMBER** — source profile PASS; staging/SDTM val in DAG; week-precision and partial ISO dates known; CORE not full-domain residual-closed |
 | **Open risks** | F-017 (partial dates / TSSEQ) · incomplete CORE residual disposition (F-015) · real SDTM not in git (correct) but inventory must stay complete for reviewers |
 | **Required evidence pack** | (1) Source profile status + CSVs · (2) SDTM val log cleanliness · (3) CORE SDTMIG 3.4 run record + residual register · (4) SDRG § source limitations final wording · (5) Data-use / access statement |
@@ -83,7 +83,7 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 
 | Field | Content |
 |---|---|
-| **Owned artifacts** | SAP v4.0 · `study_config.yaml` · CTQ/estimand register · ANALYSIS_REPORT · population rules (ITT/Safety/MEASDISF) · F-011 PSA denom residual |
+| **Owned artifacts** | SAP v4.0 · `config/study_config.yaml` · CTQ/estimand register · ANALYSIS_REPORT · population rules (ITT/Safety/MEASDISF) · F-011 PSA denom residual |
 | **Current status** | **AMBER** — config and SAP exist; G02 is **not stage-gated** in orchestrator (doc-only); PSA eligibility shell residual (F-011) |
 | **Open risks** | Spec drift from SAP; G02 never machine-checked; PSA / ITT wording inconsistency under review pressure |
 | **Required evidence pack** | (1) Spec-to-config trace table · (2) Population/endpoint matrix · (3) Sensitivity list · (4) Explicit disposition of F-011 in ADRG + TFL footnotes if not coded |
@@ -111,7 +111,7 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 
 | Field | Content |
 |---|---|
-| **Owned artifacts** | SAS production + R validation programs · ADaM XPTs · BIMO clinsite · TFL suite · `tfl_output_catalog.yaml` · forest/results drivers · safety ADaM (ADAE/ADLB/ADEX) |
+| **Owned artifacts** | SAS production + R validation programs · ADaM XPTs · BIMO clinsite · TFL suite · `config/tfl_output_catalog.yaml` · forest/results drivers · safety ADaM (ADAE/ADLB/ADEX) |
 | **Current status** | **GREEN for demo claim** — dual-lang recon PASS; TFL controlled catalog PASS; admiral T1 in DAG PASS; safety programming present |
 | **Open risks** | 21 deferred SAP TFL IDs; synthetic CbzP in TFLs; F-012 N=749 vs 755; out-of-DAG SAS figure companions |
 | **Required evidence pack** | (1) Program inventory by domain · (2) Catalog in-scope vs deferred · (3) Recon status JSON · (4) Admiral status · (5) TFL index + hashes · (6) Safety table list (T-20/T-21) |
@@ -125,7 +125,7 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 
 | Field | Content |
 |---|---|
-| **Owned artifacts** | Risk-based validation plan · validation_strategy.yaml · recon (dataset/results/forest/admiral) · log cleanliness · findings register · disposition board · CORE local rules |
+| **Owned artifacts** | Risk-based validation plan · config/validation_strategy.yaml · recon (dataset/results/forest/admiral) · log cleanliness · findings register · disposition board · CORE local rules |
 | **Current status** | **GREEN for Path A residual communication** — known-differences memo filed; machine gates PASS; still AMBER-leaning for industry if P21/CORE residual matrix missing (owned with WS-3) |
 | **Open risks** | Single-author tracks; log coverage = persisted logs only; commercial P21 external |
 | **Required evidence pack** | (1) Validation strategy control report · (2) Recon/admiral status · (3) Log cleanliness · (4) Findings + disposition · (5) **`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`** |
@@ -158,7 +158,7 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | **Open risks** | Seal ≠ submission; EXAMPLE eCTD; no one-command external verify; CI not a “release job” product |
 | **Required evidence pack** | (1) pipeline_health · (2) release_run_manifest · (3) RC status · (4) tag · (5) release note · (6) CI status · (7) verify script (missing) |
 | **Release gate** | G09 — **PASS for demo RC** |
-| **Next action** | Maintain seal; **`scripts/verify_release.py` exists** — wire CI release job to it; optional immutable evidence snapshot under `06_telemetry/evidence/` |
+| **Next action** | Maintain seal; **`scripts/verify_release.py` exists** — wire CI release job to it; optional immutable evidence snapshot under `platform/evidence/` |
 
 ---
 

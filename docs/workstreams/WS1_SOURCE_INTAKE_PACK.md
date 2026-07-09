@@ -18,14 +18,14 @@ Prove we know **what source data we have**, **what we may redistribute**, **what
 
 | Artifact | Role | Path | Status |
 |---|---|---|---|
-| Source landing area | Real SDTM + docs (local) | `01_raw_source/` | Required locally; **not** in git |
-| Data access boundary | What clone can/cannot run | `REPRODUCIBILITY.md` | Present |
-| Staging ingest | SUPP merge / staging RDS | `03_validation_r/v_staging_ingest.R` + SAS `L_staging_ingest.sas` | In DAG |
-| SDTM structural validation | Domain checks / warnings | `03_validation_r/v_sdtm_validation.R` + log | In DAG |
-| Source profile | Aggregate inventory (patient-safe) | `docs/SOURCE_PROFILING_REPORT.md` · `06_telemetry/source_profile*` | PASS at seal |
-| SDTMIG 3.4 uplift | Package source layer | `06_telemetry/uplift_sdtm_34.R` | In package path |
-| CORE SDTM 3.4 run | Open conformance evidence | `06_telemetry/conformance/CORE_SDTM34_RUN_RECORD.md` | Present (partial residual story) |
-| SDRG | Human source explanation | `08_reviewers_guides/SDRG.md` | Present; hardening continues |
+| Source landing area | Real SDTM + docs (local) | `01_source_data/` | Required locally; **not** in git |
+| Data access boundary | What clone can/cannot run | `00_governance/REPRODUCIBILITY.md` | Present |
+| Staging ingest | SUPP merge / staging RDS | `04_analysis_datasets/programs/r/v_staging_ingest.R` + SAS `L_staging_ingest.sas` | In DAG |
+| SDTM structural validation | Domain checks / warnings | `04_analysis_datasets/programs/r/v_sdtm_validation.R` + log | In DAG |
+| Source profile | Aggregate inventory (patient-safe) | `docs/SOURCE_PROFILING_REPORT.md` · `platform/source_profile*` | PASS at seal |
+| SDTMIG 3.4 uplift | Package source layer | `platform/uplift_sdtm_34.R` | In package path |
+| CORE SDTM 3.4 run | Open conformance evidence | `platform/conformance/CORE_SDTM34_RUN_RECORD.md` | Present (partial residual story) |
+| SDRG | Human source explanation | `07_reviewer_explanation/guides/SDRG.md` | Present; hardening continues |
 | Disposition | F-015, F-017 | findings register + known-differences memo | ACCEPTED on record |
 
 ---
@@ -53,8 +53,8 @@ Prove we know **what source data we have**, **what we may redistribute**, **what
 **How to re-read without ODA:**
 
 ```bash
-python3 -c "import json; print(json.load(open('06_telemetry/source_profile_status.json')))"
-python3 -c "import json; h=json.load(open('06_telemetry/pipeline_health.json')); print({k:h['stages'].get(k) for k in h['stages'] if 'SDTM' in k or 'Staging' in k})"
+python3 -c "import json; print(json.load(open('platform/source_profile_status.json')))"
+python3 -c "import json; h=json.load(open('platform/pipeline_health.json')); print({k:h['stages'].get(k) for k in h['stages'] if 'SDTM' in k or 'Staging' in k})"
 ```
 
 ---

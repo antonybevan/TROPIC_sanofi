@@ -3,7 +3,7 @@
 **Workstream:** Statistical Specification (G02)  
 **Product claim:** Path A  
 **As of:** 2026-07-09  
-**Authorities:** SAP v4.0 · `study_config.yaml` · `tfl_output_catalog.yaml` · ADRG  
+**Authorities:** SAP v4.0 · `config/study_config.yaml` · `config/tfl_output_catalog.yaml` · ADRG  
 
 ---
 
@@ -55,7 +55,7 @@ If it is not in this table, programming should not invent it for Path A.
 
 ### Config parameters that implement clinical rules
 
-From `study_config.yaml` (non-exhaustive):
+From `config/study_config.yaml` (non-exhaustive):
 
 | Parameter | Role |
 |---|---|
@@ -71,7 +71,7 @@ From `study_config.yaml` (non-exhaustive):
 
 ## 4. Deferred endpoints / displays (not Path A deliverables)
 
-All IDs in `tfl_output_catalog.yaml` → `deferred_not_in_scope` (21 SAP full-catalog IDs), including additional efficacy tables T-11-1…5, T-12-*, T-13-*, T-14-*, T-15/16, F-12-2, T-17-3.
+All IDs in `config/tfl_output_catalog.yaml` → `deferred_not_in_scope` (21 SAP full-catalog IDs), including additional efficacy tables T-11-1…5, T-12-*, T-13-*, T-14-*, T-15/16, F-12-2, T-17-3.
 
 **Programming must not silently implement these without:**
 
@@ -86,7 +86,7 @@ All IDs in `tfl_output_catalog.yaml` → `deferred_not_in_scope` (21 SAP full-ca
 Path A demonstrates **implementation of endpoint algorithms** suitable for a programming portfolio.  
 It does **not** deliver a full ICH E9(R1) estimand package for filing (intercurrent events strategy documentation remains lightweight relative to a sponsor SAP).
 
-CTQ register: `ctq_traceability.yaml` + `docs/CTQ_TRACEABILITY_REPORT.md`.
+CTQ register: `config/ctq_traceability.yaml` + `docs/CTQ_TRACEABILITY_REPORT.md`.
 
 ---
 

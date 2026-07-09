@@ -1,6 +1,6 @@
 # TROPIC Log Cleanliness Report
 
-Generated: 2026-07-09 15:00:32 UTC
+Generated: 2026-07-09 16:35:17 UTC
 
 > Automated scan of **configured persisted** SAS/R execution logs. Reviewed exceptions remain visible and capped; unapproved issues fail the gate. This gate does **not** scan ephemeral rscript/python stage stdout/stderr (those streams are not persisted by `cibuild.py`).
 
@@ -25,7 +25,7 @@ Generated: 2026-07-09 15:00:32 UTC
 
 | Log | Rationale |
 | --- | --- |
-| 02_production_sas/oda_tfl.log | Manual SAS-figure renderer log from _oda_render_tfl.py; out-of-DAG/manual artifact tracked separately under F-024, not active release-run evidence. |
+| 04_analysis_datasets/programs/sas/oda_tfl.log | Manual SAS-figure renderer log from _oda_render_tfl.py; out-of-DAG/manual artifact tracked separately under F-024, not active release-run evidence. |
 
 ## Unapproved Findings
 
@@ -33,5 +33,5 @@ No unapproved log findings.
 
 ## Machine-Readable Outputs
 
-- `06_telemetry/log_cleanliness/log_cleanliness_status.json`
-- `06_telemetry/log_cleanliness/log_findings.csv`
+- `platform/log_cleanliness/log_cleanliness_status.json`
+- `platform/log_cleanliness/log_findings.csv`

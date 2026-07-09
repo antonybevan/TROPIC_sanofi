@@ -3,36 +3,36 @@
 # ==============================================================================
 
 # Clinical Data Protection (MANDATORY: Never commit patient data)
-# Ignore the CONTENTS of 01_raw_source/ (note the /*, not /) so that the
+# Ignore the CONTENTS of 01_source_data/ (note the /*, not /) so that the
 # negations below can re-include specific non-patient files. A bare
-# `01_raw_source/` prunes the whole dir and git never evaluates the `!` rules.
-01_raw_source/*
+# `01_source_data/` prunes the whole dir and git never evaluates the `!` rules.
+01_source_data/*
 AllProvidedFiles_79.zip
 
 # Re-include reconstruction CODE, the validation report, and PUBLISHED aggregate
 # data (no patient data): (a) code that generates the synthetic CbzP arm, and
 # (b) digitised coordinates from the published de Bono 2010 Lancet figures.
 # This also addresses Finding D (untracked reconstruction dependency).
-!01_raw_source/reconstruct_cbzp_arm.R
-!01_raw_source/reconstruct_cbzp_guyot.R
-!01_raw_source/guyot_validation_report.R
-!01_raw_source/guyot_validation_report.md
-!01_raw_source/export_cbzp_xpt.R
-!01_raw_source/check_cbzp_bridge.R
-!01_raw_source/guyot_digitised/
-!01_raw_source/guyot_digitised/**
+!01_source_data/reconstruct_cbzp_arm.R
+!01_source_data/reconstruct_cbzp_guyot.R
+!01_source_data/guyot_validation_report.R
+!01_source_data/guyot_validation_report.md
+!01_source_data/export_cbzp_xpt.R
+!01_source_data/check_cbzp_bridge.R
+!01_source_data/guyot_digitised/
+!01_source_data/guyot_digitised/**
 
 # Binary Outputs & Artifacts (MANDATORY: Never commit binary XPT outputs)
-04_adam/*.xpt
-04_adam/*.sas7bdat
-04_adam/*.csv
-09_tfl/output/
+04_analysis_datasets/adam/*.xpt
+04_analysis_datasets/adam/*.sas7bdat
+04_analysis_datasets/adam/*.csv
+05_outputs/tfl/output/
 
 # Telemetry and Health Audits
-06_telemetry/pipeline_health.json
-06_telemetry/health_dashboard.md
-06_telemetry/p21_report.json
-06_telemetry/reconciliation_report.html
+platform/pipeline_health.json
+platform/health_dashboard.md
+platform/p21_report.json
+platform/reconciliation_report.html
 
 # Logs & Temporary Files
 backup_adam/
@@ -69,15 +69,15 @@ node_modules/
 # CDISC CORE conformance engine + isolated venv (large, re-downloadable per P21_RUNBOOK; never commit)
 .core_engine/
 .core_venv/
-# Pinnacle 21 Community + Java 8 runtime (large, re-downloadable per p21_adam_runrecord.md; never commit)
+# Pinnacle 21 Community + Java 8 runtime (large, re-downloadable per 06_qc_evidence/conformance/p21_adam_runrecord.md; never commit)
 .p21/
-06_telemetry/p21_out/
+platform/p21_out/
 # Staged domain-named ADaM XPT copies fed to the conformance engine (patient-derived — never commit)
-06_telemetry/_p21_datasets/
+platform/_p21_datasets/
 # CORE conformance engine output (may reference dataset paths)
-06_telemetry/p21_report.*
+platform/p21_report.*
 # Regenerable define.xml metadata flattening (intermediate for the ADaM conformance gate)
-06_telemetry/adam_conf_define_meta.json
+platform/adam_conf_define_meta.json
 
 # SAS Connection & Credentials Profiles
 sascfg_personal.py
@@ -92,16 +92,16 @@ _authinfo
 # Local IDE and temporary exploration folders
 .claude/
 scratch/
-06_telemetry/reconciliation_status.json
+platform/reconciliation_status.json
 
-# Generated from study_config.yaml by 06_telemetry/generate_config.py (do not edit/commit)
-02_production_sas/00_config_generated.sas
-06_telemetry/oda_status.json
-06_telemetry/.oda_singleflight.lock
-06_telemetry/.oda_session.json
-06_telemetry/pipeline_health_log.jsonl
-06_telemetry/stage_cache.json
-06_telemetry/.materialize_ectd_cache.json
+# Generated from config/study_config.yaml by platform/generate_config.py (do not edit/commit)
+04_analysis_datasets/programs/sas/00_config_generated.sas
+platform/oda_status.json
+platform/.oda_singleflight.lock
+platform/.oda_session.json
+platform/pipeline_health_log.jsonl
+platform/stage_cache.json
+platform/.materialize_ectd_cache.json
 
 # --- Roadmap #6: surface portfolio deliverables + honest execution evidence on GitHub ---
 # Re-include the rendered TFL gallery (figures + text tables) and the pipeline-health /
@@ -110,42 +110,42 @@ scratch/
 # sas_execution_mode (e.g. "sim" until a real oda/local run is recorded). Negations must
 # follow the broad *.png / output-dir ignores above; the directory is re-included first so
 # its contents can be re-included.
-!09_tfl/output/
-!09_tfl/output/**
-!06_telemetry/pipeline_health.json
-!06_telemetry/reconciliation_status.json
+!05_outputs/tfl/output/
+!05_outputs/tfl/output/**
+!platform/pipeline_health.json
+!platform/reconciliation_status.json
 
 # eCTD Module 5 package. The DATA-FREE preview (package_ectd.py --preview) is tracked for
 # portfolio visibility; patient-level transport/native data is NEVER tracked, even when the
 # full package is built locally with the licensed source data present.
-m5/**/*.xpt
-m5/**/*.sas7bdat
+08_submission_package/m5/**/*.xpt
+08_submission_package/m5/**/*.sas7bdat
 # Re-include the rendered submission artifacts that the global *.pdf / *.png rules would ignore.
-!m5/**/*.pdf
-!m5/**/*.png
+!08_submission_package/m5/**/*.pdf
+!08_submission_package/m5/**/*.png
 
-# Dataset-JSON v1.1 export (10_datasetjson/) is patient-level data — same data-free
+# Dataset-JSON v1.1 export (04_analysis_datasets/datasetjson/) is patient-level data — same data-free
 # policy as the XPT above. The *.json data files are never tracked; README.md (markdown)
 # and any future docs remain tracked.
-10_datasetjson/**/*.json
-10_datasetjson/**/*.ndjson
+04_analysis_datasets/datasetjson/**/*.json
+04_analysis_datasets/datasetjson/**/*.ndjson
 
-# eCTD sequence (11_ectd/0000/): the backbone (index.xml, index-md5.txt), Study Tagging File,
+# eCTD sequence (08_submission_package/ectd/0000/): the backbone (index.xml, index-md5.txt), Study Tagging File,
 # regional metadata, and util/ are tracked. The materialized dataset + report-binary payload is a
-# reproducible copy of the m5/ tree (06_telemetry/materialize_ectd.py) and is NOT tracked.
+# reproducible copy of the m5/ tree (platform/materialize_ectd.py) and is NOT tracked.
 # Patient-level data is guarded unconditionally.
-11_ectd/**/*.xpt
-11_ectd/**/*.sas7bdat
-11_ectd/**/*.json
-11_ectd/0000/m5/datasets/
-11_ectd/0000/m5/**/*.pdf
-11_ectd/0000/m5/**/*.png
-11_ectd/0000/m5/**/*.xlsx
-11_ectd/0000/m5/**/*.txt
+08_submission_package/ectd/**/*.xpt
+08_submission_package/ectd/**/*.sas7bdat
+08_submission_package/ectd/**/*.json
+08_submission_package/ectd/0000/m5/datasets/
+08_submission_package/ectd/0000/m5/**/*.pdf
+08_submission_package/ectd/0000/m5/**/*.png
+08_submission_package/ectd/0000/m5/**/*.xlsx
+08_submission_package/ectd/0000/m5/**/*.txt
 # eCTD util/dtd: track the official .dtd files (enable DTD-valid checks); ignore download cruft
 # (the ICH zip + its index.htm; FDA spec PDFs are already covered by the global *.pdf rule).
-11_ectd/0000/util/dtd/*.zip
-11_ectd/0000/util/dtd/*.htm
+08_submission_package/ectd/0000/util/dtd/*.zip
+08_submission_package/ectd/0000/util/dtd/*.htm
 
 .core_venv/
 
@@ -157,4 +157,15 @@ m5/**/*.sas7bdat
 
 # CORE conformance reports carry subject-level USUBJID rows — keep out of the data-free repo
 # (run records / classified summaries in *.md are safe and tracked).
-06_telemetry/conformance/core_*_report.json
+platform/conformance/core_*_report.json
+
+# Generated per-study runtime work areas. Study templates and source code may be tracked later,
+# but generated datasets, telemetry, rendered reports, and generated SAS configs stay local.
+studies/*/04_adam/*.xpt
+studies/*/04_adam/*.sas7bdat
+studies/*/04_adam/*.csv
+studies/*/06_telemetry/*.json
+studies/*/06_telemetry/*.jsonl
+studies/*/06_telemetry/*.html
+studies/*/06_telemetry/*.md
+studies/*/02_production_sas/*_generated.sas

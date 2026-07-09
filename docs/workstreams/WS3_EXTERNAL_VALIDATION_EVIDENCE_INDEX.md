@@ -28,19 +28,19 @@ Every row is a **slot**:
 
 | Slot | Status | Evidence location | Notes |
 |---|---|---|---|
-| Define-XML 2.1 + ARM XSD (`define.xml`) | **RUN** | `07_define_xml/validate_xsd.sh` · schema under `07_define_xml/schema/` | Schema validity ≠ business-rule conformance |
-| Define structural/referential | **RUN** | `07_define_xml/validate_define.py` | Fast gate |
-| Spec → Define conformance | **RUN** | `07_define_xml/check_define_conformance.R` · `06_telemetry/conformance/spec_define_conformance.json` | In DAG |
-| Spec → Data conformance | **RUN** | `03_validation_r/spec_data_checks.R` · `spec_data_conformance.json` | In DAG |
-| SDTM Define-XML | **RUN** | `07_define_xml/define_sdtm.xml` + package pairing | Pair with uplifted SDTM |
+| Define-XML 2.1 + ARM XSD (`define.xml`) | **RUN** | `03_metadata/define/validate_xsd.sh` · schema under `03_metadata/define/schema/` | Schema validity ≠ business-rule conformance |
+| Define structural/referential | **RUN** | `03_metadata/define/validate_define.py` | Fast gate |
+| Spec → Define conformance | **RUN** | `03_metadata/define/check_define_conformance.R` · `platform/conformance/spec_define_conformance.json` | In DAG |
+| Spec → Data conformance | **RUN** | `04_analysis_datasets/programs/r/spec_data_checks.R` · `spec_data_conformance.json` | In DAG |
+| SDTM Define-XML | **RUN** | `03_metadata/define/define_sdtm.xml` + package pairing | Pair with uplifted SDTM |
 
 ### 2.2 CDISC CORE (open engine)
 
 | Slot | Status | Evidence location | Notes |
 |---|---|---|---|
-| SDTMIG 3.4 CORE (uplifted package layer) | **PARTIAL** | `06_telemetry/conformance/CORE_SDTM34_RUN_RECORD.md` | Residuals not fully dispositioned (F-015) |
+| SDTMIG 3.4 CORE (uplifted package layer) | **PARTIAL** | `platform/conformance/CORE_SDTM34_RUN_RECORD.md` | Residuals not fully dispositioned (F-015) |
 | SDTMIG 3.2 baseline on pristine source | **PARTIAL** | `CORE_RUN_RECORD.md` / related | Version caveats documented in REPRODUCIBILITY |
-| ADaM CORE via local rules | **RUN** | `06_telemetry/conformance_rules/adam/` · CORE run record | Not official AD#### catalog |
+| ADaM CORE via local rules | **RUN** | `platform/conformance_rules/adam/` · CORE run record | Not official AD#### catalog |
 | Official ADaM Conformance Rules (members) | **NOT_AVAILABLE** | — | F-016 class |
 | CORE residual disposition matrix | **NOT_AVAILABLE** | Planned: `docs/workstreams/WS1_CORE_RESIDUAL_MATRIX.csv` | Required for honest “conformance program” story |
 
@@ -48,17 +48,17 @@ Every row is a **slot**:
 
 | Slot | Status | Evidence location | Notes |
 |---|---|---|---|
-| Pinnacle 21 Community/Enterprise ADaM | **NOT_AVAILABLE** | `06_telemetry/p21_*` historical notes only | Do not claim clean |
+| Pinnacle 21 Community/Enterprise ADaM | **NOT_AVAILABLE** | `06_qc_evidence/conformance/p21_*` historical notes only | Do not claim clean |
 | FDA DataFit / eCTD validator commercial | **NOT_AVAILABLE** | — | Structure demo only |
-| Local ADaM label/conformance scripts | **RUN** | `06_telemetry/adam_conformance_*` · `run_adam_conformance.sh` | Sponsor-authored depth limited |
+| Local ADaM label/conformance scripts | **RUN** | `06_qc_evidence/conformance/adam_conformance_*` · `platform/run_adam_conformance.sh` | Sponsor-authored depth limited |
 
 ### 2.4 eCTD structure
 
 | Slot | Status | Evidence location | Notes |
 |---|---|---|---|
-| Module 5 tree assembly | **RUN** | `06_telemetry/package_ectd.py` → `m5/` | Path A |
-| Backbone + STF + materialize + MD5 | **RUN** | `build_ectd_backbone.py` · `materialize_ectd.py` · `11_ectd/RUN_RECORD.md` | 89 m5 files indexed |
-| DTD validation (xmllint) | **RUN** (documented) | `11_ectd/RUN_RECORD.md` | EXAMPLE app IDs remain |
+| Module 5 tree assembly | **RUN** | `platform/package_ectd.py` -> `08_submission_package/m5/` | Path A |
+| Backbone + STF + materialize + MD5 | **RUN** | `build_ectd_backbone.py` · `materialize_ectd.py` · `08_submission_package/ectd/RUN_RECORD.md` | 90 checksum leaves; 89 sequence m5 hrefs indexed |
+| DTD validation (xmllint) | **RUN** (documented) | `08_submission_package/ectd/RUN_RECORD.md` | EXAMPLE app IDs remain |
 | Real application identifiers | **N/A_PATH_A** / **BLOCKED_PATH_B** | F-005 | EXAMPLE/000000 |
 | True annotated CRF | **N/A_PATH_A** / **BLOCKED_PATH_B** | F-005 | Placeholder only |
 
@@ -66,9 +66,9 @@ Every row is a **slot**:
 
 | Slot | Status | Evidence location | Notes |
 |---|---|---|---|
-| Metadata lineage YAML + check | **RUN** | `metadata_lineage.yaml` · `apply_metadata_lineage.py` | F-013 RESOLVED |
+| Metadata lineage YAML + check | **RUN** | `config/metadata_lineage.yaml` · `apply_metadata_lineage.py` | F-013 RESOLVED |
 | Metadata control report | **RUN** | `docs/METADATA_CONTROL_REPORT.md` | |
-| CT cross-validation | **PARTIAL** | `06_telemetry/ct_cross_validation.py` · JSON | May need API key |
+| CT cross-validation | **PARTIAL** | `platform/ct_cross_validation.py` · JSON | May need API key |
 | Project CT version posture | **DECLARED** | 2026-03-27 in guides/USDM | Keep aligned |
 
 ### 2.6 Exploratory modern layers (must not be oversold)
@@ -96,7 +96,7 @@ Every row is a **slot**:
 
 1. Create `WS1_CORE_RESIDUAL_MATRIX.csv` from latest CORE JSON (WS-1 lead, WS-3 support).  
 2. Add one-page “how we ran XSD / CORE” runbook pointers in SDRG (WS-6).  
-3. If P21 becomes available: drop report under `06_telemetry/conformance/p21/` and flip slot to RUN.  
+3. If P21 becomes available: drop report under `platform/conformance/p21/` and flip slot to RUN.  
 4. Keep Dataset-JSON/USDM/ARS labeled **exploratory** in ADRG until packaging decision.
 
 ---

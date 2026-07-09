@@ -102,10 +102,10 @@ Evidence:
 
 TROPIC fit:
 
-- `audit/SAP_LOCK_REVIEW_MEMO.md`
-- `study_config.yaml`
+- `06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md`
+- `config/study_config.yaml`
 - `docs/RELEASE_CANDIDATE_CHECKLIST.md`
-- `audit/findings_register.csv`
+- `06_qc_evidence/audit/findings_register.csv`
 
 ### 2. Clinical Data Management / Clinical Data Science
 
@@ -132,9 +132,9 @@ Evidence:
 
 TROPIC fit:
 
-- `01_raw_source/`
+- `01_source_data/`
 - `docs/SOURCE_PROFILING_REPORT.md`
-- `06_telemetry/source_profile/`
+- `platform/source_profile/`
 - future target: add a formal source data flow diagram and data transfer
   reconciliation manifest.
 
@@ -161,8 +161,8 @@ Evidence:
 
 TROPIC fit:
 
-- `04_adam/adae_*.xpt`
-- `09_tfl/output/`
+- `04_analysis_datasets/adam/adae_*.xpt`
+- `05_outputs/tfl/output/`
 - future target: explicit MedDRA/version and safety medical review signoff.
 
 ### 4. Standards and Metadata Governance
@@ -189,9 +189,9 @@ Evidence:
 
 TROPIC fit:
 
-- `00_specifications/ADaM_spec.xlsx`
-- `07_define_xml/define.xml`
-- `07_define_xml/define_sdtm.xml`
+- `03_metadata/adam/ADaM_spec.xlsx`
+- `03_metadata/define/define.xml`
+- `03_metadata/define/define_sdtm.xml`
 - `docs/METADATA_CONTROL_REPORT.md`
 
 Current gap:
@@ -223,9 +223,9 @@ Evidence:
 
 TROPIC fit:
 
-- `TROPIC_SAP_v4.0_industry_grade.docx`
-- `study_config.yaml`
-- `ANALYSIS_REPORT.md`
+- `02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx`
+- `config/study_config.yaml`
+- `07_reviewer_explanation/analysis_report.md`
 - future target: explicit estimand register aligned to ADaM/TFL metadata.
 
 ### 6. Statistical Programming
@@ -253,11 +253,11 @@ Evidence:
 
 TROPIC fit:
 
-- `02_production_sas/`
-- `03_validation_r/`
-- `09_tfl/`
+- `04_analysis_datasets/programs/sas/`
+- `04_analysis_datasets/programs/r/`
+- `05_outputs/tfl/`
 - `docs/TFL_OUTPUT_INDEX.md`
-- `06_telemetry/build_delivery_controls.py`
+- `platform/build_delivery_controls.py`
 
 Current gap:
 
@@ -290,9 +290,9 @@ Evidence:
 
 TROPIC fit:
 
-- `08_reviewers_guides/RISK_BASED_VALIDATION.md`
-- `05_reconciliation/`
-- `audit/findings_register.csv`
+- `07_reviewer_explanation/guides/RISK_BASED_VALIDATION.md`
+- `06_qc_evidence/reconciliation/`
+- `06_qc_evidence/audit/findings_register.csv`
 - `docs/RELEASE_CANDIDATE_CHECKLIST.md`
 
 Current gap:
@@ -326,9 +326,9 @@ TROPIC fit:
 
 - `renv.lock`
 - `.github/workflows/ci.yml`
-- `06_telemetry/cibuild.py`
-- `06_telemetry/build_delivery_controls.py`
-- `06_telemetry/pipeline_health.json`
+- `platform/cibuild.py`
+- `platform/build_delivery_controls.py`
+- `platform/pipeline_health.json`
 
 ### 9. Medical Writing and Reviewer Explanation
 
@@ -352,11 +352,11 @@ Evidence:
 
 TROPIC fit:
 
-- `08_reviewers_guides/ADRG.md`
-- `08_reviewers_guides/SDRG.md`
-- `08_reviewers_guides/BDRG.md`
-- `08_reviewers_guides/SDSP.md`
-- `08_reviewers_guides/TRACEABILITY_MATRIX.md`
+- `07_reviewer_explanation/guides/ADRG.md`
+- `07_reviewer_explanation/guides/SDRG.md`
+- `07_reviewer_explanation/guides/BDRG.md`
+- `07_reviewer_explanation/guides/SDSP.md`
+- `07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md`
 
 ### 10. Regulatory Operations / Submission Publishing
 
@@ -381,11 +381,11 @@ Evidence:
 
 TROPIC fit:
 
-- `m5/`
-- `11_ectd/`
-- `06_telemetry/package_ectd.py`
-- `06_telemetry/build_ectd_backbone.py`
-- `06_telemetry/materialize_ectd.py`
+- `08_submission_package/m5/`
+- `08_submission_package/ectd/`
+- `platform/package_ectd.py`
+- `platform/build_ectd_backbone.py`
+- `platform/materialize_ectd.py`
 
 ## Architecture Consequence for TROPIC
 
@@ -424,4 +424,3 @@ Each gate must declare:
 5. Promote metadata control to a true release gate, not a documentation afterthought.
 6. Make platform/system assurance explicit: intended use, environment lock,
    change control, run record, and inspection-ready data-flow evidence.
-

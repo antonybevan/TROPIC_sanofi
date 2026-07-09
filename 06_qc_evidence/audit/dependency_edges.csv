@@ -1,0 +1,57 @@
+source,target,relationship,status,evidence
+01_source_data/real_sdtm/*.sas7bdat,04_analysis_datasets/programs/sas/L_staging_ingest.sas,read by SAS staging,CONFIRMED,04_analysis_datasets/programs/sas/L_staging_ingest.sas
+01_source_data/real_sdtm/*.sas7bdat,04_analysis_datasets/programs/r/v_staging_ingest.R,read by R staging,CONFIRMED,04_analysis_datasets/programs/r/v_staging_ingest.R
+04_analysis_datasets/programs/sas/L_staging_ingest.sas,04_analysis_datasets/programs/sas/A_adsl_generation.sas,staging inputs,CONFIRMED,04_analysis_datasets/programs/sas/00_master_driver.sas
+04_analysis_datasets/programs/sas/L_staging_ingest.sas,04_analysis_datasets/programs/sas/A_adex_generation.sas,staging inputs,CONFIRMED,04_analysis_datasets/programs/sas/00_master_driver.sas
+04_analysis_datasets/programs/sas/L_staging_ingest.sas,04_analysis_datasets/programs/sas/A_adcm_generation.sas,staging inputs,CONFIRMED,04_analysis_datasets/programs/sas/00_master_driver.sas
+04_analysis_datasets/programs/sas/L_staging_ingest.sas,04_analysis_datasets/programs/sas/A_adae_io_respec.sas,staging inputs,CONFIRMED,04_analysis_datasets/programs/sas/00_master_driver.sas
+04_analysis_datasets/programs/sas/L_staging_ingest.sas,04_analysis_datasets/programs/sas/A_adlb_generation.sas,staging inputs,CONFIRMED,04_analysis_datasets/programs/sas/00_master_driver.sas
+04_analysis_datasets/programs/sas/L_staging_ingest.sas,04_analysis_datasets/programs/sas/A_adrs_generation.sas,staging inputs,CONFIRMED,04_analysis_datasets/programs/sas/00_master_driver.sas
+04_analysis_datasets/programs/sas/L_staging_ingest.sas,04_analysis_datasets/programs/sas/A_adtte_generation.sas,staging inputs,CONFIRMED,04_analysis_datasets/programs/sas/00_master_driver.sas
+04_analysis_datasets/programs/r/v_staging_ingest.R,04_analysis_datasets/programs/r/v_adsl_validation.R,R validation staging,CONFIRMED,04_analysis_datasets/programs/r/v_adsl_validation.R
+04_analysis_datasets/programs/r/v_staging_ingest.R,04_analysis_datasets/programs/r/v_adex_validation.R,R validation staging,CONFIRMED,04_analysis_datasets/programs/r/v_adex_validation.R
+04_analysis_datasets/programs/r/v_staging_ingest.R,04_analysis_datasets/programs/r/v_adcm_validation.R,R validation staging,CONFIRMED,04_analysis_datasets/programs/r/v_adcm_validation.R
+04_analysis_datasets/programs/r/v_staging_ingest.R,04_analysis_datasets/programs/r/v_adae_io_validation.R,R validation staging,CONFIRMED,04_analysis_datasets/programs/r/v_adae_io_validation.R
+04_analysis_datasets/programs/r/v_staging_ingest.R,04_analysis_datasets/programs/r/v_adlb_validation.R,R validation staging,CONFIRMED,04_analysis_datasets/programs/r/v_adlb_validation.R
+04_analysis_datasets/programs/r/v_staging_ingest.R,04_analysis_datasets/programs/r/v_adrs_validation.R,R validation staging,CONFIRMED,04_analysis_datasets/programs/r/v_adrs_validation.R
+04_analysis_datasets/programs/r/v_staging_ingest.R,04_analysis_datasets/programs/r/v_adtte_validation.R,R validation staging,CONFIRMED,04_analysis_datasets/programs/r/v_adtte_validation.R
+04_analysis_datasets/programs/sas/A_*_generation.sas,04_analysis_datasets/adam/*_prod.xpt,SAS production output,CONFIRMED,04_analysis_datasets/programs/sas/U_xpt_export.sas
+04_analysis_datasets/programs/r/v_*_validation.R,04_analysis_datasets/adam/*_v.xpt,R validation output,CONFIRMED,config/study_manifest.yaml
+04_analysis_datasets/adam/*_prod.xpt,06_qc_evidence/reconciliation/cross_lang_audit.R,SAS side of dual-language comparison,CONFIRMED,06_qc_evidence/reconciliation/cross_lang_audit.R
+04_analysis_datasets/adam/*_v.xpt,06_qc_evidence/reconciliation/cross_lang_audit.R,R side of dual-language comparison,CONFIRMED,06_qc_evidence/reconciliation/cross_lang_audit.R
+06_qc_evidence/reconciliation/cross_lang_audit.R,platform/reconciliation_status.json,reconciliation verdict,CONFIRMED,06_qc_evidence/reconciliation/cross_lang_audit.R
+03_metadata/adam/ADaM_spec.xlsx,03_metadata/define/define.xml,spec-to-Define check,CONFIRMED,03_metadata/define/check_define_conformance.R
+03_metadata/adam/ADaM_spec.xlsx,04_analysis_datasets/adam/*_prod.xpt,spec-to-data check,CONFIRMED,04_analysis_datasets/programs/r/spec_data_checks.R
+03_metadata/adam/ADaM_spec.xlsx,04_analysis_datasets/programs/sas/_adam_labels.sas,label generation intended but not orchestrated,STALE/BROKEN,platform/gen_adam_labels.R; 07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md:55-62
+04_analysis_datasets/adam/adsl_prod.xpt,05_outputs/tfl/tfl_generation.R,populations and covariates,CONFIRMED,07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md:73-83
+04_analysis_datasets/adam/adex_prod.xpt,05_outputs/tfl/tfl_generation.R,exposure analyses,CONFIRMED,07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md:73-83
+04_analysis_datasets/adam/adae_prod.xpt,05_outputs/tfl/tfl_generation.R,safety summaries,CONFIRMED,07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md:73-83
+04_analysis_datasets/adam/adlb_prod.xpt,05_outputs/tfl/tfl_generation.R,PSA and laboratory analyses,CONFIRMED,07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md:73-83
+04_analysis_datasets/adam/adrs_prod.xpt,05_outputs/tfl/tfl_generation.R,response analyses,CONFIRMED,05_outputs/tfl/tfl_generation.R:135-163
+04_analysis_datasets/adam/adtte_prod.xpt,05_outputs/tfl/tfl_generation.R,time-to-event analyses,CONFIRMED,07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md:73-83
+05_outputs/tfl/tfl_generation.R,05_outputs/tfl/output/**,R reporting outputs,CONFIRMED,05_outputs/tfl/tfl_generation.R
+05_outputs/tfl/output/**,07_reviewer_explanation/analysis_report.md,numerical transcription / CSR content,CLAIMED,07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md:68-71
+04_analysis_datasets/adam/*_prod.xpt,platform/export_datasetjson.py,ADaM Dataset-JSON export,CONFIRMED,platform/export_datasetjson.py:258-265
+08_submission_package/m5/datasets/tropic/tabulations/sdtm/datasets/*.xpt,platform/export_datasetjson.py,SDTM Dataset-JSON export,CONFIRMED,platform/export_datasetjson.py
+platform/export_datasetjson.py,04_analysis_datasets/datasetjson/**/*.json,Dataset-JSON output,CONFIRMED,platform/export_datasetjson.py:216-234
+platform/export_datasetjson.py,04_analysis_datasets/datasetjson/**/*.ndjson,NDJSON output only with --ndjson flag,OUT-OF-BAND/STALE,platform/export_datasetjson.py:202-227
+04_analysis_datasets/adam/adtte_prod.xpt,platform/build_ars.py,ARS source dataset,CONFIRMED,platform/build_ars.py:42-53
+platform/build_ars.py,05_outputs/ars/*,ARS output,CONFIRMED,config/study_manifest.yaml
+05_outputs/ars/*,08_submission_package/m5/**,regulatory packaging consumer,NONE/ORPHAN,platform/package_ectd.py
+02_specifications/sap/TROPIC_SAP_v3.0.docx,platform/build_usdm.py,manually transcribed study design,UNVERIFIED MANUAL TRANSCRIPTION,platform/build_usdm.py
+platform/build_usdm.py,03_metadata/usdm/tropic_usdm.json,USDM output,CONFIRMED,config/study_manifest.yaml
+03_metadata/usdm/tropic_usdm.json,08_submission_package/m5/**,regulatory packaging consumer,NONE/ORPHAN,platform/package_ectd.py
+01_source_data/real_sdtm/*.sas7bdat,platform/package_ectd.py,raw SDTM conversion to XPT,CONFIRMED,platform/package_ectd.py:232-260;335-341
+.core_run/sdtm34/*.xpt,platform/package_ectd.py,intended uplifted SDTM package input,NO EDGE/DANGLING LAYER,platform/package_ectd.py:232-260;335-341
+04_analysis_datasets/adam/*_prod.xpt,platform/package_ectd.py,ADaM package copy,CONFIRMED,platform/package_ectd.py:343-358
+platform/package_ectd.py,08_submission_package/m5/**,Module 5 tree generation,CONFIRMED,platform/package_ectd.py
+platform/uplift_sdtm_34.R,.core_run/sdtm34/*.xpt,SDTMIG 3.4 derived layer,CONFIRMED,platform/run_core_conformance.sh:54-63
+platform/gen_adam_labels.R,04_analysis_datasets/programs/sas/_adam_labels.sas,SAS label artifact generation,RESOLVED_IN_DAG,config/study_manifest.yaml
+platform/gen_adam_labels.R,04_analysis_datasets/programs/r/adam_var_labels.csv,R label artifact generation,RESOLVED_IN_DAG,config/study_manifest.yaml
+03_metadata/define/define.xml,08_submission_package/m5/datasets/tropic/analysis/adam/define.xml,package metadata copy,CONFIRMED,platform/package_ectd.py
+03_metadata/define/define_sdtm.xml,08_submission_package/m5/datasets/tropic/tabulations/sdtm/define.xml,package metadata copy,CONFIRMED,platform/package_ectd.py
+08_submission_package/m5/**,platform/build_ectd_backbone.py,eCTD leaf enumeration,CONFIRMED,08_submission_package/ectd/RUN_RECORD.md
+platform/build_ectd_backbone.py,08_submission_package/ectd/0000/index.xml,eCTD backbone generation,CONFIRMED,08_submission_package/ectd/RUN_RECORD.md:14-25
+08_submission_package/ectd/0000/index.xml,platform/materialize_ectd.py,manifest controlling payload copy,CONFIRMED,platform/materialize_ectd.py:31-65
+platform/materialize_ectd.py,08_submission_package/ectd/0000/m5/**,payload materialization with stale unindexed payload purge and MD5 re-verification,CONFIRMED,platform/materialize_ectd.py
+03_metadata/define/define.xml,05_outputs/tfl/output/**,ARM display-to-file linkage,INCOMPLETE,03_metadata/define/define.xml ARM section

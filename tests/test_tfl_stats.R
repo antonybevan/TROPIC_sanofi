@@ -3,13 +3,13 @@
 # Purpose: Numeric SNAPSHOT/regression test for the TFL survival-statistics core
 #          (roadmap #8). It locks the stratified Cox / log-rank recipe used to
 #          produce every survival HR, CI and p-value in the TFL package
-#          (09_tfl/tfl_stats.R, shared by 09_tfl/tfl_generation.R) against
+#          (05_outputs/tfl/tfl_stats.R, shared by 05_outputs/tfl/tfl_generation.R) against
 #          deterministic synthetic fixtures, so a change in the modelling code or
 #          the survival package version that moves the numbers is caught.
 #
 #          This is self-contained: it uses NO real ADaM data (which is licensed
 #          and git-ignored; a full TFL-output snapshot against the real cohort is
-#          a data-gated step — see REPRODUCIBILITY.md). It exercises the actual
+#          a data-gated step — see 00_governance/REPRODUCIBILITY.md). It exercises the actual
 #          shared statistical function, not a re-implementation.
 #
 #          Run:  Rscript tests/test_tfl_stats.R   (or via cibuild --demo)
@@ -23,7 +23,7 @@ if (!requireNamespace("survival", quietly = TRUE)) {
   fail("package 'survival' not installed — run: renv::restore()")
   cat("TFL-STATS SNAPSHOT TEST: FAIL\n"); quit(save = "no", status = 1)
 }
-source("09_tfl/tfl_stats.R")
+source("05_outputs/tfl/tfl_stats.R")
 
 # Deterministic two-arm fixture builder (fixed seed -> reproducible draws).
 mk_arm <- function(arm, rate, n) data.frame(

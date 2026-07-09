@@ -1,8 +1,8 @@
 # TROPIC Delivery Evidence Dashboard
 
-Generated: 2026-07-09 14:50:46 UTC
+Generated: 2026-07-09 16:35:20 UTC
 
-> This dashboard is generated from `evidence_layers.yaml` and `delivery_workstreams.yaml`. It is an architecture and evidence-control view, not a claim that the package is submission-ready.
+> This dashboard is generated from `config/evidence_layers.yaml` and `config/delivery_workstreams.yaml`. It is an architecture and evidence-control view, not a claim that the package is submission-ready.
 
 ## Readiness Snapshot
 
@@ -59,135 +59,135 @@ Generated: 2026-07-09 14:50:46 UTC
 
 | Workstream | Artifact | Presence |
 | --- | --- | --- |
-| governance_scope | TROPIC_SAP_v4.0_industry_grade.docx | present |
-| governance_scope | audit/SAP_LOCK_REVIEW_MEMO.md | present |
+| governance_scope | 02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx | present |
+| governance_scope | 06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md | present |
 | governance_scope | docs/REGULATORY_WORKFLOW_RESEARCH.md | present |
-| governance_scope | audit/findings_register.csv | present |
-| governance_scope | REPRODUCIBILITY.md | present |
+| governance_scope | 06_qc_evidence/audit/findings_register.csv | present |
+| governance_scope | 00_governance/REPRODUCIBILITY.md | present |
 | governance_scope | README.md | present |
-| governance_scope | validation_strategy.yaml | present |
-| governance_scope | ctq_traceability.yaml | present |
-| source_intake | 01_raw_source | present |
-| source_intake | REPRODUCIBILITY.md | present |
-| source_intake | 03_validation_r/v_staging_ingest.R | present |
-| source_intake | 03_validation_r/v_sdtm_validation.R | present |
-| source_intake | 06_telemetry/build_source_profile.py | present |
-| statistical_specification | study_config.yaml | present |
-| statistical_specification | TROPIC_SAP_v4.0_industry_grade.docx | present |
-| statistical_specification | ctq_traceability.yaml | present |
-| statistical_specification | ANALYSIS_REPORT.md | present |
-| statistical_specification | 08_reviewers_guides/TRACEABILITY_MATRIX.md | present |
-| standards_metadata | 00_specifications/ADaM_spec.xlsx | present |
-| standards_metadata | 07_define_xml/define.xml | present |
-| standards_metadata | 07_define_xml/define_sdtm.xml | present |
-| standards_metadata | 06_telemetry/gen_adam_labels.R | present |
-| standards_metadata | 02_production_sas/_adam_labels.sas | present |
-| standards_metadata | 03_validation_r/adam_var_labels.csv | present |
-| standards_metadata | 07_define_xml/check_define_conformance.R | present |
-| standards_metadata | 03_validation_r/spec_data_checks.R | present |
-| standards_metadata | metadata_lineage.yaml | present |
-| standards_metadata | 06_telemetry/apply_metadata_lineage.py | present |
-| standards_metadata | 06_telemetry/build_metadata_control_report.py | present |
-| adam_bimo_programming | 02_production_sas | present |
-| adam_bimo_programming | 03_validation_r | present |
-| adam_bimo_programming | 04_adam | present |
-| adam_bimo_programming | study_manifest.yaml | present |
-| adam_bimo_programming | 06_telemetry/cibuild.py | present |
-| tfl_results | 09_tfl/tfl_generation.R | present |
-| tfl_results | 09_tfl/tfl_stats.R | present |
-| tfl_results | 06_telemetry/build_tfl_output_index.py | present |
-| tfl_results | 12_ars | present |
-| qc_validation | 08_reviewers_guides/RISK_BASED_VALIDATION.md | present |
-| qc_validation | validation_strategy.yaml | present |
-| qc_validation | ctq_traceability.yaml | present |
-| qc_validation | 05_reconciliation | present |
-| qc_validation | log_cleanliness.yaml | present |
-| qc_validation | 06_telemetry/check_log_cleanliness.py | present |
-| qc_validation | 06_telemetry/log_cleanliness/log_cleanliness_status.json | present |
-| qc_validation | 06_telemetry/verify_evidence.py | present |
-| qc_validation | 06_telemetry/conformance | present |
-| reviewer_package | 08_reviewers_guides/ADRG.md | present |
-| reviewer_package | 08_reviewers_guides/SDRG.md | present |
-| reviewer_package | 08_reviewers_guides/BDRG.md | present |
-| reviewer_package | ANALYSIS_REPORT.md | present |
-| reviewer_package | 06_telemetry/package_ectd.py | present |
-| reviewer_package | 06_telemetry/build_ectd_backbone.py | present |
-| reviewer_package | 06_telemetry/materialize_ectd.py | present |
-| platform_release | 06_telemetry/cibuild.py | present |
-| platform_release | 06_telemetry/build_delivery_controls.py | present |
+| governance_scope | config/validation_strategy.yaml | present |
+| governance_scope | config/ctq_traceability.yaml | present |
+| source_intake | 01_source_data | present |
+| source_intake | 00_governance/REPRODUCIBILITY.md | present |
+| source_intake | 04_analysis_datasets/programs/r/v_staging_ingest.R | present |
+| source_intake | 04_analysis_datasets/programs/r/v_sdtm_validation.R | present |
+| source_intake | platform/build_source_profile.py | present |
+| statistical_specification | config/study_config.yaml | present |
+| statistical_specification | 02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx | present |
+| statistical_specification | config/ctq_traceability.yaml | present |
+| statistical_specification | 07_reviewer_explanation/analysis_report.md | present |
+| statistical_specification | 07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md | present |
+| standards_metadata | 03_metadata/adam/ADaM_spec.xlsx | present |
+| standards_metadata | 03_metadata/define/define.xml | present |
+| standards_metadata | 03_metadata/define/define_sdtm.xml | present |
+| standards_metadata | platform/gen_adam_labels.R | present |
+| standards_metadata | 04_analysis_datasets/programs/sas/_adam_labels.sas | present |
+| standards_metadata | 04_analysis_datasets/programs/r/adam_var_labels.csv | present |
+| standards_metadata | 03_metadata/define/check_define_conformance.R | present |
+| standards_metadata | 04_analysis_datasets/programs/r/spec_data_checks.R | present |
+| standards_metadata | config/metadata_lineage.yaml | present |
+| standards_metadata | platform/apply_metadata_lineage.py | present |
+| standards_metadata | platform/build_metadata_control_report.py | present |
+| adam_bimo_programming | 04_analysis_datasets/programs/sas | present |
+| adam_bimo_programming | 04_analysis_datasets/programs/r | present |
+| adam_bimo_programming | 04_analysis_datasets/adam | present |
+| adam_bimo_programming | config/study_manifest.yaml | present |
+| adam_bimo_programming | platform/cibuild.py | present |
+| tfl_results | 05_outputs/tfl/tfl_generation.R | present |
+| tfl_results | 05_outputs/tfl/tfl_stats.R | present |
+| tfl_results | platform/build_tfl_output_index.py | present |
+| tfl_results | 05_outputs/ars | present |
+| qc_validation | 07_reviewer_explanation/guides/RISK_BASED_VALIDATION.md | present |
+| qc_validation | config/validation_strategy.yaml | present |
+| qc_validation | config/ctq_traceability.yaml | present |
+| qc_validation | 06_qc_evidence/reconciliation | present |
+| qc_validation | config/log_cleanliness.yaml | present |
+| qc_validation | platform/check_log_cleanliness.py | present |
+| qc_validation | platform/log_cleanliness/log_cleanliness_status.json | present |
+| qc_validation | platform/verify_evidence.py | present |
+| qc_validation | platform/conformance | present |
+| reviewer_package | 07_reviewer_explanation/guides/ADRG.md | present |
+| reviewer_package | 07_reviewer_explanation/guides/SDRG.md | present |
+| reviewer_package | 07_reviewer_explanation/guides/BDRG.md | present |
+| reviewer_package | 07_reviewer_explanation/analysis_report.md | present |
+| reviewer_package | platform/package_ectd.py | present |
+| reviewer_package | platform/build_ectd_backbone.py | present |
+| reviewer_package | platform/materialize_ectd.py | present |
+| platform_release | platform/cibuild.py | present |
+| platform_release | platform/build_delivery_controls.py | present |
 | platform_release | renv.lock | present |
-| platform_release | evidence_layers.yaml | present |
-| platform_release | 06_telemetry/check_evidence_layers.py | present |
-| platform_release | 06_telemetry/check_delivery_model.py | present |
-| platform_release | 06_telemetry/build_delivery_dashboard.py | present |
-| platform_release | 06_telemetry/build_ctq_traceability_report.py | present |
-| platform_release | 06_telemetry/build_validation_strategy_report.py | present |
-| platform_release | 06_telemetry/build_release_candidate_checklist.py | present |
-| platform_release | 06_telemetry/build_orchestrator_gate_map.py | present |
-| platform_release | 06_telemetry/build_release_run_manifest.py | present |
-| platform_release | log_cleanliness.yaml | present |
-| platform_release | 06_telemetry/check_log_cleanliness.py | present |
-| platform_release | 06_telemetry/log_cleanliness/log_cleanliness_status.json | present |
-| platform_release | 06_telemetry/release_run_manifest/release_run_manifest.json | present |
-| platform_release | 06_telemetry/release_run_manifest/release_run_files.csv | present |
-| platform_release | audit/output_hash_binding.csv | present |
+| platform_release | config/evidence_layers.yaml | present |
+| platform_release | platform/check_evidence_layers.py | present |
+| platform_release | platform/check_delivery_model.py | present |
+| platform_release | platform/build_delivery_dashboard.py | present |
+| platform_release | platform/build_ctq_traceability_report.py | present |
+| platform_release | platform/build_validation_strategy_report.py | present |
+| platform_release | platform/build_release_candidate_checklist.py | present |
+| platform_release | platform/build_orchestrator_gate_map.py | present |
+| platform_release | platform/build_release_run_manifest.py | present |
+| platform_release | config/log_cleanliness.yaml | present |
+| platform_release | platform/check_log_cleanliness.py | present |
+| platform_release | platform/log_cleanliness/log_cleanliness_status.json | present |
+| platform_release | platform/release_run_manifest/release_run_manifest.json | present |
+| platform_release | platform/release_run_manifest/release_run_files.csv | present |
+| platform_release | 06_qc_evidence/audit/output_hash_binding.csv | present |
 
 ## Generated, External, Optional, and Planned Artifacts
 
 | Layer | Status | Artifact | Presence | Matches | Role |
 | --- | --- | --- | --- | --- | --- |
-| source_data | external | 01_raw_source/real_sdtm/*.sas7bdat | declared/excluded | n/a | Official de-identified SDTM source files; intentionally not redistributed. |
-| source_data | external | 01_raw_source/cbzp_reconstructed/*.rds | declared/excluded | n/a | Regenerable synthetic comparator artifacts; intentionally not committed. |
-| source_data | optional | 01_raw_source/reconstruct_cbzp_arm.R | present | 1 | Synthetic comparator reconstruction program, when present. |
+| source_data | external | 01_source_data/real_sdtm/*.sas7bdat | declared/excluded | n/a | Official de-identified SDTM source files; intentionally not redistributed. |
+| source_data | external | 01_source_data/cbzp_reconstructed/*.rds | declared/excluded | n/a | Regenerable synthetic comparator artifacts; intentionally not committed. |
+| source_data | optional | 01_source_data/reconstruct_cbzp_arm.R | present | 1 | Synthetic comparator reconstruction program, when present. |
 | source_data | generated | docs/SOURCE_PROFILING_REPORT.md | present | 1 | Aggregate source profiling report. |
-| source_data | generated | 06_telemetry/source_profile_status.json | present | 1 | Machine-readable source profiling status. |
-| source_data | generated | 06_telemetry/source_profile/domain_inventory.csv | present | 1 | Aggregate source domain inventory. |
-| source_data | generated | 06_telemetry/source_profile/variable_profile.csv | present | 1 | Aggregate source variable profile. |
+| source_data | generated | platform/source_profile_status.json | present | 1 | Machine-readable source profiling status. |
+| source_data | generated | platform/source_profile/domain_inventory.csv | present | 1 | Aggregate source domain inventory. |
+| source_data | generated | platform/source_profile/variable_profile.csv | present | 1 | Aggregate source variable profile. |
 | metadata | generated | docs/METADATA_CONTROL_REPORT.md | present | 1 | Generated metadata governance report. |
-| metadata | generated | 06_telemetry/metadata_control/metadata_control_status.json | present | 1 | Machine-readable metadata governance status. |
-| metadata | generated | 06_telemetry/metadata_control/metadata_dataset_control.csv | present | 1 | Dataset-level metadata control extract. |
-| metadata | generated | 06_telemetry/metadata_control/metadata_findings.csv | present | 1 | Metadata governance findings extract. |
-| metadata | generated | 06_telemetry/metadata_lineage/metadata_lineage_status.json | present | 1 | Machine-readable lineage application/check status. |
-| metadata | generated | 06_telemetry/metadata_lineage/metadata_lineage_application.csv | present | 1 | Variable-level lineage check extract. |
-| analysis_dataset | generated | 04_adam/*.xpt | present | 18 | Generated ADaM transport files. |
-| analysis_dataset | generated | 10_datasetjson/**/*.json | present | 43 | Generated Dataset-JSON metadata and data files. |
-| analysis_dataset | generated | 10_datasetjson/**/*.ndjson | present | 43 | Generated Dataset-JSON NDJSON payload files. |
-| output | generated | 09_tfl/TFL_Gallery.html | present | 1 | Rendered TFL gallery. |
-| output | generated | 09_tfl/output | present | 1 | Rendered table/figure/listing output directory. |
-| output | generated | 12_ars/tropic_ard.csv | present | 1 | Analysis Results Standard ARD. |
-| output | generated | 12_ars/tropic_reporting_event.json | present | 1 | Analysis Results Standard reporting event. |
-| output | generated | 13_usdm/tropic_usdm.json | present | 1 | USDM study definition export. |
+| metadata | generated | platform/metadata_control/metadata_control_status.json | present | 1 | Machine-readable metadata governance status. |
+| metadata | generated | platform/metadata_control/metadata_dataset_control.csv | present | 1 | Dataset-level metadata control extract. |
+| metadata | generated | platform/metadata_control/metadata_findings.csv | present | 1 | Metadata governance findings extract. |
+| metadata | generated | platform/metadata_lineage/metadata_lineage_status.json | present | 1 | Machine-readable lineage application/check status. |
+| metadata | generated | platform/metadata_lineage/metadata_lineage_application.csv | present | 1 | Variable-level lineage check extract. |
+| analysis_dataset | generated | 04_analysis_datasets/adam/*.xpt | present | 18 | Generated ADaM transport files. |
+| analysis_dataset | generated | 04_analysis_datasets/datasetjson/**/*.json | present | 43 | Generated Dataset-JSON metadata and data files. |
+| analysis_dataset | generated | 04_analysis_datasets/datasetjson/**/*.ndjson | present | 43 | Generated Dataset-JSON NDJSON payload files. |
+| output | generated | 05_outputs/tfl/TFL_Gallery.html | present | 1 | Rendered TFL gallery. |
+| output | generated | 05_outputs/tfl/output | present | 1 | Rendered table/figure/listing output directory. |
+| output | generated | 05_outputs/ars/tropic_ard.csv | present | 1 | Analysis Results Standard ARD. |
+| output | generated | 05_outputs/ars/tropic_reporting_event.json | present | 1 | Analysis Results Standard reporting event. |
+| output | generated | 03_metadata/usdm/tropic_usdm.json | present | 1 | USDM study definition export. |
 | output | generated | docs/TFL_OUTPUT_INDEX.md | present | 1 | Structured TFL output traceability index. |
-| output | generated | 06_telemetry/tfl_output_index_status.json | present | 1 | Machine-readable TFL output index status. |
-| output | generated | 06_telemetry/tfl_output_index/tfl_output_index.csv | present | 1 | CSV TFL output traceability index. |
-| output | generated | 06_telemetry/tfl_output_index/tfl_output_index.json | present | 1 | JSON TFL output traceability index. |
-| qc_evidence | generated | 06_telemetry/pipeline_health.json | present | 1 | Latest run health record. |
-| qc_evidence | generated | 06_telemetry/reconciliation_status.json | present | 1 | Dataset-level reconciliation status. |
-| qc_evidence | generated | 06_telemetry/results_reconciliation_status.json | present | 1 | Results-level reconciliation status. |
-| qc_evidence | generated | 06_telemetry/conformance/spec_define_conformance.json | present | 1 | Spec-to-define conformance result. |
-| qc_evidence | generated | 06_telemetry/conformance/spec_data_conformance.json | present | 1 | Spec-to-data conformance result. |
-| qc_evidence | generated | 06_telemetry/release_run_manifest/release_run_manifest.json | present | 1 | Machine-readable current release-run manifest and hash seal. |
-| qc_evidence | generated | 06_telemetry/release_run_manifest/release_run_files.csv | present | 1 | Per-file hash ledger bound into the release-run manifest. |
+| output | generated | platform/tfl_output_index_status.json | present | 1 | Machine-readable TFL output index status. |
+| output | generated | platform/tfl_output_index/tfl_output_index.csv | present | 1 | CSV TFL output traceability index. |
+| output | generated | platform/tfl_output_index/tfl_output_index.json | present | 1 | JSON TFL output traceability index. |
+| qc_evidence | generated | platform/pipeline_health.json | present | 1 | Latest run health record. |
+| qc_evidence | generated | platform/reconciliation_status.json | present | 1 | Dataset-level reconciliation status. |
+| qc_evidence | generated | platform/results_reconciliation_status.json | present | 1 | Results-level reconciliation status. |
+| qc_evidence | generated | platform/conformance/spec_define_conformance.json | present | 1 | Spec-to-define conformance result. |
+| qc_evidence | generated | platform/conformance/spec_data_conformance.json | present | 1 | Spec-to-data conformance result. |
+| qc_evidence | generated | platform/release_run_manifest/release_run_manifest.json | present | 1 | Machine-readable current release-run manifest and hash seal. |
+| qc_evidence | generated | platform/release_run_manifest/release_run_files.csv | present | 1 | Per-file hash ledger bound into the release-run manifest. |
 | qc_evidence | generated | docs/RELEASE_RUN_MANIFEST.md | present | 1 | Reviewer-readable release-run manifest summary. |
 | qc_evidence | generated | docs/RELEASE_CANDIDATE_CHECKLIST.md | present | 1 | Generated release-candidate go/no-go checklist. |
 | qc_evidence | generated | docs/VALIDATION_STRATEGY_CONTROL_REPORT.md | present | 1 | Generated risk-based validation strategy control report. |
 | qc_evidence | generated | docs/CTQ_TRACEABILITY_REPORT.md | present | 1 | Generated CTQ and estimand traceability report. |
-| qc_evidence | generated | 06_telemetry/ctq_traceability/ctq_traceability_status.json | present | 1 | Machine-readable CTQ traceability status. |
-| qc_evidence | generated | 06_telemetry/ctq_traceability/ctq_traceability_checks.csv | present | 1 | CSV CTQ traceability check results. |
-| qc_evidence | generated | 06_telemetry/validation_strategy/validation_strategy_status.json | present | 1 | Machine-readable risk-based validation strategy status. |
-| qc_evidence | generated | 06_telemetry/validation_strategy/validation_strategy_checks.csv | present | 1 | CSV evidence check results for the validation strategy. |
+| qc_evidence | generated | platform/ctq_traceability/ctq_traceability_status.json | present | 1 | Machine-readable CTQ traceability status. |
+| qc_evidence | generated | platform/ctq_traceability/ctq_traceability_checks.csv | present | 1 | CSV CTQ traceability check results. |
+| qc_evidence | generated | platform/validation_strategy/validation_strategy_status.json | present | 1 | Machine-readable risk-based validation strategy status. |
+| qc_evidence | generated | platform/validation_strategy/validation_strategy_checks.csv | present | 1 | CSV evidence check results for the validation strategy. |
 | qc_evidence | generated | docs/LOG_CLEANLINESS_REPORT.md | present | 1 | Generated SAS/R execution-log cleanliness report. |
-| qc_evidence | generated | 06_telemetry/log_cleanliness/log_cleanliness_status.json | present | 1 | Machine-readable log-cleanliness gate status. |
-| qc_evidence | generated | 06_telemetry/log_cleanliness/log_findings.csv | present | 1 | CSV log-cleanliness findings and reviewed exceptions. |
-| qc_evidence | generated | 06_telemetry/release_candidate/release_candidate_status.json | present | 1 | Machine-readable release-candidate status. |
-| qc_evidence | generated | 06_telemetry/release_candidate/release_candidate_checklist.csv | present | 1 | CSV release-candidate checklist. |
+| qc_evidence | generated | platform/log_cleanliness/log_cleanliness_status.json | present | 1 | Machine-readable log-cleanliness gate status. |
+| qc_evidence | generated | platform/log_cleanliness/log_findings.csv | present | 1 | CSV log-cleanliness findings and reviewed exceptions. |
+| qc_evidence | generated | platform/release_candidate/release_candidate_status.json | present | 1 | Machine-readable release-candidate status. |
+| qc_evidence | generated | platform/release_candidate/release_candidate_checklist.csv | present | 1 | CSV release-candidate checklist. |
 | qc_evidence | generated | docs/ORCHESTRATOR_GATE_MAP.md | present | 1 | Generated map from runtime DAG stages to delivery gates. |
-| qc_evidence | generated | 06_telemetry/orchestrator_gate_map/orchestrator_gate_map_status.json | present | 1 | Machine-readable orchestrator gate-map status. |
-| qc_evidence | generated | 06_telemetry/orchestrator_gate_map/orchestrator_gate_map.csv | present | 1 | CSV orchestrator stage-to-gate map. |
+| qc_evidence | generated | platform/orchestrator_gate_map/orchestrator_gate_map_status.json | present | 1 | Machine-readable orchestrator gate-map status. |
+| qc_evidence | generated | platform/orchestrator_gate_map/orchestrator_gate_map.csv | present | 1 | CSV orchestrator stage-to-gate map. |
 | reviewer_explanation | generated | docs/DELIVERY_EVIDENCE_DASHBOARD.md | present | 1 | Generated delivery/evidence architecture dashboard. |
-| submission_package | generated | m5 | present | 1 | Current eCTD Module 5 style payload tree. |
-| submission_package | generated | 11_ectd/0000 | present | 1 | Materialized sequence 0000. |
-| submission_package | generated | 11_ectd/RUN_RECORD.md | present | 1 | eCTD materialization run record. |
+| submission_package | generated | 08_submission_package/m5 | present | 1 | Current eCTD Module 5 style payload tree. |
+| submission_package | generated | 08_submission_package/ectd/0000 | present | 1 | Materialized sequence 0000. |
+| submission_package | generated | 08_submission_package/ectd/RUN_RECORD.md | present | 1 | eCTD materialization run record. |
 
 ## Missing Required Artifacts
 

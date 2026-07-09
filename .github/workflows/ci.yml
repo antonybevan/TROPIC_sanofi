@@ -45,12 +45,12 @@ jobs:
 
     - name: Lint R sources (zero-warning gate)
       run: |
-        # Covers every R source dir EXCEPT 06_telemetry/ (audit F-13). The engine scripts there
+        # Covers every R source dir EXCEPT platform/ (audit F-13). The engine scripts there
         # follow a compact style with ~290 purely-mechanical style lints (infix-spaces/commas/
         # semicolons — zero real defects); they are slated for a dedicated styler pass rather than
         # mass-reformatted here, so they are excluded from this gate, not silently un-linted.
         Rscript -e 'if (!requireNamespace("lintr", quietly = TRUE)) install.packages("lintr", repos = "https://cloud.r-project.org")'
-        Rscript -e 'files <- list.files(c("00_specifications", "01_raw_source", "03_validation_r", "05_reconciliation", "07_define_xml", "09_tfl", "tests"), pattern = "[.]R$", full.names = TRUE); n <- sum(vapply(files, function(f) length(lintr::lint(f)), integer(1))); if (n > 0) { for (f in files) print(lintr::lint(f)); stop(sprintf("lintr gate failed: %d issue(s)", n)) }; cat(sprintf("lintr gate passed: 0 issues across %d files\n", length(files)))'
+        Rscript -e 'files <- list.files(c("03_metadata/adam", "01_source_data", "04_analysis_datasets/programs/r", "06_qc_evidence/reconciliation", "03_metadata/define", "05_outputs/tfl", "tests"), pattern = "[.]R$", full.names = TRUE); n <- sum(vapply(files, function(f) length(lintr::lint(f)), integer(1))); if (n > 0) { for (f in files) print(lintr::lint(f)); stop(sprintf("lintr gate failed: %d issue(s)", n)) }; cat(sprintf("lintr gate passed: 0 issues across %d files\n", length(files)))'
 
     - name: Install Python dependencies
       run: |
@@ -63,58 +63,57 @@ jobs:
         # layer/workstream contracts. Project-state findings such as WARNING metadata
         # control or a BLOCKED release candidate are reported here, while broken
         # architecture wiring or failed report generation fails CI.
-        python3 06_telemetry/build_delivery_controls.py
+        python3 platform/build_delivery_controls.py
 
     - name: SAS static-analysis gate (blocks on hardcoded paths)
       run: |
-        python3 06_telemetry/lint_sas.py
+        python3 platform/lint_sas.py
 
     - name: CDISC CORE ADaM rule-pack validation (well-formedness gate)
       run: |
         python -m pip install pyyaml
-        python3 06_telemetry/validate_core_rules.py
+        python3 platform/validate_core_rules.py
 
     - name: Run unit tests (Broker + Seeder)
       run: |
-        python3 06_telemetry/test_oda_broker.py
+        python3 platform/test_oda_broker.py
 
     - name: Run clinical pipeline smoke test (Demo)
       run: |
-        python3 06_telemetry/cibuild.py --demo
+        python3 platform/cibuild.py --demo
 
     - name: Run ADaM conformance check gate
       run: |
-        bash 06_telemetry/run_adam_conformance.sh
+        bash platform/run_adam_conformance.sh
 
     - name: Validate Define-XML Metadata (ADaM & SDTM)
       run: |
-        bash 07_define_xml/validate_xsd.sh 07_define_xml/define.xml
-        bash 07_define_xml/validate_xsd.sh 07_define_xml/define_sdtm.xml
-        python3 07_define_xml/validate_define.py 07_define_xml/define.xml
-        python3 07_define_xml/validate_define.py 07_define_xml/define_sdtm.xml
+        bash 03_metadata/define/validate_xsd.sh 03_metadata/define/define.xml
+        bash 03_metadata/define/validate_xsd.sh 03_metadata/define/define_sdtm.xml
+        python3 03_metadata/define/validate_define.py 03_metadata/define/define.xml
+        python3 03_metadata/define/validate_define.py 03_metadata/define/define_sdtm.xml
 
-    - name: eCTD package freshness gate (m5 == source)
+    - name: eCTD package freshness gate (Module 5 package == source)
       run: |
-        # Audit F-01: the materialized m5/ submission copies must not drift in CONTENT from the
+        # Audit F-01: the materialized Module 5 submission copies must not drift in CONTENT from the
         # governing source (this is how the CT-code regression slipped into the committed package).
         # define.xml carries a build-time AsOfDateTime that write_telemetry restamps AFTER the
         # packaging stage, so compare content with that volatile stamp stripped — a real content
         # drift still fails the build; a pure restamp lag does not.
         strip() { grep -v 'AsOfDateTime' "$1"; }
-        diff <(strip 07_define_xml/define.xml)      <(strip m5/datasets/tropic/analysis/adam/datasets/define.xml)
-        diff <(strip 07_define_xml/define_sdtm.xml) <(strip m5/datasets/tropic/tabulations/sdtm/datasets/define.xml)
-        diff 06_telemetry/conformance/spec_define_conformance.json m5/datasets/tropic/analysis/adam/spec_define_conformance.json
-        echo "eCTD freshness gate: m5 define/conformance content matches source."
+        diff <(strip 03_metadata/define/define.xml)      <(strip 08_submission_package/m5/datasets/tropic/analysis/adam/datasets/define.xml)
+        diff <(strip 03_metadata/define/define_sdtm.xml) <(strip 08_submission_package/m5/datasets/tropic/tabulations/sdtm/datasets/define.xml)
+        echo "eCTD freshness gate: Module 5 define/conformance content matches source."
 
     - name: ADaM specification conformance gates (C-4 inversion)
       run: |
-        # The authoritative spec (00_specifications/ADaM_spec.xlsx) governs both
+        # The authoritative spec (03_metadata/adam/ADaM_spec.xlsx) governs both
         # define.xml and the produced data. Assert both, and prove the define gate
         # actually detects drift (self-test) rather than being a no-op.
-        Rscript 06_telemetry/gen_adam_labels.R
-        Rscript 07_define_xml/check_define_conformance.R
-        Rscript 07_define_xml/check_define_conformance.R --self-test
-        Rscript 03_validation_r/spec_data_checks.R
+        Rscript platform/gen_adam_labels.R
+        Rscript 03_metadata/define/check_define_conformance.R
+        Rscript 03_metadata/define/check_define_conformance.R --self-test
+        Rscript 04_analysis_datasets/programs/r/spec_data_checks.R
 
     - name: CT cross-validation (spec Codelists vs CDISC CT)
       run: |
@@ -125,7 +124,7 @@ jobs:
         # distinct SKIP_EXIT=2 makes that visible in the log rather than silently passing, but
         # --allow-skip is what turns that into a clean (exit 0) step instead of a hard job
         # failure; a genuine violation (a real CT mismatch) still fails the step either way.
-        python3 06_telemetry/ct_cross_validation.py --allow-skip
+        python3 platform/ct_cross_validation.py --allow-skip
       env:
         CDISC_LIBRARY_API_KEY: ${{ secrets.CDISC_LIBRARY_API_KEY }}
 
@@ -135,7 +134,7 @@ jobs:
         # classes (no patient data) — so, unlike the Dataset-JSON/ARS generators, it can
         # run in the data-free CI. Construction IS validation: a non-zero exit fails here.
         # (Dataset-JSON/ARS are data-dependent and are gated in the full pipeline instead.)
-        python3 06_telemetry/build_usdm.py
+        python3 platform/build_usdm.py
 
     - name: Verify committed GREEN-ODA evidence badge (static re-check)
       run: |
@@ -146,4 +145,4 @@ jobs:
         # cross-consistency with the other three evidence files, entirely from data already in
         # the checkout (audit F-14: real *.xpt are gitignored, so this is what IS staticly
         # checkable without a data-bearing checkout).
-        python3 06_telemetry/verify_evidence.py
+        python3 platform/verify_evidence.py

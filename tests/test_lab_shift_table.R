@@ -7,7 +7,7 @@ suppressMessages({
   library(tidyr)
 })
 
-source("09_tfl/lab_shift_table.R")
+source("05_outputs/tfl/lab_shift_table.R")
 
 ok <- TRUE
 fail <- function(msg) { cat(sprintf("  [FAIL] %s\n", msg)); ok <<- FALSE }

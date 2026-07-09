@@ -27,7 +27,7 @@ def main() -> int:
     def add(name: str, cond: bool, detail: str = "") -> None:
         checks.append((name, bool(cond), detail))
 
-    h = load("06_telemetry/pipeline_health.json") or {}
+    h = load("platform/pipeline_health.json") or {}
     stages = h.get("stages") or {}
     add("health.schema_version", h.get("schema_version") == "run_scope_v1", str(h.get("schema_version")))
     add("health.status_GREEN", h.get("pipeline_health_status") == "GREEN", str(h.get("pipeline_health_status")))
@@ -43,14 +43,14 @@ def main() -> int:
     add("health.all_pass_or_skip", not non_pass, str(non_pass[:8]))
     add("health.provenance", (h.get("provenance_guard") or {}).get("passed") is True, "")
 
-    r = load("06_telemetry/reconciliation_status.json") or {}
+    r = load("platform/reconciliation_status.json") or {}
     add("recon.PASS", r.get("overall") == "PASS", str(r.get("overall")))
     add("recon.not_sim", r.get("simulated") is False, str(r.get("simulated")))
 
-    rr = load("06_telemetry/results_reconciliation_status.json") or {}
+    rr = load("platform/results_reconciliation_status.json") or {}
     add("results_recon.PASS", rr.get("overall") == "PASS", str(rr.get("overall")))
 
-    adm = load("06_telemetry/admiral_reconciliation_status.json") or {}
+    adm = load("platform/admiral_reconciliation_status.json") or {}
     add("admiral.PASS", adm.get("overall") == "PASS", str(adm.get("overall")))
     add(
         "admiral.dag_stage",
@@ -58,18 +58,18 @@ def main() -> int:
         str(stages.get("Admiral Core Reconciliation")),
     )
 
-    tfl = load("06_telemetry/tfl_output_index_status.json") or {}
+    tfl = load("platform/tfl_output_index_status.json") or {}
     add("tfl.pass", tfl.get("status") == "pass", str(tfl.get("status")))
     cc = tfl.get("controlled_catalog") or {}
     add("tfl.catalog_pass", cc.get("status", "pass") == "pass", str(cc.get("status")))
 
-    vs = load("06_telemetry/validation_strategy/validation_strategy_status.json") or {}
+    vs = load("platform/validation_strategy/validation_strategy_status.json") or {}
     add("validation_strategy.PASS", vs.get("status") == "PASS", str(vs.get("status")))
 
-    lg = load("06_telemetry/log_cleanliness/log_cleanliness_status.json") or {}
+    lg = load("platform/log_cleanliness/log_cleanliness_status.json") or {}
     add("log_cleanliness.PASS", lg.get("status") == "PASS", str(lg.get("status")))
 
-    rm = load("06_telemetry/release_run_manifest/release_run_manifest.json") or {}
+    rm = load("platform/release_run_manifest/release_run_manifest.json") or {}
     add("release_manifest.PASS", rm.get("status") == "PASS", str(rm.get("status")))
     add(
         "release_manifest.grade",
@@ -77,7 +77,7 @@ def main() -> int:
         str(rm.get("evidence_grade")),
     )
 
-    rc = load("06_telemetry/release_candidate/release_candidate_status.json") or {}
+    rc = load("platform/release_candidate/release_candidate_status.json") or {}
     add("release_candidate.PASS", rc.get("status") == "PASS", str(rc.get("status")))
     add("release_candidate.blockers_0", rc.get("blocker", 1) == 0, str(rc.get("blocker")))
 
@@ -93,7 +93,7 @@ def main() -> int:
         "",
     )
 
-    findings_path = ROOT / "audit/findings_register.csv"
+    findings_path = ROOT / "06_qc_evidence/audit/findings_register.csv"
     if findings_path.is_file():
         rows = list(csv.DictReader(findings_path.open(encoding="utf-8")))
         active_conf = [

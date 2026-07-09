@@ -1,0 +1,197 @@
+# TROPIC biometrics delivery workstreams.
+#
+# This file makes the operating model machine-readable. It does not replace
+# config/study_manifest.yaml; it declares professional ownership boundaries and handoff
+# gates for the evidence system.
+
+version: 1
+study: TROPIC-NCT00417079
+operating_model: docs/BIOMETRICS_DELIVERY_OPERATING_MODEL.md
+evidence_index: config/evidence_layers.yaml
+
+gates:
+  G00:
+    name: governance_scope_lock
+    layer: specification
+    description: "Scope, authority, limitations, and readiness claims are aligned."
+  G01:
+    name: source_intake_lock
+    layer: source_data
+    description: "Source inventory, access limits, and source profiling are complete."
+  G02:
+    name: analysis_specification_lock
+    layer: specification
+    description: "Populations, endpoints, models, assumptions, and sensitivity rules are controlled."
+  G03:
+    name: metadata_lock
+    layer: metadata
+    description: "ADaM spec, Define-XML, CT, VLM, and traceability are internally consistent."
+  G04:
+    name: analysis_dataset_promotion
+    layer: analysis_dataset
+    description: "ADaM/BIMO datasets are built, logged, and reconciled or justified by risk."
+  G05:
+    name: output_promotion
+    layer: output
+    description: "TFLs and analysis results metadata are linked to datasets, programs, specs, and QC."
+  G06:
+    name: qc_signoff
+    layer: qc_evidence
+    description: "Risk-based validation, reconciliation, conformance, and known differences are complete."
+  G07:
+    name: reviewer_package_lock
+    layer: reviewer_explanation
+    description: "Reviewer guides explain data, methods, validation, conformance, and limitations."
+  G08:
+    name: submission_package_materialization
+    layer: submission_package
+    description: "eCTD-style package is generated from passed upstream gates."
+  G09:
+    name: release_candidate_lock
+    layer: qc_evidence
+    description: "Run record, hashes, environment, package manifest, and readiness statement are bound."
+
+workstreams:
+  governance_scope:
+    function: "Governance and scope control"
+    purpose: "Control what the package can claim and what must be disclosed."
+    owns_gates: [G00, G09]
+    consumes_layers: [specification, qc_evidence, reviewer_explanation]
+    produces_layers: [specification, reviewer_explanation]
+    required_artifacts:
+      - 02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx
+      - 06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md
+      - docs/REGULATORY_WORKFLOW_RESEARCH.md
+      - 06_qc_evidence/audit/findings_register.csv
+      - 00_governance/REPRODUCIBILITY.md
+      - README.md
+      - config/validation_strategy.yaml
+      - config/ctq_traceability.yaml
+
+  source_intake:
+    function: "Data access, privacy, and source intake"
+    purpose: "Control patient-level data handling, source inventory, and source quality profiling."
+    owns_gates: [G01]
+    consumes_layers: [source_data]
+    produces_layers: [source_data, qc_evidence]
+    required_artifacts:
+      - 01_source_data
+      - 00_governance/REPRODUCIBILITY.md
+      - 04_analysis_datasets/programs/r/v_staging_ingest.R
+      - 04_analysis_datasets/programs/r/v_sdtm_validation.R
+      - platform/build_source_profile.py
+
+  statistical_specification:
+    function: "Statistical and analysis specification"
+    purpose: "Convert SAP/protocol/publication rules into implementation-ready analysis definitions."
+    owns_gates: [G02]
+    consumes_layers: [source_data, specification]
+    produces_layers: [specification, metadata, reviewer_explanation]
+    required_artifacts:
+      - config/study_config.yaml
+      - 02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx
+      - config/ctq_traceability.yaml
+      - 07_reviewer_explanation/analysis_report.md
+      - 07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md
+
+  standards_metadata:
+    function: "Standards and metadata governance"
+    purpose: "Turn the analysis specification into a machine-readable metadata contract."
+    owns_gates: [G03]
+    consumes_layers: [specification]
+    produces_layers: [metadata, qc_evidence]
+    required_artifacts:
+      - 03_metadata/adam/ADaM_spec.xlsx
+      - 03_metadata/define/define.xml
+      - 03_metadata/define/define_sdtm.xml
+      - platform/gen_adam_labels.R
+      - 04_analysis_datasets/programs/sas/_adam_labels.sas
+      - 04_analysis_datasets/programs/r/adam_var_labels.csv
+      - 03_metadata/define/check_define_conformance.R
+      - 04_analysis_datasets/programs/r/spec_data_checks.R
+      - config/metadata_lineage.yaml
+      - platform/apply_metadata_lineage.py
+      - platform/build_metadata_control_report.py
+
+  adam_bimo_programming:
+    function: "ADaM and BIMO programming"
+    purpose: "Build analysis-ready datasets from source, specification, and metadata."
+    owns_gates: [G04]
+    consumes_layers: [source_data, specification, metadata]
+    produces_layers: [analysis_dataset, qc_evidence]
+    required_artifacts:
+      - 04_analysis_datasets/programs/sas
+      - 04_analysis_datasets/programs/r
+      - 04_analysis_datasets/adam
+      - config/study_manifest.yaml
+      - platform/cibuild.py
+
+  tfl_results:
+    function: "Efficacy, safety, and TFL production"
+    purpose: "Produce traceable tables, figures, listings, and analysis results metadata."
+    owns_gates: [G05]
+    consumes_layers: [analysis_dataset, specification, metadata]
+    produces_layers: [output, reviewer_explanation]
+    required_artifacts:
+      - 05_outputs/tfl/tfl_generation.R
+      - 05_outputs/tfl/tfl_stats.R
+      - platform/build_tfl_output_index.py
+      - 05_outputs/ars
+
+  qc_validation:
+    function: "Risk-based QC and validation"
+    purpose: "Challenge the evidence with validation effort scaled to consequence of error."
+    owns_gates: [G06]
+    consumes_layers: [analysis_dataset, output, metadata]
+    produces_layers: [qc_evidence, reviewer_explanation]
+    required_artifacts:
+      - 07_reviewer_explanation/guides/RISK_BASED_VALIDATION.md
+      - config/validation_strategy.yaml
+      - config/ctq_traceability.yaml
+      - 06_qc_evidence/reconciliation
+      - config/log_cleanliness.yaml
+      - platform/check_log_cleanliness.py
+      - platform/log_cleanliness/log_cleanliness_status.json
+      - platform/verify_evidence.py
+      - platform/conformance
+
+  reviewer_package:
+    function: "Reviewer explanation and regulatory package"
+    purpose: "Explain datasets, outputs, conformance, assumptions, and limitations to reviewers."
+    owns_gates: [G07, G08]
+    consumes_layers: [metadata, output, qc_evidence]
+    produces_layers: [reviewer_explanation, submission_package]
+    required_artifacts:
+      - 07_reviewer_explanation/guides/ADRG.md
+      - 07_reviewer_explanation/guides/SDRG.md
+      - 07_reviewer_explanation/guides/BDRG.md
+      - 07_reviewer_explanation/analysis_report.md
+      - platform/package_ectd.py
+      - platform/build_ectd_backbone.py
+      - platform/materialize_ectd.py
+
+  platform_release:
+    function: "Platform engineering and release control"
+    purpose: "Prove execution, environment, artifacts, checksums, and release candidate integrity."
+    owns_gates: [G09]
+    consumes_layers: [source_data, specification, metadata, analysis_dataset, output, qc_evidence, reviewer_explanation]
+    produces_layers: [qc_evidence, submission_package]
+    required_artifacts:
+      - platform/cibuild.py
+      - platform/build_delivery_controls.py
+      - renv.lock
+      - config/evidence_layers.yaml
+      - platform/check_evidence_layers.py
+      - platform/check_delivery_model.py
+      - platform/build_delivery_dashboard.py
+      - platform/build_ctq_traceability_report.py
+      - platform/build_validation_strategy_report.py
+      - platform/build_release_candidate_checklist.py
+      - platform/build_orchestrator_gate_map.py
+      - platform/build_release_run_manifest.py
+      - config/log_cleanliness.yaml
+      - platform/check_log_cleanliness.py
+      - platform/log_cleanliness/log_cleanliness_status.json
+      - platform/release_run_manifest/release_run_manifest.json
+      - platform/release_run_manifest/release_run_files.csv
+      - 06_qc_evidence/audit/output_hash_binding.csv

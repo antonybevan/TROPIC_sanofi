@@ -1,0 +1,11 @@
+# ADaM Conformance Report (focused, CDISC ADaMIG v1.3-aligned)
+
+*Generated:* `2026-07-09 11:05:35`  
+*Engine:* in-repo `adam_conf_check.R` — interim gate (NOT the full FDA Validator pack; see `06_qc_evidence/conformance/p21_adam_runrecord.md`).  
+*Inputs:* 7 ADaM `*_prod.xpt` + `03_metadata/define/define.xml`.  
+*Result:* **PASS (0 errors at this check level)** — 0 findings (Error **0**, Warning **0**).
+
+## Findings by rule
+
+| Rule | Severity | Count | What it checks |
+|---|---|---|---|

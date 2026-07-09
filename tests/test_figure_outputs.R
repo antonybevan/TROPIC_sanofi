@@ -1,6 +1,6 @@
 # Program: tests/test_figure_outputs.R
 # Purpose: Fast, data-independent QC gate for rendered TFL figures.
-# Run after 09_tfl/tfl_generation.R.  This checks the properties that commonly
+# Run after 05_outputs/tfl/tfl_generation.R.  This checks the properties that commonly
 # regress without producing an R error: missing files, wrong canvas size,
 # transparency, and implausibly tiny/truncated output.
 
@@ -25,7 +25,7 @@ spec <- data.frame(
   stringsAsFactors = FALSE
 )
 
-root <- "09_tfl/output/figures"
+root <- "05_outputs/tfl/output/figures"
 ok <- TRUE
 
 for (i in seq_len(nrow(spec))) {

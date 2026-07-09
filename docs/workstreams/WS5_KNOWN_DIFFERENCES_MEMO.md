@@ -3,7 +3,7 @@
 **Workstream:** WS-5 QC / Validation (G06)  
 **Audience:** Reviewer, hiring manager, audit challenge  
 **Product claim:** Path A — controlled non-submission demo (`docs/PRODUCT_CLAIM.md`)  
-**Source of truth for IDs:** `audit/findings_register.csv` · `audit/FINDINGS_DISPOSITION_BOARD.md`  
+**Source of truth for IDs:** `06_qc_evidence/audit/findings_register.csv` · `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md`  
 **As of:** 2026-07-09  
 **Machine QC grade at seal:** validation_strategy PASS · recon PASS (non-sim) · admiral PASS · log cleanliness PASS · RC PASS  
 
@@ -213,7 +213,7 @@ This is structural to a portfolio demo—not a temporary bug.
 
 ## 6. Log cleanliness residual (operational)
 
-Log cleanliness **PASS** means: configured **persisted** logs are clean under `log_cleanliness.yaml`, with reviewed ADTTE time-origin exceptions capped.  
+Log cleanliness **PASS** means: configured **persisted** logs are clean under `config/log_cleanliness.yaml`, with reviewed ADTTE time-origin exceptions capped.  
 
 It does **not** mean every rscript/python stdout line from all 30 stages is archived and scanned. Coverage is explicit: `configured_persisted_logs_only`.
 

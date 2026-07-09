@@ -1,0 +1,47 @@
+artifact,check,status,file,field,actual,expected,evidence
+source_profile,source_profile_pass,PASS,platform/source_profile_status.json,status,pass,pass,Source profile completed without findings.
+adsl,current_real_sas,PASS,platform/pipeline_health.json,sas_execution_mode,oda,"['oda', 'local']",Current live run used an independent SAS engine.
+adsl,dataset_reconciliation_pass,PASS,platform/reconciliation_status.json,overall,PASS,PASS,Dataset-level reconciliation passed.
+adsl,dataset_reconciliation_not_simulated,PASS,platform/reconciliation_status.json,simulated,False,False,Dataset-level reconciliation is not a byte-copy simulation.
+adsl,admiral_adsl_pass,PASS,platform/admiral_reconciliation_status.json,domains.ADSL.status,PASS,PASS,Third-engine ADSL reconciliation passed.
+adsl,spec_data_pass,PASS,platform/conformance/spec_data_conformance.json,status,PASS,PASS,ADaM specification matches produced data.
+adtte_primary,current_real_sas,PASS,platform/pipeline_health.json,sas_execution_mode,oda,"['oda', 'local']",Current live run used an independent SAS engine.
+adtte_primary,dataset_reconciliation_pass,PASS,platform/reconciliation_status.json,overall,PASS,PASS,Dataset-level reconciliation passed.
+adtte_primary,dataset_reconciliation_not_simulated,PASS,platform/reconciliation_status.json,simulated,False,False,Dataset-level reconciliation is not a byte-copy simulation.
+adtte_primary,results_reconciliation_pass,PASS,platform/results_reconciliation_status.json,overall,PASS,PASS,Numerical results reconciliation passed.
+adtte_primary,admiral_os_pass,PASS,platform/admiral_reconciliation_status.json,domains.ADTTE.OS.status,PASS,PASS,Third-engine OS reconciliation passed.
+adtte_primary,admiral_pfs_pass,PASS,platform/admiral_reconciliation_status.json,domains.ADTTE.PFS.status,PASS,PASS,Third-engine PFS reconciliation passed.
+adtte_primary,spec_data_pass,PASS,platform/conformance/spec_data_conformance.json,status,PASS,PASS,ADaM specification matches produced data.
+adtte_secondary,current_real_sas,PASS,platform/pipeline_health.json,sas_execution_mode,oda,"['oda', 'local']",Current live run used an independent SAS engine.
+adtte_secondary,dataset_reconciliation_pass,PASS,platform/reconciliation_status.json,overall,PASS,PASS,Dataset-level reconciliation passed.
+adtte_secondary,dataset_reconciliation_not_simulated,PASS,platform/reconciliation_status.json,simulated,False,False,Dataset-level reconciliation is not a byte-copy simulation.
+adtte_secondary,results_reconciliation_pass,PASS,platform/results_reconciliation_status.json,overall,PASS,PASS,Numerical results reconciliation passed.
+adtte_secondary,spec_data_pass,PASS,platform/conformance/spec_data_conformance.json,status,PASS,PASS,ADaM specification matches produced data.
+safety_adam,current_real_sas,PASS,platform/pipeline_health.json,sas_execution_mode,oda,"['oda', 'local']",Current live run used an independent SAS engine.
+safety_adam,dataset_reconciliation_pass,PASS,platform/reconciliation_status.json,overall,PASS,PASS,Dataset-level reconciliation passed.
+safety_adam,dataset_reconciliation_not_simulated,PASS,platform/reconciliation_status.json,simulated,False,False,Dataset-level reconciliation is not a byte-copy simulation.
+safety_adam,spec_data_pass,PASS,platform/conformance/spec_data_conformance.json,status,PASS,PASS,ADaM specification matches produced data.
+response_adam,current_real_sas,PASS,platform/pipeline_health.json,sas_execution_mode,oda,"['oda', 'local']",Current live run used an independent SAS engine.
+response_adam,dataset_reconciliation_pass,PASS,platform/reconciliation_status.json,overall,PASS,PASS,Dataset-level reconciliation passed.
+response_adam,dataset_reconciliation_not_simulated,PASS,platform/reconciliation_status.json,simulated,False,False,Dataset-level reconciliation is not a byte-copy simulation.
+response_adam,spec_data_pass,PASS,platform/conformance/spec_data_conformance.json,status,PASS,PASS,ADaM specification matches produced data.
+tfl_primary_secondary,tfl_index_pass,PASS,platform/tfl_output_index_status.json,status,pass,pass,TFL output index is complete for controlled catalog scope (config/tfl_output_catalog.yaml).
+tfl_primary_secondary,ctq_traceability_pass,PASS,platform/ctq_traceability/ctq_traceability_status.json,status,PASS,PASS,"CTQ/estimand traceability links clinical questions to ADaM, outputs, reviewer guides, and validation evidence."
+tfl_primary_secondary,results_reconciliation_pass,PASS,platform/results_reconciliation_status.json,overall,PASS,PASS,Numerical results reconciliation passed.
+tfl_primary_secondary,forest_reconciliation_pass,PASS,platform/forest_reconciliation_status.json,overall,PASS,PASS,Forest HR result reconciliation passed.
+tfl_primary_secondary,cbzp_bridge_pass,PASS,platform/cbzp_bridge_status.json,overall,PASS,PASS,Synthetic comparator bridge parity passed.
+metadata_package,spec_define_pass,PASS,platform/conformance/spec_define_conformance.json,status,PASS,PASS,ADaM specification matches Define-XML.
+metadata_package,spec_data_pass,PASS,platform/conformance/spec_data_conformance.json,status,PASS,PASS,ADaM specification matches produced data.
+metadata_package,ctq_traceability_pass,PASS,platform/ctq_traceability/ctq_traceability_status.json,status,PASS,PASS,"CTQ/estimand traceability links clinical questions to ADaM, outputs, reviewer guides, and validation evidence."
+metadata_package,metadata_control_pass,PASS,platform/metadata_control/metadata_control_status.json,status,pass,pass,Metadata control has no unresolved warning/blocking findings.
+reviewer_explanation,ctq_traceability_pass,PASS,platform/ctq_traceability/ctq_traceability_status.json,status,PASS,PASS,"CTQ/estimand traceability links clinical questions to ADaM, outputs, reviewer guides, and validation evidence."
+reviewer_explanation,file:07_reviewer_explanation/guides/ADRG.md,PASS,07_reviewer_explanation/guides/ADRG.md,,present,present,Required reviewer/documentation artifact is present.
+reviewer_explanation,file:07_reviewer_explanation/guides/SDRG.md,PASS,07_reviewer_explanation/guides/SDRG.md,,present,present,Required reviewer/documentation artifact is present.
+reviewer_explanation,file:07_reviewer_explanation/guides/BDRG.md,PASS,07_reviewer_explanation/guides/BDRG.md,,present,present,Required reviewer/documentation artifact is present.
+reviewer_explanation,file:07_reviewer_explanation/guides/SDSP.md,PASS,07_reviewer_explanation/guides/SDSP.md,,present,present,Required reviewer/documentation artifact is present.
+reviewer_explanation,file:07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md,PASS,07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md,,present,present,Required reviewer/documentation artifact is present.
+log_cleanliness,log_cleanliness_pass,PASS,platform/log_cleanliness/log_cleanliness_status.json,status,PASS,PASS,"SAS/R execution logs contain no unapproved errors, warnings, invalid-input notes, uninitialized variables, or risky conversion/merge notes."
+platform_release_controls,pipeline_green,PASS,platform/pipeline_health.json,pipeline_health_status,GREEN,GREEN,Current pipeline health is green.
+platform_release_controls,current_real_sas,PASS,platform/pipeline_health.json,sas_execution_mode,oda,"['oda', 'local']",Current live run used an independent SAS engine.
+platform_release_controls,dataset_reconciliation_not_simulated,PASS,platform/reconciliation_status.json,simulated,False,False,Dataset-level reconciliation is not a byte-copy simulation.
+platform_release_controls,log_cleanliness_pass,PASS,platform/log_cleanliness/log_cleanliness_status.json,status,PASS,PASS,"SAS/R execution logs contain no unapproved errors, warnings, invalid-input notes, uninitialized variables, or risky conversion/merge notes."

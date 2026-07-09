@@ -1,19 +1,19 @@
 # TROPIC Release-Run Manifest
 
-Generated: 2026-07-09 15:17:41 UTC
+Generated: 2026-07-09 16:35:17 UTC
 
 > Hash-sealed run manifest for current artifacts. This is not an electronic signature or Part 11 attestation.
 
 ## Verdict
 
-- Status: `PASS`
-- Evidence grade: `release_candidate`
-- Manifest SHA-256 seal: `c01e744fe5ba3a1e70fbe4a0b4304da1a8f211edb21cc5ba76f85db3f6ed0201`
+- Status: `REMEDIATION`
+- Evidence grade: `remediation_partial_or_dirty`
+- Manifest SHA-256 seal: `5be7e46573d224857f036c9881fb63cb40c908352b0a552a023882ebdcf222f9`
 - SAS execution mode: `oda`
 - Pipeline health: `GREEN`
 - Run scope: `full_dag` (30 recorded / 29 release-required upstream stages)
-- Git HEAD: `29d801653fb5ca941a938daa7e23c3a184299c74`
-- Worktree dirty: `False`
+- Git HEAD: `bfff52c1af17dacb95fdaa30b094675c7d1d7097`
+- Worktree dirty: `True`
 - SAS companion figures: `out_of_dag_capability_demo`; current with health=`False`
 
 ## Status meanings
@@ -25,6 +25,10 @@ Generated: 2026-07-09 15:17:41 UTC
 ## Problems
 
 No release-run binding problems detected.
+
+## Remediation reasons (block release-candidate PASS)
+
+- git worktree is dirty (359 porcelain entries); release-candidate lock requires a clean committed state
 
 ## Dataset Binding
 
@@ -43,20 +47,20 @@ No release-run binding problems detected.
 
 | Check | Status | Source |
 | --- | --- | --- |
-| pipeline_health | GREEN | 06_telemetry/pipeline_health.json |
-| reconciliation | PASS | 06_telemetry/reconciliation_status.json |
-| results_reconciliation | PASS | 06_telemetry/results_reconciliation_status.json |
-| forest_reconciliation | PASS | 06_telemetry/forest_reconciliation_status.json |
-| cbzp_bridge | PASS | 06_telemetry/cbzp_bridge_status.json |
-| spec_define | PASS | 06_telemetry/conformance/spec_define_conformance.json |
-| spec_data | PASS | 06_telemetry/conformance/spec_data_conformance.json |
-| metadata_control | pass | 06_telemetry/metadata_control/metadata_control_status.json |
-| log_cleanliness | PASS | 06_telemetry/log_cleanliness/log_cleanliness_status.json |
-| tfl_output_index | pass | 06_telemetry/tfl_output_index_status.json |
-| validation_strategy | PASS | 06_telemetry/validation_strategy/validation_strategy_status.json |
+| pipeline_health | GREEN | platform/pipeline_health.json |
+| reconciliation | PASS | platform/reconciliation_status.json |
+| results_reconciliation | PASS | platform/results_reconciliation_status.json |
+| forest_reconciliation | PASS | platform/forest_reconciliation_status.json |
+| cbzp_bridge | PASS | platform/cbzp_bridge_status.json |
+| spec_define | PASS | platform/conformance/spec_define_conformance.json |
+| spec_data | PASS | platform/conformance/spec_data_conformance.json |
+| metadata_control | pass | platform/metadata_control/metadata_control_status.json |
+| log_cleanliness | PASS | platform/log_cleanliness/log_cleanliness_status.json |
+| tfl_output_index | pass | platform/tfl_output_index_status.json |
+| validation_strategy | PASS | platform/validation_strategy/validation_strategy_status.json |
 
 ## Machine-Readable Outputs
 
-- `06_telemetry/release_run_manifest/release_run_manifest.json`
-- `06_telemetry/release_run_manifest/release_run_files.csv`
-- `audit/output_hash_binding.csv`
+- `platform/release_run_manifest/release_run_manifest.json`
+- `platform/release_run_manifest/release_run_files.csv`
+- `06_qc_evidence/audit/output_hash_binding.csv`

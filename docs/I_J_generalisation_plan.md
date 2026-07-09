@@ -8,8 +8,8 @@
 
 ## End-state
 
-A **study manifest** (`study_manifest.yaml`) declares pipeline *structure* the way
-`study_config.yaml` already declares clinical *parameters*. The existing engine
+A **study manifest** (`config/study_manifest.yaml`) declares pipeline *structure* the way
+`config/study_config.yaml` already declares clinical *parameters*. The existing engine
 (`cibuild.py`, `cross_lang_audit.R`, `results_reconcile.R`) reads structure from the
 manifest instead of hardcoding it. A second stub study (`DEMO02`, ADSL + ADAE only)
 runs end-to-end through the *same* engine — the proof of study-agnosticism.
@@ -55,7 +55,7 @@ rule YAMLs, and `compare_datasets()` already taking `ds_name` as a parameter.
 - **Defensive fallback:** if the manifest is missing/unreadable, the engine falls
   back to the legacy hardcoded dataset list + identity, so no regression is possible.
 
-## The manifest (`study_manifest.yaml`)
+## The manifest (`config/study_manifest.yaml`)
 
 ```yaml
 study:    { id, code, title }
@@ -69,8 +69,8 @@ infrastructure_stages:
 ## Phases
 
 ### Phase 0 — De-duplicate to one source *(low; pure refactor, zero behaviour change)*
-1. New `study_manifest.yaml` (root).
-2. New `06_telemetry/manifest.py` — pyyaml loader + helpers
+1. New `config/study_manifest.yaml` (root).
+2. New `platform/manifest.py` — pyyaml loader + helpers
    (`load_manifest`, `dataset_names`, `business_keys`, `study_identity`).
 3. `cibuild.py`: dataset lists (`:114`, `:330`) and identity strings
    (`:458/709/754`) sourced from the manifest (with legacy fallback).
@@ -93,7 +93,7 @@ infrastructure_stages:
    unchanged — only the *source* of structure changes.
 
 ### Phase 2 — Prove with a second study `DEMO02` *(medium-high)*
-1. `studies/DEMO02/`: own `study_manifest.yaml` + `study_config.yaml`, ADSL+ADAE
+1. `studies/DEMO02/`: own `config/study_manifest.yaml` + `config/study_config.yaml`, ADSL+ADAE
    programs + validation scripts + tiny synthetic seed.
 2. `cibuild.py --study DEMO02` resolves roots under `studies/DEMO02/`; no flag =
    repo root = TROPIC (back-compat).

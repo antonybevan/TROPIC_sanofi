@@ -88,10 +88,10 @@ material is authoritative, and what limitations must be carried to reviewers.
 
 **Current TROPIC assets:**
 
-- `TROPIC_SAP_v4.0_industry_grade.docx`
-- `audit/SAP_LOCK_REVIEW_MEMO.md`
-- `audit/findings_register.csv`
-- `REPRODUCIBILITY.md`
+- `02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx`
+- `06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md`
+- `06_qc_evidence/audit/findings_register.csv`
+- `00_governance/REPRODUCIBILITY.md`
 - `README.md`
 
 **Gate:** a build cannot be described as reviewer-ready unless the governing SAP,
@@ -119,11 +119,11 @@ data, not as a public sample dataset.
 
 **Current TROPIC assets:**
 
-- `01_raw_source/`
-- `REPRODUCIBILITY.md`
-- `03_validation_r/v_staging_ingest.R`
-- `03_validation_r/v_sdtm_validation.R`
-- `06_telemetry/conformance/core_sdtm34_report.json`
+- `01_source_data/`
+- `00_governance/REPRODUCIBILITY.md`
+- `04_analysis_datasets/programs/r/v_staging_ingest.R`
+- `04_analysis_datasets/programs/r/v_sdtm_validation.R`
+- `platform/conformance/core_sdtm34_report.json`
 
 **Gate:** ADaM programming should not be treated as locked until source inventory,
 subject counts, source-domain availability, missingness, date precision limits,
@@ -138,7 +138,7 @@ analysis definitions before programming.
 
 - SAP authority.
 - Protocol and clinical study report/publication evidence.
-- Study parameters in `study_config.yaml`.
+- Study parameters in `config/study_config.yaml`.
 - Estimand and endpoint decisions.
 
 **Controlled outputs:**
@@ -151,10 +151,10 @@ analysis definitions before programming.
 
 **Current TROPIC assets:**
 
-- `study_config.yaml`
-- `TROPIC_SAP_v4.0_industry_grade.docx`
-- `ANALYSIS_REPORT.md`
-- `08_reviewers_guides/TRACEABILITY_MATRIX.md`
+- `config/study_config.yaml`
+- `02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx`
+- `07_reviewer_explanation/analysis_report.md`
+- `07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md`
 
 **Gate:** every ADaM parameter, population flag, censoring rule, and TFL result
 must reference a specification section or a documented assumption.
@@ -180,13 +180,13 @@ programs, conformance checks, Define-XML, and reviewers can inspect.
 
 **Current TROPIC assets:**
 
-- `00_specifications/ADaM_spec.xlsx`
-- `07_define_xml/define.xml`
-- `07_define_xml/define_sdtm.xml`
-- `07_define_xml/check_define_conformance.R`
-- `03_validation_r/spec_data_checks.R`
-- `12_ars/`
-- `audit/adam_variable_traceability.csv`
+- `03_metadata/adam/ADaM_spec.xlsx`
+- `03_metadata/define/define.xml`
+- `03_metadata/define/define_sdtm.xml`
+- `03_metadata/define/check_define_conformance.R`
+- `04_analysis_datasets/programs/r/spec_data_checks.R`
+- `05_outputs/ars/`
+- `06_qc_evidence/audit/adam_variable_traceability.csv`
 
 **Gate:** analysis datasets and TFL outputs cannot be promoted unless the metadata
 contract is internally consistent and the known metadata gaps are explained.
@@ -213,11 +213,11 @@ with independent validation proportional to scientific risk.
 
 **Current TROPIC assets:**
 
-- `02_production_sas/`
-- `03_validation_r/`
-- `04_adam/`
-- `study_manifest.yaml`
-- `06_telemetry/cibuild.py`
+- `04_analysis_datasets/programs/sas/`
+- `04_analysis_datasets/programs/r/`
+- `04_analysis_datasets/adam/`
+- `config/study_manifest.yaml`
+- `platform/cibuild.py`
 
 **Gate:** datasets require cell-level reconciliation or a documented risk-based QC
 alternative. A simulated SAS mode cannot be represented as independent
@@ -243,11 +243,11 @@ listings with traceability to analysis datasets and specifications.
 
 **Current TROPIC assets:**
 
-- `09_tfl/tfl_generation.R`
-- `09_tfl/tfl_stats.R`
-- `09_tfl/output/`
-- `09_tfl/TFL_Gallery.html`
-- `12_ars/tropic_ard.csv`
+- `05_outputs/tfl/tfl_generation.R`
+- `05_outputs/tfl/tfl_stats.R`
+- `05_outputs/tfl/output/`
+- `05_outputs/tfl/TFL_Gallery.html`
+- `05_outputs/ars/tropic_ard.csv`
 
 **Gate:** outputs are not complete when files render. They are complete when the
 rendered result, analysis dataset, program, metadata, QC method, and reviewer
@@ -274,13 +274,13 @@ explanation are all linked.
 
 **Current TROPIC assets:**
 
-- `08_reviewers_guides/RISK_BASED_VALIDATION.md`
-- `05_reconciliation/`
-- `06_telemetry/reconciliation_status.json`
-- `06_telemetry/results_reconciliation_status.json`
-- `06_telemetry/conformance/`
-- `06_telemetry/ADMIRAL_RECONCILIATION.md`
-- `06_telemetry/verify_evidence.py`
+- `07_reviewer_explanation/guides/RISK_BASED_VALIDATION.md`
+- `06_qc_evidence/reconciliation/`
+- `platform/reconciliation_status.json`
+- `platform/results_reconciliation_status.json`
+- `platform/conformance/`
+- `06_qc_evidence/reconciliation/ADMIRAL_RECONCILIATION.md`
+- `platform/verify_evidence.py`
 
 **Gate:** critical outputs require independent reproduction or a documented reason
 why independent reproduction is not possible. Supporting and structural artifacts
@@ -309,15 +309,15 @@ to risk.
 
 **Current TROPIC assets:**
 
-- `08_reviewers_guides/ADRG.md`
-- `08_reviewers_guides/SDRG.md`
-- `08_reviewers_guides/BDRG.md`
-- `ANALYSIS_REPORT.md`
-- `m5/`
-- `11_ectd/0000/`
-- `06_telemetry/package_ectd.py`
-- `06_telemetry/build_ectd_backbone.py`
-- `06_telemetry/materialize_ectd.py`
+- `07_reviewer_explanation/guides/ADRG.md`
+- `07_reviewer_explanation/guides/SDRG.md`
+- `07_reviewer_explanation/guides/BDRG.md`
+- `07_reviewer_explanation/analysis_report.md`
+- `08_submission_package/m5/`
+- `08_submission_package/ectd/0000/`
+- `platform/package_ectd.py`
+- `platform/build_ectd_backbone.py`
+- `platform/materialize_ectd.py`
 
 **Gate:** reviewer documentation must explain what was built, what data were used,
 which outputs are synthetic or reconstructed, what QC was performed, which
@@ -345,13 +345,13 @@ misrepresented evidence.
 
 **Current TROPIC assets:**
 
-- `06_telemetry/cibuild.py`
-- `06_telemetry/pipeline_health.json`
-- `06_telemetry/pipeline_health_log.jsonl`
+- `platform/cibuild.py`
+- `platform/pipeline_health.json`
+- `platform/pipeline_health_log.jsonl`
 - `renv.lock`
-- `06_telemetry/verify_evidence.py`
-- `evidence_layers.yaml`
-- `06_telemetry/check_evidence_layers.py`
+- `platform/verify_evidence.py`
+- `config/evidence_layers.yaml`
+- `platform/check_evidence_layers.py`
 
 **Gate:** a release candidate must be bound to one run, one code state, one
 environment record, one output manifest, and one reviewer-facing limitation set.
@@ -376,7 +376,7 @@ should guide the next build steps.
 
 | Gap | Why it matters | Next control |
 |---|---|---|
-| Evidence layers now exist, but workstream ownership is not machine-readable. | The chain is visible, but the team/function handoffs are still prose. | Add `delivery_workstreams.yaml` and validate it against `evidence_layers.yaml`. |
+| Evidence layers now exist, but workstream ownership is not machine-readable. | The chain is visible, but the team/function handoffs are still prose. | Add `config/delivery_workstreams.yaml` and validate it against `config/evidence_layers.yaml`. |
 | Source profiling now has an initial aggregate report, but it is not yet wired as an orchestrator gate. | Source intake should be a distinct gate before ADaM build. | Promote `docs/SOURCE_PROFILING_REPORT.md` / `source_profile_status.json` into the DAG or CI once the report scope is stable. |
 | Specification lock exists, but executable spec references are not uniformly enforced per output. | Outputs can drift from SAP/spec without a clear broken link. | Add output-to-spec references to a structured output index. |
 | Metadata now has a generated control report, but the report currently records unresolved major findings. | Reviewers need a single metadata control story with honest gaps. | Resolve or explicitly disposition findings in `docs/METADATA_CONTROL_REPORT.md`, especially skipped CT cross-validation, ADaM label errors, and predecessor traceability gaps. |
@@ -388,18 +388,18 @@ should guide the next build steps.
 
 ### Step 1: Make workstreams executable as metadata
 
-Create `delivery_workstreams.yaml` with functions, required inputs, outputs,
+Create `config/delivery_workstreams.yaml` with functions, required inputs, outputs,
 handoff gates, and evidence-layer references.
 
 ### Step 2: Build an evidence dashboard
 
-Generate a Markdown or HTML dashboard from `evidence_layers.yaml` and
-`delivery_workstreams.yaml`, showing what is present, generated, external,
+Generate a Markdown or HTML dashboard from `config/evidence_layers.yaml` and
+`config/delivery_workstreams.yaml`, showing what is present, generated, external,
 optional, planned, or missing.
 
 ### Step 3: Add gate ids to the orchestrator
 
-Map each `study_manifest.yaml` stage to one or more operating-model gates:
+Map each `config/study_manifest.yaml` stage to one or more operating-model gates:
 source, spec, metadata, ADaM, output, QC, reviewer, package, release.
 
 ### Step 4: Decide CI and orchestrator integration

@@ -1,0 +1,31 @@
+stage_id,stage_name,script,runner,parallel,manifest_gated,delivery_gates,mapping_rationale,source
+1,ADaM Spec Label/Order Artifacts,platform/gen_adam_labels.R,rscript,False,False,"G03,G06",spec-derived metadata export contract,manifest.infrastructure_stages.pre
+2,Real SDTM Staging Ingest,04_analysis_datasets/programs/r/v_staging_ingest.R,logrx,False,False,G01,source intake/staging,manifest.infrastructure_stages.pre
+3,R SDTM Validation,04_analysis_datasets/programs/r/v_sdtm_validation.R,logrx,False,False,"G01,G06",source structural validation,manifest.infrastructure_stages.pre
+4,R ADSL Validation,04_analysis_datasets/programs/r/v_adsl_validation.R,logrx,False,False,"G04,G06",ADaM validation track,manifest.datasets.adsl
+5,R ADEX Validation,04_analysis_datasets/programs/r/v_adex_validation.R,logrx,True,False,"G04,G06",ADaM validation track,manifest.datasets.adex
+6,R ADCM Validation,04_analysis_datasets/programs/r/v_adcm_validation.R,logrx,True,False,"G04,G06",ADaM validation track,manifest.datasets.adcm
+7,R ADAE Validation,04_analysis_datasets/programs/r/v_adae_io_validation.R,logrx,True,False,"G04,G06",ADaM validation track,manifest.datasets.adae
+8,R ADLB Validation,04_analysis_datasets/programs/r/v_adlb_validation.R,logrx,True,False,"G04,G06",ADaM validation track,manifest.datasets.adlb
+9,R ADRS Validation,04_analysis_datasets/programs/r/v_adrs_validation.R,logrx,True,False,"G04,G06",ADaM validation track,manifest.datasets.adrs
+10,R ADTTE Validation,04_analysis_datasets/programs/r/v_adtte_validation.R,logrx,False,False,"G04,G06",ADaM validation track,manifest.datasets.adtte
+11,R BIMO Validation,04_analysis_datasets/programs/r/v_bimo_validation.R,logrx,False,False,"G04,G06",BIMO validation track,manifest.datasets.clinsite
+12,SAS Production (ODA/Real/Simulated),SIMULATE sentinel / SAS production resolver,sas_mode,False,False,G04,production analysis dataset build,cibuild.py sentinel
+13,Cross-Language Audit Reconcile,06_qc_evidence/reconciliation/cross_lang_audit.R,logrx,False,True,"G04,G06",dataset-level reconciliation gate,manifest.infrastructure_stages.post
+14,Admiral ADSL Re-derivation,04_analysis_datasets/programs/r/admiral_adsl.R,rscript,False,False,"G04,G06",third-engine T1 ADSL re-derivation (admiral),manifest.infrastructure_stages.post
+15,Admiral ADTTE Re-derivation (OS/PFS),04_analysis_datasets/programs/r/admiral_adtte.R,rscript,False,False,"G04,G06",third-engine T1 OS/PFS re-derivation (admiral),manifest.infrastructure_stages.post
+16,Admiral Core Reconciliation,06_qc_evidence/reconciliation/admiral_reconcile.R,rscript,False,True,"G04,G06",third-engine scoped core reconciliation gate,manifest.infrastructure_stages.post
+17,Synthetic Comparator Bridge Parity,01_source_data/check_cbzp_bridge.R,rscript,False,False,"G05,G06",synthetic comparator bridge control before TFLs,manifest.infrastructure_stages.post
+18,Efficacy & Safety TFL Suite Compilation,05_outputs/tfl/tfl_generation.R,rscript,False,True,G05,TFL output generation gate,manifest.infrastructure_stages.post
+19,Numerical Results Reconciliation (SAS vs R),06_qc_evidence/reconciliation/results_reconcile.R,logrx,False,True,G06,results-level reconciliation gate,manifest.infrastructure_stages.post
+20,Forest-HR Reconciliation (SAS vs R),06_qc_evidence/reconciliation/forest_reconcile.R,rscript,False,False,G06,figure-driving statistic reconciliation,manifest.infrastructure_stages.post
+21,ADaM Spec to Define Conformance,03_metadata/define/check_define_conformance.R,rscript,False,False,"G03,G06",metadata spec-to-define conformance,manifest.infrastructure_stages.post
+22,ADaM Spec to Data Conformance,04_analysis_datasets/programs/r/spec_data_checks.R,rscript,False,False,"G03,G04,G06",metadata spec-to-data conformance,manifest.infrastructure_stages.post
+23,Dataset-JSON Export (v1.1),platform/export_datasetjson.py,python,False,False,"G04,G08",dataset exchange layer,manifest.infrastructure_stages.post
+24,Analysis Results Standard (ARS v1.0),platform/build_ars.py,python,False,False,"G05,G08",analysis results metadata/export layer,manifest.infrastructure_stages.post
+25,USDM Study Definition (v3.0),platform/build_usdm.py,python,False,False,"G03,G08",study definition metadata/export layer,manifest.infrastructure_stages.post
+26,eCTD Final Package,platform/package_ectd.py,python,False,False,G08,Module 5 package assembly,manifest.infrastructure_stages.post
+27,eCTD Backbone + STF (sequence 0000),platform/build_ectd_backbone.py,python,False,False,G08,eCTD backbone and STF assembly,manifest.infrastructure_stages.post
+28,Materialize eCTD Sequence,platform/materialize_ectd.py,python,False,False,"G08,G09",sequence materialization and checksum verification,manifest.infrastructure_stages.post
+29,Log Cleanliness Gate,platform/check_log_cleanliness.py,python,False,False,"G06,G09",execution-log scan for unapproved warnings/errors and reviewed exception caps,manifest.infrastructure_stages.post
+30,Release Run Manifest Binding,platform/build_release_run_manifest.py,python,False,False,G09,current run hash binding and QC verdict seal,manifest.infrastructure_stages.post

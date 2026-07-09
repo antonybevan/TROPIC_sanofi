@@ -1,0 +1,207 @@
+# Machine-readable companion to docs/WORKSTREAM_EXECUTION_BOARD.md
+# Status values: GREEN | AMBER | RED | WAIVED
+# This is an operating board, not a substitute for config/study_manifest.yaml seals.
+
+version: 1
+study: TROPIC-NCT00417079
+as_of: "2026-07-09"
+product_claim_in_force: controlled_non_submission_demo
+pipeline_seal_tag: v0.1.0-demo-rc.1
+board_doc: docs/WORKSTREAM_EXECUTION_BOARD.md
+product_claim_doc: docs/PRODUCT_CLAIM.md
+disposition_board: 06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md
+
+workstreams:
+  WS0_governance:
+    name: Governance and scope control
+    gates: [G00, G09]
+    status: GREEN
+    owned_artifacts:
+      - 02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx
+      - 06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md
+      - 06_qc_evidence/audit/findings_register.csv
+      - 06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md
+      - docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md
+      - docs/PRODUCT_CLAIM.md
+      - README.md
+      - 00_governance/REPRODUCIBILITY.md
+    open_risks:
+      - claim_language_drift_to_submission_ready
+      - accepted_criticals_misread_as_scientific_closure
+    required_evidence:
+      - docs/PRODUCT_CLAIM.md
+    next_action: "Maintain claim language; reopen G00 only if product claim changes or public wording drifts"
+    residual_findings: [F-003, F-005, F-025, F-019]
+
+  WS1_source_intake:
+    name: Clinical data management / source intake
+    gates: [G01]
+    status: AMBER
+    owned_artifacts:
+      - 01_source_data
+      - 04_analysis_datasets/programs/r/v_staging_ingest.R
+      - 04_analysis_datasets/programs/r/v_sdtm_validation.R
+      - docs/SOURCE_PROFILING_REPORT.md
+      - platform/source_profile_status.json
+      - platform/conformance/CORE_SDTM34_RUN_RECORD.md
+      - 07_reviewer_explanation/guides/SDRG.md
+    open_risks:
+      - F-017_partial_iso_dates_tsseq
+      - F-015_core_residual_not_fully_dispositioned
+    required_evidence:
+      - docs/workstreams/WS1_SOURCE_INTAKE_PACK.md
+      - CORE residual disposition matrix
+    next_action: "Produce WS1_CORE_RESIDUAL_MATRIX.csv from CORE JSON; file WS-1 review note"
+    residual_findings: [F-015, F-017]
+    packs:
+      - docs/workstreams/WS1_SOURCE_INTAKE_PACK.md
+
+  WS2_statistical_specification:
+    name: Statistical and analysis specification
+    gates: [G02]
+    status: AMBER
+    owned_artifacts:
+      - config/study_config.yaml
+      - 02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx
+      - config/ctq_traceability.yaml
+      - 07_reviewer_explanation/analysis_report.md
+      - 07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md
+    open_risks:
+      - G02_not_stage_gated
+      - F-011_psa_population_shell
+    required_evidence:
+      - population_endpoint_control_table
+      - spec_to_config_trace
+    next_action: "Record WS-2 review note against population/endpoint control table; optional machine G02 check"
+    residual_findings: [F-011, F-012]
+    packs:
+      - docs/workstreams/WS2_POPULATION_ENDPOINT_CONTROL.md
+
+  WS3_standards_metadata:
+    name: Standards and metadata governance
+    gates: [G03]
+    status: AMBER
+    owned_artifacts:
+      - 03_metadata/adam/ADaM_spec.xlsx
+      - 03_metadata/define/define.xml
+      - 03_metadata/define/define_sdtm.xml
+      - config/metadata_lineage.yaml
+      - docs/METADATA_CONTROL_REPORT.md
+      - 05_outputs/ars
+      - 03_metadata/usdm
+      - 04_analysis_datasets/datasetjson
+    open_risks:
+      - F-014_arm_limited
+      - F-016_no_commercial_p21
+      - exploratory_layers_overclaim
+    required_evidence:
+      - external_validation_evidence_index
+      - package_vs_exploratory_inventory
+    next_action: "Support CORE residual matrix; keep exploratory layers non-eCTD"
+    residual_findings: [F-014, F-016, F-020, F-021, F-022]
+    packs:
+      - docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md
+
+  WS4_statistical_programming:
+    name: ADaM / BIMO / TFL / safety programming
+    gates: [G04, G05]
+    status: GREEN
+    owned_artifacts:
+      - 04_analysis_datasets/programs/sas
+      - 04_analysis_datasets/programs/r
+      - 04_analysis_datasets/adam
+      - 05_outputs/tfl
+      - config/tfl_output_catalog.yaml
+      - config/study_manifest.yaml
+      - platform/reconciliation_status.json
+      - platform/admiral_reconciliation_status.json
+    open_risks:
+      - deferred_sap_tfl_ids
+      - synthetic_cbzp_in_tfls
+      - out_of_dag_sas_companion_figures
+    required_evidence:
+      - controlled_catalog_pass
+      - dual_lang_and_admiral_pass
+    next_action: "Workstream review walkthrough ADSL→ADTTE→ADAE→T-20 using recon+catalog only; no scope expansion"
+    residual_findings: [F-003, F-012]
+
+  WS5_qc_validation:
+    name: Risk-based QC and validation
+    gates: [G06]
+    status: GREEN
+    note: "Path A residual memo filed; machine gates PASS; co-own CORE residual matrix with WS-1 for industry depth"
+    owned_artifacts:
+      - config/validation_strategy.yaml
+      - 07_reviewer_explanation/guides/RISK_BASED_VALIDATION.md
+      - 06_qc_evidence/reconciliation
+      - config/log_cleanliness.yaml
+      - 06_qc_evidence/audit/findings_register.csv
+      - 06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md
+      - docs/VALIDATION_STRATEGY_CONTROL_REPORT.md
+      - docs/LOG_CLEANLINESS_REPORT.md
+      - docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md
+    open_risks:
+      - single_author_methodological_independence_only
+      - log_coverage_persisted_only
+      - commercial_p21_not_run
+    required_evidence:
+      - docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md
+    next_action: "Keep residual memo current; co-own CORE residual matrix with WS-1"
+    residual_findings: [F-003, F-005, F-011, F-012, F-014, F-015, F-016, F-017, F-019, F-020, F-021, F-022, F-025]
+
+  WS6_regulatory_writing:
+    name: Reviewer explanation and regulatory writing
+    gates: [G07, G08]
+    status: AMBER
+    owned_artifacts:
+      - 07_reviewer_explanation/guides/ADRG.md
+      - 07_reviewer_explanation/guides/SDRG.md
+      - 07_reviewer_explanation/guides/BDRG.md
+      - 07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md
+      - docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md
+      - 07_reviewer_explanation/analysis_report.md
+    open_risks:
+      - guides_still_repo_voice
+      - G07_not_stage_gated
+      - overclaim_under_interview_pressure
+    required_evidence:
+      - hardened_adrg_sdrg_bdrg
+      - guide_signoff_checklist
+    next_action: "Execute WS6 hardening checklist S1-S3 (ADRG then SDRG then BDRG)"
+    residual_findings: [F-003, F-005, F-019, F-023]
+    packs:
+      - docs/workstreams/WS6_REVIEWER_GUIDE_HARDENING_CHECKLIST.md
+
+  WS7_release_engineering:
+    name: Platform and release engineering
+    gates: [G08, G09]
+    status: GREEN
+    owned_artifacts:
+      - platform/cibuild.py
+      - config/study_manifest.yaml
+      - platform/pipeline_health.json
+      - platform/release_run_manifest/release_run_manifest.json
+      - platform/release_candidate/release_candidate_status.json
+      - renv.lock
+      - config/evidence_layers.yaml
+      - config/delivery_workstreams.yaml
+      - scripts/verify_release.py
+      - scripts/verify_release.sh
+    open_risks:
+      - seal_confused_with_submission
+      - ci_release_job_not_wired
+    required_evidence:
+      - scripts/verify_release.py
+      - ci_release_job
+    next_action: "Wire scripts/verify_release.py into CI; optional evidence snapshot"
+    residual_findings: [F-005, F-025]
+
+priority_queue:
+  - { id: DONE-WS0, workstream: WS0_governance, action: "PRODUCT_CLAIM.md", status: DONE }
+  - { id: DONE-WS5, workstream: WS5_qc_validation, action: "KNOWN_DIFFERENCES_MEMO.md", status: DONE }
+  - { id: DONE-WS3, workstream: WS3_standards_metadata, action: "external validation index", status: DONE }
+  - { id: DONE-WS2, workstream: WS2_statistical_specification, action: "population/endpoint control table", status: DONE_DRAFT }
+  - { id: DONE-WS7-verify, workstream: WS7_release_engineering, action: "verify_release.py", status: DONE }
+  - { id: P1-WS6, workstream: WS6_regulatory_writing, action: "ADRG/SDRG/BDRG hardening S1-S3", status: OPEN }
+  - { id: P1-WS1, workstream: WS1_source_intake, action: "CORE residual matrix CSV", status: OPEN }
+  - { id: P2-WS7-ci, workstream: WS7_release_engineering, action: "CI wire verify_release", status: OPEN }

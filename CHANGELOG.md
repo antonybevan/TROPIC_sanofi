@@ -19,7 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - `tests/test_figure_outputs.R` gates dimensions, completeness, minimum size, and opacity for all
   seven R and six SAS figures.
-- `05_reconciliation/figure_data_reconcile.R` reconciles exact SAS figure exports to R: KM HR/CIs
+- `06_qc_evidence/reconciliation/figure_data_reconcile.R` reconciles exact SAS figure exports to R: KM HR/CIs
   and 32 risk counts, 747 waterfall records, 60 swimmer selections/events, and 730
   exposure-response observations. Forest reconciliation remains a separate 13-subgroup gate.
 - SAS ODA rendering now downloads the exact figure-driving CSVs used by this reconciliation.
@@ -42,7 +42,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **F-02 — ADLB PARAMN.** The old NEUT/PSA/HGB/else=4 scheme collided across analytes and left
   ANCNADIR/ANCRECDY unset. Replaced with a deterministic 1:1 dense-rank over the sorted PARAMCD set
   (SAS + R, symmetric); added AD0111/AD0112 PARAMN checks to `adam_conf_check.R`. ODA-reconciled.
-- **F-03 — ANALYSIS_REPORT.md.** Rewrote the stale provenance/efficacy sections (superseded PH-scaling
+- **F-03 — 07_reviewer_explanation/analysis_report.md.** Rewrote the stale provenance/efficacy sections (superseded PH-scaling
   numbers + "not Guyot / circular" framing) to the current Guyot OS/PFS reconstruction; numbers
   transcribed from the committed TFL tables.
 - **F-04 — ADaM conformance gate.** `adam_conf_check.R` wrote a FAIL status but always exited 0; it now
@@ -58,14 +58,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   `validate_define.py` (defined-but-unreferenced Method/Comment now fail the gate; 346 checks).
 - **F-09 — ADEX `AVISITN` + `PARAMN`.** Added the AVISIT numeric companion (ALL CYCLES→0, CYCLE n→n)
   and a 1:1 PARAMN (SAS + R + spec + define). ODA-reconciled. Spec is now 159 variables.
-- **F-13** — widened the CI R-lint gate to seven source dirs (00_specifications, 01_raw_source,
-  03_validation_r, 05_reconciliation, 07_define_xml, 09_tfl, tests); `06_telemetry/` excluded with a
+- **F-13** — widened the CI R-lint gate to seven source dirs (03_metadata/adam, 01_source_data,
+  04_analysis_datasets/programs/r, 06_qc_evidence/reconciliation, 03_metadata/define, 05_outputs/tfl, tests); `platform/` excluded with a
   documented reason (compact engine-script style, mechanical-only lints). Wired `ct_cross_validation.py`
   into CI (skips cleanly without the CDISC Library key/cache).
 
 ### Changed
 - **F-10 — ADCM OCCDS date naming.** Renamed `CMSTDT/CMENDT/CMSTDY` → `ASTDT/AENDT/ASTDY` (SAS + R +
-  spec + define + the reconciliation key in `study_manifest.yaml`). ODA-reconciled on the new key.
+  spec + define + the reconciliation key in `config/study_manifest.yaml`). ODA-reconciled on the new key.
 - **F-07** — evidence snapshot refreshed to the 2026-06-24 GREEN ODA run (22 stages); define.xml restamped.
 - Removed self-aggrandizing "Principal clinical-data-engineer / FDA-submission-lead" framing from
   `REPO_AUDIT_2026-06-21.md` (+ a dated "superseded" banner) and README.
@@ -78,23 +78,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 > standards-derived codelists and the checks that keep it from drifting.
 
 ### Added
-- **`06_telemetry/ct_cross_validation.py`** — validates the ADaM spec `Codelists` sheet against
+- **`platform/ct_cross_validation.py`** — validates the ADaM spec `Codelists` sheet against
   authoritative CDISC Controlled Terminology for the pinned package (`2026-03-27`). Sources CT from
   the **CDISC Library API** when `CDISC_LIBRARY_API_KEY` is set (`GET /mdr/ct/packages/{package}`),
   otherwise from the pinned offline CORE cache, so it is reproducible without network/credentials.
   Links each codelist by NCI code → name → value-set (all-numeric sets excluded as sponsor codes);
   fails on a high-confidence link to a non-extensible CDISC codelist carrying an invalid submission
   value, and reports ambiguous links, sponsor-defined codelists, and traceability gaps.
-- **NCI controlled-terminology drift check** in `07_define_xml/check_define_conformance.R` — the
+- **NCI controlled-terminology drift check** in `03_metadata/define/check_define_conformance.R` — the
   spec→define gate now also compares the NCI codelist code and per-term codes between the spec
   `Codelists` sheet and the define.xml `<Alias Context="nci:ExtCodeID">` entries, so any spec/define
   CT divergence fails the build. The self-test injects and detects codelist-code drift.
 
 ### Changed
-- **`00_specifications/ADaM_spec.xlsx`** — populated the NCI Codelist/Term codes for the two
+- **`03_metadata/adam/ADaM_spec.xlsx`** — populated the NCI Codelist/Term codes for the two
   standards-derived codelists: `CL.NY` → C66742 (Y=C49488, N=C49487) and `CL.SEX` → C66731
   (M=C20197, F=C16576). Sponsor-defined codelists correctly carry no NCI code.
-- **`07_define_xml/define.xml`** — the `CL.NY` and `CL.SEX` codelists and their terms now expose the
+- **`03_metadata/define/define.xml`** — the `CL.NY` and `CL.SEX` codelists and their terms now expose the
   NCI codes as `<Alias Context="nci:ExtCodeID">` elements (codelist and item level), giving
   reviewers/Pinnacle 21 a machine link to CDISC CT 2026-03-27. Remains XSD-valid (Define-XML 2.1 +
   ARM) and passes the spec→define conformance gate.
@@ -109,7 +109,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 > their R `*_v.xpt`, `pipeline_health.json` GREEN / `provenance_guard.passed: true`).
 
 ### Added
-- **Provenance guard in `write_telemetry()`** (`06_telemetry/cibuild.py`) — an `oda`/`local`
+- **Provenance guard in `write_telemetry()`** (`platform/cibuild.py`) — an `oda`/`local`
   run is only finalized GREEN when **both** hold: every `*_prod.xpt` is byte-distinct from its R
   `*_v.xpt` (the on-disk signature of independent double programming), **and** the SDTM manifest
   SHA recorded for the run matches the current local SDTM source (the production data was built
@@ -123,13 +123,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Simulation flag in the machine-readable reconciliation status** — `cross_lang_audit.R` now
   emits `"simulated"` and `"execution_mode"` into `reconciliation_status.json`; the orchestrator
   exports `TROPIC_SAS_MODE` so a tautological simulated PASS is distinguishable from a genuine one.
-- **eCTD backbone wired into the gated DAG as stages 21–22** (`study_manifest.yaml`) — eCTD
+- **eCTD backbone wired into the gated DAG as stages 21–22** (`config/study_manifest.yaml`) — eCTD
   Backbone + STF (`build_ectd_backbone.py`) and Materialize eCTD Sequence (`materialize_ectd.py`),
   previously built outside the manifest/CI and prone to drift from `m5/`. They now run on every
   full build and in CI (via `cibuild.py --demo`), each gated by its own exit code.
 - **ADaM CORE conformance executed** — the executable ADaM custom rules
   (`TROPIC-ADAM-101…107`) now run against the actual ADaM XPTs via `run_core_conformance.sh`
-  (report `06_telemetry/conformance/core_adam_report.json`, **0 issues / 7 rules**), upgrading
+  (report `platform/conformance/core_adam_report.json`, **0 issues / 7 rules**), upgrading
   the prior "rule YAML is well-formed" CI check to a real rule execution. CORE publishes no full
   ADaM rule pack, so full FDA-validator ADaM coverage remains out of scope.
 - **`.gitignore`** — `.env`, `*.env`, `**/.env` so a stray dotenv anywhere in the tree can
@@ -141,7 +141,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 - **Pipeline is now 22 stages** (was 20); the eCTD Module 5 packaging stays at stage 20, with
   the backbone/materialize stages appended at 21–22. Docs updated to match (`README.md`).
-- **`08_reviewers_guides/SDRG.md` §4.5** — documents the four `v_sdtm_validation` partial/dirty
+- **`07_reviewer_explanation/guides/SDRG.md` §4.5** — documents the four `v_sdtm_validation` partial/dirty
   date `[WARNING]`s (CM/LB/LS/PN) as expected manifestations of the source PDS date precision,
   not defects.
 
@@ -158,7 +158,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   metadata cache already held the target CT (`2026-03-27`). Both credentials live only in
   git-ignored working-tree files and were never committed.
 - Two reviewed items required no change: CLINSITE is a BIMO (not ADaM) dataset, already fully
-  documented in `08_reviewers_guides/BDRG.md`, so its absence from the ADaM Define-XML is correct;
+  documented in `07_reviewer_explanation/guides/BDRG.md`, so its absence from the ADaM Define-XML is correct;
   and the 20 SDTM CORE findings are already triaged in `SDRG.md §5`.
 
 ## [3.19.0] - 2026-06-22 — Machine-readable export layer wired into the pipeline + CI
@@ -169,7 +169,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 > data-free generator additionally gated in CI.
 
 ### Added
-- **Export layer as gated post-stages 17–19** (`study_manifest.yaml`) — Dataset-JSON v1.1
+- **Export layer as gated post-stages 17–19** (`config/study_manifest.yaml`) — Dataset-JSON v1.1
   (`export_datasetjson.py`, stage 17), Analysis Results Standard v1.0 (`build_ars.py`,
   stage 18), and USDM v3.0 (`build_usdm.py`, stage 19). They run after the data/spec
   conformance gates and before eCTD packaging. Non-gated is strict in the full pipeline:
@@ -178,14 +178,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **USDM data-free CI gate** (`.github/workflows/ci.yml`) — `build_usdm.py` is built from
   the `usdm_model` classes with no patient data, so it produces a real signal in the
   data-free runner; the `usdm` dependency is pinned to **`==0.66.0`** for reproducibility.
-  The data-dependent Dataset-JSON/ARS generators read `04_adam/*_prod.xpt` and are
+  The data-dependent Dataset-JSON/ARS generators read `04_analysis_datasets/adam/*_prod.xpt` and are
   enforced in the full pipeline run instead of CI.
-- **`06_telemetry/OFFLINE_LAYER_RUNBOOK.md`** — standalone reproduction of the three
+- **`docs/runbooks/OFFLINE_LAYER_RUNBOOK.md`** — standalone reproduction of the three
   export layers outside the orchestrator.
 
 ### Changed
 - **Pipeline is now 20 stages** (was 17); eCTD Module 5 packaging moves to stage 20. Docs
-  updated to match (`README.md`, `ANALYSIS_REPORT.md`, `08_reviewers_guides/TRACEABILITY_MATRIX.md`).
+  updated to match (`README.md`, `07_reviewer_explanation/analysis_report.md`, `07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md`).
 
 ### Fixed
 - **Reconstructed CbzP synthetic arm — flag-vs-survival artifact** (`reconstruct_cbzp_arm.R`).
@@ -227,14 +227,14 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
 > single-programmer limitation legible rather than a blanket gap.
 
 ### Added
-- **`08_reviewers_guides/RISK_BASED_VALIDATION.md`** — validation tiers (T1 Critical →
+- **`07_reviewer_explanation/guides/RISK_BASED_VALIDATION.md`** — validation tiers (T1 Critical →
   T4 Structural), an output→tier→evidence map, and the honest single-author reframe.
   Ties in Finding #4: primary efficacy (OS, PFS) + ADSL now carry **three** independent
   derivation engines (SAS · R · admiral), secondary/derived carry two, metadata is
   automated conformance — validation depth escalates with risk.
 
 ### Changed
-- **`08_reviewers_guides/ADRG.md` §6** — adds a risk-allocation lead-in pointing to the
+- **`07_reviewer_explanation/guides/ADRG.md` §6** — adds a risk-allocation lead-in pointing to the
   new plan; the section continues to document the underlying mechanics.
 
 ## [3.16.0] - 2026-06-20 — admiral third derivation track for ADSL + ADTTE (Finding #4)
@@ -245,16 +245,16 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
 > to a third built on the community-maintained reference implementation.
 
 ### Added
-- **`03_validation_r/admiral_adsl.R`** — admiral ADSL core re-derivation
-  (`derive_vars_merged`, `derive_var_trtdurd`) → `04_adam/adsl_admiral.xpt`. All 16
+- **`04_analysis_datasets/programs/r/admiral_adsl.R`** — admiral ADSL core re-derivation
+  (`derive_vars_merged`, `derive_var_trtdurd`) → `04_analysis_datasets/adam/adsl_admiral.xpt`. All 16
   admiral-derivable core variables reconcile **0-diff** vs `adsl_prod.xpt` (n=371).
-- **`03_validation_r/admiral_adtte.R`** — admiral ADTTE OS + PFS via
-  `derive_param_tte()` with `event_source`/`censor_source` → `04_adam/adtte_admiral.xpt`.
+- **`04_analysis_datasets/programs/r/admiral_adtte.R`** — admiral ADTTE OS + PFS via
+  `derive_param_tte()` with `event_source`/`censor_source` → `04_analysis_datasets/adam/adtte_admiral.xpt`.
   OS and PFS reconcile **0-diff** vs `adtte_prod.xpt` on STARTDT/ADT/AVAL/CNSR/EVNTDESC/CNSDTDSC.
-- **`05_reconciliation/admiral_reconcile.R`** — scoped, exact (0-tolerance) diff →
-  `06_telemetry/admiral_reconciliation_status.json` (overall **PASS**). Graceful
+- **`06_qc_evidence/reconciliation/admiral_reconcile.R`** — scoped, exact (0-tolerance) diff →
+  `platform/admiral_reconciliation_status.json` (overall **PASS**). Graceful
   degradation: records `not_available` and exits 0 when admiral outputs are absent.
-- **`06_telemetry/ADMIRAL_RECONCILIATION.md`** — track documentation, scope, and the
+- **`06_qc_evidence/reconciliation/ADMIRAL_RECONCILIATION.md`** — track documentation, scope, and the
   PFS finding (admiral's event-precedence / latest-censor model vs the study's
   NACT-before-progression censoring; faithful fix pre-derives the single PFS censor
   date per the SAP). Initially surfaced as 39 censor-date differences (CNSR already
@@ -270,28 +270,28 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
 ## [3.15.0] - 2026-06-20 — SDTMIG 3.4 conformance uplift + current CT + authoritative CORE run (terminal-session remediation)
 
 > **Context.** Executes the SAS/CT/validator-gated submission-standard items from
-> `06_telemetry/SUBMISSION_STANDARDS_REMEDIATION.md` and the FDA-reviewer audit
+> `06_qc_evidence/audit/run_records/SUBMISSION_STANDARDS_REMEDIATION.md` and the FDA-reviewer audit
 > (T-1/T-2/m-1/m-2/M-2), now that the CDISC Library key, populated CORE cache, network, and
-> R/haven are available. The pristine source SDTM (`01_raw_source/real_sdtm/`, SDTMIG 3.1.1) is
+> R/haven are available. The pristine source SDTM (`01_source_data/real_sdtm/`, SDTMIG 3.1.1) is
 > **never modified** — a derived 3.4 layer is produced deterministically and packaged.
 
 ### Added
-- **`06_telemetry/uplift_sdtm_34.R`** — SDTMIG 3.1.1→3.4 data uplift (read pristine source →
+- **`platform/uplift_sdtm_34.R`** — SDTMIG 3.1.1→3.4 data uplift (read pristine source →
   write XPT v5 to the m5 tabulation copy + CORE staging). Derives `DM.AGE` from the de-identified
   `AGEGRP` (`>=85` floored, cap flagged in `SUPPDM`), `ACTARM`/`ACTARMCD`, `AE.AESOC=AEBODSYS`,
   `EPOCH` (VISIT-based, SE absent), `EX.EXENDY`; relocates the non-standard week-offset timing
   (`AESTWK`/`AEENWK`/…, `DSSTWK`/…) to `SUPPAE`/`SUPPDS`; drops redundant `SUBJID`; enriches `TS`
   (`NARMS`/`ACTSUB`/`SSTDTC`/`AGEMIN`); builds `TA`; aligns variable order/labels to the CDISC library.
-- **`07_define_xml/uplift_define_34.py`** — regenerates `define_sdtm.xml` to **SDTMIG 3.4 + CT
+- **`03_metadata/define/uplift_define_34.py`** — regenerates `define_sdtm.xml` to **SDTMIG 3.4 + CT
   2026-03-27**, syncing ItemRefs/ItemDefs to the uplifted data (removes phantom `ARM2`/`ARMA`/…),
   adding `IG.TS`/`IG.TA`/`IG.SUPPAE`/`IG.SUPPDS`. XSD-VALID (Define 2.1); 315 ref-integrity checks PASS. Idempotent.
-- **`06_telemetry/conformance/CORE_SDTM34_RUN_RECORD.md`** + `core_sdtm34_report.json` —
+- **`platform/conformance/CORE_SDTM34_RUN_RECORD.md`** + `core_sdtm34_report.json` —
   authoritative CDISC CORE 0.16.0 run at `-s sdtmig -v 3.4`. All targeted structural rules cleared
   (AESOC, AGE, EPOCH, EXENDY, non-standard→SUPP, var order, types, labels, whitespace); residual
   findings classified (inherent-de-id / real-source-data / cross-domain-no-FA / engine-internal) —
   none are programming defects; real-data findings (AESER, VSSTRESC) are not overwritten.
-- **`06_telemetry/materialize_ectd.py`** — closes remediation **5a**: copies each `m5/` deliverable
-  to its `index.xml` `xlink:href` under `11_ectd/0000/` and re-verifies every leaf MD5 (89/89; all
+- **`platform/materialize_ectd.py`** — closes remediation **5a**: copies each `m5/` deliverable
+  to its `index.xml` `xlink:href` under `08_submission_package/ectd/0000/` and re-verifies every leaf MD5 (89/89; all
   90 hrefs resolve in-place; in-sequence SDTM define is the 3.4 copy). Sequence is now self-contained.
 - **eCTD now DTD-VALID** — with the official DTDs in `util/dtd/` (`ich-ectd-3-2`, `ich-stf-v2-2`,
   `us-regional-v3-3`), all three backbone XML files pass `xmllint --noout --valid`. Fixes the
@@ -300,15 +300,15 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
   ICH STF v2.2. All application identifiers are labelled `EXAMPLE` placeholders.
 
 ### Security / data hygiene
-- **`.gitignore`** — CORE conformance reports (`06_telemetry/conformance/core_*_report.json`) now
+- **`.gitignore`** — CORE conformance reports (`platform/conformance/core_*_report.json`) now
   ignored: the 3.4 report's per-record findings (AESER/VSSTRESC/RELREC) emit subject `USUBJID` rows
   (371). Prior tracked reports (which held no subject IDs) untracked for a consistent data-free
   policy; the tracked evidence is the `*_RUN_RECORD.md` (no patient data). eCTD materialized payload
   (datasets + report binaries) ignored as a reproducible copy of `m5/`.
 
 ### Changed
-- **`07_define_xml/define.xml`** (+ m5 copies) — ADaM CT bumped `2024-03-29`→`2026-03-27`.
-- **`08_reviewers_guides/SDRG.md`** — new §5 documents the 3.4 uplift, EPOCH derivation rule, and CORE residual classification; header now declares submission SDTMIG 3.4 / source 3.1.1.
+- **`03_metadata/define/define.xml`** (+ m5 copies) — ADaM CT bumped `2024-03-29`→`2026-03-27`.
+- **`07_reviewer_explanation/guides/SDRG.md`** — new §5 documents the 3.4 uplift, EPOCH derivation rule, and CORE residual classification; header now declares submission SDTMIG 3.4 / source 3.1.1.
 - Downstream re-synced: SDTM Dataset-JSON regenerated (35/35 valid); eCTD backbone checksums refreshed.
 
 ### Not done (require real data / org change — audit R-1/R-2/M-3)
@@ -318,17 +318,17 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
 
 > **Context.** Generalises the orchestration/reconciliation engine from a single-study demo
 > toward a study-agnostic, config-driven platform (strategic Findings **I/J**). Pipeline
-> *structure* now lives in a declarative `study_manifest.yaml` (companion to `study_config.yaml`,
+> *structure* now lives in a declarative `config/study_manifest.yaml` (companion to `config/study_config.yaml`,
 > which holds clinical *parameters*), and a second proof study (`DEMO02`) runs end-to-end through
 > the **unchanged** engine. TROPIC's 17-stage DAG is byte-identical to before (golden-verified;
 > full `sim` run GREEN, 8/8 dataset reconciliation PASS).
 
 ### Added
-- **`study_manifest.yaml`** — single source of truth for pipeline *structure*: study identity,
+- **`config/study_manifest.yaml`** — single source of truth for pipeline *structure*: study identity,
   the reconciled datasets (name, business `keys`, validation/SAS programs, `parallel_group`,
   `results_recon` spec), and the infrastructure stages (`pre`/`post`, each with a `runner` and
   optional `gated`/`engine` flags). Captures the `ADAE` and BIMO→`clinsite` naming exceptions
-  declaratively. Loaded by **`06_telemetry/manifest.py`** (pyyaml).
+  declaratively. Loaded by **`platform/manifest.py`** (pyyaml).
 - **Multi-study support** — `cibuild.py --study <name>` runs any study under `studies/<name>/`
   through the same engine: it chdirs into the study root, builds the DAG from that study's
   manifest, and resolves shared engine scripts (manifest `engine: true`) back to the engine root.
@@ -370,7 +370,7 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
 - **Bone Scan Progression (`PARAMCD = BSGRESP`)** — PCWG3 **2+2** rule (Scher 2016), 3-level
   `AVALC`: `PROGRESSION` / `PROGRESSION UNCONFIRMED` / `NO PROGRESSION`. Confirmed `PROGRESSION`
   is the only state that feeds `TTUMOR` (the `A_adtte` PD-date logic already expected this slot).
-  Thresholds (`BONE_PROG_MIN_NEW`, `BONE_PROG_CONFIRM_NEW`) are config-driven via `study_config.yaml`.
+  Thresholds (`BONE_PROG_MIN_NEW`, `BONE_PROG_CONFIRM_NEW`) are config-driven via `config/study_config.yaml`.
   On the real MP arm the strict 2+2 yields **5 PDu / 0 confirmed** — reported honestly, not tuned.
 
 ### Changed / Fixed
@@ -385,7 +385,7 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
   TTPSA, TTSAE, TTUMOR). Full 17-stage pipeline GREEN; dataset reconciliation **8/8 PASS**
   (ADRS FAIL→PASS). Expected downstream shifts confirmed: MP ORR 7.9%→**6.4%** (measurable),
   TTUMOR median 2.3→**2.1 mo**; TTPSA unchanged.
-- **GREEN-ODA evidence badge refreshed** (`06_telemetry/evidence/`, audit C-1): the immutable
+- **GREEN-ODA evidence badge refreshed** (`platform/evidence/`, audit C-1): the immutable
   snapshot + `*_prod`/`*_v` md5 manifest now certify this current ADRS code, not the pre-Finding-B run.
 - **ADRG §4A** documents the integration matrix, the PCWG3 2+2 rule, and the honest 5-PDu/0-confirmed
   result; §4 (`TTUMOR`), README and the traceability matrix updated; m5 copies + `adrg.pdf` resynced.
@@ -398,7 +398,7 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
 > dataset/variable traceability. Pure `define.xml` authoring — no new dependencies.
 
 ### Added
-- **5 new ARM ResultDisplays / AnalysisResults** in `07_define_xml/define.xml` (ARM now
+- **5 new ARM ResultDisplays / AnalysisResults** in `03_metadata/define/define.xml` (ARM now
   **8 ResultDisplays / 10 AnalysisResults**):
   - `RD.EFFICACY.SUBGROUP` / `AR.OS.SUBGROUP` — OS prognostic-subgroup forest (figure **F-12-1**).
   - `RD.EFFICACY.PSA.RESPONSE` / `AR.PSA.BESTPCHG` — PSA best % change waterfall (**F-13-1**).
@@ -426,30 +426,30 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
 > remediation only *reframed* the extract honestly; this one actually *inverts* the direction.
 
 ### Added
-- **Authoritative ADaM specification** `00_specifications/ADaM_spec.xlsx` (CDISC / Pinnacle-21
+- **Authoritative ADaM specification** `03_metadata/adam/ADaM_spec.xlsx` (CDISC / Pinnacle-21
   metacore workbook: Study, Datasets, Variables, ValueLevel, WhereClauses, Codelists, Methods).
-  Loadable via `metacore::spec_to_metacore()` (`03_validation_r/load_spec.R`). Bootstrapped once
-  by `00_specifications/build_spec_seed.R` (documented one-time migration), human-edited master after.
-- **spec → define conformance gate** `07_define_xml/check_define_conformance.R` — asserts every
+  Loadable via `metacore::spec_to_metacore()` (`04_analysis_datasets/programs/r/load_spec.R`). Bootstrapped once
+  by `03_metadata/adam/build_spec_seed.R` (documented one-time migration), human-edited master after.
+- **spec → define conformance gate** `03_metadata/define/check_define_conformance.R` — asserts every
   dataset/variable/label/type/length/order/mandatory/codelist/method in `define.xml` matches the
   spec; exits non-zero on drift. Ships a `--self-test` that injects synthetic drift and confirms
   detection (proves the gate is not a no-op). Latest run **PASS** (7 datasets / 157 variables).
-- **spec → data conformance gate** `03_validation_r/spec_data_checks.R` — checks the produced
-  `04_adam/*_prod.xpt` against the spec with `metatools::check_variables` / `check_ct_data` and
+- **spec → data conformance gate** `04_analysis_datasets/programs/r/spec_data_checks.R` — checks the produced
+  `04_analysis_datasets/adam/*_prod.xpt` against the spec with `metatools::check_variables` / `check_ct_data` and
   `xportr::xportr_type`/`xportr_length`. Independent (non-circular) verification. Latest run
-  **PASS** across all 7 datasets. Reports in `06_telemetry/conformance/spec_{define,data}_conformance.json`.
+  **PASS** across all 7 datasets. Reports in `platform/conformance/spec_{define,data}_conformance.json`.
 - Pipeline **Stages 15–16** (cibuild) and a CI step run both gates; `metacore`, `metatools`,
   `writexl` added to `renv.lock`.
 
 ### Changed / Fixed
-- **Variable-label artifacts are now spec-sourced.** `06_telemetry/gen_adam_labels.R` derives
-  `03_validation_r/adam_var_labels.csv` (R track) and `02_production_sas/_adam_labels.sas` (SAS
+- **Variable-label artifacts are now spec-sourced.** `platform/gen_adam_labels.R` derives
+  `04_analysis_datasets/programs/r/adam_var_labels.csv` (R track) and `04_analysis_datasets/programs/sas/_adam_labels.sas` (SAS
   track) from the spec — replacing the define-sourced `gen_adam_labels.py`. Label content is
   **byte-identical** to before (no output regression); only the provenance flips define → spec.
 - `package_ectd.py` now ships `ADaM_spec.xlsx` + the spec→define conformance report instead of
   the retired extract. eCTD packaging is now Stage 17 (was 15).
-- **Retired** `06_telemetry/generate_adam_specs.py`, `06_telemetry/gen_adam_labels.py`, and
-  `00_specifications/ADaM_Define_Extract.xlsx` (the circular define → extract path).
+- **Retired** `platform/generate_adam_specs.py`, `platform/gen_adam_labels.py`, and
+  `03_metadata/adam/ADaM_Define_Extract.xlsx` (the circular define → extract path).
 - **ADRG §6.1** added documenting the inversion and the two gates.
 
 ## [3.10.0] - 2026-06-17 — CDISC CORE conformance + Define-XML hardening
@@ -461,14 +461,14 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
 > are authored in CORE format and run via `--local-rules`.
 
 ### Added
-- **Executable ADaM conformance rules in CORE YAML** (`06_telemetry/conformance_rules/adam/`,
+- **Executable ADaM conformance rules in CORE YAML** (`platform/conformance_rules/adam/`,
   7 rules across all 7 ADaM datasets) run via CORE `--local-rules` → **7/7 SUCCESS** with the
   Define-XML engaged (`Define_XML_Version 2.1.0`). Fills the gap where CDISC ships no ADaM pack.
-- **CORE runner** (`06_telemetry/run_core_conformance.sh`) — reproducible setup (venv, engine,
+- **CORE runner** (`platform/run_core_conformance.sh`) — reproducible setup (venv, engine,
   library-metadata cache via `CDISC_LIBRARY_API_KEY`, SDTM XPT conversion, SDTM + ADaM runs).
-- **CI gate** (`06_telemetry/validate_core_rules.py`) — rule-pack well-formedness check (no API
+- **CI gate** (`platform/validate_core_rules.py`) — rule-pack well-formedness check (no API
   key/data needed), wired into `.github/workflows/ci.yml`.
-- **CORE run evidence** (`06_telemetry/conformance/`) — `CORE_RUN_RECORD.md` + redacted SDTM/ADaM
+- **CORE run evidence** (`platform/conformance/`) — `CORE_RUN_RECORD.md` + redacted SDTM/ADaM
   JSON reports (per-record subject-level `Issue_Details` stripped).
 
 ### Changed / Fixed
@@ -494,11 +494,11 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
 > (**8/8** domains incl. CLINSITE), results reconciliation PASS (6/6 parameters), SAS log 0 ERROR.
 
 ### Added
-- **Committed GREEN-ODA evidence badge (`06_telemetry/evidence/`, C-1).** Immutable snapshot of a
+- **Committed GREEN-ODA evidence badge (`platform/evidence/`, C-1).** Immutable snapshot of a
   real `oda`-mode run (pipeline_health, both reconciliation verdicts, and an md5 manifest showing
   every `*_prod.xpt` (SAS) is byte-distinct from its `*_v.xpt` (R) yet reconciles cell-identical).
   Stored separately from live telemetry so a later `sim` run can never clobber the proof.
-- **BIMO Data Reviewer's Guide (`08_reviewers_guides/BDRG.md`, C-5).** Documents the `clinsite`
+- **BIMO Data Reviewer's Guide (`07_reviewer_explanation/guides/BDRG.md`, C-5).** Documents the `clinsite`
   scope honestly against the FDA BIMO TCG Appendix-3 (~39-var) structure, the synthetic-PI
   disclosure, and the ICH E9 population definitions.
 
@@ -529,7 +529,7 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
 > Module 5 directory structure.
 
 ### Added
-- **eCTD Module 5 packaging orchestrator (`06_telemetry/package_ectd.py`).** Dynamically compiles SDTM datasets into v5 `.xpt` files, copies/renames ADaM datasets to strip `_prod` suffixes, generates PDF formatted reviewer guides (ADRG/SDRG) and CSR (with outputs in appendices), creates a blank CRF placeholder, and co-locates Define-XML metadata files.
+- **eCTD Module 5 packaging orchestrator (`platform/package_ectd.py`).** Dynamically compiles SDTM datasets into v5 `.xpt` files, copies/renames ADaM datasets to strip `_prod` suffixes, generates PDF formatted reviewer guides (ADRG/SDRG) and CSR (with outputs in appendices), creates a blank CRF placeholder, and co-locates Define-XML metadata files.
 - **Git protection for deliverables.** Added `m5/` directory to `.gitignore` to ensure the generated eCTD package remains an ephemeral build artifact.
 
 ## [3.7.0] - 2026-06-16 — Results-level double-programming, confirmed ORR, output gate
@@ -541,7 +541,7 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
 > domains), results reconciliation PASS (6/6 parameters).
 
 ### Added
-- **Numerical results reconciliation (Stage 13, `05_reconciliation/results_reconcile.R`).** SAS
+- **Numerical results reconciliation (Stage 13, `06_qc_evidence/reconciliation/results_reconcile.R`).** SAS
   computes MP-arm survival statistics independently with `PROC LIFETEST` (KM median / events / N),
   exported to `tte_stats_prod.csv`; R recomputes with `survival::survfit` and the two are diffed
   numerically (median tol 1 day; events/N exact). Verdict in `results_reconciliation_status.json`
@@ -573,12 +573,12 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
 ## [3.6.2] - 2026-06-14 — ADaM conformance remediation (129 findings → 0)
 
 > **Context.** With CORE shipping no ADaM rules and Pinnacle 21 Community 4.1.0 engine-expired under
-> this environment's clock (`06_telemetry/p21_adam_runrecord.md`), a transparent **ADaMIG v1.3-aligned
-> conformance gate** (`06_telemetry/run_adam_conformance.sh`) was built to run in-environment. Its
+> this environment's clock (`06_qc_evidence/conformance/p21_adam_runrecord.md`), a transparent **ADaMIG v1.3-aligned
+> conformance gate** (`platform/run_adam_conformance.sh`) was built to run in-environment. Its
 > first pass returned **129 findings (116 Error, 13 Warning)** — real metadata-conformance gaps that
 > value-level `diffdf` reconciliation cannot see. This release fixes **all** of them.
 
-### Fixed — define.xml (`07_define_xml/define.xml`, still XSD-valid + 273 referential checks)
+### Fixed — define.xml (`03_metadata/define/define.xml`, still XSD-valid + 273 referential checks)
 - **Variable-name mismatches vs data:** ADLB `lbdy` → **`LBDY`**, ADRS `VISIT` → **`AVISIT`**.
 - **`CL.PARAMCD` completed:** added the **33** missing PARAMCD coded values (ADEX/ADLB/ADRS) with
   real PARAM decodes — 14 → **47** terms; clears all "value not in codelist" errors.
@@ -588,14 +588,14 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
 
 ### Fixed — variable labels applied symmetrically in **both** tracks (was the bulk: 109 findings)
 - ADaM datasets previously shipped almost unlabelled (ADSL 3/42 labelled). A single label spec is now
-  **generated from define.xml** (`06_telemetry/gen_adam_labels.py`) and applied in both tracks:
-  - **SAS production:** `%lbl_<ds>` macros (`02_production_sas/_adam_labels.sas`) applied in
+  **generated from define.xml** (`platform/gen_adam_labels.py`) and applied in both tracks:
+  - **SAS production:** `%lbl_<ds>` macros (`04_analysis_datasets/programs/sas/_adam_labels.sas`) applied in
     `U_xpt_export.sas` before XPT export.
-  - **R validation:** `config_study.R::write_xpt_v` applies the same labels (`03_validation_r/adam_var_labels.csv`).
+  - **R validation:** `config_study.R::write_xpt_v` applies the same labels (`04_analysis_datasets/programs/r/adam_var_labels.csv`).
   - Result: **155/155 variables labelled** in every `*_prod.xpt` and `*_v.xpt`.
 
 ### Verified (real `oda` run)
-- **ADaM conformance gate: PASS — 0 Error / 0 Warning** (was 116/13); `06_telemetry/adam_conformance_report.md`.
+- **ADaM conformance gate: PASS — 0 Error / 0 Warning** (was 116/13); `06_qc_evidence/conformance/adam_conformance_report.md`.
 - Labels changed no values: **reconciliation still zero-diff** across all 7 domains; SAS log remains
   **0 ERROR / 0 WARNING** (the label statements reference only existing variables); pipeline **GREEN**.
 
@@ -691,11 +691,11 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
 - **ARM expanded (#7):** from 1 result display to **3** (added *Secondary Time-to-Event Analyses*
   for TTPSA/TTUMOR and *TEAE Summary* for ADAE), 5 `AnalysisResult`s, with the backing WhereClauses.
 - **TFL survival-stats snapshot test (#8):** `tests/test_tfl_stats.R` locks the stratified Cox /
-  log-rank recipe (extracted to `09_tfl/tfl_stats.R`, shared with `tfl_generation.R`) against
+  log-rank recipe (extracted to `05_outputs/tfl/tfl_stats.R`, shared with `tfl_generation.R`) against
   deterministic fixtures; wired into `cibuild.py --demo`.
-- **Pinnacle 21 / CDISC CORE runbook (#9):** `07_define_xml/P21_RUNBOOK.md` (turn-key commands;
+- **Pinnacle 21 / CDISC CORE runbook (#9):** `03_metadata/define/P21_RUNBOOK.md` (turn-key commands;
   the business-rule layer remains data-gated and is not faked).
-- **Portfolio visibility (#6):** the rendered TFL gallery (`09_tfl/output/tables/` and `09_tfl/output/figures/`) and the execution
+- **Portfolio visibility (#6):** the rendered TFL gallery (`05_outputs/tfl/output/tables/` and `05_outputs/tfl/output/figures/`) and the execution
   evidence (`pipeline_health.json`, `reconciliation_status.json`) are no longer git-ignored, so a
   reviewer sees the figures/tables and the honest `sas_execution_mode` without a local run.
 
@@ -712,9 +712,9 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
 - **`define.xml` now passes full XSD validation** against the official CDISC Define-XML 2.1 + ARM
   v1.0 schema (`xmllint --noout --schema … define.xml` → *validates*). The previously "offline-only"
   certification step is now **done and reproducible in-repo**: the freely-distributable CDISC schema
-  bundle is vendored under `07_define_xml/schema/` (240 KB, 12 XSDs; ARM entry schema
-  `cdisc-arm-1.0/arm-extension.xsd`), with `07_define_xml/validate_xsd.sh` as the one-command wrapper
-  and `07_define_xml/schema/NOTICE.md` documenting provenance.
+  bundle is vendored under `03_metadata/define/schema/` (240 KB, 12 XSDs; ARM entry schema
+  `cdisc-arm-1.0/arm-extension.xsd`), with `03_metadata/define/validate_xsd.sh` as the one-command wrapper
+  and `03_metadata/define/schema/NOTICE.md` documenting provenance.
 
 ### Fixed (conformance issues the real validator surfaced that the structural gate could not)
 - `<ODM>` was missing the **required `def:Context`** attribute → added (`Submission`).
@@ -730,7 +730,7 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
 ## [3.5.3] - 2026-06-13 — Define-XML Conformance, ARM, Conformance Gate & Reconciliation Hardening
 
 ### Added
-- **Runnable Define-XML conformance gate (`07_define_xml/validate_define.py`).** Self-contained
+- **Runnable Define-XML conformance gate (`03_metadata/define/validate_define.py`).** Self-contained
   (no network) check of the structural + referential-integrity rules a validator enforces: ODM
   root/namespaces, required Study/GlobalVariables/MetaDataVersion/def:Standards/def:DefineVersion,
   every ItemRef/Method/CodeList/WhereClause/ValueList/Comment/ARM reference resolves, leaf↔
@@ -743,7 +743,7 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
   (recorded in git history); passes the conformance gate.
 
 ### Changed
-- **Reconciliation methodology documented precisely (`05_reconciliation/cross_lang_audit.R`).**
+- **Reconciliation methodology documented precisely (`06_qc_evidence/reconciliation/cross_lang_audit.R`).**
   Corrected the stale comment that claimed "ADAE has no AESEQ key" — ADAE retains AESEQ end-to-end
   and is reconciled on the unique key `USUBJID+AESEQ`; only the genuinely keyless domains
   (ADCM/ADLB/ADRS/ADEX) use the multiset test. Documented the **residual limitation** explicitly:
@@ -758,7 +758,7 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
   ODM-namespaced define because its XPath is not namespace-aware — see Known below.)
 
 ### Fixed (Define-XML namespace re-architecture)
-- **Re-architected `07_define_xml/define.xml` to conformant Define-XML 2.1.** The document
+- **Re-architected `03_metadata/define/define.xml` to conformant Define-XML 2.1.** The document
   previously used a non-spec `<Define>` root with the **def/v2.1 namespace as default**, placing the
   entire structural backbone (`ItemGroupDef`/`ItemDef`/`ItemRef`/`CodeList`/`MethodDef`) in the wrong
   namespace — it parsed as XML but **any Define-XML validator / Pinnacle 21 / CDISC CORE would reject
@@ -776,12 +776,12 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
     WhereClause/ValueList/Comment reference + leaf/ArchiveLocationID); exact content parity vs. the
     prior file (154 ItemDefs, 7 groups, 7 codelists, 14 methods, 26 codelist items — none lost).
     Full XSD validation against `define2-1-0.xsd` is to be run offline (schema host unreachable in CI):
-    `xmllint --noout --schema define2-1-0.xsd 07_define_xml/define.xml`.
+    `xmllint --noout --schema define2-1-0.xsd 03_metadata/define/define.xml`.
   - The re-architecture was applied by a one-shot transform (recorded in git history); the reusable
-    `07_define_xml/validate_define.py` conformance gate remains in the repo for ongoing checks.
+    `03_metadata/define/validate_define.py` conformance gate remains in the repo for ongoing checks.
 
 ### Known (separate, pre-existing)
-- `07_define_xml/define2-1.xsl` now parses (CDATA fix above) but renders blank against the conformant
+- `03_metadata/define/define2-1.xsl` now parses (CDATA fix above) but renders blank against the conformant
   define because its XPath is not ODM-namespace-aware. The bundled custom stylesheet should be replaced
   with the official CDISC `define2-1.xsl`, which is namespace-aware and pairs with the ODM structure;
   rewriting the custom one's XPath is not worthwhile for an artifact slated for replacement.
@@ -789,17 +789,17 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
 ## [3.5.2] - 2026-06-12 — Resilient ODA Execution (Broker + Idempotent Seed)
 
 ### Added
-- **`06_telemetry/oda_broker.py` — connection broker** (single source of truth for connecting to
+- **`platform/oda_broker.py` — connection broker** (single source of truth for connecting to
   ODA). Replaces blind retries with: status-gated **full-jitter exponential backoff** within a
   wall-clock budget; an **error taxonomy** that fails fast on `AUTH`/`CONFIG_ENCRYPTION` and only
   retries transient classes; **slot hygiene** (single-flight lock + orphan sweep + guaranteed
   teardown) to stop orphaned ODA workspace sessions; a **live nonce probe** so
   `sas_execution_mode='oda'` is *earned*, never asserted from a bare connection; and an attempt
   **ledger** (`oda_status.json`) feeding `recommend_window()`.
-- **`06_telemetry/seed_sdtm.py` — idempotent, integrity-checked SDTM seeding (Job A).** Computes a
+- **`platform/seed_sdtm.py` — idempotent, integrity-checked SDTM seeding (Job A).** Computes a
   per-dataset `sha256`/`nrows` manifest; uploads only on mismatch; re-reads ODA row counts to
   detect a half-upload; writes the manifest sentinel **last** (transactional). `--force` overrides.
-- **`06_telemetry/test_oda_broker.py`** — 10 unit tests (injected fakes; no Java/network) covering
+- **`platform/test_oda_broker.py`** — 10 unit tests (injected fakes; no Java/network) covering
   earned-mode-via-probe, teardown on failed spawn, fail-fast classes, jittered backoff, the error
   taxonomy, idempotent seed, and unverified-library detection.
 - **Extended `pipeline_health.json` contract:** on genuine ODA success records `oda_endpoint`,
@@ -818,7 +818,7 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
 ## [3.5.1] - 2026-06-12 — ODA Efficiency & Reproducibility Hardening
 
 ### Added
-- **Incremental SDTM upload to ODA (`06_telemetry/cibuild.py`).** Stage 10 now uploads only
+- **Incremental SDTM upload to ODA (`platform/cibuild.py`).** Stage 10 now uploads only
   the SDTM files that are **missing or changed on ODA** (compared by byte size against the
   persistent ODA `$HOME`), instead of re-pushing the full ~200 MB every run. On an unchanged
   run this skips the entire upload, cutting a genuine real-SAS run from ~6–16 min to ~1–2 min.
@@ -830,35 +830,35 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
   spawned, so a transient ODA timeout no longer fails the whole pipeline.
 - **`--force-upload-sdtm`** flag to force a full SDTM re-upload after a source-data refresh.
 - **ODA SAS log capture:** the full IOM log is written to
-  `02_production_sas/oda_master_driver.log`; `WARNING:` lines are surfaced and `ERROR:` lines
+  `04_analysis_datasets/programs/sas/oda_master_driver.log`; `WARNING:` lines are surfaced and `ERROR:` lines
   fail the build.
-- **`06_telemetry/ODA_GUIDE.md`:** operator guide for the optimized real-SAS workflow — Java
+- **`docs/runbooks/ODA_GUIDE.md`:** operator guide for the optimized real-SAS workflow — Java
   (JRE) prerequisite, the upload cost model, run commands, and how to confirm
   `sas_execution_mode == 'oda'` (genuine double-programming) vs `sim` (tautological).
 
 ### Fixed
-- **`yaml` now pinned in `renv.lock`** (v2.3.12). `config_study.R` reads `study_config.yaml`
+- **`yaml` now pinned in `renv.lock`** (v2.3.12). `config_study.R` reads `config/study_config.yaml`
   via `yaml::read_yaml()`, but the package was absent from the lockfile, so a clean clone
   running `renv::restore()` would fail at config load. Reproducibility path restored.
-- **Generated SAS config untracked.** `02_production_sas/00_config_generated.sas` is produced
-  on every run from `study_config.yaml`; it is now `.gitignore`d so it no longer shows as a
+- **Generated SAS config untracked.** `04_analysis_datasets/programs/sas/00_config_generated.sas` is produced
+  on every run from `config/study_config.yaml`; it is now `.gitignore`d so it no longer shows as a
   spurious working-tree change after each pipeline execution.
 
 ## [3.5.0] - 2026-06-12 — Comprehensive Remediation & Optimization
 
 ### Added
-- **Dynamic Configuration Generation:** Introduced `study_config.yaml` as the single source of truth for all study-level constants (imputation defaults, windows, thresholds, treatment codes, study IDs). Created `06_telemetry/generate_config.py` to auto-generate SAS `%let` variables in `02_production_sas/00_config_generated.sas`, and modified `03_validation_r/config_study.R` to load the constants dynamically using R `yaml`.
-- **Parallel Orchestration:** Parallelized independent validation stages (Stages 4 to 8) in `06_telemetry/cibuild.py` using `concurrent.futures.ProcessPoolExecutor` with a `--serial` fallback option.
-- **SDTM Define-XML:** Authored `07_define_xml/define_sdtm.xml` (Define-XML 2.1) describing the consumed SDTM domains (DM, AE, EX, CM, LB, DS, VS, LS, PN) and their supplemental datasets.
-- **Reproducibility Disclosures:** Added a "Known limitations & deferred items" section to `REPRODUCIBILITY.md` detailing Pinnacle 21, ODA SAS credentials, circular Guyot KM reconstruction checks, and week-precision event dates.
+- **Dynamic Configuration Generation:** Introduced `config/study_config.yaml` as the single source of truth for all study-level constants (imputation defaults, windows, thresholds, treatment codes, study IDs). Created `platform/generate_config.py` to auto-generate SAS `%let` variables in `04_analysis_datasets/programs/sas/00_config_generated.sas`, and modified `04_analysis_datasets/programs/r/config_study.R` to load the constants dynamically using R `yaml`.
+- **Parallel Orchestration:** Parallelized independent validation stages (Stages 4 to 8) in `platform/cibuild.py` using `concurrent.futures.ProcessPoolExecutor` with a `--serial` fallback option.
+- **SDTM Define-XML:** Authored `03_metadata/define/define_sdtm.xml` (Define-XML 2.1) describing the consumed SDTM domains (DM, AE, EX, CM, LB, DS, VS, LS, PN) and their supplemental datasets.
+- **Reproducibility Disclosures:** Added a "Known limitations & deferred items" section to `00_governance/REPRODUCIBILITY.md` detailing Pinnacle 21, ODA SAS credentials, circular Guyot KM reconstruction checks, and week-precision event dates.
 
 ### Changed
-- **TFL Graphic & Count Refactoring:** Extracted a unified, vectorized `render_km()` helper in `09_tfl/tfl_generation.R` to deduplicate KM curve plotting. Replaced all hardcoded N-counts in efficacy/safety headers with dynamic counts interpolated from `adsl`/analysis datasets.
+- **TFL Graphic & Count Refactoring:** Extracted a unified, vectorized `render_km()` helper in `05_outputs/tfl/tfl_generation.R` to deduplicate KM curve plotting. Replaced all hardcoded N-counts in efficacy/safety headers with dynamic counts interpolated from `adsl`/analysis datasets.
 - **Toxicity & Severity Missingness Parity:** Kept unknown CTCAE grades as missing (`''` in SAS and `NA_character_` in R) in ADAE, and lab toxicity grades as missing (`.` in SAS and `NA` in R) in ADLB.
 - **Deterministic Fisher Tables:** Coerced treatment (`TRT01P`) and response (`AVALC`) to factors with explicit levels before compiling table contingency matrices in `tfl_generation.R`.
 
 ### Fixed
-- **Safe Reconciliation Iteration:** Fixed unsafe loop index `1:nrow` inside mismatch logger in `05_reconciliation/cross_lang_audit.R` with `seq_len()`.
+- **Safe Reconciliation Iteration:** Fixed unsafe loop index `1:nrow` inside mismatch logger in `06_qc_evidence/reconciliation/cross_lang_audit.R` with `seq_len()`.
 
 ## [3.4.0] - 2026-06-12 — Submission-Seriousness Hardening (Audit Remediation)
 
@@ -869,9 +869,9 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
   traceability gap of silent constant imputation. Computed **identically** in the SAS
   production (`case when missing(...)`) and R validation (`if_else(is.na(...))`, pre-coalesce)
   tracks so they reconcile. `ALBBL`/`LDHBL` are non-collected placeholder constants → flags
-  constant `'Y'`. Added to `07_define_xml/define.xml` (ItemRefs Order 37–42, ItemDefs with
+  constant `'Y'`. Added to `03_metadata/define/define.xml` (ItemRefs Order 37–42, ItemDefs with
   `Origin Type="Derived"` and descriptions).
-- **Traceability matrix** (`08_reviewers_guides/TRACEABILITY_MATRIX.md`): source SDTM →
+- **Traceability matrix** (`07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md`): source SDTM →
   dual-programmed ADaM → Define-XML → TFL output, with per-dataset reconciliation keys and
   SAP-section references — the standard reviewer index that was previously missing.
 - **Keyless-path smoke test** (`tests/smoke_test.R`): new Cases C/D exercise the
@@ -907,20 +907,20 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
 ## [3.3.0] - 2026-06-12 — SAS Production-Track Graphics
 
 ### Added
-- **SAS production-track statistical figures (`02_production_sas/T_tfl_generation.sas`):**
+- **SAS production-track statistical figures (`04_analysis_datasets/programs/sas/T_tfl_generation.sas`):**
   the core efficacy/safety figures are now also produced natively in SAS 9.4 via ODS
   Graphics (PROC LIFETEST / SGPLOT / SGPANEL), demonstrating the production environment
   can deliver regulatory-grade graphics and providing an independent visual check that
   the SAS analyses (Cox HR, KM survival, at-risk counts) agree with the R reporting
   track. Six figures at 300 dpi: KM OS & PFS (number-at-risk, HR, censoring), OS subgroup
-  forest, PSA waterfall, exposure swimmer, Project Optimus E-R scatter → `09_tfl/output/figures/sas/`.
+  forest, PSA waterfall, exposure swimmer, Project Optimus E-R scatter → `05_outputs/tfl/output/figures/sas/`.
   *(The R / pharmaverse track remains the primary TFL deliverable; a study ships TFLs in a
   single validated language — this is a capability demonstration, not a duplicated deliverable.)*
-- **CbzP→SAS bridge (`01_raw_source/export_cbzp_xpt.R`):** an idempotent program exports
+- **CbzP→SAS bridge (`01_source_data/export_cbzp_xpt.R`):** an idempotent program exports
   the synthetic comparator RDS to V5 XPT (`*_cbzp.xpt`, member `UPCASE(dom)_C`) so the SAS
   track can read the comparator arm; SAS reads MP from production ADaM. The render script
   runs this automatically if the bridge files are absent.
-- **`06_telemetry/_oda_render_tfl.py`:** renders the SAS figures on ODA (uploads
+- **`platform/_oda_render_tfl.py`:** renders the SAS figures on ODA (uploads
   programs + bridge XPTs, runs the master driver + `T_tfl_generation.sas`, downloads
   the PNGs). `--tfl-only` re-renders figures against the existing ODA `adam.*`.
 - Every SAS figure carries the same on-artifact synthetic-comparator disclosure as the
@@ -929,19 +929,19 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
 ## [3.2.0] - 2026-06-11 — Acceptance-Audit Remediation
 
 ### Fixed (validation integrity)
-- **F-1 — Validation independence restored:** Removed the `read_xpt("04_adam/adae_prod.xpt")` coupling from `v_adae_io_validation.R`. The R QC track no longer consumes the SAS production output to recover row order; tie-breaking now uses an independent `AESEQ`-based rule derived from source SDTM. The R validation track is now genuinely independent of the SAS production track.
+- **F-1 — Validation independence restored:** Removed the `read_xpt("04_analysis_datasets/adam/adae_prod.xpt")` coupling from `v_adae_io_validation.R`. The R QC track no longer consumes the SAS production output to recover row order; tie-breaking now uses an independent `AESEQ`-based rule derived from source SDTM. The R validation track is now genuinely independent of the SAS production track.
 - **F-6 — Honest reconciliation labelling:** `cross_lang_audit.R` documents that it performs a **keyed record-content (multiset) comparison** (appropriate for OCCDS/BDS datasets without a unique record key), not a positional row-index parity claim. HTML report text and version stamp corrected (R 4.5.2 → 4.6.0).
 - **F-2 — False method claim removed:** Deleted the unused `guyot_reconstruct()` function and corrected every "Guyot et al. (2012)" citation (README, ANALYSIS_REPORT, ADRG, reconstruction log/script). The comparator method is now described accurately as proportional-hazards time-scaling of the MP arm.
 - **F-3/F-4 — Circular conclusions removed:** Stripped "statistically significant / met primary endpoint" language. Comparative efficacy tables are relabelled as **synthetic-comparator demonstrations** with explicit "circular by construction / not a finding" caveats, and disclose that the synthetic arm overshoots published values.
 - **F-5 — Build/telemetry honesty:** `cibuild.py` now resolves an explicit `sas_execution_mode` (`local`/`oda`/`cached`/`sim`/`error`). `--real-sas` actually runs SAS (or fails loudly); new `--use-cached-sas` reconciles cached outputs without claiming a fresh run. Telemetry reports what actually executed.
-- **F-7 — Single source of truth:** Cross-document statistics aligned to the generated `09_tfl/output/tables/*.txt` (e.g. TTPSA MP 2.2 mo, p=0.0362; TEAE/Grade≥3 percentages).
+- **F-7 — Single source of truth:** Cross-document statistics aligned to the generated `05_outputs/tfl/output/tables/*.txt` (e.g. TTPSA MP 2.2 mo, p=0.0362; TEAE/Grade≥3 percentages).
 - **F-8/F-9 — Traceability & disclosure:** Added an ORR derivation/denominator trace to the ADRG (reconciling 10.5% vs published 4.4%); corrected the ADRG to state imputed ALB/LDH are schema placeholders **not used in any model** (efficacy models stratify only on `ECOGBL`, `MEASDISF`).
 
 ## [3.1.0] - 2026-06-11
 
 ### Added
 - **SASPy/ODA Production Execution:** Replaced Stage 10 SAS simulation mode with genuine SAS 9.4 execution via SASPy IOM connecting to SAS OnDemand for Academics (ODA, `odaws01-apse1-2.oda.sas.com`). The production suite now uploads, executes, and downloads real `*_prod.xpt` datasets from a live cloud SAS 9.4 engine, satisfying ICH E9 dual-programming requirements.
-- **PGMDIR Macro Variable:** Added `PGMDIR` global macro variable to `00_config.sas` and all SAS programs, enabling absolute-path `%include` resolution in IOM sessions where the working directory is not `02_production_sas/`. Pre-set by `cibuild.py` before invoking the master driver.
+- **PGMDIR Macro Variable:** Added `PGMDIR` global macro variable to `00_config.sas` and all SAS programs, enabling absolute-path `%include` resolution in IOM sessions where the working directory is not `04_analysis_datasets/programs/sas/`. Pre-set by `cibuild.py` before invoking the master driver.
 
 ### Changed
 - **SAS Library Rename:** Renamed `real_sdtm` libref to `realsdtm` (8-char SAS name limit) in `00_config.sas` and `L_staging_ingest.sas`. Updated `dictionary.tables` filter accordingly.
@@ -959,15 +959,15 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
 - **eCTD Define-XML Stylesheet:** Created a premium interactive CDISC stylesheet (`define2-1.xsl`) with sidebar dataset navigation and metadata listings (Mo-04).
 
 ### Changed
-- **Corrected TTUMOR Censoring Logic:** Adjusted censoring rules for scan-free measurable-disease subjects in both tracks ([v_adtte_validation.R](file:///Users/apple/Desktop/TROPIC/03_validation_r/v_adtte_validation.R) and [A_adtte_generation.sas](file:///Users/apple/Desktop/TROPIC/02_production_sas/A_adtte_generation.sas)) to censor on `TRTSDT` / `STARTDT` (AVAL = 1) instead of `LSTALVDT`, eliminating immortal time bias and restoring a clinically sound Hazard Ratio of `0.67` (p-value `0.0003`).
-- **Database Library Protections:** Remapped `sdtm` library to `04_adam/sdtm_mapped/` and configured raw libraries (`raw`, `real_sdtm`, `staging`) as `access=readonly` in [00_config.sas](file:///Users/apple/Desktop/TROPIC/02_production_sas/00_config.sas) to prevent accidental raw data corruption on pipeline builds.
+- **Corrected TTUMOR Censoring Logic:** Adjusted censoring rules for scan-free measurable-disease subjects in both tracks ([v_adtte_validation.R](file:///Users/apple/Desktop/TROPIC/04_analysis_datasets/programs/r/v_adtte_validation.R) and [A_adtte_generation.sas](file:///Users/apple/Desktop/TROPIC/04_analysis_datasets/programs/sas/A_adtte_generation.sas)) to censor on `TRTSDT` / `STARTDT` (AVAL = 1) instead of `LSTALVDT`, eliminating immortal time bias and restoring a clinically sound Hazard Ratio of `0.67` (p-value `0.0003`).
+- **Database Library Protections:** Remapped `sdtm` library to `04_analysis_datasets/adam/sdtm_mapped/` and configured raw libraries (`raw`, `real_sdtm`, `staging`) as `access=readonly` in [00_config.sas](file:///Users/apple/Desktop/TROPIC/04_analysis_datasets/programs/sas/00_config.sas) to prevent accidental raw data corruption on pipeline builds.
 - **TTUMOR Population Restriction:** Restricted `TTUMOR` parameter generation to subjects with measurable disease (`MEASDISF == 'Y'`) in R validation and SAS production, calibrating events to 166 to align with published HR=0.61/0.62 (C-01).
 - **Serious AE Rate Calibration:** Calibrated serious AE rates in CbzP safety population to yield exactly 145 serious subjects (39.2%) matching the EPAR publication (M-03).
 - **BDS Compliance for Reconstructed ADTTE:** Updated `make_adtte()` to include required BDS variables: `SUBJID`, `SITEID`, `TRT01PN`, and `STARTDT` (M-05).
 - **STARTDT Alignment:** Aligned `STARTDT` to treatment start date (`TRTSDT`) for `TTPSA` and `TTUMOR` parameters across all tracks (M-04).
 - **AE Terminology Alignment:** Standardized `TRTEMFL = "Y"` and default `AEACN = "NOT APPLICABLE"` in CbzP AE reconstruction to match OCCDS guidelines (Mi-01, Mi-03).
-- **CI Build Reliability and Telemetry:** Relocated backup directory to `backup_adam/` (M-06), derived runner username dynamically (Mi-06), and implemented dynamic `AsOfDateTime` regex replacement in [define.xml](file:///Users/apple/Desktop/TROPIC/07_define_xml/define.xml) on build (Mi-02).
-- **SAS Library Assignments:** Re-mapped library assignments in [00_config.sas](file:///Users/apple/Desktop/TROPIC/02_production_sas/00_config.sas) to read raw staging data from raw source directories instead of recursive ADaM directories (M-01).
+- **CI Build Reliability and Telemetry:** Relocated backup directory to `backup_adam/` (M-06), derived runner username dynamically (Mi-06), and implemented dynamic `AsOfDateTime` regex replacement in [define.xml](file:///Users/apple/Desktop/TROPIC/03_metadata/define/define.xml) on build (Mi-02).
+- **SAS Library Assignments:** Re-mapped library assignments in [00_config.sas](file:///Users/apple/Desktop/TROPIC/04_analysis_datasets/programs/sas/00_config.sas) to read raw staging data from raw source directories instead of recursive ADaM directories (M-01).
 
 ## [2.2.0] - 2026-05-27
 
@@ -1012,6 +1012,6 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
 - **OCCDS v1.0 + custom AE Episode Merging:** Implemented the pre-specified 3-day window continuous hematologic episode merging rule (CIAESEQ/CIAESDT/CIAEEDT/CIAEDUR) with correct occurrence denominator flags (`AEOCCFL`). *(Originally written as "OCCDS v1.1"; corrected — no such CDISC version exists, the merging rule is a TROPIC convention.)*
 - **Project Optimus Nadir Modeling:** Programmed continuous ANC nadir derivations (`ANCNADIR`), cycle recovery latencies (`ANCRECDY`), and relative dose intensity categories (`RDIDL`) for dose-ANC modeling.
 - **Cross-Language Audit Gate:** Programs cell-by-cell validation comparison engine (`cross_lang_audit.R`) leveraging `diffdf` package.
-- **CI/CD Build Telemetry Orchestrator:** Developed `06_telemetry/cibuild.py` providing environment check, execution restart-gates, warning scanning, and health report compilation.
+- **CI/CD Build Telemetry Orchestrator:** Developed `platform/cibuild.py` providing environment check, execution restart-gates, warning scanning, and health report compilation.
 - **Define-XML v2.1:** Generated metadata definitions (`define.xml`) with integrated custom stylesheets.
 - **TFL Figures:** Added automatic Kaplan-Meier survival curve generators, subgroup forest plots, and LOESS Exposure-Response curves.

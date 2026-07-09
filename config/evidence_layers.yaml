@@ -1,0 +1,383 @@
+# TROPIC evidence-layer index.
+#
+# Purpose: define the repository's physical evidence chain and the artifacts
+# each layer owns. This is an architectural control file, not a build manifest.
+# Execution order remains governed by config/study_manifest.yaml.
+
+version: 1
+study: TROPIC-NCT00417079
+evidence_chain:
+  - source_data
+  - specification
+  - metadata
+  - analysis_dataset
+  - output
+  - qc_evidence
+  - reviewer_explanation
+
+status_definitions:
+  required: "Must exist in the repository for the architecture check to pass."
+  generated: "Build artifact; may be absent in a clean clone, but should be produced by the pipeline."
+  external: "Intentionally excluded from git because it is patient data, credentialed input, or governed source material."
+  optional: "Useful artifact or tool, but not required for the architecture check."
+  planned: "Target-state placeholder; not yet implemented."
+
+layers:
+  source_data:
+    objective: "Document controlled source intake, data access limits, source profiling, and source-to-analysis mapping."
+    artifacts:
+      - path: 00_governance/REPRODUCIBILITY.md
+        status: required
+        role: "Data-access and reproducibility boundary."
+      - path: 01_source_data
+        status: required
+        role: "Current source-data landing area."
+      - glob: "01_source_data/real_sdtm/*.sas7bdat"
+        status: external
+        role: "Official de-identified SDTM source files; intentionally not redistributed."
+      - glob: "01_source_data/cbzp_reconstructed/*.rds"
+        status: external
+        role: "Regenerable synthetic comparator artifacts; intentionally not committed."
+      - path: 01_source_data/reconstruct_cbzp_arm.R
+        status: optional
+        role: "Synthetic comparator reconstruction program, when present."
+      - path: platform/build_source_profile.py
+        status: required
+        role: "Aggregate source profiling report generator."
+      - path: docs/SOURCE_PROFILING_REPORT.md
+        status: generated
+        role: "Aggregate source profiling report."
+      - path: platform/source_profile_status.json
+        status: generated
+        role: "Machine-readable source profiling status."
+      - path: platform/source_profile/domain_inventory.csv
+        status: generated
+        role: "Aggregate source domain inventory."
+      - path: platform/source_profile/variable_profile.csv
+        status: generated
+        role: "Aggregate source variable profile."
+
+  specification:
+    objective: "Control clinical analysis authority: SAP lock, assumptions, clinical parameters, and derivation rules."
+    artifacts:
+      - path: 02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx
+        status: required
+        role: "Current SAP authority identified by the lock review."
+      - path: 06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md
+        status: required
+        role: "Decision record for SAP v4.0 authority and non-submission-ready status."
+      - path: config/study_config.yaml
+        status: required
+        role: "Study clinical parameters consumed by programs."
+      - path: config/study_manifest.yaml
+        status: required
+        role: "Pipeline structure and dataset/program wiring."
+      - path: docs/PIPELINE_ARCHITECTURE_REDESIGN.md
+        status: required
+        role: "Target operating model and migration plan."
+      - path: docs/BIOMETRICS_DELIVERY_OPERATING_MODEL.md
+        status: required
+        role: "Cross-functional biometrics delivery operating model."
+      - path: docs/REGULATORY_WORKFLOW_RESEARCH.md
+        status: required
+        role: "Research-backed department workflow and validation model."
+      - path: config/delivery_workstreams.yaml
+        status: required
+        role: "Machine-readable workstream, gate, and handoff contract."
+      - path: config/validation_strategy.yaml
+        status: required
+        role: "Machine-readable risk-based validation strategy."
+      - path: config/ctq_traceability.yaml
+        status: required
+        role: "Machine-readable CTQ, estimand, artifact, and validation traceability register."
+
+  metadata:
+    objective: "Provide machine-readable and reviewer-readable dataset metadata, controlled terminology, and traceability."
+    artifacts:
+      - path: 03_metadata/adam/ADaM_spec.xlsx
+        status: required
+        role: "ADaM specification and metadata control source."
+      - path: 03_metadata/define/define.xml
+        status: required
+        role: "ADaM Define-XML with ARM."
+      - path: 03_metadata/define/define_sdtm.xml
+        status: required
+        role: "SDTM Define-XML."
+      - path: 03_metadata/define/validate_xsd.sh
+        status: required
+        role: "Define-XML schema validation runner."
+      - path: 03_metadata/define/check_define_conformance.R
+        status: required
+        role: "Spec-to-define conformance check."
+      - path: config/metadata_lineage.yaml
+        status: required
+        role: "Governed ADaM predecessor lineage and sponsor-defined CT disposition register."
+      - path: platform/apply_metadata_lineage.py
+        status: required
+        role: "Applies and checks governed predecessor lineage against the ADaM specification workbook."
+      - path: platform/build_metadata_control_report.py
+        status: required
+        role: "Metadata governance report generator."
+      - path: 07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md
+        status: required
+        role: "Human-readable traceability matrix."
+      - path: 06_qc_evidence/audit/adam_variable_traceability.csv
+        status: required
+        role: "Machine-readable ADaM variable traceability extract."
+      - path: docs/METADATA_CONTROL_REPORT.md
+        status: generated
+        role: "Generated metadata governance report."
+      - path: platform/metadata_control/metadata_control_status.json
+        status: generated
+        role: "Machine-readable metadata governance status."
+      - path: platform/metadata_control/metadata_dataset_control.csv
+        status: generated
+        role: "Dataset-level metadata control extract."
+      - path: platform/metadata_control/metadata_findings.csv
+        status: generated
+        role: "Metadata governance findings extract."
+      - path: platform/metadata_lineage/metadata_lineage_status.json
+        status: generated
+        role: "Machine-readable lineage application/check status."
+      - path: platform/metadata_lineage/metadata_lineage_application.csv
+        status: generated
+        role: "Variable-level lineage check extract."
+
+  analysis_dataset:
+    objective: "Build and exchange SDTM/ADaM analysis datasets with reproducible program provenance."
+    artifacts:
+      - path: 04_analysis_datasets/programs/sas
+        status: required
+        role: "SAS production ADaM programs."
+      - path: 04_analysis_datasets/programs/r
+        status: required
+        role: "Independent R validation programs."
+      - path: 04_analysis_datasets/adam
+        status: required
+        role: "Current ADaM XPT output directory."
+      - glob: "04_analysis_datasets/adam/*.xpt"
+        status: generated
+        role: "Generated ADaM transport files."
+      - path: 04_analysis_datasets/datasetjson/README.md
+        status: required
+        role: "Dataset-JSON export documentation."
+      - glob: "04_analysis_datasets/datasetjson/**/*.json"
+        status: generated
+        role: "Generated Dataset-JSON metadata and data files."
+      - glob: "04_analysis_datasets/datasetjson/**/*.ndjson"
+        status: generated
+        role: "Generated Dataset-JSON NDJSON payload files."
+
+  output:
+    objective: "Generate traceable tables, figures, listings, and analysis-results metadata."
+    artifacts:
+      - path: 05_outputs/tfl/tfl_generation.R
+        status: required
+        role: "TFL generation program."
+      - path: 05_outputs/tfl/tfl_stats.R
+        status: required
+        role: "TFL statistical helper program."
+      - path: config/tfl_output_catalog.yaml
+        status: required
+        role: "Controlled TFL release-scope catalog (SAP full vs in-scope/deferred dispositions)."
+      - path: platform/build_tfl_output_index.py
+        status: required
+        role: "Structured TFL output index generator."
+      - path: 05_outputs/tfl/TFL_Gallery.html
+        status: generated
+        role: "Rendered TFL gallery."
+      - path: 05_outputs/tfl/output
+        status: generated
+        role: "Rendered table/figure/listing output directory."
+      - path: 05_outputs/ars/tropic_ard.csv
+        status: generated
+        role: "Analysis Results Standard ARD."
+      - path: 05_outputs/ars/tropic_reporting_event.json
+        status: generated
+        role: "Analysis Results Standard reporting event."
+      - path: 03_metadata/usdm/tropic_usdm.json
+        status: generated
+        role: "USDM study definition export."
+      - path: docs/TFL_OUTPUT_INDEX.md
+        status: generated
+        role: "Structured TFL output traceability index."
+      - path: platform/tfl_output_index_status.json
+        status: generated
+        role: "Machine-readable TFL output index status."
+      - path: platform/tfl_output_index/tfl_output_index.csv
+        status: generated
+        role: "CSV TFL output traceability index."
+      - path: platform/tfl_output_index/tfl_output_index.json
+        status: generated
+        role: "JSON TFL output traceability index."
+
+  qc_evidence:
+    objective: "Capture risk-based validation, reconciliation, conformance, run telemetry, manifests, and audit evidence."
+    artifacts:
+      - path: 07_reviewer_explanation/guides/RISK_BASED_VALIDATION.md
+        status: required
+        role: "Risk-tiered statistical validation plan."
+      - path: 07_reviewer_explanation/guides/ORCHESTRATOR_ASSURANCE_RATIONALE.md
+        status: required
+        role: "Engineering assurance rationale for the orchestrator."
+      - path: 06_qc_evidence/reconciliation
+        status: required
+        role: "Dataset and results reconciliation programs."
+      - path: platform/cibuild.py
+        status: required
+        role: "Pipeline orchestrator."
+      - path: platform/build_delivery_controls.py
+        status: required
+        role: "Unified delivery architecture control runner for local and CI use."
+      - path: platform/check_evidence_layers.py
+        status: required
+        role: "Evidence-layer architecture verifier."
+      - path: platform/check_delivery_model.py
+        status: required
+        role: "Delivery workstream and gate model verifier."
+      - path: platform/build_delivery_dashboard.py
+        status: required
+        role: "Delivery evidence dashboard generator."
+      - path: platform/build_release_candidate_checklist.py
+        status: required
+        role: "Release-candidate go/no-go checklist generator."
+      - path: config/log_cleanliness.yaml
+        status: required
+        role: "Governed log-cleanliness rules and reviewed exception caps."
+      - path: platform/check_log_cleanliness.py
+        status: required
+        role: "Automated SAS/R execution-log scanner."
+      - path: platform/build_validation_strategy_report.py
+        status: required
+        role: "Risk-based validation strategy control report generator."
+      - path: platform/build_ctq_traceability_report.py
+        status: required
+        role: "CTQ and estimand traceability report generator."
+      - path: platform/build_orchestrator_gate_map.py
+        status: required
+        role: "Orchestrator stage-to-delivery-gate map generator."
+      - path: platform/build_release_run_manifest.py
+        status: required
+        role: "Current release-run hash binding manifest generator."
+      - path: platform/pipeline_health.json
+        status: generated
+        role: "Latest run health record."
+      - path: platform/reconciliation_status.json
+        status: generated
+        role: "Dataset-level reconciliation status."
+      - path: platform/results_reconciliation_status.json
+        status: generated
+        role: "Results-level reconciliation status."
+      - path: platform/conformance/spec_define_conformance.json
+        status: generated
+        role: "Spec-to-define conformance result."
+      - path: platform/conformance/spec_data_conformance.json
+        status: generated
+        role: "Spec-to-data conformance result."
+      - path: 06_qc_evidence/audit/findings_register.csv
+        status: required
+        role: "Audit findings register."
+      - path: 06_qc_evidence/audit/output_hash_binding.csv
+        status: required
+        role: "Current output-to-package hash binding evidence."
+      - path: platform/release_run_manifest/release_run_manifest.json
+        status: generated
+        role: "Machine-readable current release-run manifest and hash seal."
+      - path: platform/release_run_manifest/release_run_files.csv
+        status: generated
+        role: "Per-file hash ledger bound into the release-run manifest."
+      - path: docs/RELEASE_RUN_MANIFEST.md
+        status: generated
+        role: "Reviewer-readable release-run manifest summary."
+      - path: docs/RELEASE_CANDIDATE_CHECKLIST.md
+        status: generated
+        role: "Generated release-candidate go/no-go checklist."
+      - path: docs/VALIDATION_STRATEGY_CONTROL_REPORT.md
+        status: generated
+        role: "Generated risk-based validation strategy control report."
+      - path: docs/CTQ_TRACEABILITY_REPORT.md
+        status: generated
+        role: "Generated CTQ and estimand traceability report."
+      - path: platform/ctq_traceability/ctq_traceability_status.json
+        status: generated
+        role: "Machine-readable CTQ traceability status."
+      - path: platform/ctq_traceability/ctq_traceability_checks.csv
+        status: generated
+        role: "CSV CTQ traceability check results."
+      - path: platform/validation_strategy/validation_strategy_status.json
+        status: generated
+        role: "Machine-readable risk-based validation strategy status."
+      - path: platform/validation_strategy/validation_strategy_checks.csv
+        status: generated
+        role: "CSV evidence check results for the validation strategy."
+      - path: docs/LOG_CLEANLINESS_REPORT.md
+        status: generated
+        role: "Generated SAS/R execution-log cleanliness report."
+      - path: platform/log_cleanliness/log_cleanliness_status.json
+        status: generated
+        role: "Machine-readable log-cleanliness gate status."
+      - path: platform/log_cleanliness/log_findings.csv
+        status: generated
+        role: "CSV log-cleanliness findings and reviewed exceptions."
+      - path: platform/release_candidate/release_candidate_status.json
+        status: generated
+        role: "Machine-readable release-candidate status."
+      - path: platform/release_candidate/release_candidate_checklist.csv
+        status: generated
+        role: "CSV release-candidate checklist."
+      - path: docs/ORCHESTRATOR_GATE_MAP.md
+        status: generated
+        role: "Generated map from runtime DAG stages to delivery gates."
+      - path: platform/orchestrator_gate_map/orchestrator_gate_map_status.json
+        status: generated
+        role: "Machine-readable orchestrator gate-map status."
+      - path: platform/orchestrator_gate_map/orchestrator_gate_map.csv
+        status: generated
+        role: "CSV orchestrator stage-to-gate map."
+
+  reviewer_explanation:
+    objective: "Explain datasets, conformance, assumptions, limitations, outputs, and validation to a reviewer."
+    artifacts:
+      - path: 07_reviewer_explanation/guides/ADRG.md
+        status: required
+        role: "Analysis Data Reviewer's Guide."
+      - path: 07_reviewer_explanation/guides/SDRG.md
+        status: required
+        role: "Study Data Reviewer's Guide."
+      - path: 07_reviewer_explanation/guides/BDRG.md
+        status: required
+        role: "BIMO Data Reviewer's Guide."
+      - path: 07_reviewer_explanation/guides/SDSP.md
+        status: required
+        role: "Study Data Standardization Plan."
+      - path: 07_reviewer_explanation/analysis_report.md
+        status: required
+        role: "Reviewer-facing analysis report and concordance narrative."
+      - path: docs/DELIVERY_EVIDENCE_DASHBOARD.md
+        status: generated
+        role: "Generated delivery/evidence architecture dashboard."
+      - path: README.md
+        status: required
+        role: "Public package orientation and limitation disclosure."
+
+  submission_package:
+    objective: "Materialize an eCTD-style package after data, metadata, outputs, QC, and reviewer explanation gates pass."
+    artifacts:
+      - path: 08_submission_package/m5
+        status: generated
+        role: "Current eCTD Module 5 style payload tree."
+      - path: 08_submission_package/ectd/0000
+        status: generated
+        role: "Materialized sequence 0000."
+      - path: 08_submission_package/ectd/RUN_RECORD.md
+        status: generated
+        role: "eCTD materialization run record."
+      - path: platform/package_ectd.py
+        status: required
+        role: "Module 5 package builder."
+      - path: platform/build_ectd_backbone.py
+        status: required
+        role: "eCTD backbone/STF builder."
+      - path: platform/materialize_ectd.py
+        status: required
+        role: "Sequence materialization script."

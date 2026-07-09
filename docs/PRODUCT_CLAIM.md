@@ -5,7 +5,7 @@
 **Effective:** 2026-07-09  
 **Status:** FROZEN for tag train `v0.1.0-demo-rc.1` and successors until amended  
 **Owner workstream:** WS-0 Governance & Scope Control (G00)  
-**Binding companions:** `audit/SAP_LOCK_REVIEW_MEMO.md` · `audit/FINDINGS_DISPOSITION_BOARD.md` · `docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md` · `docs/WORKSTREAM_EXECUTION_BOARD.md`
+**Binding companions:** `06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md` · `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md` · `docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md` · `docs/WORKSTREAM_EXECUTION_BOARD.md`
 
 ---
 
@@ -63,10 +63,10 @@ Any public talk track, LinkedIn line, or interview answer must map to Path A unl
 ## 4. Authority stack (what wins conflicts)
 
 1. **This PRODUCT_CLAIM** — what we may assert.  
-2. **SAP v4.0** (`TROPIC_SAP_v4.0_industry_grade.docx`) — analysis intent for programming remediation (not sponsor-approved filing SAP).  
+2. **SAP v4.0** (`02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx`) — analysis intent for programming remediation (not sponsor-approved filing SAP).  
 3. **SAP lock memo** — SAP is programming authority; package is not submission-passed.  
-4. **`tfl_output_catalog.yaml`** — which outputs are in controlled release scope.  
-5. **`study_config.yaml` / `study_manifest.yaml`** — parameters and DAG structure.  
+4. **`config/tfl_output_catalog.yaml`** — which outputs are in controlled release scope.  
+5. **`config/study_config.yaml` / `config/study_manifest.yaml`** — parameters and DAG structure.  
 6. **Machine seals** — whether the *run* of the controlled scope is green.  
 7. **ADRG/SDRG/BDRG** — how we explain (must not exceed 1–4).
 
@@ -107,7 +107,7 @@ Sim mode (`sas_execution_mode=sim`) zero-diff is **not** double-programming evid
 
 ## 7. Output claims (TFL universe)
 
-Controlled release scope is defined solely by **`tfl_output_catalog.yaml`**:
+Controlled release scope is defined solely by **`config/tfl_output_catalog.yaml`**:
 
 - **18** in-scope output IDs must exist and index clean.  
 - **21** SAP full-catalog IDs are **deferred** with reasons—not silent gaps.  
