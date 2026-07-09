@@ -22,18 +22,14 @@ import sys
 import re
 
 # Matches a hardcoded absolute filesystem path: a Windows drive-letter path, a Windows UNC path,
-# or ANY POSIX absolute path with >=2 real segments (not just the /Users/ and /home/ conventions
-# this repo's own paths happen to use) -- a shared server mount like /opt/sasuser/... or
-# /data/tropic/... is exactly as hardcoded as a home directory, and this pipeline's own ODA
-# integration (_resolve_oda_root, roadmap #10) treats "no hardcoded per-user absolute path" as a
-# hard requirement, so the lint gate should enforce the general property, not three specific
-# shapes of it. The first POSIX segment must contain a letter, which excludes a purely-numeric
-# date-like string ("01/15/2024") from matching. A leading '/' immediately preceded by ':' or
-# another '/' is excluded so a URL scheme ("https://...") is never mistaken for an absolute path.
+# or a POSIX absolute path (token that *starts* with '/') with >=2 segments. Relative
+# multi-segment paths like `04_analysis_datasets/programs/sas` must NOT match (the slash
+# mid-token is not an absolute root). The first POSIX segment must contain a letter (excludes
+# pure dates like 01/15/2024). Leading '/' after ':' or '/' is excluded (URL schemes).
 _HARDCODED_PATH_RE = re.compile(
     r'[A-Za-z]:\\[^\s]+'
     r'|\\\\[^\s\\]+\\[^\s]*'
-    r'|(?<![:/])/(?=[^\s/]*[A-Za-z])[^\s/]+/[^\s]*'
+    r'|(?:^|[\s"=])/(?=[^\s/]*[A-Za-z])[^\s/]+/[^\s]*'
 )
 
 def _strip_block_comments(line, in_block_comment):
