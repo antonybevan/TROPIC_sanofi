@@ -142,11 +142,11 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | Field | Content |
 |---|---|
 | **Owned artifacts** | ADRG · SDRG · BDRG · TRACEABILITY_MATRIX · SDSP · ANALYSIS_REPORT · release note · limitation language · demo boundary |
-| **Current status** | **AMBER → improving** — G07 is executable in DAG; ADRG **S1 done** (v1.1 Path A front-matter + §6.0 talk track); SDRG/BDRG still need S2/S3 |
-| **Open risks** | Career risk if guides over-claim; SDRG/BDRG not yet same front-matter standard; PDF package copies lag markdown until re-package |
+| **Current status** | **AMBER → improving** — G07 executable; **ADRG S1 + SDRG S2 done** (v1.1); BDRG still needs S3 |
+| **Open risks** | BDRG depth / demo boundary; TRACEABILITY_MATRIX catalog alignment; PDF package copies lag markdown until re-package |
 | **Required evidence pack** | (1) ADRG/SDRG/BDRG revision IDs · (2) Traceability matrix aligned to catalog · (3) Explicit “what this package is / is not” · (4) Signoff checklist |
-| **Release gate** | G07 before calling package “reviewer-ready” (machine lock exists; narrative still AMBER until S2/S3) |
-| **Next action** | **S2 SDRG hardening** (same front-matter pattern + CORE residual honesty + WS-1 pack link) |
+| **Release gate** | G07 before calling package “reviewer-ready” (machine lock exists; narrative AMBER until S3) |
+| **Next action** | **S3 BDRG + TRACEABILITY_MATRIX** catalog alignment |
 
 ---
 
