@@ -81,11 +81,11 @@ jobs:
 
     - name: Delivery architecture controls
       run: |
-        # Rebuilds the evidence-dashboard reports and validates the machine-readable
-        # layer/workstream contracts. Project-state findings such as WARNING metadata
-        # control or a BLOCKED release candidate are reported here, while broken
-        # architecture wiring or failed report generation fails CI.
-        python3 platform/build_delivery_controls.py
+        # Rebuilds non-seal reports and validates machine-readable layer/workstream
+        # contracts. --ci skips seal-mutating builders (log cleanliness re-scan,
+        # release-run manifest, RC checklist) so committed Path A seals stay intact
+        # for the verify_release step. Architecture wiring failures still fail CI.
+        python3 platform/build_delivery_controls.py --ci
 
     - name: SAS static-analysis gate (blocks on hardcoded paths)
       run: |

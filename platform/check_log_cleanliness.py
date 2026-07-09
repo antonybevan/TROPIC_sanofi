@@ -275,7 +275,15 @@ def build_log_cleanliness(config_path: Path = DEFAULT_CONFIG, out_dir: Path = OU
     unapproved = [f for f in findings if f["status"] == "UNAPPROVED"]
     missing = [f for f in findings if f["status"] == "MISSING_LOG"]
     reviewed = [f for f in findings if f["status"] == "REVIEWED_EXCEPTION"]
-    status_value = "PASS" if not unapproved and not missing else "FAIL"
+    # Data-free CI / bare clone: required logs are gitignored patient-run evidence.
+    # Missing *all* required logs is not an architecture defect — it is "no run logs here".
+    # FAIL only when logs are present and dirty, or a partial set is missing mid-run.
+    if missing and not unique_paths and not unapproved:
+        status_value = "not_available"
+    elif not unapproved and not missing:
+        status_value = "PASS"
+    else:
+        status_value = "FAIL"
     status = {
         "status": status_value,
         "generated_at": generated_at,
@@ -285,7 +293,8 @@ def build_log_cleanliness(config_path: Path = DEFAULT_CONFIG, out_dir: Path = OU
             "Scans only logs listed in config/log_cleanliness.yaml (required/optional). "
             "rscript/python stage stdout/stderr is not persisted by cibuild.py and is "
             "outside this gate; PASS means configured persisted logs are clean, not full "
-            "pipeline stdout/stderr clean."
+            "pipeline stdout/stderr clean. not_available = no required logs on disk "
+            "(typical data-free CI checkout); seal re-check uses committed PASS evidence."
         ),
         "logs_scanned": len(unique_paths),
         "scanned_logs": [_rel(path) for path in unique_paths],
@@ -315,7 +324,8 @@ def main(argv: list[str] | None = None) -> int:
     print(f"Unapproved findings: {status['unapproved_findings']}")
     print(f"Reviewed exceptions: {status['reviewed_exceptions']}")
     print(f"Wrote {Path(args.out_dir) / 'log_cleanliness_status.json'}")
-    if status["status"] != "PASS" and not args.allow_fail:
+    # PASS and not_available are non-blocking for architecture/CI. FAIL is blocking.
+    if status["status"] == "FAIL" and not args.allow_fail:
         return 1
     return 0
 
