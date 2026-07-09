@@ -1,10 +1,10 @@
 {
-  "status": "BLOCKED",
-  "generated_at": "2026-07-09 15:17:41 UTC",
+  "status": "PASS",
+  "generated_at": "2026-07-09 15:17:43 UTC",
   "checks": 16,
-  "pass": 15,
+  "pass": 16,
   "warning": 0,
-  "blocker": 1,
+  "blocker": 0,
   "active_audit_findings": 0,
   "confirmed_critical_major_findings": 0,
   "live_sas_execution_mode": "oda",
@@ -96,9 +96,9 @@
     {
       "gate": "G09 release_candidate_lock",
       "check": "Current release-run manifest is release-candidate grade (full DAG, clean tree)",
-      "status": "BLOCKER",
-      "evidence": "06_telemetry/release_run_manifest/release_run_manifest.json status=REMEDIATION; evidence_grade=remediation_partial_or_dirty; run_scope=full_dag; seal=909c19dcf895d064297befd92ef3c19914f6d1c127882b49da10ac305a3a1341",
-      "required_action": "Release manifest must be status=PASS (not REMEDIATION/FAIL): full current DAG, clean worktree, and current-run binding. REMEDIATION is valid development evidence only."
+      "status": "PASS",
+      "evidence": "06_telemetry/release_run_manifest/release_run_manifest.json status=PASS; evidence_grade=release_candidate; run_scope=full_dag; seal=c01e744fe5ba3a1e70fbe4a0b4304da1a8f211edb21cc5ba76f85db3f6ed0201",
+      "required_action": ""
     },
     {
       "gate": "G09 release_candidate_lock",
