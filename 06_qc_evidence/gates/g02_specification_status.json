@@ -1,0 +1,114 @@
+{
+  "gate": "G02",
+  "name": "analysis_specification_lock",
+  "status": "PASS",
+  "generated_at": "2026-07-09T16:40:24Z",
+  "checks": [
+    {
+      "name": "exists:docs/PRODUCT_CLAIM.md",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:config/study_config.yaml",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:config/study_manifest.yaml",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:config/tfl_output_catalog.yaml",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:config/ctq_traceability.yaml",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:docs/workstreams/WS2_POPULATION_ENDPOINT_CONTROL.md",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "config.STUDYID",
+      "ok": true,
+      "detail": "TROPIC-NCT00417079"
+    },
+    {
+      "name": "config.STUDY_CUTOFF_DT",
+      "ok": true,
+      "detail": "2009-09-25"
+    },
+    {
+      "name": "config.PSA_RESP_THRESHOLD",
+      "ok": true,
+      "detail": "0.5"
+    },
+    {
+      "name": "config.EPISODE_GAP_DAYS",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "name": "catalog.in_scope_nonempty",
+      "ok": true,
+      "detail": "n=18"
+    },
+    {
+      "name": "catalog.deferred_documented",
+      "ok": true,
+      "detail": "n=21"
+    },
+    {
+      "name": "catalog.not_pretending_full_sap_only",
+      "ok": true,
+      "detail": "in_scope=18 deferred=21"
+    },
+    {
+      "name": "manifest.study_id",
+      "ok": true,
+      "detail": "TROPIC-NCT00417079"
+    },
+    {
+      "name": "manifest.datasets",
+      "ok": true,
+      "detail": "n=8"
+    },
+    {
+      "name": "population_doc.ITTFL",
+      "ok": true,
+      "detail": "ok"
+    },
+    {
+      "name": "population_doc.SAFFL",
+      "ok": true,
+      "detail": "ok"
+    },
+    {
+      "name": "population_doc.tfl_output_catalog",
+      "ok": true,
+      "detail": "ok"
+    },
+    {
+      "name": "population_doc.OS",
+      "ok": true,
+      "detail": "ok"
+    },
+    {
+      "name": "population_doc.PFS",
+      "ok": true,
+      "detail": "ok"
+    }
+  ],
+  "problems": []
+}

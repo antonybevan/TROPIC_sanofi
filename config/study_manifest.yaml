@@ -72,6 +72,10 @@ datasets:
 # marks the three stages whose post-execution QC gates live in run_single_stage().
 infrastructure_stages:
   pre:
+    # G00/G02 are first-class runtime locks (phase 2): governance + analysis specification
+    # must pass before any derivation stage is treated as in-scope for a release claim.
+    - { name: "Governance Scope Lock (G00)", script: "platform/check_gate_g00_governance.py", runner: python, gated: true }
+    - { name: "Analysis Specification Lock (G02)", script: "platform/check_gate_g02_specification.py", runner: python, gated: true }
     - { name: "ADaM Spec Label/Order Artifacts", script: "platform/gen_adam_labels.R", runner: rscript }
     - { name: "Real SDTM Staging Ingest", script: "04_analysis_datasets/programs/r/v_staging_ingest.R", runner: logrx }
     - { name: "R SDTM Validation",        script: "04_analysis_datasets/programs/r/v_sdtm_validation.R", runner: logrx }
@@ -99,6 +103,9 @@ infrastructure_stages:
     - { name: "Forest-HR Reconciliation (SAS vs R)",         script: "06_qc_evidence/reconciliation/forest_reconcile.R",    runner: rscript }
     - { name: "ADaM Spec to Define Conformance",             script: "03_metadata/define/check_define_conformance.R", runner: rscript }
     - { name: "ADaM Spec to Data Conformance",               script: "04_analysis_datasets/programs/r/spec_data_checks.R",       runner: rscript }
+    # G07 reviewer package lock: ADRG/SDRG/BDRG + residual/claim pointers must hold before
+    # Dataset-JSON/ARS/USDM/eCTD materialization is treated as reviewer-facing packaging.
+    - { name: "Reviewer Package Lock (G07)",                 script: "platform/check_gate_g07_reviewer_package.py", runner: python, gated: true }
     # Modern machine-readable export layer. Non-gated: each generator's own exit code gates it
     # (non-zero -> sys.exit(1)); they run after the data/spec gates and before eCTD packaging.
     - { name: "Dataset-JSON Export (v1.1)",                  script: "platform/export_datasetjson.py",       runner: python }

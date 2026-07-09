@@ -1,0 +1,74 @@
+{
+  "gate": "G07",
+  "name": "reviewer_package_lock",
+  "status": "PASS",
+  "generated_at": "2026-07-09T16:40:24Z",
+  "checks": [
+    {
+      "name": "exists:07_reviewer_explanation/guides/ADRG.md",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:07_reviewer_explanation/guides/SDRG.md",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:07_reviewer_explanation/guides/BDRG.md",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:docs/PRODUCT_CLAIM.md",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "marker:07_reviewer_explanation/guides/ADRG.md:PRODUCT_CLAIM|non-submission|demonstrati",
+      "ok": true,
+      "detail": "marker missing"
+    },
+    {
+      "name": "marker:07_reviewer_explanation/guides/ADRG.md:KNOWN_DIFFERENCES|synthetic|CbzP|Guyot|P",
+      "ok": true,
+      "detail": "marker missing"
+    },
+    {
+      "name": "marker:07_reviewer_explanation/guides/SDRG.md:PRODUCT_CLAIM|non-submission|demonstrati",
+      "ok": true,
+      "detail": "marker missing"
+    },
+    {
+      "name": "marker:07_reviewer_explanation/guides/SDRG.md:source|PDS|week|precision|CORE",
+      "ok": true,
+      "detail": "marker missing"
+    },
+    {
+      "name": "marker:07_reviewer_explanation/guides/BDRG.md:clinsite|BIMO|site",
+      "ok": true,
+      "detail": "marker missing"
+    },
+    {
+      "name": "traceability.no_active_L01_claim",
+      "ok": true,
+      "detail": "possible active L-01 claim"
+    }
+  ],
+  "problems": []
+}

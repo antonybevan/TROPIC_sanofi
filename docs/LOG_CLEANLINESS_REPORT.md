@@ -1,6 +1,6 @@
 # TROPIC Log Cleanliness Report
 
-Generated: 2026-07-09 16:35:17 UTC
+Generated: 2026-07-09 16:40:36 UTC
 
 > Automated scan of **configured persisted** SAS/R execution logs. Reviewed exceptions remain visible and capped; unapproved issues fail the gate. This gate does **not** scan ephemeral rscript/python stage stdout/stderr (those streams are not persisted by `cibuild.py`).
 

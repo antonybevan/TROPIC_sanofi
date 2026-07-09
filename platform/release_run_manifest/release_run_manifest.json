@@ -2,11 +2,11 @@
   "artifacts": {
     "controls": [
       {
-        "md5": "d4542bd81ebd32118755097a2318d61c",
+        "md5": "b46797ccc2188bdfe3e095905b84c5e0",
         "path": "config/study_manifest.yaml",
         "present": true,
-        "sha256": "43212b7e949fb36452d8c0ed47fe7e0d45a3d1ea7fb8c0e3992ee99ff4c77baa",
-        "size_bytes": 7845
+        "sha256": "ccd390c68144491b13df55126bacbf96e4ff9896c315ab6ea69378f625865cb0",
+        "size_bytes": 8608
       },
       {
         "md5": "a5f85e76ac17481b88701df546bc0565",
@@ -142,11 +142,11 @@
         "size_bytes": 7289
       },
       {
-        "md5": "454906487ddd723a3d29773183e2e522",
+        "md5": "1e7a29d95808922428d3537f9f70a8df",
         "path": "platform/cibuild.py",
         "present": true,
-        "sha256": "93cca9ea205b521f2e63b79c2142a5988d4a5a095bd66922ba25286a09e6dd97",
-        "size_bytes": 74515
+        "sha256": "844f48c37b0209e1117cec0daba7067a960a68f31aa21942966bc0ef19c20017",
+        "size_bytes": 75639
       },
       {
         "md5": "db6c8e54e5e146af046fb8bbc843a9d2",
@@ -1809,11 +1809,11 @@
         "size_bytes": 17484
       },
       {
-        "md5": "f5cbd7e8cfa5a1f2bb33312767e934e1",
+        "md5": "d527e5ea04e86e43ce9c9cbf17af2cc8",
         "path": "platform/build_orchestrator_gate_map.py",
         "present": true,
-        "sha256": "0dae8b4c5415dc28322c80c7e522a3af49be5bb5686444b6055293998dc7a8df",
-        "size_bytes": 11283
+        "sha256": "ec0e0de322f84fdb2175dacd7a9ad571a9ee025fbbf5e7ac95e6549cb15cbd0e",
+        "size_bytes": 11612
       },
       {
         "md5": "24605f0e65b757a4b2a5ddfcf2ffe240",
@@ -1872,6 +1872,27 @@
         "size_bytes": 4596
       },
       {
+        "md5": "02c4c76cc2bf30e15648eaeff6aeaa45",
+        "path": "platform/check_gate_g00_governance.py",
+        "present": true,
+        "sha256": "57f8913c54f998f9835b311aa1485d9ed13565400bed02e454a6ca8262a68f7d",
+        "size_bytes": 4013
+      },
+      {
+        "md5": "ec80d4195083637958142f822d1044c8",
+        "path": "platform/check_gate_g02_specification.py",
+        "present": true,
+        "sha256": "3d62f98c105fb566f7ecb5a5d2610382518ca303f4c2021294ddc0c9d2d9ad19",
+        "size_bytes": 3914
+      },
+      {
+        "md5": "17ddce7f2ddd01d7434dc6e1ff94a568",
+        "path": "platform/check_gate_g07_reviewer_package.py",
+        "present": true,
+        "sha256": "be6129bda2a57bc687010d4b48eddf77c0f0f5a8eadf272facc6afef81e2bacc",
+        "size_bytes": 3531
+      },
+      {
         "md5": "db6c8e54e5e146af046fb8bbc843a9d2",
         "path": "platform/check_log_cleanliness.py",
         "present": true,
@@ -1886,11 +1907,11 @@
         "size_bytes": 3614
       },
       {
-        "md5": "454906487ddd723a3d29773183e2e522",
+        "md5": "1e7a29d95808922428d3537f9f70a8df",
         "path": "platform/cibuild.py",
         "present": true,
-        "sha256": "93cca9ea205b521f2e63b79c2142a5988d4a5a095bd66922ba25286a09e6dd97",
-        "size_bytes": 74515
+        "sha256": "844f48c37b0209e1117cec0daba7067a960a68f31aa21942966bc0ef19c20017",
+        "size_bytes": 75639
       },
       {
         "md5": "64d06634e82e540c3b7aa85bc65a8d0a",
@@ -2112,31 +2133,31 @@
         "size_bytes": 2509
       },
       {
-        "md5": "df9fe90fa13ecbea02c404511d781485",
+        "md5": "cd5c334200eccc6d047ba691c23ffe99",
         "path": "platform/metadata_control/metadata_control_status.json",
         "present": true,
-        "sha256": "126df5fa61ece89415f02741beb09cc76fb2b369af55000f20508d33caab9d55",
+        "sha256": "d1f311b3057103ff47df547f7f8ebea5dd370297e81b0d016457ed4db9c2716a",
         "size_bytes": 1099
       },
       {
-        "md5": "267a4e79dadfd64ab305699665dc6de1",
+        "md5": "ccdf27ee9db933f34b5144a55d5bd764",
         "path": "platform/log_cleanliness/log_cleanliness_status.json",
         "present": true,
-        "sha256": "f0ab241c94c4cfb1cf50fcaf8d49f459c63ba7527acc2c6a9d984b263bd81694",
+        "sha256": "43a280f9665b8fbbd4f98dc0dddcb140adf81e42d5cbc0085dc6e2cef174778e",
         "size_bytes": 24146
       },
       {
-        "md5": "b6375eb81750c104b44192d874d4ae0e",
+        "md5": "20d0fee0b4a59d57ce8e6ed2ab582b15",
         "path": "platform/tfl_output_index_status.json",
         "present": true,
-        "sha256": "cae2073d0107d25871f7e98fb8fbe679e3535d37baadf8a975220cb8e1c8e144",
+        "sha256": "994e054ebc9b2f312a76ea27e82d7309e618c2a2cdb6a12dde8508a28781a442",
         "size_bytes": 1021
       },
       {
-        "md5": "1c21b8900458a08e28fc8387a1616691",
+        "md5": "ab8739af95fce309a2eb1b8bba6c1d05",
         "path": "platform/validation_strategy/validation_strategy_status.json",
         "present": true,
-        "sha256": "23e448fb59b18eedb799d61c8ddb8a72c1c162ed31de7e4f4189515baa58e7a2",
+        "sha256": "2e203602d0ed6b1676c77e7c669d12645328b01079502cc9747dfac6eb584a64",
         "size_bytes": 22052
       }
     ],
@@ -2554,9 +2575,9 @@
     "sas_version": "9.04.01M8P022223",
     "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007"
   },
-  "evidence_grade": "release_candidate",
-  "generated_at": "2026-07-09 16:36:51 UTC",
-  "manifest_sha256": "bbf6a8a4762c396222fda93a9d70b9f503d7741aa6271ee043b09b0b706bfad2",
+  "evidence_grade": "remediation_partial_or_dirty",
+  "generated_at": "2026-07-09 16:40:36 UTC",
+  "manifest_sha256": "6c755ea69de5777a31b6b10f8d7fef1433a04aa5c9ec33258a09a52e73a611ad",
   "problems": [],
   "qc_statuses": {
     "cbzp_bridge": {
@@ -2659,17 +2680,25 @@
       "status": "PASS"
     }
   },
-  "remediation_reasons": [],
+  "remediation_reasons": [
+    "pipeline_health does not cover a full current DAG run (30 recorded in health / 32 release-required upstream stages; missing=3; not_run=0). Acceptable as targeted remediation evidence only.",
+    "stages missing from pipeline_health: Governance Scope Lock (G00), Analysis Specification Lock (G02), Reviewer Package Lock (G07)",
+    "git worktree is dirty (22 porcelain entries); release-candidate lock requires a clean committed state"
+  ],
   "run_completeness": {
     "failed": [],
     "health_run_scope": "full_dag",
-    "missing_from_health": [],
+    "missing_from_health": [
+      "Governance Scope Lock (G00)",
+      "Analysis Specification Lock (G02)",
+      "Reviewer Package Lock (G07)"
+    ],
     "non_success": [],
     "not_run": [],
-    "run_scope": "full_dag",
-    "stages_expected": 30,
+    "run_scope": "partial_dag",
+    "stages_expected": 33,
     "stages_recorded_in_health": 30,
-    "stages_required_for_release": 29
+    "stages_required_for_release": 32
   },
   "sas_companion_figures": {
     "all_current_with_pipeline_health": false,
@@ -2719,14 +2748,79 @@
   },
   "source_control": {
     "branch": "codex/repo-structure-phase2",
-    "dirty": false,
-    "dirty_including_seal_outputs": false,
-    "head": "e112a7aa626b6dc5cc9ced412eb82a3ec9379a1a",
+    "dirty": true,
+    "dirty_including_seal_outputs": true,
+    "head": "8c9ec2cb644e43884228662c488841fb8f080577",
     "staged_diff_paths": [],
-    "status_porcelain": [],
-    "status_porcelain_all": [],
-    "status_porcelain_sha256": "",
-    "tracked_diff_paths": []
+    "status_porcelain": [
+      "M config/study_manifest.yaml",
+      " M docs/CTQ_TRACEABILITY_REPORT.md",
+      " M docs/LOG_CLEANLINESS_REPORT.md",
+      " M docs/METADATA_CONTROL_REPORT.md",
+      " M docs/ORCHESTRATOR_GATE_MAP.md",
+      " M docs/SOURCE_PROFILING_REPORT.md",
+      " M docs/TFL_OUTPUT_INDEX.md",
+      " M docs/VALIDATION_STRATEGY_CONTROL_REPORT.md",
+      " M platform/build_orchestrator_gate_map.py",
+      " M platform/cibuild.py",
+      " M platform/ctq_traceability/ctq_traceability_status.json",
+      " M platform/log_cleanliness/log_cleanliness_status.json",
+      " M platform/metadata_control/metadata_control_status.json",
+      " M platform/orchestrator_gate_map/orchestrator_gate_map.csv",
+      " M platform/orchestrator_gate_map/orchestrator_gate_map_status.json",
+      " M platform/source_profile_status.json",
+      " M platform/tfl_output_index_status.json",
+      " M platform/validation_strategy/validation_strategy_status.json",
+      "?? 06_qc_evidence/gates/",
+      "?? platform/check_gate_g00_governance.py",
+      "?? platform/check_gate_g02_specification.py",
+      "?? platform/check_gate_g07_reviewer_package.py"
+    ],
+    "status_porcelain_all": [
+      "M config/study_manifest.yaml",
+      " M docs/CTQ_TRACEABILITY_REPORT.md",
+      " M docs/LOG_CLEANLINESS_REPORT.md",
+      " M docs/METADATA_CONTROL_REPORT.md",
+      " M docs/ORCHESTRATOR_GATE_MAP.md",
+      " M docs/SOURCE_PROFILING_REPORT.md",
+      " M docs/TFL_OUTPUT_INDEX.md",
+      " M docs/VALIDATION_STRATEGY_CONTROL_REPORT.md",
+      " M platform/build_orchestrator_gate_map.py",
+      " M platform/cibuild.py",
+      " M platform/ctq_traceability/ctq_traceability_status.json",
+      " M platform/log_cleanliness/log_cleanliness_status.json",
+      " M platform/metadata_control/metadata_control_status.json",
+      " M platform/orchestrator_gate_map/orchestrator_gate_map.csv",
+      " M platform/orchestrator_gate_map/orchestrator_gate_map_status.json",
+      " M platform/source_profile_status.json",
+      " M platform/tfl_output_index_status.json",
+      " M platform/validation_strategy/validation_strategy_status.json",
+      "?? 06_qc_evidence/gates/",
+      "?? platform/check_gate_g00_governance.py",
+      "?? platform/check_gate_g02_specification.py",
+      "?? platform/check_gate_g07_reviewer_package.py"
+    ],
+    "status_porcelain_sha256": "f4b607df549adf1642716628e25cc079a70a66c8e8644d23e8878d54dbc02527",
+    "tracked_diff_paths": [
+      "config/study_manifest.yaml",
+      "docs/CTQ_TRACEABILITY_REPORT.md",
+      "docs/LOG_CLEANLINESS_REPORT.md",
+      "docs/METADATA_CONTROL_REPORT.md",
+      "docs/ORCHESTRATOR_GATE_MAP.md",
+      "docs/SOURCE_PROFILING_REPORT.md",
+      "docs/TFL_OUTPUT_INDEX.md",
+      "docs/VALIDATION_STRATEGY_CONTROL_REPORT.md",
+      "platform/build_orchestrator_gate_map.py",
+      "platform/cibuild.py",
+      "platform/ctq_traceability/ctq_traceability_status.json",
+      "platform/log_cleanliness/log_cleanliness_status.json",
+      "platform/metadata_control/metadata_control_status.json",
+      "platform/orchestrator_gate_map/orchestrator_gate_map.csv",
+      "platform/orchestrator_gate_map/orchestrator_gate_map_status.json",
+      "platform/source_profile_status.json",
+      "platform/tfl_output_index_status.json",
+      "platform/validation_strategy/validation_strategy_status.json"
+    ]
   },
-  "status": "PASS"
+  "status": "REMEDIATION"
 }

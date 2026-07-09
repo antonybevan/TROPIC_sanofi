@@ -1,6 +1,6 @@
 # TROPIC Validation Strategy Control Report
 
-Generated: 2026-07-09 16:35:17 UTC
+Generated: 2026-07-09 16:40:36 UTC
 
 > This report evaluates `config/validation_strategy.yaml`: the machine-readable risk-based, traceability-driven, specification-controlled validation strategy. A BLOCKED status means the current evidence set cannot support a release-ready claim.
 

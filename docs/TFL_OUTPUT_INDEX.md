@@ -1,6 +1,6 @@
 # TROPIC TFL Output Index
 
-Generated: 2026-07-09 16:35:17 UTC
+Generated: 2026-07-09 16:40:36 UTC
 
 > Structured index for rendered tables, figures, listings, and companion SAS figures. This is output-control evidence, not a claim that every output is submission-ready. **Controlled scope authority:** `config/tfl_output_catalog.yaml` (SAP authority: 02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx). SAS companion figures are **out-of-DAG capability demos** (`_oda_render_tfl.py`); presence/hash is inventory only and does **not** gate controlled-scope completeness.
 
@@ -8,7 +8,7 @@ Generated: 2026-07-09 16:35:17 UTC
 
 | Item | Value |
 | --- | --- |
-| Generated | 2026-07-09 16:35:17 UTC |
+| Generated | 2026-07-09 16:40:36 UTC |
 | Overall status | see Machine-Readable status JSON |
 | Controlled catalog | config/tfl_output_catalog.yaml |
 | Controlled catalog status | pass |

@@ -1,6 +1,6 @@
 # TROPIC Metadata Control Report
 
-Generated: 2026-07-09 16:35:17 UTC
+Generated: 2026-07-09 16:40:36 UTC
 
 > Metadata governance view across ADaM spec, Define-XML, ARM/ARS, conformance outputs, and traceability evidence. This report exposes both passing controls and unresolved metadata gaps.
 

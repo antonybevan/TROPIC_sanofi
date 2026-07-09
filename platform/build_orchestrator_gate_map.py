@@ -16,6 +16,8 @@ except ImportError:
 
 
 STAGE_GATE_RULES = [
+    ("Governance Scope Lock (G00)", ["G00"], "executable product-claim / authority / findings disposition lock"),
+    ("Analysis Specification Lock (G02)", ["G02"], "executable SAP/config/catalog/population-endpoint lock"),
     ("ADaM Spec Label/Order Artifacts", ["G03", "G06"], "spec-derived metadata export contract"),
     ("Real SDTM Staging Ingest", ["G01"], "source intake/staging"),
     ("R SDTM Validation", ["G01", "G06"], "source structural validation"),
@@ -38,6 +40,7 @@ STAGE_GATE_RULES = [
     ("Forest-HR Reconciliation (SAS vs R)", ["G06"], "figure-driving statistic reconciliation"),
     ("ADaM Spec to Define Conformance", ["G03", "G06"], "metadata spec-to-define conformance"),
     ("ADaM Spec to Data Conformance", ["G03", "G04", "G06"], "metadata spec-to-data conformance"),
+    ("Reviewer Package Lock (G07)", ["G07"], "executable ADRG/SDRG/BDRG + claim/residual pointer lock"),
     ("Dataset-JSON Export (v1.1)", ["G04", "G08"], "dataset exchange layer"),
     ("Analysis Results Standard (ARS v1.0)", ["G05", "G08"], "analysis results metadata/export layer"),
     ("USDM Study Definition (v3.0)", ["G03", "G08"], "study definition metadata/export layer"),

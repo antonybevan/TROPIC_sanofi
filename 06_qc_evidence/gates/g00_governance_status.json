@@ -1,0 +1,69 @@
+{
+  "gate": "G00",
+  "name": "governance_scope_lock",
+  "status": "PASS",
+  "generated_at": "2026-07-09T16:40:23Z",
+  "checks": [
+    {
+      "name": "exists:docs/PRODUCT_CLAIM.md",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:docs/WORKSTREAM_EXECUTION_BOARD.md",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:00_governance/REPRODUCIBILITY.md",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:06_qc_evidence/audit/findings_register.csv",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:config/workstream_execution_board.yaml",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "product_claim.path_a",
+      "ok": true,
+      "detail": "PRODUCT_CLAIM must freeze Path A / controlled demo language"
+    },
+    {
+      "name": "product_claim.forbids_part11",
+      "ok": true,
+      "detail": "must explicitly reject Part 11 claim"
+    },
+    {
+      "name": "findings.no_confirmed_crit_major",
+      "ok": true,
+      "detail": "none"
+    }
+  ],
+  "problems": []
+}

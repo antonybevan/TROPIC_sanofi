@@ -1,29 +1,50 @@
 {
-  "status": "warning",
-  "generated_at": "2026-07-09 16:35:20 UTC",
+  "status": "pass",
+  "generated_at": "2026-07-09 16:40:39 UTC",
   "manifest": "config/study_manifest.yaml",
   "delivery_model": "config/delivery_workstreams.yaml",
-  "stages": 30,
-  "mapped_stages": 30,
+  "stages": 33,
+  "mapped_stages": 33,
   "unmapped_stages": [],
   "gates": 10,
   "stage_covered_gates": [
+    "G00",
     "G01",
+    "G02",
     "G03",
     "G04",
     "G05",
     "G06",
+    "G07",
     "G08",
     "G09"
   ],
-  "not_currently_stage_gated": [
-    "G00",
-    "G02",
-    "G07"
-  ],
+  "not_currently_stage_gated": [],
   "stage_rows": [
     {
       "stage_id": 1,
+      "stage_name": "Governance Scope Lock (G00)",
+      "script": "platform/check_gate_g00_governance.py",
+      "runner": "python",
+      "parallel": false,
+      "manifest_gated": true,
+      "delivery_gates": "G00",
+      "mapping_rationale": "executable product-claim / authority / findings disposition lock",
+      "source": "manifest.infrastructure_stages.pre"
+    },
+    {
+      "stage_id": 2,
+      "stage_name": "Analysis Specification Lock (G02)",
+      "script": "platform/check_gate_g02_specification.py",
+      "runner": "python",
+      "parallel": false,
+      "manifest_gated": true,
+      "delivery_gates": "G02",
+      "mapping_rationale": "executable SAP/config/catalog/population-endpoint lock",
+      "source": "manifest.infrastructure_stages.pre"
+    },
+    {
+      "stage_id": 3,
       "stage_name": "ADaM Spec Label/Order Artifacts",
       "script": "platform/gen_adam_labels.R",
       "runner": "rscript",
@@ -34,7 +55,7 @@
       "source": "manifest.infrastructure_stages.pre"
     },
     {
-      "stage_id": 2,
+      "stage_id": 4,
       "stage_name": "Real SDTM Staging Ingest",
       "script": "04_analysis_datasets/programs/r/v_staging_ingest.R",
       "runner": "logrx",
@@ -45,7 +66,7 @@
       "source": "manifest.infrastructure_stages.pre"
     },
     {
-      "stage_id": 3,
+      "stage_id": 5,
       "stage_name": "R SDTM Validation",
       "script": "04_analysis_datasets/programs/r/v_sdtm_validation.R",
       "runner": "logrx",
@@ -56,7 +77,7 @@
       "source": "manifest.infrastructure_stages.pre"
     },
     {
-      "stage_id": 4,
+      "stage_id": 6,
       "stage_name": "R ADSL Validation",
       "script": "04_analysis_datasets/programs/r/v_adsl_validation.R",
       "runner": "logrx",
@@ -67,7 +88,7 @@
       "source": "manifest.datasets.adsl"
     },
     {
-      "stage_id": 5,
+      "stage_id": 7,
       "stage_name": "R ADEX Validation",
       "script": "04_analysis_datasets/programs/r/v_adex_validation.R",
       "runner": "logrx",
@@ -78,7 +99,7 @@
       "source": "manifest.datasets.adex"
     },
     {
-      "stage_id": 6,
+      "stage_id": 8,
       "stage_name": "R ADCM Validation",
       "script": "04_analysis_datasets/programs/r/v_adcm_validation.R",
       "runner": "logrx",
@@ -89,7 +110,7 @@
       "source": "manifest.datasets.adcm"
     },
     {
-      "stage_id": 7,
+      "stage_id": 9,
       "stage_name": "R ADAE Validation",
       "script": "04_analysis_datasets/programs/r/v_adae_io_validation.R",
       "runner": "logrx",
@@ -100,7 +121,7 @@
       "source": "manifest.datasets.adae"
     },
     {
-      "stage_id": 8,
+      "stage_id": 10,
       "stage_name": "R ADLB Validation",
       "script": "04_analysis_datasets/programs/r/v_adlb_validation.R",
       "runner": "logrx",
@@ -111,7 +132,7 @@
       "source": "manifest.datasets.adlb"
     },
     {
-      "stage_id": 9,
+      "stage_id": 11,
       "stage_name": "R ADRS Validation",
       "script": "04_analysis_datasets/programs/r/v_adrs_validation.R",
       "runner": "logrx",
@@ -122,7 +143,7 @@
       "source": "manifest.datasets.adrs"
     },
     {
-      "stage_id": 10,
+      "stage_id": 12,
       "stage_name": "R ADTTE Validation",
       "script": "04_analysis_datasets/programs/r/v_adtte_validation.R",
       "runner": "logrx",
@@ -133,7 +154,7 @@
       "source": "manifest.datasets.adtte"
     },
     {
-      "stage_id": 11,
+      "stage_id": 13,
       "stage_name": "R BIMO Validation",
       "script": "04_analysis_datasets/programs/r/v_bimo_validation.R",
       "runner": "logrx",
@@ -144,7 +165,7 @@
       "source": "manifest.datasets.clinsite"
     },
     {
-      "stage_id": 12,
+      "stage_id": 14,
       "stage_name": "SAS Production (ODA/Real/Simulated)",
       "script": "SIMULATE sentinel / SAS production resolver",
       "runner": "sas_mode",
@@ -155,7 +176,7 @@
       "source": "cibuild.py sentinel"
     },
     {
-      "stage_id": 13,
+      "stage_id": 15,
       "stage_name": "Cross-Language Audit Reconcile",
       "script": "06_qc_evidence/reconciliation/cross_lang_audit.R",
       "runner": "logrx",
@@ -166,7 +187,7 @@
       "source": "manifest.infrastructure_stages.post"
     },
     {
-      "stage_id": 14,
+      "stage_id": 16,
       "stage_name": "Admiral ADSL Re-derivation",
       "script": "04_analysis_datasets/programs/r/admiral_adsl.R",
       "runner": "rscript",
@@ -177,7 +198,7 @@
       "source": "manifest.infrastructure_stages.post"
     },
     {
-      "stage_id": 15,
+      "stage_id": 17,
       "stage_name": "Admiral ADTTE Re-derivation (OS/PFS)",
       "script": "04_analysis_datasets/programs/r/admiral_adtte.R",
       "runner": "rscript",
@@ -188,7 +209,7 @@
       "source": "manifest.infrastructure_stages.post"
     },
     {
-      "stage_id": 16,
+      "stage_id": 18,
       "stage_name": "Admiral Core Reconciliation",
       "script": "06_qc_evidence/reconciliation/admiral_reconcile.R",
       "runner": "rscript",
@@ -199,7 +220,7 @@
       "source": "manifest.infrastructure_stages.post"
     },
     {
-      "stage_id": 17,
+      "stage_id": 19,
       "stage_name": "Synthetic Comparator Bridge Parity",
       "script": "01_source_data/check_cbzp_bridge.R",
       "runner": "rscript",
@@ -210,7 +231,7 @@
       "source": "manifest.infrastructure_stages.post"
     },
     {
-      "stage_id": 18,
+      "stage_id": 20,
       "stage_name": "Efficacy & Safety TFL Suite Compilation",
       "script": "05_outputs/tfl/tfl_generation.R",
       "runner": "rscript",
@@ -221,7 +242,7 @@
       "source": "manifest.infrastructure_stages.post"
     },
     {
-      "stage_id": 19,
+      "stage_id": 21,
       "stage_name": "Numerical Results Reconciliation (SAS vs R)",
       "script": "06_qc_evidence/reconciliation/results_reconcile.R",
       "runner": "logrx",
@@ -232,7 +253,7 @@
       "source": "manifest.infrastructure_stages.post"
     },
     {
-      "stage_id": 20,
+      "stage_id": 22,
       "stage_name": "Forest-HR Reconciliation (SAS vs R)",
       "script": "06_qc_evidence/reconciliation/forest_reconcile.R",
       "runner": "rscript",
@@ -243,7 +264,7 @@
       "source": "manifest.infrastructure_stages.post"
     },
     {
-      "stage_id": 21,
+      "stage_id": 23,
       "stage_name": "ADaM Spec to Define Conformance",
       "script": "03_metadata/define/check_define_conformance.R",
       "runner": "rscript",
@@ -254,7 +275,7 @@
       "source": "manifest.infrastructure_stages.post"
     },
     {
-      "stage_id": 22,
+      "stage_id": 24,
       "stage_name": "ADaM Spec to Data Conformance",
       "script": "04_analysis_datasets/programs/r/spec_data_checks.R",
       "runner": "rscript",
@@ -265,7 +286,18 @@
       "source": "manifest.infrastructure_stages.post"
     },
     {
-      "stage_id": 23,
+      "stage_id": 25,
+      "stage_name": "Reviewer Package Lock (G07)",
+      "script": "platform/check_gate_g07_reviewer_package.py",
+      "runner": "python",
+      "parallel": false,
+      "manifest_gated": true,
+      "delivery_gates": "G07",
+      "mapping_rationale": "executable ADRG/SDRG/BDRG + claim/residual pointer lock",
+      "source": "manifest.infrastructure_stages.post"
+    },
+    {
+      "stage_id": 26,
       "stage_name": "Dataset-JSON Export (v1.1)",
       "script": "platform/export_datasetjson.py",
       "runner": "python",
@@ -276,7 +308,7 @@
       "source": "manifest.infrastructure_stages.post"
     },
     {
-      "stage_id": 24,
+      "stage_id": 27,
       "stage_name": "Analysis Results Standard (ARS v1.0)",
       "script": "platform/build_ars.py",
       "runner": "python",
@@ -287,7 +319,7 @@
       "source": "manifest.infrastructure_stages.post"
     },
     {
-      "stage_id": 25,
+      "stage_id": 28,
       "stage_name": "USDM Study Definition (v3.0)",
       "script": "platform/build_usdm.py",
       "runner": "python",
@@ -298,7 +330,7 @@
       "source": "manifest.infrastructure_stages.post"
     },
     {
-      "stage_id": 26,
+      "stage_id": 29,
       "stage_name": "eCTD Final Package",
       "script": "platform/package_ectd.py",
       "runner": "python",
@@ -309,7 +341,7 @@
       "source": "manifest.infrastructure_stages.post"
     },
     {
-      "stage_id": 27,
+      "stage_id": 30,
       "stage_name": "eCTD Backbone + STF (sequence 0000)",
       "script": "platform/build_ectd_backbone.py",
       "runner": "python",
@@ -320,7 +352,7 @@
       "source": "manifest.infrastructure_stages.post"
     },
     {
-      "stage_id": 28,
+      "stage_id": 31,
       "stage_name": "Materialize eCTD Sequence",
       "script": "platform/materialize_ectd.py",
       "runner": "python",
@@ -331,7 +363,7 @@
       "source": "manifest.infrastructure_stages.post"
     },
     {
-      "stage_id": 29,
+      "stage_id": 32,
       "stage_name": "Log Cleanliness Gate",
       "script": "platform/check_log_cleanliness.py",
       "runner": "python",
@@ -342,7 +374,7 @@
       "source": "manifest.infrastructure_stages.post"
     },
     {
-      "stage_id": 30,
+      "stage_id": 33,
       "stage_name": "Release Run Manifest Binding",
       "script": "platform/build_release_run_manifest.py",
       "runner": "python",

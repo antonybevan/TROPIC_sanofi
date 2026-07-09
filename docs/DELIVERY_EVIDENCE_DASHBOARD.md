@@ -1,6 +1,6 @@
 # TROPIC Delivery Evidence Dashboard
 
-Generated: 2026-07-09 16:35:20 UTC
+Generated: 2026-07-09 16:40:39 UTC
 
 > This dashboard is generated from `config/evidence_layers.yaml` and `config/delivery_workstreams.yaml`. It is an architecture and evidence-control view, not a claim that the package is submission-ready.
 

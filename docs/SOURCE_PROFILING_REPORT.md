@@ -1,6 +1,6 @@
 # TROPIC Source Profiling Report
 
-Generated: 2026-07-09 16:35:12 UTC
+Generated: 2026-07-09 16:40:31 UTC
 
 > Aggregate-only source profiling evidence. This report does not print patient-level records or subject identifiers.
 

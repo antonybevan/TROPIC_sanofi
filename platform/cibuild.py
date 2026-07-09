@@ -667,6 +667,26 @@ def run_single_stage(stage, from_stage, sas_mode, results):
     # guards (audit C-3: the M-4 sanity gate had drifted off the TFL stage onto packaging).
     stage_status_override = None
 
+    # Document/control locks promoted to runtime stages (phase 2).
+    for gate_name, status_path in (
+        ("Governance Scope Lock (G00)", "06_qc_evidence/gates/g00_governance_status.json"),
+        ("Analysis Specification Lock (G02)", "06_qc_evidence/gates/g02_specification_status.json"),
+        ("Reviewer Package Lock (G07)", "06_qc_evidence/gates/g07_reviewer_package_status.json"),
+    ):
+        if stage["name"] == gate_name and rc == 0:
+            try:
+                with open(status_path) as sf:
+                    gate = json.load(sf)
+                if gate.get("status") != "PASS":
+                    rc = 1
+                    stderr = (
+                        f"{gate_name} status is {gate.get('status')!r}; "
+                        f"problems={gate.get('problems', [])[:5]}"
+                    )
+            except (FileNotFoundError, json.JSONDecodeError) as exc:
+                rc = 1
+                stderr = f"{gate_name} status unreadable at {status_path}: {exc}"
+
     if stage["name"] == "Cross-Language Audit Reconcile" and rc == 0:
         status_path = "platform/reconciliation_status.json"
         try:
@@ -909,10 +929,13 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
     # a stage `gated` that the engine has NO gate logic for — a rename/typo that would
     # otherwise run silently ungated (the C-3 regression class).
     implemented_gates = {
+        "Governance Scope Lock (G00)",
+        "Analysis Specification Lock (G02)",
         "Cross-Language Audit Reconcile",
         "Admiral Core Reconciliation",
         "Efficacy & Safety TFL Suite Compilation",
         "Numerical Results Reconciliation (SAS vs R)",
+        "Reviewer Package Lock (G07)",
     }
     unimplemented_gates = {s["name"] for s in stages if s.get("gated")} - implemented_gates
     if unimplemented_gates:
