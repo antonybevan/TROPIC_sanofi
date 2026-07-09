@@ -4,7 +4,8 @@
 **Study:** EFC6193 / XRP6258 (TROPIC, NCT00417079)  
 **Tag:** `v0.1.0-demo-rc.1`  
 **Seal date:** 2026-07-09  
-**Git tip at seal:** `f7bfb48` (and parent seal commits `29d8016`, `647095c`)
+**Git tip at tag:** `cff7aa1` (release note)  
+**Seal artifact commits:** `f7bfb48` → `29d8016` → `647095c`
 
 ---
 
@@ -100,13 +101,13 @@ Full real re-run requires licensed SDTM placement + ODA/local SAS (see `REPRODUC
 
 ---
 
-## Tag command (repository)
+## Tag (repository)
 
-```bash
-git tag -a v0.1.0-demo-rc.1 f7bfb48 -m "TROPIC controlled demo release-candidate PASS (ODA full_dag)"
+```text
+git tag -a v0.1.0-demo-rc.1   # points at this note commit (cff7aa1)
 ```
 
-If this note is committed after `f7bfb48`, retag the note commit or leave the tag on the seal tip and treat this file as the narrative companion.
+Machine seal artifacts were landed at `f7bfb48`; this tag includes the reviewer narrative on top of that sealed tip.
 
 ---
 
