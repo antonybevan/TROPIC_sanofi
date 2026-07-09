@@ -122,8 +122,8 @@ layers:
         status: required
         role: "Human-readable traceability matrix."
       - path: 06_qc_evidence/audit/adam_variable_traceability.csv
-        status: required
-        role: "Machine-readable ADaM variable traceability extract."
+        status: generated
+        role: "Machine-readable ADaM variable traceability extract (local inventory rebuild; not portfolio surface)."
       - path: docs/METADATA_CONTROL_REPORT.md
         status: generated
         role: "Generated metadata governance report."
@@ -153,11 +153,11 @@ layers:
         status: required
         role: "Independent R validation programs."
       - path: 04_analysis_datasets/adam
-        status: required
-        role: "Current ADaM XPT output directory."
+        status: generated
+        role: "ADaM XPT output directory (local build only; patient-derived XPTs not in git)."
       - glob: "04_analysis_datasets/adam/*.xpt"
         status: generated
-        role: "Generated ADaM transport files."
+        role: "Generated ADaM transport files (never redistributed)."
       - path: 04_analysis_datasets/datasetjson/README.md
         status: required
         role: "Dataset-JSON export documentation."
@@ -278,11 +278,11 @@ layers:
         status: required
         role: "Audit findings register."
       - path: 06_qc_evidence/audit/output_hash_binding.csv
-        status: required
-        role: "Current output-to-package hash binding evidence."
-      - path: platform/release_run_manifest/release_run_manifest.json
         status: generated
-        role: "Machine-readable current release-run manifest and hash seal."
+        role: "Per-file hash binding extract from release-run manifest rebuild (local; not portfolio surface)."
+      - path: platform/release_run_manifest/release_run_manifest.json
+        status: required
+        role: "Path A seal allowlist: machine-readable release-run manifest and hash seal."
       - path: platform/release_run_manifest/release_run_files.csv
         status: generated
         role: "Per-file hash ledger bound into the release-run manifest."
