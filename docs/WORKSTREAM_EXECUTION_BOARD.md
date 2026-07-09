@@ -3,7 +3,7 @@
 **Status:** Active operating board — not a decorative architecture map  
 **As of:** 2026-07-09  
 **Pipeline seal:** `v0.1.0-demo-rc.1` · release-run `PASS` · RC checklist `PASS` · ODA `full_dag` 30/30  
-**Product claim in force:** **Controlled non-submission demonstration package**  
+**Product claim in force:** **Controlled non-submission demonstration package** (`docs/PRODUCT_CLAIM.md`)  
 **Authority:** SAP v4.0 remediation lock · `audit/SAP_LOCK_REVIEW_MEMO.md` · `audit/FINDINGS_DISPOSITION_BOARD.md`
 
 ---
@@ -56,11 +56,11 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | Field | Content |
 |---|---|
 | **Owned artifacts** | SAP v4.0 · SAP lock memo · README · REPRODUCIBILITY · findings register · disposition board · release note · tag `v0.1.0-demo-rc.1` · product claim language |
-| **Current status** | **AMBER** — claim is consistent in seals/tag; still no single signed “product claim decision” that freezes demo vs submission-simulation for v0.2 |
+| **Current status** | **GREEN** — `docs/PRODUCT_CLAIM.md` freezes the controlled demo claim and v0.2 submission-simulation path |
 | **Open risks** | Language drift back to “submission-ready”; ACCEPTED Crits (F-003, F-005, F-025) misread as closed science |
-| **Required evidence for GREEN** | Short `docs/PRODUCT_CLAIM.md` (demo vs submission simulation) signed in-repo; all public claim surfaces cite it; disposition board linked from ADRG/SDRG (done for tag) |
+| **Required evidence for GREEN** | `docs/PRODUCT_CLAIM.md` freezes demo vs submission simulation; disposition board linked from ADRG/SDRG (done for tag) |
 | **Release gate** | G00 must hold before any new “submission simulation” language |
-| **Next action** | **Write and freeze PRODUCT_CLAIM.md for v0.1 demo / v0.2 path** — owner: Governance |
+| **Next action** | Maintain claim language; next governance review only if G00 changes or public wording drifts |
 
 ---
 
@@ -183,7 +183,7 @@ WS-7 Release ──G08/G09──► tagged package (v0.1.0-demo-rc.1 done for de
 
 | Priority | Workstream | Deliverable | Why |
 |---:|---|---|---|
-| **P0** | WS-0 | `docs/PRODUCT_CLAIM.md` | Stops claim drift; career protection |
+| **Done** | WS-0 | `docs/PRODUCT_CLAIM.md` | Stops claim drift; career protection |
 | **P0** | WS-5 | Known-differences / residual risk memo for reviewers | Makes ACCEPTED findings usable in interview/review |
 | **P1** | WS-6 | ADRG/SDRG/BDRG hardening against board + claim | Reviewer package is the human product |
 | **P1** | WS-1 + WS-3 | External validation evidence index (CORE residual + P21 slot + XSD + eCTD validate) | Industry-grade package layer |
@@ -223,9 +223,8 @@ Not “another GREEN JSON.”
 
 ## 8. Immediate next command (start operating)
 
-**Next human session agenda = WS-0 + WS-5 only:**
+**Next human session agenda = WS-5 only:**
 
-1. Freeze product claim document.  
-2. Write known-differences residual risk memo from ACCEPTED findings.  
+1. Write known-differences residual risk memo from ACCEPTED findings.  
 
 That is the difference between a sealed pipeline and a submission-style operating model.

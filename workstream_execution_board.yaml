@@ -8,19 +8,21 @@ as_of: "2026-07-09"
 product_claim_in_force: controlled_non_submission_demo
 pipeline_seal_tag: v0.1.0-demo-rc.1
 board_doc: docs/WORKSTREAM_EXECUTION_BOARD.md
+product_claim_doc: docs/PRODUCT_CLAIM.md
 disposition_board: audit/FINDINGS_DISPOSITION_BOARD.md
 
 workstreams:
   WS0_governance:
     name: Governance and scope control
     gates: [G00, G09]
-    status: AMBER
+    status: GREEN
     owned_artifacts:
       - TROPIC_SAP_v4.0_industry_grade.docx
       - audit/SAP_LOCK_REVIEW_MEMO.md
       - audit/findings_register.csv
       - audit/FINDINGS_DISPOSITION_BOARD.md
       - docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md
+      - docs/PRODUCT_CLAIM.md
       - README.md
       - REPRODUCIBILITY.md
     open_risks:
@@ -28,7 +30,7 @@ workstreams:
       - accepted_criticals_misread_as_scientific_closure
     required_evidence:
       - docs/PRODUCT_CLAIM.md
-    next_action: "Write and freeze docs/PRODUCT_CLAIM.md for demo vs submission-simulation path"
+    next_action: "Maintain claim language; reopen G00 only if product claim changes or public wording drifts"
     residual_findings: [F-003, F-005, F-025, F-019]
 
   WS1_source_intake:
@@ -184,7 +186,7 @@ workstreams:
     residual_findings: [F-005, F-025]
 
 priority_queue:
-  - { id: P0-WS0, workstream: WS0_governance, action: "PRODUCT_CLAIM.md" }
+  - { id: DONE-WS0, workstream: WS0_governance, action: "PRODUCT_CLAIM.md" }
   - { id: P0-WS5, workstream: WS5_qc_validation, action: "KNOWN_DIFFERENCES_MEMO.md" }
   - { id: P1-WS6, workstream: WS6_regulatory_writing, action: "ADRG/SDRG/BDRG hardening" }
   - { id: P1-WS1-WS3, workstream: WS3_standards_metadata, action: "external validation evidence index" }

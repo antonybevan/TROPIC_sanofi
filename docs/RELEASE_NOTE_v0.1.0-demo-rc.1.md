@@ -11,7 +11,7 @@
 
 ## One-line verdict
 
-**Release-candidate PASS** for a **controlled non-submission demo** package — full ODA dual-language DAG, hash-sealed run record, dispositioned findings — **not** an FDA filing package and **not** Part 11.
+**Release-candidate PASS** for a **controlled non-submission demo** package — full ODA dual-language DAG, hash-sealed run record, dispositioned findings — **not** an FDA filing package and **not** Part 11. The governing claim boundary is now frozen in `docs/PRODUCT_CLAIM.md`.
 
 ---
 
