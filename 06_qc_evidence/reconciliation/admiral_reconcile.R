@@ -72,11 +72,18 @@ reconcile <- function(adm_path, prod_path, cols, key_extra = NULL,
 }
 
 results <- list()
-results[["ADSL"]] <- reconcile("04_analysis_datasets/adam/adsl_admiral.xpt", "04_analysis_datasets/adam/adsl_prod.xpt", ADSL_CORE)
+results[["ADSL"]] <- reconcile(
+  "04_analysis_datasets/adam/adsl_admiral.xpt",
+  "04_analysis_datasets/adam/adsl_prod.xpt",
+  ADSL_CORE
+)
 for (p in ADTTE_PARAMS) {
   results[[paste0("ADTTE.", p)]] <- reconcile(
-    "04_analysis_datasets/adam/adtte_admiral.xpt", "04_analysis_datasets/adam/adtte_prod.xpt", ADTTE_CORE,
-    key_extra = "PARAMCD", param = p
+    "04_analysis_datasets/adam/adtte_admiral.xpt",
+    "04_analysis_datasets/adam/adtte_prod.xpt",
+    ADTTE_CORE,
+    key_extra = "PARAMCD",
+    param = p
   )
 }
 
