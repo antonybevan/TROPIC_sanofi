@@ -28,12 +28,16 @@ REPORT_COMMANDS = [
     ["platform/build_delivery_dashboard.py"],
 ]
 
-# These rewrite Path A seal allowlist JSONs. Safe locally after a real run; unsafe in
-# data-free CI because they would clobber committed seals before verify_release.
+# These rewrite Path A seal allowlist JSONs (or other committed machine grades
+# that scripts/verify_release.py re-checks). Safe locally after a real run;
+# unsafe in data-free CI because they clobber committed seals before the
+# end-of-suite verify_release step.
 SEAL_MUTATING_REPORTS = {
     "platform/check_log_cleanliness.py",
     "platform/build_release_run_manifest.py",
     "platform/build_release_candidate_checklist.py",
+    "platform/build_tfl_output_index.py",
+    "platform/build_validation_strategy_report.py",
 }
 
 CHECK_COMMANDS = [
