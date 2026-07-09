@@ -118,8 +118,8 @@ Machine gates can be green while **residual risks** remain. This memo is the hum
 |---|---|
 | **Difference** | Documented CORE SDTMIG 3.4 run exists; not every residual occurrence is closed as a full commercial conformance program. |
 | **Impact if ignored** | “Zero CORE findings” overclaim |
-| **Why Path A holds** | Run record + SDRG known issues; no zero-finding claim |
-| **Close condition** | Full residual disposition matrix + SDRG linkage per issue |
+| **Why Path A holds** | Run record + SDRG §5.1 + residual matrix; no zero-finding claim |
+| **Close condition (harder claim)** | Commercial validator program + residual closure beyond Path A accept/waive classes; matrix already filed for Path A honesty |
 
 #### F-016 — Commercial P21 ADaM (Major) · **ACCEPTED**  
 **Class:** `external_dependency` · **Owner:** WS-3 + WS-5  
