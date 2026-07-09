@@ -51,8 +51,10 @@ workstreams:
     required_evidence:
       - docs/workstreams/WS1_SOURCE_INTAKE_PACK.md
       - CORE residual disposition matrix
-    next_action: "Author WS1 source intake pack + CORE residual matrix plan"
+    next_action: "Produce WS1_CORE_RESIDUAL_MATRIX.csv from CORE JSON; file WS-1 review note"
     residual_findings: [F-015, F-017]
+    packs:
+      - docs/workstreams/WS1_SOURCE_INTAKE_PACK.md
 
   WS2_statistical_specification:
     name: Statistical and analysis specification
@@ -70,8 +72,10 @@ workstreams:
     required_evidence:
       - population_endpoint_control_table
       - spec_to_config_trace
-    next_action: "Build population/endpoint control table linked to study_config and tfl_output_catalog"
+    next_action: "Record WS-2 review note against population/endpoint control table; optional machine G02 check"
     residual_findings: [F-011, F-012]
+    packs:
+      - docs/workstreams/WS2_POPULATION_ENDPOINT_CONTROL.md
 
   WS3_standards_metadata:
     name: Standards and metadata governance
@@ -93,8 +97,10 @@ workstreams:
     required_evidence:
       - external_validation_evidence_index
       - package_vs_exploratory_inventory
-    next_action: "Create external validation evidence index with P21/CORE/XSD/eCTD slots"
+    next_action: "Support CORE residual matrix; keep exploratory layers non-eCTD"
     residual_findings: [F-014, F-016, F-020, F-021, F-022]
+    packs:
+      - docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md
 
   WS4_statistical_programming:
     name: ADaM / BIMO / TFL / safety programming
@@ -122,8 +128,8 @@ workstreams:
   WS5_qc_validation:
     name: Risk-based QC and validation
     gates: [G06]
-    status: AMBER
-    note: "GREEN for demo machine gates; AMBER for industry-style residual communication"
+    status: GREEN
+    note: "Path A residual memo filed; machine gates PASS; co-own CORE residual matrix with WS-1 for industry depth"
     owned_artifacts:
       - validation_strategy.yaml
       - 08_reviewers_guides/RISK_BASED_VALIDATION.md
@@ -133,13 +139,14 @@ workstreams:
       - audit/FINDINGS_DISPOSITION_BOARD.md
       - docs/VALIDATION_STRATEGY_CONTROL_REPORT.md
       - docs/LOG_CLEANLINESS_REPORT.md
+      - docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md
     open_risks:
       - single_author_methodological_independence_only
-      - accepted_critical_residual_stack
       - log_coverage_persisted_only
+      - commercial_p21_not_run
     required_evidence:
       - docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md
-    next_action: "Write known-differences / residual risk memo from all ACCEPTED Critical/Major findings"
+    next_action: "Keep residual memo current; co-own CORE residual matrix with WS-1"
     residual_findings: [F-003, F-005, F-011, F-012, F-014, F-015, F-016, F-017, F-019, F-020, F-021, F-022, F-025]
 
   WS6_regulatory_writing:
@@ -160,8 +167,10 @@ workstreams:
     required_evidence:
       - hardened_adrg_sdrg_bdrg
       - guide_signoff_checklist
-    next_action: "Hardening pass: ADRG validation+limitations and SDRG source/CORE against disposition board"
+    next_action: "Execute WS6 hardening checklist S1-S3 (ADRG then SDRG then BDRG)"
     residual_findings: [F-003, F-005, F-019, F-023]
+    packs:
+      - docs/workstreams/WS6_REVIEWER_GUIDE_HARDENING_CHECKLIST.md
 
   WS7_release_engineering:
     name: Platform and release engineering
@@ -176,19 +185,23 @@ workstreams:
       - renv.lock
       - evidence_layers.yaml
       - delivery_workstreams.yaml
+      - scripts/verify_release.py
+      - scripts/verify_release.sh
     open_risks:
       - seal_confused_with_submission
-      - no_one_command_verify_release
+      - ci_release_job_not_wired
     required_evidence:
-      - scripts/verify_release.sh
+      - scripts/verify_release.py
       - ci_release_job
-    next_action: "Add one-command verify_release.sh rechecking machine grades without ODA rerun; wire CI release job"
+    next_action: "Wire scripts/verify_release.py into CI; optional evidence snapshot"
     residual_findings: [F-005, F-025]
 
 priority_queue:
-  - { id: DONE-WS0, workstream: WS0_governance, action: "PRODUCT_CLAIM.md" }
-  - { id: P0-WS5, workstream: WS5_qc_validation, action: "KNOWN_DIFFERENCES_MEMO.md" }
-  - { id: P1-WS6, workstream: WS6_regulatory_writing, action: "ADRG/SDRG/BDRG hardening" }
-  - { id: P1-WS1-WS3, workstream: WS3_standards_metadata, action: "external validation evidence index" }
-  - { id: P2-WS2, workstream: WS2_statistical_specification, action: "population/endpoint control table" }
-  - { id: P2-WS7, workstream: WS7_release_engineering, action: "verify_release.sh + CI" }
+  - { id: DONE-WS0, workstream: WS0_governance, action: "PRODUCT_CLAIM.md", status: DONE }
+  - { id: DONE-WS5, workstream: WS5_qc_validation, action: "KNOWN_DIFFERENCES_MEMO.md", status: DONE }
+  - { id: DONE-WS3, workstream: WS3_standards_metadata, action: "external validation index", status: DONE }
+  - { id: DONE-WS2, workstream: WS2_statistical_specification, action: "population/endpoint control table", status: DONE_DRAFT }
+  - { id: DONE-WS7-verify, workstream: WS7_release_engineering, action: "verify_release.py", status: DONE }
+  - { id: P1-WS6, workstream: WS6_regulatory_writing, action: "ADRG/SDRG/BDRG hardening S1-S3", status: OPEN }
+  - { id: P1-WS1, workstream: WS1_source_intake, action: "CORE residual matrix CSV", status: OPEN }
+  - { id: P2-WS7-ci, workstream: WS7_release_engineering, action: "CI wire verify_release", status: OPEN }

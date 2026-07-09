@@ -1,119 +1,173 @@
 # TROPIC Product Claim Decision
 
-**Decision ID:** G00-PC-2026-07-09  
-**Status:** Active  
-**Decision owner:** Governance and scope control (WS-0)  
-**Applies to:** current `main` operating model and the sealed demo release `v0.1.0-demo-rc.1`  
-**Related board:** `docs/WORKSTREAM_EXECUTION_BOARD.md`
+**Document ID:** PRODUCT_CLAIM  
+**Version:** 1.0  
+**Effective:** 2026-07-09  
+**Status:** FROZEN for tag train `v0.1.0-demo-rc.1` and successors until amended  
+**Owner workstream:** WS-0 Governance & Scope Control (G00)  
+**Binding companions:** `audit/SAP_LOCK_REVIEW_MEMO.md` · `audit/FINDINGS_DISPOSITION_BOARD.md` · `docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md` · `docs/WORKSTREAM_EXECUTION_BOARD.md`
 
 ---
 
-## 1. Product Claim In Force
+## 1. Why this document exists
 
-TROPIC is a **controlled non-submission demonstration package**.
+This repository can look “submission-ready” from the outside: CDISC datasets, dual-language recon, Define-XML, eCTD tree, release seals. That appearance is dangerous for a career if the **product claim** is not frozen.
 
-It demonstrates that a clinical programming repository can operate with:
+This file is the single answer to:
 
-- a full governed DAG;
-- real independent SAS execution through ODA;
-- SAS/R dataset and result reconciliation;
-- a scoped third-engine admiral validation track;
-- risk-based validation controls;
-- metadata, traceability, TFL catalog, log-cleanliness, and release-evidence gates;
-- a clean release-candidate seal for the controlled demo scope.
+> **What is TROPIC allowed to claim in an interview, README, ADRG, or portfolio review?**
 
-The current claim is **not** that this repository is an FDA filing package.
+If a sentence contradicts this file, the sentence is wrong—not this file.
 
 ---
 
-## 2. What The PASS Seal Means
+## 2. Active product claim (v0.1)
 
-For `v0.1.0-demo-rc.1`, `release_candidate=PASS` means:
+### Claim (allowed)
 
-- `pipeline_health` is `GREEN`, `oda`, `full_dag`, with 30/30 stages passing;
-- `release_run_manifest` is `PASS` with `evidence_grade=release_candidate`;
-- validation strategy, log cleanliness, metadata controls, TFL controlled catalog, and release checklist pass;
-- active Critical/Major findings are either `RESOLVED` or formally `ACCEPTED` for the controlled demo claim;
-- accepted residuals remain visible in `audit/FINDINGS_DISPOSITION_BOARD.md` and do not silently become filing-ready evidence.
+**TROPIC is a controlled, non-submission clinical biometrics programming demonstration package** for study EFC6193 / NCT00417079 that:
 
-This is a **release-candidate seal for the demo product claim**, not a regulatory submission attestation.
+1. Implements an end-to-end **SDTM → ADaM → TFL → Define → eCTD-style** control system.  
+2. Enforces **dual-language (SAS 9.4 / R) reconciliation** on real MP-arm analysis datasets under a genuine SAS engine (`oda` / `local`).  
+3. Applies **risk-tiered third-engine admiral** re-derivation for ADSL and primary TTE (OS, PFS).  
+4. Runs a **manifest-driven 30-stage DAG** with machine gates (recon, TFL catalog, logs, seals).  
+5. Publishes a **hash-sealed release-run record** and **release-candidate checklist PASS** under the honesty boundary below.  
+6. Organizes work as **workstreams** (source, standards, programming, QC, writing, release)—not as a single script pile.
 
----
+### Non-claims (forbidden without a new PRODUCT_CLAIM version)
 
-## 3. Claims Allowed In Public Or Interview Language
-
-The following statements are permitted:
-
-- "This is a controlled, non-submission clinical programming demo package."
-- "The pipeline completed a full ODA-backed DAG with SAS/R reconciliation and a scoped admiral third-engine validation track."
-- "The release manifest and release-candidate checklist passed for the controlled demo scope."
-- "Residual submission-grade gaps are formally dispositioned rather than hidden."
-- "The architecture models department-style handoffs across governance, source intake, specification, standards, programming, QC, writing, and release engineering."
-
----
-
-## 4. Claims Not Allowed
-
-The following statements are not permitted unless G00 is revised:
-
-- "This is FDA submission-ready."
-- "This is a validated Part 11 system."
-- "The eCTD sequence is ready for agency filing."
-- "The comparator-arm analyses are confirmatory trial evidence."
-- "All CDISC/Pinnacle 21 findings are closed."
-- "The SAP is sponsor-approved for filing."
-- "The annotated CRF and application metadata are final."
-
-These are outside the current product claim.
+| Forbidden claim | Why |
+|---|---|
+| “FDA submission ready” / “NDA package complete” | No sponsor approval, real app IDs, aCRF, full validator stack, Part 11 system |
+| “Independent clinical re-analysis of TROPIC efficacy” | CbzP arm is synthetic/reconstructed; comparative results are non-confirmatory |
+| “GxP double programming complete” | Single-author tracks; methodological independence ≠ organizational independence |
+| “Part 11 compliant” | Hash seals and Git are not a validated system with e-signatures |
+| “Full Pinnacle 21 / commercial ADaM conformance cleared” | Not run; local CORE rules + dual-lang are substitutes only |
+| “Protocol ITT N=755 reproduced in package” | Package uses real MP N=371 (+ synthetic CbzP N=378 for TFL only) |
 
 ---
 
-## 5. Accepted Residuals Under The Demo Claim
+## 3. Product path options (decision tree)
 
-The current demo release accepts residuals only because they are controlled, disclosed, and not represented as filing-ready:
+| Path | Code name | When allowed | What changes |
+|---|---|---|---|
+| **A — Controlled demo release** | `demo-rc` | **ACTIVE now** | Current seals; synthetic CbzP disclosed; EXAMPLE eCTD |
+| **B — Submission simulation** | `sub-sim` | Only after G00 amendment + new tag train | Real/placeholder app metadata policy, aCRF plan, Part 11 process evidence stubs, CbzP claim resolved or removed from comparative primary story |
+| **C — True submission support** | `sub-real` | Outside this public repo’s data rights | Full two-arm IPD, sponsor SOPs, org double programming, commercial validators |
 
-| Finding Area | Demo Decision |
-| --- | --- |
-| Synthetic/Guyot CbzP comparator content | Non-submission demo limit; comparative outputs are illustrative/non-confirmatory. |
-| EXAMPLE eCTD metadata and placeholder CRF | External dependency and demo limit; true sponsor identifiers and aCRF are required for filing. |
-| PSA population shell residual | Scoped out with disclosure; current controlled output uses documented ADRS PSARESP logic. |
-| Protocol ITT N=755 vs package N=749 | Non-submission demo limit; full two-arm IPD required for original-trial ITT claims. |
-| ARM, Dataset-JSON, USDM, ARS breadth | Controlled core or exploratory layers only; not full submission coverage. |
-| Full P21/commercial validator evidence | External dependency; local spec/conformance controls are substitutes for the demo claim only. |
-| SDTM CORE/date residuals | Source-data/conformance residuals disclosed; not silently closed. |
-| Part 11 controls | Not claimed; organizational CSV, access, audit trail, and e-signature controls required. |
-
-The authoritative residual record is `audit/FINDINGS_DISPOSITION_BOARD.md`.
+**Decision for this repository at v0.1:** **Path A only.**  
+Any public talk track, LinkedIn line, or interview answer must map to Path A unless PRODUCT_CLAIM is revised and re-tagged.
 
 ---
 
-## 6. Workstream Consequence
+## 4. Authority stack (what wins conflicts)
 
-This decision means workstreams are judged against the **controlled demo claim** unless G00 changes.
+1. **This PRODUCT_CLAIM** — what we may assert.  
+2. **SAP v4.0** (`TROPIC_SAP_v4.0_industry_grade.docx`) — analysis intent for programming remediation (not sponsor-approved filing SAP).  
+3. **SAP lock memo** — SAP is programming authority; package is not submission-passed.  
+4. **`tfl_output_catalog.yaml`** — which outputs are in controlled release scope.  
+5. **`study_config.yaml` / `study_manifest.yaml`** — parameters and DAG structure.  
+6. **Machine seals** — whether the *run* of the controlled scope is green.  
+7. **ADRG/SDRG/BDRG** — how we explain (must not exceed 1–4).
 
-| Workstream | Consequence |
-| --- | --- |
-| WS-0 Governance | Owns claim language and prevents drift into filing-ready wording. |
-| WS-1 Source/CDM | Must disclose source precision and CORE residuals; no silent source-lock overclaim. |
-| WS-2 Specification | Must separate SAP-controlled demo scope from deferred shells. |
-| WS-3 Standards | Must label exploratory standards layers and external validator gaps. |
-| WS-4 Programming | May stay GREEN only for the controlled catalog scope. |
-| WS-5 QC/Validation | Must turn accepted findings into reviewer-readable known differences. |
-| WS-6 Writing | Must make ADRG/SDRG/BDRG match this claim. |
-| WS-7 Release Engineering | Maintains the seal; does not expand product meaning by itself. |
+If ADRG and PRODUCT_CLAIM disagree, **PRODUCT_CLAIM wins** until ADRG is fixed.
 
 ---
 
-## 7. Change Control
+## 5. Data claims (non-negotiable)
 
-Changing the product claim from **controlled non-submission demo** to **submission simulation** requires a new G00 decision and, at minimum:
+| Arm | N | Nature | Where used |
+|---|---:|---|---|
+| **MP (mitoxantrone)** | 371 | Real de-identified SDTM (PDS/Sanofi 2013); not redistributed in git | ADaM recon, primary dual-lang truth |
+| **CbzP (cabazitaxel)** | 378 | Synthetic/reconstructed (Guyot OS/PFS; PH-scaled secondaries; sampling elsewhere) | TFL comparative demonstration only |
+| **Protocol ITT** | 755 | Published trial target | **Not** package ITT; do not label 749 as protocol ITT |
 
-- a real application/submission metadata path;
-- true annotated CRF evidence;
-- full sponsor-data boundary resolution for comparator claims;
-- external validator/P21 evidence or documented unavailable status with residual disposition;
-- hardened ADRG/SDRG/BDRG signoff;
-- a known-differences memo accepted by WS-5 and WS-6;
-- a fresh release-candidate seal after the changed evidence scope.
+ADaM `*_prod.xpt` / `*_v.xpt` deliverables for recon are **MP-only**.  
+CbzP is merged at reporting under controlled disclosure.
 
-Until then, `v0.1.0-demo-rc.1` remains a controlled demo release, not a filing package.
+---
+
+## 6. Validation claims (what dual-lang means)
+
+| Engine | Role | Independence type |
+|---|---|---|
+| SAS 9.4 production | Production ADaM | Production track |
+| R validation | Independent re-derivation | Methodological (language/library) |
+| admiral | T1 third track ADSL/OS/PFS | Methodological (pharmaverse library) |
+
+**Allowed sentence:**  
+“Independent dual-language reconciliation under real SAS, plus admiral third-engine on critical core.”
+
+**Forbidden sentence:**  
+“Two-programmer GxP double programming with organizational independence.”
+
+Sim mode (`sas_execution_mode=sim`) zero-diff is **not** double-programming evidence. Only `oda`/`local` with provenance guard.
+
+---
+
+## 7. Output claims (TFL universe)
+
+Controlled release scope is defined solely by **`tfl_output_catalog.yaml`**:
+
+- **18** in-scope output IDs must exist and index clean.  
+- **21** SAP full-catalog IDs are **deferred** with reasons—not silent gaps.  
+- Listings: **none** in controlled scope (false L-01 removed).
+
+Claiming “full SAP Appendix D TFL package” is **false** under Path A.
+
+---
+
+## 8. Package claims (eCTD)
+
+| Element | Status under Path A |
+|---|---|
+| Module 5–style tree, co-located define, backbone/STF | Demonstrated |
+| Application identifiers | **EXAMPLE / 000000** — not real |
+| Annotated CRF | Placeholder / not true aCRF |
+| FDA eCTD validator commercial pass | Not claimed |
+| Patient XPT in git | Never |
+
+---
+
+## 9. Machine seal claims (what PASS means)
+
+At tag `v0.1.0-demo-rc.1` (and successive Path A seals):
+
+| Seal | Meaning |
+|---|---|
+| `pipeline_health` GREEN + `full_dag` + `oda` | Full 30-stage DAG ran under real SAS |
+| `release_run_manifest` PASS | Hash-bound inputs/programs/outputs/QC under clean material tree |
+| `release_candidate` PASS | G01–G09 checklist items for **Path A** satisfied |
+| `validation_strategy` PASS | Risk-tier checks against current evidence |
+
+**PASS does not mean** residual ACCEPTED findings are gone. It means they are **dispositioned** and must remain disclosed.
+
+---
+
+## 10. Interview / portfolio talk track (use this)
+
+> “I built a submission-**style** biometrics control system on public TROPIC data: dual-language ADaM recon under SAS ODA, admiral on critical endpoints, controlled TFL catalog, Define/eCTD packaging, and a workstream operating board. The package is explicitly a **controlled demonstration**, not a filing: the comparator arm is reconstructed, eCTD IDs are EXAMPLE, and findings are dispositioned rather than hidden. The release-candidate seal proves the **platform enforces truth**; the workstream board is how I run it like departments handing evidence.”
+
+---
+
+## 11. Amendment control
+
+To change the product claim (e.g. Path B):
+
+1. Update this file (new version, date, what changes).  
+2. Re-open G00 on the workstream board.  
+3. Update disposition board and residual memo.  
+4. New release note + tag train (e.g. `v0.2.0-…`).  
+5. Do **not** silently edit README badges or ADRG to over-claim.
+
+---
+
+## 12. Sign-off (repo authority)
+
+| Role | Name / mark | Date |
+|---|---|---|
+| Product owner / programmer of record | Antony Bevan | 2026-07-09 |
+| SAP remediation authority | SAP v4.0 + lock memo | 2026-06-25 |
+| Machine seal reference | `v0.1.0-demo-rc.1` / RC PASS | 2026-07-09 |
+
+*Electronic wet-ink sponsor signatures are out of scope under Path A (see F-025).*

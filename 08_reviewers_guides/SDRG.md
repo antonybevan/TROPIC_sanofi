@@ -7,8 +7,11 @@
 **Created:** 2026-05-23 · **Uplifted:** 2026-06-20  
 
 > **Controlled demo release-candidate (2026-07-09):** Package/source integrity seals for the
-> current demo release-candidate PASS are tagged **`v0.1.0-demo-rc.1`**. Reviewer entry point:
+> current demo release-candidate PASS are tagged **`v0.1.0-demo-rc.1`**. Product claim:
+> [`docs/PRODUCT_CLAIM.md`](../docs/PRODUCT_CLAIM.md). Reviewer entry:
 > [`docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md`](../docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md).
+> Source intake pack: [`docs/workstreams/WS1_SOURCE_INTAKE_PACK.md`](../docs/workstreams/WS1_SOURCE_INTAKE_PACK.md).
+> Residuals (incl. date precision / CORE): [`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md).
 > SDTM-relevant controls include source profiling (`docs/SOURCE_PROFILING_REPORT.md`),
 > CORE SDTMIG 3.4 run records under `06_telemetry/conformance/`, and findings disposition
 > (`audit/FINDINGS_DISPOSITION_BOARD.md`). **Not** a submission or Part 11 claim.

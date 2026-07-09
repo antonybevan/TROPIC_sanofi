@@ -14,9 +14,13 @@
 
 > **Controlled demo release-candidate (2026-07-09):** Machine seals and the reviewer narrative
 > for the current demo release-candidate PASS are tagged **`v0.1.0-demo-rc.1`**. Start with
+> [`docs/PRODUCT_CLAIM.md`](../docs/PRODUCT_CLAIM.md) (what this package may assert) and
 > [`docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md`](../docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md)
-> (honesty boundary, seal anchors, re-check commands). Supporting seals:
-> `06_telemetry/pipeline_health.json`,
+> (seal anchors, re-check commands). Residual risks:
+> [`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md).
+> Operating board:
+> [`docs/WORKSTREAM_EXECUTION_BOARD.md`](../docs/WORKSTREAM_EXECUTION_BOARD.md).
+> Supporting seals: `06_telemetry/pipeline_health.json`,
 > `06_telemetry/release_run_manifest/release_run_manifest.json`,
 > `docs/RELEASE_CANDIDATE_CHECKLIST.md`,
 > `audit/FINDINGS_DISPOSITION_BOARD.md`.

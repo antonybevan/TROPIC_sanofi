@@ -74,7 +74,7 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | **Open risks** | F-017 (partial dates / TSSEQ) · incomplete CORE residual disposition (F-015) · real SDTM not in git (correct) but inventory must stay complete for reviewers |
 | **Required evidence pack** | (1) Source profile status + CSVs · (2) SDTM val log cleanliness · (3) CORE SDTMIG 3.4 run record + residual register · (4) SDRG § source limitations final wording · (5) Data-use / access statement |
 | **Release gate** | G01 before any “source locked” language |
-| **Next action** | **Build `docs/workstreams/WS1_SOURCE_INTAKE_PACK.md`** listing exact files + residual F-015/F-017 disposition text; plan full CORE residual matrix (not another partial story) |
+| **Next action** | Pack filed (`docs/workstreams/WS1_SOURCE_INTAKE_PACK.md`). **Next:** produce `WS1_CORE_RESIDUAL_MATRIX.csv` and one recorded WS-1 review note |
 
 ---
 
@@ -88,7 +88,7 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | **Open risks** | Spec drift from SAP; G02 never machine-checked; PSA / ITT wording inconsistency under review pressure |
 | **Required evidence pack** | (1) Spec-to-config trace table · (2) Population/endpoint matrix · (3) Sensitivity list · (4) Explicit disposition of F-011 in ADRG + TFL footnotes if not coded |
 | **Release gate** | G02 before claiming SAP-complete TFLs |
-| **Next action** | **Produce population/endpoint control table linked to `study_config.yaml` and controlled TFL IDs** — closes “spec is only a Word doc” gap |
+| **Next action** | Control table filed (`docs/workstreams/WS2_POPULATION_ENDPOINT_CONTROL.md`). **Next:** record one WS-2 review note; optional machine G02 check |
 
 ---
 
@@ -102,7 +102,7 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | **Open risks** | Reviewer asks for full ARM/VLM/CT story; exploratory layers over-claimed; commercial P21 not run (F-016) |
 | **Required evidence pack** | (1) Spec→define + spec→data status · (2) XSD validate run record · (3) Lineage check PASS · (4) Explicit “in package / exploratory” inventory for Dataset-JSON, USDM, ARS · (5) P21 slot: RUN or NOT_AVAILABLE with reason |
 | **Release gate** | G03 before metadata promotion language |
-| **Next action** | **Standards pack index + P21/CORE external validation slots** (even if empty) — starts “external validation package” without lying |
+| **Next action** | External validation index filed (`docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md`). **Next:** fill CORE residual matrix; keep P21 NOT_AVAILABLE until tool access |
 
 ---
 
@@ -126,11 +126,11 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | Field | Content |
 |---|---|
 | **Owned artifacts** | Risk-based validation plan · validation_strategy.yaml · recon (dataset/results/forest/admiral) · log cleanliness · findings register · disposition board · CORE local rules |
-| **Current status** | **GREEN for demo claim / AMBER for industry** — strategy PASS; logs PASS; findings dispositioned; full commercial validator pack missing; residual ACCEPTED risks still owned here |
-| **Open risks** | Single-author tracks (methodological ≠ organizational independence); ACCEPTED Crits; log coverage = persisted logs only; P21 external |
-| **Required evidence pack** | (1) Validation strategy control report · (2) All recon status files · (3) Log cleanliness report · (4) Findings register + board · (5) Known differences list for reviewer |
+| **Current status** | **GREEN for Path A residual communication** — known-differences memo filed; machine gates PASS; still AMBER-leaning for industry if P21/CORE residual matrix missing (owned with WS-3) |
+| **Open risks** | Single-author tracks; log coverage = persisted logs only; commercial P21 external |
+| **Required evidence pack** | (1) Validation strategy control report · (2) Recon/admiral status · (3) Log cleanliness · (4) Findings + disposition · (5) **`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`** |
 | **Release gate** | G06 |
-| **Next action** | **QC workstream review package:** one known-differences memo distilled from ACCEPTED findings (F-003, F-005, F-011, F-012, F-014–017, F-019–022, F-025) — reviewer-ready, not CSV archaeology |
+| **Next action** | Hold residual memo current when any ACCEPTED finding changes; co-own CORE residual matrix with WS-1 |
 
 ---
 
@@ -144,7 +144,7 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | **Open risks** | Career risk if guides over-claim; inconsistency with disposition board; BDRG depth; shell-quality language |
 | **Required evidence pack** | (1) ADRG/SDRG/BDRG revision IDs · (2) Traceability matrix aligned to catalog · (3) Explicit “what this package is / is not” section (partially in release note) · (4) Signoff checklist for guide completeness |
 | **Release gate** | G07 before calling package “reviewer-ready” |
-| **Next action** | **Hardening sprint:** rewrite ADRG § validation + limitations against disposition board; same for SDRG source/CORE; BDRG pass — treat as formal deliverables |
+| **Next action** | Hardening checklist filed (`docs/workstreams/WS6_REVIEWER_GUIDE_HARDENING_CHECKLIST.md`). **Execute S1–S3** (ADRG → SDRG → BDRG) against PRODUCT_CLAIM + known-differences memo |
 
 ---
 
@@ -158,7 +158,7 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | **Open risks** | Seal ≠ submission; EXAMPLE eCTD; no one-command external verify; CI not a “release job” product |
 | **Required evidence pack** | (1) pipeline_health · (2) release_run_manifest · (3) RC status · (4) tag · (5) release note · (6) CI status · (7) verify script (missing) |
 | **Release gate** | G09 — **PASS for demo RC** |
-| **Next action** | **Maintain seal; add `scripts/verify_release.sh` that re-checks all machine grades without re-running ODA** — then CI release job |
+| **Next action** | Maintain seal; **`scripts/verify_release.py` exists** — wire CI release job to it; optional immutable evidence snapshot under `06_telemetry/evidence/` |
 
 ---
 
@@ -221,10 +221,14 @@ Not “another GREEN JSON.”
 
 ---
 
-## 8. Immediate next command (start operating)
+## 8. Immediate next command (continue operating)
 
-**Next human session agenda = WS-5 only:**
+**P0 packs filed.** Next:
 
-1. Write known-differences residual risk memo from ACCEPTED findings.  
+1. **WS-6 S1** — ADRG hardening vs PRODUCT_CLAIM + known-differences memo  
+2. **WS-1** — CORE residual matrix CSV  
+3. **WS-7** — wire `scripts/verify_release.py` into CI  
 
-That is the difference between a sealed pipeline and a submission-style operating model.
+```bash
+python3 scripts/verify_release.py
+```
