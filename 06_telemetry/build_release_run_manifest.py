@@ -245,18 +245,46 @@ def _run_completeness(health: dict, expected_stages: list[str]) -> dict:
     }
 
 
+# Paths this seal (and the sibling RC checklist) rewrites on every run. They must
+# not self-trip the dirty-worktree remediation gate or a PASS seal can never land
+# on a clean tree.
+_SEAL_SELF_PATH_PREFIXES = (
+    "06_telemetry/release_run_manifest/",
+    "06_telemetry/release_candidate/",
+    "docs/RELEASE_RUN_MANIFEST.md",
+    "docs/RELEASE_CANDIDATE_CHECKLIST.md",
+    "audit/output_hash_binding.csv",
+)
+
+
+def _porcelain_path(line: str) -> str:
+    # porcelain v1: "XY path" or "XY orig -> path" (renames)
+    body = line[3:] if len(line) >= 4 else line
+    if " -> " in body:
+        body = body.split(" -> ", 1)[1]
+    return body.strip()
+
+
+def _is_seal_self_path(path: str) -> bool:
+    return any(path == p or path.startswith(p) for p in _SEAL_SELF_PATH_PREFIXES)
+
+
 def _git_state() -> dict:
     status = _run_git(["status", "--porcelain=v1"])
     tracked_diff_names = _run_git(["diff", "--name-only", "HEAD", "--"])
     staged_diff_names = _run_git(["diff", "--cached", "--name-only"])
+    all_lines = [x for x in status.splitlines() if x]
+    material_lines = [ln for ln in all_lines if not _is_seal_self_path(_porcelain_path(ln))]
     return {
         "head": _run_git(["rev-parse", "HEAD"]),
         "branch": _run_git(["branch", "--show-current"]),
-        "dirty": bool(status),
-        "status_porcelain_sha256": _sha256_bytes(status.encode("utf-8")) if status else "",
-        "tracked_diff_paths": [x for x in tracked_diff_names.splitlines() if x],
-        "staged_diff_paths": [x for x in staged_diff_names.splitlines() if x],
-        "status_porcelain": status.splitlines(),
+        "dirty": bool(material_lines),
+        "dirty_including_seal_outputs": bool(all_lines),
+        "status_porcelain_sha256": _sha256_bytes("\n".join(material_lines).encode("utf-8")) if material_lines else "",
+        "tracked_diff_paths": [x for x in tracked_diff_names.splitlines() if x and not _is_seal_self_path(x)],
+        "staged_diff_paths": [x for x in staged_diff_names.splitlines() if x and not _is_seal_self_path(x)],
+        "status_porcelain": material_lines,
+        "status_porcelain_all": all_lines,
     }
 
 

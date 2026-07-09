@@ -1,6 +1,6 @@
 # TROPIC Release-Candidate Checklist
 
-Generated: 2026-07-09 15:02:26 UTC
+Generated: 2026-07-09 15:17:41 UTC
 
 > Strict go/no-go checklist for the current working evidence set. This report is intentionally conservative and does not convert historical evidence into current release readiness.
 
@@ -42,7 +42,7 @@ No release-candidate warnings.
 | G06 qc_signoff | Results reconciliation available and passing | PASS | 06_telemetry/results_reconciliation_status.json overall=PASS |  |
 | G06 qc_signoff | Forest HR reconciliation passes | PASS | 06_telemetry/forest_reconciliation_status.json overall=PASS |  |
 | G06 qc_signoff | Synthetic comparator bridge parity passes | PASS | 06_telemetry/cbzp_bridge_status.json overall=PASS | Still disclose CbzP as synthetic/reconstructed demonstration content. |
-| G09 release_candidate_lock | Current release-run manifest is release-candidate grade (full DAG, clean tree) | BLOCKER | 06_telemetry/release_run_manifest/release_run_manifest.json status=REMEDIATION; evidence_grade=remediation_partial_or_dirty; run_scope=full_dag; seal=8f644a2c4fdcfe8fe4af5ec68e0d5ee5cbc7ed873fae46015d49a747ff2206b8 | Release manifest must be status=PASS (not REMEDIATION/FAIL): full current DAG, clean worktree, and current-run binding. REMEDIATION is valid development evidence only. |
+| G09 release_candidate_lock | Current release-run manifest is release-candidate grade (full DAG, clean tree) | BLOCKER | 06_telemetry/release_run_manifest/release_run_manifest.json status=REMEDIATION; evidence_grade=remediation_partial_or_dirty; run_scope=full_dag; seal=909c19dcf895d064297befd92ef3c19914f6d1c127882b49da10ac305a3a1341 | Release manifest must be status=PASS (not REMEDIATION/FAIL): full current DAG, clean worktree, and current-run binding. REMEDIATION is valid development evidence only. |
 | G09 release_candidate_lock | Pipeline health records a full current DAG run | PASS | 06_telemetry/pipeline_health.json run_scope=full_dag; stages_recorded=30; stages_expected=30; stages_not_run=0 |  |
 | G06 qc_signoff | Audit findings register has no active confirmed Critical/Major blockers | PASS | audit/findings_register.csv active=0; confirmed Critical/Major=0; severity_counts={} | Close, resolve, or formally disposition confirmed Critical/Major findings before any release-ready claim. |
 | G08 submission_package_materialization | eCTD backbone/run record present | PASS | 11_ectd/0000/index.xml present=True; 11_ectd/RUN_RECORD.md present=True | Rebuild/materialize eCTD sequence after upstream release candidate is clean. |
