@@ -122,7 +122,7 @@ workstreams:
     required_artifacts:
       - 04_analysis_datasets/programs/sas
       - 04_analysis_datasets/programs/r
-      - 04_analysis_datasets/adam
+      # ADaM XPT dir is local build output (patient-derived; not in git portfolio surface)
       - config/study_manifest.yaml
       - platform/cibuild.py
 
@@ -193,5 +193,5 @@ workstreams:
       - platform/check_log_cleanliness.py
       - platform/log_cleanliness/log_cleanliness_status.json
       - platform/release_run_manifest/release_run_manifest.json
-      - platform/release_run_manifest/release_run_files.csv
-      - 06_qc_evidence/audit/output_hash_binding.csv
+      - platform/release_candidate/release_candidate_status.json
+      - scripts/verify_release.py
