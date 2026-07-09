@@ -1,0 +1,192 @@
+# Machine-readable companion to docs/WORKSTREAM_EXECUTION_BOARD.md
+# Status values: GREEN | AMBER | RED | WAIVED
+# This is an operating board, not a substitute for study_manifest.yaml seals.
+
+version: 1
+study: TROPIC-NCT00417079
+as_of: "2026-07-09"
+product_claim_in_force: controlled_non_submission_demo
+pipeline_seal_tag: v0.1.0-demo-rc.1
+board_doc: docs/WORKSTREAM_EXECUTION_BOARD.md
+disposition_board: audit/FINDINGS_DISPOSITION_BOARD.md
+
+workstreams:
+  WS0_governance:
+    name: Governance and scope control
+    gates: [G00, G09]
+    status: AMBER
+    owned_artifacts:
+      - TROPIC_SAP_v4.0_industry_grade.docx
+      - audit/SAP_LOCK_REVIEW_MEMO.md
+      - audit/findings_register.csv
+      - audit/FINDINGS_DISPOSITION_BOARD.md
+      - docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md
+      - README.md
+      - REPRODUCIBILITY.md
+    open_risks:
+      - claim_language_drift_to_submission_ready
+      - accepted_criticals_misread_as_scientific_closure
+    required_evidence:
+      - docs/PRODUCT_CLAIM.md
+    next_action: "Write and freeze docs/PRODUCT_CLAIM.md for demo vs submission-simulation path"
+    residual_findings: [F-003, F-005, F-025, F-019]
+
+  WS1_source_intake:
+    name: Clinical data management / source intake
+    gates: [G01]
+    status: AMBER
+    owned_artifacts:
+      - 01_raw_source
+      - 03_validation_r/v_staging_ingest.R
+      - 03_validation_r/v_sdtm_validation.R
+      - docs/SOURCE_PROFILING_REPORT.md
+      - 06_telemetry/source_profile_status.json
+      - 06_telemetry/conformance/CORE_SDTM34_RUN_RECORD.md
+      - 08_reviewers_guides/SDRG.md
+    open_risks:
+      - F-017_partial_iso_dates_tsseq
+      - F-015_core_residual_not_fully_dispositioned
+    required_evidence:
+      - docs/workstreams/WS1_SOURCE_INTAKE_PACK.md
+      - CORE residual disposition matrix
+    next_action: "Author WS1 source intake pack + CORE residual matrix plan"
+    residual_findings: [F-015, F-017]
+
+  WS2_statistical_specification:
+    name: Statistical and analysis specification
+    gates: [G02]
+    status: AMBER
+    owned_artifacts:
+      - study_config.yaml
+      - TROPIC_SAP_v4.0_industry_grade.docx
+      - ctq_traceability.yaml
+      - ANALYSIS_REPORT.md
+      - 08_reviewers_guides/TRACEABILITY_MATRIX.md
+    open_risks:
+      - G02_not_stage_gated
+      - F-011_psa_population_shell
+    required_evidence:
+      - population_endpoint_control_table
+      - spec_to_config_trace
+    next_action: "Build population/endpoint control table linked to study_config and tfl_output_catalog"
+    residual_findings: [F-011, F-012]
+
+  WS3_standards_metadata:
+    name: Standards and metadata governance
+    gates: [G03]
+    status: AMBER
+    owned_artifacts:
+      - 00_specifications/ADaM_spec.xlsx
+      - 07_define_xml/define.xml
+      - 07_define_xml/define_sdtm.xml
+      - metadata_lineage.yaml
+      - docs/METADATA_CONTROL_REPORT.md
+      - 12_ars
+      - 13_usdm
+      - 10_datasetjson
+    open_risks:
+      - F-014_arm_limited
+      - F-016_no_commercial_p21
+      - exploratory_layers_overclaim
+    required_evidence:
+      - external_validation_evidence_index
+      - package_vs_exploratory_inventory
+    next_action: "Create external validation evidence index with P21/CORE/XSD/eCTD slots"
+    residual_findings: [F-014, F-016, F-020, F-021, F-022]
+
+  WS4_statistical_programming:
+    name: ADaM / BIMO / TFL / safety programming
+    gates: [G04, G05]
+    status: GREEN
+    owned_artifacts:
+      - 02_production_sas
+      - 03_validation_r
+      - 04_adam
+      - 09_tfl
+      - tfl_output_catalog.yaml
+      - study_manifest.yaml
+      - 06_telemetry/reconciliation_status.json
+      - 06_telemetry/admiral_reconciliation_status.json
+    open_risks:
+      - deferred_sap_tfl_ids
+      - synthetic_cbzp_in_tfls
+      - out_of_dag_sas_companion_figures
+    required_evidence:
+      - controlled_catalog_pass
+      - dual_lang_and_admiral_pass
+    next_action: "Workstream review walkthrough ADSL→ADTTE→ADAE→T-20 using recon+catalog only; no scope expansion"
+    residual_findings: [F-003, F-012]
+
+  WS5_qc_validation:
+    name: Risk-based QC and validation
+    gates: [G06]
+    status: AMBER
+    note: "GREEN for demo machine gates; AMBER for industry-style residual communication"
+    owned_artifacts:
+      - validation_strategy.yaml
+      - 08_reviewers_guides/RISK_BASED_VALIDATION.md
+      - 05_reconciliation
+      - log_cleanliness.yaml
+      - audit/findings_register.csv
+      - audit/FINDINGS_DISPOSITION_BOARD.md
+      - docs/VALIDATION_STRATEGY_CONTROL_REPORT.md
+      - docs/LOG_CLEANLINESS_REPORT.md
+    open_risks:
+      - single_author_methodological_independence_only
+      - accepted_critical_residual_stack
+      - log_coverage_persisted_only
+    required_evidence:
+      - docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md
+    next_action: "Write known-differences / residual risk memo from all ACCEPTED Critical/Major findings"
+    residual_findings: [F-003, F-005, F-011, F-012, F-014, F-015, F-016, F-017, F-019, F-020, F-021, F-022, F-025]
+
+  WS6_regulatory_writing:
+    name: Reviewer explanation and regulatory writing
+    gates: [G07, G08]
+    status: AMBER
+    owned_artifacts:
+      - 08_reviewers_guides/ADRG.md
+      - 08_reviewers_guides/SDRG.md
+      - 08_reviewers_guides/BDRG.md
+      - 08_reviewers_guides/TRACEABILITY_MATRIX.md
+      - docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md
+      - ANALYSIS_REPORT.md
+    open_risks:
+      - guides_still_repo_voice
+      - G07_not_stage_gated
+      - overclaim_under_interview_pressure
+    required_evidence:
+      - hardened_adrg_sdrg_bdrg
+      - guide_signoff_checklist
+    next_action: "Hardening pass: ADRG validation+limitations and SDRG source/CORE against disposition board"
+    residual_findings: [F-003, F-005, F-019, F-023]
+
+  WS7_release_engineering:
+    name: Platform and release engineering
+    gates: [G08, G09]
+    status: GREEN
+    owned_artifacts:
+      - 06_telemetry/cibuild.py
+      - study_manifest.yaml
+      - 06_telemetry/pipeline_health.json
+      - 06_telemetry/release_run_manifest/release_run_manifest.json
+      - 06_telemetry/release_candidate/release_candidate_status.json
+      - renv.lock
+      - evidence_layers.yaml
+      - delivery_workstreams.yaml
+    open_risks:
+      - seal_confused_with_submission
+      - no_one_command_verify_release
+    required_evidence:
+      - scripts/verify_release.sh
+      - ci_release_job
+    next_action: "Add one-command verify_release.sh rechecking machine grades without ODA rerun; wire CI release job"
+    residual_findings: [F-005, F-025]
+
+priority_queue:
+  - { id: P0-WS0, workstream: WS0_governance, action: "PRODUCT_CLAIM.md" }
+  - { id: P0-WS5, workstream: WS5_qc_validation, action: "KNOWN_DIFFERENCES_MEMO.md" }
+  - { id: P1-WS6, workstream: WS6_regulatory_writing, action: "ADRG/SDRG/BDRG hardening" }
+  - { id: P1-WS1-WS3, workstream: WS3_standards_metadata, action: "external validation evidence index" }
+  - { id: P2-WS2, workstream: WS2_statistical_specification, action: "population/endpoint control table" }
+  - { id: P2-WS7, workstream: WS7_release_engineering, action: "verify_release.sh + CI" }

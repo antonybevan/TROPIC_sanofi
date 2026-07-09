@@ -111,9 +111,20 @@ Machine seal artifacts were landed at `f7bfb48`; this tag includes the reviewer 
 
 ---
 
-## Recommended next steps (optional)
+## Operating model after this seal
 
-1. Push tag when remote share is intended: `git push origin main --tags` (only with explicit approval).
-2. Snapshot immutable ODA evidence under `06_telemetry/evidence/` if a frozen offline pack is required.
-3. Reviewer package pass: ADRG/SDRG cross-links to this release note and disposition board.
+Pipeline seal ≠ department operating model. Post-seal work is run through the
+**Workstream Execution Board**:
+
+- [`docs/WORKSTREAM_EXECUTION_BOARD.md`](WORKSTREAM_EXECUTION_BOARD.md)
+- [`workstream_execution_board.yaml`](../workstream_execution_board.yaml)
+
+Priority is team-by-team evidence packs (source, standards, programming, QC,
+writing, release) — not another DAG re-run without a regression.
+
+## Recommended next steps
+
+1. Freeze product claim + known-differences memo (WS-0 / WS-5 on the board).
+2. Reviewer guide hardening (WS-6) and external validation evidence index (WS-1/WS-3).
+3. `verify_release.sh` + CI release job (WS-7).
 4. Do **not** describe this tag as submission-ready without new Crit/Major board + sponsor data + Part 11 program.
