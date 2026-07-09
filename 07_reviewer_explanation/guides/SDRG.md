@@ -130,7 +130,7 @@ The pristine source SDTM (`01_source_data/real_sdtm/`, PDS 2013) was authored to
 **Rule for reviewers:**  
 - **Do claim:** “Uplifted package layer; CORE run recorded; structural targets cleared; residuals classified.”  
 - **Do not claim:** “Full commercial conformance” or “zero CORE findings.”  
-- **Open engineering (WS-1):** rule-level CSV matrix still planned (`docs/workstreams/WS1_CORE_RESIDUAL_MATRIX.csv` — not yet filed). Until then, this section + run record + known-differences memo are the residual story.
+- **Rule-level disposition matrix (WS-1):** [`docs/workstreams/WS1_CORE_RESIDUAL_MATRIX.csv`](../../docs/workstreams/WS1_CORE_RESIDUAL_MATRIX.csv) — filed; still not a “CORE clean” claim.
 
 **Related residual:** week-offset / partial ISO dates — **F-017** (§2 AE note, §4.5). Never invent day precision.
 

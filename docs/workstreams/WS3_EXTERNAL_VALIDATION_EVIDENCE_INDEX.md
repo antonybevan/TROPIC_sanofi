@@ -42,7 +42,7 @@ Every row is a **slot**:
 | SDTMIG 3.2 baseline on pristine source | **PARTIAL** | `CORE_RUN_RECORD.md` / related | Version caveats documented in REPRODUCIBILITY |
 | ADaM CORE via local rules | **RUN** | `platform/conformance_rules/adam/` · CORE run record | Not official AD#### catalog |
 | Official ADaM Conformance Rules (members) | **NOT_AVAILABLE** | — | F-016 class |
-| CORE residual disposition matrix | **NOT_AVAILABLE** | Planned: `docs/workstreams/WS1_CORE_RESIDUAL_MATRIX.csv` | Required for honest “conformance program” story |
+| CORE residual disposition matrix | **RUN** | `docs/workstreams/WS1_CORE_RESIDUAL_MATRIX.csv` | Rule/domain disposition; still not “CORE clean” |
 
 ### 2.3 Commercial / FDA validators
 

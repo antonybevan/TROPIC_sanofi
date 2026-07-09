@@ -111,6 +111,7 @@ Machine gates can be green while **residual risks** remain. This memo is the hum
 ### 3.4 Conformance / standards tooling
 
 #### F-015 — CORE residual / domain breadth (Major) · **ACCEPTED**  
+**Disposition matrix:** [`docs/workstreams/WS1_CORE_RESIDUAL_MATRIX.csv`](WS1_CORE_RESIDUAL_MATRIX.csv) (filed 2026-07-09; rule/domain/disposition)  
 **Class:** `external_dependency` + `scope_out_with_disclosure` · **Owner:** WS-1 + WS-3 + WS-5  
 
 | | |

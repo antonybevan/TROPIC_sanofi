@@ -4,7 +4,7 @@
 **Gate:** G01  
 **Product claim:** Path A (`docs/PRODUCT_CLAIM.md`)  
 **As of:** 2026-07-09  
-**Board status:** AMBER (pack exists; CORE residual matrix still open)
+**Board status:** AMBER → improving (pack + **CORE residual matrix filed** 2026-07-09; not “CORE clean”)
 
 ---
 
@@ -64,15 +64,22 @@ python3 -c "import json; h=json.load(open('platform/pipeline_health.json')); pri
 | ID | Issue | Disclosure location | Next work |
 |---|---|---|---|
 | F-017 | Partial ISO / TSSEQ / week precision | SDRG §2/§5 · known-differences memo | Keep disclosed; no silent “fix” |
-| F-015 | CORE residual breadth | CORE run record · known-differences | Build residual disposition spreadsheet by rule/domain |
+| F-015 | CORE residual breadth | CORE run record · **matrix** · known-differences | Matrix filed; maintain on re-run |
+| F-017 | Partial ISO / week precision | SDRG · matrix SOURCE-* rows · known-differences | Keep disclosed |
 
-### CORE residual plan (next engineering task)
+### CORE residual matrix (filed)
 
-Deliverable: `docs/workstreams/WS1_CORE_RESIDUAL_MATRIX.csv` with columns:
+**File:** [`WS1_CORE_RESIDUAL_MATRIX.csv`](WS1_CORE_RESIDUAL_MATRIX.csv)
 
-`rule_id, domain, severity, n_occurrences, scientific_impact, disposition (fix|accept|waive), sdrg_section, owner, target_date`
+| Columns | Content |
+|---|---|
+| rule_id / domain | CORE rule or SOURCE-* precision tag |
+| severity / n_occurrences | From CORE SDTM 3.4 run record (2026-06-20) |
+| disposition | `fix` (structural uplift targets) · `accept` (de-id / real source / engine / precision) · `waive` (no-FA cross-domain) |
+| sdrg_section / owner / finding_id | SDRG §5.1 · WS-1/WS-3 · F-015 / F-017 |
 
-Until that file exists, **do not** claim “full CORE clean.”
+**Headline:** structural-fixable residual **0**; total CORE issue occurrences still large (source + scope + tool classes).  
+**Still forbidden:** claim “full CORE clean” or commercial P21 clearance (F-016).
 
 ---
 

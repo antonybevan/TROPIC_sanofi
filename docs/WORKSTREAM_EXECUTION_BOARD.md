@@ -72,11 +72,11 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | Field | Content |
 |---|---|
 | **Owned artifacts** | `01_source_data/` (governed, not redistributed) · staging ingest · SDTM validation · source profile report · SDTM CORE run records · SDRG source sections · F-017 timing residuals |
-| **Current status** | **AMBER** — source profile PASS; staging/SDTM val in DAG; week-precision and partial ISO dates known; CORE not full-domain residual-closed |
-| **Open risks** | F-017 (partial dates / TSSEQ) · incomplete CORE residual disposition (F-015) · real SDTM not in git (correct) but inventory must stay complete for reviewers |
-| **Required evidence pack** | (1) Source profile status + CSVs · (2) SDTM val log cleanliness · (3) CORE SDTMIG 3.4 run record + residual register · (4) SDRG § source limitations final wording · (5) Data-use / access statement |
+| **Current status** | **AMBER → improving** — pack + **CORE residual matrix filed**; F-015/F-017 dispositioned in CSV; still not “CORE clean” / commercial P21 |
+| **Open risks** | F-017 remains source-inherent · F-015 open classes remain accepted · real SDTM not in git (correct) |
+| **Required evidence pack** | (1) Source profile · (2) SDTM val · (3) CORE run record + **`WS1_CORE_RESIDUAL_MATRIX.csv`** · (4) SDRG §5.1 · (5) REPRODUCIBILITY data-access |
 | **Release gate** | G01 before any “source locked” language |
-| **Next action** | Pack filed (`docs/workstreams/WS1_SOURCE_INTAKE_PACK.md`). **Next:** produce `WS1_CORE_RESIDUAL_MATRIX.csv` and one recorded WS-1 review note |
+| **Next action** | Maintain matrix on any CORE re-run; do not claim full CORE clean |
 
 ---
 
@@ -225,13 +225,13 @@ Not “another GREEN JSON.”
 
 ## 8. Immediate next command (continue operating)
 
-**Done recently:** portfolio surface · WS-6 **S1–S3** (ADRG/SDRG/BDRG/TRACEABILITY v1.1) · seals still PASS  
+**Done recently:** portfolio surface · WS-6 S1–S3 · **WS-1 CORE residual matrix** · seals still PASS  
 
 **Next (resume order):**
 
-1. **WS-1** — `docs/workstreams/WS1_CORE_RESIDUAL_MATRIX.csv`  
-2. **WS-7** — wire `scripts/verify_release.py` into CI  
-3. Optional — re-package guide PDFs into `m5/` when convenient
+1. **WS-7** — wire `scripts/verify_release.py` into CI  
+2. Optional — re-package guide PDFs into `m5/` when convenient  
+3. Optional — WS-2 review note / maintain guides on claim drift
 
 ```bash
 python3 scripts/verify_release.py
