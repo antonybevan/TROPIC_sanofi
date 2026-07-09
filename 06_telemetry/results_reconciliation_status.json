@@ -1,9 +1,14 @@
 {
-  "overall": "not_available",
+  "overall": "PASS",
   "scope": "MP arm only (real cohort); two-arm HR with synthetic CbzP is R-only by construction",
   "median_tol_days": 1,
   "parameters": {
-
+    "OS": "PASS",
+    "PFS": "PASS",
+    "TTPAIN": "PASS",
+    "TTPSA": "PASS",
+    "TTSAE": "PASS",
+    "TTUMOR": "PASS"
   }
 }
 

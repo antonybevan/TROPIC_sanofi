@@ -55,7 +55,15 @@ jobs:
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install pyreadstat lxml saspy pyyaml usdm==0.66.0 "jsonschema>=4"
+        python -m pip install pyreadstat lxml saspy pyyaml openpyxl usdm==0.66.0 "jsonschema>=4"
+
+    - name: Delivery architecture controls
+      run: |
+        # Rebuilds the evidence-dashboard reports and validates the machine-readable
+        # layer/workstream contracts. Project-state findings such as WARNING metadata
+        # control or a BLOCKED release candidate are reported here, while broken
+        # architecture wiring or failed report generation fails CI.
+        python3 06_telemetry/build_delivery_controls.py
 
     - name: SAS static-analysis gate (blocks on hardcoded paths)
       run: |
@@ -103,6 +111,7 @@ jobs:
         # The authoritative spec (00_specifications/ADaM_spec.xlsx) governs both
         # define.xml and the produced data. Assert both, and prove the define gate
         # actually detects drift (self-test) rather than being a no-op.
+        Rscript 06_telemetry/gen_adam_labels.R
         Rscript 07_define_xml/check_define_conformance.R
         Rscript 07_define_xml/check_define_conformance.R --self-test
         Rscript 03_validation_r/spec_data_checks.R

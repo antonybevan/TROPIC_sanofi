@@ -27,6 +27,7 @@ from __future__ import annotations
 import importlib
 import inspect
 import json
+import hashlib
 import os
 import pkgutil
 import uuid
@@ -36,7 +37,8 @@ import usdm_model
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "13_usdm", "tropic_usdm.json")
 CT_SYS = "http://www.cdisc.org/ns/ct"
-CT_VER = "2024-03-29"
+# Align with project-declared CDISC CT release used for CORE / standards posture.
+CT_VER = "2026-03-27"
 
 # name -> class across all usdm_model submodules
 C = {}
@@ -51,9 +53,25 @@ for _m in sorted(pkgutil.iter_modules(usdm_model.__path__), key=lambda m: m.name
         _IMPORT_ERRORS.append(f"{_m.name}: {type(e).__name__}: {e}")
 
 
+_NID_SEQ = 0
+_NID_NS = uuid.UUID("6ba7b810-9dad-11d1-80b4-00c04fd430c8")  # URL namespace
+
+
+def reset_nid_sequence():
+    """Reset sequential UUID generator so full builds are deterministic."""
+    global _NID_SEQ
+    _NID_SEQ = 0
+
+
 def nid():
-    # USDM id fields are typed as UUIDs in usdm_model; references use the object's .id
-    return str(uuid.uuid4())
+    """Deterministic UUID5 from construction order (uuid4 was non-reproducible — F-021).
+
+    Order-stable: build_wrapper() always constructs objects in the same sequence,
+    so seq:N yields the same ids across runs without colliding on reused labels.
+    """
+    global _NID_SEQ
+    _NID_SEQ += 1
+    return str(uuid.uuid5(_NID_NS, f"TROPIC-NCT00417079:seq:{_NID_SEQ}"))
 
 
 def make(cls_name, **kw):
@@ -84,6 +102,7 @@ ENDPOINT_LEVEL = {
 
 
 def build_wrapper():
+    reset_nid_sequence()
     # organizations
     sponsor = make("Organization", name="Sanofi-Aventis", type=code("C70793", "Clinical Study Sponsor"),
                    identifierScheme="UNVERIFIED", identifier="SANOFI-DUNS-NOT-PROVIDED")

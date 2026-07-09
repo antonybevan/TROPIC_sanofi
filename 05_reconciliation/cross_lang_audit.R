@@ -93,12 +93,14 @@ compare_datasets <- function(ds_name) {
       val[[col]]  <- as.character(v_col)
     }
 
-    # Coerce missing representations (empty strings and "NA" to NA)
+    # Coerce transport blank strings to missing, but preserve literal "NA" as data.
+    # A literal "NA" must fail reconciliation unless it is explicitly defined as a
+    # legitimate analysis value.
     if (is.character(prod[[col]])) {
       prod[[col]] <- trimws(prod[[col]])
       val[[col]]  <- trimws(val[[col]])
-      prod[[col]][is.na(prod[[col]]) | prod[[col]] == "" | prod[[col]] == "NA"] <- NA_character_
-      val[[col]][is.na(val[[col]]) | val[[col]] == "" | val[[col]] == "NA"]   <- NA_character_
+      prod[[col]][is.na(prod[[col]]) | prod[[col]] == ""] <- NA_character_
+      val[[col]][is.na(val[[col]]) | val[[col]] == ""]   <- NA_character_
     }
   }
 

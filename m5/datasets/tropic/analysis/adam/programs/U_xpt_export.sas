@@ -25,11 +25,46 @@
    Applies %lbl_<ds> so every ADaM variable carries its spec label (ADaMIG conformance). */
 %include "&PGMDIR./_adam_labels.sas";
 
+%macro assert_spec_vars(dataset);
+    %local expected actual missing extra i v;
+    %let expected = %upcase(%sysfunc(compbl(%vars_&dataset.)));
+    proc sql noprint;
+        select upcase(name)
+          into :actual separated by ' '
+          from dictionary.columns
+         where libname = 'ADAM'
+           and memname = "%upcase(&dataset.)"
+         order by varnum;
+    quit;
+    %let actual = %upcase(%sysfunc(compbl(&actual.)));
+
+    %let missing = ;
+    %do i = 1 %to %sysfunc(countw(&expected.));
+        %let v = %scan(&expected., &i.);
+        %if not %sysfunc(indexw(&actual., &v.)) %then %let missing = &missing. &v.;
+    %end;
+
+    %let extra = ;
+    %do i = 1 %to %sysfunc(countw(&actual.));
+        %let v = %scan(&actual., &i.);
+        %if not %sysfunc(indexw(&expected., &v.)) %then %let extra = &extra. &v.;
+    %end;
+
+    %if %length(%superq(missing)) or %length(%superq(extra)) %then %do;
+        %put ERROR: [EXPORT] &dataset. variables do not match ADaM spec.;
+        %put ERROR: [EXPORT] Missing from data: &missing.;
+        %put ERROR: [EXPORT] Extra in data: &extra.;
+        %abort cancel;
+    %end;
+%mend assert_spec_vars;
+
 %macro export_xpt(dataset);
     /* DATA step write to XPORT: avoids SORTEDBY WARNING (not preserved by DATA step)
        and avoids PROC COPY NOREPLACE ERROR when the XPT already exists. */
+    %assert_spec_vars(&dataset.);
     libname _xout xport "&PROJ_ROOT.&PATH_SEP.04_adam&PATH_SEP.&dataset._prod.xpt";
     data _xout.&dataset.;
+        %ord_&dataset.;
         set adam.&dataset.;
         %lbl_&dataset.;
     run;

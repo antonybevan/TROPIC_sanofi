@@ -2,7 +2,7 @@
   "check": "spec -> data conformance (metacore/metatools/xportr)",
   "spec": "ADaM_spec.xlsx",
   "data": "04_adam/*_prod.xpt",
-  "timestamp": "2026-07-05T21:51:24",
+  "timestamp": "2026-07-09T20:30:06",
   "status": "PASS",
   "datasets": [
     {

@@ -265,6 +265,7 @@ def validate(spec, by_ccode, by_name, value_sets):
                "possible_cdisc_mismatch": possible_mismatch,
                "unverifiable_numeric": numeric_unverifiable,
                "violations": violations, "traceability_gaps": traceability_gaps}
+    summary["status"] = "VIOLATION" if violations else ("WARNING" if traceability_gaps else "PASS")
     return results, summary
 
 

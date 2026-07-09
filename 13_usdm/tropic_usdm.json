@@ -1,12 +1,12 @@
 {
   "study": {
-    "id": "b9f2e904-56a7-48bc-a45e-12cf50b939fd",
+    "id": "d4e3ffa8-cab3-5ef1-8985-86061d8ba9ba",
     "name": "TROPIC",
     "description": "Cabazitaxel vs mitoxantrone in mCRPC (NCT00417079).",
     "label": "TROPIC",
     "versions": [
       {
-        "id": "3d1636d7-f78b-457c-9efd-6e3a1fc93be6",
+        "id": "0f288ef2-5f8b-56c7-8f35-2f9e904e521b",
         "extensionAttributes": [],
         "versionIdentifier": "1.0",
         "rationale": "Initial reconstruction.",
@@ -15,53 +15,53 @@
         "amendments": [],
         "businessTherapeuticAreas": [
           {
-            "id": "974f35f2-5ea7-4a50-8909-7073ed117afc",
+            "id": "c9e742bf-0bd5-573a-9c36-ee9dc02f758b",
             "extensionAttributes": [],
             "code": "C2991",
             "codeSystem": "http://www.cdisc.org/ns/ct",
-            "codeSystemVersion": "2024-03-29",
+            "codeSystemVersion": "2026-03-27",
             "decode": "Oncology",
             "instanceType": "Code"
           }
         ],
         "studyIdentifiers": [
           {
-            "id": "8b8b2921-429b-4690-a157-2a2e28cc8968",
+            "id": "336d5615-262b-5fc8-b0f0-cc15dcccd5d6",
             "extensionAttributes": [],
             "text": "NCT00417079",
-            "scopeId": "2930a177-0cce-43e1-8067-72bd370b1987",
+            "scopeId": "d6f6c257-0174-58ba-88ab-0e147099d173",
             "instanceType": "StudyIdentifier"
           },
           {
-            "id": "395dcfe0-e8ad-4a5a-81bb-5ab7d2812c5e",
+            "id": "3b1d37cf-a7d8-53d8-933c-a83e468bdf7e",
             "extensionAttributes": [],
             "text": "EFC6193",
-            "scopeId": "7d07997d-09ea-4695-9835-515265f39fc9",
+            "scopeId": "fe5092a8-782e-5a63-9e0a-ac4e915706a7",
             "instanceType": "StudyIdentifier"
           },
           {
-            "id": "b7c30503-377e-48d0-840b-01a2dc07b641",
+            "id": "2cfa8acb-2c3b-517b-80e1-d6cc3d01dfa7",
             "extensionAttributes": [],
             "text": "XRP6258",
-            "scopeId": "7d07997d-09ea-4695-9835-515265f39fc9",
+            "scopeId": "fe5092a8-782e-5a63-9e0a-ac4e915706a7",
             "instanceType": "StudyIdentifier"
           }
         ],
         "referenceIdentifiers": [],
         "studyDesigns": [
           {
-            "id": "5ae700b2-23a5-49fa-afbe-60c7ca4e4f10",
+            "id": "61f7abc5-9385-54ed-ace4-5306365e533d",
             "extensionAttributes": [],
             "name": "TROPIC interventional design",
             "studyPhase": {
-              "id": "585c5b48-66e2-491e-8ec9-91a977cc2180",
+              "id": "e06e0e9a-d0a8-550d-ba13-9967b97ed495",
               "extensionAttributes": [],
               "standardCode": {
-                "id": "15375b3e-e331-4feb-a862-c3211ace1f9d",
+                "id": "075782b8-eb91-50b0-acfe-b1f44fe8a31d",
                 "extensionAttributes": [],
                 "code": "C15602",
                 "codeSystem": "http://www.cdisc.org/ns/ct",
-                "codeSystemVersion": "2024-03-29",
+                "codeSystemVersion": "2026-03-27",
                 "decode": "Phase III Trial",
                 "instanceType": "Code"
               },
@@ -74,25 +74,25 @@
             "activities": [],
             "arms": [
               {
-                "id": "1a871878-9dc0-4b61-9624-bd0e2442d8cf",
+                "id": "b39d4131-7a87-5483-a2e4-ad0e90db6084",
                 "extensionAttributes": [],
                 "name": "Cabazitaxel + Prednisone",
                 "type": {
-                  "id": "ba25ab02-e553-4d10-9067-ad6b6ed38c53",
+                  "id": "62dd1a58-9138-5678-99fa-5aecf56df477",
                   "extensionAttributes": [],
                   "code": "C174266",
                   "codeSystem": "http://www.cdisc.org/ns/ct",
-                  "codeSystemVersion": "2024-03-29",
+                  "codeSystemVersion": "2026-03-27",
                   "decode": "Experimental Arm",
                   "instanceType": "Code"
                 },
                 "dataOriginDescription": "Subject data collected during the trial",
                 "dataOriginType": {
-                  "id": "02272344-b8a5-4b8f-8572-7f0317523518",
+                  "id": "86b5b998-cba7-50c4-a61f-15d00f950e36",
                   "extensionAttributes": [],
                   "code": "C188866",
                   "codeSystem": "http://www.cdisc.org/ns/ct",
-                  "codeSystemVersion": "2024-03-29",
+                  "codeSystemVersion": "2026-03-27",
                   "decode": "Subject Data Origin",
                   "instanceType": "Code"
                 },
@@ -101,25 +101,25 @@
                 "instanceType": "StudyArm"
               },
               {
-                "id": "3246da5f-af77-401d-9589-e3b83f4af5fb",
+                "id": "9b2d2dfa-cda7-58f0-a2b2-d5dd47aa98e5",
                 "extensionAttributes": [],
                 "name": "Mitoxantrone + Prednisone",
                 "type": {
-                  "id": "fc744924-375f-4545-b29c-feb8fcf13978",
+                  "id": "89590675-0c28-5132-8b4e-2324853d3136",
                   "extensionAttributes": [],
                   "code": "C174267",
                   "codeSystem": "http://www.cdisc.org/ns/ct",
-                  "codeSystemVersion": "2024-03-29",
+                  "codeSystemVersion": "2026-03-27",
                   "decode": "Active Comparator Arm",
                   "instanceType": "Code"
                 },
                 "dataOriginDescription": "Subject data collected during the trial",
                 "dataOriginType": {
-                  "id": "ccde9eae-6d0c-409a-a7a7-58e8d0910068",
+                  "id": "0c1a6c71-c107-58aa-b571-941d9bf9e9b8",
                   "extensionAttributes": [],
                   "code": "C188866",
                   "codeSystem": "http://www.cdisc.org/ns/ct",
-                  "codeSystemVersion": "2024-03-29",
+                  "codeSystemVersion": "2026-03-27",
                   "decode": "Subject Data Origin",
                   "instanceType": "Code"
                 },
@@ -130,62 +130,62 @@
             ],
             "studyCells": [
               {
-                "id": "fe52282c-284a-4d02-b30b-3d1f978e3a64",
+                "id": "c88c3738-330d-5df5-b262-b30f5d1e2ade",
                 "extensionAttributes": [],
-                "armId": "1a871878-9dc0-4b61-9624-bd0e2442d8cf",
-                "epochId": "ed88cac0-609d-4d90-bb15-da33ea546e76",
+                "armId": "b39d4131-7a87-5483-a2e4-ad0e90db6084",
+                "epochId": "c6e5aa56-44d8-577e-ad0b-f3c5b026d0be",
                 "elementIds": [
-                  "b474f4e9-f58f-483e-bd94-60c940813543"
+                  "96c280fa-a8e9-5db0-af56-2f9a3ffbc8ce"
                 ],
                 "instanceType": "StudyCell"
               },
               {
-                "id": "da7c9d2d-f41c-41d8-af5f-851217ef5431",
+                "id": "c8aba387-13b3-5d79-b482-a525f7cf9340",
                 "extensionAttributes": [],
-                "armId": "3246da5f-af77-401d-9589-e3b83f4af5fb",
-                "epochId": "ed88cac0-609d-4d90-bb15-da33ea546e76",
+                "armId": "9b2d2dfa-cda7-58f0-a2b2-d5dd47aa98e5",
+                "epochId": "c6e5aa56-44d8-577e-ad0b-f3c5b026d0be",
                 "elementIds": [
-                  "b474f4e9-f58f-483e-bd94-60c940813543"
+                  "96c280fa-a8e9-5db0-af56-2f9a3ffbc8ce"
                 ],
                 "instanceType": "StudyCell"
               },
               {
-                "id": "4f62e890-7ac1-44a6-a119-90d5f670fd2b",
+                "id": "62879045-c6e2-59e3-9922-6ea62f860d68",
                 "extensionAttributes": [],
-                "armId": "1a871878-9dc0-4b61-9624-bd0e2442d8cf",
-                "epochId": "97982321-e602-4691-88cf-a6c221df234c",
+                "armId": "b39d4131-7a87-5483-a2e4-ad0e90db6084",
+                "epochId": "95a6b8fd-2b20-5858-b3d1-fd5a4ac62934",
                 "elementIds": [
-                  "ac5275bf-5be0-49eb-88df-85b6bfb0525c"
+                  "ab89e713-acd0-5f9d-8b64-0717c4fa7cb2"
                 ],
                 "instanceType": "StudyCell"
               },
               {
-                "id": "691cdd53-f27d-45af-9d9c-4a83b3f6a102",
+                "id": "78c1e3f7-1c5d-5aed-92f5-9d794e31b662",
                 "extensionAttributes": [],
-                "armId": "3246da5f-af77-401d-9589-e3b83f4af5fb",
-                "epochId": "97982321-e602-4691-88cf-a6c221df234c",
+                "armId": "9b2d2dfa-cda7-58f0-a2b2-d5dd47aa98e5",
+                "epochId": "95a6b8fd-2b20-5858-b3d1-fd5a4ac62934",
                 "elementIds": [
-                  "ac5275bf-5be0-49eb-88df-85b6bfb0525c"
+                  "ab89e713-acd0-5f9d-8b64-0717c4fa7cb2"
                 ],
                 "instanceType": "StudyCell"
               },
               {
-                "id": "356ac756-fe6e-483b-a872-335a10bf01eb",
+                "id": "c263c9cd-d017-58ad-ba6d-86f9ef2bfa1c",
                 "extensionAttributes": [],
-                "armId": "1a871878-9dc0-4b61-9624-bd0e2442d8cf",
-                "epochId": "6943fb9b-daa9-46f3-a87c-b7ebd3d84740",
+                "armId": "b39d4131-7a87-5483-a2e4-ad0e90db6084",
+                "epochId": "e6d183d6-563e-5a16-a37b-8dde69f05603",
                 "elementIds": [
-                  "ee336bed-eb2d-477f-a388-837b1f545200"
+                  "dbc6c0de-6244-5a3e-9fbd-519f4272aada"
                 ],
                 "instanceType": "StudyCell"
               },
               {
-                "id": "4a3cc205-0c63-48d1-a3f4-61e6ee3e8663",
+                "id": "4d528ea6-bc24-5bda-b4f0-0c07875e121e",
                 "extensionAttributes": [],
-                "armId": "3246da5f-af77-401d-9589-e3b83f4af5fb",
-                "epochId": "6943fb9b-daa9-46f3-a87c-b7ebd3d84740",
+                "armId": "9b2d2dfa-cda7-58f0-a2b2-d5dd47aa98e5",
+                "epochId": "e6d183d6-563e-5a16-a37b-8dde69f05603",
                 "elementIds": [
-                  "ee336bed-eb2d-477f-a388-837b1f545200"
+                  "dbc6c0de-6244-5a3e-9fbd-519f4272aada"
                 ],
                 "instanceType": "StudyCell"
               }
@@ -193,15 +193,15 @@
             "rationale": "Two-arm randomized comparison of cabazitaxel vs mitoxantrone.",
             "epochs": [
               {
-                "id": "ed88cac0-609d-4d90-bb15-da33ea546e76",
+                "id": "c6e5aa56-44d8-577e-ad0b-f3c5b026d0be",
                 "extensionAttributes": [],
                 "name": "Screening",
                 "type": {
-                  "id": "8b4ce72d-9bfb-441f-9f78-01cedc820f51",
+                  "id": "6f842abe-4f45-594a-b37a-a7bd391bfae4",
                   "extensionAttributes": [],
                   "code": "C48262",
                   "codeSystem": "http://www.cdisc.org/ns/ct",
-                  "codeSystemVersion": "2024-03-29",
+                  "codeSystemVersion": "2026-03-27",
                   "decode": "Screening",
                   "instanceType": "Code"
                 },
@@ -209,15 +209,15 @@
                 "instanceType": "StudyEpoch"
               },
               {
-                "id": "97982321-e602-4691-88cf-a6c221df234c",
+                "id": "95a6b8fd-2b20-5858-b3d1-fd5a4ac62934",
                 "extensionAttributes": [],
                 "name": "Treatment",
                 "type": {
-                  "id": "ec1700ca-3f0b-4dfb-b51d-b41aa0f3a260",
+                  "id": "d0206df6-5fa9-591a-9af3-404962947c22",
                   "extensionAttributes": [],
                   "code": "C101526",
                   "codeSystem": "http://www.cdisc.org/ns/ct",
-                  "codeSystemVersion": "2024-03-29",
+                  "codeSystemVersion": "2026-03-27",
                   "decode": "Treatment",
                   "instanceType": "Code"
                 },
@@ -225,15 +225,15 @@
                 "instanceType": "StudyEpoch"
               },
               {
-                "id": "6943fb9b-daa9-46f3-a87c-b7ebd3d84740",
+                "id": "e6d183d6-563e-5a16-a37b-8dde69f05603",
                 "extensionAttributes": [],
                 "name": "Follow-up",
                 "type": {
-                  "id": "ea285f8b-a31f-4ec2-8dd9-6822556b067c",
+                  "id": "16274bf4-98af-5ab6-b484-bffdeb88a965",
                   "extensionAttributes": [],
                   "code": "C99158",
                   "codeSystem": "http://www.cdisc.org/ns/ct",
-                  "codeSystemVersion": "2024-03-29",
+                  "codeSystemVersion": "2026-03-27",
                   "decode": "Follow-up",
                   "instanceType": "Code"
                 },
@@ -243,7 +243,7 @@
             ],
             "elements": [
               {
-                "id": "b474f4e9-f58f-483e-bd94-60c940813543",
+                "id": "96c280fa-a8e9-5db0-af56-2f9a3ffbc8ce",
                 "extensionAttributes": [],
                 "name": "Screening element",
                 "studyInterventionIds": [],
@@ -251,7 +251,7 @@
                 "instanceType": "StudyElement"
               },
               {
-                "id": "ac5275bf-5be0-49eb-88df-85b6bfb0525c",
+                "id": "ab89e713-acd0-5f9d-8b64-0717c4fa7cb2",
                 "extensionAttributes": [],
                 "name": "Treatment element",
                 "studyInterventionIds": [],
@@ -259,7 +259,7 @@
                 "instanceType": "StudyElement"
               },
               {
-                "id": "ee336bed-eb2d-477f-a388-837b1f545200",
+                "id": "dbc6c0de-6244-5a3e-9fbd-519f4272aada",
                 "extensionAttributes": [],
                 "name": "Follow-up element",
                 "studyInterventionIds": [],
@@ -270,29 +270,29 @@
             "estimands": [],
             "indications": [],
             "studyInterventionIds": [
-              "9c9442ad-869e-4eb3-ad16-3b977fef0525",
-              "f3e4fe65-e2a4-4e3c-8a30-3a95b02b379d"
+              "ed86edbc-2466-512c-8d26-eac9664f466c",
+              "12e06d2f-5cf5-5462-9c32-21bf3389d83a"
             ],
             "objectives": [
               {
-                "id": "1cd43a40-d791-4e7d-8eee-1a8b0da06a7f",
+                "id": "616b0c3c-46ee-5dd1-bae0-ef0b5b84dddf",
                 "extensionAttributes": [],
                 "name": "Compare overall survival between treatment arms",
                 "text": "Compare overall survival between treatment arms",
                 "notes": [],
                 "instanceType": "Objective",
                 "level": {
-                  "id": "ecf914ae-3609-463c-82db-5dfc2da5467f",
+                  "id": "03ba7b97-7dd9-5e8c-8f46-856468ae752b",
                   "extensionAttributes": [],
                   "code": "C85826",
                   "codeSystem": "http://www.cdisc.org/ns/ct",
-                  "codeSystemVersion": "2024-03-29",
+                  "codeSystemVersion": "2026-03-27",
                   "decode": "Trial Primary Objective",
                   "instanceType": "Code"
                 },
                 "endpoints": [
                   {
-                    "id": "ea38237d-5cbd-49a3-beab-7e0736159b47",
+                    "id": "6f365644-dc1d-5ba1-af39-f8fb1baf0ef9",
                     "extensionAttributes": [],
                     "name": "Overall survival (OS)",
                     "text": "Overall survival (OS)",
@@ -300,11 +300,11 @@
                     "instanceType": "Endpoint",
                     "purpose": "Primary Endpoint",
                     "level": {
-                      "id": "ce273c77-a8d7-4358-ab65-1b18fb04438f",
+                      "id": "f28bda01-d8e8-55ed-9b45-ade14ddd3dd1",
                       "extensionAttributes": [],
                       "code": "C94496",
                       "codeSystem": "http://www.cdisc.org/ns/ct",
-                      "codeSystemVersion": "2024-03-29",
+                      "codeSystemVersion": "2026-03-27",
                       "decode": "Primary Endpoint",
                       "instanceType": "Code"
                     }
@@ -312,24 +312,24 @@
                 ]
               },
               {
-                "id": "f90669f7-ebcc-4f7a-98c5-234a6a9c7a37",
+                "id": "c2231fe2-d40c-5244-b491-b6aeac868a5a",
                 "extensionAttributes": [],
                 "name": "Compare progression-free survival",
                 "text": "Compare progression-free survival",
                 "notes": [],
                 "instanceType": "Objective",
                 "level": {
-                  "id": "04725604-ef2f-47a1-b21b-753e804fdd58",
+                  "id": "80cf0898-b6b7-5a34-b536-b1878dab152b",
                   "extensionAttributes": [],
                   "code": "C85827",
                   "codeSystem": "http://www.cdisc.org/ns/ct",
-                  "codeSystemVersion": "2024-03-29",
+                  "codeSystemVersion": "2026-03-27",
                   "decode": "Trial Secondary Objective",
                   "instanceType": "Code"
                 },
                 "endpoints": [
                   {
-                    "id": "4cca73d9-e53b-4841-b3c3-d1cebe0055c9",
+                    "id": "3429468d-ef5e-5ae9-8c06-1d4beeacbd09",
                     "extensionAttributes": [],
                     "name": "Progression-free survival (PFS)",
                     "text": "Progression-free survival (PFS)",
@@ -337,11 +337,11 @@
                     "instanceType": "Endpoint",
                     "purpose": "Secondary Endpoint",
                     "level": {
-                      "id": "2529c1fe-d825-4ba2-b9c3-354519298666",
+                      "id": "e975541b-0206-58b2-b51d-326216324fca",
                       "extensionAttributes": [],
                       "code": "C139173",
                       "codeSystem": "http://www.cdisc.org/ns/ct",
-                      "codeSystemVersion": "2024-03-29",
+                      "codeSystemVersion": "2026-03-27",
                       "decode": "Secondary Endpoint",
                       "instanceType": "Code"
                     }
@@ -349,24 +349,24 @@
                 ]
               },
               {
-                "id": "3274497a-1d0b-4583-bee1-285c7b6e6984",
+                "id": "0e5da173-b5d6-5e43-8dd5-240e4538e8f8",
                 "extensionAttributes": [],
                 "name": "Compare confirmed PSA response",
                 "text": "Compare confirmed PSA response",
                 "notes": [],
                 "instanceType": "Objective",
                 "level": {
-                  "id": "e754ebeb-2a11-4678-9be8-4ba4d5a102e0",
+                  "id": "2fb954d1-4df3-56d8-b4df-5f9828ba9aca",
                   "extensionAttributes": [],
                   "code": "C85827",
                   "codeSystem": "http://www.cdisc.org/ns/ct",
-                  "codeSystemVersion": "2024-03-29",
+                  "codeSystemVersion": "2026-03-27",
                   "decode": "Trial Secondary Objective",
                   "instanceType": "Code"
                 },
                 "endpoints": [
                   {
-                    "id": "e446340d-a580-44e0-9453-445f72b3df29",
+                    "id": "9228f005-1ee7-5e02-bb2a-ee0c7f8bf559",
                     "extensionAttributes": [],
                     "name": "PSA response (>=50% confirmed decline)",
                     "text": "PSA response (>=50% confirmed decline)",
@@ -374,11 +374,11 @@
                     "instanceType": "Endpoint",
                     "purpose": "Secondary Endpoint",
                     "level": {
-                      "id": "29ef562e-4e41-4ced-a34e-002f0b0f1c7e",
+                      "id": "c7ab67c4-5c68-5bf5-9d0d-1d3d2b56fff9",
                       "extensionAttributes": [],
                       "code": "C139173",
                       "codeSystem": "http://www.cdisc.org/ns/ct",
-                      "codeSystemVersion": "2024-03-29",
+                      "codeSystemVersion": "2026-03-27",
                       "decode": "Secondary Endpoint",
                       "instanceType": "Code"
                     }
@@ -386,24 +386,24 @@
                 ]
               },
               {
-                "id": "d5a33836-7d3f-4191-a590-bf4e87d49bfb",
+                "id": "64439362-b073-580b-86f6-c324651ce23f",
                 "extensionAttributes": [],
                 "name": "Compare tumor response and time to tumor progression",
                 "text": "Compare tumor response and time to tumor progression",
                 "notes": [],
                 "instanceType": "Objective",
                 "level": {
-                  "id": "7c84b986-b1cf-4300-9fcc-fb2415bd5f9f",
+                  "id": "fc3760b4-fdbc-5a57-9e5f-5880c17d0a14",
                   "extensionAttributes": [],
                   "code": "C85827",
                   "codeSystem": "http://www.cdisc.org/ns/ct",
-                  "codeSystemVersion": "2024-03-29",
+                  "codeSystemVersion": "2026-03-27",
                   "decode": "Trial Secondary Objective",
                   "instanceType": "Code"
                 },
                 "endpoints": [
                   {
-                    "id": "0c3c75a3-7786-4350-b517-89bf4938e6fd",
+                    "id": "0b81b2df-091a-5eb6-9794-4276ea05f8af",
                     "extensionAttributes": [],
                     "name": "Tumor response / time to tumor progression",
                     "text": "Tumor response / time to tumor progression",
@@ -411,11 +411,11 @@
                     "instanceType": "Endpoint",
                     "purpose": "Secondary Endpoint",
                     "level": {
-                      "id": "912120e0-432d-4829-b7b6-061e2c35807a",
+                      "id": "8a9a0cb1-da57-5484-83bb-d3a79be23f2f",
                       "extensionAttributes": [],
                       "code": "C139173",
                       "codeSystem": "http://www.cdisc.org/ns/ct",
-                      "codeSystemVersion": "2024-03-29",
+                      "codeSystemVersion": "2026-03-27",
                       "decode": "Secondary Endpoint",
                       "instanceType": "Code"
                     }
@@ -423,24 +423,24 @@
                 ]
               },
               {
-                "id": "08c1d923-086e-4e39-96bd-b5f1f0afdb86",
+                "id": "4fc4f607-d5b1-5427-9be9-1c4a52eac410",
                 "extensionAttributes": [],
                 "name": "Characterize safety and tolerability",
                 "text": "Characterize safety and tolerability",
                 "notes": [],
                 "instanceType": "Objective",
                 "level": {
-                  "id": "22b73782-1a67-463a-801b-e01c605c4681",
+                  "id": "cbe51d31-f330-5121-88c9-3b3d116750d4",
                   "extensionAttributes": [],
                   "code": "C85827",
                   "codeSystem": "http://www.cdisc.org/ns/ct",
-                  "codeSystemVersion": "2024-03-29",
+                  "codeSystemVersion": "2026-03-27",
                   "decode": "Trial Secondary Objective",
                   "instanceType": "Code"
                 },
                 "endpoints": [
                   {
-                    "id": "64965334-cd72-412c-a565-4d2d6fee7f16",
+                    "id": "ed88d66b-777f-55e8-824c-154201c3441a",
                     "extensionAttributes": [],
                     "name": "Adverse events, CTCAE grade",
                     "text": "Adverse events, CTCAE grade",
@@ -448,11 +448,11 @@
                     "instanceType": "Endpoint",
                     "purpose": "Secondary Endpoint",
                     "level": {
-                      "id": "553869f4-4310-4453-a288-ace7ef8a5957",
+                      "id": "e7455626-898c-5863-90be-d34e369c8ced",
                       "extensionAttributes": [],
                       "code": "C139173",
                       "codeSystem": "http://www.cdisc.org/ns/ct",
-                      "codeSystemVersion": "2024-03-29",
+                      "codeSystemVersion": "2026-03-27",
                       "decode": "Secondary Endpoint",
                       "instanceType": "Code"
                     }
@@ -461,17 +461,17 @@
               }
             ],
             "population": {
-              "id": "0ba7534b-e03b-4239-b531-2c75d9e0aae5",
+              "id": "330fd1bb-1edb-590d-843c-4d90f57b4a94",
               "extensionAttributes": [],
               "name": "Metastatic castration-resistant prostate cancer, post-docetaxel",
               "includesHealthySubjects": false,
               "plannedSex": [
                 {
-                  "id": "b3a4c200-fbae-4818-ace5-5446ec557273",
+                  "id": "3267962b-30f3-5ca3-9eb5-bed1782ba2ce",
                   "extensionAttributes": [],
                   "code": "C20197",
                   "codeSystem": "http://www.cdisc.org/ns/ct",
-                  "codeSystemVersion": "2024-03-29",
+                  "codeSystemVersion": "2026-03-27",
                   "decode": "Male",
                   "instanceType": "Code"
                 }
@@ -490,21 +490,21 @@
             "instanceType": "InterventionalStudyDesign",
             "subTypes": [],
             "model": {
-              "id": "19249c0d-2514-4345-9344-0e793914655a",
+              "id": "4af32e1c-1ef5-588e-bc10-2619002e55a3",
               "extensionAttributes": [],
               "code": "C82639",
               "codeSystem": "http://www.cdisc.org/ns/ct",
-              "codeSystemVersion": "2024-03-29",
+              "codeSystemVersion": "2026-03-27",
               "decode": "Parallel Study",
               "instanceType": "Code"
             },
             "intentTypes": [
               {
-                "id": "84f8c972-42bd-4dcb-a2b3-30e9f8a6d715",
+                "id": "255cd811-5576-5f40-9e34-8a9e7afd0a90",
                 "extensionAttributes": [],
                 "code": "C49656",
                 "codeSystem": "http://www.cdisc.org/ns/ct",
-                "codeSystemVersion": "2024-03-29",
+                "codeSystemVersion": "2026-03-27",
                 "decode": "Treatment Study",
                 "instanceType": "Code"
               }
@@ -513,30 +513,30 @@
         ],
         "titles": [
           {
-            "id": "671f2075-1081-4b3d-8186-bb5a8db62ad5",
+            "id": "49ff97b7-45e1-5cd8-96b1-2dbe68dfb5ff",
             "extensionAttributes": [],
             "text": "A randomized, open-label, multicenter study of cabazitaxel plus prednisone versus mitoxantrone plus prednisone in metastatic castration-resistant prostate cancer previously treated with a docetaxel-containing regimen",
             "type": {
-              "id": "44ffdb44-45f8-45ec-aa0f-fcc2d877b5b8",
+              "id": "5756748c-98d9-5a02-b3f4-ea6923e6138e",
               "extensionAttributes": [],
               "code": "C207615",
               "codeSystem": "http://www.cdisc.org/ns/ct",
-              "codeSystemVersion": "2024-03-29",
+              "codeSystemVersion": "2026-03-27",
               "decode": "Official Study Title",
               "instanceType": "Code"
             },
             "instanceType": "StudyTitle"
           },
           {
-            "id": "039f3464-e0fa-41c0-a591-3e932cc39090",
+            "id": "fad74d5e-1b75-56f1-8c18-28727edf3d7b",
             "extensionAttributes": [],
             "text": "TROPIC",
             "type": {
-              "id": "9af20d37-29fb-432e-bae6-afbc34946e06",
+              "id": "dba6728b-3ebd-53cc-8906-e1ecf5affd90",
               "extensionAttributes": [],
               "code": "C207646",
               "codeSystem": "http://www.cdisc.org/ns/ct",
-              "codeSystemVersion": "2024-03-29",
+              "codeSystemVersion": "2026-03-27",
               "decode": "Study Acronym",
               "instanceType": "Code"
             },
@@ -549,15 +549,15 @@
         "roles": [],
         "organizations": [
           {
-            "id": "7d07997d-09ea-4695-9835-515265f39fc9",
+            "id": "fe5092a8-782e-5a63-9e0a-ac4e915706a7",
             "extensionAttributes": [],
             "name": "Sanofi-Aventis",
             "type": {
-              "id": "e9110bc4-107d-4336-ad6b-4c7ecfa4e31d",
+              "id": "f4ebbb90-a474-5ae3-8a0b-aef06bd07eec",
               "extensionAttributes": [],
               "code": "C70793",
               "codeSystem": "http://www.cdisc.org/ns/ct",
-              "codeSystemVersion": "2024-03-29",
+              "codeSystemVersion": "2026-03-27",
               "decode": "Clinical Study Sponsor",
               "instanceType": "Code"
             },
@@ -567,15 +567,15 @@
             "instanceType": "Organization"
           },
           {
-            "id": "2930a177-0cce-43e1-8067-72bd370b1987",
+            "id": "d6f6c257-0174-58ba-88ab-0e147099d173",
             "extensionAttributes": [],
             "name": "ClinicalTrials.gov",
             "type": {
-              "id": "a5308422-6490-4812-981d-a8f9edfb4156",
+              "id": "a5604132-5dc9-5744-b99e-ecca09b6b112",
               "extensionAttributes": [],
               "code": "C93453",
               "codeSystem": "http://www.cdisc.org/ns/ct",
-              "codeSystemVersion": "2024-03-29",
+              "codeSystemVersion": "2026-03-27",
               "decode": "Study Registry",
               "instanceType": "Code"
             },
@@ -587,25 +587,25 @@
         ],
         "studyInterventions": [
           {
-            "id": "9c9442ad-869e-4eb3-ad16-3b977fef0525",
+            "id": "ed86edbc-2466-512c-8d26-eac9664f466c",
             "extensionAttributes": [],
             "name": "Cabazitaxel + Prednisone",
             "description": "Cabazitaxel 25 mg/m2 IV q3w + prednisone 10 mg PO daily",
             "role": {
-              "id": "18e8cd91-160b-4014-84fc-7ae13590f2f6",
+              "id": "40025f7d-33b2-5d8a-b85f-fd9f4f105be1",
               "extensionAttributes": [],
               "code": "C41161",
               "codeSystem": "http://www.cdisc.org/ns/ct",
-              "codeSystemVersion": "2024-03-29",
+              "codeSystemVersion": "2026-03-27",
               "decode": "Experimental Intervention",
               "instanceType": "Code"
             },
             "type": {
-              "id": "669673ea-b33a-429c-a266-33ac5caa2156",
+              "id": "e9d506b3-0f4a-5914-a178-d077e56814ab",
               "extensionAttributes": [],
               "code": "C1909",
               "codeSystem": "http://www.cdisc.org/ns/ct",
-              "codeSystemVersion": "2024-03-29",
+              "codeSystemVersion": "2026-03-27",
               "decode": "Pharmacologic Substance",
               "instanceType": "Code"
             },
@@ -615,25 +615,25 @@
             "instanceType": "StudyIntervention"
           },
           {
-            "id": "f3e4fe65-e2a4-4e3c-8a30-3a95b02b379d",
+            "id": "12e06d2f-5cf5-5462-9c32-21bf3389d83a",
             "extensionAttributes": [],
             "name": "Mitoxantrone + Prednisone",
             "description": "Mitoxantrone 12 mg/m2 IV q3w + prednisone 10 mg PO daily",
             "role": {
-              "id": "e97d85e3-e13c-4ec3-8d9b-95915e3b9dd8",
+              "id": "77ec7753-2b34-5b34-85b4-81e49f69a57f",
               "extensionAttributes": [],
               "code": "C41162",
               "codeSystem": "http://www.cdisc.org/ns/ct",
-              "codeSystemVersion": "2024-03-29",
+              "codeSystemVersion": "2026-03-27",
               "decode": "Active Comparator",
               "instanceType": "Code"
             },
             "type": {
-              "id": "4a82f39f-186e-45e6-b199-37d05a914bd3",
+              "id": "81891b6e-a0a5-56e9-94c6-09db1af53009",
               "extensionAttributes": [],
               "code": "C1909",
               "codeSystem": "http://www.cdisc.org/ns/ct",
-              "codeSystemVersion": "2024-03-29",
+              "codeSystemVersion": "2026-03-27",
               "decode": "Pharmacologic Substance",
               "instanceType": "Code"
             },

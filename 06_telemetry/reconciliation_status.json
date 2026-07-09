@@ -1,7 +1,7 @@
 {
   "overall": "PASS",
-  "simulated": true,
-  "execution_mode": "sim",
+  "simulated": false,
+  "execution_mode": "oda",
   "domains": {
     "ADSL": "PASS",
     "ADEX": "PASS",

@@ -114,6 +114,7 @@ cat("NOTE: [TFL] Verifying statistical boundaries (Hierarchical step-down gateke
 # Stratified Cox / log-rank helper (SAP pre-specified). Extracted to 09_tfl/tfl_stats.R so the # nolint
 # same recipe is regression-tested on a deterministic fixture (tests/test_tfl_stats.R, roadmap #8). # nolint
 source("09_tfl/tfl_stats.R")
+source("09_tfl/lab_shift_table.R")
 
 os_data <- adtte |>
   filter(PARAMCD == "OS") |>
@@ -1170,53 +1171,6 @@ writeLines(paste0(synth_banner, ae_summary_txt),
 # ==============================================================================
 cat("  [TFL] Compiling Lab Shift Tables...\n")
 
-build_shift_table <- function(lb_data, paramcd_val, param_label, n_total) {
-  # Baseline values
-  base <- lb_data |>
-    filter(
-      .data$PARAMCD == paramcd_val,
-      .data$BASEFL == "Y",
-      !is.na(.data$ATOXGR)
-    ) |>
-    select("USUBJID", BASE_GRADE = "ATOXGR")
-
-  # Worst post-baseline
-  worst <- lb_data |>
-    filter(
-      .data$PARAMCD == paramcd_val,
-      .data$BASEFL == "N",
-      .data$ANL01FL == "Y",
-      !is.na(.data$ATOXGR)
-    ) |>
-    group_by(.data$USUBJID) |>
-    slice_max(.data$ATOXGR, n = 1, with_ties = FALSE) |>
-    ungroup() |>
-    select("USUBJID", WORST_GRADE = "ATOXGR")
-
-  shift <- base |>
-    inner_join(worst, by = "USUBJID") |>
-    mutate(
-      BASE_GRADE  = paste0("Grade ", .data$BASE_GRADE),
-      WORST_GRADE = paste0("Grade ", .data$WORST_GRADE)
-    )
-
-  tbl <- shift |>
-    count(.data$BASE_GRADE, .data$WORST_GRADE) |>
-    pivot_wider(
-      names_from = "WORST_GRADE",
-      values_from = "n",
-      values_fill = 0,
-      names_sort = TRUE
-    )
-
-  header <- sprintf(
-    "\n  %s Baseline vs Worst Post-Baseline Grade Shift (n=%d)\n",
-    param_label, n_total
-  )
-  tbl_str <- paste(capture.output(print(as.data.frame(tbl))), collapse = "\n")
-  paste0(header, tbl_str, "\n")
-}
-
 # Restrict to Safety Population so the shift counts match the SAFFL
 # denominators (n_mp / n_cbzp); the 7 non-safety CbzP subjects carry ADLB rows.
 saf_ids <- adsl$USUBJID[adsl$SAFFL == "Y"]
@@ -1227,14 +1181,14 @@ shift_output <- paste0(
   "\n TROPIC (Study EFC6193 / XRP6258) Laboratory Toxicity Shift Tables\n",
   " =================================================================\n",
   " T-21-1: Baseline to Worst Post-Baseline CTCAE Grade Shift (MP Arm)\n\n",
-  build_shift_table(adlb_mp, "NEUT", "ANC / Neutrophils", n_mp),
-  build_shift_table(adlb_mp, "HGB", "Haemoglobin", n_mp),
-  build_shift_table(adlb_mp, "PLAT", "Platelets", n_mp),
+  build_lab_shift_table(adlb_mp, "NEUT", "ANC / Neutrophils", n_mp),
+  build_lab_shift_table(adlb_mp, "HGB", "Haemoglobin", n_mp),
+  build_lab_shift_table(adlb_mp, "PLAT", "Platelets", n_mp),
   "\n -----------------------------------------------------------------\n",
   " T-21-2: Baseline to Worst Post-Baseline CTCAE Grade Shift (CbzP Arm)\n\n",
-  build_shift_table(adlb_cbzp, "NEUT", "ANC / Neutrophils", n_cbzp),
-  build_shift_table(adlb_cbzp, "HGB", "Haemoglobin", n_cbzp),
-  build_shift_table(adlb_cbzp, "PLAT", "Platelets", n_cbzp)
+  build_lab_shift_table(adlb_cbzp, "NEUT", "ANC / Neutrophils", n_cbzp),
+  build_lab_shift_table(adlb_cbzp, "HGB", "Haemoglobin", n_cbzp),
+  build_lab_shift_table(adlb_cbzp, "PLAT", "Platelets", n_cbzp)
 )
 
 writeLines(paste0(synth_banner, shift_output),

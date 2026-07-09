@@ -1,0 +1,125 @@
+{
+  "status": "BLOCKED",
+  "generated_at": "2026-07-09 15:02:26 UTC",
+  "checks": 16,
+  "pass": 15,
+  "warning": 0,
+  "blocker": 1,
+  "active_audit_findings": 0,
+  "confirmed_critical_major_findings": 0,
+  "live_sas_execution_mode": "oda",
+  "items": [
+    {
+      "gate": "G01 source_intake_lock",
+      "check": "Source profile generated and clean",
+      "status": "PASS",
+      "evidence": "06_telemetry/source_profile_status.json status=pass; domains=34; DM subjects=371",
+      "required_action": ""
+    },
+    {
+      "gate": "G03 metadata_lock",
+      "check": "Metadata control report has no blocking warnings",
+      "status": "PASS",
+      "evidence": "06_telemetry/metadata_control/metadata_control_status.json status=pass; findings=0",
+      "required_action": ""
+    },
+    {
+      "gate": "G06 qc_signoff",
+      "check": "Risk-based validation strategy is satisfied by current evidence",
+      "status": "PASS",
+      "evidence": "06_telemetry/validation_strategy/validation_strategy_status.json status=PASS; blocked=0",
+      "required_action": ""
+    },
+    {
+      "gate": "G06 qc_signoff",
+      "check": "Execution logs have no unapproved warnings, errors, invalid-input notes, or uninitialized-variable findings",
+      "status": "PASS",
+      "evidence": "06_telemetry/log_cleanliness/log_cleanliness_status.json status=PASS; unapproved=0; reviewed_exceptions=39",
+      "required_action": ""
+    },
+    {
+      "gate": "G04 analysis_dataset_promotion",
+      "check": "Current live run uses real independent SAS engine",
+      "status": "PASS",
+      "evidence": "06_telemetry/pipeline_health.json sas_execution_mode=oda; pipeline=GREEN",
+      "required_action": ""
+    },
+    {
+      "gate": "G04 analysis_dataset_promotion",
+      "check": "Dataset reconciliation is non-simulated",
+      "status": "PASS",
+      "evidence": "06_telemetry/reconciliation_status.json overall=PASS; simulated=False",
+      "required_action": ""
+    },
+    {
+      "gate": "G04 analysis_dataset_promotion",
+      "check": "Committed ODA evidence snapshot exists",
+      "status": "PASS",
+      "evidence": "06_telemetry/evidence/*.oda-green.json",
+      "required_action": "Snapshot is evidence of a prior genuine ODA run, not the current live run."
+    },
+    {
+      "gate": "G04 analysis_dataset_promotion",
+      "check": "Third-engine admiral reconciliation passes for critical core on current run",
+      "status": "PASS",
+      "evidence": "06_telemetry/admiral_reconciliation_status.json overall=PASS; dag_stage=PASS; current_with_run=True",
+      "required_action": ""
+    },
+    {
+      "gate": "G05 output_promotion",
+      "check": "TFL output index is complete for controlled catalog scope",
+      "status": "PASS",
+      "evidence": "06_telemetry/tfl_output_index_status.json status=pass; controlled_catalog=pass; in_scope=18; deferred=21; stale_sas_companions_nongating=6",
+      "required_action": ""
+    },
+    {
+      "gate": "G06 qc_signoff",
+      "check": "Results reconciliation available and passing",
+      "status": "PASS",
+      "evidence": "06_telemetry/results_reconciliation_status.json overall=PASS",
+      "required_action": ""
+    },
+    {
+      "gate": "G06 qc_signoff",
+      "check": "Forest HR reconciliation passes",
+      "status": "PASS",
+      "evidence": "06_telemetry/forest_reconciliation_status.json overall=PASS",
+      "required_action": ""
+    },
+    {
+      "gate": "G06 qc_signoff",
+      "check": "Synthetic comparator bridge parity passes",
+      "status": "PASS",
+      "evidence": "06_telemetry/cbzp_bridge_status.json overall=PASS",
+      "required_action": "Still disclose CbzP as synthetic/reconstructed demonstration content."
+    },
+    {
+      "gate": "G09 release_candidate_lock",
+      "check": "Current release-run manifest is release-candidate grade (full DAG, clean tree)",
+      "status": "BLOCKER",
+      "evidence": "06_telemetry/release_run_manifest/release_run_manifest.json status=REMEDIATION; evidence_grade=remediation_partial_or_dirty; run_scope=full_dag; seal=8f644a2c4fdcfe8fe4af5ec68e0d5ee5cbc7ed873fae46015d49a747ff2206b8",
+      "required_action": "Release manifest must be status=PASS (not REMEDIATION/FAIL): full current DAG, clean worktree, and current-run binding. REMEDIATION is valid development evidence only."
+    },
+    {
+      "gate": "G09 release_candidate_lock",
+      "check": "Pipeline health records a full current DAG run",
+      "status": "PASS",
+      "evidence": "06_telemetry/pipeline_health.json run_scope=full_dag; stages_recorded=30; stages_expected=30; stages_not_run=0",
+      "required_action": ""
+    },
+    {
+      "gate": "G06 qc_signoff",
+      "check": "Audit findings register has no active confirmed Critical/Major blockers",
+      "status": "PASS",
+      "evidence": "audit/findings_register.csv active=0; confirmed Critical/Major=0; severity_counts={}",
+      "required_action": "Close, resolve, or formally disposition confirmed Critical/Major findings before any release-ready claim."
+    },
+    {
+      "gate": "G08 submission_package_materialization",
+      "check": "eCTD backbone/run record present",
+      "status": "PASS",
+      "evidence": "11_ectd/0000/index.xml present=True; 11_ectd/RUN_RECORD.md present=True",
+      "required_action": "Rebuild/materialize eCTD sequence after upstream release candidate is clean."
+    }
+  ]
+}

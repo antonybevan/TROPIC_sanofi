@@ -1,3 +1,1 @@
 "rule","severity","dataset","variable","count","message"
-"AD0102","Error","ADEX","PARAMN",1,"Variable label is missing"
-"AD0102","Error","ADEX","AVISITN",1,"Variable label is missing"

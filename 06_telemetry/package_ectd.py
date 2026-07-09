@@ -344,7 +344,10 @@ def main(data_free=False):
         write_dataset_placeholder(m5_adam_datasets_dir)
     else:
         print("Copying ADaM datasets...")
-        adam_prod_files = glob.glob(os.path.join(adam_src_dir, "*_prod.xpt"))
+        adam_prod_files = [
+            f for f in glob.glob(os.path.join(adam_src_dir, "*_prod.xpt"))
+            if os.path.basename(f).lower() != "clinsite_prod.xpt"
+        ]
         if not adam_prod_files:
             print("Error: No ADaM '*_prod.xpt' datasets found in 04_adam/.")
             sys.exit(1)

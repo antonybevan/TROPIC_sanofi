@@ -1,0 +1,163 @@
+# TROPIC critical-to-quality and estimand traceability register.
+#
+# Purpose: connect clinical questions to specifications, ADaM artifacts,
+# TFL/ARS outputs, reviewer explanation, and validation evidence. This is the
+# clinical backbone for risk-based validation.
+
+version: 1
+study: TROPIC-NCT00417079
+authority:
+  sap: TROPIC_SAP_v4.0_industry_grade.docx
+  validation_strategy: validation_strategy.yaml
+  research_basis: docs/REGULATORY_WORKFLOW_RESEARCH.md
+
+ctq_factors:
+  - id: CTQ-EFF-OS
+    domain: efficacy
+    risk_tier: critical
+    clinical_question: "What is the overall survival experience in the real MP cohort and the illustrative comparative OS display?"
+    estimand:
+      population: "Intent-to-treat analysis population as represented in ADSL/ADTTE."
+      variable: "Time from randomization to death from any cause."
+      intercurrent_events: "Deaths are events; subjects without death are censored at last known alive date."
+      summary_measure: "Kaplan-Meier median, event count, survival curve, hazard ratio where comparator is displayed."
+    specification_refs:
+      - "SAP v4.0 section 9"
+      - "ADRG efficacy traceability narrative"
+    adam_datasets: [ADSL, ADTTE]
+    key_variables: [USUBJID, ITTFL, PARAMCD, AVAL, CNSR]
+    outputs: [F-11-1, F-12-1]
+    ars_analyses: [AN.OS]
+    validation_artifacts: [adtte_primary, adsl, tfl_primary_secondary]
+    reviewer_guides: [08_reviewers_guides/ADRG.md, 08_reviewers_guides/TRACEABILITY_MATRIX.md]
+
+  - id: CTQ-EFF-PFS
+    domain: efficacy
+    risk_tier: critical
+    clinical_question: "What is the progression-free survival experience in the real MP cohort and illustrative comparative PFS display?"
+    estimand:
+      population: "Intent-to-treat analysis population as represented in ADSL/ADTTE."
+      variable: "Time from randomization to progression or death."
+      intercurrent_events: "Progression or death are events; subjects without event are censored per SAP rules."
+      summary_measure: "Kaplan-Meier median, event count, survival curve, hazard ratio where comparator is displayed."
+    specification_refs:
+      - "SAP v4.0 section 10.1"
+      - "ADRG efficacy traceability narrative"
+    adam_datasets: [ADSL, ADTTE]
+    key_variables: [USUBJID, ITTFL, PARAMCD, AVAL, CNSR]
+    outputs: [F-11-2]
+    ars_analyses: [AN.PFS]
+    validation_artifacts: [adtte_primary, adsl, tfl_primary_secondary]
+    reviewer_guides: [08_reviewers_guides/ADRG.md, 08_reviewers_guides/TRACEABILITY_MATRIX.md]
+
+  - id: CTQ-EFF-SECONDARY-TTE
+    domain: efficacy
+    risk_tier: high
+    clinical_question: "What are the supportive time-to-event results for PSA progression and tumor progression?"
+    estimand:
+      population: "Intent-to-treat analysis population, with endpoint-specific evaluability where applicable."
+      variable: "Time from randomization to endpoint-specific progression event."
+      intercurrent_events: "Endpoint events and censoring are applied according to SAP endpoint definitions."
+      summary_measure: "Kaplan-Meier median and event count."
+    specification_refs:
+      - "SAP v4.0 sections 4.3-5.3"
+    adam_datasets: [ADSL, ADTTE]
+    key_variables: [USUBJID, ITTFL, PARAMCD, AVAL, CNSR]
+    outputs: [T-11-6, T-11-7]
+    ars_analyses: [AN.TTPSA, AN.TTUMOR]
+    validation_artifacts: [adtte_secondary, adsl, tfl_primary_secondary]
+    reviewer_guides: [08_reviewers_guides/ADRG.md, 08_reviewers_guides/TRACEABILITY_MATRIX.md]
+
+  - id: CTQ-EFF-RESPONSE
+    domain: efficacy
+    risk_tier: high
+    clinical_question: "What response evidence supports the efficacy profile?"
+    estimand:
+      population: "Response-evaluable or analysis population as described in reviewer guide limitations."
+      variable: "Best clinical response and response-related ADaM records."
+      intercurrent_events: "Non-evaluable response records are handled according to response analysis definitions."
+      summary_measure: "Responder counts and response summaries."
+    specification_refs:
+      - "SAP v4.0 sections 4.3-5.3"
+      - "review-board SR-1 sensitivity trace"
+    adam_datasets: [ADSL, ADRS, ADLB]
+    key_variables: [USUBJID, PARAMCD, AVAL, AVALC]
+    outputs: [T-11-8, T-11-8b, F-13-1]
+    ars_analyses: []
+    validation_artifacts: [response_adam, safety_adam, tfl_primary_secondary]
+    reviewer_guides: [08_reviewers_guides/ADRG.md, 08_reviewers_guides/TRACEABILITY_MATRIX.md]
+
+  - id: CTQ-SAFE-TEAE
+    domain: safety
+    risk_tier: high
+    clinical_question: "What is the treatment-emergent adverse-event profile?"
+    estimand:
+      population: "Safety population as represented in ADSL."
+      variable: "Treatment-emergent adverse events by subject and event classification."
+      intercurrent_events: "Events are included according to treatment-emergent windowing rules."
+      summary_measure: "Subject counts and percentages by category, grade, and system organ class."
+    specification_refs:
+      - "SAP v4.0 section 7"
+    adam_datasets: [ADSL, ADAE]
+    key_variables: [USUBJID, SAFFL, TRTEMFL, ATOXGR, AEDECOD, AESOC]
+    outputs: [T-20-1, T-20-2]
+    ars_analyses: []
+    validation_artifacts: [safety_adam, adsl]
+    reviewer_guides: [08_reviewers_guides/ADRG.md, 08_reviewers_guides/SDRG.md]
+
+  - id: CTQ-SAFE-LAB
+    domain: safety
+    risk_tier: high
+    clinical_question: "What laboratory toxicity shifts are observed?"
+    estimand:
+      population: "Safety population with evaluable laboratory records."
+      variable: "Baseline and post-baseline laboratory toxicity grade."
+      intercurrent_events: "Post-baseline worst grade is summarized within the analysis window."
+      summary_measure: "Baseline-to-worst grade shift counts."
+    specification_refs:
+      - "SAP v4.0 section 7.5"
+    adam_datasets: [ADSL, ADLB]
+    key_variables: [USUBJID, SAFFL, PARAMCD, BASE, AVAL, ATOXGR]
+    outputs: [T-21-1, T-21-2]
+    ars_analyses: []
+    validation_artifacts: [safety_adam]
+    reviewer_guides: [08_reviewers_guides/ADRG.md, 08_reviewers_guides/SDRG.md]
+
+  - id: CTQ-SAFE-EXPOSURE
+    domain: safety
+    risk_tier: high
+    clinical_question: "What exposure context supports safety and benefit-risk interpretation?"
+    estimand:
+      population: "Safety population with exposure records."
+      variable: "Treatment duration, relative dose intensity, and exposure summaries."
+      intercurrent_events: "Dose interruptions/reductions are reflected in exposure-derived measures where available."
+      summary_measure: "Exposure duration and relative dose intensity categories."
+    specification_refs:
+      - "SAP v4.0 section 7.8"
+      - "Project Optimus demonstration"
+    adam_datasets: [ADSL, ADEX, ADLB, ADTTE]
+    key_variables: [USUBJID, SAFFL, TRTSDT, TRTEDT, PARAMCD, AVAL]
+    outputs: [F-14-1, F-17-1, T-17-1, T-17-2, T-17-4]
+    ars_analyses: []
+    validation_artifacts: [safety_adam, adtte_secondary]
+    reviewer_guides: [08_reviewers_guides/ADRG.md, 08_reviewers_guides/TRACEABILITY_MATRIX.md]
+
+  - id: CTQ-META-REVIEWABILITY
+    domain: metadata
+    risk_tier: critical
+    clinical_question: "Can a reviewer navigate, understand, and reproduce the submitted data and results?"
+    estimand:
+      population: "Not applicable."
+      variable: "Dataset, variable, codelist, method, ARM/ARS, and reviewer-guide metadata."
+      intercurrent_events: "Not applicable."
+      summary_measure: "Conformance, traceability, and package-readiness status."
+    specification_refs:
+      - "FDA Study Data Technical Conformance Guide"
+      - "CDISC ADaM/Define-XML/ARS"
+    adam_datasets: [ADSL, ADEX, ADCM, ADAE, ADLB, ADRS, ADTTE]
+    key_variables: []
+    outputs: []
+    ars_analyses: []
+    validation_artifacts: [metadata_package, reviewer_explanation, platform_release_controls]
+    reviewer_guides: [08_reviewers_guides/ADRG.md, 08_reviewers_guides/SDRG.md, 08_reviewers_guides/BDRG.md, 08_reviewers_guides/SDSP.md]
+

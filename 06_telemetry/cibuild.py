@@ -650,7 +650,11 @@ def run_stage_execution(stage, sas_mode):
 
 def run_single_stage(stage, from_stage, sas_mode, results):
     if stage["id"] < from_stage:
+        # Record explicitly: omitted stages must never look like "not part of the DAG".
+        # NOT_RUN = --from-stage skip (partial evidence). Distinct from SKIPPED
+        # (stage ran, legitimately nothing to do, e.g. results recon in sim mode).
         print(f"Skipping Stage {stage['id']}: {stage['name']}")
+        results[stage["name"]] = "NOT_RUN"
         return True
 
     print(f"Executing Stage {stage['id']}: {stage['name']}...")
@@ -675,6 +679,24 @@ def run_single_stage(stage, from_stage, sas_mode, results):
         except FileNotFoundError:
             rc = 1
             stderr = "Reconciliation status file missing; cannot confirm zero differences."
+
+    # T1 third-engine gate: admiral must reconcile the scoped ADSL/OS/PFS core to SAS prod.
+    # not_available is a FAIL when this stage is in the DAG (no silent skip of T1 evidence).
+    if stage["name"] == "Admiral Core Reconciliation" and rc == 0:
+        status_path = "06_telemetry/admiral_reconciliation_status.json"
+        try:
+            with open(status_path) as sf:
+                adm = json.load(sf)
+            overall = adm.get("overall")
+            if overall != "PASS":
+                rc = 1
+                stderr = (
+                    f"Admiral reconciliation did not pass (overall='{overall}'). "
+                    "T1 third-engine evidence is required when this stage is orchestrated."
+                )
+        except (FileNotFoundError, json.JSONDecodeError):
+            rc = 1
+            stderr = "Admiral reconciliation status file missing or unreadable."
 
     # M-4 sanity gate fires immediately after the TFL deliverables are rendered, so a
     # corrupted table is caught BEFORE results-reconciliation or eCTD packaging consume it.
@@ -774,6 +796,7 @@ def run_parallel_batch(batch, from_stage, sas_mode, results):
     import concurrent.futures
     for s in [s for s in batch if s["id"] < from_stage]:
         print(f"Skipping Stage {s['id']}: {s['name']}")
+        results[s["name"]] = "NOT_RUN"
     parallel_stages = [s for s in batch if s["id"] >= from_stage]
     if not parallel_stages:
         return
@@ -887,6 +910,7 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
     # otherwise run silently ungated (the C-3 regression class).
     implemented_gates = {
         "Cross-Language Audit Reconcile",
+        "Admiral Core Reconciliation",
         "Efficacy & Safety TFL Suite Compilation",
         "Numerical Results Reconciliation (SAS vs R)",
     }
@@ -916,6 +940,7 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
     create_backup()
 
     results = {}
+    expected_stage_names = [s["name"] for s in stages]
 
     # Execute in declared order. A contiguous run of parallel-marked stages (the
     # independent ADaM validations) fans out concurrently; everything else runs
@@ -932,11 +957,43 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
             run_parallel_batch(batch, from_stage, sas_mode, results)
             idx = j
         else:
+            if stage["name"] == "Release Run Manifest Binding" and stage["id"] >= from_stage:
+                # The release manifest hashes pipeline_health.json as a current-run QC
+                # verdict. Write telemetry for completed UPSTREAM stages only — exclude
+                # this stage from expected so run_scope is full_dag when 1..(N-1) all ran
+                # (otherwise the not-yet-run release stage forces partial_dag and the
+                # seal incorrectly self-blocks).
+                upstream_expected = [
+                    n for n in expected_stage_names
+                    if n != "Release Run Manifest Binding"
+                ]
+                write_telemetry(results, sas_mode, expected_stage_names=upstream_expected)
             run_single_stage(stage, from_stage, sas_mode, results)
             idx += 1
 
     clean_backup()
-    write_telemetry(results, sas_mode)
+    # Always seal the full stage map (PASS / SKIPPED / NOT_RUN / FAIL), including the
+    # release-manifest stage itself. Partial --from-stage runs are therefore visible
+    # rather than silently under-counted as a "15-stage green" pipeline.
+    write_telemetry(results, sas_mode, expected_stage_names=expected_stage_names)
+    # Re-bind the release manifest against FINAL full_dag health. Stage 30 itself ran
+    # against pre-stage health; without this re-seal, a green full DAG still seals as
+    # REMEDIATION(partial) from the intermediate write.
+    if results.get("Release Run Manifest Binding") in {"PASS", "REMEDIATION"} or (
+        any(s["name"] == "Release Run Manifest Binding" and s["id"] >= from_stage for s in stages)
+        and results.get("Release Run Manifest Binding") != "FAIL"
+        and results.get("Release Run Manifest Binding") != "NOT_RUN"
+    ):
+        rc_rm, out_rm, err_rm = run_command(
+            ["python3", "06_telemetry/build_release_run_manifest.py"],
+            timeout=STAGE_TIMEOUT_S,
+        )
+        if rc_rm == 0:
+            print("  [RELEASE SEAL] Release-run manifest re-bound against final pipeline_health.")
+        else:
+            # Non-zero is OK for REMEDIATION (dirty tree); FAIL binding is not.
+            # build_release_run_manifest exits 0 on REMEDIATION and 1 only on FAIL.
+            print(f"  [RELEASE SEAL] Re-bind finished with exit {rc_rm}: {(err_rm or out_rm).strip()[:200]}")
     print("All clinical pipeline stages compiled successfully!")
 
 def update_define_timestamp():
@@ -1121,21 +1178,31 @@ def _sas_version_from_log(log_path):
     return m.group(1).strip() if m else None
 
 
-def write_telemetry(results, sas_mode="sim"):
+def write_telemetry(results, sas_mode="sim", expected_stage_names=None):
     import platform
     # A legitimately SKIPPED stage (e.g. results-reconciliation in sim/cached mode) does
-    # not turn the pipeline RED; only a real FAIL does.
+    # not turn the pipeline RED; only a real FAIL does. NOT_RUN (partial --from-stage)
+    # also keeps GREEN so remediation runs remain usable, but run_scope marks incompleteness.
     health_status = "RED" if any(v == "FAIL" for v in results.values()) else "GREEN"
 
     # Update define.xml timestamp if the build succeeds (Mi-02)
     if health_status == "GREEN":
         update_define_timestamp()
 
+    expected = list(expected_stage_names) if expected_stage_names else list(results.keys())
+    not_run = [n for n in expected if results.get(n) == "NOT_RUN" or n not in results]
+    run_scope = "full_dag" if not not_run else "partial_dag"
+
     health = {
         "timestamp": datetime.now().isoformat(),
         "runner": f"{getpass.getuser()} (System Agent)",
         "pipeline_health_status": health_status,
         "sas_execution_mode": sas_mode,
+        "schema_version": "run_scope_v1",
+        "run_scope": run_scope,
+        "stages_expected": len(expected),
+        "stages_recorded": len(results),
+        "stages_not_run": not_run,
         "stages": results
     }
 

@@ -53,15 +53,17 @@ ADEX,PARCAT1,Parameter Category 1
 ADEX,AVAL,Analysis Value
 ADEX,AVALC,Analysis Value (C)
 ADEX,AVISIT,Analysis Visit
+ADEX,PARAMN,Parameter (N)
+ADEX,AVISITN,Analysis Visit (N)
 ADCM,STUDYID,Study Identifier
 ADCM,USUBJID,Unique Subject Identifier
 ADCM,CMDECOD,Standardized Medication Name
 ADCM,CMCAT,Category for Medication
 ADCM,CMINDC,Indication
-ADCM,CMSTDT,Analysis Start Date
-ADCM,CMENDT,Analysis End Date
+ADCM,ASTDT,Analysis Start Date
+ADCM,AENDT,Analysis End Date
 ADCM,CMTRT,"Reported Name of Drug, Med, or Therapy"
-ADCM,CMSTDY,Analysis Start Day
+ADCM,ASTDY,Analysis Start Day
 ADCM,GCSFFL,G-CSF Concomitant Med Flag
 ADCM,GCSFPRFL,G-CSF Prophylactic Med Flag
 ADCM,NACTFL,New Anti-Cancer Therapy Flag

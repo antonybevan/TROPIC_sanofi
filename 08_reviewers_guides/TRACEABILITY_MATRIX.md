@@ -38,7 +38,7 @@ OS / PFS / TTSAE / TTPSA / TTUMOR inherit this limitation (SDRG §2).
 |---|---|---|---|---|---|---|
 | **ADSL** | `A_adsl_generation.sas` | `v_adsl_validation.R` | `IG.ADSL` | Populations ITTFL/SAFFL/PPROTFL; TRTSDT/TRTEDT (EX); DTHDT/LSTALVDT (DS, week-offset); ECOGBL (VS); MEASDISF/VISCFL (LS); PAINBL (PN, §6.3); baseline labs + **imputation flags `*IF`** (ADRG §5.1) | `USUBJID` (unique) | `reconciliation_status.json` |
 | **ADEX** | `A_adex_generation.sas` | `v_adex_validation.R` | `IG.ADEX` | Cycle dose, CUMDOSE, NCYCLE, **RDI** (dose exposure §7.8; Project Optimus E-R §10) | `USUBJID,PARAMCD,AVISIT` (multiset) | ″ |
-| **ADCM** | `A_adcm_generation.sas` | `v_adcm_validation.R` | `IG.ADCM` | Prior/concomitant meds; NACTDT (new anti-cancer therapy); docetaxel history | `USUBJID,CMSTDT,CMDECOD` (multiset) | ″ |
+| **ADCM** | `A_adcm_generation.sas` | `v_adcm_validation.R` | `IG.ADCM` | Prior/concomitant meds; NACTDT (new anti-cancer therapy); docetaxel history | `USUBJID,ASTDT,CMDECOD` (multiset) | ″ |
 | **ADAE** | `A_adae_io_respec.sas` | `v_adae_io_validation.R` | `IG.ADAE` | TRTEMFL; **custom continuous-episode merging** (OCCDS v1.0 base; CQ02 hematologic irAE, ≤3-day gap, §7.7); AEOCCFL denominator flag; ATOXGR | `USUBJID,AESEQ` (unique) | ″ |
 | **ADLB** | `A_adlb_generation.sas` | `v_adlb_validation.R` | `IG.ADLB` | Analysis windows (§11.1.3); ATOXGR baseline→worst shift; ANL01FL; ANCNADIR / ANCRECDY (§10) | `USUBJID,PARAMCD,AVISITN,LBDY` (multiset) | ″ |
 | **ADRS** | `A_adrs_generation.sas` | `v_adrs_validation.R` | `IG.ADRS` | OVRLRESP (integrated RECIST v1.0 target+non-target+new-lesion, SAP v4.0 §10.3); BSGRESP (PCWG3 bone 2+2 — exploratory demonstration unless promoted by SAP amendment); PSPROG / PSARESP (SAP v4.0 §10.2); OBJRESP (SAP v4.0 §10.3) | `USUBJID,PARAMCD,AVISIT` (multiset) | ″ |
@@ -84,8 +84,12 @@ them. SAS production-track copies of the statistical figures are rendered separa
 | `F-14-1_Swimmer_Plot.png` | 7.8 | exposure swimmer | ADEX, ADSL |
 | `F-17-1_Optimus_Scatter.png` | 10 | LOESS E-R (RDI vs ANC nadir) | ADEX (RDI), ADLB (ANCNADIR) |
 | `T-11-Efficacy_Tables.txt` | 4.3–5.3 | efficacy summary (KM/Cox/Fisher) | ADTTE, ADRS |
+| `T-17-Optimus_Tables.txt` | 10 / Appendix D | Optimus RDI / ANC / benefit-risk tables | ADEX, ADLB, ADTTE, ADSL |
 | `T-20-AE_Summary_Tables.txt` | 7 | TEAE summary | ADAE |
 | `T-21-Lab_Shift_Tables.txt` | 7.5 | CTCAE shift | ADLB |
+
+Controlled release-scope authority for which of the above IDs are in-scope vs deferred:
+`tfl_output_catalog.yaml` (see also `docs/TFL_OUTPUT_INDEX.md`).
 
 QC convention: the validated objects are the **analysis results behind each figure**
 (survival functions, HRs, at-risk counts, response distributions), driven by the
@@ -110,23 +114,28 @@ that link key results to their ADaM data + method — the define-level complemen
 > (each `Name` cites its TFL ID for ARM↔TFL traceability; referential integrity is gated by
 > `07_define_xml/validate_define.py`). The analysis-population overview (`F-01`, legacy
 > `CONSORT` filename) and the
-> discontinuation listing (`L-01`) are intentionally **out of ARM scope** — they are a flow
-> diagram and a data listing, not statistical analysis results.
+> discontinuation listing is intentionally **out of scope** (F-004 removed; no listing in
+> `tfl_output_catalog.yaml` controlled scope). Flow diagram `F-01-1` is out of ARM scope.
 
 ---
 
 ## 4. Orchestration & Provenance
 
-The pipeline is **22 stages** (`cibuild.py`); the BIMO domain at Stage 10 and the two ADaM
-specification-conformance gates at Stages 15–16 (audit C-4 inversion) shifted the later stage numbers,
-and the eCTD backbone + materialize steps (Stages 21–22) were subsequently folded into the DAG.
+The pipeline is **30 stages** (`study_manifest.yaml` → `cibuild.py`), including third-engine
+**admiral** re-derivation + gated core reconciliation after cross-language audit, TFL/catalog
+controls, eCTD backbone/materialize, log cleanliness, and release-run manifest binding.
 
-| Stage | Driver | Evidence artifact |
+| Stage band | Driver | Evidence artifact |
 |---|---|---|
-| 1–9 (staging + R ADaM validation) | `06_telemetry/cibuild.py` → `logrx::axecute(...)` | `03_validation_r/*.log` |
-| 10 (R BIMO validation) | `v_bimo_validation.R` | `04_adam/clinsite_v.xpt` |
-| 11 (SAS production) | `cibuild.py` (`local`/`oda`/`cached`/`sim`/`error`) | `pipeline_health.json` `sas_execution_mode` |
-| 12 (cross-language reconciliation) | `cross_lang_audit.R` | `reconciliation_status.json` (**8 domains** incl. CLINSITE), `reconciliation_report.html` |
+| Pre + R ADaM/BIMO validation | `cibuild.py` → `logrx` / rscript | `03_validation_r/*.log`, `04_adam/*_v.xpt` |
+| SAS production | `cibuild.py` (`local`/`oda`/`cached`/`sim`) | `pipeline_health.json` `sas_execution_mode` |
+| Cross-language reconciliation | `cross_lang_audit.R` | `reconciliation_status.json` (**8 domains**), HTML report |
+| Admiral T1 track (ADSL, OS/PFS) | `admiral_*.R` + `admiral_reconcile.R` | `admiral_reconciliation_status.json` |
+| TFL + results/forest recon | `tfl_generation.R`, `results_reconcile.R`, `forest_reconcile.R` | `09_tfl/output/`, recon status JSON |
+| Spec conformance + package | define/data checks, eCTD, log gate, release manifest | `06_telemetry/*`, `m5/`, `11_ectd/0000/` |
+
+Stage numbers are **manifest-derived** (not hard-coded); see
+`docs/ORCHESTRATOR_GATE_MAP.md` for the current numbered list and delivery-gate mapping.
 | 13 (TFL) | `tfl_generation.R` | `09_tfl/output/tables/*`, `09_tfl/output/figures/*` |
 | 14 (numerical results reconciliation) | `results_reconcile.R` — SAS `PROC LIFETEST` vs R `survfit` (MP-arm KM medians / events / N) | `results_reconciliation_status.json` |
 | 15 (spec → define conformance) | `07_define_xml/check_define_conformance.R` — `define.xml` checked against `ADaM_spec.xlsx` (C-4 inversion; `--self-test` proves drift detection) | `06_telemetry/conformance/spec_define_conformance.json` |

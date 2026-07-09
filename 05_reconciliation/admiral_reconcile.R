@@ -98,15 +98,43 @@ for (nm in names(results)) {
 }
 
 any_fail <- any(vapply(avail, function(r) r$status != "PASS", logical(1)))
-rows <- vapply(names(avail), function(nm) {
+# Nested domain shape so validation_strategy can read domains.ADSL.status and
+# domains.ADTTE.OS.status / domains.ADTTE.PFS.status without dotted-key ambiguity.
+domain_json <- function(name, r) {
+  sprintf('"%s": {"n": %d, "cell_diffs": %d, "status": "%s"}',
+          name, r$n, r$diffs, r$status)
+}
+adsl_part <- if (!is.null(results[["ADSL"]])) {
+  domain_json("ADSL", results[["ADSL"]])
+} else {
+  '"ADSL": {"status": "not_available"}'
+}
+adtte_parts <- c()
+for (p in ADTTE_PARAMS) {
+  key <- paste0("ADTTE.", p)
+  if (!is.null(results[[key]])) {
+    adtte_parts <- c(adtte_parts, domain_json(p, results[[key]]))
+  }
+}
+adtte_block <- if (length(adtte_parts)) {
+  paste0('"ADTTE": {\n      ', paste(adtte_parts, collapse = ",\n      "), "\n    }")
+} else {
+  '"ADTTE": {"status": "not_available"}'
+}
+# Flat keys retained for backward-compatible readers / dashboards.
+flat_rows <- vapply(names(avail), function(nm) {
   r <- avail[[nm]]
   sprintf('    "%s": {"n": %d, "cell_diffs": %d, "status": "%s"}', nm, r$n, r$diffs, r$status)
 }, character(1))
+generated_at <- format(Sys.time(), "%Y-%m-%dT%H:%M:%OS3%z")
 json <- paste0(
   '{\n  "overall": "', if (any_fail) "FAIL" else "PASS", '",\n',
+  '  "generated_at": "', generated_at, '",\n',
+  '  "orchestrated": true,\n',
   '  "scope": "admiral-derivable core only; ADSL covariates + SAFETY TTE params out of scope; MP arm",\n',
   '  "tolerance": "exact (0 cell differences)",\n',
-  '  "domains": {\n', paste(rows, collapse = ",\n"), "\n  }\n}\n"
+  '  "domains": {\n    ', adsl_part, ",\n    ", adtte_block, "\n  },\n",
+  '  "domains_flat": {\n', paste(flat_rows, collapse = ",\n"), "\n  }\n}\n"
 )
 writeLines(json, status_path)
 cat(sprintf("NOTE: [ADMIRAL-RECON] Wrote %s\n", status_path))

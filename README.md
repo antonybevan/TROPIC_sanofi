@@ -20,7 +20,7 @@
 
 > **Controlled status after SAP lock review (2026-06-25):** The remediation authority for this repository is **`TROPIC_SAP_v4.0_industry_grade.docx`**, with the decision record in **`audit/SAP_LOCK_REVIEW_MEMO.md`**. The lock review passed SAP v4.0 as the programming authority, but it did **not** pass the repository as submission-ready. All CbzP comparative outputs are synthetic/reconstructed, non-confirmatory, and must not be read as independent clinical evidence.
 
-A complete, end-to-end **clinical data programming pipeline demonstration** — **SDTM → ADaM → Define-XML → eCTD-style packaging** — built to model the structure and controls expected in a serious clinical programming environment for the TROPIC Phase III trial. A manifest-driven **Python orchestrator** (`06_telemetry/cibuild.py`) executes a 22-stage build in which independent **SAS 9.4 and R** tracks derive CDISC-modelled **ADaM** analysis datasets from the source **SDTM** tabulations, and an automated step (`06_telemetry/package_ectd.py`) assembles the deliverables into an **eCTD Module 5 (Section 5.3) style** tree. The engine is **study-agnostic** — pipeline structure is declared in `study_manifest.yaml` rather than hard-coded — so additional studies run through the same orchestrator unchanged.
+A complete, end-to-end **clinical data programming pipeline demonstration** — **SDTM → ADaM → Define-XML → eCTD-style packaging** — built to model the structure and controls expected in a serious clinical programming environment for the TROPIC Phase III trial. A manifest-driven **Python orchestrator** (`06_telemetry/cibuild.py`) executes a 24-stage build in which independent **SAS 9.4 and R** tracks derive CDISC-modelled **ADaM** analysis datasets from the source **SDTM** tabulations, and an automated step (`06_telemetry/package_ectd.py`) assembles the deliverables into an **eCTD Module 5 (Section 5.3) style** tree. The engine is **study-agnostic** — pipeline structure is declared in `study_manifest.yaml` rather than hard-coded — so additional studies run through the same orchestrator unchanged.
 
 **Quality control is enforced as code.** Each derivation is reconciled across two independent language implementations at both the **analysis-dataset** level (cell-by-cell `diffdf`) and the **analysis-results** level (SAS `PROC LIFETEST` vs R `survfit`); every reconciliation gate emits machine-readable status and fails the build on any difference. Validation is allocated by an explicit **[risk-based plan](08_reviewers_guides/RISK_BASED_VALIDATION.md)**: the highest-risk endpoints (OS, PFS) and ADSL additionally carry a **third, independent derivation built with the pharmaverse `admiral` package** ([ADMIRAL_RECONCILIATION.md](06_telemetry/ADMIRAL_RECONCILIATION.md)). All tracks are single-author, so this is rigorous **implementation** reconciliation — *not* the organizational two-programmer GxP double programming a production submission requires (see [ADRG §6](08_reviewers_guides/ADRG.md)).
 
@@ -52,9 +52,37 @@ Submission-style metadata is delivered as machine-readable **Define-XML v2.1 wit
 
 ## Pipeline Architecture
 
+> **Architecture redesign note:** the current 24-stage pipeline is operational, but
+> the target professional operating model is the evidence chain
+> `source data -> specification -> metadata -> analysis dataset -> output -> QC evidence -> reviewer explanation`.
+> See [docs/PIPELINE_ARCHITECTURE_REDESIGN.md](docs/PIPELINE_ARCHITECTURE_REDESIGN.md)
+> for the source-backed redesign and migration map; [evidence_layers.yaml](evidence_layers.yaml)
+> indexes the current repository into that evidence chain without moving files.
+> The cross-functional delivery model is defined in
+> [docs/BIOMETRICS_DELIVERY_OPERATING_MODEL.md](docs/BIOMETRICS_DELIVERY_OPERATING_MODEL.md)
+> and enforced structurally by [delivery_workstreams.yaml](delivery_workstreams.yaml);
+> department workflows and the modern risk-based validation stance are grounded in
+> [docs/REGULATORY_WORKFLOW_RESEARCH.md](docs/REGULATORY_WORKFLOW_RESEARCH.md);
+> the generated status view is [docs/DELIVERY_EVIDENCE_DASHBOARD.md](docs/DELIVERY_EVIDENCE_DASHBOARD.md).
+> The source-intake gate now has an aggregate, patient-safe profile at
+> [docs/SOURCE_PROFILING_REPORT.md](docs/SOURCE_PROFILING_REPORT.md).
+> TFL output control is indexed at [docs/TFL_OUTPUT_INDEX.md](docs/TFL_OUTPUT_INDEX.md).
+> Metadata governance is summarized at [docs/METADATA_CONTROL_REPORT.md](docs/METADATA_CONTROL_REPORT.md).
+> ADaM predecessor lineage and sponsor-defined CT dispositions are governed by
+> [metadata_lineage.yaml](metadata_lineage.yaml) and checked with
+> `python3 06_telemetry/apply_metadata_lineage.py --check`.
+> CTQ and estimand traceability is governed by [ctq_traceability.yaml](ctq_traceability.yaml)
+> and summarized at [docs/CTQ_TRACEABILITY_REPORT.md](docs/CTQ_TRACEABILITY_REPORT.md).
+> Risk-based validation is machine-checked through [validation_strategy.yaml](validation_strategy.yaml)
+> and [docs/VALIDATION_STRATEGY_CONTROL_REPORT.md](docs/VALIDATION_STRATEGY_CONTROL_REPORT.md).
+> Release-candidate readiness is checked at [docs/RELEASE_CANDIDATE_CHECKLIST.md](docs/RELEASE_CANDIDATE_CHECKLIST.md).
+> Runtime stages are mapped to delivery gates at [docs/ORCHESTRATOR_GATE_MAP.md](docs/ORCHESTRATOR_GATE_MAP.md).
+> The complete architecture-control suite runs locally and in CI with
+> `python3 06_telemetry/build_delivery_controls.py`.
+
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│  TROPIC Analysis Pipeline · Python orchestrator cibuild.py · 22 stages     │
+│  TROPIC Analysis Pipeline · Python orchestrator cibuild.py · 24 stages     │
 └────────────────────────────────────────────────────────────────────────────┘
 
   01_raw_source/real_sdtm/   (34 native SAS data sets, sas7bdat — official Sanofi 2013 release)
@@ -106,7 +134,7 @@ Real SDTM (SAS7BDAT)
 
 ```
 TROPIC/
-├── study_manifest.yaml             # Pipeline structure — reconciled datasets, keys & 22-stage DAG
+├── study_manifest.yaml             # Pipeline structure — reconciled datasets, keys & 24-stage DAG
 ├── study_config.yaml               # Clinical parameters — thresholds, windows, imputation defaults
 ├── 00_specifications/              # Single source of truth — ADaM spec governs define + data
 │   ├── ADaM_spec.xlsx              # Authoritative ADaM spec (metacore / Pinnacle 21 format)
@@ -167,7 +195,7 @@ TROPIC/
 │   └── admiral_reconcile.R         # admiral ↔ SAS production reconciliation
 │
 ├── 06_telemetry/                   # Pipeline Orchestration & Telemetry
-│   ├── cibuild.py                  # Python execution driver (manifest-driven 22-stage DAG; --study)
+│   ├── cibuild.py                  # Python execution driver (manifest-driven 24-stage DAG; --study)
 │   ├── manifest.py                 # Study-manifest loader (datasets, keys, identity, DAG structure)
 │   ├── package_ectd.py             # eCTD Module 5 packaging orchestrator
 │   ├── oda_broker.py               # Resilient ODA connection broker (probe-earned 'oda' mode)
@@ -180,6 +208,7 @@ TROPIC/
 │   ├── conformance/                # CORE reports + CORE_RUN_RECORD.md (run evidence)
 │   ├── upstream_contributions/     # CDISC CORE engine contribution (cdisc-rules-engine PR #1770, merged)
 │   ├── ADMIRAL_RECONCILIATION.md   # admiral reconciliation — scope, methodology, and results
+│   ├── build_delivery_controls.py  # Delivery architecture controls: reports + structural checks
 │   ├── health_dashboard.md         # Live pipeline status dashboard
 │   └── reconciliation_report.html  # diffdf audit HTML report
 │
@@ -247,7 +276,7 @@ TROPIC/
 # Clone and enter
 git clone https://github.com/antonybevan/TROPIC_sanofi.git TROPIC && cd TROPIC
 
-# Run all 22 stages (default = sim mode; add --real-sas for a genuine ODA run)
+# Run all 24 stages (default = sim mode; add --real-sas for a genuine ODA run)
 python3 06_telemetry/cibuild.py
 ```
 
@@ -265,20 +294,22 @@ Expected output (default `sim` mode):
 [SUCCESS] Stage 10 — R BIMO Validation
 [SUCCESS] Stage 11 — SAS Production (ODA/Real/Simulated)
 [SUCCESS] Stage 12 — Cross-Language Audit Reconcile
-[SUCCESS] Stage 13 — Efficacy & Safety TFL Suite Compilation
-[SKIPPED] Stage 14 — Numerical Results Reconciliation (SAS vs R)   # PASS under --real-sas
-[SUCCESS] Stage 15 — ADaM Spec to Define Conformance              # spec governs define
-[SUCCESS] Stage 16 — ADaM Spec to Data Conformance                # metacore/metatools/xportr
-[SUCCESS] Stage 17 — Dataset-JSON Export (v1.1)
-[SUCCESS] Stage 18 — Analysis Results Standard (ARS v1.0)
-[SUCCESS] Stage 19 — USDM Study Definition (v3.0)
-[SUCCESS] Stage 20 — eCTD Final Package
-[SUCCESS] Stage 21 — eCTD Backbone + STF (sequence 0000)
-[SUCCESS] Stage 22 — Materialize eCTD Sequence
+[SUCCESS] Stage 13 — Synthetic Comparator Bridge Parity
+[SUCCESS] Stage 14 — Efficacy & Safety TFL Suite Compilation
+[SKIPPED] Stage 15 — Numerical Results Reconciliation (SAS vs R)   # PASS under --real-sas
+[SUCCESS] Stage 16 — Forest-HR Reconciliation (SAS vs R)
+[SUCCESS] Stage 17 — ADaM Spec to Define Conformance              # spec governs define
+[SUCCESS] Stage 18 — ADaM Spec to Data Conformance                # metacore/metatools/xportr
+[SUCCESS] Stage 19 — Dataset-JSON Export (v1.1)
+[SUCCESS] Stage 20 — Analysis Results Standard (ARS v1.0)
+[SUCCESS] Stage 21 — USDM Study Definition (v3.0)
+[SUCCESS] Stage 22 — eCTD Final Package
+[SUCCESS] Stage 23 — eCTD Backbone + STF (sequence 0000)
+[SUCCESS] Stage 24 — Materialize eCTD Sequence
 All clinical pipeline stages compiled successfully!
 ```
 
-> Stage 14 transparently reports **`SKIPPED`** in `sim`/`cached` mode (no real SAS `PROC LIFETEST`
+> Stage 15 transparently reports **`SKIPPED`** in `sim`/`cached` mode (no real SAS `PROC LIFETEST`
 > statistics exist to reconcile); under `--real-sas` it computes and reports a genuine `PASS`/`FAIL`.
 
 > **Multi-study.** The engine is study-agnostic — pipeline *structure* lives in `study_manifest.yaml`,

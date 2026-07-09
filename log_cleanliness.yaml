@@ -1,0 +1,63 @@
+version: 1
+study: TROPIC-NCT00417079
+purpose: "Governed log-scanning rules for the submission-grade pipeline."
+# Coverage: configured persisted logs only. Stage stdout/stderr from rscript/python
+# runners is not written to disk by cibuild.py and is not scanned here.
+
+required_logs:
+  - 02_production_sas/oda_master_driver.log
+  - 03_validation_r/v_staging_ingest.log
+  - 03_validation_r/v_sdtm_validation.log
+  - 03_validation_r/v_adsl_validation.log
+  - 03_validation_r/v_adex_validation.log
+  - 03_validation_r/v_adcm_validation.log
+  - 03_validation_r/v_adae_io_validation.log
+  - 03_validation_r/v_adlb_validation.log
+  - 03_validation_r/v_adrs_validation.log
+  - 03_validation_r/v_adtte_validation.log
+  - 03_validation_r/v_bimo_validation.log
+  - 05_reconciliation/cross_lang_audit.log
+  - 05_reconciliation/results_reconcile.log
+
+optional_logs:
+  - 09_tfl/*.log
+
+excluded_logs:
+  - path: 02_production_sas/oda_tfl.log
+    rationale: "Manual SAS-figure renderer log from _oda_render_tfl.py; out-of-DAG/manual artifact tracked separately under F-024, not active release-run evidence."
+
+fail_patterns:
+  - id: SAS_ERROR
+    regex: '^ERROR:'
+    severity: critical
+    rationale: "SAS ERROR lines invalidate the executed program log."
+  - id: SAS_WARNING
+    regex: '^WARNING:'
+    severity: major
+    rationale: "SAS WARNING lines require correction or formal disposition."
+  - id: SAS_INVALID_NOTE
+    regex: '^NOTE: (Invalid|Mathematical operations could not be performed|Missing values were generated|Character values have been converted|Numeric values have been converted)'
+    severity: major
+    rationale: "Problematic SAS NOTE lines can indicate uncontrolled data conversion or derivation defects."
+  - id: SAS_INVALID_INPUT
+    regex: 'Invalid argument to function INPUT|Missing values may be generated|uninitialized|MERGE statement has more than one data set with repeats of BY values'
+    severity: major
+    rationale: "Invalid input, uninitialized variables, and many-to-many merge notes require correction or controlled exception."
+  - id: R_WARNING
+    regex: '^(Warning message:|Warning messages:|Warning in |There (was|were) [0-9]+ warning|Caused by warning|! NAs introduced by coercion)'
+    severity: major
+    rationale: "R warning lines in validation/reconciliation logs require correction or controlled exception."
+  - id: R_ERROR
+    regex: '^(Error in |Execution halted|ERROR:)'
+    severity: critical
+    rationale: "R errors invalidate the validation/reconciliation log."
+
+reviewed_exceptions:
+  - id: ADTTE_TIME_ORIGIN_FLOORING
+    files:
+      - 02_production_sas/oda_master_driver.log
+    regex: '^WARNING: \[ADTTE\] event/censor date precedes time origin; floored to 1 day\. PARAMCD=(PFS|TTPAIN|TTPSA|TTUMOR) USUBJID=[0-9-]+$'
+    severity: reviewed_exception
+    max_count: 39
+    owner: statistical_programming
+    rationale: "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017."

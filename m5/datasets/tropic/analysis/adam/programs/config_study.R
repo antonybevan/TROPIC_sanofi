@@ -99,6 +99,18 @@ STAGING_PATH <- do.call(file.path, as.list(strsplit(cfg$STAGING_PATH, "/")[[1]])
 
 write_xpt_v <- function(.df, path, domain) {
   sp <- .adam_label_spec[.adam_label_spec$dataset == toupper(domain), ]
+  expected <- sp$variable
+  missing <- setdiff(expected, names(.df))
+  extra <- setdiff(names(.df), expected)
+  if (length(missing) || length(extra)) {
+    stop(sprintf(
+      "%s variables do not match ADaM spec. Missing: %s; Extra: %s",
+      domain,
+      paste(missing, collapse = ", "),
+      paste(extra, collapse = ", ")
+    ), call. = FALSE)
+  }
+  .df <- .df[, expected, drop = FALSE]
   for (i in seq_len(nrow(sp)))
     if (sp$variable[i] %in% names(.df)) attr(.df[[sp$variable[i]]], "label") <- sp$label[i]
   withCallingHandlers(

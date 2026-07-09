@@ -71,8 +71,19 @@ reconciles exactly.
 NACT-priority censoring is a genuine extension point — a useful, concrete example of
 where a standard toolkit needs a study-specific pre-step rather than a config flag.
 
-## Not wired into the gated CI build
+## Orchestrated in the gated DAG
 
-This is a runnable, self-checking demonstration track (it writes its own status
-JSON). It is intentionally *not* added to `cibuild.py`'s gated stages yet: that would
-require `admiral` in the CI renv lockfile. Left as a deliberate follow-up.
+As of the controlled-DAG wiring, this track is **in** `study_manifest.yaml`
+`infrastructure_stages.post` (after Cross-Language Audit Reconcile):
+
+1. `Admiral ADSL Re-derivation` → `03_validation_r/admiral_adsl.R`
+2. `Admiral ADTTE Re-derivation (OS/PFS)` → `03_validation_r/admiral_adtte.R`
+3. `Admiral Core Reconciliation` → `05_reconciliation/admiral_reconcile.R` (**gated**)
+
+`cibuild.py` fails the build if `admiral_reconciliation_status.json` is not
+`overall: PASS`. `validation_strategy.yaml` further requires the status file to be
+**current with** `pipeline_health.json` (no stale third-engine evidence).
+
+PFS event definition matches production/R: composite progression =
+tumour/PSA/bone PD **and** SAP v4.0 diary pain progression, with NACT-priority
+censoring pre-derived for admiral.

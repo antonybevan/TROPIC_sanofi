@@ -75,7 +75,8 @@ KEYS = {
 }
 
 ADAM_MDV = "MDV.TROPIC_NCT00417079.ADAM.1.3"
-SDTM_MDV = "MDV.TROPIC_NCT00417079.SDTM.3.1.1"
+# Package SDTM layer is the uplifted 3.4 deliverable (define_sdtm.xml / m5 tabulations).
+SDTM_MDV = "MDV.TROPIC_NCT00417079.SDTM.3.4"
 
 # A SAS format is "temporal" (kept as integer with displayFormat) if it starts with
 # one of these stems - we preserve the stored numeric, we do not reformat values.
@@ -331,13 +332,16 @@ def main():
                 for f in os.listdir(sdtm_dir) if f.endswith(".xpt")
             )
         if not sdtm_names:
-            all_results.append(("SDTM", "<none>", "MISSING", 0, 0, "no SDTM XPT inputs"))
-        else:
-            items = [(os.path.join(sdtm_dir, f"{n}.xpt"), n) for n in sdtm_names]
-            out = os.path.join(ROOT, "10_datasetjson", "sdtm")
-            res = convert_set(items, out, SDTM_MDV, "../../07_define_xml/define_sdtm.xml",
-                              schema, ndjson_schema)
-            all_results += [("SDTM", *r) for r in res]
+            # Fail closed: an empty m5 SDTM folder must not report a green 0/0 export.
+            raise SystemExit(
+                "ERROR: no SDTM XPT inputs under "
+                "m5/datasets/tropic/tabulations/sdtm/datasets/ — refuse empty Dataset-JSON export"
+            )
+        items = [(os.path.join(sdtm_dir, f"{n}.xpt"), n) for n in sdtm_names]
+        out = os.path.join(ROOT, "10_datasetjson", "sdtm")
+        res = convert_set(items, out, SDTM_MDV, "../../07_define_xml/define_sdtm.xml",
+                          schema, ndjson_schema)
+        all_results += [("SDTM", *r) for r in res]
 
     print(f"{'Std':5} {'Dataset':10} {'Status':8} {'Records':>9} {'Cols':>5}  Size")
     print("-" * 56)
@@ -349,7 +353,13 @@ def main():
     print("-" * 56)
     print(f"{ok}/{len(all_results)} datasets exported and schema-VALID "
           f"(CDISC Dataset-JSON v{DATASETJSON_VERSION})")
-    return 0 if all_results and ok == len(all_results) else 1
+    if not all_results:
+        print("ERROR: no datasets selected for export")
+        return 1
+    if ok == 0:
+        print("ERROR: zero VALID Dataset-JSON exports (refusing green empty run)")
+        return 1
+    return 0 if ok == len(all_results) else 1
 
 
 if __name__ == "__main__":

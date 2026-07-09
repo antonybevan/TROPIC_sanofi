@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<?xml-stylesheet type="text/xsl" href="define2-1.xsl"?><ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:def="http://www.cdisc.org/ns/def/v2.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:arm="http://www.cdisc.org/ns/arm/v1.0" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 http://schema.cdisc.org/define/v2.1/define2-1-0.xsd" ODMVersion="1.3.2" FileType="Snapshot" FileOID="TROPIC_ADAM_Metadata_v2.1" CreationDateTime="2026-06-12T21:52:12" AsOfDateTime="2026-06-24T12:09:52" Originator="Antony Bevan, Clinical Programming" def:Context="Submission"><Study OID="STDY.TROPIC">
+<?xml-stylesheet type="text/xsl" href="define2-1.xsl"?><ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:def="http://www.cdisc.org/ns/def/v2.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:arm="http://www.cdisc.org/ns/arm/v1.0" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 http://schema.cdisc.org/define/v2.1/define2-1-0.xsd" ODMVersion="1.3.2" FileType="Snapshot" FileOID="TROPIC_ADAM_Metadata_v2.1" CreationDateTime="2026-06-12T21:52:12" AsOfDateTime="2026-07-09T11:40:16" Originator="Antony Bevan, Clinical Programming" def:Context="Submission"><Study OID="STDY.TROPIC">
     <GlobalVariables>
       <StudyName>TROPIC (EFC6193 / XRP6258)</StudyName>
       <StudyDescription>Cabazitaxel vs Mitoxantrone in mCRPC progressing after docetaxel (NCT00417079).</StudyDescription>
@@ -113,9 +113,9 @@
       <ItemRef ItemOID="IT.ADSL.SAFFL" Mandatory="Yes" MethodOID="MT.SAFFL" OrderNumber="20"/>
       <ItemRef ItemOID="IT.ADSL.PPROTFL" Mandatory="Yes" OrderNumber="21"/>
       <ItemRef ItemOID="IT.ADSL.DTHFL" Mandatory="Yes" OrderNumber="22"/>
-      <ItemRef ItemOID="IT.ADSL.DTHDT" Mandatory="No" OrderNumber="23"/>
+      <ItemRef ItemOID="IT.ADSL.DTHDT" Mandatory="No" OrderNumber="23" MethodOID="MT.DTHDT"/>
       <ItemRef ItemOID="IT.ADSL.DTHCAUS" Mandatory="No" OrderNumber="24"/>
-      <ItemRef ItemOID="IT.ADSL.LSTALVDT" Mandatory="Yes" OrderNumber="25"/>
+      <ItemRef ItemOID="IT.ADSL.LSTALVDT" Mandatory="Yes" OrderNumber="25" MethodOID="MT.LSTALVDT"/>
       <ItemRef ItemOID="IT.ADSL.ECOGBL" Mandatory="No" MethodOID="MT.ECOGBL" OrderNumber="26"/>
       <ItemRef ItemOID="IT.ADSL.MEASDISF" Mandatory="No" MethodOID="MT.MEASDISF" OrderNumber="27"/>
       <ItemRef ItemOID="IT.ADSL.VISCFL" Mandatory="No" OrderNumber="28"/>
@@ -127,12 +127,12 @@
       <ItemRef ItemOID="IT.ADSL.HGBBL" Mandatory="No" OrderNumber="34"/>
       <ItemRef ItemOID="IT.ADSL.DOCPROG" Mandatory="No" OrderNumber="35"/>
       <ItemRef ItemOID="IT.ADSL.DOCRESP" Mandatory="No" OrderNumber="36"/>
-      <ItemRef ItemOID="IT.ADSL.ECOGBLIF" Mandatory="No" OrderNumber="37"/>
-      <ItemRef ItemOID="IT.ADSL.PSABLIF" Mandatory="No" OrderNumber="38"/>
-      <ItemRef ItemOID="IT.ADSL.ALPBLIF" Mandatory="No" OrderNumber="39"/>
-      <ItemRef ItemOID="IT.ADSL.HGBBLIF" Mandatory="No" OrderNumber="40"/>
-      <ItemRef ItemOID="IT.ADSL.ALBBLIF" Mandatory="No" OrderNumber="41"/>
-      <ItemRef ItemOID="IT.ADSL.LDHBLIF" Mandatory="No" OrderNumber="42"/>
+      <ItemRef ItemOID="IT.ADSL.ECOGBLIF" Mandatory="No" OrderNumber="37" MethodOID="MT.ECOGBLIF"/>
+      <ItemRef ItemOID="IT.ADSL.PSABLIF" Mandatory="No" OrderNumber="38" MethodOID="MT.PSABLIF"/>
+      <ItemRef ItemOID="IT.ADSL.ALPBLIF" Mandatory="No" OrderNumber="39" MethodOID="MT.ALPBLIF"/>
+      <ItemRef ItemOID="IT.ADSL.HGBBLIF" Mandatory="No" OrderNumber="40" MethodOID="MT.HGBBLIF"/>
+      <ItemRef ItemOID="IT.ADSL.ALBBLIF" Mandatory="No" OrderNumber="41" MethodOID="MT.ALBBLIF"/>
+      <ItemRef ItemOID="IT.ADSL.LDHBLIF" Mandatory="No" OrderNumber="42" MethodOID="MT.LDHBLIF"/>
       <def:Class Name="SUBJECT LEVEL ANALYSIS DATASET"/>
       <def:leaf ID="LF.ADSL" xlink:href="adsl.xpt">
         <def:title>adsl.xpt</def:title>
@@ -151,11 +151,11 @@
       <ItemRef ItemOID="IT.ADEX.PARAMCD" Mandatory="Yes" OrderNumber="7"/>
       <ItemRef ItemOID="IT.ADEX.PARAM" Mandatory="Yes" OrderNumber="8"/>
       <ItemRef ItemOID="IT.ADEX.PARCAT1" Mandatory="Yes" OrderNumber="9"/>
-      <ItemRef ItemOID="IT.ADEX.AVAL" Mandatory="No" OrderNumber="10"/>
-      <ItemRef ItemOID="IT.ADEX.AVALC" Mandatory="No" OrderNumber="11"/>
+      <ItemRef ItemOID="IT.ADEX.AVAL" Mandatory="No" OrderNumber="10" MethodOID="MT.ADEX_AVAL"/>
+      <ItemRef ItemOID="IT.ADEX.AVALC" Mandatory="No" OrderNumber="11" MethodOID="MT.ADEX_AVALC"/>
       <ItemRef ItemOID="IT.ADEX.AVISIT" Mandatory="Yes" OrderNumber="12"/>
-      <ItemRef ItemOID="IT.ADEX.PARAMN" Mandatory="No" OrderNumber="13"/>
-      <ItemRef ItemOID="IT.ADEX.AVISITN" Mandatory="No" OrderNumber="14"/>
+      <ItemRef ItemOID="IT.ADEX.PARAMN" Mandatory="No" OrderNumber="13" MethodOID="MT.ADEX_PARAMN"/>
+      <ItemRef ItemOID="IT.ADEX.AVISITN" Mandatory="No" OrderNumber="14" MethodOID="MT.ADEX_AVISITN"/>
       <def:Class Name="BASIC DATA STRUCTURE"/>
       <def:leaf ID="LF.ADEX" xlink:href="adex.xpt">
         <def:title>adex.xpt</def:title>
@@ -170,10 +170,10 @@
       <ItemRef ItemOID="IT.ADCM.CMDECOD" Mandatory="Yes" OrderNumber="3"/>
       <ItemRef ItemOID="IT.ADCM.CMCAT" Mandatory="Yes" OrderNumber="4"/>
       <ItemRef ItemOID="IT.ADCM.CMINDC" Mandatory="No" OrderNumber="5"/>
-      <ItemRef ItemOID="IT.ADCM.ASTDT" Mandatory="No" OrderNumber="6"/>
-      <ItemRef ItemOID="IT.ADCM.AENDT" Mandatory="No" OrderNumber="7"/>
+      <ItemRef ItemOID="IT.ADCM.ASTDT" Mandatory="No" OrderNumber="6" MethodOID="MT.ADCM_ASTDT"/>
+      <ItemRef ItemOID="IT.ADCM.AENDT" Mandatory="No" OrderNumber="7" MethodOID="MT.ADCM_AENDT"/>
       <ItemRef ItemOID="IT.ADCM.CMTRT" Mandatory="Yes" OrderNumber="8"/>
-      <ItemRef ItemOID="IT.ADCM.ASTDY" Mandatory="No" OrderNumber="9"/>
+      <ItemRef ItemOID="IT.ADCM.ASTDY" Mandatory="No" OrderNumber="9" MethodOID="MT.ADCM_ASTDY"/>
       <ItemRef ItemOID="IT.ADCM.GCSFFL" Mandatory="No" OrderNumber="10"/>
       <ItemRef ItemOID="IT.ADCM.GCSFPRFL" Mandatory="No" OrderNumber="11"/>
       <ItemRef ItemOID="IT.ADCM.NACTFL" Mandatory="No" OrderNumber="12"/>
@@ -195,7 +195,7 @@
       <ItemRef ItemOID="IT.ADAE.AEBODSYS" Mandatory="Yes" OrderNumber="4"/>
       <ItemRef ItemOID="IT.ADAE.AEHLT" Mandatory="No" OrderNumber="5"/>
       <ItemRef ItemOID="IT.ADAE.AESEV" Mandatory="No" OrderNumber="6"/>
-      <ItemRef ItemOID="IT.ADAE.ATOXGR" Mandatory="No" OrderNumber="7"/>
+      <ItemRef ItemOID="IT.ADAE.ATOXGR" Mandatory="No" OrderNumber="7" MethodOID="MT.ADAE_ATOXGR"/>
       <ItemRef ItemOID="IT.ADAE.AESSER" Mandatory="No" OrderNumber="8"/>
       <ItemRef ItemOID="IT.ADAE.AEREL" Mandatory="No" OrderNumber="9"/>
       <ItemRef ItemOID="IT.ADAE.ASTDT" Mandatory="No" OrderNumber="10"/>
@@ -236,24 +236,24 @@
       <ItemRef ItemOID="IT.ADLB.PARAM" Mandatory="Yes" OrderNumber="7"/>
       <ItemRef ItemOID="IT.ADLB.PARAMN" Mandatory="Yes" OrderNumber="8"/>
       <ItemRef ItemOID="IT.ADLB.PARCAT1" Mandatory="Yes" OrderNumber="9"/>
-      <ItemRef ItemOID="IT.ADLB.AVAL" Mandatory="No" OrderNumber="10"/>
-      <ItemRef ItemOID="IT.ADLB.AVALC" Mandatory="No" OrderNumber="11"/>
+      <ItemRef ItemOID="IT.ADLB.AVAL" Mandatory="No" OrderNumber="10" MethodOID="MT.ADLB_AVAL"/>
+      <ItemRef ItemOID="IT.ADLB.AVALC" Mandatory="No" OrderNumber="11" MethodOID="MT.ADLB_AVALC"/>
       <ItemRef ItemOID="IT.ADLB.LBNRLO" Mandatory="No" OrderNumber="12"/>
       <ItemRef ItemOID="IT.ADLB.LBNRHI" Mandatory="No" OrderNumber="13"/>
       <ItemRef ItemOID="IT.ADLB.LBNRIND" Mandatory="No" OrderNumber="14"/>
       <ItemRef ItemOID="IT.ADLB.AVISIT" Mandatory="Yes" OrderNumber="15"/>
       <ItemRef ItemOID="IT.ADLB.AVISITN" Mandatory="Yes" OrderNumber="16"/>
       <ItemRef ItemOID="IT.ADLB.AWDIST" Mandatory="No" OrderNumber="17"/>
-      <ItemRef ItemOID="IT.ADLB.ATOXGR" Mandatory="No" OrderNumber="18"/>
-      <ItemRef ItemOID="IT.ADLB.BASE" Mandatory="No" OrderNumber="19"/>
-      <ItemRef ItemOID="IT.ADLB.BASEC" Mandatory="No" OrderNumber="20"/>
+      <ItemRef ItemOID="IT.ADLB.ATOXGR" Mandatory="No" OrderNumber="18" MethodOID="MT.ADLB_ATOXGR"/>
+      <ItemRef ItemOID="IT.ADLB.BASE" Mandatory="No" OrderNumber="19" MethodOID="MT.ADLB_BASE"/>
+      <ItemRef ItemOID="IT.ADLB.BASEC" Mandatory="No" OrderNumber="20" MethodOID="MT.ADLB_BASEC"/>
       <ItemRef ItemOID="IT.ADLB.BTOXGR" Mandatory="No" OrderNumber="21"/>
-      <ItemRef ItemOID="IT.ADLB.CHG" Mandatory="No" OrderNumber="22"/>
-      <ItemRef ItemOID="IT.ADLB.PCHG" Mandatory="No" OrderNumber="23"/>
+      <ItemRef ItemOID="IT.ADLB.CHG" Mandatory="No" OrderNumber="22" MethodOID="MT.ADLB_CHG"/>
+      <ItemRef ItemOID="IT.ADLB.PCHG" Mandatory="No" OrderNumber="23" MethodOID="MT.ADLB_PCHG"/>
       <ItemRef ItemOID="IT.ADLB.ANL01FL" Mandatory="No" OrderNumber="24"/>
-      <ItemRef ItemOID="IT.ADLB.BASEFL" Mandatory="No" OrderNumber="25"/>
+      <ItemRef ItemOID="IT.ADLB.BASEFL" Mandatory="No" OrderNumber="25" MethodOID="MT.ADLB_BASEFL"/>
       <ItemRef ItemOID="IT.ADLB.LBDY" Mandatory="No" OrderNumber="26"/>
-      <ItemRef ItemOID="IT.ADLB.ADT" Mandatory="No" OrderNumber="27"/>
+      <ItemRef ItemOID="IT.ADLB.ADT" Mandatory="No" OrderNumber="27" MethodOID="MT.ADLB_ADT"/>
       <def:Class Name="BASIC DATA STRUCTURE"/>
       <def:leaf ID="LF.ADLB" xlink:href="adlb.xpt">
         <def:title>adlb.xpt</def:title>
@@ -270,12 +270,12 @@
       <ItemRef ItemOID="IT.ADRS.TRTSDT" Mandatory="Yes" OrderNumber="5"/>
       <ItemRef ItemOID="IT.ADRS.PARAMCD" Mandatory="Yes" OrderNumber="6"/>
       <ItemRef ItemOID="IT.ADRS.PARAM" Mandatory="Yes" OrderNumber="7"/>
-      <ItemRef ItemOID="IT.ADRS.AVALC" Mandatory="No" OrderNumber="8"/>
+      <ItemRef ItemOID="IT.ADRS.AVALC" Mandatory="No" OrderNumber="8" MethodOID="MT.ADRS_AVALC"/>
       <ItemRef ItemOID="IT.ADRS.ADT" Mandatory="Yes" OrderNumber="9"/>
       <ItemRef ItemOID="IT.ADRS.ADY" Mandatory="No" OrderNumber="10"/>
       <ItemRef ItemOID="IT.ADRS.VISIT" Mandatory="Yes" OrderNumber="11"/>
       <ItemRef ItemOID="IT.ADRS.ANL01FL" Mandatory="No" OrderNumber="12"/>
-      <ItemRef ItemOID="IT.ADRS.AVAL" Mandatory="No" OrderNumber="13"/>
+      <ItemRef ItemOID="IT.ADRS.AVAL" Mandatory="No" OrderNumber="13" MethodOID="MT.ADRS_AVAL"/>
       <def:Class Name="BASIC DATA STRUCTURE"/>
       <def:leaf ID="LF.ADRS" xlink:href="adrs.xpt">
         <def:title>adrs.xpt</def:title>
@@ -291,19 +291,19 @@
       <ItemRef ItemOID="IT.ADTTE.SITEID" Mandatory="Yes" OrderNumber="4"/>
       <ItemRef ItemOID="IT.ADTTE.TRT01P" Mandatory="Yes" OrderNumber="5"/>
       <ItemRef ItemOID="IT.ADTTE.TRT01PN" Mandatory="Yes" OrderNumber="6"/>
-      <ItemRef ItemOID="IT.ADTTE.ITTFL" Mandatory="Yes" OrderNumber="7"/>
-      <ItemRef ItemOID="IT.ADTTE.SAFFL" Mandatory="Yes" OrderNumber="8"/>
+      <ItemRef ItemOID="IT.ADTTE.ITTFL" Mandatory="Yes" OrderNumber="7" MethodOID="MT.ADTTE_ITTFL"/>
+      <ItemRef ItemOID="IT.ADTTE.SAFFL" Mandatory="Yes" OrderNumber="8" MethodOID="MT.ADTTE_SAFFL"/>
       <ItemRef ItemOID="IT.ADTTE.PARAMCD" Mandatory="Yes" OrderNumber="9"/>
       <ItemRef ItemOID="IT.ADTTE.PARAM" Mandatory="Yes" OrderNumber="10"/>
-      <ItemRef ItemOID="IT.ADTTE.PARAMN" Mandatory="No" OrderNumber="11"/>
-      <ItemRef ItemOID="IT.ADTTE.PARCAT1" Mandatory="No" OrderNumber="12"/>
+      <ItemRef ItemOID="IT.ADTTE.PARAMN" Mandatory="No" OrderNumber="11" MethodOID="MT.ADTTE_PARAMN"/>
+      <ItemRef ItemOID="IT.ADTTE.PARCAT1" Mandatory="No" OrderNumber="12" MethodOID="MT.ADTTE_PARCAT1"/>
       <ItemRef ItemOID="IT.ADTTE.STARTDT" Mandatory="Yes" OrderNumber="13"/>
       <ItemRef ItemOID="IT.ADTTE.ADT" Mandatory="Yes" OrderNumber="14"/>
       <ItemRef ItemOID="IT.ADTTE.CNSR" Mandatory="Yes" MethodOID="MT.CNSR_TTE" OrderNumber="15"/>
       <ItemRef ItemOID="IT.ADTTE.EVNTDESC" Mandatory="No" OrderNumber="16"/>
       <ItemRef ItemOID="IT.ADTTE.CNSDTDSC" Mandatory="No" OrderNumber="17"/>
       <ItemRef ItemOID="IT.ADTTE.AVAL" Mandatory="Yes" MethodOID="MT.AVAL_TTE" OrderNumber="18"/>
-      <ItemRef ItemOID="IT.ADTTE.AVALU" Mandatory="No" OrderNumber="19"/>
+      <ItemRef ItemOID="IT.ADTTE.AVALU" Mandatory="No" OrderNumber="19" MethodOID="MT.ADTTE_AVALU"/>
       <def:Class Name="BASIC DATA STRUCTURE"/>
       <def:leaf ID="LF.ADTTE" xlink:href="adtte.xpt">
         <def:title>adtte.xpt</def:title>
@@ -1273,7 +1273,7 @@
         <TranslatedText xml:lang="en">Censoring indicator, set to 0 if the event occurred, or 1 if censored.</TranslatedText>
       </Description>
     </MethodDef>
-    <def:CommentDef OID="COM.CIAESEQ">
+    <MethodDef OID="MT.DTHDT" Name="Method for DTHDT" Type="Computation"><Description><TranslatedText xml:lang="en">Death date derived from SDTM.DM.DTHDTC or disposition/death records.</TranslatedText></Description></MethodDef><MethodDef OID="MT.LSTALVDT" Name="Method for LSTALVDT" Type="Computation"><Description><TranslatedText xml:lang="en">Last known alive date derived as the maximum non-death contact or assessment date across source domains.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ECOGBLIF" Name="Method for ECOGBLIF" Type="Computation"><Description><TranslatedText xml:lang="en">Baseline ECOG imputation flag derived from ECOGBL source availability and baseline window rules.</TranslatedText></Description></MethodDef><MethodDef OID="MT.PSABLIF" Name="Method for PSABLIF" Type="Computation"><Description><TranslatedText xml:lang="en">Baseline PSA imputation flag derived from PSABL source availability and baseline window rules.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ALPBLIF" Name="Method for ALPBLIF" Type="Computation"><Description><TranslatedText xml:lang="en">Baseline alkaline phosphatase imputation flag derived from ALPBL source availability and baseline window rules.</TranslatedText></Description></MethodDef><MethodDef OID="MT.HGBBLIF" Name="Method for HGBBLIF" Type="Computation"><Description><TranslatedText xml:lang="en">Baseline hemoglobin imputation flag derived from HGBBL source availability and baseline window rules.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ALBBLIF" Name="Method for ALBBLIF" Type="Computation"><Description><TranslatedText xml:lang="en">Baseline albumin imputation flag derived from ALBBL source availability and baseline window rules.</TranslatedText></Description></MethodDef><MethodDef OID="MT.LDHBLIF" Name="Method for LDHBLIF" Type="Computation"><Description><TranslatedText xml:lang="en">Baseline lactate dehydrogenase imputation flag derived from LDHBL source availability and baseline window rules.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADEX_AVAL" Name="Method for ADEX_AVAL" Type="Computation"><Description><TranslatedText xml:lang="en">Numeric exposure analysis value derived from SDTM.EX dose, duration, or cycle records according to ADEX.PARAMCD.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADEX_AVALC" Name="Method for ADEX_AVALC" Type="Computation"><Description><TranslatedText xml:lang="en">Character exposure analysis value derived from SDTM.EX dose, duration, or cycle records according to ADEX.PARAMCD.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADEX_PARAMN" Name="Method for ADEX_PARAMN" Type="Computation"><Description><TranslatedText xml:lang="en">Numeric ADEX parameter ordering derived from ADEX.PARAMCD.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADEX_AVISITN" Name="Method for ADEX_AVISITN" Type="Computation"><Description><TranslatedText xml:lang="en">Numeric ADEX analysis visit derived from ADEX.AVISIT and SDTM.EX date or sequence ordering.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADAE_ATOXGR" Name="Method for ADAE_ATOXGR" Type="Computation"><Description><TranslatedText xml:lang="en">Numeric adverse-event toxicity grade derived from SDTM.AE toxicity grade or severity source fields.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_AVAL" Name="Method for ADLB_AVAL" Type="Computation"><Description><TranslatedText xml:lang="en">Numeric laboratory analysis value derived from SDTM.LB.LBSTRESN after parameter-specific unit standardization.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_AVALC" Name="Method for ADLB_AVALC" Type="Computation"><Description><TranslatedText xml:lang="en">Character laboratory analysis value derived from SDTM.LB.LBSTRESC.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_ATOXGR" Name="Method for ADLB_ATOXGR" Type="Computation"><Description><TranslatedText xml:lang="en">Analysis toxicity grade derived from laboratory result, normal range, and grading rules.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_BASE" Name="Method for ADLB_BASE" Type="Computation"><Description><TranslatedText xml:lang="en">Baseline numeric value selected from the latest eligible pre-treatment ADLB.AVAL record.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_BASEC" Name="Method for ADLB_BASEC" Type="Computation"><Description><TranslatedText xml:lang="en">Baseline character value selected from the latest eligible pre-treatment ADLB.AVALC record.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_CHG" Name="Method for ADLB_CHG" Type="Computation"><Description><TranslatedText xml:lang="en">Change from baseline calculated as ADLB.AVAL minus ADLB.BASE.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_PCHG" Name="Method for ADLB_PCHG" Type="Computation"><Description><TranslatedText xml:lang="en">Percent change from baseline calculated as 100 times ADLB.CHG divided by ADLB.BASE.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_BASEFL" Name="Method for ADLB_BASEFL" Type="Computation"><Description><TranslatedText xml:lang="en">Baseline flag set on the selected eligible pre-treatment laboratory record.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_ADT" Name="Method for ADLB_ADT" Type="Computation"><Description><TranslatedText xml:lang="en">Analysis date derived from SDTM.LB.LBDTC.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADRS_AVALC" Name="Method for ADRS_AVALC" Type="Computation"><Description><TranslatedText xml:lang="en">Character response result derived from response source assessments and response derivation rules.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADRS_AVAL" Name="Method for ADRS_AVAL" Type="Computation"><Description><TranslatedText xml:lang="en">Numeric response category derived from ADRS.AVALC response ordering.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADTTE_ITTFL" Name="Method for ADTTE_ITTFL" Type="Computation"><Description><TranslatedText xml:lang="en">Intent-to-treat flag inherited from ADSL.ITTFL.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADTTE_SAFFL" Name="Method for ADTTE_SAFFL" Type="Computation"><Description><TranslatedText xml:lang="en">Safety population flag inherited from ADSL.SAFFL.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADTTE_PARAMN" Name="Method for ADTTE_PARAMN" Type="Computation"><Description><TranslatedText xml:lang="en">Numeric ADTTE parameter ordering derived from ADTTE.PARAMCD.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADTTE_PARCAT1" Name="Method for ADTTE_PARCAT1" Type="Computation"><Description><TranslatedText xml:lang="en">Time-to-event parameter category derived from ADTTE.PARAMCD.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADTTE_AVALU" Name="Method for ADTTE_AVALU" Type="Computation"><Description><TranslatedText xml:lang="en">Time-to-event unit assigned by ADTTE parameter derivation.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADCM_ASTDT" Name="Method for ADCM_ASTDT" Type="Computation"><Description><TranslatedText xml:lang="en">Analysis medication start date derived from SDTM.CM.CMSTDTC.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADCM_AENDT" Name="Method for ADCM_AENDT" Type="Computation"><Description><TranslatedText xml:lang="en">Analysis medication end date derived from SDTM.CM.CMENDTC.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADCM_ASTDY" Name="Method for ADCM_ASTDY" Type="Computation"><Description><TranslatedText xml:lang="en">Analysis medication start relative day derived from ADCM.ASTDT and ADSL.TRTSDT.</TranslatedText></Description></MethodDef><def:CommentDef OID="COM.CIAESEQ">
       <Description>
         <TranslatedText xml:lang="en">Sequence index increments when chronological gap between myeloid AEs is &gt; 3 days, representing separate clinical episodes.</TranslatedText>
       </Description>

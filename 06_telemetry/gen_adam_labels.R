@@ -3,9 +3,9 @@
 # gen_adam_labels.R -- derive the ADaM variable-label artifacts for BOTH tracks
 # from the AUTHORITATIVE spec (00_specifications/ADaM_spec.xlsx), so the SAS
 # production track and the R validation track carry identical, SPEC-sourced
-# labels:
+# labels and variable order:
 #   * 03_validation_r/adam_var_labels.csv  -- read by config_study.R (R track)
-#   * 02_production_sas/_adam_labels.sas    -- %lbl_<ds> macros %included by
+#   * 02_production_sas/_adam_labels.sas    -- %vars_<ds>, %ord_<ds>, and %lbl_<ds> macros %included by
 #                                              U_xpt_export.sas (SAS track)
 #
 # This REPLACES the previous 06_telemetry/gen_adam_labels.py, which sourced the
@@ -32,15 +32,15 @@ source(.find_file("03_validation_r/load_spec.R"))
 spec <- load_tropic_spec()
 ds_order <- spec$ds_spec$dataset
 
-# variable-level (dataset, variable, label) in spec order, non-empty labels only
-labs <- bind_rows(lapply(ds_order, function(ds) {
+# variable-level (dataset, variable, label) in spec order
+vars <- bind_rows(lapply(ds_order, function(ds) {
   s <- suppressMessages(select_dataset(spec, ds))
   s$ds_vars %>%
     left_join(s$var_spec, by = "variable") %>%
     arrange(order) %>%
-    transmute(dataset = ds, variable, label) %>%
-    filter(!is.na(label) & nzchar(trimws(label)))
+    transmute(dataset = ds, variable, label)
 }))
+labs <- vars %>% filter(!is.na(label) & nzchar(trimws(label)))
 
 # ----------------------------------------------------------------- CSV (R) -----
 # Minimally-quoted, CRLF line endings to match the historical (python csv) format
@@ -66,7 +66,19 @@ lines <- c(
   ""
 )
 for (ds in ds_order) {
+  v <- vars %>% filter(dataset == ds)
   d <- labs %>% filter(dataset == ds)
+  lines <- c(
+    lines,
+    sprintf("%%macro vars_%s;", tolower(ds)),
+    paste(v$variable, collapse = " "),
+    sprintf("%%mend vars_%s;", tolower(ds)),
+    "",
+    sprintf("%%macro ord_%s;", tolower(ds)),
+    paste("  retain", paste(v$variable, collapse = " "), ";"),
+    sprintf("%%mend ord_%s;", tolower(ds)),
+    ""
+  )
   lines <- c(lines, sprintf("%%macro lbl_%s;", tolower(ds)), "  label")
   for (i in seq_len(nrow(d))) {
     esc <- gsub("'", "''", d$label[i]) # double apostrophes for SAS literal

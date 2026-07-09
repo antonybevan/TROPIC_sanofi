@@ -109,7 +109,9 @@ cycle_bds <- ex_clean %>%
   transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRT01PN, TRTSDT,
     PARAMCD = "PERFDOSE", PARAM = "Actual Dose Administered (mg/m2)", PARCAT1 = "INDIVIDUAL",
-    AVAL = EXDOSE2, AVALC = sprintf("%.2f", EXDOSE2), AVISIT = paste("CYCLE", EXSEQ)
+    AVAL = EXDOSE2,
+    AVALC = if_else(is.na(EXDOSE2), NA_character_, sprintf("%.2f", EXDOSE2)),
+    AVISIT = paste("CYCLE", EXSEQ)
   )
 
 cycle_adj <- ex_clean %>%
@@ -135,7 +137,11 @@ cycle_adj_ae <- ex_clean %>%
 # Combine and Sort
 adex <- bind_rows(summary_bds, cycle_bds, cycle_adj, cycle_adj_ae) %>%
   # AVISITN companion to AVISIT (audit F-09): ALL CYCLES -> 0; CYCLE n -> n
-  mutate(AVISITN = if_else(AVISIT == "ALL CYCLES", 0, as.numeric(sub("^CYCLE ", "", AVISIT))))
+  mutate(
+    .cycle_num = if_else(grepl("^CYCLE [0-9]+$", AVISIT), sub("^CYCLE ", "", AVISIT), NA_character_),
+    AVISITN = if_else(AVISIT == "ALL CYCLES", 0, as.numeric(.cycle_num))
+  ) %>%
+  select(-.cycle_num)
 
 # Deterministic 1:1 PARAMN over the sorted distinct PARAMCD set (audit F-09) — identical to the
 # SAS track (proc sort nodupkey by PARAMCD + _n_).

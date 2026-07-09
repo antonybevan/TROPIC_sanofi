@@ -35,7 +35,11 @@ quit;
 proc sql;
     create table work.post_sod as
     select ls.usubjid, ls.visitnum, ls.visit,
-           input(substr(ls.lsdtc, 1, 10), yymmdd10.) as lsd_dt format=yymmdd10.,
+           case
+               when prxmatch('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/', substr(ls.lsdtc, 1, 10))
+               then input(substr(ls.lsdtc, 1, 10), yymmdd10.)
+               else .
+           end as lsd_dt format=yymmdd10.,
            sum(ls.lsstresn) as post_sod
     from staging.ls as ls
     where ls.lscat = 'TARGET' and ls.lstestcd = 'LENGTH' and not missing(ls.lsstresn) and ls.visit ne 'BASELINE'
@@ -381,7 +385,11 @@ proc sql;
     /* New bone lesions per post-baseline scan date */
     create table work.bone_new as
     select usubjid,
-           input(substr(lsdtc, 1, 10), yymmdd10.) as scan_dt format=yymmdd10.,
+           case
+               when prxmatch('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/', substr(lsdtc, 1, 10))
+               then input(substr(lsdtc, 1, 10), yymmdd10.)
+               else .
+           end as scan_dt format=yymmdd10.,
            count(*) as n_new_bone
     from staging.ls
     where lstestcd = 'NEWLES' and lsloc = 'BONE' and lsstresc = 'NEW LESION'

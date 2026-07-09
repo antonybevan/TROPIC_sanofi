@@ -1,0 +1,49 @@
+{
+  "status": "pass",
+  "generated_at": "2026-07-09 14:50:43 UTC",
+  "spec": {
+    "datasets": 7,
+    "variables": 159,
+    "valuelevel": 7,
+    "whereclauses": 10,
+    "codelist_terms": 60,
+    "methods": 46,
+    "dictionaries": 0,
+    "variables_missing_predecessor": 0,
+    "derived_variables_missing_method": 0,
+    "blank_labels": 0
+  },
+  "define_adam": {
+    "present": true,
+    "itemgroups": 7,
+    "items": 166,
+    "codelists": 7,
+    "methods": 45,
+    "valuelists": 3,
+    "resultdisplays": 8,
+    "analysisresults": 10
+  },
+  "define_sdtm": {
+    "present": true,
+    "itemgroups": 18,
+    "items": 272,
+    "codelists": 0,
+    "methods": 0,
+    "valuelists": 0,
+    "resultdisplays": 0,
+    "analysisresults": 0
+  },
+  "conformance": {
+    "spec_define_status": "PASS",
+    "spec_data_status": "PASS",
+    "ct_cross_validation_status": "WARNING",
+    "ct_disposition_count": 2,
+    "ct_unresolved_traceability_gaps": 0,
+    "adam_conformance_status": "PASS (0 errors at this check level)"
+  },
+  "ars": {
+    "ard_rows": 16,
+    "reporting_event_present": true
+  },
+  "findings": []
+}

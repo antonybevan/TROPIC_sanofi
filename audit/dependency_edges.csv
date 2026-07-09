@@ -54,5 +54,4 @@ m5/**,06_telemetry/build_ectd_backbone.py,eCTD leaf enumeration,CONFIRMED,11_ect
 06_telemetry/build_ectd_backbone.py,11_ectd/0000/index.xml,eCTD backbone generation,CONFIRMED,11_ectd/RUN_RECORD.md:14-25
 11_ectd/0000/index.xml,06_telemetry/materialize_ectd.py,manifest controlling payload copy,CONFIRMED,06_telemetry/materialize_ectd.py:31-65
 06_telemetry/materialize_ectd.py,11_ectd/0000/m5/**,payload materialization without stale-file deletion,BROKEN,06_telemetry/materialize_ectd.py:31-65
-09_tfl/output/listings/L-01-1_Discontinuations.txt,L_discon.sas,claimed producer reference,DANGLING PROGRAM,09_tfl/output/listings/L-01-1_Discontinuations.txt:19
 07_define_xml/define.xml,09_tfl/output/**,ARM display-to-file linkage,INCOMPLETE,07_define_xml/define.xml ARM section

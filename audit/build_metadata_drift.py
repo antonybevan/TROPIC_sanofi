@@ -15,7 +15,7 @@ ODM = "{http://www.cdisc.org/ns/odm/v1.3}"
 DEF = "{http://www.cdisc.org/ns/def/v2.1}"
 
 
-def define_model(path: Path):
+def define_model(path: Path, require_methods: bool = True):
     root = ET.parse(path).getroot()
     itemdefs = {x.get("OID"): x for x in root.iter(ODM + "ItemDef")}
     result = {}
@@ -31,15 +31,15 @@ def define_model(path: Path):
             var = item.get("Name")
             variables.append(var)
             origin = item.find(DEF + "Origin")
-            if origin is not None and origin.get("Type") == "Derived" and not ref.get("MethodOID"):
+            if require_methods and origin is not None and origin.get("Type") == "Derived" and not ref.get("MethodOID"):
                 derived_no_method.append(var)
         if variables:
             result[name] = {"variables": variables, "derived_no_method": derived_no_method}
     return result
 
 
-def compare(standard, define_path, data_dir, suffix=".xpt"):
-    model = define_model(define_path)
+def compare(standard, define_path, data_dir, suffix=".xpt", require_methods=True):
+    model = define_model(define_path, require_methods=require_methods)
     actual_files = {p.stem.upper(): p for p in Path(data_dir).glob(f"*{suffix}")}
     rows = []
     for name in sorted(set(model) | set(actual_files)):
@@ -75,8 +75,12 @@ for row in rows:
         row["dataset"] = row["dataset"].removesuffix("_PROD")
 
 # Rebuild ADaM correctly against normalized names.
-adam_model = define_model(ROOT / "07_define_xml/define.xml")
-adam_actual = {p.stem.removesuffix("_prod").upper(): p for p in (ROOT / "04_adam").glob("*_prod.xpt")}
+adam_model = define_model(ROOT / "07_define_xml/define.xml", require_methods=True)
+adam_actual = {
+    p.stem.removesuffix("_prod").upper(): p
+    for p in (ROOT / "04_adam").glob("*_prod.xpt")
+    if p.stem.removesuffix("_prod").upper() != "CLINSITE"
+}
 rows = []
 for name in sorted(set(adam_model) | set(adam_actual)):
     exp = adam_model.get(name, {}).get("variables", [])
@@ -100,7 +104,8 @@ for name in sorted(set(adam_model) | set(adam_actual)):
 
 rows += compare(
     "SDTM", ROOT / "07_define_xml/define_sdtm.xml",
-    ROOT / "11_ectd/0000/m5/datasets/tropic/tabulations/sdtm/datasets"
+    ROOT / "11_ectd/0000/m5/datasets/tropic/tabulations/sdtm/datasets",
+    require_methods=False,
 )
 
 out = ROOT / "audit/metadata_data_drift.csv"

@@ -19,6 +19,8 @@
 #   TS  : enrich with public NCT00417079 facts (NARMS, ACTSUB, SSTDTC, AGEMIN).
 #   TA  : build the public 2-arm trial-design (Trial Arms) domain.
 #   SUPPDM: append AGEGRP de-identification cap qualifier for the '>=85' group.
+#   CM/LB/LS/PN and selected SUPP-- domains: package the staged source-aligned
+#         3.4 metadata shape declared by define_sdtm.xml.
 #
 # EPOCH derivation rule (documented in SDRG): Subject Elements (SE) are absent
 # from this de-identified extract, so EPOCH is derived from the collected VISIT
@@ -37,8 +39,10 @@ SRC <- file.path(ROOT, "01_raw_source", "real_sdtm")
 STG <- file.path(ROOT, ".core_run", "sdtm34")
 M5  <- file.path(ROOT, "m5", "datasets", "tropic", "tabulations", "sdtm", "datasets")
 dir.create(STG, recursive = TRUE, showWarnings = FALSE)
+dir.create(M5, recursive = TRUE, showWarnings = FALSE)
 
 rd  <- function(n) read_sas(file.path(SRC, paste0(n, ".sas7bdat")))
+rds <- function(n) readRDS(file.path(SRC, "staging", paste0(n, ".rds")))
 lab <- function(df, m) { for (v in names(m)) if (v %in% names(df)) attr(df[[v]], "label") <- m[[v]]; df }
 # Canonical title-cased SDTM labels (mirror of 07_define_xml/uplift_define_34.py LBL) so the
 # XPT variable labels match the define and are title-case (clears CORE-000594/398).
@@ -68,6 +72,40 @@ CLBL <- c(
  VSSTRESC="Character Result/Finding in Std Format", VSSTRESN="Numeric Finding in Standard Units",
  VSSTRESU="Standard Units", VSMETHOD="Method of Test or Examination", VSBLFL="Baseline Flag",
  VSDRVFL="Derived Flag", VSDTC="Date/Time of Measurements", VSDY="Study Day of Vital Signs",
+ CMSEQ="Sequence Number", CMTRT="Reported Name of Drug, Med, or Therapy",
+ CMDECOD="Standardized Medication Name", CMCAT="Category for Medication", CMINDC="Indication",
+ CMDOSE="Dose per Administration", CMDOSU="Dose Units", CMDOSRGM="Intended Dose Regimen",
+ CMSTDTC="Start Date/Time of Medication", CMSTDY="Study Day of Start of Medication",
+ CMENDTC="End Date/Time of Medication", CMENDY="Study Day of End of Medication",
+ CMATCL1="Selected Anatomic Class", CMATCL2="Selected Therapeutic Class",
+ CMATCSEL="Selected ATC Code", CMONGB="Ongoing at Baseline", CMONGO="Ongoing",
+ CMLOC="Location", CMENDRCM="End Relative to Concomitant Medication",
+ CMRLTL="Relationship to Treatment", CMRSON="Reason", CMPRGDTC="Progression Date/Time",
+ LBSEQ="Sequence Number", LBTESTCD="Lab Test or Examination Short Name",
+ LBTEST="Lab Test or Examination Name", LBCAT="Category for Lab Test",
+ LBSCAT="Subcategory for Lab Test", LBORRES="Result or Finding in Original Units",
+ LBORRESU="Original Units", LBORNRLO="Reference Range Lower Limit in Orig Unit",
+ LBORNRHI="Reference Range Upper Limit in Orig Unit",
+ LBSTRESC="Character Result/Finding in Std Format",
+ LBSTRESN="Numeric Result/Finding in Standard Units", LBSTRESU="Standard Units",
+ LBSTNRLO="Reference Range Lower Limit-Std Units",
+ LBSTNRHI="Reference Range Upper Limit-Std Units", LBNRIND="Reference Range Indicator",
+ LBSTAT="Lab Status", LBTOX="Toxicity", LBTOXGR="Standard Toxicity Grade",
+ LBBLFL="Baseline Flag", LBDTC="Date/Time of Specimen Collection",
+ LBDY="Study Day of Specimen Collection", LBOVISIT="Original Visit Name",
+ LSSEQ="Sequence Number", LSSPID="Sponsor-Defined Identifier",
+ LSTESTCD="Short Name of LSTEST", LSTEST="Lesion Test", LSCAT="Category for Lesions",
+ LSLOC="Location of Tumor", LSORRES="Result or Finding in Original Units",
+ LSORRESU="Original Units", LSSTRESC="Character Result/Finding in Std Format",
+ LSSTRESN="Numeric Result/Finding in Standard Units", LSSTRESU="Standard Units",
+ LSMETHOD="Test Method", LSSTAT="Tumor Measurement Status", LSBLFL="Baseline Flag",
+ LSDTC="Date/Time Performed", LSSLOC="Location of Tumor (Subcategory)",
+ PNSEQ="Sequence Number", PNSPID="Sponsor-Defined Identifier",
+ PNTESTCD="Short Name of PNTEST", PNTEST="Pain Intensity Assessment",
+ PNCAT="Category for Pain Intensity Assessment", PNORRES="Result or Finding in Original Units",
+ PNORRESU="Original Units", PNSTRESC="Character Result/Finding in Std Format",
+ PNSTRESN="Numeric Result/Finding in Standard Units", PNSTRESU="Standard Units",
+ PNSTAT="Examination Status", PNDTC="Date/Time Performed",
  RDOMAIN="Related Domain Abbreviation", IDVAR="Identifying Variable",
  IDVARVAL="Identifying Variable Value", QNAM="Qualifier Variable Name", QLABEL="Qualifier Variable Label",
  QVAL="Data Value", QORIG="Origin", QEVAL="Evaluator", TSSEQ="Sequence Number",
@@ -89,7 +127,15 @@ ORD <- list(
  ae = c("STUDYID","DOMAIN","USUBJID","AESEQ","AEREFID","AESPID","AETERM","AEDECOD","AEBODSYS","AESOC","AESER","AEACN","AEREL","AEPATT","AEOUT","AESCONG","AESDISAB","AESDTH","AESHOSP","AESLIFE","AESMIE","AECONTRT","AETOXGR","VISITNUM","VISIT","EPOCH"),
  ex = c("STUDYID","DOMAIN","USUBJID","EXSEQ","EXTRT","EXDOSE","EXDOSU","EXDOSFRM","EXROUTE","EXLOT","VISITNUM","VISIT","EPOCH","EXSTDTC","EXENDTC","EXSTDY","EXENDY"),
  ds = c("STUDYID","DOMAIN","USUBJID","DSSEQ","DSTERM","DSDECOD","DSCAT","DSSCAT","VISITNUM","VISIT","EPOCH"),
- vs = c("STUDYID","DOMAIN","USUBJID","VSSEQ","VSTESTCD","VSTEST","VSORRES","VSORRESU","VSSTRESC","VSSTRESN","VSSTRESU","VSMETHOD","VSBLFL","VSDRVFL","VISITNUM","VISIT","EPOCH","VSDTC","VSDY"))
+ vs = c("STUDYID","DOMAIN","USUBJID","VSSEQ","VSTESTCD","VSTEST","VSORRES","VSORRESU","VSSTRESC","VSSTRESN","VSSTRESU","VSMETHOD","VSBLFL","VSDRVFL","VISITNUM","VISIT","EPOCH","VSDTC","VSDY"),
+ cm = c("STUDYID","DOMAIN","USUBJID","CMSEQ","CMTRT","CMDECOD","CMCAT","CMINDC","CMDOSE","CMDOSU","CMDOSRGM","VISITNUM","VISIT","CMSTDTC","CMSTDY","CMENDTC","CMENDY","SUBJID","CMATCL1","CMATCL2","CMATCSEL","CMONGB","CMONGO","CMLOC","CMENDRCM","CMRLTL","CMRSON","CMPRGDTC"),
+ lb = c("STUDYID","DOMAIN","USUBJID","LBSEQ","LBTESTCD","LBTEST","LBCAT","LBSCAT","LBORRES","LBORRESU","LBORNRLO","LBORNRHI","LBSTRESC","LBSTRESN","LBSTRESU","LBSTNRLO","LBSTNRHI","LBNRIND","LBSTAT","LBTOX","LBTOXGR","LBBLFL","VISITNUM","VISIT","LBDTC","LBDY","SUBJID","LBOVISIT"),
+ ls = c("STUDYID","DOMAIN","USUBJID","LSSEQ","LSSPID","LSTESTCD","LSTEST","LSCAT","LSLOC","LSORRES","LSORRESU","LSSTRESC","LSSTRESN","LSSTRESU","LSMETHOD","LSSTAT","LSBLFL","VISITNUM","VISIT","LSDTC","SUBJID","LSSLOC"),
+ pn = c("STUDYID","DOMAIN","USUBJID","PNSEQ","PNSPID","PNTESTCD","PNTEST","PNCAT","PNORRES","PNORRESU","PNSTRESC","PNSTRESN","PNSTRESU","PNSTAT","VISITNUM","VISIT","PNDTC","SUBJID"),
+ suppcm = c("STUDYID","RDOMAIN","USUBJID","IDVAR","IDVARVAL","QNAM","QLABEL","QVAL","QORIG","QEVAL","SUBJID"),
+ suppex = c("STUDYID","RDOMAIN","USUBJID","IDVAR","IDVARVAL","QNAM","QLABEL","QVAL","QORIG","QEVAL","SUBJID"),
+ supplb = c("STUDYID","RDOMAIN","USUBJID","IDVAR","IDVARVAL","QNAM","QLABEL","QVAL","QORIG","QEVAL","SUBJID"),
+ suppls = c("STUDYID","RDOMAIN","USUBJID","IDVAR","IDVARVAL","QNAM","QLABEL","QVAL","QORIG","QEVAL","SUBJID"))
 # write v5 XPT to both staging and the m5 submission copy
 wr  <- function(df, name) {
   if (!is.null(ORD[[name]])) df <- df[, ORD[[name]], drop = FALSE]
@@ -197,6 +243,16 @@ vs$EPOCH <- epoch_of(vs$VISIT)
 vs_out <- vs %>% select(-any_of("SUBJID")) %>% relocate(EPOCH, .before = VISITNUM)
 wr(vs_out, "vs")
 
+# ---- CM / LB / LS / PN staged source-aligned package domains -----------------
+# These staged RDS files are produced from the pristine source plus SUPP-- merges
+# already used by the analysis pipeline. They match the package metadata declared
+# in define_sdtm.xml, including source supplemental qualifiers promoted to parent
+# domains where the Define declares them.
+wr(rds("cm"), "cm")
+wr(rds("lb"), "lb")
+wr(rds("ls"), "ls")
+wr(rds("pn"), "pn")
+
 # ---- TS (enrich with public NCT00417079 facts) -------------------------------
 ts <- rd("ts")
 sid <- ts$STUDYID[1]
@@ -233,5 +289,11 @@ wr(sup_ae, "suppae")
 sup_ds <- rd("suppds") %>% select(-any_of("SUBJID"))
 if (nrow(supp_ds)) { cm <- intersect(names(sup_ds), names(supp_ds)); sup_ds <- bind_rows(sup_ds[cm], supp_ds[cm]) }
 wr(sup_ds, "suppds")
+
+# ---- SUPP domains retained by define_sdtm.xml --------------------------------
+wr(rd("suppcm"), "suppcm")
+wr(rd("suppex"), "suppex")
+wr(rd("supplb"), "supplb")
+wr(rd("suppls"), "suppls")
 
 cat("== uplift complete ==\n")
