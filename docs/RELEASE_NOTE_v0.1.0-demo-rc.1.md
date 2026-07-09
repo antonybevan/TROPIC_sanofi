@@ -4,8 +4,7 @@
 **Study:** EFC6193 / XRP6258 (TROPIC, NCT00417079)  
 **Tag:** `v0.1.0-demo-rc.1`  
 **Seal date:** 2026-07-09  
-**Git tip at tag:** `64d4821`  
-**Release note commits:** `3f4ae18` / `cff7aa1`  
+**Git tip at tag:** `git rev-parse v0.1.0-demo-rc.1^{commit}` (annotated tag on this branch tip)  
 **Seal artifact commits:** `f7bfb48` → `29d8016` → `647095c`
 
 ---
