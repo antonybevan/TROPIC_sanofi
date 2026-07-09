@@ -31,11 +31,16 @@
 
 | ID | Pri | Work | Status |
 |---|---|---|---|
-| **W-ADAM-00** | P0 | Arm from DM; dens ADSL SAFFL; TEAE=TRTEMFL; no EXTRT arm | **PASS** — see `WS4_ADAM_PHASE_ENTRY_2026-07-09.md` |
-| **W-ADAM-01** | P0 | Dual-lang rebuild ADSL/ADAE + recon after arm map change | When SAS/ODA available |
+| **W-ADAM-00** | P0 | Arm from DM; dens ADSL SAFFL; TEAE=TRTEMFL; no EXTRT arm | **PASS** — `WS4_ADAM_PHASE_ENTRY_2026-07-09.md` |
+| **W-ADAM-01** | P0 | Dual-lang rebuild ADSL/ADAE + recon after arm map change | **OPEN** — when SAS/ODA available |
 | **W-ADAM-02** | P1 | Hard gate TEAE blank AESER | Soft QC present |
-| **W-ADAM-03** | P1 | ADTTE/ADRS dens audit same ADSL rule | Next ADaM slice |
-| **W-SDTM-02** | P0 | Confirm dens ADSL N=371 | **Verified** T-20 uses SAFFL dens |
+| **W-ADAM-03** | P1 | ADTTE/ADRS dens audit same ADSL rule | **DONE** — `WS4_ADAM_DENS_AUDIT_2026-07-09.md` |
+| **W-ADAM-04** | P2 | ADEX dens SAFFL + ADSL arm docs | **DONE** — dens audit pack |
+| **W-ADAM-05** | P2 | Optional: OBJRESP dens = full MEAS in ADaM (now TFL-only) | Open; TFL dens correct |
+| **W-SDTM-02** | P0 | Confirm dens ADSL N=371 | **Verified** T-20 + dens audit |
+
+**Dens audit pack:** `docs/workstreams/reviews/WS4_ADAM_DENS_AUDIT_2026-07-09.md`  
+**ORR dens fix:** `tfl_generation.R` left-joins ADSL `MEASDISF='Y'` to OBJRESP (203, not 201).
 
 ---
 
@@ -45,13 +50,15 @@
 - Inventing day-true AE dates  
 - Filling blank AESER on baseline rows with guessed Y/N  
 - Claiming commercial P21 clean  
+- Expanding ADRS OBJRESP to full ITT in ADaM without SAP basis  
 
 ---
 
 ## Priority order for next session
 
-1. **W-AE-01** — if rebuilding ADAE soon, promote soft QC to gated assert after dual-lang recon  
-2. **W-PKG-01** — PDF refresh if demoing package face  
-3. Otherwise hold Path A and interview with D-012 + this register  
+1. **W-ADAM-01** — dual-lang rebuild when SAS/ODA available (seals post arm-map change)  
+2. **W-ADAM-02** — promote TEAE AESER soft QC after rebuild  
+3. **W-PKG-01** — PDF refresh if demoing package face  
+4. Otherwise hold Path A with dens pack + D-012  
 
-Source decision: `WS1_CRF_GROUNDING_D012_2026-07-09.md`
+Source decision: `WS1_CRF_GROUNDING_D012_2026-07-09.md` · dens: `WS4_ADAM_DENS_AUDIT_2026-07-09.md`

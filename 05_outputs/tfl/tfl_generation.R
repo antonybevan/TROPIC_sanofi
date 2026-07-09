@@ -150,20 +150,31 @@ cat(sprintf("  Step 3: PSA Response Significance check -> p = %e (Significant & 
     as.character(psa_significant))) # nolint
 
 # Step 4: ORR (Tested only if PSA Response is significant)
-# Conformed to SAP measurable-disease ITT population (MEASDISF == 'Y')
-orr_resp_data <- adrs |>
-  filter(PARAMCD == "OBJRESP") |>
-  filter(USUBJID %in% adsl$USUBJID[adsl$MEASDISF == "Y"]) |>
+# SAP measurable-disease dens = all ADSL MEASDISF=='Y' (not only subjects with
+# an OBJRESP row). Two MEAS subjects lack OBJRESP in ADaM — count as non-responders.
+orr_meas_den <- adsl |>
+  filter(MEASDISF == "Y") |>
+  select(USUBJID, TRT01P) |>
+  left_join(
+    adrs |> filter(PARAMCD == "OBJRESP") |> select(USUBJID, AVALC),
+    by = "USUBJID"
+  ) |>
   mutate(
     TRT01P = factor(TRT01P, levels = c("MP", "CbzP")),
-    AVALC = factor(AVALC, levels = c("N", "Y"))
+    AVALC = factor(if_else(is.na(AVALC) | AVALC == "", "N", AVALC),
+                   levels = c("N", "Y"))
   )
+orr_resp_data <- orr_meas_den
 orr_table <- table(orr_resp_data$TRT01P, orr_resp_data$AVALC)
 orr_test <- fisher.test(orr_table)
 orr_pval <- orr_test$p.value
 orr_significant <- psa_significant && (orr_pval < 0.05)
 cat(sprintf("  Step 4: ORR Significance check -> p = %f (Significant & Tested: %s)\n", orr_pval, # nolint
     as.character(orr_significant))) # nolint
+cat(sprintf("  [TFL-QC] ORR dens MEASDISF=%d (OBJRESP rows in dens=%d)\n",
+            nrow(orr_meas_den),
+            sum(!is.na(adrs$AVALC[adrs$PARAMCD == "OBJRESP" &
+                                    adrs$USUBJID %in% orr_meas_den$USUBJID]))))
 
 if (!os_significant) {
   cat("WARNING: [TFL] Primary endpoint (OS) did not meet statistical significance boundary. Subsequent p-values are descriptive.\n") # nolint
@@ -708,19 +719,22 @@ psa_mp_resp <- sum(psa_resp_data$AVALC == "Y" & psa_resp_data$TRT01P == "MP")
 psa_mp_total <- sum(psa_resp_data$TRT01P == "MP")
 psa_mp_pct <- psa_mp_resp / psa_mp_total * 100
 
-# Objective Response Rate (ORR) restricted to Measurable-Disease ITT population
+# Objective Response Rate (ORR) — dens = ADSL MEASDISF=='Y' (left-join OBJRESP)
 meas_subj <- adsl |>
   filter(MEASDISF == "Y") |>
   select(USUBJID, TRT01P)
-orr_resp_data <- adrs |>
-  filter(PARAMCD == "OBJRESP") |>
-  filter(USUBJID %in% meas_subj$USUBJID)
+orr_resp_data <- meas_subj |>
+  left_join(
+    adrs |> filter(PARAMCD == "OBJRESP") |> select(USUBJID, AVALC),
+    by = "USUBJID"
+  ) |>
+  mutate(AVALC = if_else(is.na(AVALC) | AVALC == "", "N", AVALC))
 orr_cbzp_resp <- sum(orr_resp_data$AVALC == "Y" & orr_resp_data$TRT01P == "CbzP") # nolint
 orr_cbzp_total <- sum(meas_subj$TRT01P == "CbzP")
-orr_cbzp_pct <- orr_cbzp_resp / orr_cbzp_total * 100
+orr_cbzp_pct <- orr_cbzp_resp / max(orr_cbzp_total, 1) * 100
 orr_mp_resp <- sum(orr_resp_data$AVALC == "Y" & orr_resp_data$TRT01P == "MP")
 orr_mp_total <- sum(meas_subj$TRT01P == "MP")
-orr_mp_pct <- orr_mp_resp / orr_mp_total * 100
+orr_mp_pct <- orr_mp_resp / max(orr_mp_total, 1) * 100
 
 n_cbzp_itt <- sum(adsl$TRT01P == "CbzP")
 n_mp_itt <- sum(adsl$TRT01P == "MP")

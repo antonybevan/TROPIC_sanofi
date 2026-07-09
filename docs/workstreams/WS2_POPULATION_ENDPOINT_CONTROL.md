@@ -26,7 +26,7 @@ If it is not in this table, programming should not invent it for Path A.
 |---|---|---|---|---|
 | **ITT** | `ITTFL='Y'` | ADSL → carried to ADTTE | OS, PFS, TTPSA/TTUMOR per ADRG; efficacy TFLs | Randomisation-anchored for OS/PFS |
 | **Safety** | `SAFFL='Y'` | ADSL | ADAE TEAE tables T-20; lab shifts T-21; exposure | Denominators for safety must use SAFFL N, not ITT alone |
-| **Measurable disease** | `MEASDISF='Y'` | ADSL | ORR (T-11-8) | Explicit filter in TFL code |
+| **Measurable disease** | `MEASDISF='Y'` | ADSL | ORR (T-11-8) | TFL dens = **all** MEAS subjects left-join ADRS OBJRESP (missing → non-responder). Do **not** use `nrow(OBJRESP)` (BOR spine 351 ≠ MEAS 203). See dens audit 2026-07-09. |
 | **Package combined display** | Real MP + synthetic CbzP | TFL merge only | Comparative figures/tables | **Not** protocol ITT 755 (F-012) |
 | **PSA response analysis set** | ADRS `PSARESP` rows (baseline + post-baseline PSA per ADRG) | ADRS | PSA response in T-11 | Stricter SAP shell deferred (F-011) |
 
@@ -47,7 +47,7 @@ If it is not in this table, programming should not invent it for Path A.
 | Time to PSA progression | TTPSA | ITT (per ADRG) | ADTTE | T-11-6 | Secondary; CbzP PH-scaled if shown |
 | Time to tumor progression | TTUMOR | ITT ∩ measurable where required | ADTTE | T-11-7 | |
 | PSA response | PSARESP | PSA analysis set | ADRS | T-11-8 | F-011 residual on shell strictness |
-| Objective response | OBJRESP | Measurable ITT | ADRS | T-11-8 / T-11-8b | MEASDISF |
+| Objective response | OBJRESP | Measurable ITT dens at **TFL**; ADRS row = BOR spine | ADRS + TFL left-join | T-11-8 / T-11-8b | MEASDISF dens N=203; OBJRESP XPT n=351 |
 | TEAE summary | ADAE TRTEMFL etc. | Safety | ADAE | T-20-1, T-20-2 | OCCDS + episode merge |
 | Lab CTCAE shift | ADLB grades | Safety | ADLB | T-21-1, T-21-2 | T-21-2 synthetic arm demo |
 | Exposure / RDI | ADEX | Safety / treated | ADEX | F-14-1, T-17-*, F-17-1 | Optimus demonstration |

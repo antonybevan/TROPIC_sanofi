@@ -44,12 +44,14 @@ That is intentional Path A honesty: arm authority is DM; EX anomaly remains in S
 
 ## 4. Residual ADaM work (not blocking entry)
 
-| ID | Work | Pri |
-|---|---|---|
-| **W-ADAM-01** | Re-run dual-lang ADSL/ADAE + recon after this code change (ODA/local) | P0 when engine available |
-| **W-ADAM-02** | Hard-fail TEAE blank AESER after rebuild | P1 |
-| **W-ADAM-03** | Walk ADTTE/ADRS dens same ADSL rule | P1 next session |
-| **W-ADAM-04** | ADEX: document EX dates include all EXTRT; arm from ADSL | P2 |
+| ID | Work | Pri | Status |
+|---|---|---|---|
+| **W-ADAM-01** | Re-run dual-lang ADSL/ADAE + recon after this code change (ODA/local) | P0 when engine available | OPEN |
+| **W-ADAM-02** | Hard-fail TEAE blank AESER after rebuild | P1 | OPEN |
+| **W-ADAM-03** | Walk ADTTE/ADRS dens same ADSL rule | P1 | **DONE** — dens audit pack |
+| **W-ADAM-04** | ADEX: document EX dates include all EXTRT; arm from ADSL | P2 | **DONE** |
+
+**Dens follow-on:** `WS4_ADAM_DENS_AUDIT_2026-07-09.md` (G-ADAM-07–11).
 
 ---
 
@@ -57,7 +59,7 @@ That is intentional Path A honesty: arm authority is DM; EX anomaly remains in S
 
 | Question | Answer |
 |---|---|
-| Safe to continue ADTTE/ADRS/ADEX review under same rules? | **GO** |
+| Safe to continue ADTTE/ADRS/ADEX review under same rules? | **GO** — dens slice complete |
 | Re-seal release without rebuild? | **No** — code changed; seal still prior XPT until full DAG |
 
 Local verify_release still checks **prior** sealed XPT-derived grades — program changes do not invalidate Path A claim until next ODA seal cycle.
