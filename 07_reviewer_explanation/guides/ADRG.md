@@ -98,10 +98,23 @@ All response counts/percentages are emitted by `05_outputs/tfl/tfl_generation.R`
 
 ---
 
+## 4B. ADAE source fidelity notes (CRF D-012 follow-on)
+
+| Fact | Evidence | Programming impact |
+|---|---|---|
+| ~**1,134 BASELINE** AE rows have terms but **blank** `AESER`/`AEREL`/`AEOUT`/`AEPATT` | PDS AE extract; VISIT=BASELINE | These are **non-treatment-emergent** skeleton/prior-AE rows, not full on-treatment AE form completion |
+| TEAE rows (`TRTEMFL='Y'`) | ~3,921 rows; blank AESER ≈ **0–1** | Safety T-20/TEAE denominators use **treatment-emergent** flags — blank AESER does **not** dominate TEAE analyses |
+| Grade 5 | CRF grade item labels 1–4; outcome includes **Fatal**; `AETOXGR=5` n=25 all FATAL + AESER=Y | Grade 5 is fatal-outcome toxicity mapping, not a missing CRF grade checkbox “5” on the grade line |
+| ALB / LDH on ADSL | **Not** on CRF Hematology/Biochemistry panels; **not** in PDS LB | `ALBBL`/`LDHBL` are schema placeholders (Assigned) — **Class C** for these forms, not PDS stripping of labs that were on the form |
+
+TEAE blank-AESER soft QC is logged in ADAE production/validation programs (`[ADAE-QC]`).
+
+---
+
 ## 5. Missing Data Handling (ADaMIG v1.3 §4.4 Compliance)
 
 ### 5.1 Baseline Laboratory Covariates — Schema Placeholders (not used in any model)
-Several baseline laboratory variables are carried on ADSL to satisfy the ADaM schema, but some are not present in the public SDTM release. Where a value was unavailable, a published population-median constant is stored:
+Several baseline laboratory variables are carried on ADSL to satisfy the ADaM schema, but some are not present in the public SDTM release **and are not on the Sanofi CRF hematology/biochemistry panels used for TROPIC** (D-012: no Albumin/LDH fields on `LABH_1`/`LABB_1`). Where a value was unavailable, a published population-median constant is stored:
 
 | Variable | Stored Value | Units | Source patient-level data available? |
 |----------|--------------|-------|--------------------------------------|

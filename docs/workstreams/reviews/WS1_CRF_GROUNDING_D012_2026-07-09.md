@@ -131,3 +131,28 @@ Do claim: **date precision** is reduced to week-level in the public extract; res
 ## 6. Interview / review one-liner
 
 > “I ground AE/LB/ECOG/DS against the Sanofi CRF. Seriousness, causality, and action were collected and are largely in the PDS extract. What the public release reduced is mainly **date precision** (week offsets) and some nulls — not ‘the trial never collected safety seriousness.’ The package CRF is a source copy, not a full annotated aCRF.”
+
+---
+
+## 7. Real work found (not docs-only)
+
+D-012 was **not** a no-op. After form×extract reconciliation, these are **open / tracked** engineering items:
+
+| ID | Priority | Finding | Recommended work | Status |
+|---|---|---|---|---|
+| **W-AE-01** | **P0** | ~1,134 **BASELINE** AE rows have MedDRA terms but blank AESER/AEREL/AEOUT (skeleton prior-AE pattern). Almost all blank AESER are `TRTEMFL=N`. | Document in ADRG; TEAE analyses already exclude via TRTEMFL; log soft QC if TEAE AESER blank >5 | **In progress** — ADRG §4B + ADAE QC notes |
+| **W-AE-02** | P1 | CRF grade item shows 1–4; extract has `AETOXGR=5` (n=25, all FATAL) | Document mapping fatal outcome → grade 5 in ADRG (done §4B); optional define codelist note | Documented |
+| **W-LB-01** | P1 | **Albumin / LDH** not on CRF LABH/LABB panels and not in PDS LB | Confirm Class C; keep ALBBL/LDHBL as Assigned placeholders; stop implying “PDS stripped ALB/LDH if never on form” | Documented ADRG §5.1 |
+| **W-AE-03** | P2 | CORE residual AESER consistency (historical CORE-000266) | Keep ACCEPTED with D-012 narrative; no silent overwrite of source | Open (no data rewrite) |
+| **W-CRF-01** | P2 | Full aCRF page-level origins for define | Path B only | Deferred Path A |
+| **W-CRF-02** | P2 | Extend CRF grounding to CM/EX/lesion forms | Only if programming claims expand | Backlog |
+
+### Principal judgment
+
+| Not a “science hole” | Is real residual / work |
+|---|---|
+| “Trial never collected AE seriousness” (false for TROPIC) | Baseline AE skeleton incompleteness must be **named** so TEAE rates aren’t misread |
+| “Electrolytes missing from study” (false — on CRF and in LB) | ALB/LDH truly **not on these CRF panels** → placeholder labs stay Assigned |
+| Need to invent day-true AE dates | Week-offset precision remains F-017 Class B |
+
+**Next coding slice if we continue:** optional machine gate failing CI only if TEAE blank AESER exceeds cap after full dual-lang rebuild; optional SUPPAE/baseline-AE analysis flag for transparency in ADAE.

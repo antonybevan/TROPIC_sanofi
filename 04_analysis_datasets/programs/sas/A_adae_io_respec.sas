@@ -211,6 +211,21 @@ proc sort data=adam.adae;
     by usubjid astdt aedecod aendt aeseq;
 run;
 
+/* QC (D-012 follow-on): TEAE rows must carry AESER. Baseline/non-TE skeleton
+   rows may have blank AESER (VISIT=BASELINE medical-history-like AEs in extract). */
+data _null_;
+    set adam.adae end=eof;
+    retain n_teae_blank_aeser 0 n_nte_blank_aeser 0;
+    if TRTEMFL = 'Y' and missing(AESER) then n_teae_blank_aeser + 1;
+    if TRTEMFL = 'N' and missing(AESER) then n_nte_blank_aeser + 1;
+    if eof then do;
+        putlog "NOTE: [ADAE-QC] Non-TE blank AESER rows (expected baseline skeleton) = " n_nte_blank_aeser;
+        putlog "NOTE: [ADAE-QC] TEAE blank AESER rows (expect 0 or near-0) = " n_teae_blank_aeser;
+        if n_teae_blank_aeser > 5 then
+            putlog "WARNING: [ADAE-QC] TEAE blank AESER exceeds soft cap 5 — review extract fidelity.";
+    end;
+run;
+
 /* Clean up work library */
 proc delete data=work.ae_base work.ae_episodes;
 run;

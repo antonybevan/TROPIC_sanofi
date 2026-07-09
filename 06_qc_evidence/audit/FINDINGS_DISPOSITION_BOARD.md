@@ -20,7 +20,9 @@
 | ID | Sev | Class | Decision | Rationale |
 |---|---|---|---|---|
 | **F-003** | Critical | `non_submission_demo_limit` | **ACCEPTED** | Synthetic/Guyot CbzP is TFL-only by design; comparative claims are non-confirmatory. Controlled by README/ADRG/TFL banners/`config/tfl_output_catalog.yaml`. |
-| **F-005** | Critical | `external_dependency` + `non_submission_demo_limit` | **ACCEPTED** | EXAMPLE app IDs + placeholder CRF require sponsor-assigned identifiers and true aCRF. eCTD sequence remains a **structure demo**, not a filing package. |
+| **F-005** | Critical | `external_dependency` + `non_submission_demo_limit` | **ACCEPTED** | EXAMPLE app IDs; **source CRF PDF exists** but full **aCRF** package not claimed. eCTD remains structure demo. CRF domain grounding = D-012 (separate). |
+| **F-026** | Major | `scope_out_with_disclosure` | **ACCEPTED** | ~1134 BASELINE AE rows are skeleton (terms present, AESER/AEREL/AEOUT blank). TEAE blank AESER ≈0–1. Documented ADRG §4B; soft QC in ADAE. Do not invent AESER. |
+| **F-027** | Minor | `scope_out_with_disclosure` | **ACCEPTED** | ALB/LDH not on Sanofi CRF LABH/LABB panels and not in PDS LB — Class C; ADSL placeholders remain Assigned (not “PDS stripped collected labs”). |
 | **F-011** | Major | `scope_out_with_disclosure` | **ACCEPTED** | PSA response shell uses ADRS `PSARESP` analysis records; SAP baseline-eligible subset shell not implemented as a separate controlled output. Disclosed in ADRG § PSA response; full shell = backlog. |
 | **F-012** | Major | `non_submission_demo_limit` | **ACCEPTED** | N=749 = real MP 371 + synthetic CbzP 378; protocol ITT 755 needs full two-arm IPD. Figures must not be read as original-trial ITT. |
 | **F-014** | Major | `scope_out_with_disclosure` | **ACCEPTED** | ARM has 8 displays/10 analyses for controlled TFL core; full ADSL covariate declarations and every deferred SAP display remain backlog. Controlled catalog limits the claim. |

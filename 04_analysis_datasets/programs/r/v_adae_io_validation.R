@@ -238,6 +238,15 @@ if (nrow(adae) == 0) {
   stop("ERROR: [VALIDATION] ADAE output dataset is empty!")
 }
 
+# D-012 follow-on: TEAE must carry AESER; baseline skeleton AEs often blank AESER
+n_teae_blank <- sum(adae$TRTEMFL == "Y" & (is.na(adae$AESER) | adae$AESER == ""), na.rm = TRUE)
+n_nte_blank <- sum(adae$TRTEMFL == "N" & (is.na(adae$AESER) | adae$AESER == ""), na.rm = TRUE)
+cat(sprintf("NOTE: [ADAE-QC] Non-TE blank AESER (baseline skeleton expected) = %d\n", n_nte_blank))
+cat(sprintf("NOTE: [ADAE-QC] TEAE blank AESER (expect 0 or near-0) = %d\n", n_teae_blank))
+if (n_teae_blank > 5) {
+  warning("ADAE-QC: TEAE blank AESER exceeds soft cap 5 — review extract fidelity.")
+}
+
 # XPT v5 compliance (clean log): uppercase variable names + SAS date formats
 names(adae) <- toupper(names(adae))
 for (.dv in names(adae)) {
