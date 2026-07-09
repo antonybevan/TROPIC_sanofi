@@ -1,21 +1,26 @@
 # Analysis Traceability Matrix
 
-> **SAP v4.0 lock note (2026-06-25):** This matrix is retained as current implementation
-> traceability. It must be regenerated after SAP v4.0 remediation and final metadata lock
-> before it can be treated as release traceability. The SAP and lock memo govern any conflict.
+| Field | Value |
+|---|---|
+| **Document** | Analysis Traceability Matrix |
+| **Study** | TROPIC (EFC6193 / XRP6258) · NCT00417079 |
+| **Standards** | SDTMIG v3.1.1 source → v3.4 uplift · ADaMIG v1.3 / OCCDS v1.0 + custom episode-merge |
+| **Document version** | 1.1 (Path A catalog-aligned) |
+| **Effective** | 2026-07-09 |
+| **Product claim** | **Path A only** (`docs/PRODUCT_CLAIM.md`) |
+| **TFL control authority** | `config/tfl_output_catalog.yaml` |
 
-**Study:** TROPIC (EFC6193 / XRP6258) · NCT00417079
-**Standards:** SDTMIG v3.1.1 source → v3.4 uplift · ADaMIG v1.3 / OCCDS v1.0 + custom episode-merging (analysis)
-**Purpose:** End-to-end traceability from source SDTM → ADaM (dual-programmed) → Define-XML
-metadata → TFL output, plus the reconciliation evidence for each analysis dataset. This is
-the single index a reviewer uses to walk any number on a table back to the code and the
-source domains that produced it.
+**Purpose:** Walk any controlled display number back to code, ADaM, define, and recon evidence.
 
-> **Scope reminder.** The reconciled `*_v.xpt` / `*_prod.xpt` deliverables contain the
-> **real Mitoxantrone (MP) arm only (N=371)**. The synthetic, illustrative Cabazitaxel
-> (CbzP) arm is merged for TFL demonstration only and is **never** part of the reconciled
-> ADaM. SAS↔R parity is meaningful only for runs whose recorded `sas_execution_mode`
-> (in `platform/pipeline_health.json`) is `oda` or `local` — see ADRG §6.
+> **SAP v4.0:** Programming authority for analysis intent (`02_specifications/sap/…`). This matrix
+> is **implementation** traceability for the controlled demo cut — not a sponsor filing lock.
+
+> **Scope.** Reconciled `*_v.xpt` / `*_prod.xpt` = **real MP only (N=371)**. Synthetic CbzP is
+> TFL-merge only (F-003). Dual-language recon is meaningful only when
+> `sas_execution_mode` is `oda`/`local` (ADRG §6). Single-author tracks ≠ org GxP double programming.
+
+**Companions:** [`ADRG.md`](ADRG.md) · [`SDRG.md`](SDRG.md) · [`BDRG.md`](BDRG.md) ·
+[`WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)
 
 ---
 
@@ -67,33 +72,52 @@ variable-label artifacts for both tracks (`platform/gen_adam_labels.R`).
 
 ---
 
-## 3. TFL Outputs → SAP Section → Generator → ADaM Inputs
+## 3. TFL outputs — controlled catalog alignment (Path A)
 
-All TFLs are produced by `05_outputs/tfl/tfl_generation.R` (R / pharmaverse track, the reporting
-deliverable). The generated numbers are implementation evidence; SAP v4.0 remains the
-planning authority. `07_reviewer_explanation/analysis_report.md` transcribes
-them. SAS production-track copies of the statistical figures are rendered separately by
-`04_analysis_datasets/programs/sas/T_tfl_generation.sas` → `05_outputs/tfl/output/figures/sas/` (capability demo / visual QC).
+**Authority:** `config/tfl_output_catalog.yaml` only.  
+**Generator:** `05_outputs/tfl/tfl_generation.R` (reporting deliverable).  
+**Not claimed:** full SAP Appendix D (21 IDs deferred with reasons).  
+**Regenerate local index (optional):** `python3 platform/build_tfl_output_index.py` (report is gitignored under portfolio surface policy).
 
-| Output | SAP § | Generator function (`tfl_generation.R`) | Primary ADaM input(s) |
+### 3.1 Controlled in-scope (18 IDs)
+
+| Catalog ID | File / delivery form | Primary ADaM | Notes |
 |---|---|---|---|
-| `F-01-1_CONSORT_Disposition.png` | 3 | Analysis-population/mortality overview builder | ADSL (ITTFL, SAFFL, TRT01P, DTHFL) |
-| `F-11-1_KM_OS.png` / `F-11-2_KM_PFS.png` | SAP v4.0 §9 (OS), §10.1 (PFS) | `compute_tte_stats()` → KM/Cox | ADTTE (OS, PFS) |
-| `F-12-1_Subgroup_Forest.png` | 8.2 | per-subgroup Cox (`coxph(Surv(AVAL,1-CNSR) ~ TRT)` within each level) | ADTTE (OS) + ADSL covariates |
-| `F-13-1_PSA_Waterfall.png` | 5.2 | PSA best-change (`min(PCHG)` per subject) | ADLB (PSA `PCHG`), ADSL (arm) |
-| `F-14-1_Swimmer_Plot.png` | 7.8 | exposure swimmer | ADEX, ADSL |
-| `F-17-1_Optimus_Scatter.png` | 10 | LOESS E-R (RDI vs ANC nadir) | ADEX (RDI), ADLB (ANCNADIR) |
-| `T-11-Efficacy_Tables.txt` | 4.3–5.3 | efficacy summary (KM/Cox/Fisher) | ADTTE, ADRS |
-| `T-17-Optimus_Tables.txt` | 10 / Appendix D | Optimus RDI / ANC / benefit-risk tables | ADEX, ADLB, ADTTE, ADSL |
-| `T-20-AE_Summary_Tables.txt` | 7 | TEAE summary | ADAE |
-| `T-21-Lab_Shift_Tables.txt` | 7.5 | CTCAE shift | ADLB |
+| F-01-1 | `F-01-1_CONSORT_Disposition.png` | ADSL | Legacy CONSORT filename; population/mortality overview |
+| F-11-1 | `F-11-1_KM_OS.png` | ADTTE OS | Primary OS KM |
+| F-11-2 | `F-11-2_KM_PFS.png` | ADTTE PFS | Primary PFS KM |
+| F-12-1 | `F-12-1_Subgroup_Forest.png` | ADTTE OS + ADSL | Forest HR recon gated |
+| F-13-1 | `F-13-1_PSA_Waterfall.png` | ADLB PSA + ADSL | |
+| F-14-1 | `F-14-1_Swimmer_Plot.png` | ADEX + ADSL | |
+| F-17-1 | `F-17-1_Optimus_Scatter.png` | ADEX RDI + ADLB ANCNADIR | Synthetic/comparative caution |
+| T-11-6 | inside `T-11-Efficacy_Tables.txt` | ADTTE TTPSA | Catalog ID ≠ separate file per row |
+| T-11-7 | inside `T-11-Efficacy_Tables.txt` | ADTTE TTUMOR | |
+| T-11-8 | inside `T-11-Efficacy_Tables.txt` | ADRS | Best clinical response |
+| T-11-8b | inside `T-11-Efficacy_Tables.txt` | ADRS | ORR response-evaluable sensitivity |
+| T-17-1 | inside `T-17-Optimus_Tables.txt` | ADEX | RDI categories |
+| T-17-2 | inside `T-17-Optimus_Tables.txt` | ADLB + ADEX | ANC nadir by G-CSF |
+| T-17-4 | inside `T-17-Optimus_Tables.txt` | ADEX/ADLB/ADTTE | Benefit–risk by RDI tertile |
+| T-20-1 | inside `T-20-AE_Summary_Tables.txt` | ADAE | TEAE summary |
+| T-20-2 | inside `T-20-AE_Summary_Tables.txt` | ADAE | Grade ≥3 by SOC |
+| T-21-1 | inside `T-21-Lab_Shift_Tables.txt` | ADLB | CTCAE shift MP |
+| T-21-2 | inside `T-21-Lab_Shift_Tables.txt` | ADLB | CTCAE shift CbzP (synthetic arm display) |
 
-Controlled release-scope authority for which of the above IDs are in-scope vs deferred:
-`config/tfl_output_catalog.yaml` (see also `docs/TFL_OUTPUT_INDEX.md`).
+### 3.2 Explicitly deferred (21 IDs) — sample of policy
 
-QC convention: the validated objects are the **analysis results behind each figure**
-(survival functions, HRs, at-risk counts, response distributions), driven by the
-SAS↔R-reconciled ADaM — not the rendered pixels.
+Not listed above = **not** Path A controlled delivery. Examples: standalone T-11-1/T-11-2 OS/PFS table shells (evidence via F-11-1/F-11-2 + results recon instead), F-12-2, T-12-*, many T-20 detail shells. Full list and reasons: `config/tfl_output_catalog.yaml` → `deferred_not_in_scope`.
+
+### 3.3 SAS companion figures (out of DAG)
+
+SAS PNGs under `05_outputs/tfl/output/figures/sas/` / package `figures/sas/` are **capability demos**
+(`platform/_oda_render_tfl.py`, outside `study_manifest` spine). Inventories may hash them; they
+do **not** gate controlled-scope completeness. Linked primary IDs: F-11-1, F-11-2, F-12-1, F-13-1, F-14-1, F-17-1.
+
+### 3.4 QC convention
+
+Validated objects are the **analysis results behind each figure/table** (driven by reconcilable
+ADaM and figure-data/forest gates when exports exist) — not pixel identity.
+
+**Listings:** none in controlled scope (prior L-01 discontinuation placeholder removed — F-004).
 
 **Analysis Results Metadata (ARM).** `03_metadata/define/define.xml` carries ARM v1.0 ResultDisplays
 that link key results to their ADaM data + method — the define-level complement to this matrix:
@@ -121,8 +145,9 @@ that link key results to their ADaM data + method — the define-level complemen
 
 ## 4. Orchestration & Provenance
 
-The pipeline is **30 stages** (`config/study_manifest.yaml` → `cibuild.py`), including third-engine
-**admiral** re-derivation + gated core reconciliation after cross-language audit, TFL/catalog
+The pipeline is a **manifest-driven full DAG** (`config/study_manifest.yaml` → `cibuild.py`;
+stage count includes G00/G02/G07 locks + admiral + figure-data recon + packaging — see live
+`pipeline_health.json` / `stages_expected`). Includes third-engine **admiral**, TFL/catalog
 controls, eCTD backbone/materialize, log cleanliness, and release-run manifest binding.
 
 | Stage band | Driver | Evidence artifact |
@@ -134,8 +159,8 @@ controls, eCTD backbone/materialize, log cleanliness, and release-run manifest b
 | TFL + results/forest recon | `tfl_generation.R`, `results_reconcile.R`, `forest_reconcile.R` | `05_outputs/tfl/output/`, recon status JSON |
 | Spec conformance + package | define/data checks, eCTD, log gate, release manifest | `platform/*`, `08_submission_package/m5/`, `08_submission_package/ectd/0000/` |
 
-Stage numbers are **manifest-derived** (not hard-coded); see
-`docs/ORCHESTRATOR_GATE_MAP.md` for the current numbered list and delivery-gate mapping.
+Stage numbers are **manifest-derived** (not hard-coded). Optional local gate map:
+`python3 platform/build_orchestrator_gate_map.py` (generated report is gitignored).
 
 | Stage | Control | Evidence artifact |
 |---|---|---|

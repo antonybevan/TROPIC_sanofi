@@ -1,83 +1,142 @@
 # Bioresearch Monitoring (BIMO) Data Reviewer's Guide (BDRG)
 
-**Study Name:** TROPIC Re-Analysis (Study EFC6193 / XRP6258, NCT00417079)
-**Compound:** Mitoxantrone (MP) control arm — real, de-identified cohort (N=371)
-**Standard:** FDA *Bioresearch Monitoring Technical Conformance Guide* (clinsite, Appendix 3)
-**Created:** 2026-06-16
+| Field | Value |
+|---|---|
+| **Document** | BIMO Data Reviewer's Guide (BDRG) |
+| **Study** | TROPIC / EFC6193 / XRP6258 · NCT00417079 |
+| **Cohort in clinsite** | Real Mitoxantrone (MP) de-identified arm only (N=371 subjects → site roll-up) |
+| **Standard** | FDA *Bioresearch Monitoring Technical Conformance Guide* (clinsite pattern; Appendix 3 **subset**) |
+| **Document version** | 1.1 (Path A hardened) |
+| **Effective** | 2026-07-09 |
+| **Supersedes** | BDRG drafts prior to `v0.1.0-demo-rc.1` Path A freeze |
+| **Product claim** | **Path A only** — controlled non-submission demonstration |
+
+---
+
+## 0. What this package is / is not (read first)
+
+| This package **is** | This package **is not** |
+|---|---|
+| Site-level roll-up (`clinsite`) for **BIMO-style** review practice | Full BIMO TCG Appendix-3 ~39-variable production clinsite |
+| Dual-language (SAS/R) recon of the delivered clinsite subset under genuine SAS when seals say `oda`/`local` | Organizational GxP double programming |
+| Honest omissions where PDS has no PI/CTMS/DV data | Real investigator identity / financial disclosure / full DV counts |
+| Path A demo deliverable under `m5/.../bimo/` | FDA filing BIMO package |
+
+**Binding claim:** [`docs/PRODUCT_CLAIM.md`](../../docs/PRODUCT_CLAIM.md)  
+**Residuals:** [`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)  
+**Sealed demo RC:** tag `v0.1.0-demo-rc.1` · [`docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md`](../../docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md) · `python3 scripts/verify_release.py`  
+**Package path:** [`08_submission_package/m5/datasets/tropic/bimo/`](../../08_submission_package/m5/datasets/tropic/bimo/)  
+**Related guides:** [`ADRG.md`](ADRG.md) · [`SDRG.md`](SDRG.md) · [`TRACEABILITY_MATRIX.md`](TRACEABILITY_MATRIX.md)
 
 ---
 
 ## 1. Purpose
 
 The summary-level clinical-site dataset (`clinsite`) supports the FDA Office of Scientific
-Investigations (OSI) / BIMO program. It aggregates subject-level enrollment, disposition, and
-safety experience **to the study-site level** so that reviewers can prioritise clinical sites for
-on-site inspection. It is **not** an analysis dataset and is **not** part of the ADaM define.xml;
-per the BIMO Technical Conformance Guide it is delivered with its own data-definition documentation
-(this BDRG) under `08_submission_package/m5/datasets/tropic/bimo/`.
+Investigations (OSI) / BIMO **review pattern**. It aggregates subject-level enrollment,
+disposition, and safety experience **to the study-site level** so reviewers can prioritise
+sites for inspection. It is **not** an ADaM analysis dataset and is **not** in the ADaM
+`define.xml`; per BIMO TCG practice it is delivered with its own guide (this BDRG) under
+`08_submission_package/m5/datasets/tropic/bimo/`.
 
-This guide follows the structure recommended by the PHUSE *BIMO Data Reviewer's Guide Completion
-Guidelines*.
+Structure follows PHUSE *BIMO Data Reviewer's Guide Completion Guidelines* as far as this
+source honestly allows.
 
-## 2. Honest Scope vs. the Full BIMO TCG `clinsite` Specification
+---
+
+## 2. Honest scope vs full BIMO TCG `clinsite`
 
 > [!IMPORTANT]
-> The full BIMO TCG Appendix-3 `clinsite` structure specifies **~39 site-level variables**
-> (investigator identity/address/contact, country, screen/randomized/treated/completed/discontinued
-> counts, protocol-deviation counts, primary-endpoint contribution, financial-disclosure flags, etc.).
-> This portfolio implements the **subset that is HONESTLY DERIVABLE** from the public, de-identified
-> TROPIC release (Project Data Sphere). It deliberately does **not** fabricate variables the source
-> cannot support. This is an *illustrative BIMO subset*, not a submission-complete clinsite.
+> Full BIMO TCG Appendix-3 specifies **~39 site-level variables** (investigator identity/
+> address/contact, country, screen/randomized/treated/completed/discontinued counts,
+> protocol-deviation counts, primary-endpoint contribution, financial-disclosure flags, etc.).
+> This portfolio implements the **subset honestly derivable** from the public, de-identified
+> TROPIC release (Project Data Sphere). It does **not** fabricate variables the source cannot
+> support. **Illustrative BIMO subset**, not a submission-complete clinsite.
 
-**Variables intentionally NOT populated, and why:**
-
-| Omitted BIMO TCG content | Reason it is not derivable from this source |
+| Omitted BIMO TCG content | Why not populated |
 |---|---|
-| Investigator name / address / phone / email | The de-identified PDS release carries **no** principal-investigator identity. `INVNAM` below is a clearly-labelled **synthetic placeholder** (`PI_<siteid>`), never a real investigator. |
-| `COUNTRY` / site geography | Not present in the de-identified release. |
-| Important / significant protocol deviations | No SDTM `DV` (protocol deviations) domain is available in the public release. |
-| Screened / completed / discontinued counts | DS disposition reasons are not separable into screen-fail vs. completion vs. discontinuation in the de-identified release. |
-| Financial disclosure | Not applicable to a public secondary-use dataset. |
+| Investigator name / address / phone / email | PDS has **no** PI identity. `INVNAM` is a labelled **synthetic placeholder** (`PI_<siteid>`), never a real investigator. |
+| `COUNTRY` / site geography | Not in de-identified release. |
+| Important / significant protocol deviations | No SDTM `DV` domain in public release. |
+| Screened / completed / discontinued counts | Disposition reasons not separable into screen-fail vs completion in this release. |
+| Financial disclosure | Not applicable to public secondary-use data. |
 
-A production BIMO package would populate the full Appendix-3 structure from the sponsor's
-operational/CTMS data; the derivation **pattern** demonstrated here (subject-level → site-level
-roll-up, joined across populations and safety) is the transferable skill.
+A production BIMO package would populate Appendix-3 from sponsor CTMS/operational data. The
+**transferable skill** here is subject → site roll-up joined to populations and safety, with
+dual-language recon.
 
-## 3. Variables Delivered (`clinsite`, one row per study site; 69 sites)
+---
+
+## 3. Variables delivered (`clinsite`)
+
+**One row per study site** (69 sites in the current MP-only build).
 
 | Variable | Label | Derivation |
 |---|---|---|
 | `STUDYID` | Study Identifier | ADSL `STUDYID` |
 | `SITEID` | Study Site Identifier | ADSL `SITEID` (group key) |
-| `INVNAM` | Principal Investigator (**SYNTHETIC** placeholder) | `"PI_" || SITEID` — see §2 |
+| `INVNAM` | Principal Investigator (**SYNTHETIC** placeholder) | `"PI_" \|\| SITEID` — see §2 |
 | `N_RAND` | Number of Subjects Randomized | `COUNT(DISTINCT USUBJID)` per site |
-| `N_SAF` | Number of Subjects Treated (Safety Population) | `SAFFL='Y'` per site |
-| `N_ITT` | Number of Subjects in ITT Population | `ITTFL='Y'` per site |
-| `N_PPROT` | Number of Subjects in Per-Protocol Population | `PPROTFL='Y'` per site |
+| `N_SAF` | Number of Subjects Treated (Safety) | `SAFFL='Y'` per site |
+| `N_ITT` | Number of Subjects in ITT | `ITTFL='Y'` per site |
+| `N_PPROT` | Number of Subjects in Per-Protocol | `PPROTFL='Y'` per site |
 | `N_DEATH` | Number of Subjects Who Died | `DTHFL='Y'` per site |
-| `N_SAE` | Number of Subjects with a Serious AE | distinct `USUBJID` with ADAE `AESER='Y'`, routed to site via ADSL |
-| `N_TEAE` | Number of Subjects with a TEAE | distinct `USUBJID` with ADAE `TRTEMFL='Y'`, routed to site via ADSL |
+| `N_SAE` | Subjects with a Serious AE | distinct `USUBJID` with ADAE `AESER='Y'`, via ADSL site |
+| `N_TEAE` | Subjects with a TEAE | distinct `USUBJID` with ADAE `TRTEMFL='Y'`, via ADSL site |
 
-> **Population note (ICH E9):** Randomized, Safety (treated), ITT, and Per-Protocol are **distinct
-> analysis sets**. ITT is reported as `N_ITT` and is **never** relabelled "Efficacy Population"
-> (a prior version mislabelled the ITT count as efficacy — corrected). In this de-identified
-> single-arm release all subjects are randomized, treated, ITT, and per-protocol, so those four
-> counts coincide per site; the safety counts (`N_DEATH`, `N_SAE`, `N_TEAE`) vary by site and carry
-> the inspection-prioritisation signal.
+### 3.1 Population note (ICH E9 + Path A source)
 
-## 4. Dual-Programming / Reconciliation
+Randomized, Safety, ITT, and Per-Protocol are **distinct analysis-set concepts**. ITT is
+reported as `N_ITT` and is **never** relabelled “Efficacy Population.”
 
-`clinsite` is double-programmed like the ADaM domains: produced by SAS
-(`04_analysis_datasets/programs/sas/B_bimo_generation.sas` → `clinsite_prod.xpt`) and independently by R
-(`04_analysis_datasets/programs/r/v_bimo_validation.R` → `clinsite_v.xpt`), then reconciled cell-by-cell on the
-`(STUDYID, SITEID)` key by `06_qc_evidence/reconciliation/cross_lang_audit.R`. As with all domains, a genuine
-SAS↔R reconciliation requires a run executed against a real SAS engine
-(`sas_execution_mode = oda/local` in `platform/pipeline_health.json`); a `sim`-mode byte-copy
-reconciliation is tautological.
+In this de-identified MP-only release, population flags on ADSL are **source-inherited and
+non-discriminating** (all 371 subjects `ITTFL = SAFFL = PPROTFL = 'Y'` — see ADRG §5.4).
+Therefore `N_RAND` / `N_SAF` / `N_ITT` / `N_PPROT` **coincide per site**. Inspection signal
+lives in the safety roll-ups (`N_DEATH`, `N_SAE`, `N_TEAE`), which vary by site.
 
-## 5. References
+**Programs:**
+
+| Track | Program | Output (local build) |
+|---|---|---|
+| Production (SAS) | `04_analysis_datasets/programs/sas/B_bimo_generation.sas` | `clinsite_prod.xpt` |
+| Validation (R) | `04_analysis_datasets/programs/r/v_bimo_validation.R` | `clinsite_v.xpt` |
+| Package copy | assembled by `package_ectd.py` | `m5/.../bimo/datasets/clinsite.xpt` (local; not in git) |
+
+---
+
+## 4. Dual-language reconciliation (Path A talk track)
+
+`clinsite` is produced on both tracks and reconciled on keys `(STUDYID, SITEID)` by
+`06_qc_evidence/reconciliation/cross_lang_audit.R` (one of eight recon domains).
+
+| Claim | Honesty |
+|---|---|
+| Independent SAS vs R **implementations** | Yes (different language/structure) |
+| Organizational two-programmer GxP | **No** — single author (PRODUCT_CLAIM non-claim) |
+| Meaningful zero-diff under `sim` mode | **No** — tautological byte-copy |
+| Meaningful recon under `oda` / `local` | Yes — check `platform/pipeline_health.json` |
+
+Seals / residual memo: [`WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md).
+
+---
+
+## 5. Delivery location (review face)
+
+```text
+08_submission_package/m5/datasets/tropic/bimo/datasets/
+  clinsite.xpt    # local full package only (patient-derived — not in git)
+  bdrg.pdf        # rendered guide when packaged
+```
+
+Markdown source of truth for narrative: this file.
+
+---
+
+## 6. References
 
 - FDA, *Bioresearch Monitoring Technical Conformance Guide* (clinsite, Appendix 3).
 - PHUSE, *BIMO Data Reviewer's Guide (BDRG) Completion Guidelines*.
 - PHUSE SA01, *Development of a standard BIMO process to create the clinsite dataset*.
 - ICH E9, *Statistical Principles for Clinical Trials* (analysis-set definitions).
+- Path A claim: `docs/PRODUCT_CLAIM.md`

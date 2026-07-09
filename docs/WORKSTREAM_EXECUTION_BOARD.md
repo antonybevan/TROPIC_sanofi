@@ -142,11 +142,11 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | Field | Content |
 |---|---|
 | **Owned artifacts** | ADRG · SDRG · BDRG · TRACEABILITY_MATRIX · SDSP · ANALYSIS_REPORT · release note · limitation language · demo boundary |
-| **Current status** | **AMBER → improving** — G07 executable; **ADRG S1 + SDRG S2 done** (v1.1); BDRG still needs S3 |
-| **Open risks** | BDRG depth / demo boundary; TRACEABILITY_MATRIX catalog alignment; PDF package copies lag markdown until re-package |
-| **Required evidence pack** | (1) ADRG/SDRG/BDRG revision IDs · (2) Traceability matrix aligned to catalog · (3) Explicit “what this package is / is not” · (4) Signoff checklist |
-| **Release gate** | G07 before calling package “reviewer-ready” (machine lock exists; narrative AMBER until S3) |
-| **Next action** | **S3 BDRG + TRACEABILITY_MATRIX** catalog alignment |
+| **Current status** | **GREEN for Path A narrative** — S1 ADRG + S2 SDRG + S3 BDRG/TRACEABILITY v1.1; G07 executable; optional PDF re-package lag only |
+| **Open risks** | Package PDF copies may lag markdown until next `package_ectd`; over-claim if someone cites old PDFs only |
+| **Required evidence pack** | (1) ADRG/SDRG/BDRG revision IDs · (2) Traceability matrix catalog-aligned · (3) is/is-not · (4) S1–S3 review notes |
+| **Release gate** | G07 narrative satisfied for Path A; re-seal only if promotion-class science changes |
+| **Next action** | Maintain guides on claim drift; optional package PDF refresh; hand residual matrix to WS-1 |
 
 ---
 
@@ -225,13 +225,13 @@ Not “another GREEN JSON.”
 
 ## 8. Immediate next command (continue operating)
 
-**Done recently:** portfolio surface · WS-6 **S1 ADRG** · WS-6 **S2 SDRG** · seals still PASS  
+**Done recently:** portfolio surface · WS-6 **S1–S3** (ADRG/SDRG/BDRG/TRACEABILITY v1.1) · seals still PASS  
 
 **Next (resume order):**
 
-1. **WS-6 S3** — BDRG + TRACEABILITY_MATRIX catalog alignment  
-2. **WS-1** — `WS1_CORE_RESIDUAL_MATRIX.csv`  
-3. **WS-7** — wire `scripts/verify_release.py` into CI  
+1. **WS-1** — `docs/workstreams/WS1_CORE_RESIDUAL_MATRIX.csv`  
+2. **WS-7** — wire `scripts/verify_release.py` into CI  
+3. Optional — re-package guide PDFs into `m5/` when convenient
 
 ```bash
 python3 scripts/verify_release.py

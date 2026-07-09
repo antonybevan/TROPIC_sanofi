@@ -20,9 +20,9 @@ Each of ADRG, SDRG, BDRG must contain—near the top:
 
 - [x] Link to **product claim** Path A  
 - [x] Link to tag / release note `v0.1.0-demo-rc.1`  
-- [x] Explicit **document version + date + supersedes** line — **ADRG + SDRG done**; BDRG pending S3  
-- [x] **what this package is / is not** — **ADRG + SDRG done**  
-- [x] Pointer to **known-differences memo** — **ADRG + SDRG done**  
+- [x] Explicit **document version + date + supersedes** line — **ADRG + SDRG + BDRG done**  
+- [x] **what this package is / is not** — **ADRG + SDRG + BDRG done**  
+- [x] Pointer to **known-differences memo** — **ADRG + SDRG + BDRG done**  
 
 ---
 
@@ -65,10 +65,11 @@ Each of ADRG, SDRG, BDRG must contain—near the top:
 
 | Section theme | Required content | Status |
 |---|---|---|
-| clinsite purpose | BIMO site-level rollup | Present |
-| Schema | Variables, keys, generation program | Verify depth |
-| Validation | Recon with dual-lang | Present if recon includes clinsite |
-| Limitations | Demo package boundary | Required |
+| clinsite purpose | BIMO site-level rollup | **Done (S3)** |
+| Schema | Variables, keys, generation program | **Done (S3)** §3 |
+| Validation | Dual-lang recon + single-author disclosure | **Done (S3)** §4 |
+| Limitations | Demo package / TCG subset boundary | **Done (S3)** §0–§2 |
+| Path A is/is-not | Mirror PRODUCT_CLAIM | **Done (S3)** |
 
 ---
 
@@ -78,9 +79,10 @@ Each of ADRG, SDRG, BDRG must contain—near the top:
 |---|---|
 | ADCM keys ASTDT | Fixed (F-023) |
 | T-17 present | Fixed |
-| Stage model 30 + admiral | Fixed |
-| Aligns with controlled TFL catalog | Required ongoing |
+| Stage model + admiral | Fixed (manifest-derived) |
+| Aligns with controlled TFL catalog (18 / deferred 21) | **Done (S3)** §3.1–§3.2 |
 | No L-01 claim | Fixed |
+| Path A front-matter | **Done (S3)** |
 
 ---
 
@@ -99,16 +101,17 @@ Each of ADRG, SDRG, BDRG must contain—near the top:
 |---|---|---|
 | S1 | ADRG: PRODUCT_CLAIM + known-differences; Path A validation talk track | **DONE** (`ADRG.md` v1.1) |
 | S2 | SDRG: CORE residual honesty + WS-1 pack link; precision § audit | **DONE** (`SDRG.md` v1.1) |
-| S3 | BDRG depth pass + TRACEABILITY_MATRIX catalog alignment | **Next** |
+| S3 | BDRG depth pass + TRACEABILITY_MATRIX catalog alignment | **DONE** (`BDRG.md` + `TRACEABILITY_MATRIX.md` v1.1) |
 
-After S1–S3: file `docs/workstreams/reviews/WS6_review_YYYYMMDD.md` and move board toward GREEN.
+After S1–S3: review notes under `docs/workstreams/reviews/WS6_S*_*.md`. Board may move toward **GREEN** for Path A narrative once PDF package re-render is optional ops.
 
 ---
 
 ## 9. Exit criteria for WS-6 GREEN (Path A)
 
-- [ ] All three guides carry Path A non-claim language  
-- [ ] Known-differences memo linked  
-- [ ] No conflict with PRODUCT_CLAIM  
-- [ ] Hostile-reader test passed (peer or self with checklist)  
-- [ ] Review note filed  
+- [x] All three guides carry Path A non-claim language  
+- [x] Known-differences memo linked  
+- [x] No conflict with PRODUCT_CLAIM (self-check S1–S3)  
+- [x] Hostile-reader test passed (self with checklist)  
+- [x] Review notes filed (S1, S2, S3)  
+- [ ] Optional: re-package ADRG/SDRG/BDRG PDFs into `m5/` when next package_ectd run
