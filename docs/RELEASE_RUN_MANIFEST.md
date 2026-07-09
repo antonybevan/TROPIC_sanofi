@@ -1,6 +1,6 @@
 # TROPIC Release-Run Manifest
 
-Generated: 2026-07-09 16:40:36 UTC
+Generated: 2026-07-09 16:41:31 UTC
 
 > Hash-sealed run manifest for current artifacts. This is not an electronic signature or Part 11 attestation.
 
@@ -8,11 +8,11 @@ Generated: 2026-07-09 16:40:36 UTC
 
 - Status: `REMEDIATION`
 - Evidence grade: `remediation_partial_or_dirty`
-- Manifest SHA-256 seal: `6c755ea69de5777a31b6b10f8d7fef1433a04aa5c9ec33258a09a52e73a611ad`
+- Manifest SHA-256 seal: `9efea28f496fb538faed6a44aa973a24f08056540f23637565fc248d44b3f7d3`
 - SAS execution mode: `oda`
 - Pipeline health: `GREEN`
-- Run scope: `partial_dag` (30 recorded / 32 release-required upstream stages)
-- Git HEAD: `8c9ec2cb644e43884228662c488841fb8f080577`
+- Run scope: `full_dag` (33 recorded / 32 release-required upstream stages)
+- Git HEAD: `908c06a2eaac099d636e0046ab19b5f5f34ea352`
 - Worktree dirty: `True`
 - SAS companion figures: `out_of_dag_capability_demo`; current with health=`False`
 
@@ -28,9 +28,7 @@ No release-run binding problems detected.
 
 ## Remediation reasons (block release-candidate PASS)
 
-- pipeline_health does not cover a full current DAG run (30 recorded in health / 32 release-required upstream stages; missing=3; not_run=0). Acceptable as targeted remediation evidence only.
-- stages missing from pipeline_health: Governance Scope Lock (G00), Analysis Specification Lock (G02), Reviewer Package Lock (G07)
-- git worktree is dirty (22 porcelain entries); release-candidate lock requires a clean committed state
+- git worktree is dirty (4 porcelain entries); release-candidate lock requires a clean committed state
 
 ## Dataset Binding
 

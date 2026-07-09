@@ -2084,11 +2084,11 @@
     ],
     "qc_files": [
       {
-        "md5": "a41e8aaf60dbd3bf5c3037a2ea905fdc",
+        "md5": "9ec1f38cc9ecf75ee975a48d439da2f7",
         "path": "platform/pipeline_health.json",
         "present": true,
-        "sha256": "3f835fad5946b56b5903146207384192b4a75f6e3d0ee62d613572d4a1f594b1",
-        "size_bytes": 3221
+        "sha256": "0486e74fd5aa514122eef8f716a23eafc5723ad6080d6f54a765e82fe3c018db",
+        "size_bytes": 3546
       },
       {
         "md5": "953ada8cff5731833ade7aca56a86169",
@@ -2576,8 +2576,8 @@
     "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007"
   },
   "evidence_grade": "remediation_partial_or_dirty",
-  "generated_at": "2026-07-09 16:40:36 UTC",
-  "manifest_sha256": "6c755ea69de5777a31b6b10f8d7fef1433a04aa5c9ec33258a09a52e73a611ad",
+  "generated_at": "2026-07-09 16:41:31 UTC",
+  "manifest_sha256": "9efea28f496fb538faed6a44aa973a24f08056540f23637565fc248d44b3f7d3",
   "problems": [],
   "qc_statuses": {
     "cbzp_bridge": {
@@ -2681,23 +2681,17 @@
     }
   },
   "remediation_reasons": [
-    "pipeline_health does not cover a full current DAG run (30 recorded in health / 32 release-required upstream stages; missing=3; not_run=0). Acceptable as targeted remediation evidence only.",
-    "stages missing from pipeline_health: Governance Scope Lock (G00), Analysis Specification Lock (G02), Reviewer Package Lock (G07)",
-    "git worktree is dirty (22 porcelain entries); release-candidate lock requires a clean committed state"
+    "git worktree is dirty (4 porcelain entries); release-candidate lock requires a clean committed state"
   ],
   "run_completeness": {
     "failed": [],
     "health_run_scope": "full_dag",
-    "missing_from_health": [
-      "Governance Scope Lock (G00)",
-      "Analysis Specification Lock (G02)",
-      "Reviewer Package Lock (G07)"
-    ],
+    "missing_from_health": [],
     "non_success": [],
     "not_run": [],
-    "run_scope": "partial_dag",
+    "run_scope": "full_dag",
     "stages_expected": 33,
-    "stages_recorded_in_health": 30,
+    "stages_recorded_in_health": 33,
     "stages_required_for_release": 32
   },
   "sas_companion_figures": {
@@ -2750,76 +2744,31 @@
     "branch": "codex/repo-structure-phase2",
     "dirty": true,
     "dirty_including_seal_outputs": true,
-    "head": "8c9ec2cb644e43884228662c488841fb8f080577",
+    "head": "908c06a2eaac099d636e0046ab19b5f5f34ea352",
     "staged_diff_paths": [],
     "status_porcelain": [
-      "M config/study_manifest.yaml",
-      " M docs/CTQ_TRACEABILITY_REPORT.md",
-      " M docs/LOG_CLEANLINESS_REPORT.md",
-      " M docs/METADATA_CONTROL_REPORT.md",
-      " M docs/ORCHESTRATOR_GATE_MAP.md",
-      " M docs/SOURCE_PROFILING_REPORT.md",
-      " M docs/TFL_OUTPUT_INDEX.md",
-      " M docs/VALIDATION_STRATEGY_CONTROL_REPORT.md",
-      " M platform/build_orchestrator_gate_map.py",
-      " M platform/cibuild.py",
-      " M platform/ctq_traceability/ctq_traceability_status.json",
-      " M platform/log_cleanliness/log_cleanliness_status.json",
-      " M platform/metadata_control/metadata_control_status.json",
-      " M platform/orchestrator_gate_map/orchestrator_gate_map.csv",
-      " M platform/orchestrator_gate_map/orchestrator_gate_map_status.json",
-      " M platform/source_profile_status.json",
-      " M platform/tfl_output_index_status.json",
-      " M platform/validation_strategy/validation_strategy_status.json",
-      "?? 06_qc_evidence/gates/",
-      "?? platform/check_gate_g00_governance.py",
-      "?? platform/check_gate_g02_specification.py",
-      "?? platform/check_gate_g07_reviewer_package.py"
+      "M 06_qc_evidence/gates/g00_governance_status.json",
+      " M 06_qc_evidence/gates/g02_specification_status.json",
+      " M 06_qc_evidence/gates/g07_reviewer_package_status.json",
+      " M platform/pipeline_health.json"
     ],
     "status_porcelain_all": [
-      "M config/study_manifest.yaml",
-      " M docs/CTQ_TRACEABILITY_REPORT.md",
-      " M docs/LOG_CLEANLINESS_REPORT.md",
-      " M docs/METADATA_CONTROL_REPORT.md",
-      " M docs/ORCHESTRATOR_GATE_MAP.md",
-      " M docs/SOURCE_PROFILING_REPORT.md",
-      " M docs/TFL_OUTPUT_INDEX.md",
-      " M docs/VALIDATION_STRATEGY_CONTROL_REPORT.md",
-      " M platform/build_orchestrator_gate_map.py",
-      " M platform/cibuild.py",
-      " M platform/ctq_traceability/ctq_traceability_status.json",
-      " M platform/log_cleanliness/log_cleanliness_status.json",
-      " M platform/metadata_control/metadata_control_status.json",
-      " M platform/orchestrator_gate_map/orchestrator_gate_map.csv",
-      " M platform/orchestrator_gate_map/orchestrator_gate_map_status.json",
-      " M platform/source_profile_status.json",
-      " M platform/tfl_output_index_status.json",
-      " M platform/validation_strategy/validation_strategy_status.json",
-      "?? 06_qc_evidence/gates/",
-      "?? platform/check_gate_g00_governance.py",
-      "?? platform/check_gate_g02_specification.py",
-      "?? platform/check_gate_g07_reviewer_package.py"
+      "M 06_qc_evidence/gates/g00_governance_status.json",
+      " M 06_qc_evidence/gates/g02_specification_status.json",
+      " M 06_qc_evidence/gates/g07_reviewer_package_status.json",
+      " M docs/RELEASE_CANDIDATE_CHECKLIST.md",
+      " M docs/RELEASE_RUN_MANIFEST.md",
+      " M platform/pipeline_health.json",
+      " M platform/release_candidate/release_candidate_checklist.csv",
+      " M platform/release_candidate/release_candidate_status.json",
+      " M platform/release_run_manifest/release_run_manifest.json"
     ],
-    "status_porcelain_sha256": "f4b607df549adf1642716628e25cc079a70a66c8e8644d23e8878d54dbc02527",
+    "status_porcelain_sha256": "2d248f761b369c182ada74bb233e51174ed56007babf56e6c99c00197e5dfa02",
     "tracked_diff_paths": [
-      "config/study_manifest.yaml",
-      "docs/CTQ_TRACEABILITY_REPORT.md",
-      "docs/LOG_CLEANLINESS_REPORT.md",
-      "docs/METADATA_CONTROL_REPORT.md",
-      "docs/ORCHESTRATOR_GATE_MAP.md",
-      "docs/SOURCE_PROFILING_REPORT.md",
-      "docs/TFL_OUTPUT_INDEX.md",
-      "docs/VALIDATION_STRATEGY_CONTROL_REPORT.md",
-      "platform/build_orchestrator_gate_map.py",
-      "platform/cibuild.py",
-      "platform/ctq_traceability/ctq_traceability_status.json",
-      "platform/log_cleanliness/log_cleanliness_status.json",
-      "platform/metadata_control/metadata_control_status.json",
-      "platform/orchestrator_gate_map/orchestrator_gate_map.csv",
-      "platform/orchestrator_gate_map/orchestrator_gate_map_status.json",
-      "platform/source_profile_status.json",
-      "platform/tfl_output_index_status.json",
-      "platform/validation_strategy/validation_strategy_status.json"
+      "06_qc_evidence/gates/g00_governance_status.json",
+      "06_qc_evidence/gates/g02_specification_status.json",
+      "06_qc_evidence/gates/g07_reviewer_package_status.json",
+      "platform/pipeline_health.json"
     ]
   },
   "status": "REMEDIATION"

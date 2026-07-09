@@ -1,10 +1,10 @@
 {
   "status": "BLOCKED",
-  "generated_at": "2026-07-09 16:40:39 UTC",
+  "generated_at": "2026-07-09 16:41:33 UTC",
   "checks": 16,
-  "pass": 14,
+  "pass": 15,
   "warning": 0,
-  "blocker": 2,
+  "blocker": 1,
   "active_audit_findings": 0,
   "confirmed_critical_major_findings": 0,
   "live_sas_execution_mode": "oda",
@@ -97,15 +97,15 @@
       "gate": "G09 release_candidate_lock",
       "check": "Current release-run manifest is release-candidate grade (full DAG, clean tree)",
       "status": "BLOCKER",
-      "evidence": "platform/release_run_manifest/release_run_manifest.json status=REMEDIATION; evidence_grade=remediation_partial_or_dirty; run_scope=partial_dag; seal=6c755ea69de5777a31b6b10f8d7fef1433a04aa5c9ec33258a09a52e73a611ad",
+      "evidence": "platform/release_run_manifest/release_run_manifest.json status=REMEDIATION; evidence_grade=remediation_partial_or_dirty; run_scope=full_dag; seal=9efea28f496fb538faed6a44aa973a24f08056540f23637565fc248d44b3f7d3",
       "required_action": "Release manifest must be status=PASS (not REMEDIATION/FAIL): full current DAG, clean worktree, and current-run binding. REMEDIATION is valid development evidence only."
     },
     {
       "gate": "G09 release_candidate_lock",
       "check": "Pipeline health records a full current DAG run",
-      "status": "BLOCKER",
-      "evidence": "platform/pipeline_health.json run_scope=full_dag; stages_recorded=30; stages_expected=30; stages_not_run=0",
-      "required_action": "Run the full DAG from stage 1 (no --from-stage) under --real-sas so pipeline_health covers every study_manifest stage."
+      "status": "PASS",
+      "evidence": "platform/pipeline_health.json run_scope=full_dag; stages_recorded=33; stages_expected=33; stages_not_run=0",
+      "required_action": ""
     },
     {
       "gate": "G06 qc_signoff",

@@ -1,6 +1,6 @@
 # TROPIC Release-Candidate Checklist
 
-Generated: 2026-07-09 16:40:39 UTC
+Generated: 2026-07-09 16:41:33 UTC
 
 > Strict go/no-go checklist for the current working evidence set. This report is intentionally conservative and does not convert historical evidence into current release readiness.
 
@@ -10,9 +10,9 @@ Generated: 2026-07-09 16:40:39 UTC
 | --- | --- |
 | Overall status | BLOCKED |
 | Checks | 16 |
-| Pass | 14 |
+| Pass | 15 |
 | Warning | 0 |
-| Blocker | 2 |
+| Blocker | 1 |
 | Live SAS execution mode | oda |
 | Confirmed active Critical/Major audit findings | 0 |
 
@@ -21,7 +21,6 @@ Generated: 2026-07-09 16:40:39 UTC
 | Gate | Check | Required action |
 | --- | --- | --- |
 | G09 release_candidate_lock | Current release-run manifest is release-candidate grade (full DAG, clean tree) | Release manifest must be status=PASS (not REMEDIATION/FAIL): full current DAG, clean worktree, and current-run binding. REMEDIATION is valid development evidence only. |
-| G09 release_candidate_lock | Pipeline health records a full current DAG run | Run the full DAG from stage 1 (no --from-stage) under --real-sas so pipeline_health covers every study_manifest stage. |
 
 ## Warnings
 
@@ -43,8 +42,8 @@ No release-candidate warnings.
 | G06 qc_signoff | Results reconciliation available and passing | PASS | platform/results_reconciliation_status.json overall=PASS |  |
 | G06 qc_signoff | Forest HR reconciliation passes | PASS | platform/forest_reconciliation_status.json overall=PASS |  |
 | G06 qc_signoff | Synthetic comparator bridge parity passes | PASS | platform/cbzp_bridge_status.json overall=PASS | Still disclose CbzP as synthetic/reconstructed demonstration content. |
-| G09 release_candidate_lock | Current release-run manifest is release-candidate grade (full DAG, clean tree) | BLOCKER | platform/release_run_manifest/release_run_manifest.json status=REMEDIATION; evidence_grade=remediation_partial_or_dirty; run_scope=partial_dag; seal=6c755ea69de5777a31b6b10f8d7fef1433a04aa5c9ec33258a09a52e73a611ad | Release manifest must be status=PASS (not REMEDIATION/FAIL): full current DAG, clean worktree, and current-run binding. REMEDIATION is valid development evidence only. |
-| G09 release_candidate_lock | Pipeline health records a full current DAG run | BLOCKER | platform/pipeline_health.json run_scope=full_dag; stages_recorded=30; stages_expected=30; stages_not_run=0 | Run the full DAG from stage 1 (no --from-stage) under --real-sas so pipeline_health covers every study_manifest stage. |
+| G09 release_candidate_lock | Current release-run manifest is release-candidate grade (full DAG, clean tree) | BLOCKER | platform/release_run_manifest/release_run_manifest.json status=REMEDIATION; evidence_grade=remediation_partial_or_dirty; run_scope=full_dag; seal=9efea28f496fb538faed6a44aa973a24f08056540f23637565fc248d44b3f7d3 | Release manifest must be status=PASS (not REMEDIATION/FAIL): full current DAG, clean worktree, and current-run binding. REMEDIATION is valid development evidence only. |
+| G09 release_candidate_lock | Pipeline health records a full current DAG run | PASS | platform/pipeline_health.json run_scope=full_dag; stages_recorded=33; stages_expected=33; stages_not_run=0 |  |
 | G06 qc_signoff | Audit findings register has no active confirmed Critical/Major blockers | PASS | 06_qc_evidence/audit/findings_register.csv active=0; confirmed Critical/Major=0; severity_counts={} | Close, resolve, or formally disposition confirmed Critical/Major findings before any release-ready claim. |
 | G08 submission_package_materialization | eCTD backbone/run record present | PASS | 08_submission_package/ectd/0000/index.xml present=True; 08_submission_package/ectd/RUN_RECORD.md present=True | Rebuild/materialize eCTD sequence after upstream release candidate is clean. |
 

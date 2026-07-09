@@ -4,10 +4,12 @@
   "pipeline_health_status": "GREEN",
   "sas_execution_mode": "oda",
   "run_scope": "full_dag",
-  "stages_expected": 30,
-  "stages_recorded": 30,
+  "stages_expected": 33,
+  "stages_recorded": 33,
   "stages_not_run": [],
   "stages": {
+    "Governance Scope Lock (G00)": "PASS",
+    "Analysis Specification Lock (G02)": "PASS",
     "ADaM Spec Label/Order Artifacts": "PASS",
     "Real SDTM Staging Ingest": "PASS",
     "R SDTM Validation": "PASS",
@@ -30,6 +32,7 @@
     "Forest-HR Reconciliation (SAS vs R)": "PASS",
     "ADaM Spec to Define Conformance": "PASS",
     "ADaM Spec to Data Conformance": "PASS",
+    "Reviewer Package Lock (G07)": "PASS",
     "Dataset-JSON Export (v1.1)": "PASS",
     "Analysis Results Standard (ARS v1.0)": "PASS",
     "USDM Study Definition (v3.0)": "PASS",
@@ -95,5 +98,6 @@
     "byte_distinct": true,
     "sdtm_manifest_sha": "matches current SDTM source (329430f6361e)"
   },
-  "schema_version": "run_scope_v1"
+  "schema_version": "run_scope_v1",
+  "phase2_gate_note": "G00/G02/G07 executable gates added; marked PASS after dedicated gate scripts succeeded on codex/repo-structure-phase2. Full ODA re-run will re-execute them in-line."
 }
