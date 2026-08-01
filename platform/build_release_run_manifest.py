@@ -94,6 +94,13 @@ PROGRAM_GLOBS = [
     "05_outputs/tfl/**/*.R",
 ]
 
+# Generated configuration is consumed by the local/ODA run but is intentionally
+# ignored by Git. It must not enter a release source seal that a clean checkout
+# cannot reproduce; the authoritative YAML/config generator is sealed instead.
+GENERATED_SOURCE_EXCLUDES = {
+    "04_analysis_datasets/programs/sas/00_config_generated.sas",
+}
+
 
 def _rel(path: Path) -> str:
     return path.relative_to(ROOT).as_posix()
@@ -135,7 +142,7 @@ def _source_tree_sha256(controls: list, programs: list) -> str:
 def _current_source_tree_sha256() -> str:
     """Recompute the run-binding digest from the current source/control tree."""
     controls = _hash_existing(CONTROL_FILES)
-    programs = _hash_globs(PROGRAM_GLOBS)
+    programs = _hash_globs(PROGRAM_GLOBS, exclude_paths=GENERATED_SOURCE_EXCLUDES)
     return _source_tree_sha256(controls, programs)
 
 
@@ -338,12 +345,13 @@ def _hash_existing(paths: list[str]) -> list[dict]:
     return rows
 
 
-def _hash_globs(patterns: list[str]) -> list[dict]:
+def _hash_globs(patterns: list[str], exclude_paths: set[str] | None = None) -> list[dict]:
     rows = []
     seen = set()
+    exclude_paths = exclude_paths or set()
     for pattern in patterns:
         for path in sorted(ROOT.glob(pattern)):
-            if path.is_file() and path not in seen:
+            if path.is_file() and path not in seen and _rel(path) not in exclude_paths:
                 seen.add(path)
                 rows.append(_hash_file(path))
     return rows
@@ -666,7 +674,7 @@ def build_release_run_manifest(out_dir: Path = OUT_DIR) -> dict:
         "01_source_data/cbzp_reconstructed/*.xpt",
         ".core_run/sdtm34/*.xpt",
     ])
-    programs = _hash_globs(PROGRAM_GLOBS)
+    programs = _hash_globs(PROGRAM_GLOBS, exclude_paths=GENERATED_SOURCE_EXCLUDES)
     controls = _hash_existing(CONTROL_FILES)
 
     expected_stages = _expected_stage_names(manifest)

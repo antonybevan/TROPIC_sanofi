@@ -1,6 +1,6 @@
 {
   "status": "pass",
-  "generated_at": "2026-08-01 16:52:09 UTC",
+  "generated_at": "2026-08-01 17:14:23 UTC",
   "controlled_catalog": {
     "catalog_file": "config/tfl_output_catalog.yaml",
     "sap_authority": "02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx",

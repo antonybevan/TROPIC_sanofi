@@ -26,9 +26,10 @@ write_status <- function(overall, detail = NULL) {
 }
 
 cat("========== R <-> SAS FIGURE-DATA RECONCILIATION ==========\n")
-ok <- TRUE
+state <- new.env(parent = emptyenv())
+state$ok <- TRUE
 fail <- function(label, detail) {
-  ok <<- FALSE
+  state$ok <- FALSE
   cat(sprintf("  [FAIL] %-22s %s\n", label, detail))
 }
 pass <- function(label, detail) cat(sprintf("  [PASS] %-22s %s\n", label, detail))
@@ -171,7 +172,7 @@ if (er_ok) pass("Exposure-response", sprintf("%d joined observations identical",
   fail("Exposure-response", "figure-driving records differ")
 
 cat("==========================================================\n")
-if (!ok) {
+if (!state$ok) {
   write_status("FAIL", "one or more figure-driving checks failed")
   quit(save = "no", status = 1)
 }

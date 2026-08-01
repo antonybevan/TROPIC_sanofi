@@ -20,7 +20,10 @@ compute_tte_stats <- function(df) {
   hr_lcl <- s_cox$conf.int[3]
   hr_ucl <- s_cox$conf.int[4]
 
-  fit_lr <- survival::survdiff(survival::Surv(AVAL, 1 - CNSR) ~ TRT01P + survival::strata(ECOGBLGRP, MEASDISF), data = df)
+  fit_lr <- survival::survdiff(
+    survival::Surv(AVAL, 1 - CNSR) ~ TRT01P + survival::strata(ECOGBLGRP, MEASDISF),
+    data = df
+  )
   pval <- 1 - pchisq(fit_lr$chisq, 1)
 
   list(hr = hr, lcl = hr_lcl, ucl = hr_ucl, pval = pval)

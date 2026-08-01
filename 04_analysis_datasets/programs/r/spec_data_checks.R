@@ -95,7 +95,7 @@ for (ds in domains) {
       semantic_w <- c(semantic_w, "ALBBL/LDHBL contain values although the source release has no fields")
     }
     if (any(!is.na(df$ALBBLIF) & nzchar(trimws(as.character(df$ALBBLIF)))) ||
-        any(!is.na(df$LDHBLIF) & nzchar(trimws(as.character(df$LDHBLIF))))) {
+          any(!is.na(df$LDHBLIF) & nzchar(trimws(as.character(df$LDHBLIF))))) {
       semantic_w <- c(semantic_w, "ALBBLIF/LDHBLIF are non-blank despite unavailable baseline labs")
     }
   }
@@ -146,7 +146,13 @@ for (r in records) {
   ))
   if (length(r$missing_in_data)) cat("         missing in data:", paste(r$missing_in_data, collapse = ", "), "\n")
   if (length(r$extra_in_data)) cat("         extra in data:  ", paste(r$extra_in_data, collapse = ", "), "\n")
-  if (!is.null(r$semantic_detail) && length(r$semantic_detail)) cat("         semantic:       ", paste(r$semantic_detail, collapse = " | "), "\n")
+  if (!is.null(r$semantic_detail) && length(r$semantic_detail)) {
+    cat(
+      "         semantic:       ",
+      paste(r$semantic_detail, collapse = " | "),
+      "\n"
+    )
+  }
 }
 if (overall != "PASS") quit(status = 1)
 invisible(0)
