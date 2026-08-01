@@ -112,7 +112,9 @@ jobs:
         Rscript tests/test_lab_shift_table.R
         Rscript tests/test_figure_outputs.R
         Rscript tests/test_tfl_population_contract.R
-        python3 platform/check_gate_g07_reviewer_package.py
+        # Re-check the committed G07 evidence without rewriting its timestamp;
+        # the final release seal requires a clean material worktree.
+        python3 platform/check_gate_g07_reviewer_package.py --check-only
 
     - name: Run ADaM conformance check gate
       run: |

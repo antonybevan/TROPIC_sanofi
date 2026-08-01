@@ -56,6 +56,7 @@ REVIEWER_PDFS = [
 
 
 def main() -> int:
+    check_only = "--check-only" in sys.argv[1:]
     checks = []
     problems = []
 
@@ -130,12 +131,16 @@ def main() -> int:
         "checks": checks,
         "problems": problems,
     }
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    if not check_only:
+        OUT.parent.mkdir(parents=True, exist_ok=True)
+        OUT.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     print(f"G07 Reviewer Package Lock: {status}")
     for p in problems:
         print(f"  - {p}")
-    print(f"Wrote {OUT.relative_to(ROOT)}")
+    if check_only:
+        print("Check-only mode: committed G07 status was not rewritten")
+    else:
+        print(f"Wrote {OUT.relative_to(ROOT)}")
     return 0 if status == "PASS" else 1
 
 
