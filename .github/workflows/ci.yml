@@ -185,4 +185,5 @@ jobs:
       run: |
         # Same gate as path-a-seal-verify job; kept at end of full suite so a full CI green
         # implies seals still PASS after other steps (no ODA re-run).
+        git status --porcelain=v1
         python3 scripts/verify_release.py
