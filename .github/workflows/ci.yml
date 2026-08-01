@@ -118,7 +118,7 @@ jobs:
 
     - name: Run ADaM conformance check gate
       run: |
-        bash platform/run_adam_conformance.sh
+        bash platform/run_adam_conformance.sh --check-only
 
     - name: Validate Define-XML Metadata (ADaM & SDTM)
       run: |
@@ -185,5 +185,4 @@ jobs:
       run: |
         # Same gate as path-a-seal-verify job; kept at end of full suite so a full CI green
         # implies seals still PASS after other steps (no ODA re-run).
-        git status --porcelain=v1
         python3 scripts/verify_release.py

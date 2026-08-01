@@ -13,11 +13,20 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 RSCRIPT="$(command -v Rscript || echo /opt/homebrew/bin/Rscript)"
+CHECK_ONLY="${1:-}"
+if [[ -n "$CHECK_ONLY" && "$CHECK_ONLY" != "--check-only" ]]; then
+  echo "usage: $0 [--check-only]" >&2
+  exit 2
+fi
+R_ARGS=()
+if [[ "$CHECK_ONLY" == "--check-only" ]]; then
+  R_ARGS+=("--check-only")
+fi
 
 echo "[1/2] Parsing define.xml -> metadata JSON ..."
 python3 platform/adam_conf_parse_define.py
 
 echo "[2/2] Running ADaM conformance checks against 04_analysis_datasets/adam/*_prod.xpt ..."
-"$RSCRIPT" platform/adam_conf_check.R
+"$RSCRIPT" platform/adam_conf_check.R "${R_ARGS[@]}"
 
 echo "Done. See 06_qc_evidence/conformance/adam_conformance_report.md"

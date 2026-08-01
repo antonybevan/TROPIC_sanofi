@@ -8,6 +8,7 @@
 # Enterprise run (see 06_qc_evidence/conformance/p21_adam_runrecord.md). It is an honest interim gate that runs
 # in-environment and surfaces real findings. Inputs: 04_analysis_datasets/adam/<ds>_prod.xpt + define metadata JSON.
 suppressMessages({library(haven); library(jsonlite)})
+check_only <- "--check-only" %in% commandArgs(trailingOnly = TRUE)
 
 meta <- jsonlite::fromJSON("platform/adam_conf_define_meta.json",
                            simplifyDataFrame = TRUE)
@@ -250,8 +251,12 @@ if (nrow(res)) {
     for (nm in names(tb)) md <- c(md, sprintf("| %s | %d |", nm, tb[[nm]]))
   }
 }
-writeLines(md, "06_qc_evidence/conformance/adam_conformance_report.md")
-cat("\nWrote: adam_conformance_report.{csv,md}, adam_conformance_status.json\n")
+if (check_only) {
+  cat("\nCheck-only mode: committed adam_conformance_report.md was not rewritten.\n")
+} else {
+  writeLines(md, "06_qc_evidence/conformance/adam_conformance_report.md")
+  cat("\nWrote: adam_conformance_report.{csv,md}, adam_conformance_status.json\n")
+}
 
 # Gate (audit F-04): fail the build on genuine ADaM conformance errors; SKIP (exit 0) when there
 # is simply no data present (data-free clone / CI), so the step is a real gate, not a no-op.
