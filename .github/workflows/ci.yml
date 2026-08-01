@@ -53,7 +53,7 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libxml2-dev libssl-dev libcurl4-openssl-dev libxml2-utils
+        sudo apt-get install -y libxml2-dev libssl-dev libcurl4-openssl-dev libxml2-utils poppler-utils
 
     - name: Cache renv packages
       uses: actions/cache@v5
