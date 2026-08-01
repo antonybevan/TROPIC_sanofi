@@ -37,6 +37,7 @@ QC_FILES = {
     "reconciliation": "platform/reconciliation_status.json",
     "results_reconciliation": "platform/results_reconciliation_status.json",
     "forest_reconciliation": "platform/forest_reconciliation_status.json",
+    "figure_data_reconciliation": "platform/figure_data_reconciliation_status.json",
     "cbzp_bridge": "platform/cbzp_bridge_status.json",
     "spec_define": "platform/conformance/spec_define_conformance.json",
     "spec_data": "platform/conformance/spec_data_conformance.json",
@@ -67,6 +68,7 @@ CONTROL_FILES = [
     "06_qc_evidence/reconciliation/cross_lang_audit.R",
     "06_qc_evidence/reconciliation/results_reconcile.R",
     "06_qc_evidence/reconciliation/forest_reconcile.R",
+    "06_qc_evidence/reconciliation/figure_data_reconcile.R",
     "platform/cibuild.py",
     "platform/check_log_cleanliness.py",
     "platform/package_ectd.py",
@@ -96,6 +98,23 @@ def _run_git(args: list[str]) -> str:
 
 def _sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def _source_tree_sha256(controls: list, programs: list) -> str:
+    """Digest of sealed material source (controls + programs), seal-output-free.
+
+    Replaces HEAD-based staleness binding: committing the tracked seal advances
+    HEAD past the recorded head, so a committed manifest can never satisfy a
+    current_HEAD equality check (audit CRITICAL). The source-tree digest attests
+    to the exact source/config/program tree the seal was built from, is stable
+    across the seal commit (seal outputs are in neither group), and is
+    recomputable in a bare clone.
+    """
+    rows = sorted(
+        (r["path"], r["sha256"]) for r in (controls + programs)
+        if r.get("sha256")
+    )
+    return _sha256_bytes(b"\n".join(f"{p}\0{s}".encode("utf-8") for p, s in rows))
 
 
 def _hash_file(path: Path) -> dict:
@@ -387,6 +406,7 @@ def _binding_problems(payload: dict) -> list[str]:
     recon = _load_json(QC_FILES["reconciliation"])
     results = _load_json(QC_FILES["results_reconciliation"])
     forest = _load_json(QC_FILES["forest_reconciliation"])
+    figure_data = _load_json(QC_FILES["figure_data_reconciliation"])
     spec_define = _load_json(QC_FILES["spec_define"])
     spec_data = _load_json(QC_FILES["spec_data"])
     log_cleanliness = _load_json(QC_FILES["log_cleanliness"])
@@ -403,6 +423,8 @@ def _binding_problems(payload: dict) -> list[str]:
         problems.append("results reconciliation is not PASS")
     if forest.get("overall") != "PASS":
         problems.append("forest reconciliation is not PASS")
+    if figure_data.get("overall") != "PASS":
+        problems.append("figure-data reconciliation is not PASS")
     if spec_define.get("status") != "PASS":
         problems.append("spec-to-Define conformance is not PASS")
     if spec_data.get("status") != "PASS":
@@ -628,11 +650,14 @@ def build_release_run_manifest(out_dir: Path = OUT_DIR) -> dict:
     run_completeness = _run_completeness(health, expected_stages)
     sas_companion_figures = _sas_companion_freshness(health)
 
+    git_state = _git_state()
+    git_state["source_tree_sha256"] = _source_tree_sha256(controls, programs)
+
     payload = {
         "status": "PENDING",
         "evidence_grade": "pending",
         "generated_at": generated_at,
-        "source_control": _git_state(),
+        "source_control": git_state,
         "environment": {
             "python": sys.version.split()[0],
             "platform": platform.platform(),

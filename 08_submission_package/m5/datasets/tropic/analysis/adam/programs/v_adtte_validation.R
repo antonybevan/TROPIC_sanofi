@@ -11,11 +11,10 @@
 # single authorship and is disclosed as such in ADRG §6.
 # Rules implemented (must match A_adtte_generation.sas exactly):
 #   Rule 4  Population per parameter, carried on-record (ITTFL + SAFFL):
-#         OS, PFS        -> ITT  (ITTFL is "Y")
-#         TTPAIN         -> ITT with diary evaluability (ITTFL is "Y")
-#         TTPSA          -> ITT  (ITTFL is "Y")
-#         TTSAE          -> Safety (SAFFL is "Y")
-#         TTUMOR         -> ITT and MEASDISF is "Y"
+#         OS, PFS, TTPSA, TTPAIN -> one row per ADSL ITTFL=="Y" (Path A: 371)
+#         TTSAE                  -> one row per ADSL SAFFL=="Y"
+#         TTUMOR                 -> ADSL ITTFL=="Y" & MEASDISF=="Y"
+#         TRT01P always from ADSL (DM arm; never EXTRT)
 #   Rule 3  PSA-progression censoring date read from ADLB (adlb_v.xpt,
 #       where PARAMCD is "PSA"), an ADaM input -- not raw staging LB.
 #   Rule 2  Same-day pain scores aggregated with min() (order-independent;

@@ -150,20 +150,31 @@ cat(sprintf("  Step 3: PSA Response Significance check -> p = %e (Significant & 
     as.character(psa_significant))) # nolint
 
 # Step 4: ORR (Tested only if PSA Response is significant)
-# Conformed to SAP measurable-disease ITT population (MEASDISF == 'Y')
-orr_resp_data <- adrs |>
-  filter(PARAMCD == "OBJRESP") |>
-  filter(USUBJID %in% adsl$USUBJID[adsl$MEASDISF == "Y"]) |>
+# SAP measurable-disease dens = all ADSL MEASDISF=='Y' (not only subjects with
+# an OBJRESP row). Two MEAS subjects lack OBJRESP in ADaM — count as non-responders.
+orr_meas_den <- adsl |>
+  filter(MEASDISF == "Y") |>
+  select(USUBJID, TRT01P) |>
+  left_join(
+    adrs |> filter(PARAMCD == "OBJRESP") |> select(USUBJID, AVALC),
+    by = "USUBJID"
+  ) |>
   mutate(
     TRT01P = factor(TRT01P, levels = c("MP", "CbzP")),
-    AVALC = factor(AVALC, levels = c("N", "Y"))
+    AVALC = factor(if_else(is.na(AVALC) | AVALC == "", "N", AVALC),
+                   levels = c("N", "Y"))
   )
+orr_resp_data <- orr_meas_den
 orr_table <- table(orr_resp_data$TRT01P, orr_resp_data$AVALC)
 orr_test <- fisher.test(orr_table)
 orr_pval <- orr_test$p.value
 orr_significant <- psa_significant && (orr_pval < 0.05)
 cat(sprintf("  Step 4: ORR Significance check -> p = %f (Significant & Tested: %s)\n", orr_pval, # nolint
     as.character(orr_significant))) # nolint
+cat(sprintf("  [TFL-QC] ORR dens MEASDISF=%d (OBJRESP rows in dens=%d)\n",
+            nrow(orr_meas_den),
+            sum(!is.na(adrs$AVALC[adrs$PARAMCD == "OBJRESP" &
+                                    adrs$USUBJID %in% orr_meas_den$USUBJID]))))
 
 if (!os_significant) {
   cat("WARNING: [TFL] Primary endpoint (OS) did not meet statistical significance boundary. Subsequent p-values are descriptive.\n") # nolint
@@ -540,23 +551,29 @@ ggsave("05_outputs/tfl/output/figures/F-12-1_Subgroup_Forest.png", final_forest,
 # ==============================================================================
 cat("  [TFL] Compiling clinical table summaries...\n")
 
-# Dynamic calculations for T-17-1
-rdi_mp_85 <- sum(adex$TRT01P == "MP" & adex$PARAMCD == "RDIDL" &
-    adex$AVALC == ">=85%") # nolint
-rdi_mp_65 <- sum(adex$TRT01P == "MP" & adex$PARAMCD == "RDIDL" &
-    adex$AVALC == "65-<85%") # nolint
-rdi_mp_low <- sum(adex$TRT01P == "MP" & adex$PARAMCD == "RDIDL" &
-    adex$AVALC == "<65%") # nolint
+# Dynamic calculations for T-17-1 (SAP population: CbzP/MP Safety = ADSL SAFFL='Y' only).
+# RDI rows exist for non-safety CbzP subjects (7 with no TRTSDT); they must NOT enter
+# a Safety-population exposure table (audit BLOCKER: previously N=378, now N=371).
+adex_safety <- adex |>
+  left_join(adsl |> select(USUBJID, SAFFL), by = "USUBJID") |>
+  filter(SAFFL == "Y")
 
-rdi_cbzp_85 <- sum(adex$TRT01P == "CbzP" & adex$PARAMCD == "RDIDL" &
-    adex$AVALC == ">=85%") # nolint
-rdi_cbzp_65 <- sum(adex$TRT01P == "CbzP" & adex$PARAMCD == "RDIDL" &
-    adex$AVALC == "65-<85%") # nolint
-rdi_cbzp_low <- sum(adex$TRT01P == "CbzP" & adex$PARAMCD == "RDIDL" &
-    adex$AVALC == "<65%") # nolint
+rdi_mp_85 <- sum(adex_safety$TRT01P == "MP" & adex_safety$PARAMCD == "RDIDL" &
+    adex_safety$AVALC == ">=85%") # nolint
+rdi_mp_65 <- sum(adex_safety$TRT01P == "MP" & adex_safety$PARAMCD == "RDIDL" &
+    adex_safety$AVALC == "65-<85%") # nolint
+rdi_mp_low <- sum(adex_safety$TRT01P == "MP" & adex_safety$PARAMCD == "RDIDL" &
+    adex_safety$AVALC == "<65%") # nolint
 
-n_mp_rdi <- sum(adex$TRT01P == "MP" & adex$PARAMCD == "RDIDL")
-n_cbzp_rdi <- sum(adex$TRT01P == "CbzP" & adex$PARAMCD == "RDIDL")
+rdi_cbzp_85 <- sum(adex_safety$TRT01P == "CbzP" & adex_safety$PARAMCD == "RDIDL" &
+    adex_safety$AVALC == ">=85%") # nolint
+rdi_cbzp_65 <- sum(adex_safety$TRT01P == "CbzP" & adex_safety$PARAMCD == "RDIDL" &
+    adex_safety$AVALC == "65-<85%") # nolint
+rdi_cbzp_low <- sum(adex_safety$TRT01P == "CbzP" & adex_safety$PARAMCD == "RDIDL" &
+    adex_safety$AVALC == "<65%") # nolint
+
+n_mp_rdi <- sum(adex_safety$TRT01P == "MP" & adex_safety$PARAMCD == "RDIDL")
+n_cbzp_rdi <- sum(adex_safety$TRT01P == "CbzP" & adex_safety$PARAMCD == "RDIDL")
 
 # Dynamic calculations for T-17-2
 optimus_gcsf <- adlb |>
@@ -575,8 +592,8 @@ gcsf_n_g12 <- sum(optimus_gcsf$GCSF_PROP == "N" & optimus_gcsf$ATOXGR <= 2)
 gcsf_n_g3 <- sum(optimus_gcsf$GCSF_PROP == "N" & optimus_gcsf$ATOXGR == 3)
 gcsf_n_g4 <- sum(optimus_gcsf$GCSF_PROP == "N" & optimus_gcsf$ATOXGR == 4)
 
-# Dynamic calculations for T-17-4
-cbzp_rdi <- adex |>
+# Dynamic calculations for T-17-4 (Safety population, same as T-17-1)
+cbzp_rdi <- adex_safety |>
   filter(TRT01P == "CbzP" & PARAMCD == "RDIDL" & AVISIT == "ALL CYCLES") |>
   select(USUBJID, RDIDL = AVALC)
 
@@ -648,6 +665,7 @@ writeLines(paste0(synth_banner, table_content),
 
 # ==============================================================================
 # TABLES T-11-6 / T-11-7: Dynamic Efficacy Summaries for Secondary Endpoints
+# (T-11-6 = TTUMOR, T-11-7 = TTPSA per SAP v4.0 Appendix D)
 # ==============================================================================
 cat("  [TFL] Calculating dynamic KM and Cox PH statistics for TTPSA and TTUMOR...\n") # nolint
 
@@ -708,19 +726,22 @@ psa_mp_resp <- sum(psa_resp_data$AVALC == "Y" & psa_resp_data$TRT01P == "MP")
 psa_mp_total <- sum(psa_resp_data$TRT01P == "MP")
 psa_mp_pct <- psa_mp_resp / psa_mp_total * 100
 
-# Objective Response Rate (ORR) restricted to Measurable-Disease ITT population
+# Objective Response Rate (ORR) — dens = ADSL MEASDISF=='Y' (left-join OBJRESP)
 meas_subj <- adsl |>
   filter(MEASDISF == "Y") |>
   select(USUBJID, TRT01P)
-orr_resp_data <- adrs |>
-  filter(PARAMCD == "OBJRESP") |>
-  filter(USUBJID %in% meas_subj$USUBJID)
+orr_resp_data <- meas_subj |>
+  left_join(
+    adrs |> filter(PARAMCD == "OBJRESP") |> select(USUBJID, AVALC),
+    by = "USUBJID"
+  ) |>
+  mutate(AVALC = if_else(is.na(AVALC) | AVALC == "", "N", AVALC))
 orr_cbzp_resp <- sum(orr_resp_data$AVALC == "Y" & orr_resp_data$TRT01P == "CbzP") # nolint
 orr_cbzp_total <- sum(meas_subj$TRT01P == "CbzP")
-orr_cbzp_pct <- orr_cbzp_resp / orr_cbzp_total * 100
+orr_cbzp_pct <- orr_cbzp_resp / max(orr_cbzp_total, 1) * 100
 orr_mp_resp <- sum(orr_resp_data$AVALC == "Y" & orr_resp_data$TRT01P == "MP")
 orr_mp_total <- sum(meas_subj$TRT01P == "MP")
-orr_mp_pct <- orr_mp_resp / orr_mp_total * 100
+orr_mp_pct <- orr_mp_resp / max(orr_mp_total, 1) * 100
 
 n_cbzp_itt <- sum(adsl$TRT01P == "CbzP")
 n_mp_itt <- sum(adsl$TRT01P == "MP")
@@ -731,24 +752,24 @@ efficacy_tables <- sprintf(
 TROPIC (Study EFC6193 / XRP6258) Secondary Efficacy Tables
 ==========================================================
 
-T-11-6: Kaplan-Meier Analysis of Time to PSA Progression (TTPSA) - ITT Population
----------------------------------------------------------------------------------
-Statistic                                 CbzP (N=%d)        MP (N=%d)
-Number of Events / Total N                %d/%d               %d/%d
-Median Survival Time (Months)             %.1f                %.1f
-95%% Confidence Interval                   %s      %s
-Unstratified Hazard Ratio (CbzP vs MP)     %.2f (95%% CI: %.2f-%.2f)
-Wald Log-Rank p-value                     %.4f
-
-
-T-11-7: Kaplan-Meier Analysis of Time to Tumor Progression (TTUMOR) - Measurable Subpopulation
+T-11-6: Kaplan-Meier Analysis of Time to Tumor Progression (TTUMOR) - Measurable Subpopulation
 ------------------------------------------------------------------------------------------------
 Statistic                                 CbzP (N=%d)        MP (N=%d)
 Number of Events / Total N                %d/%d               %d/%d
 Median Survival Time (Months)             %.1f                %.1f
 95%% Confidence Interval                   %s      %s
 Unstratified Hazard Ratio (CbzP vs MP)     %.2f (95%% CI: %.2f-%.2f)
-Wald Log-Rank p-value                     %.4f
+Wald p-value                             %.4f
+
+
+T-11-7: Kaplan-Meier Analysis of Time to PSA Progression (TTPSA) - ITT Population
+---------------------------------------------------------------------------------
+Statistic                                 CbzP (N=%d)        MP (N=%d)
+Number of Events / Total N                %d/%d               %d/%d
+Median Survival Time (Months)             %.1f                %.1f
+95%% Confidence Interval                   %s      %s
+Unstratified Hazard Ratio (CbzP vs MP)     %.2f (95%% CI: %.2f-%.2f)
+Wald p-value                             %.4f
 
 
 T-11-8: Analysis of Best Clinical Response Endpoints
@@ -765,15 +786,15 @@ Objective Response Rate (ORR) - Measurable ITT Population†
 †Restricted to patients with measurable disease at baseline (CbzP N=%d, MP N=%d).
 ",
   n_cbzp_itt, n_mp_itt,
-  as.integer(events_psa_cbzp), as.integer(total_psa_cbzp),
-  as.integer(events_psa_mp), as.integer(total_psa_mp),
-  med_psa_cbzp, med_psa_mp, ci_psa_cbzp, ci_psa_mp,
-  hr_psa, hr_psa_lcl, hr_psa_ucl, p_psa,
-  total_tumor_cbzp, total_tumor_mp,
   as.integer(events_tumor_cbzp), as.integer(total_tumor_cbzp),
   as.integer(events_tumor_mp), as.integer(total_tumor_mp),
   med_tumor_cbzp, med_tumor_mp, ci_tumor_cbzp, ci_tumor_mp,
   hr_tumor, hr_tumor_lcl, hr_tumor_ucl, p_tumor,
+  n_cbzp_itt, n_mp_itt,
+  as.integer(events_psa_cbzp), as.integer(total_psa_cbzp),
+  as.integer(events_psa_mp), as.integer(total_psa_mp),
+  med_psa_cbzp, med_psa_mp, ci_psa_cbzp, ci_psa_mp,
+  hr_psa, hr_psa_lcl, hr_psa_ucl, p_psa,
   as.integer(psa_cbzp_resp), as.integer(psa_cbzp_total), psa_cbzp_pct,
   as.integer(psa_mp_resp), as.integer(psa_mp_total), psa_mp_pct,
   psa_pval,
@@ -1001,18 +1022,21 @@ ggsave("05_outputs/tfl/output/figures/F-14-1_Swimmer_Plot.png", swimmer_plot,
 # ==============================================================================
 cat("  [TFL] Compiling AE Summary Tables...\n")
 
-# Join AE to ADSL to get treatment arm (TRTEMFL: T=treatment-emergent,
-# P=pre-existing, N=not TEAE)
+# TEAE analysis: TRTEMFL == "Y" only (not AESER non-missing).
+# Arm from ADSL (DM-derived), never from EXTRT. Denominators = ADSL SAFFL
+# (N=371 MP in real extract; subjects with no AE rows stay in denom with count 0).
 ae_safety <- adae |>
   select(-any_of("TRT01P")) |>
   filter(TRTEMFL == "Y") |>
-  left_join(adsl |> select(USUBJID, TRT01P), by = "USUBJID")
+  left_join(adsl |> select(USUBJID, TRT01P, SAFFL), by = "USUBJID")
 
-# Safety Population denominators per arm from ADSL (SAFFL); these head the
-# Safety Population AE (T-20) and lab shift (T-21) tables. ITT (TRT01P only)
-# would over-count CbzP (378 ITT vs 371 safety).
+# Safety Population denominators per arm from ADSL (SAFFL) — not AE-distinct n.
+# ITT-only dens would mis-handle CbzP synthetic merge (378 ITT vs 371 safety).
 n_mp <- sum(adsl$SAFFL == "Y" & adsl$TRT01P == "MP")
 n_cbzp <- sum(adsl$SAFFL == "Y" & adsl$TRT01P == "CbzP")
+stopifnot(n_mp + n_cbzp > 0)
+# Path A real MP dens must be 371 when only MP ADSL present pre-merge check:
+# (after CbzP bind_rows, n_mp remains real SAFFL MP count)
 
 # Precompute AE summary counts once (Issue 6 / 2.4)
 ae_counts <- ae_safety |>

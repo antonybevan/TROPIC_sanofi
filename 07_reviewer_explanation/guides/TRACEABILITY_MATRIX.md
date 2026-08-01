@@ -90,8 +90,8 @@ variable-label artifacts for both tracks (`platform/gen_adam_labels.R`).
 | F-13-1 | `F-13-1_PSA_Waterfall.png` | ADLB PSA + ADSL | |
 | F-14-1 | `F-14-1_Swimmer_Plot.png` | ADEX + ADSL | |
 | F-17-1 | `F-17-1_Optimus_Scatter.png` | ADEX RDI + ADLB ANCNADIR | Synthetic/comparative caution |
-| T-11-6 | inside `T-11-Efficacy_Tables.txt` | ADTTE TTPSA | Catalog ID ≠ separate file per row |
-| T-11-7 | inside `T-11-Efficacy_Tables.txt` | ADTTE TTUMOR | |
+| T-11-6 | inside `T-11-Efficacy_Tables.txt` | ADTTE TTUMOR | Catalog ID ≠ separate file per row |
+| T-11-7 | inside `T-11-Efficacy_Tables.txt` | ADTTE TTPSA | |
 | T-11-8 | inside `T-11-Efficacy_Tables.txt` | ADRS | Best clinical response |
 | T-11-8b | inside `T-11-Efficacy_Tables.txt` | ADRS | ORR response-evaluable sensitivity |
 | T-17-1 | inside `T-17-Optimus_Tables.txt` | ADEX | RDI categories |

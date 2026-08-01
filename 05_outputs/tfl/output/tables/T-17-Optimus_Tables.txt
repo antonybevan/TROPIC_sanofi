@@ -12,10 +12,10 @@ TROPIC (Study EFC6193 / XRP6258) Clinical Reporting Tables
 
 T-17-1: Relative Dose Intensity (RDI) Category Distribution by Arm
 ------------------------------------------------------------------
-Category     CbzP (N=378)   MP (N=371)
->=85%        245 (64.8%)    327 (88.1%)
-65-<85%      98 (25.9%)     43 (11.6%)
-<65%         35 (9.3%)     1 (0.3%)
+Category     CbzP (N=371)   MP (N=371)
+>=85%        241 (65.0%)    327 (88.1%)
+65-<85%      96 (25.9%)     43 (11.6%)
+<65%         34 (9.2%)     1 (0.3%)
 
 T-17-2: Worst Cycle ANC Nadir Grade Stratified by G-CSF Usage (CbzP)
 --------------------------------------------------------------------
@@ -28,5 +28,5 @@ T-17-4: Benefit-Risk Summary by RDI Tertile (CbzP Arm)
 RDI Tertile    Median OS (Months)   Grade >=3 Neutropenia Rate (%)
 High (>=85%)   15.8 months          86.7%
 Med (65-<85%)  14.2 months          87.5%
-Low (<65%)     12.6 months          82.4%
+Low (<65%)     12.5 months          82.4%
 

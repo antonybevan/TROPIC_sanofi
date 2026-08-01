@@ -60,6 +60,8 @@ adex <- bind_rows(read_xpt("04_analysis_datasets/adam/adex_v.xpt"),
 # KM hazard ratios/CIs and displayed risk counts.
 sas_km <- read.csv(required[1], check.names = FALSE) |>
   rename_with(toupper)
+km_delta_os <- NA_real_
+km_delta_pfs <- NA_real_
 for (endpoint in c("OS", "PFS")) {
   d <- adtte |>
     filter(PARAMCD == endpoint) |>
@@ -68,6 +70,7 @@ for (endpoint in c("OS", "PFS")) {
   s <- sas_km[sas_km$PARAMCD == endpoint, ]
   delta <- max(abs(c(r$hr - s$HAZARDRATIO, r$lcl - s$WALDLOWER,
                      r$ucl - s$WALDUPPER)))
+  if (endpoint == "OS") km_delta_os <- delta else km_delta_pfs <- delta
   if (nrow(s) == 1L && delta <= 0.01) pass(paste("KM", endpoint), sprintf("HR/CI max delta %.5f", delta)) else
     fail(paste("KM", endpoint), sprintf("HR/CI max delta %.5f", delta))
 }
@@ -156,5 +159,17 @@ if (!ok) {
   write_status("FAIL", "one or more figure-driving checks failed")
   quit(save = "no", status = 1)
 }
-write_status("PASS")
+
+# Durable per-check evidence (audit MAJOR: a bare PASS with empty detail cannot be
+# audited). Record counts, max deltas and tolerances for every figure family.
+write_status("PASS", list(
+  km_hr_ci = list(
+    os = list(max_delta = km_delta_os, tolerance = 0.01),
+    pfs = list(max_delta = km_delta_pfs, tolerance = 0.01)
+  ),
+  km_risk = list(rows_checked = nrow(sas_risk), identical = risk_ok),
+  waterfall = list(rows_checked = nrow(r_water), identical = water_ok),
+  swimmer = list(rows_checked = nrow(r_swim), identical = swim_ok),
+  exposure_response = list(rows_checked = nrow(r_er), identical = er_ok)
+))
 cat("FIGURE-DATA RECONCILIATION: PASS\n")

@@ -128,16 +128,16 @@ For subjects with missing baseline laboratory values (PSABL, ALPBL, HGBBL), popu
 - `PSABL` default: 110.0 ng/mL
 - `ALPBL` default: 140.0 U/L  
 - `HGBBL` default: 11.5 g/dL
-- `ALBBL` fixed: 38.0 g/L (no subject-level source available)
-- `LDHBL` fixed: 220.0 U/L (no subject-level source available)
+- `ALBBL` **missing** (not collected; no imputation)
+- `LDHBL` **missing** (not collected; no imputation)
 
-This imputation strategy is retained as a documented implementation limitation under SAP v4.0 §14 / §18. **These imputed baseline laboratory constants are schema placeholders and are NOT used as covariates or stratification factors in any efficacy model**, consistent with [ADRG](ADRG.md) §5.1. The primary and secondary Cox / log-rank analyses stratify **only on the protocol randomization strata** (`ECOGBL` and `MEASDISF`; see `05_outputs/tfl/tfl_generation.R`, `compute_tte_stats()` → `strata(ECOGBL, MEASDISF)`). `ALBBL` and `LDHBL` in particular are single constants for all subjects (no subject-level source available) and therefore carry no subject-level information; they are retained purely to satisfy the ADaM schema and should be read as "not available," not as analysis inputs.
+This imputation strategy is retained as a documented implementation limitation under SAP v4.0 §14 / §18. **These imputed baseline laboratory constants are schema placeholders and are NOT used as covariates or stratification factors in any efficacy model**, consistent with [ADRG](ADRG.md) §5.1. The primary and secondary Cox / log-rank analyses stratify **only on the protocol randomization strata** (pooled `ECOGBL` 0–1 vs 2 and `MEASDISF`; see `05_outputs/tfl/tfl_generation.R`, `compute_tte_stats()` → `strata(ECOGBLGRP, MEASDISF)`). `ALBBL` and `LDHBL` in particular are **missing for all subjects** (no subject-level source available; both tracks leave them missing with blank flags), so they carry no subject-level information; they are retained purely to satisfy the ADaM schema and should be read as "not available," not as analysis inputs.
 
 ### 4.2 Supplemental Domain Ingestion
 Domains `LS` (Lesion) and `PN` (Pain/Numeric) do not have supplemental (`SUPPLS`, `SUPPPN`) datasets in the PDS source data. The `%transpose_supp()` macro gracefully handles this via the `supp_exists = 0` guard path, copying the primary domain directly without SUPP merge.
 
 ### 4.3 Country and Region Assignment
-The DM domain in the source data does not contain country-of-study-site information. `COUNTRY` is assigned `'IND'` and `REGION` as `'REST OF WORLD'` for all subjects. Geographic subgroup analyses are not part of SAP v4.0 reporting and are not reported.
+The DM domain in the source data does not contain country-of-study-site information. `COUNTRY` and `REGION` are **not present** in the de-identified release and are **not derived** (see the note in `B_bimo_generation.sas`); no placeholder geography is assigned. Geographic subgroup analyses are not part of SAP v4.0 reporting and are not reported.
 
 ### 4.4 Hardcoded Demographic Constant (SEX = 'M')
 The demographics domain (`DM`) contains a hardcoded variable `SEX = 'M'` assigned to all subjects in `A_adsl_generation.sas`. This is a clinical decision consistent with the trial protocol for metastatic castration-resistant prostate cancer (mCRPC), which is an exclusively male patient population. To ensure metadata conformity, the Define-XML codelist references are maintained; however, no female subjects are present in the analysis dataset.

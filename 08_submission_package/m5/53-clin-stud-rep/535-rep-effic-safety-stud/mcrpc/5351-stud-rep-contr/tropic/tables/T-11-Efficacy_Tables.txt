@@ -10,24 +10,24 @@
 TROPIC (Study EFC6193 / XRP6258) Secondary Efficacy Tables
 ==========================================================
 
-T-11-6: Kaplan-Meier Analysis of Time to PSA Progression (TTPSA) - ITT Population
+T-11-6: Kaplan-Meier Analysis of Time to Tumor Progression (TTUMOR) - Measurable Subpopulation
+------------------------------------------------------------------------------------------------
+Statistic                                 CbzP (N=378)        MP (N=371)
+Number of Events / Total N                166/179               186/203
+Median Survival Time (Months)             3.4                2.1
+95% Confidence Interval                   (95% CI: 2.7-4.6)      (95% CI: 1.7-2.8)
+Unstratified Hazard Ratio (CbzP vs MP)     0.67 (95% CI: 0.54-0.83)
+Wald p-value                             0.0002
+
+
+T-11-7: Kaplan-Meier Analysis of Time to PSA Progression (TTPSA) - ITT Population
 ---------------------------------------------------------------------------------
 Statistic                                 CbzP (N=378)        MP (N=371)
 Number of Events / Total N                286/378               265/371
 Median Survival Time (Months)             2.7                2.2
 95% Confidence Interval                   (95% CI: 1.9-3.2)      (95% CI: 1.7-3.3)
 Unstratified Hazard Ratio (CbzP vs MP)     0.85 (95% CI: 0.72-1.00)
-Wald Log-Rank p-value                     0.0514
-
-
-T-11-7: Kaplan-Meier Analysis of Time to Tumor Progression (TTUMOR) - Measurable Subpopulation
-------------------------------------------------------------------------------------------------
-Statistic                                 CbzP (N=179)        MP (N=203)
-Number of Events / Total N                166/179               186/203
-Median Survival Time (Months)             3.4                2.1
-95% Confidence Interval                   (95% CI: 2.7-4.6)      (95% CI: 1.7-2.8)
-Unstratified Hazard Ratio (CbzP vs MP)     0.67 (95% CI: 0.54-0.83)
-Wald Log-Rank p-value                     0.0002
+Wald p-value                             0.0514
 
 
 T-11-8: Analysis of Best Clinical Response Endpoints
@@ -39,7 +39,7 @@ PSA Response Rate (>=50% decline) - ITT Population
 
 Objective Response Rate (ORR) - Measurable ITT Population†
   Responders / N (%)                      30/179 (16.8%)      13/203 (6.4%)
-  Fisher's Exact p-value                  0.0019
+  Fisher's Exact p-value                  0.0018
 
 †Restricted to patients with measurable disease at baseline (CbzP N=179, MP N=203).
 

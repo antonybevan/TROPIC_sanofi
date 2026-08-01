@@ -1,11 +1,12 @@
 {
-  "timestamp": "2026-07-09T20:30:36.585806",
+  "timestamp": "2026-07-10T01:20:39.217308",
   "runner": "apple (System Agent)",
   "pipeline_health_status": "GREEN",
   "sas_execution_mode": "oda",
+  "schema_version": "run_scope_v1",
   "run_scope": "full_dag",
-  "stages_expected": 33,
-  "stages_recorded": 33,
+  "stages_expected": 34,
+  "stages_recorded": 34,
   "stages_not_run": [],
   "stages": {
     "Governance Scope Lock (G00)": "PASS",
@@ -30,6 +31,7 @@
     "Efficacy & Safety TFL Suite Compilation": "PASS",
     "Numerical Results Reconciliation (SAS vs R)": "PASS",
     "Forest-HR Reconciliation (SAS vs R)": "PASS",
+    "Figure-Data Reconciliation (SAS vs R)": "PASS",
     "ADaM Spec to Define Conformance": "PASS",
     "ADaM Spec to Data Conformance": "PASS",
     "Reviewer Package Lock (G07)": "PASS",
@@ -43,10 +45,10 @@
     "Release Run Manifest Binding": "PASS"
   },
   "r_version": "R version 4.6.0 (2026-04-24)",
-  "renv_lock_sha256": "b143171db9f764d1c18963b37105abc1ee22363e2af1c38261fcc49bd8956435",
+  "renv_lock_sha256": "a9ba2082ce1f227add5d2cb400fb70688ea5031fef238dcf1bf1928de2700630",
   "oda_endpoint": "odaws01-apse1-2.oda.sas.com",
   "oda_attempts": 1,
-  "oda_total_wait_s": 18.7,
+  "oda_total_wait_s": 6.9,
   "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007",
   "reconciliation": "SAS_vs_R",
   "probe_nonce_echoed": true,
@@ -97,7 +99,5 @@
     ],
     "byte_distinct": true,
     "sdtm_manifest_sha": "matches current SDTM source (329430f6361e)"
-  },
-  "schema_version": "run_scope_v1",
-  "phase2_gate_note": "G00/G02/G07 executable gates added; marked PASS after dedicated gate scripts succeeded on codex/repo-structure-phase2. Full ODA re-run will re-execute them in-line."
+  }
 }

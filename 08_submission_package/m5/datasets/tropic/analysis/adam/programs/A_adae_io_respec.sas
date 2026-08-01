@@ -1,15 +1,22 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: A_adae_io_respec.sas
-   Version: 2.2.0
+   Version: 2.2.1
    Author: Antony Bevan, Clinical Programming
-   Date: 2026-05-27
+   Date: 2026-05-27 (header fidelity update 2026-07-09)
    Standard: ADaMIG v1.3 OCCDS v1.0
    Input: sdtm.ae, adam.adsl
    Output: adam.adae
    Description: Generates Adverse Events ADaM (ADAE) under OCCDS v1.0.
                 Implements custom sponsor-defined continuous episode merging (gap <= 3 days)
                 with corrected AEOCCFL occurrence denominator flags.
+
+   CRF grounding (D-012 — Sanofi CRF O.1_AE_1):
+     Form collected: seriousness, relationship to study treatment, action taken,
+     corrective therapy, outcome (incl. fatal), seriousness criteria, calendar dates.
+     PDS extract largely retains AESER/AEREL/AEACN/AEOUT/AESxxx; timing is week-offset
+     (AESTWK/AEENWK), not day-true ISO. Do not claim "trial never collected seriousness."
+     See docs/workstreams/reviews/WS1_CRF_GROUNDING_D012_2026-07-09.md and SDRG §0A.
    ============================================================================= */
 
 /* PGMDIR guard: define only when running standalone; master driver pre-defines this. */
@@ -202,6 +209,22 @@ run;
 
 proc sort data=adam.adae;
     by usubjid astdt aedecod aendt aeseq;
+run;
+
+/* ADaM phase: TEAE = TRTEMFL='Y' only. TEAE dens for TFLs use ADSL SAFFL
+   (left-join), not distinct AE subjects (14 DM subjects have zero AE rows).
+   QC: TEAE rows should carry AESER; baseline skeleton may blank AESER. */
+data _null_;
+    set adam.adae end=eof;
+    retain n_teae_blank_aeser 0 n_nte_blank_aeser 0;
+    if TRTEMFL = 'Y' and missing(AESER) then n_teae_blank_aeser + 1;
+    if TRTEMFL = 'N' and missing(AESER) then n_nte_blank_aeser + 1;
+    if eof then do;
+        putlog "NOTE: [ADAE-QC] Non-TE blank AESER rows (expected baseline skeleton) = " n_nte_blank_aeser;
+        putlog "NOTE: [ADAE-QC] TEAE blank AESER rows (expect 0 or near-0) = " n_teae_blank_aeser;
+        if n_teae_blank_aeser > 5 then
+            putlog "WARNING: [ADAE-QC] TEAE blank AESER exceeds soft cap 5 — review extract fidelity.";
+    end;
 run;
 
 /* Clean up work library */

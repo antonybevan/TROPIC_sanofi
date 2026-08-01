@@ -1,6 +1,15 @@
-# Program: v_adrs_validation.R | Version: 2.0 | Author: Antony Bevan, Clinical Programming | Date: 2026-05-23
+# Program: v_adrs_validation.R | Version: 2.1.0
+# Author: Antony Bevan, Clinical Programming | Date: 2026-05-23
+# (ADaM dens contract 2026-07-09)
 # Standard: CDISC ADaMIG v1.3 BDS | renv.lock hash: locked
 # Description: R Independent Validation double-programming for TROPIC ADRS.
+#
+# Dens contract (must match A_adrs_generation.sas; TRT01P from ADSL/DM only):
+#   PSARESP / PSPROG / BSGRESP -> one row per ADSL SAFFL=="Y" (Path A: 371)
+#   OVRLRESP                   -> visit-level RECIST, lesion-evaluable spine
+#   BESTRESP / OBJRESP         -> BOR spine (351), NOT SAP ORR dens
+#   ORR TFL dens = ADSL MEASDISF=="Y" left-join OBJRESP (see tfl_generation.R)
+#   Missing OBJRESP among MEAS subjects counts as non-responder in TFL only.
 
 library(dplyr)
 library(haven)

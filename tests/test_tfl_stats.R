@@ -26,12 +26,14 @@ if (!requireNamespace("survival", quietly = TRUE)) {
 source("05_outputs/tfl/tfl_stats.R")
 
 # Deterministic two-arm fixture builder (fixed seed -> reproducible draws).
+# ECOGBL is sampled 0/1/2 so the locked SAP strata (0-1 pooled vs 2) are exercised;
+# a fixture containing only ECOG 0/1 could not detect a regression to 3 raw strata.
 mk_arm <- function(arm, rate, n) data.frame(
   USUBJID  = paste0(arm, seq_len(n)),
   TRT01P   = arm,
   AVAL     = round(rexp(n, rate) * 100) + 1,
   CNSR     = rbinom(n, 1, 0.25),
-  ECOGBL   = sample(c(0, 1), n, replace = TRUE),
+  ECOGBL   = sample(c(0, 1, 2), n, replace = TRUE),
   MEASDISF = sample(c("Y", "N"), n, replace = TRUE),
   stringsAsFactors = FALSE
 )
@@ -47,10 +49,10 @@ s <- compute_tte_stats(eff)
 if (all(c("hr", "lcl", "ucl", "pval") %in% names(s))) pass("compute_tte_stats returns hr/lcl/ucl/pval") else
   fail(sprintf("unexpected return shape: %s", paste(names(s), collapse = ", ")))
 
-if (near(s$hr, 0.3581843138, 1e-3)) pass(sprintf("effect HR matches snapshot 0.3582 (got %.6f)", s$hr)) else
-  fail(sprintf("effect HR drifted from snapshot 0.3582 (got %.6f)", s$hr))
-if (near(s$lcl, 0.2648602741, 1e-3) && near(s$ucl, 0.4843912627, 1e-3))
-  pass(sprintf("effect 95%% CI matches snapshot [0.265, 0.484] (got [%.3f, %.3f])", s$lcl, s$ucl)) else
+if (near(s$hr, 0.3996370716, 1e-3)) pass(sprintf("effect HR matches snapshot 0.3996 (got %.6f)", s$hr)) else
+  fail(sprintf("effect HR drifted from snapshot 0.3996 (got %.6f)", s$hr))
+if (near(s$lcl, 0.2974502580, 1e-3) && near(s$ucl, 0.5369291065, 1e-3))
+  pass(sprintf("effect 95%% CI matches snapshot [0.297, 0.537] (got [%.3f, %.3f])", s$lcl, s$ucl)) else
   fail(sprintf("effect CI drifted (got [%.6f, %.6f])", s$lcl, s$ucl))
 if (s$ucl < 1) pass("effect CI excludes HR=1 (separation detected)") else
   fail("effect CI does not exclude 1 — model lost sensitivity")
@@ -67,6 +69,21 @@ if (near(n$hr, 1.0, 1e-6)) pass(sprintf("null (identical arms) HR == 1 (got %.6f
   fail(sprintf("null HR != 1 (got %.6f) — false separation", n$hr))
 if (near(n$pval, 1.0, 1e-6)) pass(sprintf("null log-rank p == 1 (got %.6f)", n$pval)) else
   fail(sprintf("null p != 1 (got %.6f)", n$pval))
+
+# ---- Case 3: ECOG pooling contract — function must equal the locked 4-strata
+# definition (ECOGBL 0-1 pooled vs 2 crossed with MEASDISF), not 3 raw ECOG
+# levels (audit MAJOR: previously 6 strata vs the SAP-specified 4).
+set.seed(202)
+pool_fix <- rbind(mk_arm("MP", 0.80, 120), mk_arm("CbzP", 0.60, 120))
+s_pool <- compute_tte_stats(pool_fix)
+ref <- pool_fix
+ref$TRT01P <- factor(ref$TRT01P, levels = c("MP", "CbzP"))  # same coding as compute_tte_stats
+ref$ECOGBLGRP <- ifelse(ref$ECOGBL <= 1, "0-1", "2")
+fit_ref <- survival::coxph(survival::Surv(AVAL, 1 - CNSR) ~ TRT01P +
+                             survival::strata(ECOGBLGRP, MEASDISF), data = ref)
+hr_ref <- summary(fit_ref)$conf.int[1]
+if (near(s_pool$hr, hr_ref, 1e-9)) pass(sprintf("ECOG pooling matches locked 4-strata HR (%.6f)", s_pool$hr)) else
+  fail(sprintf("ECOG pooling drifted from locked 4-strata HR (got %.6f vs ref %.6f)", s_pool$hr, hr_ref))
 
 cat("===========================================================\n")
 if (ok) {

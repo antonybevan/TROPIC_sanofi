@@ -22,7 +22,7 @@
 | **W-AE-03** | P2 | WS-1 / WS-5 | CORE AESER residual | No overwrite | Residual matrix |
 | **W-CRF-01** | P2 | WS-6 / WS-7 | Full aCRF + real app IDs | Path B | Deferred |
 | **W-PKG-01** | P3 | WS-7 | Re-package guide PDFs into `m5/` | Optional | Optional |
-| **W-PKG-02** | **P0** | WS-7 | Sync git-tracked **m5 programs** from factory (arm map + dens) | Review face shows pre-arm-map ADSL | Meta-audit M-01 |
+| **W-PKG-02** | **P0** | WS-7 | Sync git-tracked **m5 programs** from factory (arm map + dens) | Review face shows pre-arm-map ADSL | Meta-audit M-01 — **DONE** 2026-08-01: m5 program copies byte-identical to factory (ADSL/ADAE/ADEX/ADRS/ADTTE SAS+R, TFL); pending package refresh for output artifacts (W-PKG-01) |
 | **W-CI-01** | Done | WS-7 | Data-free CI green | Done | CI success |
 
 **SDTM E2E audit pack:** `docs/workstreams/reviews/WS1_SDTM_E2E_AUDIT_2026-07-09.md`  
@@ -33,7 +33,7 @@
 | ID | Pri | Work | Status |
 |---|---|---|---|
 | **W-ADAM-00** | P0 | Arm from DM; dens ADSL SAFFL; TEAE=TRTEMFL; no EXTRT arm | **PASS** — `WS4_ADAM_PHASE_ENTRY_2026-07-09.md` |
-| **W-ADAM-01** | P0 | Dual-lang rebuild ADSL/ADAE + recon after arm map change | **OPEN** — when SAS/ODA available |
+| **W-ADAM-01** | P0 | Dual-lang rebuild ADSL/ADAE + recon after arm map change | **DONE** — current ODA run (pipeline_health 2026-07-10T01:20Z) records SAS production, cross-language audit, and admiral core all PASS post-arm-map |
 | **W-ADAM-02** | P1 | Hard gate TEAE blank AESER | Soft QC present |
 | **W-ADAM-03** | P1 | ADTTE/ADRS dens audit same ADSL rule | **DONE** — `WS4_ADAM_DENS_AUDIT_2026-07-09.md` |
 | **W-ADAM-04** | P2 | ADEX dens SAFFL + ADSL arm docs | **DONE** — dens audit pack |
@@ -57,11 +57,9 @@
 
 ## Priority order for next session
 
-1. **W-PKG-02** — sync m5 programs from factory (no ODA required; closes review-face drift)  
-2. **W-ADAM-01** — dual-lang rebuild when SAS/ODA available (seals post arm-map change)  
-3. **W-ADAM-02** — promote TEAE AESER soft QC after rebuild  
-4. **W-PKG-01** — PDF refresh if demoing package face  
-5. Otherwise hold Path A with meta-audit + dens + D-012  
+1. **W-PKG-01** — refresh package outputs (TFLs, guides PDFs, eCTD leaves) after 2026-08-01 remediation regen
+2. **W-ADAM-02** — promote TEAE AESER soft QC to hard gate after rebuild
+3. Otherwise hold Path A with the 2026-08-01 remediation audit trail (T-17 Safety dens, ECOG pooling, T-11-6/7 IDs, seal source-tree binding, CRF tag, guide sync)
 
 **Meta-audit (2026-07-09):** `docs/workstreams/reviews/WS_META_AUDIT_PATH_A_2026-07-09.md`  
 Source decision: `WS1_CRF_GROUNDING_D012_2026-07-09.md` · dens: `WS4_ADAM_DENS_AUDIT_2026-07-09.md`

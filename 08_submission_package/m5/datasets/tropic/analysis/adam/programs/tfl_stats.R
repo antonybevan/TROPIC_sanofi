@@ -10,13 +10,17 @@
 # ECOGBL and MEASDISF. Returns list(hr, lcl, ucl, pval).
 compute_tte_stats <- function(df) {
   df$TRT01P <- factor(df$TRT01P, levels = c("MP", "CbzP"))
-  fit_cox <- survival::coxph(survival::Surv(AVAL, 1 - CNSR) ~ TRT01P + survival::strata(ECOGBL, MEASDISF), data = df)
+  # SAP randomization strata: ECOG 0-1 pooled vs 2 (locked definition), crossed
+  # with measurable-disease status. Raw ECOG levels must NOT enter as 3 separate
+  # strata (audit MAJOR: previously 6 strata instead of the locked 4).
+  df$ECOGBLGRP <- ifelse(df$ECOGBL <= 1, "0-1", "2")
+  fit_cox <- survival::coxph(survival::Surv(AVAL, 1 - CNSR) ~ TRT01P + survival::strata(ECOGBLGRP, MEASDISF), data = df)
   s_cox <- summary(fit_cox)
   hr <- s_cox$conf.int[1]
   hr_lcl <- s_cox$conf.int[3]
   hr_ucl <- s_cox$conf.int[4]
 
-  fit_lr <- survival::survdiff(survival::Surv(AVAL, 1 - CNSR) ~ TRT01P + survival::strata(ECOGBL, MEASDISF), data = df)
+  fit_lr <- survival::survdiff(survival::Surv(AVAL, 1 - CNSR) ~ TRT01P + survival::strata(ECOGBLGRP, MEASDISF), data = df)
   pval <- 1 - pchisq(fit_lr$chisq, 1)
 
   list(hr = hr, lcl = hr_lcl, ucl = hr_ucl, pval = pval)

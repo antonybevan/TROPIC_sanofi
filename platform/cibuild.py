@@ -466,6 +466,10 @@ def _run_saspy_stage10():
 
         # ---- Upload SAS programs (tiny; always ship the latest code) ----
         print("  [ODA] Uploading SAS programs...")
+        for remote_dir in (PGMDIR_ODA, ADAM_ODA, f"{ADAM_ODA}/sdtm_mapped"):
+            if not seed_sdtm._ensure_remote_dir(sas, remote_dir):
+                return 2, "", f"Could not create required ODA directory: {remote_dir}", {
+                    "oda_endpoint": conn.endpoint, "reconciliation": "none"}
         for f in sorted(_glob.glob("04_analysis_datasets/programs/sas/*.sas")):
             sas.upload(f, f"{PGMDIR_ODA}/{os.path.basename(f)}")
 
@@ -740,6 +744,21 @@ def run_single_stage(stage, from_stage, sas_mode, results):
             elif overall not in ("PASS", None):
                 rc = 1
                 stderr = f"Results reconciliation did not pass (overall='{overall}')."
+        except (FileNotFoundError, json.JSONDecodeError):
+            stage_status_override = "SKIPPED"
+
+    # Figure-data reconciliation requires the SAS figure exports. Keep a data-free or
+    # incomplete figure-render run visible as SKIPPED rather than recording a false PASS;
+    # the release manifest independently requires an actual PASS for release promotion.
+    if stage["name"] == "Figure-Data Reconciliation (SAS vs R)" and rc == 0:
+        try:
+            with open("platform/figure_data_reconciliation_status.json") as sf:
+                overall = json.load(sf).get("overall")
+            if overall == "not_available":
+                stage_status_override = "SKIPPED"
+            elif overall != "PASS":
+                rc = 1
+                stderr = f"Figure-data reconciliation did not pass (overall='{overall}')."
         except (FileNotFoundError, json.JSONDecodeError):
             stage_status_override = "SKIPPED"
 

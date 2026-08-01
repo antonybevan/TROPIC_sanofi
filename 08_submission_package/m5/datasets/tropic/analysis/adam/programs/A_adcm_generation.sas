@@ -1,14 +1,16 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: A_adcm_generation.sas
-   Version: 2.2.0
+   Version: 2.2.1
    Author: Antony Bevan, Clinical Programming
-   Date: 2026-05-27
+   Date: 2026-05-27 (ADaM dens note 2026-07-09)
    Standard: ADaMIG v1.3 OCCDS v1.0
    Input: sdtm.cm, adam.adsl
    Output: adam.adcm
    Description: Generates Concomitant Medications ADaM (ADCM) and derives
                 critical safety flags for G-CSF, Prednisone compliance, and NACT.
+
+   ADaM dens: OCCDS rows for ADSL SAFFL='Y' subjects with CM; arm from ADSL.
    ============================================================================= */
 
 /* PGMDIR guard: define only when running standalone; master driver pre-defines this. */

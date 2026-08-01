@@ -1,13 +1,19 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: A_adtte_generation.sas
-   Version: 2.4.0
+   Version: 2.5.0
    Author: Antony Bevan, Clinical Programming
-   Date: 2026-06-13
+   Date: 2026-06-13 (ADaM dens contract 2026-07-09)
    Standard: ADaMIG v1.3 / CDISC BDS TTE v1.0
    Input: adam.adsl, adam.adrs, adam.adcm, adam.adae, adam.adlb, staging.pn
    Output: adam.adtte
    Description: Time-to-Event ADaM (ADTTE) with standard censoring (CNSR=0/1).
+
+   ADaM dens contract (from ADSL — never EXTRT arm; never AE-distinct dens):
+           OS, PFS, TTPSA, TTPAIN -> one row per ADSL ITTFL='Y' (Path A: 371)
+           TTSAE                  -> one row per ADSL SAFFL='Y' (Path A: 371)
+           TTUMOR                 -> one row per ADSL ITTFL='Y' & MEASDISF='Y'
+           TRT01P/TRT01PN always from ADSL (DM-derived)
 
    Remediation v2.4.0 (roadmap #2/#3/#4/#7):
      #4  Analysis population per parameter is explicit and recorded on-record

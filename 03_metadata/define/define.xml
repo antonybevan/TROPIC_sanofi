@@ -418,14 +418,14 @@
     <ItemDef OID="IT.ADSL.ALBBL" Name="ALBBL" DataType="float" Length="8">
       <Description><TranslatedText xml:lang="en">Baseline Albumin (g/L)</TranslatedText></Description><def:Origin Type="Assigned" Source="Sponsor">
         <Description>
-          <TranslatedText xml:lang="en">Not collected in the public MP SDTM release; single population-reference constant for all subjects (placeholder; see ADRG 5.1). ALBBLIF='Y' for all records.</TranslatedText>
+          <TranslatedText xml:lang="en">Not collected in the public MP SDTM release; left missing with blank imputation flag (see ADRG 5.1).</TranslatedText>
         </Description>
       </def:Origin>
     </ItemDef>
     <ItemDef OID="IT.ADSL.LDHBL" Name="LDHBL" DataType="float" Length="8">
       <Description><TranslatedText xml:lang="en">Baseline Lactate Dehydrogenase (U/L)</TranslatedText></Description><def:Origin Type="Assigned" Source="Sponsor">
         <Description>
-          <TranslatedText xml:lang="en">Not collected in the public MP SDTM release; single population-reference constant for all subjects (placeholder; see ADRG 5.1). LDHBLIF='Y' for all records.</TranslatedText>
+          <TranslatedText xml:lang="en">Not collected in the public MP SDTM release; left missing with blank imputation flag (see ADRG 5.1).</TranslatedText>
         </Description>
       </def:Origin>
     </ItemDef>
@@ -475,7 +475,7 @@
       <Description><TranslatedText xml:lang="en">Baseline Albumin Imputed Flag</TranslatedText></Description><CodeListRef CodeListOID="CL.NY"/>
       <def:Origin Type="Derived" Source="Sponsor">
         <Description>
-          <TranslatedText xml:lang="en">Constant 'Y' — ALBBL is a non-collected placeholder constant for all subjects.</TranslatedText>
+          <TranslatedText xml:lang="en">Blank — ALBBL is not collected and is left missing (no imputation).</TranslatedText>
         </Description>
       </def:Origin>
     </ItemDef>
@@ -483,7 +483,7 @@
       <Description><TranslatedText xml:lang="en">Baseline LDH Imputed Flag</TranslatedText></Description><CodeListRef CodeListOID="CL.NY"/>
       <def:Origin Type="Derived" Source="Sponsor">
         <Description>
-          <TranslatedText xml:lang="en">Constant 'Y' — LDHBL is a non-collected placeholder constant for all subjects.</TranslatedText>
+          <TranslatedText xml:lang="en">Blank — LDHBL is not collected and is left missing (no imputation).</TranslatedText>
         </Description>
       </def:Origin>
     </ItemDef>

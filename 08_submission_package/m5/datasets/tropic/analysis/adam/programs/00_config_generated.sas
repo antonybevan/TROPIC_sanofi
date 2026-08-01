@@ -1,5 +1,5 @@
 /* ==============================================================================
-   Generated automatically from study_config.yaml. Do not edit directly.
+   Generated automatically from config/study_config.yaml. Do not edit directly.
    Content-stable output: rewritten only when parsed config changes.
    ============================================================================== */
 
@@ -121,4 +121,4 @@
 %let W_C3D1_HI = 45;
 
 %global STAGING_PATH;
-%let STAGING_PATH = %nrstr(01_raw_source/real_sdtm/staging);
+%let STAGING_PATH = %nrstr(01_source_data/real_sdtm/staging);

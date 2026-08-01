@@ -1,7 +1,10 @@
-# Program: v_adsl_validation.R | Version: 3.5.0
-# Author: Antony Bevan, Clinical Programming | Date: 2026-06-12
+# Program: v_adsl_validation.R | Version: 3.6.0
+# Author: Antony Bevan, Clinical Programming | Date: 2026-06-12 (ADaM phase 2026-07-09)
 # Standard: ADaMIG v1.3 | renv.lock hash: locked
 # Description: R Independent Validation double-programming for TROPIC ADSL.
+#
+# ADaM entry criteria: TRT01P/TRT01A from DM.ARM/ARMCD only (F-028 — never EXTRT).
+# EX used only for TRTSDT/TRTEDT/TRTDURD. ADSL n must equal DM n.
 
 library(dplyr)
 library(haven)
@@ -25,7 +28,7 @@ ls <- readRDS("01_source_data/real_sdtm/staging/ls.rds")
 pn <- readRDS("01_source_data/real_sdtm/staging/pn.rds")
 cm <- readRDS("01_source_data/real_sdtm/staging/cm.rds")
 
-# Derive treatment start and end dates
+# Exposure dates only — arm is NEVER taken from EXTRT (F-028).
 df_ex <- ex |>
   filter(!is.na(EXSTDTC)) |>
   mutate(
@@ -155,10 +158,19 @@ adsl <- dm |>
     AGEGR1N = if_else(AGE < .env$AGE_STRAT_CUT, 1.0, 2.0),
     ETHNIC = "NOT REPORTED",
     SEX = "M",
-    TRT01P = .env$TRT01P_CODE,
-    TRT01PN = .env$TRT01PN_CODE,
-    TRT01A = .env$TRT01P_CODE,
-    TRT01AN = .env$TRT01PN_CODE,
+    # Planned/actual analysis arm from DM only (F-028 / ADaM entry criteria)
+    TRT01P = dplyr::case_when(
+      grepl("MITOX", ARM, ignore.case = TRUE) | ARMCD == "A" ~ "MP",
+      grepl("CABAZ|XRP", ARM, ignore.case = TRUE) ~ "CbzP",
+      TRUE ~ .env$TRT01P_CODE
+    ),
+    TRT01PN = dplyr::case_when(
+      grepl("MITOX", ARM, ignore.case = TRUE) | ARMCD == "A" ~ 2L,
+      grepl("CABAZ|XRP", ARM, ignore.case = TRUE) ~ 1L,
+      TRUE ~ as.integer(.env$TRT01PN_CODE)
+    ),
+    TRT01A = TRT01P,
+    TRT01AN = TRT01PN,
     RANDDT = ymd(substring(RFSTDTC, 1, 10), quiet = TRUE),
     ITTFL = coalesce(ITT, "N"),
     SAFFL = coalesce(SAFETY, "N"),
@@ -218,3 +230,10 @@ for (.dv in names(adsl)) {
 write_xpt_v(adsl, "04_analysis_datasets/adam/adsl_v.xpt", domain = "ADSL")
 
 cat("NOTE: [VALIDATION] Wrote validation ADSL: 04_analysis_datasets/adam/adsl_v.xpt\n")
+cat(sprintf("NOTE: [ADSL-QC] ADSL n=%d DM n=%d\n", nrow(adsl), nrow(dm)))
+if (nrow(adsl) != nrow(dm)) {
+  warning("ADSL-QC: ADSL row count differs from DM")
+}
+trt_tab <- table(adsl$TRT01P, useNA = "ifany")
+cat("NOTE: [ADSL-QC] TRT01P distribution: ",
+    paste(names(trt_tab), trt_tab, sep = "=", collapse = ", "), "\n")

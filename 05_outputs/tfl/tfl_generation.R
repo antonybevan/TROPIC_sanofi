@@ -551,23 +551,29 @@ ggsave("05_outputs/tfl/output/figures/F-12-1_Subgroup_Forest.png", final_forest,
 # ==============================================================================
 cat("  [TFL] Compiling clinical table summaries...\n")
 
-# Dynamic calculations for T-17-1
-rdi_mp_85 <- sum(adex$TRT01P == "MP" & adex$PARAMCD == "RDIDL" &
-    adex$AVALC == ">=85%") # nolint
-rdi_mp_65 <- sum(adex$TRT01P == "MP" & adex$PARAMCD == "RDIDL" &
-    adex$AVALC == "65-<85%") # nolint
-rdi_mp_low <- sum(adex$TRT01P == "MP" & adex$PARAMCD == "RDIDL" &
-    adex$AVALC == "<65%") # nolint
+# Dynamic calculations for T-17-1 (SAP population: CbzP/MP Safety = ADSL SAFFL='Y' only).
+# RDI rows exist for non-safety CbzP subjects (7 with no TRTSDT); they must NOT enter
+# a Safety-population exposure table (audit BLOCKER: previously N=378, now N=371).
+adex_safety <- adex |>
+  left_join(adsl |> select(USUBJID, SAFFL), by = "USUBJID") |>
+  filter(SAFFL == "Y")
 
-rdi_cbzp_85 <- sum(adex$TRT01P == "CbzP" & adex$PARAMCD == "RDIDL" &
-    adex$AVALC == ">=85%") # nolint
-rdi_cbzp_65 <- sum(adex$TRT01P == "CbzP" & adex$PARAMCD == "RDIDL" &
-    adex$AVALC == "65-<85%") # nolint
-rdi_cbzp_low <- sum(adex$TRT01P == "CbzP" & adex$PARAMCD == "RDIDL" &
-    adex$AVALC == "<65%") # nolint
+rdi_mp_85 <- sum(adex_safety$TRT01P == "MP" & adex_safety$PARAMCD == "RDIDL" &
+    adex_safety$AVALC == ">=85%") # nolint
+rdi_mp_65 <- sum(adex_safety$TRT01P == "MP" & adex_safety$PARAMCD == "RDIDL" &
+    adex_safety$AVALC == "65-<85%") # nolint
+rdi_mp_low <- sum(adex_safety$TRT01P == "MP" & adex_safety$PARAMCD == "RDIDL" &
+    adex_safety$AVALC == "<65%") # nolint
 
-n_mp_rdi <- sum(adex$TRT01P == "MP" & adex$PARAMCD == "RDIDL")
-n_cbzp_rdi <- sum(adex$TRT01P == "CbzP" & adex$PARAMCD == "RDIDL")
+rdi_cbzp_85 <- sum(adex_safety$TRT01P == "CbzP" & adex_safety$PARAMCD == "RDIDL" &
+    adex_safety$AVALC == ">=85%") # nolint
+rdi_cbzp_65 <- sum(adex_safety$TRT01P == "CbzP" & adex_safety$PARAMCD == "RDIDL" &
+    adex_safety$AVALC == "65-<85%") # nolint
+rdi_cbzp_low <- sum(adex_safety$TRT01P == "CbzP" & adex_safety$PARAMCD == "RDIDL" &
+    adex_safety$AVALC == "<65%") # nolint
+
+n_mp_rdi <- sum(adex_safety$TRT01P == "MP" & adex_safety$PARAMCD == "RDIDL")
+n_cbzp_rdi <- sum(adex_safety$TRT01P == "CbzP" & adex_safety$PARAMCD == "RDIDL")
 
 # Dynamic calculations for T-17-2
 optimus_gcsf <- adlb |>
@@ -586,8 +592,8 @@ gcsf_n_g12 <- sum(optimus_gcsf$GCSF_PROP == "N" & optimus_gcsf$ATOXGR <= 2)
 gcsf_n_g3 <- sum(optimus_gcsf$GCSF_PROP == "N" & optimus_gcsf$ATOXGR == 3)
 gcsf_n_g4 <- sum(optimus_gcsf$GCSF_PROP == "N" & optimus_gcsf$ATOXGR == 4)
 
-# Dynamic calculations for T-17-4
-cbzp_rdi <- adex |>
+# Dynamic calculations for T-17-4 (Safety population, same as T-17-1)
+cbzp_rdi <- adex_safety |>
   filter(TRT01P == "CbzP" & PARAMCD == "RDIDL" & AVISIT == "ALL CYCLES") |>
   select(USUBJID, RDIDL = AVALC)
 
@@ -659,6 +665,7 @@ writeLines(paste0(synth_banner, table_content),
 
 # ==============================================================================
 # TABLES T-11-6 / T-11-7: Dynamic Efficacy Summaries for Secondary Endpoints
+# (T-11-6 = TTUMOR, T-11-7 = TTPSA per SAP v4.0 Appendix D)
 # ==============================================================================
 cat("  [TFL] Calculating dynamic KM and Cox PH statistics for TTPSA and TTUMOR...\n") # nolint
 
@@ -745,24 +752,24 @@ efficacy_tables <- sprintf(
 TROPIC (Study EFC6193 / XRP6258) Secondary Efficacy Tables
 ==========================================================
 
-T-11-6: Kaplan-Meier Analysis of Time to PSA Progression (TTPSA) - ITT Population
----------------------------------------------------------------------------------
-Statistic                                 CbzP (N=%d)        MP (N=%d)
-Number of Events / Total N                %d/%d               %d/%d
-Median Survival Time (Months)             %.1f                %.1f
-95%% Confidence Interval                   %s      %s
-Unstratified Hazard Ratio (CbzP vs MP)     %.2f (95%% CI: %.2f-%.2f)
-Wald Log-Rank p-value                     %.4f
-
-
-T-11-7: Kaplan-Meier Analysis of Time to Tumor Progression (TTUMOR) - Measurable Subpopulation
+T-11-6: Kaplan-Meier Analysis of Time to Tumor Progression (TTUMOR) - Measurable Subpopulation
 ------------------------------------------------------------------------------------------------
 Statistic                                 CbzP (N=%d)        MP (N=%d)
 Number of Events / Total N                %d/%d               %d/%d
 Median Survival Time (Months)             %.1f                %.1f
 95%% Confidence Interval                   %s      %s
 Unstratified Hazard Ratio (CbzP vs MP)     %.2f (95%% CI: %.2f-%.2f)
-Wald Log-Rank p-value                     %.4f
+Wald p-value                             %.4f
+
+
+T-11-7: Kaplan-Meier Analysis of Time to PSA Progression (TTPSA) - ITT Population
+---------------------------------------------------------------------------------
+Statistic                                 CbzP (N=%d)        MP (N=%d)
+Number of Events / Total N                %d/%d               %d/%d
+Median Survival Time (Months)             %.1f                %.1f
+95%% Confidence Interval                   %s      %s
+Unstratified Hazard Ratio (CbzP vs MP)     %.2f (95%% CI: %.2f-%.2f)
+Wald p-value                             %.4f
 
 
 T-11-8: Analysis of Best Clinical Response Endpoints
@@ -779,15 +786,15 @@ Objective Response Rate (ORR) - Measurable ITT Population†
 †Restricted to patients with measurable disease at baseline (CbzP N=%d, MP N=%d).
 ",
   n_cbzp_itt, n_mp_itt,
-  as.integer(events_psa_cbzp), as.integer(total_psa_cbzp),
-  as.integer(events_psa_mp), as.integer(total_psa_mp),
-  med_psa_cbzp, med_psa_mp, ci_psa_cbzp, ci_psa_mp,
-  hr_psa, hr_psa_lcl, hr_psa_ucl, p_psa,
-  total_tumor_cbzp, total_tumor_mp,
   as.integer(events_tumor_cbzp), as.integer(total_tumor_cbzp),
   as.integer(events_tumor_mp), as.integer(total_tumor_mp),
   med_tumor_cbzp, med_tumor_mp, ci_tumor_cbzp, ci_tumor_mp,
   hr_tumor, hr_tumor_lcl, hr_tumor_ucl, p_tumor,
+  n_cbzp_itt, n_mp_itt,
+  as.integer(events_psa_cbzp), as.integer(total_psa_cbzp),
+  as.integer(events_psa_mp), as.integer(total_psa_mp),
+  med_psa_cbzp, med_psa_mp, ci_psa_cbzp, ci_psa_mp,
+  hr_psa, hr_psa_lcl, hr_psa_ucl, p_psa,
   as.integer(psa_cbzp_resp), as.integer(psa_cbzp_total), psa_cbzp_pct,
   as.integer(psa_mp_resp), as.integer(psa_mp_total), psa_mp_pct,
   psa_pval,

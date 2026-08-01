@@ -106,12 +106,12 @@ controlled_in_scope:
     basis: "SAP v4.0 §10 / Appendix D (methodological demonstration)"
   - id: T-11-6
     class: table
-    title: KM Analysis of Time to PSA Progression
+    title: KM Analysis of Time to Tumor Progression
     disposition: sap_full_catalog
     basis: "SAP v4.0 §§4.3–5.3 / Appendix D"
   - id: T-11-7
     class: table
-    title: KM Analysis of Time to Tumor Progression
+    title: KM Analysis of Time to PSA Progression
     disposition: sap_full_catalog
     basis: "SAP v4.0 §§4.3–5.3 / Appendix D"
   - id: T-11-8
