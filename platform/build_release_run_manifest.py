@@ -106,7 +106,7 @@ def _run_git(args: list[str]) -> str:
             cwd=ROOT,
             text=True,
             stderr=subprocess.DEVNULL,
-        ).strip()
+        ).rstrip()
     except (subprocess.CalledProcessError, FileNotFoundError):
         return ""
 
