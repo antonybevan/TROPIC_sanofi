@@ -78,7 +78,30 @@ for (ds in domains) {
   type_w <- capture_warnings(xportr_type(df, mc, domain = ds))
   len_w <- capture_warnings(xportr_length(df, mc, domain = ds))
 
-  n_issues <- length(missing) + length(extra) + length(ct_w) + length(type_w) + length(len_w)
+  # Semantic checks supplement the structural metacore checks.  These are
+  # deliberately limited to Path-A contracts that are otherwise invisible to
+  # variable/length conformance: DM is the arm authority (F-028), ETHNIC is an
+  # assigned NOT REPORTED placeholder because the public DM has no ETHNIC field,
+  # and ALBBL/LDHBL are genuinely unavailable and therefore remain missing.
+  semantic_w <- character()
+  if (identical(toupper(ds), "ADSL")) {
+    if (!all(as.character(df$TRT01A) == as.character(df$TRT01P), na.rm = TRUE)) {
+      semantic_w <- c(semantic_w, "TRT01A is not equal to the DM-authoritative TRT01P arm")
+    }
+    if (!all(as.character(df$ETHNIC) == "NOT REPORTED", na.rm = TRUE)) {
+      semantic_w <- c(semantic_w, "ETHNIC is not the documented NOT REPORTED assignment")
+    }
+    if (any(!is.na(df$ALBBL)) || any(!is.na(df$LDHBL))) {
+      semantic_w <- c(semantic_w, "ALBBL/LDHBL contain values although the source release has no fields")
+    }
+    if (any(!is.na(df$ALBBLIF) & nzchar(trimws(as.character(df$ALBBLIF)))) ||
+        any(!is.na(df$LDHBLIF) & nzchar(trimws(as.character(df$LDHBLIF))))) {
+      semantic_w <- c(semantic_w, "ALBBLIF/LDHBLIF are non-blank despite unavailable baseline labs")
+    }
+  }
+
+  n_issues <- length(missing) + length(extra) + length(ct_w) + length(type_w) +
+    length(len_w) + length(semantic_w)
   status <- if (n_issues == 0) "PASS" else "FAIL"
   records[[ds]] <- list(
     dataset = ds, n_data_vars = ncol(df), n_spec_vars = length(spec_vars),
@@ -86,6 +109,7 @@ for (ds in domains) {
     ct_violations = length(ct_w), ct_detail = utils::head(ct_w, 5),
     type_mismatches = length(type_w), type_detail = utils::head(type_w, 5),
     length_mismatches = length(len_w), length_detail = utils::head(len_w, 5),
+    semantic_violations = length(semantic_w), semantic_detail = utils::head(semantic_w, 5),
     status = status
   )
 }
@@ -115,12 +139,14 @@ for (r in records) {
     next
   }
   cat(sprintf(
-    "  %-6s %s  vars %d/%d  CT:%d type:%d length:%d\n",
+    "  %-6s %s  vars %d/%d  CT:%d type:%d length:%d semantic:%d\n",
     r$dataset, r$status, r$n_data_vars, r$n_spec_vars,
-    r$ct_violations, r$type_mismatches, r$length_mismatches
+    r$ct_violations, r$type_mismatches, r$length_mismatches,
+    if (is.null(r$semantic_violations)) 0 else r$semantic_violations
   ))
   if (length(r$missing_in_data)) cat("         missing in data:", paste(r$missing_in_data, collapse = ", "), "\n")
   if (length(r$extra_in_data)) cat("         extra in data:  ", paste(r$extra_in_data, collapse = ", "), "\n")
+  if (!is.null(r$semantic_detail) && length(r$semantic_detail)) cat("         semantic:       ", paste(r$semantic_detail, collapse = " | "), "\n")
 }
 if (overall != "PASS") quit(status = 1)
 invisible(0)

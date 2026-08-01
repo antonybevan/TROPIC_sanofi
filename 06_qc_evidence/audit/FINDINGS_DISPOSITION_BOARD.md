@@ -1,10 +1,12 @@
 # TROPIC Findings Disposition Board
 
-**Date:** 2026-07-09  
+**Date:** 2026-08-01
 **Product claim:** Controlled **non-submission demonstration** programming pipeline  
 **Authority:** SAP v4.0 locked for remediation (`06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md`); not sponsor-approved for filing  
 
-> Purpose: classify every active Critical/Major finding **before** a full ODA seal run, so the DAG proves a stable release scope rather than rediscovering open science/scope debt.
+> Purpose: classify every active Critical/Major finding before and after a full ODA seal run, so the DAG proves a stable release scope rather than rediscovering open science/scope debt.
+
+> **2026-08-01 remediation update:** The full real-SAS DAG completed 34/34 stages GREEN. F-011 (baseline PSA eligibility), F-030 (ECOG pooling across TTE/forest), F-031 (TFL endpoint identifiers), F-039 (companion freshness), and the related control findings are resolved in the register. F-012 remains an explicit non-submission demonstration limit: combined N=749 is not protocol ITT N=755.
 
 ## Disposition classes
 
@@ -24,7 +26,8 @@
 | **F-026** | Major | `scope_out_with_disclosure` | **ACCEPTED** | ~1134 BASELINE AE rows are skeleton (terms present, AESER/AEREL/AEOUT blank). TEAE blank AESER ≈0–1. Documented ADRG §4B; soft QC in ADAE. Do not invent AESER. |
 | **F-027** | Minor | `scope_out_with_disclosure` | **ACCEPTED** | ALB/LDH not on Sanofi CRF LABH/LABB panels and not in PDS LB — Class C; ADSL placeholders remain Assigned (not “PDS stripped collected labs”). |
 | **F-028** | Major | `scope_out_with_disclosure` | **ACCEPTED** | One subject has EXTRT=XRP6258 (10 cycles) while DM.ARM is MITOXANTRONE for all 371. Arm authority = DM/ADSL; do not re-code EX. SDTM E2E 2026-07-09. |
-| **F-011** | Major | `scope_out_with_disclosure` | **ACCEPTED** | PSA response shell uses ADRS `PSARESP` analysis records; SAP baseline-eligible subset shell not implemented as a separate controlled output. Disclosed in ADRG § PSA response; full shell = backlog. |
+| **F-011** | Major | `resolve_now` | **RESOLVED** | T-11-8 now uses the SAP baseline PSA >=20 eligible set (CbzP 145/361; MP 61/330); the set is shared by the R output, SAS companion, and regression contract. |
+| **F-039** | Major | `resolve_now` | **RESOLVED** | Stage-14 SAS companions are current-run evidence: UTC health timestamps plus bounded same-run mtime ordering produce a PASS index with zero stale/missing companions. |
 | **F-012** | Major | `non_submission_demo_limit` | **ACCEPTED** | N=749 = real MP 371 + synthetic CbzP 378; protocol ITT 755 needs full two-arm IPD. Figures must not be read as original-trial ITT. |
 | **F-014** | Major | `scope_out_with_disclosure` | **ACCEPTED** | ARM has 8 displays/10 analyses for controlled TFL core; full ADSL covariate declarations and every deferred SAP display remain backlog. Controlled catalog limits the claim. |
 | **F-015** | Major | `external_dependency` + `scope_out_with_disclosure` | **ACCEPTED** | Full CORE breadth on every SDTM domain + residual issue disposition is a conformance program beyond current targeted SDTMIG 3.4 run. Known residuals stay in CORE run records/SDRG. |
@@ -61,7 +64,6 @@ After this board:
 
 ## Next after board
 
-1. Apply register updates (this board → `findings_register.csv`).  
-2. Land resolve_now code/doc fixes.  
-3. Rebuild RC checklist — findings gate should clear.  
-4. Only then: full `cibuild.py --real-sas` from stage 1.  
+1. Keep register and board synchronized with every remediation cut.
+2. Preserve the explicit non-submission disclosures (especially F-003/F-005/F-012/F-025).
+3. Rebuild the RC checklist and release-run manifest after the clean commit; a dirty worktree remains the only current seal blocker.

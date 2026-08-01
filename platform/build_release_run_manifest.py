@@ -79,6 +79,21 @@ CONTROL_FILES = [
     "05_outputs/tfl/tfl_stats.R",
 ]
 
+# Keep the source inventory in one place.  The same digest is written into
+# pipeline_health.json at run time and recomputed here during release sealing;
+# this prevents a green health snapshot from being paired with later-edited
+# programs or controls.
+PROGRAM_GLOBS = [
+    "04_analysis_datasets/programs/sas/**/*.sas",
+    "04_analysis_datasets/programs/r/**/*.R",
+    "06_qc_evidence/reconciliation/**/*.R",
+    "platform/*.py",
+    "platform/*.R",
+    "03_metadata/define/*.py",
+    "03_metadata/define/*.R",
+    "05_outputs/tfl/**/*.R",
+]
+
 
 def _rel(path: Path) -> str:
     return path.relative_to(ROOT).as_posix()
@@ -115,6 +130,13 @@ def _source_tree_sha256(controls: list, programs: list) -> str:
         if r.get("sha256")
     )
     return _sha256_bytes(b"\n".join(f"{p}\0{s}".encode("utf-8") for p, s in rows))
+
+
+def _current_source_tree_sha256() -> str:
+    """Recompute the run-binding digest from the current source/control tree."""
+    controls = _hash_existing(CONTROL_FILES)
+    programs = _hash_globs(PROGRAM_GLOBS)
+    return _source_tree_sha256(controls, programs)
 
 
 def _hash_file(path: Path) -> dict:
@@ -194,7 +216,7 @@ def _file_mtime_utc(path: Path):
 
 
 def _sas_companion_freshness(health: dict) -> dict:
-    """SAS companion figures are rendered out-of-DAG; flag when older than the live run."""
+    """SAS companion figures are rendered by the real-SAS stage; flag stale files."""
     pattern = "05_outputs/tfl/output/figures/sas/*"
     health_ts = _parse_iso_ts(health.get("timestamp"))
     files = []
@@ -218,14 +240,14 @@ def _sas_companion_freshness(health: dict) -> dict:
             stale.append(row["path"])
         files.append(row)
     return {
-        "generation_scope": "out_of_dag_capability_demo",
+        "generation_scope": "in_dag_real_sas_companion",
         "file_count": len(files),
         "files": files,
         "stale_paths": stale,
         "all_current_with_pipeline_health": bool(files) and not stale,
         "note": (
-            "SAS companion figures are produced by platform/_oda_render_tfl.py outside "
-            "config/study_manifest.yaml; presence/hash is inventory only, not current-run generation proof."
+            "SAS companion figures are rendered by the real-SAS Stage 14 session and "
+            "their figure-driving CSVs are reconciled before release sealing."
         ),
     }
 
@@ -403,6 +425,19 @@ def _binding_problems(payload: dict) -> list[str]:
     """Hard binding failures (package/data/QC integrity). These always force FAIL."""
     problems = []
     health = _load_json(QC_FILES["pipeline_health"])
+
+    expected_source_tree = payload["source_control"].get("source_tree_sha256", "")
+    recorded_source_tree = health.get("source_tree_sha256", "")
+    if not recorded_source_tree:
+        problems.append(
+            "pipeline_health.json has no source_tree_sha256 run binding; "
+            "health is not attributable to the current control/program tree"
+        )
+    elif recorded_source_tree != expected_source_tree:
+        problems.append(
+            "pipeline_health.json source_tree_sha256 does not match the current "
+            "control/program tree"
+        )
     recon = _load_json(QC_FILES["reconciliation"])
     results = _load_json(QC_FILES["results_reconciliation"])
     forest = _load_json(QC_FILES["forest_reconciliation"])
@@ -488,9 +523,6 @@ def _remediation_reasons(payload: dict) -> list[str]:
             "release-candidate lock requires a clean committed state"
         )
 
-    # SAS companion figures are out-of-DAG capability demos (tfl_output_catalog policy):
-    # inventory/hash only — do not block release-grade PASS. Still recorded on the payload
-    # for reviewer disclosure.
     return reasons
 
 
@@ -560,7 +592,7 @@ def _write_report(payload: dict) -> None:
         "## Status meanings",
         "",
         "- `PASS` — full current DAG + clean worktree + current-run binding; release-candidate grade.",
-        "- `REMEDIATION` — hard QC/package bindings hold, but run is partial, dirty, or carries out-of-DAG stale companions; development/remediation evidence only.",
+        "- `REMEDIATION` — hard QC/package bindings hold, but run is partial, dirty, or carries stale companion artifacts; development/remediation evidence only.",
         "- `FAIL` — package/data/QC binding integrity failed.",
         "",
         "## Problems",
@@ -634,16 +666,7 @@ def build_release_run_manifest(out_dir: Path = OUT_DIR) -> dict:
         "01_source_data/cbzp_reconstructed/*.xpt",
         ".core_run/sdtm34/*.xpt",
     ])
-    programs = _hash_globs([
-        "04_analysis_datasets/programs/sas/**/*.sas",
-        "04_analysis_datasets/programs/r/**/*.R",
-        "06_qc_evidence/reconciliation/**/*.R",
-        "platform/*.py",
-        "platform/*.R",
-        "03_metadata/define/*.py",
-        "03_metadata/define/*.R",
-        "05_outputs/tfl/**/*.R",
-    ])
+    programs = _hash_globs(PROGRAM_GLOBS)
     controls = _hash_existing(CONTROL_FILES)
 
     expected_stages = _expected_stage_names(manifest)

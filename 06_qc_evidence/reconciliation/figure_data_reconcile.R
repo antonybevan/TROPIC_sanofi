@@ -48,6 +48,20 @@ if (length(missing)) {
   quit(save = "no", status = 0)
 }
 
+run_start <- suppressWarnings(as.numeric(Sys.getenv("TROPIC_PIPELINE_RUN_START_EPOCH", "")))
+if (is.finite(run_start)) {
+  stale <- required[vapply(required, function(p) {
+    file.info(p)$mtime < as.POSIXct(run_start, origin = "1970-01-01", tz = "UTC")
+  }, logical(1))]
+  if (length(stale)) {
+    msg <- paste0("SAS figure-data CSV predates current pipeline run: ", paste(stale, collapse = ", "))
+    cat("  [SKIP] ", msg, " — not_available\n", sep = "")
+    write_status("not_available", msg)
+    cat("FIGURE-DATA RECONCILIATION: NOT_AVAILABLE\n")
+    quit(save = "no", status = 0)
+  }
+}
+
 adsl <- bind_rows(read_xpt("04_analysis_datasets/adam/adsl_v.xpt"),
                   readRDS("01_source_data/cbzp_reconstructed/adsl_cbzp.rds"))
 adtte <- bind_rows(read_xpt("04_analysis_datasets/adam/adtte_v.xpt"),
@@ -92,6 +106,8 @@ r_water <- adlb |>
   filter(PARAMCD == "PSA", !is.na(PCHG)) |>
   group_by(USUBJID, TRT01P) |>
   summarise(BEST = min(PCHG), .groups = "drop") |>
+  inner_join(adsl |> select(USUBJID, PSABL), by = "USUBJID") |>
+  filter(!is.na(PSABL), PSABL >= 20) |>
   mutate(RESPCAT = case_when(
     BEST <= -50 ~ "PSA Response (>=50% dec)",
     BEST < 0 ~ "PSA Decrease (<50%)",

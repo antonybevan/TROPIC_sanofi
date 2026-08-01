@@ -136,12 +136,20 @@ cat(sprintf("  Step 2: PFS Significance check -> p = %f (Significant & Tested: %
     as.character(pfs_significant))) # nolint
 
 # Step 3: PSA Response (Tested only if PFS is significant)
+# SAP v4.0 §5.2 / Table 12: baseline PSA >=20 ug/L plus an evaluable
+# PSARESP analysis record.  Reuse this exact analysis set for the response
+# table below so gatekeeping and display denominators cannot diverge.
 psa_resp_data <- adrs |>
   filter(PARAMCD == "PSARESP") |>
+  inner_join(adsl |> select(USUBJID, PSABL), by = "USUBJID") |>
+  filter(!is.na(PSABL), PSABL >= 20) |>
   mutate(
     TRT01P = factor(TRT01P, levels = c("MP", "CbzP")),
     AVALC = factor(AVALC, levels = c("N", "Y"))
   )
+if (anyDuplicated(psa_resp_data$USUBJID) > 0) {
+  stop("ERROR: [TFL] PSARESP must be unique per subject after SAP eligibility filtering.")
+}
 psa_table <- table(psa_resp_data$TRT01P, psa_resp_data$AVALC)
 psa_test <- fisher.test(psa_table)
 psa_pval <- psa_test$p.value
@@ -355,7 +363,7 @@ render_km(
   data = os_data,
   stats = os_stats,
   x_max = 24,
-  title = "F-11-1: Kaplan-Meier Overall Survival (OS) Analysis — ITT Population", # nolint
+  title = "F-11-1: Kaplan-Meier Overall Survival (OS) Analysis - Demonstration Analysis Cohort", # nolint
   subtitle_endpoint = sprintf(
     "Primary Endpoint: Cabazitaxel + Prednisone (CbzP) vs Mitoxantrone + Prednisone (MP)\nHR = %.2f (95%% CI: %.2f-%.2f), Stratified Log-Rank %s", # nolint
     os_stats$hr, os_stats$lcl, os_stats$ucl,
@@ -428,7 +436,16 @@ cat("  [TFL] Rendering Subgroup Forest Plot...\n")
 # Filter OS data and join with ADSL covariates
 os_sub_data <- adtte |>
   filter(PARAMCD == "OS") |>
-  left_join(select(adsl, USUBJID, AGEGR1, ECOGBL, MEASDISF, VISCFL, PAINBL, DOCPROG), by = "USUBJID") # nolint
+  left_join(select(adsl, USUBJID, AGEGR1, ECOGBL, MEASDISF, VISCFL, PAINBL, DOCPROG), by = "USUBJID") |>
+  mutate(
+    # Randomisation stratum is ECOG 0-1 versus ECOG 2; do not split 0 and 1.
+    ECOGBLGRP = case_when(
+      is.na(ECOGBL) ~ NA_character_,
+      ECOGBL <= 1 ~ "0-1",
+      ECOGBL == 2 ~ "2",
+      TRUE ~ as.character(ECOGBL)
+    )
+  ) # nolint
 
 # Use the dual-arm subgroup data directly from ADaM
 
@@ -441,7 +458,7 @@ run_subgroup_cox <- function(factor_name, level_val, display_label) {
   n_total <- nrow(df)
 
   if (n_total < 5) {
-    data.frame(Subgroup = display_label, N = n_total, HR = 1.0, LCL = 1.0, UCL = 1.0) # nolint
+    return(data.frame(Subgroup = display_label, N = n_total, HR = 1.0, LCL = 1.0, UCL = 1.0)) # nolint
   }
 
   fit <- coxph(Surv(AVAL, 1 - CNSR) ~ TREAT, data = df)
@@ -473,8 +490,8 @@ subgroups <- rbind(
   ),
   run_subgroup_cox("AGEGR1", "<65", "Age < 65"),
   run_subgroup_cox("AGEGR1", ">=65", "Age >= 65"),
-  run_subgroup_cox("ECOGBL", 0, "ECOG Performance Status 0"),
-  run_subgroup_cox("ECOGBL", 1, "ECOG Performance Status 1"),
+  run_subgroup_cox("ECOGBLGRP", "0-1", "ECOG Performance Status 0-1"),
+  run_subgroup_cox("ECOGBLGRP", "2", "ECOG Performance Status 2"),
   run_subgroup_cox("MEASDISF", "N", "Measurable Disease: No"),
   run_subgroup_cox("MEASDISF", "Y", "Measurable Disease: Yes"),
   run_subgroup_cox("VISCFL", "N", "Visceral Metastasis: No"),
@@ -717,8 +734,8 @@ total_tumor_cbzp <- sum_fit_tumor["TRT01P=CbzP", "n.max"]
 events_tumor_mp <- sum_fit_tumor["TRT01P=MP", "events"]
 total_tumor_mp <- sum_fit_tumor["TRT01P=MP", "n.max"]
 
-# Best Clinical Response Endpoints Analysis (PSA response and ORR)
-psa_resp_data <- adrs |> filter(PARAMCD == "PSARESP")
+# Best Clinical Response Endpoints Analysis (PSA response and ORR).
+# Reuse the SAP-eligible PSARESP set created for hierarchical gatekeeping above.
 psa_cbzp_resp <- sum(psa_resp_data$AVALC == "Y" & psa_resp_data$TRT01P == "CbzP") # nolint
 psa_cbzp_total <- sum(psa_resp_data$TRT01P == "CbzP")
 psa_cbzp_pct <- psa_cbzp_resp / psa_cbzp_total * 100
@@ -743,8 +760,8 @@ orr_mp_resp <- sum(orr_resp_data$AVALC == "Y" & orr_resp_data$TRT01P == "MP")
 orr_mp_total <- sum(meas_subj$TRT01P == "MP")
 orr_mp_pct <- orr_mp_resp / max(orr_mp_total, 1) * 100
 
-n_cbzp_itt <- sum(adsl$TRT01P == "CbzP")
-n_mp_itt <- sum(adsl$TRT01P == "MP")
+n_cbzp_demo <- sum(adsl$TRT01P == "CbzP")
+n_mp_demo <- sum(adsl$TRT01P == "MP")
 
 # nolint start: line_length_linter.
 efficacy_tables <- sprintf(
@@ -762,7 +779,7 @@ Unstratified Hazard Ratio (CbzP vs MP)     %.2f (95%% CI: %.2f-%.2f)
 Wald p-value                             %.4f
 
 
-T-11-7: Kaplan-Meier Analysis of Time to PSA Progression (TTPSA) - ITT Population
+T-11-7: Kaplan-Meier Analysis of Time to PSA Progression (TTPSA) - Demonstration Analysis Cohort
 ---------------------------------------------------------------------------------
 Statistic                                 CbzP (N=%d)        MP (N=%d)
 Number of Events / Total N                %d/%d               %d/%d
@@ -775,22 +792,23 @@ Wald p-value                             %.4f
 T-11-8: Analysis of Best Clinical Response Endpoints
 ----------------------------------------------------
 Statistic                                 CbzP                MP
-PSA Response Rate (>=50%% decline) - ITT Population
+PSA Response Rate (>=50%% decline) - Baseline PSA >=20 ug/L Response-Evaluable Population
   Responders / N (%%)                      %d/%d (%.1f%%)      %d/%d (%.1f%%)
   Fisher's Exact p-value                  %.4e
 
-Objective Response Rate (ORR) - Measurable ITT Population†
+Objective Response Rate (ORR) - Measurable Demonstration Cohort†
   Responders / N (%%)                      %d/%d (%.1f%%)      %d/%d (%.1f%%)
   Fisher's Exact p-value                  %.4f
 
-†Restricted to patients with measurable disease at baseline (CbzP N=%d, MP N=%d).
+†Restricted to patients with measurable disease at baseline (CbzP N=%d, MP N=%d). The combined
+cohort is a demonstration population (MP real; CbzP synthetic), not the original trial ITT.
 ",
-  n_cbzp_itt, n_mp_itt,
+  as.integer(total_tumor_cbzp), as.integer(total_tumor_mp),
   as.integer(events_tumor_cbzp), as.integer(total_tumor_cbzp),
   as.integer(events_tumor_mp), as.integer(total_tumor_mp),
   med_tumor_cbzp, med_tumor_mp, ci_tumor_cbzp, ci_tumor_mp,
   hr_tumor, hr_tumor_lcl, hr_tumor_ucl, p_tumor,
-  n_cbzp_itt, n_mp_itt,
+  as.integer(total_psa_cbzp), as.integer(total_psa_mp),
   as.integer(events_psa_cbzp), as.integer(total_psa_cbzp),
   as.integer(events_psa_mp), as.integer(total_psa_mp),
   med_psa_cbzp, med_psa_mp, ci_psa_cbzp, ci_psa_mp,
@@ -806,7 +824,7 @@ Objective Response Rate (ORR) - Measurable ITT Population†
 # nolint end
 
 # Objective Response Rate (ORR) with response-evaluable denominator (review-board SR-1). # nolint
-# The T-11-8 block above uses the SAP measurable-disease ITT denominator.
+# The T-11-8 block above uses the SAP baseline measurable-disease denominator.
 # Report the response-evaluable denominator version here for full transparency.
 orr_ev_resp_data <- adrs |> filter(PARAMCD == "OBJRESP")
 orr_ev_cbzp_resp <- sum(orr_ev_resp_data$AVALC == "Y" & orr_ev_resp_data$TRT01P == "CbzP") # nolint
@@ -819,8 +837,8 @@ orr_md_addendum <- sprintf(
     "--------------------------------------------------------------------------------------\n", # nolint
     "Denominator basis        CbzP (evaluable)          MP (evaluable)\n",
     "Responders / N (%%)       %d/%d (%.1f%%)             %d/%d (%.1f%%)\n",
-    "Note: T-11-8 above uses the SAP-specified measurable-disease ITT denominator. The response-\n", # nolint
-    "evaluable denominator version is reported here for full traceability.\n"
+    "Note: T-11-8 above uses the SAP-specified baseline measurable-disease denominator on the\n", # nolint
+    "combined demonstration cohort; T-11-8b uses only subjects with an OBJRESP record.\n"
   ),
   orr_ev_cbzp_resp, orr_ev_cbzp_total, 100 * orr_ev_cbzp_resp / max(orr_ev_cbzp_total, 1), # nolint
   orr_ev_mp_resp, orr_ev_mp_total,
@@ -848,7 +866,7 @@ render_km(
   x_max = 18,
   title = paste0(
       "F-11-2: Kaplan-Meier Progression-Free Survival (PFS) Analysis ", # nolint
-      "— ITT Population"
+      "- Demonstration Analysis Cohort (MP real; CbzP synthetic)"
     ),
   subtitle_endpoint = sprintf(
     paste0(
@@ -872,12 +890,17 @@ render_km(
 # ==============================================================================
 cat("  [TFL] Rendering PSA Waterfall Plot...\n")
 
-# Best PSA % change from baseline per subject
+# Best PSA % change from baseline per subject.  The controlled catalog places
+# this display under SAP v4.0 §5.2, so it uses the same baseline PSA >=20 ug/L
+# eligibility as the PSA response endpoint.
+psa_response_eligible <- adsl |>
+  filter(!is.na(PSABL), PSABL >= 20) |>
+  select(USUBJID, TRT01P)
 psa_lb <- adlb |>
   filter(PARAMCD == "PSA", !is.na(PCHG)) |>
   group_by(USUBJID) |>
   summarise(best_pchg = min(PCHG, na.rm = TRUE), .groups = "drop") |>
-  left_join(select(adsl, USUBJID, TRT01P), by = "USUBJID") |>
+  inner_join(psa_response_eligible, by = "USUBJID") |>
   filter(!is.na(TRT01P))
 
 # Use the dual-arm PSA data directly from ADaM
@@ -920,10 +943,10 @@ waterfall_plot <- ggplot(psa_lb, aes(
   ) +
   facet_wrap(~TRT_LABEL, scales = "free_x", ncol = 2) +
   labs(
-    title = "F-13-1: PSA Best Percentage Change from Baseline — Waterfall Plot",
+    title = "F-13-1: PSA Best Percentage Change from Baseline - Waterfall Plot (Baseline PSA >=20 ug/L)",
     subtitle = paste0(
       "Each bar represents one subject's maximum PSA decrease (or increase), sorted within arm.\n",
-      "Dashed line denotes the 50% decrease response threshold."
+      "Population: baseline PSA >=20 ug/L; dashed line denotes the 50% decrease response threshold."
     ),
     x = "Subjects (ranked by PSA response within arm)",
     y = "Best PSA % Change from Baseline",
@@ -1227,7 +1250,7 @@ cat("  [TFL] Rendering Patient Population Flow Diagram...\n")
 # ADSL has no completion/discontinuation status, so treatment duration must not
 # be used as a surrogate for disposition (for example, TRTDURD >= 60 days).
 n_total <- nrow(adsl)
-n_itt <- nrow(adsl |> filter(ITTFL == "Y"))
+n_demo <- nrow(adsl |> filter(ITTFL == "Y"))
 saf <- adsl |> filter(SAFFL == "Y")
 n_safety <- nrow(saf)
 n_deaths <- nrow(saf |> filter(DTHFL == "Y"))
@@ -1246,7 +1269,7 @@ consort <- ggplot() +
   ) +
   annotate("text",
     x = 0.5, y = 0.93,
-    label = sprintf("Patients enrolled\nN = %d", n_total),
+    label = sprintf("Combined demonstration cohort\nN = %d", n_total),
     size = 3.2, fontface = "bold", color = "#1e3a5f", family = "serif"
   ) +
   # Arrow down
@@ -1262,8 +1285,8 @@ consort <- ggplot() +
   annotate("text",
     x = 0.5, y = 0.735,
     label = sprintf(
-      "ITT Population: N = %d\nSafety Population: N = %d (100%%)",
-      n_itt, n_safety
+      "Demonstration Analysis Cohort: N = %d\nSafety Population: N = %d (100%%)",
+      n_demo, n_safety
     ),
     size = 3.2, fontface = "bold", color = "#065f46", family = "serif"
   ) +

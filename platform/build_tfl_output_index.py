@@ -12,7 +12,7 @@ import json
 import os
 import re
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 try:
     import yaml
@@ -21,6 +21,14 @@ except ImportError:  # pragma: no cover
 
 
 CONTROLLED_CATALOG_PATH = "config/tfl_output_catalog.yaml"
+
+# Endpoint semantics are part of traceability, not just presentation.  The
+# bijection gate catches missing IDs but would not catch a stable T-11-6/T-11-7
+# title swap, so keep the SAP endpoint tokens executable here.
+SEMANTIC_ENDPOINT_TOKENS = {
+    "T-11-6": "tumor",
+    "T-11-7": "psa",
+}
 
 
 CATALOG = {
@@ -44,7 +52,7 @@ CATALOG = {
         "adam_inputs": "ADTTE (OS), ADSL",
         "generator": "05_outputs/tfl/tfl_generation.R compute_tte_stats() / KM plot",
         "arm": "RD.EFFICACY.SURVIVAL",
-        "qc": "ADTTE reconciliation; numerical results reconciliation; R primary output hash; SAS companion is out-of-DAG inventory only",
+        "qc": "ADTTE reconciliation; numerical results reconciliation; R primary output hash; SAS companion rendered in real-SAS Stage 14",
     },
     "F-11-2": {
         "title": "Kaplan-Meier Progression-Free Survival",
@@ -55,7 +63,7 @@ CATALOG = {
         "adam_inputs": "ADTTE (PFS), ADSL",
         "generator": "05_outputs/tfl/tfl_generation.R compute_tte_stats() / KM plot",
         "arm": "RD.EFFICACY.SURVIVAL",
-        "qc": "ADTTE reconciliation; numerical results reconciliation; R primary output hash; SAS companion is out-of-DAG inventory only",
+        "qc": "ADTTE reconciliation; numerical results reconciliation; R primary output hash; SAS companion rendered in real-SAS Stage 14",
     },
     "F-12-1": {
         "title": "Overall Survival Subgroup Forest Plot",
@@ -66,7 +74,7 @@ CATALOG = {
         "adam_inputs": "ADTTE (OS), ADSL covariates",
         "generator": "05_outputs/tfl/tfl_generation.R subgroup Cox model",
         "arm": "RD.EFFICACY.SUBGROUP",
-        "qc": "ADTTE/ADSL reconciliation; forest HR reconciliation; R primary output hash; SAS companion is out-of-DAG inventory only",
+        "qc": "ADTTE/ADSL reconciliation; forest HR reconciliation; R primary output hash; SAS companion rendered in real-SAS Stage 14",
     },
     "F-13-1": {
         "title": "PSA Best Percentage Change from Baseline Waterfall",
@@ -77,7 +85,7 @@ CATALOG = {
         "adam_inputs": "ADLB (PSA), ADSL",
         "generator": "05_outputs/tfl/tfl_generation.R PSA best-change waterfall",
         "arm": "RD.EFFICACY.PSA.RESPONSE",
-        "qc": "ADLB/ADSL reconciliation; R primary output hash; SAS companion is out-of-DAG inventory only",
+        "qc": "ADLB/ADSL reconciliation; R primary output hash; SAS companion rendered in real-SAS Stage 14",
     },
     "F-14-1": {
         "title": "Treatment Exposure Duration Swimmer Plot",
@@ -88,7 +96,7 @@ CATALOG = {
         "adam_inputs": "ADEX, ADSL",
         "generator": "05_outputs/tfl/tfl_generation.R exposure swimmer plot",
         "arm": "RD.SAFETY.EXPOSURE",
-        "qc": "ADEX/ADSL reconciliation; R primary output hash; SAS companion is out-of-DAG inventory only",
+        "qc": "ADEX/ADSL reconciliation; R primary output hash; SAS companion rendered in real-SAS Stage 14",
     },
     "F-17-1": {
         "title": "Project Optimus Exposure-Response Scatter",
@@ -99,10 +107,10 @@ CATALOG = {
         "adam_inputs": "ADEX (RDI), ADLB (ANC nadir)",
         "generator": "05_outputs/tfl/tfl_generation.R LOESS exposure-response scatter",
         "arm": "RD.OPTIMUS.ER",
-        "qc": "ADEX/ADLB reconciliation; R primary output hash; SAS companion is out-of-DAG inventory only",
+        "qc": "ADEX/ADLB reconciliation; R primary output hash; SAS companion rendered in real-SAS Stage 14",
     },
     "T-11-6": {
-        "title": "KM Analysis of Time to PSA Progression",
+        "title": "KM Analysis of Time to Tumor Progression",
         "class": "table",
         "file": "05_outputs/tfl/output/tables/T-11-Efficacy_Tables.txt",
         "sap_ref": "SAP v4.0 sections 4.3-5.3",
@@ -112,7 +120,7 @@ CATALOG = {
         "qc": "ADTTE reconciliation; TFL generation gate; output hash",
     },
     "T-11-7": {
-        "title": "KM Analysis of Time to Tumor Progression",
+        "title": "KM Analysis of Time to PSA Progression",
         "class": "table",
         "file": "05_outputs/tfl/output/tables/T-11-Efficacy_Tables.txt",
         "sap_ref": "SAP v4.0 sections 4.3-5.3",
@@ -330,25 +338,76 @@ def _evaluate_controlled_catalog(controlled, catalog_ids):
     }
 
 
+def _semantic_catalog_problems(controlled, rows, output_root):
+    """Validate endpoint meaning across static catalogs and the physical text output."""
+    problems = []
+    in_scope = {
+        str(row.get("id")): str(row.get("title", "")).lower()
+        for row in (controlled.get("controlled_in_scope") or [])
+        if row.get("id")
+    }
+    sap = controlled.get("sap_full_catalog") or {}
+    full = {
+        str(row.get("id")): str(row.get("title", "")).lower()
+        for row in (sap.get("tables") or [])
+        if row.get("id")
+    }
+    row_by_id = {row["output_id"]: row for row in rows}
+    for output_id, token in SEMANTIC_ENDPOINT_TOKENS.items():
+        expected = token.lower()
+        for source, title in (
+            ("CATALOG", str(CATALOG.get(output_id, {}).get("title", "")).lower()),
+            ("controlled_in_scope", in_scope.get(output_id, "")),
+            ("sap_full_catalog", full.get(output_id, "")),
+        ):
+            if expected not in title:
+                problems.append(f"{source} {output_id} title lacks endpoint token '{token}'")
+
+        row = row_by_id.get(output_id)
+        if row and row.get("primary_present"):
+            path = row["primary_file"]
+            try:
+                text = open(path, "r", encoding="utf-8", errors="replace").read().lower()
+            except OSError:
+                text = ""
+            start = text.find(output_id.lower())
+            block = text[start:start + 500] if start >= 0 else ""
+            if expected not in block:
+                problems.append(f"physical output {output_id} block lacks endpoint token '{token}'")
+    return problems
+
+
 def _companion_freshness(primary_meta, companion_meta, health_ts):
-    """SAS companions are out-of-DAG; inventory/hash only — not current-run generation proof."""
+    """SAS companions are rendered in the real-SAS stage and must be current."""
     if not companion_meta.get("present"):
         return {
-            "generation_scope": "out_of_dag_capability_demo",
+            "generation_scope": "in_dag_real_sas_companion",
             "current_with_primary": False,
             "current_with_pipeline_health": False,
             "freshness": "missing",
         }
     companion_mtime = companion_meta.get("mtime")
     primary_mtime = primary_meta.get("mtime")
-    current_primary = bool(companion_mtime and primary_mtime and companion_mtime >= primary_mtime)
-    current_health = bool(health_ts and companion_mtime and companion_mtime >= health_ts)
+    # The SAS companion is rendered before the R primary in the DAG, so the
+    # companion is normally a few minutes older than the primary. Treat the
+    # pair as same-run when their mtimes are within a bounded window in either
+    # order; the independent pipeline-health timestamp below is the historical
+    # file guard.
+    current_primary = bool(
+        companion_mtime and primary_mtime
+        and abs(companion_mtime - primary_mtime) <= timedelta(hours=1)
+    )
+    # The health JSON is written after the companion download. Allow a bounded
+    # clock/order skew while still rejecting historical files.
+    current_health = bool(
+        health_ts and companion_mtime and companion_mtime >= health_ts - timedelta(hours=1)
+    )
     if current_primary and current_health:
         freshness = "current"
     else:
         freshness = "stale_or_historical"
     return {
-        "generation_scope": "out_of_dag_capability_demo",
+        "generation_scope": "in_dag_real_sas_companion",
         "current_with_primary": current_primary,
         "current_with_pipeline_health": current_health,
         "freshness": freshness,
@@ -492,7 +551,7 @@ def _build_markdown(generated_at, rows, unindexed, extracted_ids, missing_catalo
         ["Table IDs", len(tables)],
         ["Missing primary files", len(missing_files)],
         ["Missing SAS companion figures", len(missing_companions)],
-        ["Stale/historical SAS companions (out-of-DAG, non-gating)", len(stale_companions)],
+        ["Historical SAS companions", len(stale_companions)],
         ["Unindexed physical files", len(unindexed)],
         ["Table IDs in text but not catalog", len(missing_catalog)],
         ["Catalog table IDs not found in text", len(missing_text)],
@@ -547,8 +606,8 @@ def _build_markdown(generated_at, rows, unindexed, extracted_ids, missing_catalo
         "This is output-control evidence, not a claim that every output is submission-ready. "
         f"**Controlled scope authority:** `{CONTROLLED_CATALOG_PATH}` "
         f"(SAP authority: {controlled.get('sap_authority', 'SAP v4.0')}). "
-        "SAS companion figures are **out-of-DAG capability demos** (`_oda_render_tfl.py`); "
-        "presence/hash is inventory only and does **not** gate controlled-scope completeness.",
+        "SAS companion figures are rendered in the real-SAS Stage 14 session and "
+        "their figure-driving datasets are reconciled before release sealing.",
         "",
         "## Summary",
         "",
@@ -574,7 +633,7 @@ def _build_markdown(generated_at, rows, unindexed, extracted_ids, missing_catalo
         "",
         _md_table(["File", "Detected IDs"], extracted_rows),
         "",
-        "## SAS Companion Figures (out-of-DAG inventory)",
+        "## SAS Companion Figures (real-SAS Stage 14)",
         "",
         _md_table(
             ["ID", "SAS companion file", "Presence", "Scope", "Freshness", "mtime UTC", "SHA-256"],
@@ -643,6 +702,7 @@ def build_tfl_output_index(output_root, out_dir, report_path):
     controlled = _load_controlled_catalog()
     controlled_eval = _evaluate_controlled_catalog(controlled, set(CATALOG))
     rows, unindexed, extracted_ids, missing_catalog, missing_text = _build_rows(output_root)
+    semantic_problems = _semantic_catalog_problems(controlled, rows, output_root)
     os.makedirs(out_dir, exist_ok=True)
     os.makedirs(os.path.dirname(report_path) or ".", exist_ok=True)
 
@@ -658,13 +718,16 @@ def build_tfl_output_index(output_root, out_dir, report_path):
     ]
     missing_primary = [r["output_id"] for r in rows if not r["primary_present"]]
     # Gate on controlled-scope completeness + physical index integrity.
-    # Stale out-of-DAG SAS companions are disclosed but non-gating.
+    # In-DAG SAS companions are a controlled completeness gate. Historical
+    # files are retained in the index as a visible failure signal.
     hard_fail = bool(
         controlled_eval["status"] != "pass"
         or unindexed
         or missing_catalog
         or missing_text
         or missing_primary
+        or stale_companions
+        or semantic_problems
     )
     status = {
         "status": "fail" if hard_fail else "pass",
@@ -676,11 +739,12 @@ def build_tfl_output_index(output_root, out_dir, report_path):
             r["output_id"] for r in rows if r["sas_companion_file"] and not r["sas_companion_present"]
         ],
         "stale_sas_companion_figures": stale_companions,
-        "sas_companion_generation_scope": "out_of_dag_capability_demo",
-        "sas_companion_gates_completeness": False,
+        "sas_companion_generation_scope": "in_dag_real_sas_companion",
+        "sas_companion_gates_completeness": True,
         "unindexed_physical_files": unindexed,
         "table_ids_detected_without_catalog": missing_catalog,
         "catalog_table_ids_not_detected_in_text": missing_text,
+        "semantic_problems": semantic_problems,
     }
     status_path = os.path.join(os.path.dirname(out_dir), "tfl_output_index_status.json")
     with open(status_path, "w", encoding="utf-8") as f:

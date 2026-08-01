@@ -1,6 +1,6 @@
 {
   "status": "pass",
-  "generated_at": "2026-08-01 13:47:16 UTC",
+  "generated_at": "2026-08-01 16:38:40 UTC",
   "controlled_catalog": {
     "catalog_file": "config/tfl_output_catalog.yaml",
     "sap_authority": "02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx",
@@ -19,17 +19,11 @@
   "indexed_output_ids": 18,
   "missing_primary_files": [],
   "missing_sas_companion_figures": [],
-  "stale_sas_companion_figures": [
-    "F-11-1",
-    "F-11-2",
-    "F-12-1",
-    "F-13-1",
-    "F-14-1",
-    "F-17-1"
-  ],
-  "sas_companion_generation_scope": "out_of_dag_capability_demo",
-  "sas_companion_gates_completeness": false,
+  "stale_sas_companion_figures": [],
+  "sas_companion_generation_scope": "in_dag_real_sas_companion",
+  "sas_companion_gates_completeness": true,
   "unindexed_physical_files": [],
   "table_ids_detected_without_catalog": [],
-  "catalog_table_ids_not_detected_in_text": []
+  "catalog_table_ids_not_detected_in_text": [],
+  "semantic_problems": []
 }

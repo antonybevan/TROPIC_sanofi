@@ -118,7 +118,7 @@ workstreams:
     open_risks:
       - deferred_sap_tfl_ids
       - synthetic_cbzp_in_tfls
-      - out_of_dag_sas_companion_figures
+      - manual_sas_figure_renderer_diagnostic_only
     required_evidence:
       - controlled_catalog_pass
       - dual_lang_and_admiral_pass

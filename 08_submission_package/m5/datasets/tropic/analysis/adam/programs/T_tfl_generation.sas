@@ -84,10 +84,13 @@ quit;
     data _km_sl;
         set adam.adsl(keep=usubjid ecogbl measdisf)
             cbz_adsl(keep=usubjid ecogbl measdisf);
+        length ecogblgrp $3;
+        if not missing(ecogbl) and ecogbl <= 1 then ecogblgrp='0-1';
+        else if ecogbl = 2 then ecogblgrp='2';
     run;
     proc sql;
         create table _km as
-        select a.*, b.ecogbl, b.measdisf
+        select a.*, b.ecogblgrp, b.measdisf
         from _km_tte a left join _km_sl b on a.usubjid=b.usubjid;
     quit;
 
@@ -96,7 +99,7 @@ quit;
     proc phreg data=_km;
         class trt01p (ref='MP');
         model avalm*cnsr(1) = trt01p / ties=efron;
-        strata ecogbl measdisf;
+        strata ecogblgrp measdisf;
         hazardratio 'CbzP vs MP' trt01p / cl=wald;
         ods output HazardRatios=_hr_ds;
     run;
@@ -185,6 +188,9 @@ run;
 data _adsl_all;
     set adam.adsl(keep=usubjid agegr1 ecogbl measdisf viscfl painbl docprog)
         cbz_adsl(keep=usubjid agegr1 ecogbl measdisf viscfl painbl docprog);
+    length ecogblgrp $3;
+    if not missing(ecogbl) and ecogbl <= 1 then ecogblgrp='0-1';
+    else if ecogbl = 2 then ecogblgrp='2';
 run;
 data _os;
     set adam.adtte(keep=usubjid trt01p paramcd aval cnsr)
@@ -193,7 +199,7 @@ data _os;
 run;
 proc sql;
     create table _ossub as
-    select a.*, b.agegr1, b.ecogbl, b.measdisf, b.viscfl, b.painbl, b.docprog
+    select a.*, b.agegr1, b.ecogblgrp, b.measdisf, b.viscfl, b.painbl, b.docprog
     from _os a left join _adsl_all b on a.usubjid=b.usubjid;
 quit;
 
@@ -227,8 +233,8 @@ run;
 
 %sgcox(agegr1,  <65,  %str(Age < 65),                2)
 %sgcox(agegr1,  >=65, %str(Age >= 65),               3)
-%sgcox(ecogbl,  0,    %str(ECOG 0),                  4, num=1)
-%sgcox(ecogbl,  1,    %str(ECOG 1),                  5, num=1)
+%sgcox(ecogblgrp, %str(0-1), %str(ECOG 0-1),          4)
+%sgcox(ecogblgrp, %str(2),   %str(ECOG 2),            5)
 %sgcox(measdisf, Y,   %str(Measurable Disease: Yes), 6)
 %sgcox(measdisf, N,   %str(Measurable Disease: No),  7)
 %sgcox(viscfl,  Y,    %str(Visceral Mets: Yes),      8)
@@ -275,10 +281,16 @@ data _psa;
         cbz_adlb(keep=usubjid trt01p paramcd pchg);
     if paramcd='PSA' and not missing(pchg);
 run;
+data _psa_elig;
+    set adam.adsl(keep=usubjid psabl)
+        cbz_adsl(keep=usubjid psabl);
+    if not missing(psabl) and psabl >= 20;
+run;
 proc sql;
     create table _psab as
-    select usubjid, trt01p, min(pchg) as best
-    from _psa group by usubjid, trt01p;
+    select a.usubjid, a.trt01p, min(a.pchg) as best
+    from _psa a inner join _psa_elig b on a.usubjid=b.usubjid
+    group by a.usubjid, a.trt01p;
 quit;
 proc sort data=_psab; by trt01p best; run;
 data _psab;
@@ -307,7 +319,7 @@ run;
 
 ods graphics on / reset=index imagename="F-13-1_PSA_Waterfall_SAS";
 title  j=l h=12pt c=cx111111 "F-13-1: PSA Best % Change from Baseline (Waterfall) - SAS Production Track";
-title2 j=l h=9pt  c=cx444444 "Each bar = one subject's best PSA change, sorted within arm; dashed line = 50% decrease threshold";
+title2 j=l h=9pt  c=cx444444 "Baseline PSA >=20 ug/L; each bar = one subject's best PSA change; dashed line = 50% decrease threshold";
 footnote j=l h=7pt c=&LRED. "&SYNTHFN.";
 proc sgpanel data=_psab dattrmap=_psamap;
     format trt01p $trtlbl.;

@@ -8,7 +8,8 @@ import shutil
 import getpass
 import re
 import signal
-from datetime import datetime
+import time
+from datetime import datetime, timezone
 
 # Resolve Rscript: prefer PATH, then the TROPIC_RSCRIPT env override, then common
 # install locations. No hard-coded per-user paths (a clone on another machine must
@@ -235,6 +236,15 @@ _ODA_OUTCOME = {}
 # overridden with TROPIC_ODA_PROJ_ROOT for a non-default ODA layout.
 PROJ_ROOT_ODA = os.environ.get("TROPIC_ODA_PROJ_ROOT", "~/TROPIC")
 
+SAS_TFL_FIGURES = [
+    "F-11-1_KM_OS_SAS", "F-11-2_KM_PFS_SAS", "F-12-1_Subgroup_Forest_SAS",
+    "F-13-1_PSA_Waterfall_SAS", "F-14-1_Swimmer_Plot_SAS", "F-17-1_Optimus_Scatter_SAS",
+]
+SAS_TFL_DATA_FILES = [
+    "forest_hr_prod.csv", "figure_km_stats_prod.csv", "figure_km_risk_prod.csv",
+    "figure_waterfall_prod.csv", "figure_swimmer_prod.csv", "figure_er_prod.csv",
+]
+
 # --- Study structure from the manifest (I/J platform generalisation) ----------
 # config/study_manifest.yaml declares the reconciled datasets and the study identity so
 # they are no longer hardcoded here. A missing/malformed manifest falls back to the
@@ -435,6 +445,8 @@ def _run_saspy_stage10():
     sas_version = _probe_sas_version(sas)  # roadmap item 5; best-effort, never gates the run
     PGMDIR_ODA = f"{proj_root_oda}/04_analysis_datasets/programs/sas"
     ADAM_ODA = f"{proj_root_oda}/04_analysis_datasets/adam"
+    CBZ_ODA = f"{proj_root_oda}/01_source_data/cbzp_reconstructed"
+    SASFIG_ODA = f"{proj_root_oda}/05_outputs/tfl/output/figures/sas"
     # Execution-phase deadline: connect()'s budget only covers the spawn; a wedged server-side
     # workspace would otherwise block submit() forever. On a hit we force-reap (SIGKILL) the
     # local gateway instead of leaking a CPU-burning zombie. Default 30 min for the full suite.
@@ -466,12 +478,21 @@ def _run_saspy_stage10():
 
         # ---- Upload SAS programs (tiny; always ship the latest code) ----
         print("  [ODA] Uploading SAS programs...")
-        for remote_dir in (PGMDIR_ODA, ADAM_ODA, f"{ADAM_ODA}/sdtm_mapped"):
+        for remote_dir in (PGMDIR_ODA, ADAM_ODA, f"{ADAM_ODA}/sdtm_mapped", CBZ_ODA, SASFIG_ODA):
             if not seed_sdtm._ensure_remote_dir(sas, remote_dir):
                 return 2, "", f"Could not create required ODA directory: {remote_dir}", {
                     "oda_endpoint": conn.endpoint, "reconciliation": "none"}
         for f in sorted(_glob.glob("04_analysis_datasets/programs/sas/*.sas")):
             sas.upload(f, f"{PGMDIR_ODA}/{os.path.basename(f)}")
+        # The SAS companion TFL track consumes the same deterministic CbzP XPT
+        # bridge as the standalone renderer.  Upload it in this verified session
+        # so a release run never depends on a prior remote workspace state.
+        for dom in ("adsl", "adtte", "adlb", "adex"):
+            local_cbz = f"01_source_data/cbzp_reconstructed/{dom}_cbzp.xpt"
+            if not os.path.exists(local_cbz):
+                return 2, "", f"Missing synthetic comparator bridge: {local_cbz}", {
+                    "oda_endpoint": conn.endpoint, "reconciliation": "none"}
+            sas.upload(local_cbz, f"{CBZ_ODA}/{dom}_cbzp.xpt")
 
         # ---- Execute master driver ----
         print("  [ODA] Submitting 00_master_driver.sas via SAS IOM...")
@@ -502,10 +523,52 @@ filename drv "{PGMDIR_ODA}/00_master_driver.sas";
         if err:
             return 1, "", "\n".join(err), {"oda_endpoint": conn.endpoint, "reconciliation": "none"}
 
+        # Render the SAS companion figures and their figure-driving datasets in
+        # the same real-SAS session.  This makes the forest/figure reconciliation
+        # stages consume current-run statistics rather than stale out-of-DAG CSVs.
+        print("  [ODA] Rendering SAS companion TFLs...")
+        try:
+            tfl_log = oda_broker.submit_timed(sas, f"""
+options notes source;
+%global PROJ_ROOT PGMDIR;
+%let PROJ_ROOT = {proj_root_oda};
+%let PGMDIR    = {PGMDIR_ODA};
+filename tfl "{PGMDIR_ODA}/T_tfl_generation.sas";
+%include tfl;
+""", timeout_s=exec_timeout).get("LOG", "")
+        except oda_broker.OdaExecTimeout as e:
+            force_teardown = True
+            return 1, "", f"ODA TFL rendering timed out after {e.timeout_s}s", {
+                "oda_endpoint": conn.endpoint, "reconciliation": "none"}
+        try:
+            with open("04_analysis_datasets/programs/sas/oda_tfl.log", "w", encoding="utf-8") as _tf:
+                _tf.write(tfl_log)
+        except OSError:
+            pass
+        tfl_err = [l.strip() for l in tfl_log.splitlines() if l.strip().startswith("ERROR:")]
+        if tfl_err:
+            return 1, "", "\n".join(tfl_err), {
+                "oda_endpoint": conn.endpoint, "reconciliation": "none"}
+        print("  [ODA] SAS companion TFL render completed.")
+
         # ---- Download the 7 *_prod.xpt ----
         print("  [ODA] Downloading *_prod.xpt...")
         for ds in ODA_DATASETS:
             _atomic_download(sas, f"04_analysis_datasets/adam/{ds}_prod.xpt", f"{ADAM_ODA}/{ds}_prod.xpt")
+
+        print("  [ODA] Downloading SAS companion TFLs and figure-driving data...")
+        for fig in SAS_TFL_FIGURES:
+            _atomic_download(
+                sas,
+                f"05_outputs/tfl/output/figures/sas/{fig}.png",
+                f"{SASFIG_ODA}/{fig}.png",
+            )
+        for data_file in SAS_TFL_DATA_FILES:
+            _atomic_download(
+                sas,
+                f"04_analysis_datasets/adam/{data_file}",
+                f"{ADAM_ODA}/{data_file}",
+            )
 
         # ---- M-1: independent SAS analysis RESULTS (PROC LIFETEST), MP arm ----
         # Extends double-programming from the ADaM dataset layer to the analysis-
@@ -876,6 +939,10 @@ def run_parallel_batch(batch, from_stage, sas_mode, results):
 
 def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=False, force_upload_sdtm=False, seed_if_needed=False):
     print(f"=== EXECUTING {STUDY_LABEL} PIPELINE ===")
+    # Child reconciliation stages use this marker to reject out-of-date SAS
+    # companion CSVs instead of accidentally comparing a prior run's figure
+    # statistics with the current R outputs.
+    os.environ["TROPIC_PIPELINE_RUN_START_EPOCH"] = str(time.time())
     # Force a full SDTM re-upload on ODA this run (default: upload only the delta).
     os.environ["TROPIC_ODA_FORCE_SDTM"] = "TRUE" if force_upload_sdtm else "FALSE"
     # Seed SDTM inline within the Stage-10 ODA session (single spawn) if it isn't resident.
@@ -1205,6 +1272,26 @@ def _renv_lock_sha(path="renv.lock"):
         return None
 
 
+def _source_tree_sha256_for_telemetry():
+    """Return the same controls/programs digest used by the release seal.
+
+    The release manifest owns the inventory definition; importing its helper
+    here prevents the runtime health record and the later seal from silently
+    using different source scopes.
+    """
+    try:
+        from build_release_run_manifest import _current_source_tree_sha256
+    except ImportError:
+        # cibuild.py is normally launched as ``python3 platform/cibuild.py``
+        # (so platform/ is already on sys.path), but keep direct module use
+        # deterministic for tests and IDE runners.
+        module_dir = os.path.dirname(os.path.abspath(__file__))
+        if module_dir not in sys.path:
+            sys.path.insert(0, module_dir)
+        from build_release_run_manifest import _current_source_tree_sha256
+    return _current_source_tree_sha256()
+
+
 def _sas_version_from_log(log_path):
     """Best-effort SAS version extraction from the standard startup NOTE banner SAS itself
     writes at the top of every log (e.g. 'NOTE: SAS (r) Proprietary Software Release 9.4
@@ -1236,7 +1323,9 @@ def write_telemetry(results, sas_mode="sim", expected_stage_names=None):
     run_scope = "full_dag" if not not_run else "partial_dag"
 
     health = {
-        "timestamp": datetime.now().isoformat(),
+        # Use an explicit UTC offset so downstream freshness gates do not have
+        # to guess whether a naive timestamp is local time or UTC.
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "runner": f"{getpass.getuser()} (System Agent)",
         "pipeline_health_status": health_status,
         "sas_execution_mode": sas_mode,
@@ -1254,6 +1343,10 @@ def write_telemetry(results, sas_mode="sim", expected_stage_names=None):
     # effective sas_mode (post ODA-fallback) is known.
     health["r_version"] = _r_version()
     health["renv_lock_sha256"] = _renv_lock_sha()
+    try:
+        health["source_tree_sha256"] = _source_tree_sha256_for_telemetry()
+    except Exception as exc:  # telemetry must not mask the underlying stage result
+        health["source_tree_sha256_error"] = str(exc)
 
     # Merge the ODA Stage-10 outcome (brief §6): on a connection-budget exhaustion the mode is
     # honestly downgraded to 'sim'; on success we record endpoint/attempts/manifest/probe.

@@ -149,7 +149,7 @@ Helpers included by SAS (not separate DAG rows): `00_config.sas`, `L_staging_ing
 | `platform/manifest.py` | Loaded by cibuild |
 | `platform/oda_broker.py` · `seed_sdtm.py` | Real ODA SAS only |
 | `platform/generate_config.py` | Regen SAS config from YAML |
-| `platform/_oda_render_tfl.py` | SAS figure render (out-of-DAG capability) |
+| `platform/_oda_render_tfl.py` | Manual SAS figure diagnostic (release DAG uses `cibuild.py` Stage 14) |
 | `scripts/verify_release.py` | Re-check seals |
 | `01_source_data/reconstruct_cbzp_*.R` · `export_cbzp_xpt.R` | Build synthetic arm (manual / pre-req) |
 | `04_analysis_datasets/programs/r/config_study.R` · `load_spec.R` · `activate_renv.R` | Shared R helpers |
@@ -186,7 +186,7 @@ Source of truth for this section:
 | Item | Status | What to do |
 |---|---|---|
 | `figure_data_reconcile.R` | **On DAG** (after forest); `not_available` if SAS figure CSVs absent | Keep; re-run full DAG to refresh seal stage list |
-| SAS `T_tfl_generation.sas` + `_oda_render_tfl.py` | Capability demo, out-of-DAG | Classified in `platform/README.md` |
+| SAS `T_tfl_generation.sas` + `_oda_render_tfl.py` | TFL program is in the real-SAS DAG; `_oda_render_tfl.py` is manual diagnostic-only | Classified in `platform/README.md` |
 | Dataset-JSON / ARS / USDM outputs | Built on DAG; **not** eCTD primary path | CLASSIFIED_ADDITIVE (folder READMEs) |
 | `tools/archive/**` | Dead / one-time / migration | Do not run as prod |
 | Manual CbzP reconstruct scripts | Pre-req, not every DAG tick | Documented; bind hashes on release |

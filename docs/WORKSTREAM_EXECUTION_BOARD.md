@@ -115,7 +115,7 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 |---|---|
 | **Owned artifacts** | SAS production + R validation programs · ADaM XPTs · BIMO clinsite · TFL suite · `config/tfl_output_catalog.yaml` · forest/results drivers · safety ADaM (ADAE/ADLB/ADEX) |
 | **Current status** | **GREEN for demo claim** — dual-lang recon PASS; TFL controlled catalog PASS; admiral T1 in DAG PASS; safety programming present |
-| **Open risks** | 21 deferred SAP TFL IDs; synthetic CbzP in TFLs; F-012 N=749 vs 755; out-of-DAG SAS figure companions |
+| **Open risks** | 21 deferred SAP TFL IDs; synthetic CbzP in TFLs; F-012 N=749 vs 755; manual SAS renderer remains diagnostic-only |
 | **Required evidence pack** | (1) Program inventory by domain · (2) Catalog in-scope vs deferred · (3) Recon status JSON · (4) Admiral status · (5) TFL index + hashes · (6) Safety table list (T-20/T-21) |
 | **Release gate** | G04/G05 — currently satisfied for controlled scope |
 | **Next action** | **Do not expand scope casually.** Programming workstream review: walk ADSL → ADTTE → ADAE → T-20 with catalog and recon evidence only |

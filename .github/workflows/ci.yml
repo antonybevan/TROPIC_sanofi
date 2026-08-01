@@ -111,6 +111,8 @@ jobs:
       run: |
         Rscript tests/test_lab_shift_table.R
         Rscript tests/test_figure_outputs.R
+        Rscript tests/test_tfl_population_contract.R
+        python3 platform/check_gate_g07_reviewer_package.py
 
     - name: Run ADaM conformance check gate
       run: |

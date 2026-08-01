@@ -12,7 +12,7 @@ TROPIC (Study EFC6193 / XRP6258) Secondary Efficacy Tables
 
 T-11-6: Kaplan-Meier Analysis of Time to Tumor Progression (TTUMOR) - Measurable Subpopulation
 ------------------------------------------------------------------------------------------------
-Statistic                                 CbzP (N=378)        MP (N=371)
+Statistic                                 CbzP (N=179)        MP (N=203)
 Number of Events / Total N                166/179               186/203
 Median Survival Time (Months)             3.4                2.1
 95% Confidence Interval                   (95% CI: 2.7-4.6)      (95% CI: 1.7-2.8)
@@ -20,7 +20,7 @@ Unstratified Hazard Ratio (CbzP vs MP)     0.67 (95% CI: 0.54-0.83)
 Wald p-value                             0.0002
 
 
-T-11-7: Kaplan-Meier Analysis of Time to PSA Progression (TTPSA) - ITT Population
+T-11-7: Kaplan-Meier Analysis of Time to PSA Progression (TTPSA) - Demonstration Analysis Cohort
 ---------------------------------------------------------------------------------
 Statistic                                 CbzP (N=378)        MP (N=371)
 Number of Events / Total N                286/378               265/371
@@ -33,20 +33,21 @@ Wald p-value                             0.0514
 T-11-8: Analysis of Best Clinical Response Endpoints
 ----------------------------------------------------
 Statistic                                 CbzP                MP
-PSA Response Rate (>=50% decline) - ITT Population
-  Responders / N (%)                      148/378 (39.2%)      69/371 (18.6%)
-  Fisher's Exact p-value                  4.5688e-10
+PSA Response Rate (>=50% decline) - Baseline PSA >=20 ug/L Response-Evaluable Population
+  Responders / N (%)                      145/361 (40.2%)      61/330 (18.5%)
+  Fisher's Exact p-value                  5.2387e-10
 
-Objective Response Rate (ORR) - Measurable ITT Population†
+Objective Response Rate (ORR) - Measurable Demonstration Cohort†
   Responders / N (%)                      30/179 (16.8%)      13/203 (6.4%)
   Fisher's Exact p-value                  0.0018
 
-†Restricted to patients with measurable disease at baseline (CbzP N=179, MP N=203).
+†Restricted to patients with measurable disease at baseline (CbzP N=179, MP N=203). The combined
+cohort is a demonstration population (MP real; CbzP synthetic), not the original trial ITT.
 
 T-11-8b: Objective Response Rate — Response-Evaluable Denominator (review-board SR-1)
 --------------------------------------------------------------------------------------
 Denominator basis        CbzP (evaluable)          MP (evaluable)
 Responders / N (%)       54/378 (14.3%)             13/351 (3.7%)
-Note: T-11-8 above uses the SAP-specified measurable-disease ITT denominator. The response-
-evaluable denominator version is reported here for full traceability.
+Note: T-11-8 above uses the SAP-specified baseline measurable-disease denominator on the
+combined demonstration cohort; T-11-8b uses only subjects with an OBJRESP record.
 

@@ -2,7 +2,7 @@
   "gate": "G07",
   "name": "reviewer_package_lock",
   "status": "PASS",
-  "generated_at": "2026-07-09T19:50:08Z",
+  "generated_at": "2026-08-01T16:41:18Z",
   "checks": [
     {
       "name": "exists:07_reviewer_explanation/guides/ADRG.md",
@@ -68,6 +68,51 @@
       "name": "traceability.no_active_L01_claim",
       "ok": true,
       "detail": "possible active L-01 claim"
+    },
+    {
+      "name": "reviewer_pdf.pdftotext_available",
+      "ok": true,
+      "detail": "Poppler pdftotext not found"
+    },
+    {
+      "name": "reviewer_pdf.no_symbol_substitution:08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
+      "ok": true,
+      "detail": "rendered threshold substitutions: []"
+    },
+    {
+      "name": "reviewer_pdf.no_raw_markdown:08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "reviewer_pdf.no_symbol_substitution:08_submission_package/m5/datasets/tropic/tabulations/sdtm/sdrg.pdf",
+      "ok": true,
+      "detail": "rendered threshold substitutions: []"
+    },
+    {
+      "name": "reviewer_pdf.no_raw_markdown:08_submission_package/m5/datasets/tropic/tabulations/sdtm/sdrg.pdf",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "reviewer_pdf.no_symbol_substitution:08_submission_package/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
+      "ok": true,
+      "detail": "rendered threshold substitutions: []"
+    },
+    {
+      "name": "reviewer_pdf.no_raw_markdown:08_submission_package/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "reviewer_pdf.no_symbol_substitution:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
+      "ok": true,
+      "detail": "rendered threshold substitutions: []"
+    },
+    {
+      "name": "reviewer_pdf.no_raw_markdown:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
+      "ok": true,
+      "detail": ""
     }
   ],
   "problems": []

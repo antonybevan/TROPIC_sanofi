@@ -55,7 +55,7 @@ The secondary time-to-event endpoints (TTPSA, TTUMOR, TTPAIN) use the synthetic 
 |---|---|---|---|---|---|
 | Time to PSA Progression‡ | 2.7 mo (286/378) | 2.2 mo (265/371) | HR 0.85 (0.72–1.00) | 0.0514 | median 6.4 mo, HR 0.75 |
 | Time to Tumour Progression‡§ | 3.4 mo (166/179) | 2.1 mo (186/203) | HR 0.67 (0.54–0.83) | 0.0002 | median 8.8 mo, HR 0.61 |
-| PSA Response (≥50% decrease) | 39.2% (148/378) | 18.6% (69/371) | Fisher's exact | 4.6e-10 | 39% vs 24% (p = 0.0002) |
+| PSA Response (≥50% decrease; baseline PSA ≥20 ug/L) | 40.2% (145/361) | 18.5% (61/330) | Fisher's exact | 5.2e-10 | 39% vs 24% (p = 0.0002) |
 | Overall Response Rate (ORR, confirmed)§ | 16.8% (30/179) | 6.4% (13/203) | Fisher's exact | 0.0018 | 14.4% vs 4.4% (p = 0.005) |
 
 †Synthetic, illustrative — not real patient data. ‡PH-scaled from the real MP arm; the HR is **circular by construction** (descriptive of synthetic data only, not a treatment-effect estimate). §Restricted to the measurable-disease subpopulation (CbzP N=179, MP N=203). The OS/PFS primary endpoints — which **are** non-circular Guyot reconstructions — are in §2.
@@ -154,4 +154,3 @@ FDA Project Optimus alignment: RDI in Cycle 1 was used as the E-R exposure proxy
 
 de Bono JS, Oudard S, Ozguroglu M, et al. **Prednisone plus cabazitaxel or mitoxantrone for metastatic castration-resistant prostate cancer progressing after docetaxel treatment: a randomised open-label trial.** *Lancet.* 2010;376(9747):1147–1154.
 * Local Copy: [de_bono_lancet_2010.pdf](file:///Users/apple/Desktop/TROPIC/01_source_data/reference_literature/de_bono_lancet_2010.pdf)
-
