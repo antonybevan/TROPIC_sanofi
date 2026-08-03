@@ -3,7 +3,7 @@
 
 record:
   id: EDR-F042-T11-8-2026-08-03
-  version: 0.3.1
+  version: 0.3.2
   status: author_decision_ready_pending_signoff
   executable: false
   consumption: documentation_only
@@ -29,6 +29,7 @@ record:
     approval_specification: docs/workstreams/decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md
     approver_review_packet: docs/workstreams/decisions/F042_APPROVER_REVIEW_PACKET_2026-08-03.md
     provisional_implementation_note: docs/workstreams/decisions/F042_PROVISIONAL_IMPLEMENTATION_NOTE_2026-08-03.md
+    adjudication_worksheet_spec: docs/workstreams/decisions/F042_ADJUDICATION_WORKSHEET_SPEC_2026-08-03.md
 
 pre_implementation:
   status: decision_evidence_complete_endpoint_use_blocked

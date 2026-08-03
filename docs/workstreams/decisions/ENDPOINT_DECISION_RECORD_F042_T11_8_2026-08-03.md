@@ -1,7 +1,7 @@
 # Endpoint Decision Record — F-042 / T-11-8
 
 **Record ID:** `EDR-F042-T11-8-2026-08-03`<br>
-**Version:** `0.3.1`<br>
+**Version:** `0.3.2`<br>
 **Status:** **AUTHOR-DECISION READY — PENDING ACCOUNTABLE-AUTHOR SIGN-OFF**<br>
 **Product path:** Path A — controlled non-submission demonstration<br>
 **Baseline commit:** `a213667` (`codex/submission-pipeline-rc`)<br>
@@ -18,6 +18,10 @@ records a bounded author-directed exploratory program. That artifact may inspect
 the proposed rules and quantify provisional impact, but it cannot consume the
 decision as production authority, modify/reseal Path A outputs, or represent
 formal author adoption before the signed record is complete.
+
+The associated [CM/PR adjudication worksheet specification](F042_ADJUDICATION_WORKSHEET_SPEC_2026-08-03.md)
+defines the local, patient-level review fields and disposition controls. It does
+not place patient-level records in Git and does not replace the signed decision.
 
 This record is subordinate to:
 

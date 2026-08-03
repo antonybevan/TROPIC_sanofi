@@ -80,6 +80,12 @@ The prior `290 + k` framing is no longer valid: the author-adopted rule can iden
 
 This appendix was prepared without changing ADTTE, ADRS, TFL, metadata, package, release-manifest, or machine-gate outputs. It does not close F-042, author-adopt T-11-8, or expand the Path A product claim.
 
+The provisional implementation now provides a reproducible local
+subject-level comparison and CM/PR adjudication worksheet. Their handling and
+required review fields are defined in the [adjudication worksheet
+specification](F042_ADJUDICATION_WORKSHEET_SPEC_2026-08-03.md); patient-level
+CSV outputs remain outside Git and the release surface.
+
 ## 7. Phase 2 acceptance criteria
 
 The next implementation may begin only when the parent record contains the accountable-author decision and single-author limitation acknowledgement. Its evidence package must include:

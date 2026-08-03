@@ -559,6 +559,19 @@ f042_run_provisional <- function(
     write.csv(result$primary_events, file.path(out_dir, "f042_provisional_primary_events.csv"), row.names = FALSE)
     write.csv(result$diary_events, file.path(out_dir, "f042_provisional_diary_lineage.csv"), row.names = FALSE)
     write.csv(result$rt_candidates, file.path(out_dir, "f042_provisional_rt_lineage.csv"), row.names = FALSE)
+    write.csv(
+      result$rt_candidates |>
+        filter(!rt_autoqualifies) |>
+        mutate(
+          author_disposition = "",
+          author_reason = "",
+          author_initials = "",
+          author_signature_ref = "",
+          decision_date = ""
+        ),
+      file.path(out_dir, "f042_provisional_rt_adjudication_worksheet.csv"),
+      row.names = FALSE
+    )
   }
   result
 }

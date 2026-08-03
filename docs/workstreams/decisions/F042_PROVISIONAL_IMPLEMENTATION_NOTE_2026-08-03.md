@@ -20,6 +20,12 @@ supplied temporary/output directory. The controlled decision record remains
 `author_decision_ready_pending_signoff`; `implementation_gate.phase_2_allowed`
 remains `false`.
 
+The local output also includes the patient-level RT review file specified by the
+[CM/PR adjudication worksheet specification](F042_ADJUDICATION_WORKSHEET_SPEC_2026-08-03.md)
+and the subject-level current-versus-provisional comparison. Those files remain
+local because patient-level source/output records are not part of the Git review
+surface.
+
 This provisional step does not change the production SAS program. A separate
 SAS implementation and SAS/R reconciliation are required only after the signed
 decision record authorizes controlled integration.
@@ -86,6 +92,9 @@ results and must not be copied into a submission package.
   covering thresholds, summaries, duplicates/discordance, confirmation timing,
   missing-visit bridging, terminal triggers, unscheduled visits, CM+PR flags,
   and post-randomization evidence.
+- The local run produced 16 CM/PR inventory records, 15 complete-date records,
+  13 adjudication records, and a one-row-per-ITT-subject impact comparison;
+  generated patient-level CSVs were not committed.
 - The sealed `adtte_prod.xpt` file was not modified.
 
 ## Required path to formal adoption

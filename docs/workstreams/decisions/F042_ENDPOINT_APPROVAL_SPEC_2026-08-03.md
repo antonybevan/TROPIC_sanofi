@@ -1,7 +1,7 @@
 # F-042 Endpoint Approval Specification
 
 **Specification ID:** `F042-ENDPOINT-APPROVAL-SPEC-2026-08-03`<br>
-**Version:** `0.3.1`<br>
+**Version:** `0.3.2`<br>
 **Status:** **AUTHOR-DECISION READY — PENDING ACCOUNTABLE-AUTHOR SIGN-OFF**<br>
 **Parent record:** [`ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md`](ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md)<br>
 **Execution state:** Documentation only for production; no program may consume this specification as production authority until the accountable author signs the parent record. A bounded exploratory implementation is tracked separately in the provisional implementation note and may not modify or reseal Path A outputs.
@@ -130,6 +130,10 @@ The direct-intent CM and PR subject sets do not overlap. This is why PR-only pre
 5. **Population support:** present TTUMOR measurable-disease subgroup/sensitivity while retaining ITT as primary.
 
 Every analysis must report event-source counts and subject-level before/after reclassification relative to the currently sealed Path A output.
+
+The provisional local worksheet fields for RT adjudication and the
+current-versus-provisional subject comparison are defined in the [F-042 CM/PR
+adjudication worksheet specification](F042_ADJUDICATION_WORKSHEET_SPEC_2026-08-03.md).
 
 ## 8. TFL identifier mapping
 
