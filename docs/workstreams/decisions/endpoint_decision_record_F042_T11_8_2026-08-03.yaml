@@ -1,10 +1,10 @@
 # Documentation-only decision state for EDR-F042-T11-8-2026-08-03.
-# This file is intentionally not consumed by the pipeline while status is draft_pending_approval.
+# This file is intentionally not consumed by the pipeline before named signatures are recorded.
 
 record:
   id: EDR-F042-T11-8-2026-08-03
-  version: 0.1.0
-  status: draft_pending_approval
+  version: 0.2.0
+  status: approval_ready_pending_signatures
   executable: false
   consumption: documentation_only
   product_path: A_controlled_non_submission_demonstration
@@ -25,70 +25,84 @@ record:
     section_4_audit: 06_qc_evidence/audit/section_reviews/SECTION_04_METADATA_TFL_REVIEWER_PACKAGE_AUDIT_2026-08-03.md
     pr_source_qualification_audit: docs/workstreams/decisions/F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.md
     pr_source_profile: docs/workstreams/decisions/F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.yaml
+    approval_specification: docs/workstreams/decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md
 
 pre_implementation:
-  status: source_profile_complete_endpoint_use_blocked
+  status: approval_evidence_complete_endpoint_use_blocked
   source_profile_rows: 151
   source_profile_subjects: 65
   source_profile_adsl_linkage: 65/65
   duplicate_usubjid_prseq_keys: 0
   endpoint_consumption_allowed: false
   clinical_rule_approved: false
+  pn_subject_visits: 1937
+  pn_subject_visits_with_exact_sv_match: 1931
+  current_pain_algorithm_conforms_to_authority: false
 
 decisions:
   - id: ED-01
-    status: open_approval
-    question: PFS pain progression supporting disease evidence
-    current_state: 37 real-MP pain-led PFS candidate records are labelled; no approved evidence hierarchy or time window exists.
-    proposed_direction: Approve the evidence set, hierarchy, and time window before implementation.
+    status: recommended_pending_signature
+    question: TTPAIN/PFS pain progression supporting disease evidence
+    current_state: The protocol requires cancer-related clinical and/or radiological evidence; no signed operational rule exists.
+    proposed_direction: Apply Approval Specification sections 3-5; accept qualifying evidence no later than the confirming visit or direct-intent palliative/antalgic RT; do not use PSA alone or later backdating.
     approval_roles: [sponsor_statistician, medical_reviewer]
     blocks:
       - pfs_derivation_change
       - filing_facing_endpoint_claim
 
   - id: ED-02
-    status: open_approval
+    status: recommended_pending_signature
     question: Palliative radiotherapy source and precedence
-    current_state: Raw PR contains 11 radiation-related rows across 9 subjects; PR is not staged; CM also contains radiation history.
-    proposed_direction: Stage PR as the primary procedure source unless the approved decision specifies another precedence; define CM handling and date/intent rules.
+    current_state: Direct-intent RT evidence occurs in 13 CM rows/10 subjects and 3 PR rows/1 different subject; PR is not staged.
+    proposed_direction: Stage full PR and use a provenance-preserving CM+PR union; require radiation plus explicit PALLIATIVE or ANTALGIC text; auto-collapse exact subject/date duplicates only.
     approval_roles: [sponsor_statistician, medical_reviewer]
     blocks:
       - pr_staging
       - palliative_rt_derivation
 
   - id: ED-03
-    status: open_approval
+    status: recommended_pending_signature
     question: Palliative-RT-only sensitivity
     current_state: SAP mentions palliative radiotherapy, but no controlled sensitivity output is produced.
-    proposed_direction: Pre-specify the primary qualification rule and an explicit RT-only sensitivity scenario before coding.
+    proposed_direction: Primary diary-or-RT analysis plus diary-only sensitivity, RT-only supportive analysis, and bounded missing-date review.
     approval_roles: [sponsor_statistician]
     blocks:
       - sensitivity_programming
 
   - id: ED-04
-    status: open_approval
+    status: recommended_pending_signature
     question: SAP T-11-8 collision
     current_state: SAP T-11-8 is TTPAIN; current physical T-11-8 is response summary.
-    proposed_direction: Restore TTPAIN to T-11-8 and move response summary to an approved extension identifier, or approve a documented SAP/catalog amendment and defer TTPAIN.
-    recommended_option: restore_ttpain_to_t_11_8_and_assign_approved_response_extension
+    proposed_direction: Restore SAP-native mappings T-11-3 PSA response, T-11-4 ORR, T-11-5 pain response, T-11-6 TTUMOR, T-11-7 TTPSA, and T-11-8 TTPAIN.
+    recommended_option: restore_complete_sap_native_t_11_3_through_t_11_8_mapping
     approval_roles: [sponsor_statistician]
     blocks:
       - tfl_catalog_change
       - metadata_reseal
 
   - id: ED-05
-    status: clarification_required
+    status: recommended_pending_signature
     question: TTUMOR population
     current_state: Path A uses ITT measurable disease; SAP Table 22 wording requires clarification.
-    proposed_direction: Retain the current endpoint-specific measurable implementation for Path A and document the approved SAP interpretation before filing-facing use.
+    proposed_direction: Use ITT as the primary TTUMOR population; retain measurable disease as supportive subgroup/sensitivity only.
     approval_roles: [sponsor_statistician]
 
   - id: ED-06
-    status: clarification_required
+    status: recommended_pending_signature
     question: Secondary TTE time origins
     current_state: RANDDT anchors OS/PFS/TTPAIN/TTPSA/TTUMOR; TRTSDT anchors TTSAE; one reviewer-guide passage conflicts.
     proposed_direction: Approve parameter-level origins and synchronize reviewer-facing documentation.
     approval_roles: [sponsor_statistician]
+
+  - id: ED-07
+    status: recommended_pending_signature
+    question: Exact pain progression algorithm
+    current_state: Current code uses median AS, PPI >=2, absolute AS >=10, combined-component confirmation, minimum diary date, and a terminal-trigger exception.
+    proposed_direction: Apply Approval Specification sections 3-4 with component-specific 5-of-7 summaries, PPI >=1, mean AS >=25% from positive baseline, same-component confirmation at consecutive scheduled evaluations at least 21 days apart without bridging a missing/non-evaluable visit, no terminal exception, RT standalone, and SV date hierarchy.
+    approval_roles: [sponsor_statistician, medical_reviewer]
+    blocks:
+      - ttpain_derivation_change
+      - pfs_pain_component_change
 
 impact_baseline:
   dataset: 04_analysis_datasets/adam/adtte_prod.xpt
@@ -103,13 +117,20 @@ impact_baseline:
   radiation_pr_subjects: 9
   pain_event_subjects_with_any_radiation_pr: 1
   radiation_pr_rows_on_or_before_pain_event: 0
+  direct_intent_cm_rows: 13
+  direct_intent_cm_subjects: 10
+  direct_intent_cm_complete_start_dates: 12
+  direct_intent_pr_rows: 3
+  direct_intent_pr_subjects: 1
+  direct_intent_cm_pr_subject_overlap: 0
   source_pr_dataset: 01_source_data/real_sdtm/pr.sas7bdat
   source_pr_staged: false
+  current_pain_counts_approval_eligible: false
 
 implementation_gate:
   phase_2_allowed: false
-  required_approved_decisions: [ED-01, ED-02, ED-03, ED-04]
-  required_clarifications_before_reseal: [ED-05, ED-06]
+  required_approved_decisions: [ED-01, ED-02, ED-03, ED-04, ED-05, ED-06, ED-07]
+  required_clarifications_before_reseal: []
   no_silent_rule_inference: true
   no_output_regeneration_in_phase_1: true
 

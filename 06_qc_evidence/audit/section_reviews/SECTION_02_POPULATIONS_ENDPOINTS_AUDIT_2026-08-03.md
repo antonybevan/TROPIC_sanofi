@@ -6,6 +6,16 @@
 **SAP reviewed:** `02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx`  
 **Rendered SAP QA:** 22 pages rendered with the documents workflow; pages 1–22 visually reviewed with no clipping, overlap, broken table, or unreadable continuation detected.
 
+## Approval-preparation addendum
+
+The later protocol/publication/source-to-code review found that the original handoff understated the required correction. The approval-ready [`F-042 Endpoint Approval Specification`](../../../docs/workstreams/decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md) supersedes this audit's former recommended dispositions for S2-01, S2-02 and S2-04:
+
+- restore the existing SAP-native `T-11-3` PSA response, `T-11-4` ORR, `T-11-5` pain response and `T-11-8` TTPAIN mappings rather than assigning the primary response results to a new extension;
+- use ITT as primary TTUMOR, with measurable disease as support rather than primary denominator; and
+- replace the current pain algorithm, which uses non-conforming thresholds, AS summary and confirmation logic.
+
+The historical observations and counts below remain evidence of the sealed Path A state; they are not the recommended signed endpoint rules.
+
 ## Decision
 
 **AMBER — PASS for the current Path A implementation handoff, with two SAP/TFL alignment items requiring explicit disposition before any filing-facing or SAP-complete claim.**

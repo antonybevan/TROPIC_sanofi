@@ -10,6 +10,8 @@
 
 **Section 3/4 review addendum (2026-08-03):** ADRG, SDRG, BDRG, and the traceability matrix were rechecked against the corrected ADTTE derivations. PFS now exposes pain-led versus non-pain component labels, TTUMOR excludes death milestones, and no-post-baseline PFS censoring is explicit. F-042 (supporting disease evidence/palliative RT) remains an accepted Path A residual pending medical/statistical direction; it is not described as a filing-ready closure.
 
+**Approval-preparation addendum (2026-08-03):** ED-01–ED-07 now provide exact recommended replacement rules. The current pain derivation is additionally non-conforming in thresholds, AS summary, confirmation and event dating; TTUMOR must move to ITT; SAP-native `T-11-3`–`T-11-8` mappings must be restored. Reviewer guides must continue describing the sealed output as Path A historical evidence until signed implementation and reseal.
+
 ---
 
 ## 1. Goal

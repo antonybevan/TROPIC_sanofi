@@ -6,6 +6,12 @@
 **Programs reviewed:** `A_adtte_generation.sas`, `v_adtte_validation.R`, `admiral_adtte.R`, `tfl_generation.R`
 **Evidence run:** real-SAS ODA DAG, 34/34 stages PASS, final run after the corrections described below
 
+## Approval-preparation addendum
+
+The later protocol/corrected-publication comparison established that the pain implementation is not merely missing supporting-disease and PR handling. It also uses median rather than mean AS, `PPI >=2` rather than `>=1`, absolute `AS >=10` rather than `>=25%` from baseline, combined-component confirmation, minimum diary date and a terminal single-trigger exception. These reproducible rules are non-conforming and must be replaced after authorization.
+
+Direct-intent source review also found 13 palliative/antalgic CM RT rows across 10 subjects and 3 direct-intent PR rows for 1 different subject, so PR-only precedence is not acceptable. The approval-ready [`F-042 Endpoint Approval Specification`](../../../docs/workstreams/decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md) supersedes the original S3-04 implementation handoff while preserving the sealed counts below as historical evidence.
+
 ## Decision
 
 **AMBER — computational ADTTE handoff PASS; filing-facing endpoint interpretation remains blocked.**

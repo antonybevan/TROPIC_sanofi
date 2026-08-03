@@ -12,9 +12,9 @@ The next controlled work item is specification closure, not an unapproved ADTTE 
 
 | ID | Pri | Owner | Work | Why it matters | Exit |
 |---|---|---|---|---|---|
-| **W-ENDPOINT-01** | **P0** | WS-2 / WS-4 + sponsor statistician / medical reviewer | **Source profile complete.** Approve the F-042 pain-supporting-disease rule, PR source/precedence, palliative-RT sensitivity, and SAP `T-11-8` mapping; clarify TTUMOR population and TTE origins. | Numerical parity cannot prove an unresolved clinical interpretation or an SAP-ID mapping. | [`EDR-F042-T11-8-2026-08-03.md`](decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md) approved or explicitly scoped out; then Phase 2 rerun plan. |
+| **W-ENDPOINT-01** | **P0** | WS-2 / WS-4 + sponsor statistician / medical reviewer | **Approval package ready.** Sign or revise ED-01–ED-07: corrected pain algorithm, cancer-related evidence, CM+PR union, RT sensitivities, SAP-native `T-11-3`–`T-11-8` mappings, TTUMOR ITT population and TTE origins. | Numerical parity cannot prove clinical correctness; the sealed pain and TTUMOR rules require replacement after authorization. | [`EDR-F042-T11-8-2026-08-03.md`](decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md) and [`F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md`](decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md) signed or returned with exact replacement wording; then Phase 2 rerun. |
 
-The decision record and impact appendix are documentation-only and leave the current Path A outputs untouched. The historical backlog below remains useful evidence, but this handoff supersedes its older “next session” ordering for endpoint work.
+The approval-ready decision record, executable proposal and impact appendix are documentation-only until signed and leave the current Path A outputs untouched. The historical backlog below remains useful evidence, but this handoff supersedes its older “next session” ordering for endpoint work.
 
 ---
 

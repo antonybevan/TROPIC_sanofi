@@ -112,10 +112,10 @@ Machine gates can be green while **residual risks** remain. This memo is the hum
 
 | | |
 |---|---|
-| **Difference** | SAP v4.0 requires pain progression in PFS to have supporting disease evidence and to account for palliative radiotherapy. The current staging layer does not ingest PR, and no approved source-precedence or qualification rule exists. The corrected ADTTE labels 37 pain-led PFS candidate events rather than hiding them in a generic disease-progression label. |
-| **Impact if ignored** | PFS event composition could be challenged as over-inclusive or insufficiently traceable. Numerical SAS/R/admiral parity would not prove the clinical rule. |
+| **Difference** | The sealed pain derivation is reproducible but non-conforming: median AS, `PPI >=2`, absolute `AS >=10`, combined-component/terminal confirmation, minimum diary date, no signed cancer-related qualification and no CM+PR RT consumption. Its 37 pain-led PFS labels are historical output inventory, not an approval denominator. |
+| **Impact if ignored** | TTPAIN/PFS event dates and event sets can be wrong in both directions; numerical SAS/R/admiral parity would only reproduce the same clinical-rule error. |
 | **Why Path A holds** | The residual is explicit in the Section 3 audit, findings register, board, and reviewer-facing guide posture; no filing or SAP-complete claim is made. |
-| **Close condition** | Sponsor/statistician decision on supporting-disease qualification, PR staging/source precedence, and a palliative-RT-only sensitivity analysis, followed by rerun and independent QC. |
+| **Close condition** | Named signatures on ED-01–ED-07 (or exact replacement wording), followed by corrected component-specific pain derivation, CM+PR union, TTUMOR ITT, T-11 remap, subject-level impact analysis, independent SAS/R QC and full rerun/reseal. |
 
 ---
 
@@ -266,3 +266,4 @@ Under `docs/PRODUCT_CLAIM.md` Path A and the residual register above:
 |---|---|---|
 | 1.0 | 2026-07-09 | Initial residual memo for Path A / v0.1.0-demo-rc.1 train |
 | 1.1 | 2026-08-03 | Section 3 corrections, F-011 observed-baseline update, and F-042 pain/RT residual |
+| 1.2 | 2026-08-03 | F-042 approval-ready specification: corrected pain algorithm, CM+PR union, TTUMOR ITT and SAP-native T-11 mappings |

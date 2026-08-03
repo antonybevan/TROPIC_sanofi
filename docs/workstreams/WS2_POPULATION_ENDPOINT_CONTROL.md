@@ -5,7 +5,7 @@
 **As of:** 2026-08-03
 **Authorities:** SAP v4.0 · `config/study_config.yaml` · `config/tfl_output_catalog.yaml` · ADRG · [Section 2 audit](../../06_qc_evidence/audit/section_reviews/SECTION_02_POPULATIONS_ENDPOINTS_AUDIT_2026-08-03.md)
 
-**Decision handoff:** Open endpoint decisions are controlled in the [F-042 / T-11-8 Endpoint Decision Record](decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md), its [quantified impact appendix](decisions/F042_PFS_PAIN_IMPACT_APPENDIX_2026-08-03.md), and the [PR source qualification audit](decisions/F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.md). The record is draft/pending approval and does not change current Path A outputs.
+**Decision handoff:** Endpoint decisions are presented for signature in the [F-042 / T-11-8 Endpoint Decision Record](decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md), the [approval specification](decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md), its [quantified impact appendix](decisions/F042_PFS_PAIN_IMPACT_APPENDIX_2026-08-03.md), and the [CM/PR source qualification audit](decisions/F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.md). The package is approval-ready/pending signatures and does not change current Path A outputs.
 
 ---
 
@@ -26,12 +26,12 @@ If it is not in this table, programming should not invent it for Path A.
 
 | Population | Flag / rule | ADaM | Used in controlled outputs | Notes / residual |
 |---|---|---|---|---|
-| **ITT** | `ITTFL='Y'` | ADSL → carried to ADTTE | OS, PFS, TTPSA, and the endpoint-specific TTUMOR implementation | MP N=371; synthetic CbzP N=378; combined N=749 is not protocol ITT N=755. |
+| **ITT** | `ITTFL='Y'` | ADSL → carried to ADTTE | OS, PFS, TTPSA; signed proposal also requires TTUMOR and TTPAIN | MP N=371; synthetic CbzP N=378; combined N=749 is not protocol ITT N=755. |
 | **Safety** | `SAFFL='Y'` | ADSL | ADAE TEAE tables T-20; lab shifts T-21; exposure | MP N=371; synthetic CbzP N=371. Denominators use SAFFL, not AE-distinct N. |
-| **Measurable disease** | `MEASDISF='Y'` | ADSL | ORR response summary; TTUMOR | Current TFL dens = **all** MEAS subjects left-join ADRS OBJRESP: MP N=203, CbzP N=179. Missing `OBJRESP` means non-responder; do not use the BOR spine (MP 351, CbzP 378). |
+| **Measurable disease** | `MEASDISF='Y'` | ADSL | ORR response summary; current TTUMOR implementation only | Current ORR dens = **all** MEAS subjects left-join ADRS OBJRESP: MP N=203, CbzP N=179. Signed proposal moves primary TTUMOR to ITT and retains MEAS only as support. |
 | **Package combined display** | Real MP + synthetic CbzP | TFL merge only | Comparative figures/tables | **Not** protocol ITT 755 (F-012) |
 | **PSA response analysis set** | `PSARESP` rows joined to ADSL baseline PSA, excluding controlled fallback (`PSABLIF='Y'`), and filtered `PSABL >= 20` | ADRS + ADSL | PSA response in the current T-11 response block and F-13-1 | **F-011 resolved:** MP 61/329; CbzP 145/361; 690 unique eligible subjects. Synthetic rows without `PSABLIF` are treated as observed. |
-| **Pain progression** | ADTTE `PARAMCD='TTPAIN'` with diary evaluability | ADTTE | Not a separate controlled Path A TFL | SAP Appendix D assigns TTPAIN to T-11-8; the current response block uses that ID. This collision is recorded in the Section 2 audit and requires amendment or an extension-ID decision. |
+| **Pain progression** | Current ADTTE `PARAMCD='TTPAIN'`; signed proposal replaces the non-conforming pain algorithm | ADTTE | Not a separate controlled Path A TFL | SAP assigns TTPAIN to T-11-8. Approval Specification ED-07 corrects visit summaries, thresholds, confirmation, RT handling and event dating before implementation. |
 
 ### Population hard rules
 
@@ -47,11 +47,11 @@ If it is not in this table, programming should not invent it for Path A.
 |---|---|---|---|---|---|
 | Overall survival | OS | ITT | ADTTE | F-11-1, forest F-12-1 | Results recon LIFETEST; randomization origin |
 | Progression-free survival | PFS (composite: tumour/PSA/pain/death + NACT censor) | ITT | ADTTE | F-11-2 | SAP v4 PFS hierarchy; randomization origin |
-| Time to tumor progression | TTUMOR | ITT ∩ `MEASDISF='Y'` in current implementation | ADTTE | T-11-6 | Physical block and index agree; SAP Table 22 says ITT and requires clarification. |
+| Time to tumor progression | TTUMOR | Current: ITT ∩ `MEASDISF='Y'`; signed proposal: ITT primary, MEAS supportive | ADTTE | T-11-6 | Protocol/publication and SAP Table 22 support ITT; current denominator must be replaced after signature. |
 | Time to PSA progression | TTPSA | ITT | ADTTE | T-11-7 | Physical block and index agree; current CbzP parameter is PH-scaled demonstration data. |
-| Time to pain progression | TTPAIN | ITT with diary evaluability | ADTTE | SAP target T-11-8; not currently controlled as a TFL | Five-of-seven diary rule is coded; palliative-RT/source-availability review is handed to Section 3. |
-| PSA response | PSARESP | Observed ADSL baseline PSA >=20 (`PSABLIF != 'Y'`) plus unique PSARESP row | ADRS + ADSL | Current T-11 response block; SAP-ID collision noted | F-011 resolved: MP 61/329; CbzP 145/361. |
-| Objective response | OBJRESP | MEAS TFL dens; ADRS row = BOR spine | ADRS + TFL left-join | Current T-11 response block / response-evaluable sensitivity | MEAS dens MP 203/CbzP 179; response-evaluable spine MP 351/CbzP 378. |
+| Time to pain progression | TTPAIN | ITT with signed endpoint evaluability/qualification | ADTTE | SAP target T-11-8; not currently controlled as a TFL | Current five-of-seven/trigger implementation is reproducible but non-conforming; ED-01/02/03/07 define its replacement. |
+| PSA response | PSARESP | Observed ADSL baseline PSA >=20 (`PSABLIF != 'Y'`) plus unique PSARESP row | ADRS + ADSL | SAP `T-11-3` after signed remap | F-011 resolved: MP 61/329; CbzP 145/361. |
+| Objective response | OBJRESP | MEAS TFL dens; ADRS row = BOR spine | ADRS + TFL left-join | SAP `T-11-4`; response-evaluable `T-11-8b` remains sensitivity | MEAS dens MP 203/CbzP 179; response-evaluable spine MP 351/CbzP 378. |
 | TEAE summary | ADAE TRTEMFL etc. | Safety | ADAE | T-20-1, T-20-2 | OCCDS + episode merge |
 | Lab CTCAE shift | ADLB grades | Safety | ADLB | T-21-1, T-21-2 | T-21-2 synthetic arm demo |
 | Exposure / RDI | ADEX | Safety / treated | ADEX | F-14-1, T-17-*, F-17-1 | Optimus demonstration |
@@ -87,7 +87,7 @@ All IDs in `config/tfl_output_catalog.yaml` → `deferred_not_in_scope` (21 SAP 
 
 ## 5. SAP/TFL alignment note
 
-The current Path A TFL text is internally reproducible, but `T-11-8` is not a valid SAP-ID mapping as presently written: SAP Appendix D/Table 22 defines it as TTPAIN, whereas the physical block is PSA response + ORR. This is an **open control decision**, not a hidden residual. Before a filing-facing rerun, either implement TTPAIN as T-11-8 and move the response summary to an approved extension ID, or amend the SAP/catalog and disposition TTPAIN explicitly. The Section 2 audit records the evidence and handoff.
+The current Path A TFL text is internally reproducible, but the `T-11-3`–`T-11-8` mappings do not match SAP Appendix D/Table 22. The `T-11-8` TTPAIN/response collision therefore remains explicit and unresolved until the signed rules are implemented and resealed. The approval-ready disposition restores `T-11-3` PSA response, `T-11-4` ORR, `T-11-5` pain response, `T-11-6` TTUMOR, `T-11-7` TTPSA and `T-11-8` TTPAIN. Primary PSA/ORR results do not require an invented extension ID. No mapping changes occur until signature.
 
 ## 6. Estimand posture (honest)
 
@@ -123,6 +123,6 @@ The orchestrator **does stage-gate G02** through `platform/check_gate_g02_specif
 - [x] F-011 closure and F-012 limitation linked
 - [x] Section 2 review note filed
 - [x] Runtime G02 gate exists
-- [ ] SAP T-11-8 collision resolved by amendment or explicit extension-ID decision
+- [ ] ED-01–ED-07 signed and SAP-native `T-11-3`–`T-11-8` mapping implemented/resealed
 
 Board status: **AMBER** until the T-11-8 decision and the Section 3 endpoint-origin/diary handoff are closed.
