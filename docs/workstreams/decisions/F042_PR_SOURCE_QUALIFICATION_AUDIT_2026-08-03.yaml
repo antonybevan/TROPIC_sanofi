@@ -1,0 +1,65 @@
+# Documentation-only aggregate profile for the raw PR source.
+# It is not an executable staging or endpoint specification.
+
+profile:
+  id: F042-PR-SOURCE-QUAL-2026-08-03
+  version: 0.1.0
+  status: profiling_complete
+  executable: false
+  endpoint_consumption_allowed: false
+  parent_decision: EDR-F042-T11-8-2026-08-03
+  approval_dependency: ED-02
+  source: 01_source_data/real_sdtm/pr.sas7bdat
+  target_staging: 01_source_data/real_sdtm/staging/pr.rds
+
+source_shape:
+  domain: PR
+  studyid: EFC6193
+  rows: 151
+  subjects: 65
+  unique_prtrt_terms: 106
+  prcat_values: [OTHER PROCEDURES]
+  visitnum_values: [99]
+  visit_values: [UNSCHEDULED]
+  duplicate_usubjid_prseq_keys: 0
+  missing_prdtc: 0
+  complete_iso_prdtc: 148
+  year_month_prdtc: 3
+  missing_prtrt: 0
+  missing_prcat: 0
+  usubjid_subjid_mismatches: 0
+
+linkage:
+  adsl_subjects_matched: 65
+  adsl_subjects_unmatched: 0
+  matched_real_mp_itt_subjects: 65
+
+radiation_screen:
+  method: case_insensitive_PRTRT_contains_radi
+  rows: 11
+  subjects: 9
+  palliative_radiation_to_spine_rows: 3
+  complete_iso_dates: 11
+  after_randdt: 11
+  after_trtsdt: 11
+  pain_candidate_subjects_with_any_radiation_pr: 1
+  radiation_rows_on_or_before_pain_event: 0
+  radiation_rows_after_pain_event: 3
+  post_event_day_range: [23, 25]
+
+controls:
+  preserve_all_pr_rows: true
+  preserve_source_text: true
+  no_day_imputation: true
+  no_treatment_intent_inference_at_ingest: true
+  no_endpoint_consumption_before_approval: true
+  no_current_output_change: true
+
+proposed_staging:
+  preserve_prdtc: true
+  derive_complete_date_only: true
+  carry_date_precision_flag: true
+  retain_lineage_keys: [USUBJID, PRSEQ, SUBJID]
+  filter_radiation_at_ingest: false
+  require_sas_r_reconciliation: true
+  require_subject_level_impact_report: true

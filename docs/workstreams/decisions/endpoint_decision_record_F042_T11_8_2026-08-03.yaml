@@ -23,6 +23,17 @@ record:
     section_2_audit: 06_qc_evidence/audit/section_reviews/SECTION_02_POPULATIONS_ENDPOINTS_AUDIT_2026-08-03.md
     section_3_audit: 06_qc_evidence/audit/section_reviews/SECTION_03_ADAM_DERIVATION_AUDIT_2026-08-03.md
     section_4_audit: 06_qc_evidence/audit/section_reviews/SECTION_04_METADATA_TFL_REVIEWER_PACKAGE_AUDIT_2026-08-03.md
+    pr_source_qualification_audit: docs/workstreams/decisions/F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.md
+    pr_source_profile: docs/workstreams/decisions/F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.yaml
+
+pre_implementation:
+  status: source_profile_complete_endpoint_use_blocked
+  source_profile_rows: 151
+  source_profile_subjects: 65
+  source_profile_adsl_linkage: 65/65
+  duplicate_usubjid_prseq_keys: 0
+  endpoint_consumption_allowed: false
+  clinical_rule_approved: false
 
 decisions:
   - id: ED-01

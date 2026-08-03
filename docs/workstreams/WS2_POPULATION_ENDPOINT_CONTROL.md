@@ -5,7 +5,7 @@
 **As of:** 2026-08-03
 **Authorities:** SAP v4.0 · `config/study_config.yaml` · `config/tfl_output_catalog.yaml` · ADRG · [Section 2 audit](../../06_qc_evidence/audit/section_reviews/SECTION_02_POPULATIONS_ENDPOINTS_AUDIT_2026-08-03.md)
 
-**Decision handoff:** Open endpoint decisions are controlled in the [F-042 / T-11-8 Endpoint Decision Record](decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md) and its [quantified impact appendix](decisions/F042_PFS_PAIN_IMPACT_APPENDIX_2026-08-03.md). The record is draft/pending approval and does not change current Path A outputs.
+**Decision handoff:** Open endpoint decisions are controlled in the [F-042 / T-11-8 Endpoint Decision Record](decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md), its [quantified impact appendix](decisions/F042_PFS_PAIN_IMPACT_APPENDIX_2026-08-03.md), and the [PR source qualification audit](decisions/F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.md). The record is draft/pending approval and does not change current Path A outputs.
 
 ---
 

@@ -30,6 +30,7 @@ The baseline is the final real-SAS run used by the current Path A release eviden
 - Release verification at the baseline: 30/30 checks passed.
 - Current PFS component labels: 282 disease-progression events, 37 pain-progression candidate events, 8 death events, and 44 censored records in the real MP ADTTE.
 - Raw SDTM PR exists, but PR is not in the current staging handoff or ADaM derivation.
+- Pre-implementation PR source profile is complete: 151 rows, 65 subjects, 0 duplicate `USUBJID/PRSEQ` keys, 148 complete ISO dates, and 65/65 ADSL linkages; endpoint consumption remains blocked.
 
 The numerical agreement above proves reproducibility of the current rule. It does not approve the unresolved clinical interpretation.
 
@@ -76,6 +77,8 @@ If approval is not obtained, retain the current Path A labels and the explicit F
 
 - [F-042 impact appendix](F042_PFS_PAIN_IMPACT_APPENDIX_2026-08-03.md)
 - [Machine-readable decision state](endpoint_decision_record_F042_T11_8_2026-08-03.yaml)
+- [PR source qualification audit](F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.md)
+- [Machine-readable PR source profile](F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.yaml)
 - [Section 2 population/endpoint audit](../../../06_qc_evidence/audit/section_reviews/SECTION_02_POPULATIONS_ENDPOINTS_AUDIT_2026-08-03.md)
 - [Section 3 ADaM audit](../../../06_qc_evidence/audit/section_reviews/SECTION_03_ADAM_DERIVATION_AUDIT_2026-08-03.md)
 - [Section 4 metadata/TFL audit](../../../06_qc_evidence/audit/section_reviews/SECTION_04_METADATA_TFL_REVIEWER_PACKAGE_AUDIT_2026-08-03.md)
