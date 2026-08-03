@@ -42,6 +42,7 @@ workstreams:
     name: Clinical data management / source intake
     gates: [G01]
     status: AMBER
+    note: "Path A source handoff is GREEN with disclosed residuals; AMBER reflects broader CORE/P21 industry depth. Section 1 audit passed 2026-08-03."
     owned_artifacts:
       - 01_source_data
       - 04_analysis_datasets/programs/r/v_staging_ingest.R
@@ -56,7 +57,7 @@ workstreams:
     required_evidence:
       - docs/workstreams/WS1_SOURCE_INTAKE_PACK.md
       - CORE residual disposition matrix
-    next_action: "Maintain WS1_CORE_RESIDUAL_MATRIX.csv on re-run; complete the Section 1 source/SDTM audit"
+    next_action: "Maintain WS1_CORE_RESIDUAL_MATRIX.csv on re-run; hand off to the Section 2 population/endpoint audit"
     residual_findings: [F-015, F-017]
     packs:
       - docs/workstreams/WS1_SOURCE_INTAKE_PACK.md
@@ -201,12 +202,14 @@ workstreams:
     residual_findings: [F-005, F-025]
 
 priority_queue:
-  - { id: P0-SECTION0, workstream: WS0_governance, action: "Section 0 governance/SAP consistency audit", status: IN_PROGRESS }
+  - { id: DONE-SECTION0, workstream: WS0_governance, action: "Section 0 governance/SAP consistency audit", status: DONE }
+  - { id: DONE-SECTION1, workstream: WS1_source_intake, action: "Section 1 source/SDTM provenance and CORE residual audit", status: DONE }
+  - { id: P0-SECTION2, workstream: WS2_statistical_specification, action: "Section 2 population/endpoint/SAP dot-connection audit", status: IN_PROGRESS }
   - { id: DONE-WS0, workstream: WS0_governance, action: "PRODUCT_CLAIM.md", status: DONE }
   - { id: DONE-WS5, workstream: WS5_qc_validation, action: "KNOWN_DIFFERENCES_MEMO.md", status: DONE }
   - { id: DONE-WS3, workstream: WS3_standards_metadata, action: "external validation index", status: DONE }
   - { id: DONE-WS2, workstream: WS2_statistical_specification, action: "population/endpoint control table", status: DONE_DRAFT }
   - { id: DONE-WS7-verify, workstream: WS7_release_engineering, action: "verify_release.py", status: DONE }
   - { id: P1-WS6, workstream: WS6_regulatory_writing, action: "ADRG/SDRG/BDRG hardening S1-S3", status: OPEN }
-  - { id: P1-WS1, workstream: WS1_source_intake, action: "CORE residual matrix CSV", status: OPEN }
+  - { id: DONE-WS1, workstream: WS1_source_intake, action: "CORE residual matrix CSV", status: DONE }
   - { id: DONE-WS7-ci, workstream: WS7_release_engineering, action: "CI wire verify_release", status: DONE }

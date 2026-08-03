@@ -74,11 +74,11 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | Field | Content |
 |---|---|
 | **Owned artifacts** | `01_source_data/` (governed, not redistributed) · staging ingest · SDTM validation · source profile report · SDTM CORE run records · SDRG source sections · F-017 timing residuals |
-| **Current status** | **AMBER → improving** — pack + **CORE residual matrix filed**; F-015/F-017 dispositioned in CSV; still not “CORE clean” / commercial P21 |
+| **Current status** | **GREEN for Path A; AMBER for broader industry depth** — Section 1 source recheck passed; CORE residual matrix and F-015/F-017 dispositions are filed; still not “CORE clean” / commercial P21 |
 | **Open risks** | F-017 remains source-inherent · F-015 open classes remain accepted · real SDTM not in git (correct) |
 | **Required evidence pack** | (1) Source profile · (2) SDTM val · (3) CORE run record + **`WS1_CORE_RESIDUAL_MATRIX.csv`** · (4) SDRG §5.1 · (5) REPRODUCIBILITY data-access |
 | **Release gate** | G01 before any “source locked” language |
-| **Next action** | Maintain matrix on any CORE re-run; do not claim full CORE clean |
+| **Next action** | Maintain matrix on any CORE re-run; hand off to Section 2; do not claim full CORE clean |
 
 ---
 
@@ -227,13 +227,13 @@ Not “another GREEN JSON.”
 
 ## 8. Immediate next command (continue operating)
 
-**Done recently:** portfolio surface · WS-6 guides · CORE matrix · CI green · **D-012 CRF grounding audit**  
+**Done recently:** portfolio surface · Section 0 governance/SAP audit · Section 1 source/SDTM audit · WS-6 guides · CORE matrix · CI green · **D-012 CRF grounding audit**
 
 **Next (controlled audit sequence):**
 
-1. Complete Section 0 governance/SAP synchronization and record the audit memo.
-2. Audit Section 1 source intake/SDTM provenance and CORE residuals.
-3. Continue through populations/endpoints, ADaM, metadata, TFLs, QC, writing, and package integrity before issuing a successor Path A release note.
+1. Audit Section 2 populations/endpoints/estimands against SAP, config, ADaM, and controlled TFLs.
+2. Audit Section 3 ADaM metadata, Define-XML, ARM, and traceability.
+3. Continue through TFLs, QC, writing, and package integrity before issuing a successor Path A release note.
 
 ```bash
 python3 scripts/verify_release.py   # local
