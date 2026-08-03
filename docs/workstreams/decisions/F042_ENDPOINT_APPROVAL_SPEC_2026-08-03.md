@@ -1,10 +1,10 @@
 # F-042 Endpoint Approval Specification
 
 **Specification ID:** `F042-ENDPOINT-APPROVAL-SPEC-2026-08-03`<br>
-**Version:** `0.2.0`<br>
-**Status:** **APPROVAL-READY — PENDING NAMED SIGNATURES**<br>
+**Version:** `0.3.0`<br>
+**Status:** **AUTHOR-DECISION READY — PENDING ACCOUNTABLE-AUTHOR SIGN-OFF**<br>
 **Parent record:** [`ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md`](ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md)<br>
-**Execution state:** Documentation only; no program may consume this specification until the parent record is signed.
+**Execution state:** Documentation only; no program may consume this specification until the accountable author signs the parent record.
 
 ## 1. Authority and interpretation boundary
 
@@ -13,21 +13,21 @@ This specification converts the open endpoint questions into one recommended, ex
 1. Protocol Amendment 5, 21-Jul-2008, for endpoint concepts, populations and planned analyses.
 2. Corrected de Bono et al. Lancet 2010 publication for the documented correction from pain PPI nadir to baseline/reference value and the final published analysis convention.
 3. Available patient-level source domains for implementation feasibility.
-4. SAP v4.0 after approval for project programming control.
+4. SAP v4.0 after accountable-author adoption for internal Path A programming control.
 
-SAS/R parity and release-seal checks demonstrate reproducibility only. They do not override the protocol, corrected publication or signed SAP decision.
+SAS/R parity and release-seal checks demonstrate reproducibility only. They do not override the protocol or corrected publication and do not create sponsor approval.
 
-## 2. Recommended approval dispositions
+## 2. Recommended accountable-author dispositions
 
-| Decision | Recommended disposition | Approval statement |
+| Decision | Recommended disposition | Path A adoption statement |
 |---|---|---|
-| `ED-01` | **Approve with the rule in §3–§5** | Pain progression is cancer-related and supported by clinical and/or radiological disease evidence. Later evidence may confirm an earlier diary trigger only through its protocol-required confirming visit; later evidence must not otherwise backdate a primary event. |
-| `ED-02` | **Approve CM+PR union in §6** | PR is staged in full, but PR is not the sole endpoint source. Direct-intent CM and PR records are both eligible. Generic radiation text is not automatically classified as palliative. |
-| `ED-03` | **Approve the sensitivity set in §7** | Primary TTPAIN/PFS includes approved diary or palliative-RT criteria. Diary-only and RT-only supportive analyses isolate source contribution. |
-| `ED-04` | **Approve the SAP-native mapping in §8** | Use existing SAP identifiers `T-11-3` through `T-11-8`; do not invent an extension for the primary PSA/ORR response results. |
-| `ED-05` | **Approve ITT for TTUMOR** | TTUMOR contains one record per ITT subject. Measurable disease is the ORR population and may be a TTUMOR sensitivity/subgroup, not the primary TTUMOR denominator. |
-| `ED-06` | **Approve parameter-level origins in §9** | Efficacy TTE parameters use randomization; TTSAE uses first exposure. |
-| `ED-07` | **Approve the pain algorithm in §3–§4** | Replace the current non-conforming thresholds, summary statistic, combined-component confirmation and terminal-trigger exception. |
+| `ED-01` | **Adopt the rule in §3–§5** | Pain progression is cancer-related and supported by clinical and/or radiological disease evidence. Later evidence may confirm an earlier diary trigger only through its protocol-required confirming visit; later evidence must not otherwise backdate a primary event. |
+| `ED-02` | **Adopt the CM+PR union in §6** | PR is staged in full, but PR is not the sole endpoint source. Direct-intent CM and PR records are both eligible. Generic radiation text is not automatically classified as palliative. |
+| `ED-03` | **Adopt the sensitivity set in §7** | Primary TTPAIN/PFS includes author-adopted diary or palliative-RT criteria. Diary-only and RT-only supportive analyses isolate source contribution. |
+| `ED-04` | **Adopt the SAP-native mapping in §8** | Use existing SAP identifiers `T-11-3` through `T-11-8`; do not invent an extension for the primary PSA/ORR response results. |
+| `ED-05` | **Adopt ITT for TTUMOR** | TTUMOR contains one record per ITT subject. Measurable disease is the ORR population and may be a TTUMOR sensitivity/subgroup, not the primary TTUMOR denominator. |
+| `ED-06` | **Adopt parameter-level origins in §9** | Efficacy TTE parameters use randomization; TTSAE uses first exposure. |
+| `ED-07` | **Adopt the pain algorithm in §3–§4** | Replace the current non-conforming thresholds, summary statistic, combined-component confirmation and terminal-trigger exception. |
 
 ## 3. Pain visit construction and evaluability
 
@@ -38,7 +38,7 @@ SAS/R parity and release-seal checks demonstrate reproducibility only. They do n
 - Baseline analgesic score is the mean of the non-missing `ANSCORE` daily values in that window.
 - A baseline component is evaluable only when at least 5 distinct expected calendar dates contain a non-missing value for that component.
 - Do not replace a missing baseline component with zero.
-- For the analgesic percentage-change criterion, baseline mean AS must be greater than zero. Subjects with baseline mean AS equal to zero are not evaluable for the percentage-change branch unless a later signed amendment defines a clinically justified absolute-change rule; their PPI and RT branches remain eligible.
+- For the analgesic percentage-change criterion, baseline mean AS must be greater than zero. Subjects with baseline mean AS equal to zero are not evaluable for the percentage-change branch unless a later controlled amendment defines a clinically justified absolute-change rule; their PPI and RT branches remain eligible.
 
 ### 3.2 Post-baseline visits
 
@@ -109,7 +109,7 @@ Generic `RADIOTHERAPY`, prior-radiation categories, radiopharmaceuticals and tex
 - Use the union of direct-intent CM and PR candidates.
 - Exact subject/date duplicates may be collapsed to one clinical event while retaining both source records and provenance.
 - For an exact duplicate, a complete PR procedure start date is the displayed event date and CM is corroborative.
-- Non-exact dates are not silently merged. Retain both candidates for medical review or apply a subsequently signed same-course matching rule.
+- Non-exact dates are not silently merged. Retain both candidates for adjudication or apply a subsequently adopted same-course matching rule.
 - A missing or partial start date is excluded from the primary exact-date event derivation and included only in bounded sensitivity/adjudication evidence.
 
 Observed direct-intent inventory:
@@ -123,7 +123,7 @@ The direct-intent CM and PR subject sets do not overlap. This is why PR-only pre
 
 ## 7. Required sensitivity and supporting analyses
 
-1. **Primary:** approved diary progression or direct-intent palliative RT, with cancer-related qualification in §5.
+1. **Primary:** author-adopted diary progression or direct-intent palliative RT, with cancer-related qualification in §5.
 2. **Diary-only sensitivity:** remove RT-only events; retain qualified diary events.
 3. **RT-only supportive analysis:** treat only direct-intent, complete-date palliative/antalgic RT as events; present counts, dates, KM summaries where estimable and a subject-level lineage listing for QC.
 4. **Date-bound sensitivity:** separately disposition partial/missing RT dates; do not impute them into the primary result.
@@ -142,7 +142,7 @@ Every analysis must report event-source counts and subject-level before/after re
 | `T-11-7` | Time to PSA Progression |
 | `T-11-8` | Time to Pain Progression |
 
-`T-11-8b` may remain an explicitly approved ORR denominator sensitivity, but it must not replace or rename any primary SAP identifier.
+`T-11-8b` may remain an explicitly author-adopted ORR denominator sensitivity for Path A, but it must not replace or rename any primary SAP identifier.
 
 ## 9. Populations and time origins
 
@@ -157,22 +157,23 @@ Every analysis must report event-source counts and subject-level before/after re
 
 ORR remains restricted to ITT subjects with measurable disease. TTUMOR must not inherit the ORR denominator.
 
-## 10. Implementation acceptance criteria after signature
+## 10. Implementation acceptance criteria after author adoption
 
-- Independent SAS and R implementations use the same signed rule but are programmed separately.
+- SAS and R implementations use the same author-adopted rule but are programmed separately without copying derivation code between languages.
 - Regression fixtures cover baseline AS zero, same-day Cycle 1 values, component-specific 5-of-7 evaluability, exact and discordant same-day duplicates, an interval below 21 days, an immediately consecutive qualifying assessment, an intervening missing/non-evaluable scheduled assessment, alternating PPI/AS triggers, terminal single trigger, unscheduled diaries, RT-only event, exact CM/PR duplicate, non-exact cross-domain records, missing RT start date, DS week-date boundary uncertainty and SV-date fallback. A DS week-offset fixture qualifies for the primary cancer-related rule only when `point date + 4 days <= confirming visit date`.
 - Every currently labelled pain-led PFS record has a before/after disposition and source lineage.
 - TTUMOR contains the full ITT denominator and a measurable-disease supportive result.
 - TFL catalog, physical output labels, ARM/ARS, Define methods, ADRG and traceability use the §8 mapping.
-- Full real-SAS DAG, independent R reconciliation, relevant scoped admiral checks, output QC and release verification pass before reseal.
-- No document may describe the result as sponsor-approved or filing-ready until all required signatures are recorded.
+- A delayed second-pass author review uses a frozen checklist and is recorded separately from initial programming.
+- Full real-SAS DAG, separate R reconciliation, relevant scoped admiral checks, automated output QC and release verification pass before reseal.
+- No document may describe the result as independently reviewed, sponsor-approved, medically approved, SAP-approved for filing, or filing-ready. External qualified review and sponsor governance remain required for regulated reuse.
 
-## 11. Approval election
+## 11. Accountable-author election
 
-The approver must select one:
+The accountable author must select one in the parent decision record:
 
-- [ ] **APPROVE AS WRITTEN** — authorize implementation of §§3–10.
-- [ ] **APPROVE WITH DOCUMENTED MODIFICATIONS** — attach exact replacement wording; no verbal-only change is executable.
+- [ ] **ADOPT AS WRITTEN FOR PATH A** — authorize implementation of §§3–10 for the controlled non-submission demonstration.
+- [ ] **ADOPT WITH DOCUMENTED MODIFICATIONS FOR PATH A** — attach exact replacement wording; no verbal-only change is executable.
 - [ ] **REJECT / RETURN FOR REVISION** — state the rejected decision IDs and rationale.
 
-Blank boxes and blank signature fields mean no approval.
+Blank boxes and blank accountable-author fields mean no decision and no authorization to implement.

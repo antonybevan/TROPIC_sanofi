@@ -112,10 +112,10 @@ Machine gates can be green while **residual risks** remain. This memo is the hum
 
 | | |
 |---|---|
-| **Difference** | The sealed pain derivation is reproducible but non-conforming: median AS, `PPI >=2`, absolute `AS >=10`, combined-component/terminal confirmation, minimum diary date, no signed cancer-related qualification and no CM+PR RT consumption. Its 37 pain-led PFS labels are historical output inventory, not an approval denominator. |
+| **Difference** | The sealed pain derivation is reproducible but non-conforming: median AS, `PPI >=2`, absolute `AS >=10`, combined-component/terminal confirmation, minimum diary date, no author-adopted cancer-related qualification and no CM+PR RT consumption. Its 37 pain-led PFS labels are historical output inventory, not an adoption denominator. |
 | **Impact if ignored** | TTPAIN/PFS event dates and event sets can be wrong in both directions; numerical SAS/R/admiral parity would only reproduce the same clinical-rule error. |
 | **Why Path A holds** | The residual is explicit in the Section 3 audit, findings register, board, and reviewer-facing guide posture; no filing or SAP-complete claim is made. |
-| **Close condition** | Named signatures on ED-01–ED-07 (or exact replacement wording), followed by corrected component-specific pain derivation, CM+PR union, TTUMOR ITT, T-11 remap, subject-level impact analysis, independent SAS/R QC and full rerun/reseal. |
+| **Close condition** | Accountable-author sign-off on ED-01–ED-07 (or exact replacement wording) with the single-author limitation acknowledged, followed by corrected component-specific pain derivation, CM+PR union, TTUMOR ITT, T-11 remap, subject-level impact analysis, separately programmed SAS/R reconciliation, delayed second-pass author review and full rerun/reseal. This closes the Path A implementation residual only; external qualified review remains required before regulated reuse. |
 
 ---
 
@@ -267,3 +267,4 @@ Under `docs/PRODUCT_CLAIM.md` Path A and the residual register above:
 | 1.0 | 2026-07-09 | Initial residual memo for Path A / v0.1.0-demo-rc.1 train |
 | 1.1 | 2026-08-03 | Section 3 corrections, F-011 observed-baseline update, and F-042 pain/RT residual |
 | 1.2 | 2026-08-03 | F-042 approval-ready specification: corrected pain algorithm, CM+PR union, TTUMOR ITT and SAP-native T-11 mappings |
+| 1.3 | 2026-08-03 | F-042 single-author governance: accountable-author Path A decision, disclosed non-independence and external-review boundary |

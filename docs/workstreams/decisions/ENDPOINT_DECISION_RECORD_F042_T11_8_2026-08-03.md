@@ -1,17 +1,17 @@
 # Endpoint Decision Record — F-042 / T-11-8
 
 **Record ID:** `EDR-F042-T11-8-2026-08-03`<br>
-**Version:** `0.2.1`<br>
-**Status:** **APPROVAL-READY — PENDING NAMED SIGNATURES**<br>
+**Version:** `0.3.0`<br>
+**Status:** **AUTHOR-DECISION READY — PENDING ACCOUNTABLE-AUTHOR SIGN-OFF**<br>
 **Product path:** Path A — controlled non-submission demonstration<br>
 **Baseline commit:** `a213667` (`codex/submission-pipeline-rc`)<br>
 **Change class:** Analysis-specification and output-catalog decision; no derivation change in this record
 
 ## 1. Purpose and control boundary
 
-This record turns the open endpoint issues into explicit decisions that can be approved, rejected, or superseded. It is a decision-control artifact, not an approval. The exact recommended implementation is defined in the [`F-042 Endpoint Approval Specification`](F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md), which remains non-executable until this record is signed.
+This record turns the open endpoint issues into explicit decisions that can be adopted, revised, rejected, or superseded. It is a decision-control artifact, not sponsor or medical approval. The exact recommended implementation is defined in the [`F-042 Endpoint Approval Specification`](F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md), which remains non-executable until the accountable author signs this record.
 
-The current validated ADTTE, TFL, metadata, and release outputs remain unchanged. Until the required decisions are approved, no program may silently promote the current pain component to an SAP-complete PFS rule or treat the current response block as the SAP `T-11-8` TTPAIN deliverable.
+The current validated ADTTE, TFL, metadata, and release outputs remain unchanged. Until the required decisions are author-adopted, no program may silently promote the current pain component to an SAP-complete PFS rule or treat the current response block as the SAP `T-11-8` TTPAIN deliverable.
 
 This record is subordinate to:
 
@@ -32,77 +32,85 @@ The baseline is the final real-SAS run used by the current Path A release eviden
 - Raw SDTM PR exists, but PR is not in the current staging handoff or ADaM derivation.
 - Pre-implementation PR source profile is complete: 151 rows, 65 subjects, 0 duplicate `USUBJID/PRSEQ` keys, 148 complete ISO dates, and 65/65 ADSL linkages; endpoint consumption remains blocked.
 - A direct-intent CM review found 13 palliative/antalgic radiotherapy rows across 10 subjects, including 12 complete post-randomization start dates. Direct-intent PR contains 3 rows for 1 different subject. PR therefore cannot be the sole endpoint source.
-- The current pain implementation does not match the protocol/corrected-publication rule: it uses median AS, `PPI >=2`, absolute `AS >=10`, combined-component confirmation, and a terminal-trigger exception. These rules must be replaced before endpoint approval can be implemented.
+- The current pain implementation does not match the protocol/corrected-publication rule: it uses median AS, `PPI >=2`, absolute `AS >=10`, combined-component confirmation, and a terminal-trigger exception. These rules must be replaced after accountable-author adoption and before the endpoint can be represented as corrected for Path A.
 - PN-to-SV profiling found exact SV visit-date matches for 1,931 of 1,937 PN subject-visits, supporting a controlled `SVSTDTC` event-date hierarchy with a flagged fallback.
 
 The numerical agreement above proves reproducibility of the current rule. It does not approve the unresolved clinical interpretation.
 
 ## 3. Decision register
 
-| ID | Decision question | Current state | Proposed controlled direction | Approval gate | Downstream impact |
+| ID | Decision question | Current state | Proposed controlled direction | Decision gate | Downstream impact |
 |---|---|---|---|---|---|
-| `ED-01` | What disease evidence qualifies pain progression for TTPAIN and PFS? | The protocol requires cancer-related clinical and/or radiological support; the current implementation has no approved operational rule. | **Recommended:** apply Approval Specification §§3–5. Accept qualifying radiological/clinical progression no later than the confirming visit, or direct-intent palliative/antalgic RT. Do not use PSA alone to certify pain and do not backdate from later evidence. | Sponsor statistician + medical reviewer | TTPAIN/PFS `EVNTDESC`, `ADT`, `CNSR`, `AVAL`, event counts, medians, HRs, and sensitivity outputs. |
-| `ED-02` | Which sources and precedence govern palliative radiotherapy? | PR has 11 broad radiation-screen rows, but direct-intent evidence is split across non-overlapping CM and PR subjects. | **Recommended:** stage full PR and use the controlled CM+PR union in Approval Specification §6. Direct-intent text requires both a radiation concept and `PALLIATIVE`/`ANTALGIC`; generic or prior radiation is not auto-qualified. | Sponsor statistician + medical reviewer | SDTM staging, ADTTE PFS/TTPAIN, source traceability, and reviewer guides. |
-| `ED-03` | What palliative-RT sensitivity set is required? | RT is a protocol pain-progression criterion; no controlled source-isolation analysis exists. | **Recommended:** primary diary-or-RT analysis plus diary-only sensitivity, RT-only supportive analysis and bounded missing-date review per Approval Specification §7. | Sponsor statistician | PFS/TTPAIN event composition, summaries and lineage. |
-| `ED-04` | How is the SAP `T-11-8` collision resolved? | SAP Table 22 assigns `T-11-3` PSA response, `T-11-4` ORR, `T-11-5` pain response and `T-11-8` TTPAIN; the current catalog/physical block is wrong. | **Recommended:** restore the complete SAP-native `T-11-3`–`T-11-8` mapping in Approval Specification §8. Do not invent an extension for the primary PSA/ORR results. | SAP/statistician authority | TFL catalog, ARM/ARS, Define, traceability matrix, package, and reviewer narrative. |
-| `ED-05` | What population governs TTUMOR? | Current Path A ADTTE incorrectly uses ITT ∩ measurable disease (`MEASDISF='Y'`). Protocol/publication evidence and SAP Table 22 support ITT. | **Recommended:** one TTUMOR record per ITT subject; retain measurable disease as supportive subgroup/sensitivity only. ORR remains measurable-disease restricted. | Statistician/SAP authority | TTUMOR dens, shells, estimand wording, and metadata. |
-| `ED-06` | What are the time origins for secondary TTE parameters? | Code uses `RANDDT` for OS/PFS/TTPAIN/TTPSA/TTUMOR and `TRTSDT` for TTSAE; one reviewer-guide passage conflicts. | **Recommended:** approve the current parameter-level origins in Approval Specification §9 and correct reviewer-facing text. | Statistician/SAP authority | `STARTDT`, `AVAL`, ADRG, traceability, and Define methods. |
-| `ED-07` | What exact pain progression algorithm is authorized? | Current code uses the wrong PPI/AS thresholds and AS summary, can confirm across different components, and accepts a terminal single trigger. | **Recommended:** component-specific 5-of-7 summaries; PPI median increase `>=1`; mean AS increase `>=25%` with positive baseline; same component at two consecutive scheduled evaluations at least 21 days apart; do not bridge an intervening missing/non-evaluable visit; no terminal exception; RT standalone; SV visit-date hierarchy. | Sponsor statistician + medical reviewer | TTPAIN and PFS derivations, event dating, censoring, source traceability and regression scope. |
+| `ED-01` | What disease evidence qualifies pain progression for TTPAIN and PFS? | The protocol requires cancer-related clinical and/or radiological support; the current implementation has no adopted operational rule. | **Recommended:** apply Approval Specification §§3–5. Accept qualifying radiological/clinical progression no later than the confirming visit, or direct-intent palliative/antalgic RT. Do not use PSA alone to certify pain and do not backdate from later evidence. | Accountable author for Path A; external statistical/medical review before regulated reuse | TTPAIN/PFS `EVNTDESC`, `ADT`, `CNSR`, `AVAL`, event counts, medians, HRs, and sensitivity outputs. |
+| `ED-02` | Which sources and precedence govern palliative radiotherapy? | PR has 11 broad radiation-screen rows, but direct-intent evidence is split across non-overlapping CM and PR subjects. | **Recommended:** stage full PR and use the controlled CM+PR union in Approval Specification §6. Direct-intent text requires both a radiation concept and `PALLIATIVE`/`ANTALGIC`; generic or prior radiation is not auto-qualified. | Accountable author for Path A; external statistical/medical review before regulated reuse | SDTM staging, ADTTE PFS/TTPAIN, source traceability, and reviewer guides. |
+| `ED-03` | What palliative-RT sensitivity set is required? | RT is a protocol pain-progression criterion; no controlled source-isolation analysis exists. | **Recommended:** primary diary-or-RT analysis plus diary-only sensitivity, RT-only supportive analysis and bounded missing-date review per Approval Specification §7. | Accountable author for Path A; external statistical review before regulated reuse | PFS/TTPAIN event composition, summaries and lineage. |
+| `ED-04` | How is the SAP `T-11-8` collision resolved? | SAP Table 22 assigns `T-11-3` PSA response, `T-11-4` ORR, `T-11-5` pain response and `T-11-8` TTPAIN; the current catalog/physical block is wrong. | **Recommended:** restore the complete SAP-native `T-11-3`–`T-11-8` mapping in Approval Specification §8. Do not invent an extension for the primary PSA/ORR results. | Accountable author for Path A; sponsor/SAP authority before regulated reuse | TFL catalog, ARM/ARS, Define, traceability matrix, package, and reviewer narrative. |
+| `ED-05` | What population governs TTUMOR? | Current Path A ADTTE incorrectly uses ITT ∩ measurable disease (`MEASDISF='Y'`). Protocol/publication evidence and SAP Table 22 support ITT. | **Recommended:** one TTUMOR record per ITT subject; retain measurable disease as supportive subgroup/sensitivity only. ORR remains measurable-disease restricted. | Accountable author for Path A; sponsor/SAP authority before regulated reuse | TTUMOR dens, shells, estimand wording, and metadata. |
+| `ED-06` | What are the time origins for secondary TTE parameters? | Code uses `RANDDT` for OS/PFS/TTPAIN/TTPSA/TTUMOR and `TRTSDT` for TTSAE; one reviewer-guide passage conflicts. | **Recommended:** adopt the current parameter-level origins in Approval Specification §9 and correct reviewer-facing text. | Accountable author for Path A; sponsor/SAP authority before regulated reuse | `STARTDT`, `AVAL`, ADRG, traceability, and Define methods. |
+| `ED-07` | What exact pain progression algorithm is authorized? | Current code uses the wrong PPI/AS thresholds and AS summary, can confirm across different components, and accepts a terminal single trigger. | **Recommended:** component-specific 5-of-7 summaries; PPI median increase `>=1`; mean AS increase `>=25%` with positive baseline; same component at two consecutive scheduled evaluations at least 21 days apart; do not bridge an intervening missing/non-evaluable visit; no terminal exception; RT standalone; SV visit-date hierarchy. | Accountable author for Path A; external statistical/medical review before regulated reuse | TTPAIN and PFS derivations, event dating, censoring, source traceability and regression scope. |
 
-## 4. Required approval record
+## 4. Required accountable-author decision
 
-No approval is recorded by this document. Use the [`F-042 Endpoint Approver Review Packet`](F042_APPROVER_REVIEW_PACKET_2026-08-03.md) to conduct the review, then record the authoritative disposition below.
+No decision is recorded by this unsigned document. Use the [`F-042 Endpoint Approver Review Packet`](F042_APPROVER_REVIEW_PACKET_2026-08-03.md) to conduct the review, then record the accountable Path A disposition below.
 
-### Approval election
+### Author decision election
 
-- [ ] **APPROVE AS WRITTEN** — approve `ED-01` through `ED-07` and authorize implementation of Approval Specification §§3–10.
-- [ ] **APPROVE WITH DOCUMENTED MODIFICATIONS** — attach exact replacement wording and identify affected decision IDs.
+- [ ] **ADOPT AS WRITTEN FOR PATH A** — adopt `ED-01` through `ED-07` and authorize implementation of Approval Specification §§3–10.
+- [ ] **ADOPT WITH DOCUMENTED MODIFICATIONS FOR PATH A** — attach exact replacement wording and identify affected decision IDs.
 - [ ] **REJECT / RETURN FOR REVISION** — identify rejected decision IDs and rationale.
 
 If decisions are dispositioned individually, complete every row:
 
-| Decision | Approve as written | Modify (attach wording) | Reject | Statistician initials | Medical initials where required |
-|---|---|---|---|---|---|
-| `ED-01` | [ ] | [ ] | [ ] | — | — |
-| `ED-02` | [ ] | [ ] | [ ] | — | — |
-| `ED-03` | [ ] | [ ] | [ ] | — | N/A |
-| `ED-04` | [ ] | [ ] | [ ] | — | N/A |
-| `ED-05` | [ ] | [ ] | [ ] | — | N/A |
-| `ED-06` | [ ] | [ ] | [ ] | — | N/A |
-| `ED-07` | [ ] | [ ] | [ ] | — | — |
+| Decision | Adopt as written | Modify (attach wording) | Reject | Accountable-author initials |
+|---|---|---|---|---|
+| `ED-01` | [ ] | [ ] | [ ] | — |
+| `ED-02` | [ ] | [ ] | [ ] | — |
+| `ED-03` | [ ] | [ ] | [ ] | — |
+| `ED-04` | [ ] | [ ] | [ ] | — |
+| `ED-05` | [ ] | [ ] | [ ] | — |
+| `ED-06` | [ ] | [ ] | [ ] | — |
+| `ED-07` | [ ] | [ ] | [ ] | — |
 
 | Role | Required action | Name / signature | Date | Status |
 |---|---|---|---|---|
-| Sponsor statistician | Approve/revise/reject ED-01–ED-07 and the primary/sensitivity estimands | — | — | **Pending** |
-| Medical reviewer | Approve/revise/reject pain clinical meaning, cancer-related evidence and RT intent handling | — | — | **Pending** |
-| Programming lead | Confirm feasibility, source availability, implementation plan and regression scope | — | — | **Pending** |
-| QC/independent reviewer | Confirm the specification is independently testable and the planned evidence is sufficient | — | — | **Pending** |
+| Accountable author / project owner | Adopt, modify, or reject ED-01–ED-07; acknowledge the single-author limitations below | — | — | **Pending** |
+| External statistician/medical reviewer | Required before regulated, sponsor, or filing use; optional enhancement for Path A | Not available | — | **Not performed** |
 
-An email, meeting minute, or signed amendment may be attached or linked only after it is available. Blank fields must not be replaced with invented approval metadata.
+### Single-author limitation acknowledgement
 
-By signing, each approver confirms that any modification is written into the controlled record or an identified attachment. Verbal qualifications and unlinked email statements are not executable authority.
+By signing, the accountable author acknowledges that:
+
+- the same person performed the evidence review, selected the proposed interpretation, and will direct implementation;
+- no independent human statistician, medical reviewer, programming lead, or QC unit is represented;
+- adoption authorizes only the Path A controlled non-submission demonstration;
+- separate SAS/R implementations, automated tests, subject-level reconciliation, and a documented delayed second-pass review mitigate—but do not eliminate—the lack of independent human review; and
+- external qualified statistical and medical review, sponsor governance, and applicable validated-system controls remain required before regulated or filing use.
+
+The accountable-author signature is a project decision record, not sponsor approval, independent medical/statistical approval, or a Part 11 electronic signature. Blank fields must not be replaced with invented identity or approval metadata.
+
+By signing, the author confirms that any modification is written into the controlled record or an identified attachment. Verbal qualifications and unlinked statements are not executable authority.
 
 ## 5. Implementation gate for the next phase
 
-Phase 2 programming is **blocked** until ED-01 through ED-07 have an explicit signed disposition. A partially signed record is non-executable unless the signed text explicitly authorizes a bounded subset that has no dependency on the unresolved decisions.
+Phase 2 programming is **blocked** until the accountable author has signed and dated an explicit disposition for ED-01 through ED-07 and acknowledged the single-author limitations. A partially dispositioned record is non-executable unless the signed text explicitly authorizes a bounded subset that has no dependency on unresolved decisions.
 
-After approval, the implementation order is:
+After accountable-author adoption, the implementation order is:
 
-1. Stage full PR and construct the signed CM+PR candidate union with provenance.
-2. Implement the signed visit-level pain summaries, confirmation rule, event-date hierarchy and cancer-related qualification independently in SAS and R.
-3. Implement the signed primary, diary-only, RT-only and missing-date analyses.
+1. Stage full PR and construct the author-adopted CM+PR candidate union with provenance.
+2. Implement the author-adopted visit-level pain summaries, confirmation rule, event-date hierarchy and cancer-related qualification separately in SAS and R.
+3. Implement the author-adopted primary, diary-only, RT-only and missing-date analyses.
 4. Expand TTUMOR to ITT and retain the measurable-disease supportive analysis.
 5. Restore the SAP-native `T-11-3`–`T-11-8` catalog and physical mappings; update metadata/reviewer documents.
-6. Reconcile SAS/R and scoped admiral results; quantify every event and denominator reclassification.
+6. Reconcile separately programmed SAS/R results and scoped admiral checks; quantify every event and denominator reclassification.
 7. Rerun the complete DAG and reseal only after all output and traceability checks pass.
 
-If approval is not obtained, retain the current Path A labels and the explicit F-042 residual. Do not change the validated analysis merely to make the catalog appear complete.
+If author adoption is not recorded, retain the current Path A labels and the explicit F-042 residual. Do not change the validated analysis merely to make the catalog appear complete.
 
 ## 6. Companion evidence
 
 - [Approver review packet](F042_APPROVER_REVIEW_PACKET_2026-08-03.md)
 - [F-042 impact appendix](F042_PFS_PAIN_IMPACT_APPENDIX_2026-08-03.md)
-- [Approval-ready executable specification](F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md)
+- [Author-decision-ready endpoint specification](F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md)
 - [Machine-readable decision state](endpoint_decision_record_F042_T11_8_2026-08-03.yaml)
 - [PR source qualification audit](F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.md)
 - [Machine-readable PR source profile](F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.yaml)

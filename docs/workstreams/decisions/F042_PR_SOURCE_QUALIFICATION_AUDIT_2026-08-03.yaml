@@ -3,12 +3,12 @@
 
 profile:
   id: F042-PR-SOURCE-QUAL-2026-08-03
-  version: 0.2.0
-  status: approval_evidence_complete
+  version: 0.2.1
+  status: author_decision_evidence_complete
   executable: false
   endpoint_consumption_allowed: false
   parent_decision: EDR-F042-T11-8-2026-08-03
-  approval_dependency: ED-02
+  author_decision_dependency: ED-02
   source: 01_source_data/real_sdtm/pr.sas7bdat
   target_staging: 01_source_data/real_sdtm/staging/pr.rds
 
@@ -80,7 +80,7 @@ controls:
   preserve_source_text: true
   no_day_imputation: true
   no_treatment_intent_inference_at_ingest: true
-  no_endpoint_consumption_before_approval: true
+  no_endpoint_consumption_before_author_adoption: true
   no_current_output_change: true
   no_pr_only_precedence: true
   exact_subject_date_auto_dedup_only: true

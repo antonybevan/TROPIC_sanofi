@@ -8,7 +8,7 @@
 
 ## Approval-preparation addendum
 
-The later protocol/publication/source-to-code review found that the original handoff understated the required correction. The approval-ready [`F-042 Endpoint Approval Specification`](../../../docs/workstreams/decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md) supersedes this audit's former recommended dispositions for S2-01, S2-02 and S2-04:
+The later protocol/publication/source-to-code review found that the original handoff understated the required correction. The accountable-author decision-ready [`F-042 Endpoint Approval Specification`](../../../docs/workstreams/decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md) supersedes this audit's former recommended dispositions for S2-01, S2-02 and S2-04:
 
 - restore the existing SAP-native `T-11-3` PSA response, `T-11-4` ORR, `T-11-5` pain response and `T-11-8` TTPAIN mappings rather than assigning the primary response results to a new extension;
 - use ITT as primary TTUMOR, with measurable disease as support rather than primary denominator; and

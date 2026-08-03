@@ -41,7 +41,7 @@
 | **F-025** | Major | `non_submission_demo_limit` | **ACCEPTED** (was UNVERIFIED) | Hash seals ≠ Part 11. Product is explicitly non-Part-11 until org CSV program exists. |
 | **F-040** | Major | `resolve_now` | **RESOLVED** | ADTTE TTUMOR censoring now excludes DS death milestones and baseline-only records; final output has zero death-date TTUMOR censors. Evidence: `SECTION_03_ADAM_DERIVATION_AUDIT_2026-08-03.md`. |
 | **F-041** | Major | `resolve_now` | **RESOLVED** | PFS now uses the latest valid post-baseline RECIST/PSA/evaluable-pain assessment, or randomization when none exists; NACT remains priority. SAS/R/admiral agree after the final 34-stage run. |
-| **F-042** | Major | `scope_out_with_disclosure` | **ACCEPTED** | The sealed pain rule is reproducible but non-conforming in thresholds, AS summary, confirmation, event dating and CM/PR use. The approval-ready ED-01–ED-07 package specifies the corrected pain rule, CM+PR union, sensitivities, TTUMOR ITT and SAP-native T-11 mapping. Current Path A remains an explicit residual until named signatures, implementation, independent QC and reseal. |
+| **F-042** | Major | `scope_out_with_disclosure` | **ACCEPTED** | The sealed pain rule is reproducible but non-conforming in thresholds, AS summary, confirmation, event dating and CM/PR use. The ED-01–ED-07 package specifies the corrected pain rule, CM+PR union, sensitivities, TTUMOR ITT and SAP-native T-11 mapping. Under the disclosed one-person Path A model, implementation requires accountable-author sign-off, separately programmed SAS/R reconciliation, delayed second-pass review and reseal. This is not independent, sponsor, medical, or regulated approval. |
 
 ## Minor (not RC Crit/Major gate)
 

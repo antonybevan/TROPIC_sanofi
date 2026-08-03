@@ -9,7 +9,7 @@
 
 ## 1. Audit purpose
 
-This audit establishes whether the raw SDTM PR domain and the staged CM domain are technically available and linkable for a future approved palliative-radiotherapy rule. It is a source-quality and staging-readiness assessment only.
+This audit establishes whether the raw SDTM PR domain and the staged CM domain are technically available and linkable for a future author-adopted Path A palliative-radiotherapy rule. It is a source-quality and staging-readiness assessment only.
 
 It does not classify treatment intent, decide whether a procedure is palliative for pain, define a PFS event window, or change the current ADTTE/TFL outputs.
 
@@ -56,7 +56,7 @@ The date-only linkage does not answer whether a later procedure should alter an 
 
 ### 3.1 Direct-intent CM/PR review
 
-The approval review identified source text containing both a radiation concept and an explicit `PALLIATIVE` or `ANTALGIC` intent term. This narrow screen avoids false-positive matches such as estradiol, generic historical radiotherapy and radiopharmaceutical terms.
+The decision review identified source text containing both a radiation concept and an explicit `PALLIATIVE` or `ANTALGIC` intent term. This narrow screen avoids false-positive matches such as estradiol, generic historical radiotherapy and radiopharmaceutical terms.
 
 | Direct-intent screen | CM | PR |
 |---|---:|---:|
@@ -69,7 +69,7 @@ The approval review identified source text containing both a radiation concept a
 
 All 13 direct-intent CM rows are categorized as post-treatment anti-cancer therapy. Twelve have complete start dates; one has a recorded end date but no start date. The latter cannot enter the primary exact-date event derivation.
 
-The direct-intent CM and PR subject sets do not overlap. Therefore, the prior proposal to make PR the sole or presumptive primary endpoint source would omit distinct CM evidence and is rejected. The approval-ready proposal uses a CM+PR union with source-level provenance.
+The direct-intent CM and PR subject sets do not overlap. Therefore, the prior proposal to make PR the sole or presumptive primary endpoint source would omit distinct CM evidence and is rejected. The author-decision-ready proposal uses a CM+PR union with source-level provenance.
 
 ## 4. Staging-readiness assessment
 
@@ -81,11 +81,11 @@ The direct-intent CM and PR subject sets do not overlap. Therefore, the prior pr
 | Date derivation | 148 complete dates; 3 year-month dates | **Required** — retain source precision; no day imputation. |
 | Key integrity | No duplicate `USUBJID/PRSEQ`; subject mapping complete | **PASS** for staging readiness. |
 | ADSL linkage | 65/65 PR subjects link to real MP ITT ADSL | **PASS** for linkage readiness. |
-| Endpoint qualification | No approved rule | **BLOCKED** pending ED-01/ED-02/ED-03. |
+| Endpoint qualification | No author-adopted rule | **BLOCKED** pending accountable-author disposition of ED-01/ED-02/ED-03. |
 
-## 5. Approval-ready staging/source specification — pending signature
+## 5. Author-decision-ready staging/source specification — pending author sign-off
 
-If ED-02 is approved, the staging layer should:
+If ED-02 is author-adopted, the staging layer should:
 
 1. Create `01_source_data/real_sdtm/staging/pr.rds` from the raw PR domain using the existing uppercase-domain ingestion convention.
 2. Preserve all 151 rows and all source variables; do not filter to radiotherapy at ingestion.
@@ -95,10 +95,10 @@ If ED-02 is approved, the staging layer should:
 6. Construct the downstream candidate set from the union of direct-intent CM and PR records; require a radiation concept plus explicit `PALLIATIVE` or `ANTALGIC` source text.
 7. Do not auto-classify generic radiotherapy, prior-radiation categories, radiopharmaceuticals or substring false positives as palliative pain events.
 8. Collapse only exact subject/date duplicates automatically, retaining both source records and provenance. Do not silently merge non-exact dates.
-9. Apply the signed date and cancer-related qualification rules only in the downstream endpoint derivation layer.
+9. Apply the author-adopted date and cancer-related qualification rules only in the downstream endpoint derivation layer.
 10. Add SAS/R regression fixtures for duplicate keys, partial/missing dates, same-day cross-domain records, non-exact records, post-randomization timing, generic radiation and false-positive text.
 
-This is a proposed technical staging design, not an approved clinical derivation.
+This is a proposed technical staging design, not an independently or medically approved clinical derivation.
 
 ## 6. Release and data-integrity boundary
 
@@ -115,8 +115,8 @@ The raw patient-level PR file remains outside git under the repository data-righ
 
 Before CM or PR is consumed by an endpoint program, the parent decision record must contain:
 
-- approved CM+PR union and exact-duplicate precedence;
-- approved treatment-intent classification rule;
-- approved date precision and window handling;
-- an identified medical/statistical approver;
+- author-adopted CM+PR union and exact-duplicate precedence;
+- author-adopted treatment-intent classification rule;
+- author-adopted date precision and window handling;
+- accountable-author identity, sign-off date, and single-author limitation acknowledgement;
 - a planned SAS/R reconciliation and subject-level impact report.
