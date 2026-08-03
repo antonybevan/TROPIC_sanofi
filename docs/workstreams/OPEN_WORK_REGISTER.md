@@ -6,6 +6,18 @@
 
 ---
 
+## Current endpoint decision handoff (2026-08-03)
+
+The next controlled work item is specification closure, not an unapproved ADTTE rewrite.
+
+| ID | Pri | Owner | Work | Why it matters | Exit |
+|---|---|---|---|---|---|
+| **W-ENDPOINT-01** | **P0** | WS-2 / WS-4 + sponsor statistician / medical reviewer | Approve the F-042 pain-supporting-disease rule, PR source/precedence, palliative-RT sensitivity, and SAP `T-11-8` mapping; clarify TTUMOR population and TTE origins. | Numerical parity cannot prove an unresolved clinical interpretation or an SAP-ID mapping. | [`EDR-F042-T11-8-2026-08-03.md`](decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md) approved or explicitly scoped out; then Phase 2 rerun plan. |
+
+The decision record and impact appendix are documentation-only and leave the current Path A outputs untouched. The historical backlog below remains useful evidence, but this handoff supersedes its older “next session” ordering for endpoint work.
+
+---
+
 ## Active backlog
 
 ### SDTM layer (complete E2E audit first — 2026-07-09)
@@ -57,9 +69,10 @@
 
 ## Priority order for next session
 
-1. **W-PKG-01** — refresh package outputs (TFLs, guides PDFs, eCTD leaves) after 2026-08-01 remediation regen
-2. **W-ADAM-02** — promote TEAE AESER soft QC to hard gate after rebuild
-3. Otherwise hold Path A with the 2026-08-01 remediation audit trail (T-17 Safety dens, ECOG pooling, T-11-6/7 IDs, seal source-tree binding, CRF tag, guide sync)
+1. **W-ENDPOINT-01** — obtain the controlled endpoint/catalog decision before changing ADTTE or TFL outputs
+2. **W-PKG-01** — refresh package outputs (TFLs, guides PDFs, eCTD leaves) only after any approved endpoint rerun
+3. **W-ADAM-02** — promote TEAE AESER soft QC to hard gate after rebuild
+4. Otherwise hold Path A with the 2026-08-01 remediation audit trail (T-17 Safety dens, ECOG pooling, T-11-6/7 IDs, seal source-tree binding, CRF tag, guide sync)
 
 **Meta-audit (2026-07-09):** `docs/workstreams/reviews/WS_META_AUDIT_PATH_A_2026-07-09.md`  
 Source decision: `WS1_CRF_GROUNDING_D012_2026-07-09.md` · dens: `WS4_ADAM_DENS_AUDIT_2026-07-09.md`

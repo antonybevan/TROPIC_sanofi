@@ -1,0 +1,109 @@
+# Documentation-only decision state for EDR-F042-T11-8-2026-08-03.
+# This file is intentionally not consumed by the pipeline while status is draft_pending_approval.
+
+record:
+  id: EDR-F042-T11-8-2026-08-03
+  version: 0.1.0
+  status: draft_pending_approval
+  executable: false
+  consumption: documentation_only
+  product_path: A_controlled_non_submission_demonstration
+  baseline_commit: a213667
+  current_outputs_unchanged: true
+  approval_required: true
+  approval_roles:
+    - sponsor_statistician
+    - medical_reviewer
+    - programming_lead
+    - qc_reviewer
+  authority:
+    product_claim: docs/PRODUCT_CLAIM.md
+    sap_lock_memo: 06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md
+    findings_board: 06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md
+    section_2_audit: 06_qc_evidence/audit/section_reviews/SECTION_02_POPULATIONS_ENDPOINTS_AUDIT_2026-08-03.md
+    section_3_audit: 06_qc_evidence/audit/section_reviews/SECTION_03_ADAM_DERIVATION_AUDIT_2026-08-03.md
+    section_4_audit: 06_qc_evidence/audit/section_reviews/SECTION_04_METADATA_TFL_REVIEWER_PACKAGE_AUDIT_2026-08-03.md
+
+decisions:
+  - id: ED-01
+    status: open_approval
+    question: PFS pain progression supporting disease evidence
+    current_state: 37 real-MP pain-led PFS candidate records are labelled; no approved evidence hierarchy or time window exists.
+    proposed_direction: Approve the evidence set, hierarchy, and time window before implementation.
+    approval_roles: [sponsor_statistician, medical_reviewer]
+    blocks:
+      - pfs_derivation_change
+      - filing_facing_endpoint_claim
+
+  - id: ED-02
+    status: open_approval
+    question: Palliative radiotherapy source and precedence
+    current_state: Raw PR contains 11 radiation-related rows across 9 subjects; PR is not staged; CM also contains radiation history.
+    proposed_direction: Stage PR as the primary procedure source unless the approved decision specifies another precedence; define CM handling and date/intent rules.
+    approval_roles: [sponsor_statistician, medical_reviewer]
+    blocks:
+      - pr_staging
+      - palliative_rt_derivation
+
+  - id: ED-03
+    status: open_approval
+    question: Palliative-RT-only sensitivity
+    current_state: SAP mentions palliative radiotherapy, but no controlled sensitivity output is produced.
+    proposed_direction: Pre-specify the primary qualification rule and an explicit RT-only sensitivity scenario before coding.
+    approval_roles: [sponsor_statistician]
+    blocks:
+      - sensitivity_programming
+
+  - id: ED-04
+    status: open_approval
+    question: SAP T-11-8 collision
+    current_state: SAP T-11-8 is TTPAIN; current physical T-11-8 is response summary.
+    proposed_direction: Restore TTPAIN to T-11-8 and move response summary to an approved extension identifier, or approve a documented SAP/catalog amendment and defer TTPAIN.
+    recommended_option: restore_ttpain_to_t_11_8_and_assign_approved_response_extension
+    approval_roles: [sponsor_statistician]
+    blocks:
+      - tfl_catalog_change
+      - metadata_reseal
+
+  - id: ED-05
+    status: clarification_required
+    question: TTUMOR population
+    current_state: Path A uses ITT measurable disease; SAP Table 22 wording requires clarification.
+    proposed_direction: Retain the current endpoint-specific measurable implementation for Path A and document the approved SAP interpretation before filing-facing use.
+    approval_roles: [sponsor_statistician]
+
+  - id: ED-06
+    status: clarification_required
+    question: Secondary TTE time origins
+    current_state: RANDDT anchors OS/PFS/TTPAIN/TTPSA/TTUMOR; TRTSDT anchors TTSAE; one reviewer-guide passage conflicts.
+    proposed_direction: Approve parameter-level origins and synchronize reviewer-facing documentation.
+    approval_roles: [sponsor_statistician]
+
+impact_baseline:
+  dataset: 04_analysis_datasets/adam/adtte_prod.xpt
+  arm: MP
+  pfs_itt_rows: 371
+  pfs_event_rows: 327
+  disease_progression_events: 282
+  pain_progression_candidate_events: 37
+  death_events: 8
+  censored_rows: 44
+  radiation_pr_rows: 11
+  radiation_pr_subjects: 9
+  pain_event_subjects_with_any_radiation_pr: 1
+  radiation_pr_rows_on_or_before_pain_event: 0
+  source_pr_dataset: 01_source_data/real_sdtm/pr.sas7bdat
+  source_pr_staged: false
+
+implementation_gate:
+  phase_2_allowed: false
+  required_approved_decisions: [ED-01, ED-02, ED-03, ED-04]
+  required_clarifications_before_reseal: [ED-05, ED-06]
+  no_silent_rule_inference: true
+  no_output_regeneration_in_phase_1: true
+
+signoffs:
+  sponsor_statistician: pending
+  medical_reviewer: pending
+  programming_lead: pending
+  qc_reviewer: pending

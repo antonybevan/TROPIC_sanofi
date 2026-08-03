@@ -130,6 +130,7 @@
 |---|---|
 | Execution board | [`WORKSTREAM_EXECUTION_BOARD.md`](WORKSTREAM_EXECUTION_BOARD.md) |
 | WS packs | [`workstreams/`](workstreams/) |
+| Endpoint decision pack | [`workstreams/decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md`](workstreams/decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md) |
 | Delivery model | [`BIOMETRICS_DELIVERY_OPERATING_MODEL.md`](BIOMETRICS_DELIVERY_OPERATING_MODEL.md) |
 | Regulatory workflow research | [`REGULATORY_WORKFLOW_RESEARCH.md`](REGULATORY_WORKFLOW_RESEARCH.md) |
 
