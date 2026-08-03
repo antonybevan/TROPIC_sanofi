@@ -87,12 +87,12 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 
 | Field | Content |
 |---|---|
-| **Owned artifacts** | SAP v4.0 · `config/study_config.yaml` · CTQ/estimand register · ANALYSIS_REPORT · population rules (ITT/Safety/MEASDISF) · F-011 PSA denom residual |
-| **Current status** | **AMBER** — config and SAP exist; G02 **is stage-gated** (executable); PSA eligibility shell residual (F-011) remains |
-| **Open risks** | Spec drift from SAP; G02 never machine-checked; PSA / ITT wording inconsistency under review pressure |
-| **Required evidence pack** | (1) Spec-to-config trace table · (2) Population/endpoint matrix · (3) Sensitivity list · (4) Explicit disposition of F-011 in ADRG + TFL footnotes if not coded |
+| **Owned artifacts** | SAP v4.0 · `config/study_config.yaml` · CTQ/estimand register · ANALYSIS_REPORT · population rules (ITT/Safety/MEASDISF) · [Section 2 audit](../06_qc_evidence/audit/section_reviews/SECTION_02_POPULATIONS_ENDPOINTS_AUDIT_2026-08-03.md) |
+| **Current status** | **AMBER** — G02 is runtime stage-gated; F-011 PSA eligibility is resolved; the Section 2 review found an open SAP `T-11-8` endpoint-ID collision and TTUMOR population wording ambiguity |
+| **Open risks** | SAP Appendix D/Table 22 calls `T-11-8` TTPAIN while the physical block is PSA/ORR; TTUMOR is measurable in code but ITT in one SAP catalog row; secondary TTE origins need one authority |
+| **Required evidence pack** | (1) Section 2 audit and population/endpoint matrix · (2) spec-to-config trace · (3) sensitivity list · (4) recorded SAP amendment or extension-ID decision for `T-11-8` · (5) Section 3 ADTTE origin/diary handoff |
 | **Release gate** | G02 before claiming SAP-complete TFLs |
-| **Next action** | Control table filed (`docs/workstreams/WS2_POPULATION_ENDPOINT_CONTROL.md`). **Next:** record one WS-2 review note; optional machine G02 check |
+| **Next action** | Section 2 audit filed; hand off S2-02/S2-03/S2-04 to Section 3, then record the `T-11-8` decision before any SAP-complete output claim |
 
 ---
 
@@ -191,7 +191,7 @@ WS-7 Release ──G08/G09──► tagged package (v0.1.0-demo-rc.1 done for de
 | **P0** | WS-5 | Known-differences / residual risk memo for reviewers | Makes ACCEPTED findings usable in interview/review |
 | **P1** | WS-6 | ADRG/SDRG/BDRG hardening against board + claim | Reviewer package is the human product |
 | **P1** | WS-1 + WS-3 | External validation evidence index (CORE residual + P21 slot + XSD + eCTD validate) | Industry-grade package layer |
-| **P2** | WS-2 | Spec/config/TFL dot-connection audit | Confirms G02 content, not just stage wiring |
+| **Done** | WS-2 | Section 2 populations/endpoints audit | Confirms live denominators, corrected T-11-6/T-11-7 mapping, and records the T-11-8 collision |
 | **Done** | WS-7 | `verify_release` + CI `path-a-seal-verify` | Operational polish without reopening science |
 | **P3** | WS-4 | Deferred TFL backlog only if claim expands | Do not explode scope on GREEN programming |
 

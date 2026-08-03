@@ -72,16 +72,20 @@ workstreams:
       - config/ctq_traceability.yaml
       - 07_reviewer_explanation/analysis_report.md
       - 07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md
+    note: "Section 2 audit completed 2026-08-03: live PSA/ORR denominators and T-11-6/T-11-7 mapping pass; SAP T-11-8 collision and TTUMOR population wording remain open for controlled disposition."
     open_risks:
-      - population_endpoint_content_requires_section_2_audit
+      - SAP_T11_8_TTPAIN_vs_response_block_collision
+      - SAP_TTUMOR_population_wording_requires_clarification
+      - secondary_TTE_time_origin_language_requires_one_authority
       - F-012_combined_n749_is_not_protocol_itt
     required_evidence:
       - population_endpoint_control_table
       - spec_to_config_trace
-    next_action: "Complete the Section 2 population/endpoint dot-connection audit against SAP, config, ADaM, and controlled TFLs"
+    next_action: "Hand off S2-02/S2-03/S2-04 to Section 3; record a SAP amendment or extension-ID decision for T-11-8 before any SAP-complete claim"
     residual_findings: [F-012]
     packs:
       - docs/workstreams/WS2_POPULATION_ENDPOINT_CONTROL.md
+      - 06_qc_evidence/audit/section_reviews/SECTION_02_POPULATIONS_ENDPOINTS_AUDIT_2026-08-03.md
 
   WS3_standards_metadata:
     name: Standards and metadata governance

@@ -86,6 +86,56 @@ def main() -> int:
         for token in ("ITTFL", "SAFFL", "tfl_output_catalog", "OS", "PFS"):
             add(f"population_doc.{token}", token in text, "missing token" if token not in text else "ok")
 
+        # Semantic controls added after the structural G02 lock.  These are
+        # deliberately data-free: the live XPT denominator checks belong in
+        # the Section 2 audit, while this gate prevents a stale control table
+        # from silently reintroducing the known endpoint/denominator drift.
+        lower = text.lower()
+        add(
+            "population_doc.T-11-6_TTUMOR",
+            "time to tumor progression" in lower and "t-11-6" in lower,
+            "T-11-6 must be the TTUMOR mapping",
+        )
+        add(
+            "population_doc.T-11-7_TTPSA",
+            "time to psa progression" in lower and "t-11-7" in lower,
+            "T-11-7 must be the TTPSA mapping",
+        )
+        add(
+            "population_doc.F-011_closure",
+            "f-011 resolved" in lower and "145/361" in lower and "61/330" in lower,
+            "PSA eligibility closure and current arm counts must be present",
+        )
+        add(
+            "population_doc.T-11-8_collision_disclosed",
+            "t-11-8" in lower and "ttpain" in lower and "collision" in lower,
+            "the SAP T-11-8 TTPAIN/response collision must be explicit until resolved",
+        )
+
+    cat_path = ROOT / "config/tfl_output_catalog.yaml"
+    if yaml is not None and cat_path.is_file():
+        cat = yaml.safe_load(cat_path.read_text(encoding="utf-8")) or {}
+        in_scope = {
+            str(row.get("id")): str(row.get("title", "")).lower()
+            for row in (cat.get("controlled_in_scope") or [])
+            if row.get("id")
+        }
+        full = {
+            str(row.get("id")): str(row.get("title", "")).lower()
+            for row in ((cat.get("sap_full_catalog") or {}).get("tables") or [])
+            if row.get("id")
+        }
+        add(
+            "catalog.T-11-6_semantics",
+            "tumor" in in_scope.get("T-11-6", "") and "tumor" in full.get("T-11-6", ""),
+            "T-11-6 must be tumor progression in both release and SAP catalogs",
+        )
+        add(
+            "catalog.T-11-7_semantics",
+            "psa" in in_scope.get("T-11-7", "") and "psa" in full.get("T-11-7", ""),
+            "T-11-7 must be PSA progression in both release and SAP catalogs",
+        )
+
     status = "PASS" if not problems else "FAIL"
     payload = {
         "gate": "G02",

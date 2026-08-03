@@ -6,6 +6,8 @@
 **As of:** 2026-07-09  
 **Current board status:** AMBER  
 
+**Section 2 review addendum (2026-08-03):** F-011 is resolved for the current PSA response set (MP 61/330; CbzP 145/361). The remaining reviewer-facing specification risks are the SAP `T-11-8` TTPAIN/response ID collision, the TTUMOR population wording, and one authoritative secondary-TTE time-origin statement; these are handed to WS-2/WS-4 rather than described as closed.
+
 ---
 
 ## 1. Goal
@@ -34,7 +36,7 @@ Each of ADRG, SDRG, BDRG must contain—near the top:
 | Data provenance | MP real / CbzP synthetic; Guyot vs PH | **Done (S1)** §1 + §7 |
 | Populations | ITT/Safety/MEASDISF consistent with WS-2 table | Present §5.4 — recheck at S2 |
 | Validation | Dual-lang + admiral + single-author disclosure | **Done (S1)** §6.0 Path A talk track |
-| Residuals | F-003, F-011, F-012, F-014 language | **Done (S1)** — memo linked; F-003/012 in §7 |
+| Residuals | F-003, F-012, F-014 language; F-011 closure | **Updated (S2)** — F-011 closure evidence and the Section 2 SAP/TFL findings are linked; F-003/012 remain in §7 |
 | TFL scope | Controlled catalog 18 IDs; deferred 21 | **Done (S1)** §6.0 table |
 | OCCDS | v1.0 + custom episode merge; no OCCDS v1.1 | Present |
 | Part 11 | Explicit non-claim | **Done (S1)** §0 table |

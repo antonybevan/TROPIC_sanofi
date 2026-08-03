@@ -87,15 +87,15 @@ Machine gates can be green while **residual risks** remain. This memo is the hum
 
 ### 3.3 Analysis / population / outputs
 
-#### F-011 — PSA response population shell (Major) · **ACCEPTED**  
-**Class:** `scope_out_with_disclosure` · **Owner:** WS-2 + WS-4  
+#### F-011 — PSA response population shell (Major) · **RESOLVED 2026-08-01**
+**Class:** `resolve_now` (closed for the current Path A response output) · **Owner:** WS-2 + WS-4
 
 | | |
 |---|---|
-| **Difference** | Controlled TFL uses ADRS `PSARESP` analysis records; a stricter SAP “baseline PSA eligible” shell is not implemented as a separate controlled deliverable. |
+| **Difference** | The controlled TFL now joins `PSARESP` to ADSL baseline PSA and filters `PSABL >= 20`, with a duplicate-subject guard. |
 | **Impact if ignored** | Population mismatch under SAP challenge |
-| **Why Path A holds** | Catalog/ADRG define delivered shell; not claimed as full SAP shell set |
-| **Close condition** | Code + shell + recon for eligibility flag |
+| **Why Path A holds** | The same eligible set drives the hierarchy gate, response TFL, SAS companion evidence, and regression contract; current counts are CbzP 145/361 and MP 61/330. |
+| **Close evidence** | `05_outputs/tfl/tfl_generation.R`, `tests/test_tfl_population_contract.R`, `06_qc_evidence/audit/section_reviews/SECTION_02_POPULATIONS_ENDPOINTS_AUDIT_2026-08-03.md`, and the 2026-08-01 full DAG seal. |
 
 #### F-014 — ARM completeness (Major) · **ACCEPTED**  
 **Class:** `scope_out_with_disclosure` · **Owner:** WS-3  
