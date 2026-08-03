@@ -3,7 +3,7 @@
 
 record:
   id: EDR-F042-T11-8-2026-08-03
-  version: 0.3.0
+  version: 0.3.1
   status: author_decision_ready_pending_signoff
   executable: false
   consumption: documentation_only
@@ -28,6 +28,7 @@ record:
     pr_source_profile: docs/workstreams/decisions/F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.yaml
     approval_specification: docs/workstreams/decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md
     approver_review_packet: docs/workstreams/decisions/F042_APPROVER_REVIEW_PACKET_2026-08-03.md
+    provisional_implementation_note: docs/workstreams/decisions/F042_PROVISIONAL_IMPLEMENTATION_NOTE_2026-08-03.md
 
 pre_implementation:
   status: decision_evidence_complete_endpoint_use_blocked
@@ -40,6 +41,13 @@ pre_implementation:
   pn_subject_visits: 1937
   pn_subject_visits_with_exact_sv_match: 1931
   current_pain_algorithm_conforms_to_authority: false
+  provisional_exploratory_work:
+    status: author_directed_pending_formal_signoff
+    implementation_scope: isolated_f042_r_derivation_and_synthetic_regression_tests
+    production_consumption_allowed: false
+    production_outputs_modified: false
+    release_reseal_allowed: false
+    formal_signoff_required_before_integration: true
 
 decisions:
   - id: ED-01

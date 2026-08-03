@@ -1,7 +1,7 @@
 # F-042 Endpoint Approver Review Packet
 
 **Packet ID:** `F042-APPROVER-PACKET-2026-08-03`<br>
-**Version:** `1.1.0`<br>
+**Version:** `1.1.1`<br>
 **Status:** **READY FOR ACCOUNTABLE-AUTHOR REVIEW — NO DECISION RECORDED**<br>
 **Decision record:** [`EDR-F042-T11-8-2026-08-03`](ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md)<br>
 **Approval specification:** [`F042-ENDPOINT-APPROVAL-SPEC-2026-08-03`](F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md)<br>
@@ -39,7 +39,10 @@ Until the accountable-author decision is signed and dated:
 
 - do not modify the sealed ADTTE, TFL, metadata, or package outputs;
 - do not describe TTPAIN/PFS as corrected, sponsor-approved, SAP-complete, or filing-ready; and
-- keep F-042 open as a disclosed Path A residual.
+- keep F-042 open as a disclosed Path A residual; and
+- if the author directs exploratory programming before signature, keep it isolated,
+  explicitly provisional, and linked to the non-production
+  [provisional implementation note](F042_PROVISIONAL_IMPLEMENTATION_NOTE_2026-08-03.md).
 
 ## 4. Decision summary
 

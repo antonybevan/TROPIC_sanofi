@@ -1,7 +1,7 @@
 # Endpoint Decision Record — F-042 / T-11-8
 
 **Record ID:** `EDR-F042-T11-8-2026-08-03`<br>
-**Version:** `0.3.0`<br>
+**Version:** `0.3.1`<br>
 **Status:** **AUTHOR-DECISION READY — PENDING ACCOUNTABLE-AUTHOR SIGN-OFF**<br>
 **Product path:** Path A — controlled non-submission demonstration<br>
 **Baseline commit:** `a213667` (`codex/submission-pipeline-rc`)<br>
@@ -12,6 +12,12 @@
 This record turns the open endpoint issues into explicit decisions that can be adopted, revised, rejected, or superseded. It is a decision-control artifact, not sponsor or medical approval. The exact recommended implementation is defined in the [`F-042 Endpoint Approval Specification`](F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md), which remains non-executable until the accountable author signs this record.
 
 The current validated ADTTE, TFL, metadata, and release outputs remain unchanged. Until the required decisions are author-adopted, no program may silently promote the current pain component to an SAP-complete PFS rule or treat the current response block as the SAP `T-11-8` TTPAIN deliverable.
+
+The separate [provisional implementation note](F042_PROVISIONAL_IMPLEMENTATION_NOTE_2026-08-03.md)
+records a bounded author-directed exploratory program. That artifact may inspect
+the proposed rules and quantify provisional impact, but it cannot consume the
+decision as production authority, modify/reseal Path A outputs, or represent
+formal author adoption before the signed record is complete.
 
 This record is subordinate to:
 
