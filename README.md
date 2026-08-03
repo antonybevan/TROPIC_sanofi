@@ -32,6 +32,8 @@
 **What GitHub is allowed to contain:** [`docs/REPO_SURFACE_POLICY.md`](docs/REPO_SURFACE_POLICY.md)  
 **10-minute interviewer walk:** [`docs/INTERVIEWER_GUIDE.md`](docs/INTERVIEWER_GUIDE.md)
 
+> The linked `v0.1.0-demo-rc.1` note is a historical Path A tag record. The current branch contains subsequent controlled hardening; its current audit baseline is recorded in [`06_qc_evidence/audit/section_reviews/SECTION_00_GOVERNANCE_SAP_AUDIT_2026-08-03.md`](06_qc_evidence/audit/section_reviews/SECTION_00_GOVERNANCE_SAP_AUDIT_2026-08-03.md).
+
 > **Portfolio surface:** this repo tracks the **review package face**, **spine programs**, **config**, and a **minimal seal pack** — not patient data, not secrets, not regenerable factory status piles. That is standard practice, not incompleteness.
 
 ---
@@ -181,7 +183,7 @@ Multi-study proof: `python3 platform/cibuild.py --study DEMO02` — see [`studie
 
 ## Pipeline (factory summary)
 
-Manifest-driven **~30-stage DAG** (`config/study_manifest.yaml` · `platform/cibuild.py`):
+Manifest-driven **34-stage DAG** (`config/study_manifest.yaml` · `platform/cibuild.py`):
 
 ```text
 01 real SDTM (local, not in git)

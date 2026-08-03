@@ -1,6 +1,6 @@
 # Offline Capability-Layer Runbook
 
-The 30-stage pipeline (`platform/cibuild.py`, gated by `.github/workflows/ci.yml`)
+The 34-stage pipeline (`platform/cibuild.py`, gated by `.github/workflows/ci.yml`)
 builds and validates the core ADaM/SDTM/TFL/Define/eCTD deliverables, third-engine
 admiral evidence, Dataset-JSON, ARS, USDM, log cleanliness, and release-manifest binding.
 A remaining **additive capability layer** runs on demand beside it: the SDTMIG-3.4 uplift,

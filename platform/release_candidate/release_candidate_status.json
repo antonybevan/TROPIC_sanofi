@@ -1,6 +1,6 @@
 {
   "status": "PASS",
-  "generated_at": "2026-08-01 14:49:42 UTC",
+  "generated_at": "2026-08-03 05:31:19 UTC",
   "checks": 17,
   "pass": 17,
   "warning": 0,
@@ -69,7 +69,7 @@
       "gate": "G05 output_promotion",
       "check": "TFL output index is complete for controlled catalog scope",
       "status": "PASS",
-      "evidence": "platform/tfl_output_index_status.json status=pass; controlled_catalog=pass; in_scope=18; deferred=21; stale_sas_companions_nongating=6",
+      "evidence": "platform/tfl_output_index_status.json status=pass; controlled_catalog=pass; in_scope=18; deferred=21; stale_sas_companions_nongating=0",
       "required_action": ""
     },
     {
@@ -104,7 +104,7 @@
       "gate": "G09 release_candidate_lock",
       "check": "Current release-run manifest is release-candidate grade (full DAG, clean tree)",
       "status": "PASS",
-      "evidence": "platform/release_run_manifest/release_run_manifest.json status=PASS; evidence_grade=release_candidate; run_scope=full_dag; seal=1b5c823c43776e06e4ee6a5c549b0a3ca6f1868438103725a37bc012830a62d0",
+      "evidence": "platform/release_run_manifest/release_run_manifest.json status=PASS; evidence_grade=release_candidate; run_scope=full_dag; seal=070232617a258217662d056a7471b28bd3c4e081d612ae509518a76696f67230",
       "required_action": ""
     },
     {

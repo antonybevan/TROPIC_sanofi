@@ -1,9 +1,11 @@
 # TROPIC Workstream Execution Board
 
 **Status:** Active operating board — not a decorative architecture map  
-**As of:** 2026-07-09 (resume after portfolio surface)  
-**Branch tip:** `codex/repo-structure-phase2` (presentation + git surface hygiene pushed)  
-**Pipeline seal:** `v0.1.0-demo-rc.1` · release-run `PASS` · RC checklist `PASS` · `verify_release` 25/25  
+**As of:** 2026-08-03 (Section 0 governance/SAP audit opened)
+**Audit baseline:** `d32b04d` on `codex/submission-pipeline-rc`
+**Latest sealed run:** source head `73d8ca1`; seal outputs committed in `d32b04d` · `oda` · `full_dag` · 34/34 stages
+**Current controls:** RC checklist 17/17 · `verify_release` 30/30 · CI green
+**Historical Path A tag:** `v0.1.0-demo-rc.1` (its release note remains immutable)
 **Product claim in force:** **Path A controlled non-submission demonstration** (`docs/PRODUCT_CLAIM.md`)  
 **Authority:** SAP v4.0 remediation lock · `06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md` · `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md`  
 **Portfolio surface:** `docs/REPO_SURFACE_POLICY.md` · `docs/INTERVIEWER_GUIDE.md` · dual-surface README
@@ -189,7 +191,7 @@ WS-7 Release ──G08/G09──► tagged package (v0.1.0-demo-rc.1 done for de
 | **P0** | WS-5 | Known-differences / residual risk memo for reviewers | Makes ACCEPTED findings usable in interview/review |
 | **P1** | WS-6 | ADRG/SDRG/BDRG hardening against board + claim | Reviewer package is the human product |
 | **P1** | WS-1 + WS-3 | External validation evidence index (CORE residual + P21 slot + XSD + eCTD validate) | Industry-grade package layer |
-| **P2** | WS-2 | Spec/config/TFL control table | Closes G02 gap |
+| **P2** | WS-2 | Spec/config/TFL dot-connection audit | Confirms G02 content, not just stage wiring |
 | **Done** | WS-7 | `verify_release` + CI `path-a-seal-verify` | Operational polish without reopening science |
 | **P3** | WS-4 | Deferred TFL backlog only if claim expands | Do not explode scope on GREEN programming |
 
@@ -227,11 +229,11 @@ Not “another GREEN JSON.”
 
 **Done recently:** portfolio surface · WS-6 guides · CORE matrix · CI green · **D-012 CRF grounding audit**  
 
-**Next (optional polish):**
+**Next (controlled audit sequence):**
 
-1. Re-package guide PDFs into `m5/` when convenient  
-2. WS-2 review note if population/endpoint narrative drifts  
-3. Extend CRF grounding to additional domains only if claimed in programming 
+1. Complete Section 0 governance/SAP synchronization and record the audit memo.
+2. Audit Section 1 source intake/SDTM provenance and CORE residuals.
+3. Continue through populations/endpoints, ADaM, metadata, TFLs, QC, writing, and package integrity before issuing a successor Path A release note.
 
 ```bash
 python3 scripts/verify_release.py   # local

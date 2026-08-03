@@ -4,9 +4,14 @@
 
 version: 1
 study: TROPIC-NCT00417079
-as_of: "2026-07-09"
+as_of: "2026-08-03"
 product_claim_in_force: controlled_non_submission_demo
 pipeline_seal_tag: v0.1.0-demo-rc.1
+historical_tag_note: "The v0.1.0-demo-rc.1 release note is immutable; the current audit baseline is an untagged successor state."
+audit_baseline_commit: d32b04d
+latest_sealed_run_source_head: 73d8ca1
+latest_pipeline_health: "oda/full_dag/GREEN, 34 of 34 stages"
+latest_release_verification: "30 of 30 checks"
 board_doc: docs/WORKSTREAM_EXECUTION_BOARD.md
 product_claim_doc: docs/PRODUCT_CLAIM.md
 disposition_board: 06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md
@@ -51,7 +56,7 @@ workstreams:
     required_evidence:
       - docs/workstreams/WS1_SOURCE_INTAKE_PACK.md
       - CORE residual disposition matrix
-    next_action: "Produce WS1_CORE_RESIDUAL_MATRIX.csv from CORE JSON; file WS-1 review note"
+    next_action: "Maintain WS1_CORE_RESIDUAL_MATRIX.csv on re-run; complete the Section 1 source/SDTM audit"
     residual_findings: [F-015, F-017]
     packs:
       - docs/workstreams/WS1_SOURCE_INTAKE_PACK.md
@@ -67,13 +72,13 @@ workstreams:
       - 07_reviewer_explanation/analysis_report.md
       - 07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md
     open_risks:
-      - G02_not_stage_gated
-      - F-011_psa_population_shell
+      - population_endpoint_content_requires_section_2_audit
+      - F-012_combined_n749_is_not_protocol_itt
     required_evidence:
       - population_endpoint_control_table
       - spec_to_config_trace
-    next_action: "Record WS-2 review note against population/endpoint control table; optional machine G02 check"
-    residual_findings: [F-011, F-012]
+    next_action: "Complete the Section 2 population/endpoint dot-connection audit against SAP, config, ADaM, and controlled TFLs"
+    residual_findings: [F-012]
     packs:
       - docs/workstreams/WS2_POPULATION_ENDPOINT_CONTROL.md
 
@@ -97,7 +102,7 @@ workstreams:
     required_evidence:
       - external_validation_evidence_index
       - package_vs_exploratory_inventory
-    next_action: "Support CORE residual matrix; keep exploratory layers non-eCTD"
+    next_action: "Maintain CORE residual handoff; keep exploratory layers non-eCTD; complete the Section 3 metadata audit"
     residual_findings: [F-014, F-016, F-020, F-021, F-022]
     packs:
       - docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md
@@ -147,7 +152,7 @@ workstreams:
     required_evidence:
       - docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md
     next_action: "Keep residual memo current; co-own CORE residual matrix with WS-1"
-    residual_findings: [F-003, F-005, F-011, F-012, F-014, F-015, F-016, F-017, F-019, F-020, F-021, F-022, F-025]
+    residual_findings: [F-003, F-005, F-012, F-014, F-015, F-016, F-017, F-019, F-020, F-021, F-022, F-025]
 
   WS6_regulatory_writing:
     name: Reviewer explanation and regulatory writing
@@ -161,14 +166,13 @@ workstreams:
       - docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md
       - 07_reviewer_explanation/analysis_report.md
     open_risks:
-      - guides_still_repo_voice
-      - G07_not_stage_gated
+      - guide_content_requires_section_6_audit
       - overclaim_under_interview_pressure
     required_evidence:
       - hardened_adrg_sdrg_bdrg
       - guide_signoff_checklist
-    next_action: "Execute WS6 hardening checklist S1-S3 (ADRG then SDRG then BDRG)"
-    residual_findings: [F-003, F-005, F-019, F-023]
+    next_action: "Complete the Section 6 reviewer-guide/package narrative audit; preserve Path A limitations"
+    residual_findings: [F-003, F-005, F-019]
     packs:
       - docs/workstreams/WS6_REVIEWER_GUIDE_HARDENING_CHECKLIST.md
 
@@ -189,14 +193,15 @@ workstreams:
       - scripts/verify_release.sh
     open_risks:
       - seal_confused_with_submission
-      - ci_release_job_not_wired
+      - ci_release_job_requires_regression_monitoring
     required_evidence:
       - scripts/verify_release.py
       - ci_release_job
-    next_action: "Wire scripts/verify_release.py into CI; optional evidence snapshot"
+    next_action: "Maintain CI seal verification and issue a successor release note only after the full section audit"
     residual_findings: [F-005, F-025]
 
 priority_queue:
+  - { id: P0-SECTION0, workstream: WS0_governance, action: "Section 0 governance/SAP consistency audit", status: IN_PROGRESS }
   - { id: DONE-WS0, workstream: WS0_governance, action: "PRODUCT_CLAIM.md", status: DONE }
   - { id: DONE-WS5, workstream: WS5_qc_validation, action: "KNOWN_DIFFERENCES_MEMO.md", status: DONE }
   - { id: DONE-WS3, workstream: WS3_standards_metadata, action: "external validation index", status: DONE }
@@ -204,4 +209,4 @@ priority_queue:
   - { id: DONE-WS7-verify, workstream: WS7_release_engineering, action: "verify_release.py", status: DONE }
   - { id: P1-WS6, workstream: WS6_regulatory_writing, action: "ADRG/SDRG/BDRG hardening S1-S3", status: OPEN }
   - { id: P1-WS1, workstream: WS1_source_intake, action: "CORE residual matrix CSV", status: OPEN }
-  - { id: P2-WS7-ci, workstream: WS7_release_engineering, action: "CI wire verify_release", status: OPEN }
+  - { id: DONE-WS7-ci, workstream: WS7_release_engineering, action: "CI wire verify_release", status: DONE }
