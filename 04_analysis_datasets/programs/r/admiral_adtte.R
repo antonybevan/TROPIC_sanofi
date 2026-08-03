@@ -32,6 +32,8 @@ adsl <- adsl |>
 # A_adtte_generation.sas / v_adtte_validation.R) + ADCM NACT for censoring.
 adrs <- read_xpt("04_analysis_datasets/adam/adrs_v.xpt")
 names(adrs) <- toupper(names(adrs))
+adlb <- read_xpt("04_analysis_datasets/adam/adlb_v.xpt")
+names(adlb) <- toupper(names(adlb))
 adcm <- read_xpt("04_analysis_datasets/adam/adcm_v.xpt")
 names(adcm) <- toupper(names(adcm))
 
@@ -39,8 +41,11 @@ first_pd <- adrs |>
   filter((PARAMCD == "OVRLRESP" & AVALC == "PD") |
            (PARAMCD == "BSGRESP" & AVALC == "PROGRESSION") |
            (PARAMCD == "PSPROG"  & AVALC == "Y")) |>
+  transmute(USUBJID, PDDT = as.Date(ADT, origin = "1960-01-01")) |>
+  inner_join(adsl |> select(USUBJID, RANDDT), by = "USUBJID") |>
+  filter(!is.na(PDDT) & PDDT > RANDDT) |>
   group_by(USUBJID) |>
-  summarise(PDDT = min(as.Date(ADT, origin = "1960-01-01")), .groups = "drop")
+  summarise(PDDT = min(PDDT), .groups = "drop")
 
 # Pain progression eligible for composite PFS (mirror v_adtte_validation.R).
 pn <- readRDS("01_source_data/real_sdtm/staging/pn.rds")
@@ -102,17 +107,52 @@ pain_prog_pfs <- cycle_vals |>
   filter(confirmed == 1) |>
   summarise(PAIN_PROG_DT = min(cycle_date), .groups = "drop")
 
+# PFS last-evaluable censor date: valid post-randomisation RECIST, PSA, or
+# evaluable pain visit.  Death milestones are not tumour assessments.
+pfs_tumor_lastassess <- adrs |>
+  filter(PARAMCD == "OVRLRESP", AVALC %in% c("CR", "PR", "SD", "PD")) |>
+  transmute(USUBJID, last_eval_dt = as.Date(ADT, origin = "1960-01-01")) |>
+  inner_join(adsl |> select(USUBJID, RANDDT), by = "USUBJID") |>
+  filter(!is.na(last_eval_dt) & last_eval_dt > RANDDT) |>
+  group_by(USUBJID) |>
+  summarise(last_eval_dt = max(last_eval_dt), .groups = "drop")
+
+pfs_psa_lastassess <- adlb |>
+  filter(PARAMCD == "PSA", !is.na(AVAL), !is.na(ADT)) |>
+  transmute(USUBJID, last_eval_dt = as.Date(ADT, origin = "1960-01-01")) |>
+  inner_join(adsl |> select(USUBJID, RANDDT), by = "USUBJID") |>
+  filter(last_eval_dt > RANDDT) |>
+  group_by(USUBJID) |>
+  summarise(last_eval_dt = max(last_eval_dt), .groups = "drop")
+
+pfs_pain_lastassess <- cycle_dates |>
+  transmute(USUBJID, last_eval_dt = cycle_date) |>
+  inner_join(adsl |> select(USUBJID, RANDDT), by = "USUBJID") |>
+  filter(!is.na(last_eval_dt) & last_eval_dt > RANDDT) |>
+  group_by(USUBJID) |>
+  summarise(last_eval_dt = max(last_eval_dt), .groups = "drop")
+
+pfs_lastassess <- bind_rows(
+  pfs_tumor_lastassess,
+  pfs_psa_lastassess,
+  pfs_pain_lastassess
+) |>
+  group_by(USUBJID) |>
+  summarise(last_eval_dt = max(last_eval_dt), .groups = "drop")
+
 # Composite progression date = earliest of tumour/PSA/bone PD and pain progression.
 first_prog <- first_pd |>
+  rename(NONPAIN_PROG_DT = PDDT) |>
   full_join(pain_prog_pfs, by = "USUBJID") |>
   mutate(
     PDDT = case_when(
-      !is.na(PDDT) & !is.na(PAIN_PROG_DT) ~ pmin(PDDT, PAIN_PROG_DT),
-      !is.na(PDDT)                        ~ PDDT,
+      !is.na(NONPAIN_PROG_DT) & !is.na(PAIN_PROG_DT) ~
+        pmin(NONPAIN_PROG_DT, PAIN_PROG_DT),
+      !is.na(NONPAIN_PROG_DT)                        ~ NONPAIN_PROG_DT,
       TRUE                                ~ PAIN_PROG_DT
     )
   ) |>
-  select(USUBJID, PDDT)
+  select(USUBJID, PDDT, NONPAIN_PROG_DT, PAIN_PROG_DT)
 
 first_nact <- adcm |>
   filter(!is.na(NACTDT)) |>
@@ -124,6 +164,7 @@ first_nact <- adcm |>
 adsl_tte <- adsl |>
   left_join(first_prog, by = "USUBJID") |>
   left_join(first_nact, by = "USUBJID") |>
+  left_join(pfs_lastassess, by = "USUBJID") |>
   mutate(
     LSTALV_CAP = pmin(LSTALVDT, STUDY_CUTOFF_DT),          # admin cutoff applied
     # PFS censoring hierarchy (SAP): a new anti-cancer therapy censors at the day
@@ -131,10 +172,16 @@ adsl_tte <- adsl |>
     # the LATEST date among competing censor_sources, which does not honour this
     # priority (it would pick last-evaluable). So the single PFS censor date is
     # pre-derived per the SAP and fed to admiral as one censor_source.
-    PFS_CENSDT  = if_else(!is.na(NACTDT), NACTDT - days(1), LSTALV_CAP),
-    PFS_CENSDSC = if_else(!is.na(NACTDT),
-                          "NEW ANTI-CANCER THERAPY START",
-                          "LAST EVALUABLE TUMOR ASSESSMENT")
+    PFS_CENSDT  = case_when(
+      !is.na(NACTDT)       ~ NACTDT - days(1),
+      !is.na(last_eval_dt) ~ pmin(last_eval_dt, STUDY_CUTOFF_DT),
+      TRUE                 ~ RANDDT
+    ),
+    PFS_CENSDSC = case_when(
+      !is.na(NACTDT)       ~ "NEW ANTI-CANCER THERAPY START",
+      !is.na(last_eval_dt) ~ "LAST EVALUABLE ASSESSMENT",
+      TRUE                 ~ "NO POST-BASELINE ASSESSMENT"
+    )
   )
 
 # ---- OS: Overall Survival (ITT) --------------------------------------------
@@ -161,11 +208,22 @@ os <- derive_param_tte(
 # Faithful to the SAP branch order (NACT before PD/death censors the event): an
 # event only fires if NOT pre-empted by an earlier NACT. NACT-pre-event subjects
 # fall through to the NACT censor; everyone else to last-evaluable.
-# EVNTDESC matches production vocabulary ("DISEASE PROGRESSION") for recon.
+# EVNTDESC retains the earliest composite component.  A same-day tie is
+# assigned to the non-pain component, matching the SAS/R tracks.
 pfs_pd <- event_source(
   dataset_name = "adsl",
-  filter = !is.na(PDDT) & (is.na(NACTDT) | NACTDT >= PDDT),
-  date = PDDT, set_values_to = exprs(EVNTDESC = "DISEASE PROGRESSION")
+  filter = !is.na(NONPAIN_PROG_DT) &
+    (is.na(PAIN_PROG_DT) | PDDT <= PAIN_PROG_DT) &
+    (is.na(NACTDT) | NACTDT >= NONPAIN_PROG_DT),
+  date = NONPAIN_PROG_DT,
+  set_values_to = exprs(EVNTDESC = "DISEASE PROGRESSION")
+)
+pfs_pain <- event_source(
+  dataset_name = "adsl",
+  filter = !is.na(PAIN_PROG_DT) &
+    (is.na(NONPAIN_PROG_DT) | PAIN_PROG_DT < NONPAIN_PROG_DT) &
+    (is.na(NACTDT) | NACTDT >= PAIN_PROG_DT),
+  date = PAIN_PROG_DT, set_values_to = exprs(EVNTDESC = "PAIN PROGRESSION")
 )
 pfs_death <- event_source(
   dataset_name = "adsl",
@@ -180,7 +238,7 @@ pfs_censor <- censor_source(
 pfs <- derive_param_tte(
   dataset_adsl = adsl_tte |> filter(ITTFL == "Y"),
   start_date = RANDDT,
-  event_conditions = list(pfs_pd, pfs_death),
+  event_conditions = list(pfs_pd, pfs_pain, pfs_death),
   censor_conditions = list(pfs_censor),
   source_datasets = list(adsl = adsl_tte |> filter(ITTFL == "Y")),
   set_values_to = exprs(PARAMCD = "PFS", PARAM = "Progression Free Survival",

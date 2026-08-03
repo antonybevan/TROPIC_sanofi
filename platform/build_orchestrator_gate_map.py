@@ -38,6 +38,7 @@ STAGE_GATE_RULES = [
     ("Efficacy & Safety TFL Suite Compilation", ["G05"], "TFL output generation gate"),
     ("Numerical Results Reconciliation (SAS vs R)", ["G06"], "results-level reconciliation gate"),
     ("Forest-HR Reconciliation (SAS vs R)", ["G06"], "figure-driving statistic reconciliation"),
+    ("Figure-Data Reconciliation (SAS vs R)", ["G06"], "figure-driving data reconciliation"),
     ("ADaM Spec to Define Conformance", ["G03", "G06"], "metadata spec-to-define conformance"),
     ("ADaM Spec to Data Conformance", ["G03", "G04", "G06"], "metadata spec-to-data conformance"),
     ("Reviewer Package Lock (G07)", ["G07"], "executable ADRG/SDRG/BDRG + claim/residual pointer lock"),

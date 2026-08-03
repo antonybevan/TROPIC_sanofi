@@ -1,6 +1,6 @@
 {
   "status": "PASS",
-  "generated_at": "2026-08-01 17:54:07 UTC",
+  "generated_at": "2026-08-03 06:57:40 UTC",
   "config": "config/log_cleanliness.yaml",
   "coverage": "configured_persisted_logs_only",
   "coverage_note": "Scans only logs listed in config/log_cleanliness.yaml (required/optional). rscript/python stage stdout/stderr is not persisted by cibuild.py and is outside this gate; PASS means configured persisted logs are clean, not full pipeline stdout/stderr clean. not_available = no required logs on disk (typical data-free CI checkout); seal re-check uses committed PASS evidence.",
@@ -20,14 +20,14 @@
     "06_qc_evidence/reconciliation/cross_lang_audit.log",
     "06_qc_evidence/reconciliation/results_reconcile.log"
   ],
-  "findings": 39,
+  "findings": 37,
   "unapproved_findings": 0,
-  "reviewed_exceptions": 39,
+  "reviewed_exceptions": 37,
   "missing_required_logs": 0,
   "reviewed_exception_caps": [
     {
       "id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "count": 39,
+      "count": 37,
       "max_count": 39,
       "status": "PASS",
       "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017."
@@ -43,7 +43,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 4472,
+      "line": 4499,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-038-002-701",
@@ -53,7 +53,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 4473,
+      "line": 4500,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-238-005-601",
@@ -63,7 +63,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 4474,
+      "line": 4503,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-400-108-601",
@@ -73,7 +73,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 4475,
+      "line": 4504,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-430-108-401",
@@ -83,7 +83,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 4476,
+      "line": 4505,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-430-708-801",
@@ -93,7 +93,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 4477,
+      "line": 4506,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-480-508-401",
@@ -103,7 +103,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 4478,
+      "line": 4507,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-490-308-601",
@@ -113,7 +113,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 4479,
+      "line": 4508,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-490-508-701",
@@ -123,7 +123,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 4480,
+      "line": 4509,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-490-508-801",
@@ -133,7 +133,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 4481,
+      "line": 4510,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-530-002-103",
@@ -143,7 +143,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 4482,
+      "line": 4511,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-530-002-504",
@@ -153,7 +153,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 4483,
+      "line": 4512,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-530-002-604",
@@ -163,7 +163,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 4484,
+      "line": 4513,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-530-002-802",
@@ -173,7 +173,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 4485,
+      "line": 4514,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-536-003-202",
@@ -183,7 +183,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 4486,
+      "line": 4515,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-536-003-501",
@@ -193,7 +193,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 4487,
+      "line": 4516,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-536-003-801",
@@ -203,7 +203,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 4488,
+      "line": 4517,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-546-000-102",
@@ -213,17 +213,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 4489,
-      "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "severity": "reviewed_exception",
-      "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-546-003-601",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
-      "owner": "statistical_programming"
-    },
-    {
-      "status": "REVIEWED_EXCEPTION",
-      "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 4490,
+      "line": 4518,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-550-002-202",
@@ -233,7 +223,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 4491,
+      "line": 4519,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-550-002-901",
@@ -243,7 +233,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 4492,
+      "line": 4520,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-560-002-402",
@@ -253,7 +243,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5061,
+      "line": 5087,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=TTPAIN USUBJID=006193-038-002-202",
@@ -263,7 +253,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5062,
+      "line": 5088,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=TTPAIN USUBJID=006193-058-002-002",
@@ -273,7 +263,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5063,
+      "line": 5089,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=TTPAIN USUBJID=006193-266-008-601",
@@ -283,7 +273,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5064,
+      "line": 5090,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=TTPAIN USUBJID=006193-266-008-901",
@@ -293,7 +283,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5065,
+      "line": 5091,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=TTPAIN USUBJID=006193-274-001-401",
@@ -303,7 +293,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5066,
+      "line": 5092,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=TTPAIN USUBJID=006193-420-908-401",
@@ -313,7 +303,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5067,
+      "line": 5093,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=TTPAIN USUBJID=006193-460-108-901",
@@ -323,7 +313,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5068,
+      "line": 5094,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=TTPAIN USUBJID=006193-480-008-801",
@@ -333,7 +323,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5069,
+      "line": 5095,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=TTPAIN USUBJID=006193-530-002-204",
@@ -343,7 +333,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5070,
+      "line": 5096,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=TTPAIN USUBJID=006193-530-002-804",
@@ -353,7 +343,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5071,
+      "line": 5097,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=TTPAIN USUBJID=006193-542-001-901",
@@ -363,7 +353,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5072,
+      "line": 5098,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=TTPAIN USUBJID=006193-550-002-401",
@@ -373,7 +363,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5073,
+      "line": 5099,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=TTPAIN USUBJID=006193-840-003-402",
@@ -383,7 +373,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5074,
+      "line": 5100,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=TTPAIN USUBJID=006193-870-003-601",
@@ -393,7 +383,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5075,
+      "line": 5103,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=TTPAIN USUBJID=006193-932-007-603",
@@ -403,7 +393,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5155,
+      "line": 5183,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=TTPSA USUBJID=006193-038-002-202",
@@ -413,20 +403,10 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5156,
+      "line": 5184,
       "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
       "severity": "reviewed_exception",
       "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=TTPSA USUBJID=006193-264-007-801",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
-      "owner": "statistical_programming"
-    },
-    {
-      "status": "REVIEWED_EXCEPTION",
-      "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5238,
-      "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "severity": "reviewed_exception",
-      "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=TTUMOR USUBJID=006193-546-003-601",
       "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
       "owner": "statistical_programming"
     }

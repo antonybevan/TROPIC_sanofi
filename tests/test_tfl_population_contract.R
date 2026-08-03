@@ -38,10 +38,10 @@ adrs <- bind_rows(
 
 psa <- adrs |>
   filter(PARAMCD == "PSARESP") |>
-  inner_join(select(adsl, USUBJID, PSABL), by = "USUBJID") |>
-  filter(!is.na(PSABL), PSABL >= 20)
-stopifnot(nrow(psa) == 691L)
-stopifnot(all((psa |> count(TRT01P) |> arrange(TRT01P))$n == c(361L, 330L)))
+  inner_join(select(adsl, USUBJID, PSABL, any_of("PSABLIF")), by = "USUBJID") |>
+  filter(coalesce(PSABLIF, "N") != "Y", !is.na(PSABL), PSABL >= 20)
+stopifnot(nrow(psa) == 690L)
+stopifnot(all((psa |> count(TRT01P) |> arrange(TRT01P))$n == c(361L, 329L)))
 stopifnot(all((psa |> count(TRT01P, AVALC) |> filter(AVALC == "Y") |> arrange(TRT01P))$n == c(145L, 61L)))
 
 eco <- adsl |>
@@ -54,7 +54,7 @@ stopifnot(identical(eco$n, c(691L, 58L)))
 tfl_text <- paste(readLines("05_outputs/tfl/output/tables/T-11-Efficacy_Tables.txt", warn = FALSE), collapse = "\n")
 stopifnot(grepl("T-11-6:.*Tumor Progression", tfl_text))
 stopifnot(grepl("T-11-7:.*PSA Progression", tfl_text))
-stopifnot(grepl("145/361", tfl_text), grepl("61/330", tfl_text))
+stopifnot(grepl("145/361", tfl_text), grepl("61/329", tfl_text))
 stopifnot(!grepl("148/378|69/371", tfl_text))
 
 cat("TFL population contract: PASS (PSA baseline eligibility, ECOG pooling, and output labels)\n")

@@ -6,7 +6,9 @@
 **As of:** 2026-07-09  
 **Current board status:** AMBER  
 
-**Section 2 review addendum (2026-08-03):** F-011 is resolved for the current PSA response set (MP 61/330; CbzP 145/361). The remaining reviewer-facing specification risks are the SAP `T-11-8` TTPAIN/response ID collision, the TTUMOR population wording, and one authoritative secondary-TTE time-origin statement; these are handed to WS-2/WS-4 rather than described as closed.
+**Section 2 review addendum (2026-08-03):** F-011 is resolved for the current PSA response set using observed baseline PSA (MP 61/329; CbzP 145/361). The remaining reviewer-facing specification risks are the SAP `T-11-8` TTPAIN/response ID collision, the TTUMOR population wording, and the pain/RT component decision; these are handed to WS-2/WS-4 rather than described as closed.
+
+**Section 3/4 review addendum (2026-08-03):** ADRG, SDRG, BDRG, and the traceability matrix were rechecked against the corrected ADTTE derivations. PFS now exposes pain-led versus non-pain component labels, TTUMOR excludes death milestones, and no-post-baseline PFS censoring is explicit. F-042 (supporting disease evidence/palliative RT) remains an accepted Path A residual pending medical/statistical direction; it is not described as a filing-ready closure.
 
 ---
 
@@ -104,6 +106,7 @@ Each of ADRG, SDRG, BDRG must contain—near the top:
 | S1 | ADRG: PRODUCT_CLAIM + known-differences; Path A validation talk track | **DONE** (`ADRG.md` v1.1) |
 | S2 | SDRG: CORE residual honesty + WS-1 pack link; precision § audit | **DONE** (`SDRG.md` v1.1) |
 | S3 | BDRG depth pass + TRACEABILITY_MATRIX catalog alignment | **DONE** (`BDRG.md` + `TRACEABILITY_MATRIX.md` v1.1) |
+| S4 | Corrected ADTTE/PSA reviewer-language and package crosswalk | **DONE** (Section 3/4 audit memos, ADRG, WS-5/board updates) |
 
 After S1–S3: review notes under `docs/workstreams/reviews/WS6_S*_*.md`. Board may move toward **GREEN** for Path A narrative once PDF package re-render is optional ops.
 

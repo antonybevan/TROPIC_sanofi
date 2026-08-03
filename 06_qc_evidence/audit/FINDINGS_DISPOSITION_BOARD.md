@@ -1,12 +1,12 @@
 # TROPIC Findings Disposition Board
 
-**Date:** 2026-08-01
+**Date:** 2026-08-03
 **Product claim:** Controlled **non-submission demonstration** programming pipeline  
 **Authority:** SAP v4.0 locked for remediation (`06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md`); not sponsor-approved for filing  
 
 > Purpose: classify every active Critical/Major finding before and after a full ODA seal run, so the DAG proves a stable release scope rather than rediscovering open science/scope debt.
 
-> **2026-08-01 remediation update:** The full real-SAS DAG completed 34/34 stages GREEN. F-011 (baseline PSA eligibility), F-030 (ECOG pooling across TTE/forest), F-031 (TFL endpoint identifiers), F-039 (companion freshness), and the related control findings are resolved in the register. F-012 remains an explicit non-submission demonstration limit: combined N=749 is not protocol ITT N=755.
+> **2026-08-03 remediation update:** The corrected full real-SAS DAG completed 34/34 stages GREEN. F-011 now excludes the one ADSL fallback baseline PSA (MP 61/329; CbzP 145/361). Section 3 corrected TTUMOR death-milestone censoring, PFS last-evaluable/no-post-baseline censoring, and ADTTE composite event labels. The PFS pain/supporting-disease and palliative-RT decision remains an explicitly accepted Path A residual. F-012 remains an explicit non-submission demonstration limit: combined N=749 is not protocol ITT N=755.
 
 ## Disposition classes
 
@@ -26,7 +26,7 @@
 | **F-026** | Major | `scope_out_with_disclosure` | **ACCEPTED** | ~1134 BASELINE AE rows are skeleton (terms present, AESER/AEREL/AEOUT blank). TEAE blank AESER ≈0–1. Documented ADRG §4B; soft QC in ADAE. Do not invent AESER. |
 | **F-027** | Minor | `scope_out_with_disclosure` | **ACCEPTED** | ALB/LDH not on Sanofi CRF LABH/LABB panels and not in PDS LB — Class C; ADSL placeholders remain Assigned (not “PDS stripped collected labs”). |
 | **F-028** | Major | `scope_out_with_disclosure` | **ACCEPTED** | One subject has EXTRT=XRP6258 (10 cycles) while DM.ARM is MITOXANTRONE for all 371. Arm authority = DM/ADSL; do not re-code EX. SDTM E2E 2026-07-09. |
-| **F-011** | Major | `resolve_now` | **RESOLVED** | T-11-8 now uses the SAP baseline PSA >=20 eligible set (CbzP 145/361; MP 61/330); the set is shared by the R output, SAS companion, and regression contract. |
+| **F-011** | Major | `resolve_now` | **RESOLVED** | T-11-8 now uses observed baseline PSA >=20 (excluding `PSABLIF='Y'` fallback values; CbzP 145/361; MP 61/329); the set is shared by the R output, SAS companion, and regression contract. |
 | **F-039** | Major | `resolve_now` | **RESOLVED** | Stage-14 SAS companions are current-run evidence: UTC health timestamps plus bounded same-run mtime ordering produce a PASS index with zero stale/missing companions. |
 | **F-012** | Major | `non_submission_demo_limit` | **ACCEPTED** | N=749 = real MP 371 + synthetic CbzP 378; protocol ITT 755 needs full two-arm IPD. Figures must not be read as original-trial ITT. |
 | **F-014** | Major | `scope_out_with_disclosure` | **ACCEPTED** | ARM has 8 displays/10 analyses for controlled TFL core; full ADSL covariate declarations and every deferred SAP display remain backlog. Controlled catalog limits the claim. |
@@ -39,6 +39,9 @@
 | **F-022** | Major | `scope_out_with_disclosure` | **ACCEPTED** | ARS covers controlled primary/secondary survival displays; full SAP/TFL ARS coverage and eCTD consumer deferred with controlled TFL catalog. |
 | **F-023** | Major | `resolve_now` | **RESOLVED** | TRACEABILITY_MATRIX corrected (ADCM keys, T-17, stage count/orchestration). |
 | **F-025** | Major | `non_submission_demo_limit` | **ACCEPTED** (was UNVERIFIED) | Hash seals ≠ Part 11. Product is explicitly non-Part-11 until org CSV program exists. |
+| **F-040** | Major | `resolve_now` | **RESOLVED** | ADTTE TTUMOR censoring now excludes DS death milestones and baseline-only records; final output has zero death-date TTUMOR censors. Evidence: `SECTION_03_ADAM_DERIVATION_AUDIT_2026-08-03.md`. |
+| **F-041** | Major | `resolve_now` | **RESOLVED** | PFS now uses the latest valid post-baseline RECIST/PSA/evaluable-pain assessment, or randomization when none exists; NACT remains priority. SAS/R/admiral agree after the final 34-stage run. |
+| **F-042** | Major | `scope_out_with_disclosure` | **ACCEPTED** | SAP requires pain progression with supporting disease evidence and palliative-RT handling. Current source PR is not staged and no approved qualification rule exists; 37 pain-led candidate PFS events are labelled and carried as an explicit residual. Filing-facing closure requires sponsor/statistician decision and sensitivity analysis. |
 
 ## Minor (not RC Crit/Major gate)
 

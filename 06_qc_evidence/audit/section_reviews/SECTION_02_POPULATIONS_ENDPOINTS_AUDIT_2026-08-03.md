@@ -105,3 +105,7 @@ The current dual-language TTPAIN derivation enforces five-of-seven diary evaluab
 **To Section 3:** audit ADTTE/ADRS derivations against S2-02 through S2-04, including start dates, no-post-baseline censoring, diary eligibility, and palliative-RT source availability.  
 **To Section 4:** reconcile metadata/ARM/TFL catalog wording after the S2-01 decision; do not regenerate a “SAP-complete” TFL index before that decision.  
 **Release posture:** Path A controlled demonstration may continue with the explicit limitations above. Submission-readiness or SAP-complete language remains blocked.
+
+## Section 3 correction addendum — 2026-08-03
+
+The Section 2 live-data snapshot counted one MP subject whose ADSL baseline PSA (`PSABL=110`) was a controlled fallback (`PSABLIF='Y'`) as PSA-eligible. Section 3 rechecked the source baseline and corrected the governed response eligibility rule to exclude fallback values while retaining synthetic comparator rows with no `PSABLIF` field. The corrected current denominator is **690 unique subjects: MP 329 and CbzP 361; responders remain MP 61 and CbzP 145**. This supersedes the Section 2 snapshot values 691 / MP 330 for current output generation; the original values remain above as historical audit evidence rather than being silently overwritten.

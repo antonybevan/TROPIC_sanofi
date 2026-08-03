@@ -28,7 +28,7 @@ If it is not in this table, programming should not invent it for Path A.
 | **Safety** | `SAFFL='Y'` | ADSL | ADAE TEAE tables T-20; lab shifts T-21; exposure | MP N=371; synthetic CbzP N=371. Denominators use SAFFL, not AE-distinct N. |
 | **Measurable disease** | `MEASDISF='Y'` | ADSL | ORR response summary; TTUMOR | Current TFL dens = **all** MEAS subjects left-join ADRS OBJRESP: MP N=203, CbzP N=179. Missing `OBJRESP` means non-responder; do not use the BOR spine (MP 351, CbzP 378). |
 | **Package combined display** | Real MP + synthetic CbzP | TFL merge only | Comparative figures/tables | **Not** protocol ITT 755 (F-012) |
-| **PSA response analysis set** | `PSARESP` rows joined to ADSL baseline PSA and filtered `PSABL >= 20` | ADRS + ADSL | PSA response in the current T-11 response block and F-13-1 | **F-011 resolved:** MP 61/330; CbzP 145/361; 691 unique eligible subjects. |
+| **PSA response analysis set** | `PSARESP` rows joined to ADSL baseline PSA, excluding controlled fallback (`PSABLIF='Y'`), and filtered `PSABL >= 20` | ADRS + ADSL | PSA response in the current T-11 response block and F-13-1 | **F-011 resolved:** MP 61/329; CbzP 145/361; 690 unique eligible subjects. Synthetic rows without `PSABLIF` are treated as observed. |
 | **Pain progression** | ADTTE `PARAMCD='TTPAIN'` with diary evaluability | ADTTE | Not a separate controlled Path A TFL | SAP Appendix D assigns TTPAIN to T-11-8; the current response block uses that ID. This collision is recorded in the Section 2 audit and requires amendment or an extension-ID decision. |
 
 ### Population hard rules
@@ -48,7 +48,7 @@ If it is not in this table, programming should not invent it for Path A.
 | Time to tumor progression | TTUMOR | ITT ∩ `MEASDISF='Y'` in current implementation | ADTTE | T-11-6 | Physical block and index agree; SAP Table 22 says ITT and requires clarification. |
 | Time to PSA progression | TTPSA | ITT | ADTTE | T-11-7 | Physical block and index agree; current CbzP parameter is PH-scaled demonstration data. |
 | Time to pain progression | TTPAIN | ITT with diary evaluability | ADTTE | SAP target T-11-8; not currently controlled as a TFL | Five-of-seven diary rule is coded; palliative-RT/source-availability review is handed to Section 3. |
-| PSA response | PSARESP | ADSL baseline PSA >=20 plus unique PSARESP row | ADRS + ADSL | Current T-11 response block; SAP-ID collision noted | F-011 resolved: MP 61/330; CbzP 145/361. |
+| PSA response | PSARESP | Observed ADSL baseline PSA >=20 (`PSABLIF != 'Y'`) plus unique PSARESP row | ADRS + ADSL | Current T-11 response block; SAP-ID collision noted | F-011 resolved: MP 61/329; CbzP 145/361. |
 | Objective response | OBJRESP | MEAS TFL dens; ADRS row = BOR spine | ADRS + TFL left-join | Current T-11 response block / response-evaluable sensitivity | MEAS dens MP 203/CbzP 179; response-evaluable spine MP 351/CbzP 378. |
 | TEAE summary | ADAE TRTEMFL etc. | Safety | ADAE | T-20-1, T-20-2 | OCCDS + episode merge |
 | Lab CTCAE shift | ADLB grades | Safety | ADLB | T-21-1, T-21-2 | T-21-2 synthetic arm demo |

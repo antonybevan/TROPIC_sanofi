@@ -80,14 +80,17 @@ finalize_tte <- function(d) {
 
 # First event dates per subject, pulled once from the relevant ADaM domains.
 first_pd <- adrs |>
+  mutate(PDDT = as.Date(ADT, origin = "1960-01-01")) |>
   filter(
     (PARAMCD == "OVRLRESP" & AVALC == "PD") |
       (PARAMCD == "BSGRESP"  & AVALC == "PROGRESSION") |
       (PARAMCD == "PSPROG"   & AVALC == "Y")
   ) |>
+  inner_join(df_adsl |> select(USUBJID, RANDDT), by = "USUBJID") |>
+  filter(!is.na(PDDT) & PDDT > RANDDT) |>
   group_by(USUBJID) |>
   summarise(
-    pd_dt = min(as.Date(ADT, origin = "1960-01-01")),
+    pd_dt = min(PDDT),
     .groups = "drop"
   )
 
@@ -185,6 +188,41 @@ pain_prog_pfs <- pain_triggers_pfs |>
   filter(confirmed == 1) |>
   summarise(pain_prog_dt = min(cycle_date), .groups = "drop")
 
+# SAP v4.0 PFS censoring: use the last evaluable post-baseline RECIST, PSA, or
+# five-of-seven pain visit when there is no event; randomisation is the censor
+# date when none of those assessments exists.  Death milestones are excluded
+# from the tumour assessment pool.
+pfs_tumor_lastassess <- adrs |>
+  filter(PARAMCD == "OVRLRESP", AVALC %in% c("CR", "PR", "SD", "PD")) |>
+  transmute(USUBJID, last_eval_dt = as.Date(ADT, origin = "1960-01-01")) |>
+  inner_join(df_adsl |> select(USUBJID, RANDDT), by = "USUBJID") |>
+  filter(!is.na(last_eval_dt) & last_eval_dt > RANDDT) |>
+  group_by(USUBJID) |>
+  summarise(last_eval_dt = max(last_eval_dt), .groups = "drop")
+
+pfs_psa_lastassess <- adlb |>
+  filter(PARAMCD == "PSA", !is.na(AVAL), !is.na(ADT)) |>
+  transmute(USUBJID, last_eval_dt = as.Date(ADT, origin = "1960-01-01")) |>
+  inner_join(df_adsl |> select(USUBJID, RANDDT), by = "USUBJID") |>
+  filter(last_eval_dt > RANDDT) |>
+  group_by(USUBJID) |>
+  summarise(last_eval_dt = max(last_eval_dt), .groups = "drop")
+
+pfs_pain_lastassess <- cycle_dates_pfs |>
+  transmute(USUBJID, last_eval_dt = cycle_date) |>
+  inner_join(df_adsl |> select(USUBJID, RANDDT), by = "USUBJID") |>
+  filter(!is.na(last_eval_dt) & last_eval_dt > RANDDT) |>
+  group_by(USUBJID) |>
+  summarise(last_eval_dt = max(last_eval_dt), .groups = "drop")
+
+pfs_lastassess <- bind_rows(
+  pfs_tumor_lastassess,
+  pfs_psa_lastassess,
+  pfs_pain_lastassess
+) |>
+  group_by(USUBJID) |>
+  summarise(last_eval_dt = max(last_eval_dt), .groups = "drop")
+
 # ------------------------------------------------------------------------------
 # OS — Overall Survival (ITT, anchored at randomisation)
 # ------------------------------------------------------------------------------
@@ -229,6 +267,7 @@ pfs <- df_adsl |>
   left_join(first_pd, by = "USUBJID") |>
   left_join(pain_prog_pfs, by = "USUBJID") |>
   left_join(first_nact, by = "USUBJID") |>
+  left_join(pfs_lastassess, by = "USUBJID") |>
   mutate(
     PARAMCD = "PFS", PARAM = "Progression Free Survival", PARAMN = 2,
     PARCAT1 = "EFFICACY",
@@ -239,6 +278,13 @@ pfs <- df_adsl |>
       !is.na(pain_prog_dt)                 ~ pain_prog_dt,
       TRUE                                 ~ as.Date(NA)
     ),
+    prog_event_desc = case_when(
+      !is.na(pain_prog_dt) & (is.na(pd_dt) | pain_prog_dt < pd_dt) ~
+        "PAIN PROGRESSION",
+      !is.na(pd_dt) ~ "DISEASE PROGRESSION",
+      !is.na(pain_prog_dt) ~ "PAIN PROGRESSION",
+      TRUE ~ ""
+    ),
     pd_found   = !is.na(prog_dt),
     nact_found = !is.na(nactdt),
     branch = case_when(
@@ -247,25 +293,28 @@ pfs <- df_adsl |>
       DTHFL == "Y" & nact_found & nactdt < DTHDT        ~ "NACT_PRE_DEATH",
       DTHFL == "Y"                                      ~ "DEATH",
       nact_found                                        ~ "NACT_ONLY",
-      TRUE                                              ~ "CENSOR_LASTEVAL"
+      !is.na(last_eval_dt)                               ~ "CENSOR_LASTEVAL",
+      TRUE                                               ~ "CENSOR_NO_POST"
     ),
     ADT = case_when(
       branch == "PD"    ~ prog_dt,
       branch == "DEATH" ~ DTHDT,
       branch %in% c("NACT_PRE_PD", "NACT_PRE_DEATH", "NACT_ONLY") ~
         nactdt - days(1),
-      TRUE ~ pmin(LSTALVDT, STUDY_CUTOFF_DT)
+      branch == "CENSOR_LASTEVAL" ~ pmin(last_eval_dt, STUDY_CUTOFF_DT),
+      branch == "CENSOR_NO_POST"  ~ RANDDT
     ),
     CNSR     = if_else(branch %in% c("PD", "DEATH"), 0, 1),
     EVNTDESC = case_when(
-      branch == "PD"    ~ "DISEASE PROGRESSION",
+      branch == "PD"    ~ prog_event_desc,
       branch == "DEATH" ~ "DEATH",
       TRUE ~ ""
     ),
     CNSDTDSC = case_when(
       branch %in% c("NACT_PRE_PD", "NACT_PRE_DEATH", "NACT_ONLY") ~
         "NEW ANTI-CANCER THERAPY START",
-      branch == "CENSOR_LASTEVAL" ~ "LAST EVALUABLE TUMOR ASSESSMENT",
+      branch == "CENSOR_LASTEVAL" ~ "LAST EVALUABLE ASSESSMENT",
+      branch == "CENSOR_NO_POST"  ~ "NO POST-BASELINE ASSESSMENT",
       TRUE ~ ""
     )
   ) |>
@@ -391,7 +440,10 @@ ttpain <- df_adsl |>
 # ------------------------------------------------------------------------------
 psa_event <- adrs |>
   filter(PARAMCD == "PSPROG" & AVALC == "Y") |>
-  transmute(USUBJID, psa_prog_dt = as.Date(ADT, origin = "1960-01-01"))
+  transmute(USUBJID, psa_prog_dt = as.Date(ADT, origin = "1960-01-01")) |>
+  inner_join(df_adsl |> select(USUBJID, RANDDT), by = "USUBJID") |>
+  filter(!is.na(psa_prog_dt) & psa_prog_dt > RANDDT) |>
+  select(USUBJID, psa_prog_dt)
 
 psa_lastassess <- adlb |>
   filter(PARAMCD == "PSA" & !is.na(AVAL) & !is.na(ADT)) |>
@@ -433,17 +485,23 @@ ttpsa <- df_adsl |>
 # ------------------------------------------------------------------------------
 tumor_event <- adrs |>
   filter(PARAMCD == "OVRLRESP" & AVALC == "PD") |>
+  transmute(USUBJID, tumor_prog_dt = as.Date(ADT, origin = "1960-01-01")) |>
+  inner_join(df_adsl |> select(USUBJID, RANDDT), by = "USUBJID") |>
+  filter(!is.na(tumor_prog_dt) & tumor_prog_dt > RANDDT) |>
   group_by(USUBJID) |>
   summarise(
-    tumor_prog_dt = min(as.Date(ADT, origin = "1960-01-01")),
+    tumor_prog_dt = min(tumor_prog_dt),
     .groups = "drop"
   )
 
 tumor_lastassess <- adrs |>
-  filter(PARAMCD == "OVRLRESP" & !is.na(ADT)) |>
+  filter(PARAMCD == "OVRLRESP" & AVALC %in% c("CR", "PR", "SD", "PD") & !is.na(ADT)) |>
+  transmute(USUBJID, last_tumor_dt = as.Date(ADT, origin = "1960-01-01")) |>
+  inner_join(df_adsl |> select(USUBJID, RANDDT), by = "USUBJID") |>
+  filter(last_tumor_dt > RANDDT) |>
   group_by(USUBJID) |>
   summarise(
-    last_tumor_dt = max(as.Date(ADT, origin = "1960-01-01")),
+    last_tumor_dt = max(last_tumor_dt),
     .groups = "drop"
   )
 

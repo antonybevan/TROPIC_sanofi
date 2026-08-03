@@ -87,15 +87,15 @@ Machine gates can be green while **residual risks** remain. This memo is the hum
 
 ### 3.3 Analysis / population / outputs
 
-#### F-011 — PSA response population shell (Major) · **RESOLVED 2026-08-01**
+#### F-011 — PSA response population shell (Major) · **RESOLVED 2026-08-03**
 **Class:** `resolve_now` (closed for the current Path A response output) · **Owner:** WS-2 + WS-4
 
 | | |
 |---|---|
-| **Difference** | The controlled TFL now joins `PSARESP` to ADSL baseline PSA and filters `PSABL >= 20`, with a duplicate-subject guard. |
+| **Difference** | The controlled TFL joins `PSARESP` to ADSL baseline PSA, excludes the ADSL controlled fallback (`PSABLIF='Y'`), and applies a duplicate-subject guard. Synthetic rows without the flag are treated as observed for the demonstration arm. |
 | **Impact if ignored** | Population mismatch under SAP challenge |
-| **Why Path A holds** | The same eligible set drives the hierarchy gate, response TFL, SAS companion evidence, and regression contract; current counts are CbzP 145/361 and MP 61/330. |
-| **Close evidence** | `05_outputs/tfl/tfl_generation.R`, `tests/test_tfl_population_contract.R`, `06_qc_evidence/audit/section_reviews/SECTION_02_POPULATIONS_ENDPOINTS_AUDIT_2026-08-03.md`, and the 2026-08-01 full DAG seal. |
+| **Why Path A holds** | The same eligible set drives the hierarchy gate, response TFL, SAS companion evidence, and regression contract; current counts are CbzP 145/361 and MP 61/329 (690 unique eligible subjects). |
+| **Close evidence** | `05_outputs/tfl/tfl_generation.R`, `tests/test_tfl_population_contract.R`, `06_qc_evidence/audit/section_reviews/SECTION_02_POPULATIONS_ENDPOINTS_AUDIT_2026-08-03.md` plus its Section 3 correction addendum, and the post-correction rerun evidence. |
 
 #### F-014 — ARM completeness (Major) · **ACCEPTED**  
 **Class:** `scope_out_with_disclosure` · **Owner:** WS-3  
@@ -106,6 +106,16 @@ Machine gates can be green while **residual risks** remain. This memo is the hum
 | **Impact if ignored** | Metadata completeness overclaim |
 | **Why Path A holds** | Bound to controlled TFL catalog |
 | **Close condition** | Expand ARM with every promoted output |
+
+#### F-042 — PFS pain component/supporting disease evidence (Major) · **ACCEPTED FOR PATH A**
+**Class:** `scope_out_with_disclosure` · **Owner:** WS-2 + WS-4 + medical/statistical reviewer
+
+| | |
+|---|---|
+| **Difference** | SAP v4.0 requires pain progression in PFS to have supporting disease evidence and to account for palliative radiotherapy. The current staging layer does not ingest PR, and no approved source-precedence or qualification rule exists. The corrected ADTTE labels 37 pain-led PFS candidate events rather than hiding them in a generic disease-progression label. |
+| **Impact if ignored** | PFS event composition could be challenged as over-inclusive or insufficiently traceable. Numerical SAS/R/admiral parity would not prove the clinical rule. |
+| **Why Path A holds** | The residual is explicit in the Section 3 audit, findings register, board, and reviewer-facing guide posture; no filing or SAP-complete claim is made. |
+| **Close condition** | Sponsor/statistician decision on supporting-disease qualification, PR staging/source precedence, and a palliative-RT-only sensitivity analysis, followed by rerun and independent QC. |
 
 ---
 
@@ -199,6 +209,8 @@ These are **not** residuals; cite them when challenged on quality culture:
 | F-013 | Variable lineage | Traceability |
 | F-018 | Log cleanliness gate | Execution hygiene |
 | F-023 | Traceability matrix fix | Doc integrity |
+| F-040 | TTUMOR censor pool | Death milestones excluded from tumor censor dates |
+| F-041 | PFS censoring hierarchy | Last-evaluable/no-post-baseline branches now match SAP |
 
 ---
 
@@ -243,7 +255,7 @@ Under `docs/PRODUCT_CLAIM.md` Path A and the residual register above:
 | F-003, F-012 | WS-6 language consistency every guide revision |
 | F-005, F-025 | WS-7 package + PRODUCT_CLAIM enforcement |
 | F-015, F-016, F-017 | WS-1/WS-3 external validation evidence index |
-| F-011, F-014, F-022 | WS-2/WS-4 only if scope expands |
+| F-011, F-014, F-022, F-042 | WS-2/WS-4 and medical/statistical review before any filing-facing expansion |
 | F-020, F-021 | WS-3 exploratory inventory in standards pack |
 
 ---
@@ -253,3 +265,4 @@ Under `docs/PRODUCT_CLAIM.md` Path A and the residual register above:
 | Version | Date | Change |
 |---|---|---|
 | 1.0 | 2026-07-09 | Initial residual memo for Path A / v0.1.0-demo-rc.1 train |
+| 1.1 | 2026-08-03 | Section 3 corrections, F-011 observed-baseline update, and F-042 pain/RT residual |

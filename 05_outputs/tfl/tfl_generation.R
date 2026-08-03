@@ -141,8 +141,11 @@ cat(sprintf("  Step 2: PFS Significance check -> p = %f (Significant & Tested: %
 # table below so gatekeeping and display denominators cannot diverge.
 psa_resp_data <- adrs |>
   filter(PARAMCD == "PSARESP") |>
-  inner_join(adsl |> select(USUBJID, PSABL), by = "USUBJID") |>
-  filter(!is.na(PSABL), PSABL >= 20) |>
+  inner_join(adsl |> select(USUBJID, PSABL, any_of("PSABLIF")), by = "USUBJID") |>
+  # ADSL's PSABL may be a controlled fallback for missing source baseline
+  # (PSABLIF='Y').  SAP eligibility is based on observed baseline PSA; retain
+  # synthetic comparator rows whose flag is absent by treating NA as observed.
+  filter(coalesce(PSABLIF, "N") != "Y", !is.na(PSABL), PSABL >= 20) |>
   mutate(
     TRT01P = factor(TRT01P, levels = c("MP", "CbzP")),
     AVALC = factor(AVALC, levels = c("N", "Y"))

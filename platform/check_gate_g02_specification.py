@@ -103,7 +103,7 @@ def main() -> int:
         )
         add(
             "population_doc.F-011_closure",
-            "f-011 resolved" in lower and "145/361" in lower and "61/330" in lower,
+            "f-011 resolved" in lower and "145/361" in lower and "61/329" in lower,
             "PSA eligibility closure and current arm counts must be present",
         )
         add(

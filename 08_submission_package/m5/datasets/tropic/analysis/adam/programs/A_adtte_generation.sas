@@ -44,17 +44,22 @@
 %set_pgmdir;
 %include "&PGMDIR./00_config.sas";
 
-/* 1. Retrieve first PD date per subject across all source domains */
+/* 1. Retrieve first post-randomisation PD date per subject across all source
+   domains.  Baseline milestones are not PFS/TTE events under SAP v4.0. */
 proc sql;
     create table work.pd_dates as
     select
-        usubjid,
-        min(ADT) as pd_dt format=yymmdd10.
-    from adam.adrs
-    where (PARAMCD = 'OVRLRESP' and AVALC = 'PD') or
-          (PARAMCD = 'BSGRESP' and AVALC = 'PROGRESSION') or
-          (PARAMCD = 'PSPROG' and AVALC = 'Y')
-    group by usubjid;
+        r.usubjid,
+        min(r.ADT) as pd_dt format=yymmdd10.
+    from adam.adrs as r
+    inner join adam.adsl(keep=usubjid randdt) as a
+        on r.usubjid = a.usubjid
+    where ((r.PARAMCD = 'OVRLRESP' and r.AVALC = 'PD') or
+           (r.PARAMCD = 'BSGRESP' and r.AVALC = 'PROGRESSION') or
+           (r.PARAMCD = 'PSPROG' and r.AVALC = 'Y'))
+      and not missing(r.ADT)
+      and r.ADT > a.RANDDT
+    group by r.usubjid;
 quit;
 
 /* Retrieve first Serious AE date per subject */
@@ -282,6 +287,59 @@ proc sql;
     group by usubjid;
 quit;
 
+/* SAP v4.0 PFS censoring uses the last evaluable post-baseline assessment when
+   no progression/death/NACT event exists, and randomisation when there is no
+   post-baseline assessment.  Build one governed date from the valid RECIST,
+   PSA, and evaluable pain-visit sources.  Death milestones are excluded from
+   the RECIST pool; they are not tumour assessments. */
+proc sql;
+    create table work.pfs_tumor_eval_dates as
+    select r.usubjid, max(r.ADT) as last_tumor_eval_dt format=yymmdd10.
+    from adam.adrs as r
+    inner join adam.adsl(keep=usubjid randdt) as a
+        on r.usubjid = a.usubjid
+    where r.PARAMCD = 'OVRLRESP'
+      and r.AVALC in ('CR', 'PR', 'SD', 'PD')
+      and not missing(r.ADT)
+      and r.ADT > a.RANDDT
+    group by r.usubjid;
+
+    create table work.pfs_psa_eval_dates as
+    select l.usubjid, max(l.ADT) as last_psa_eval_dt format=yymmdd10.
+    from adam.adlb as l
+    inner join adam.adsl(keep=usubjid randdt) as a
+        on l.usubjid = a.usubjid
+    where l.PARAMCD = 'PSA'
+      and not missing(l.AVAL)
+      and not missing(l.ADT)
+      and l.ADT > a.RANDDT
+    group by l.usubjid;
+
+    create table work.pfs_pain_eval_dates as
+    select d.usubjid, max(d.cycle_date) as last_pain_eval_dt format=yymmdd10.
+    from work.pain_pfs_cycle_min_date as d
+    inner join adam.adsl(keep=usubjid randdt) as a
+        on d.usubjid = a.usubjid
+    where not missing(d.cycle_date)
+      and d.cycle_date > a.RANDDT
+    group by d.usubjid;
+
+    create table work.pfs_eval_candidates as
+    select usubjid, last_tumor_eval_dt as last_eval_dt
+    from work.pfs_tumor_eval_dates
+    union all
+    select usubjid, last_psa_eval_dt as last_eval_dt
+    from work.pfs_psa_eval_dates
+    union all
+    select usubjid, last_pain_eval_dt as last_eval_dt
+    from work.pfs_pain_eval_dates;
+
+    create table work.pfs_last_eval_dates as
+    select usubjid, max(last_eval_dt) as last_eval_dt format=yymmdd10.
+    from work.pfs_eval_candidates
+    group by usubjid;
+quit;
+
 /* Add PFS parameter which has a more complex censoring hierarchy (ITT) */
 proc sql;
     create table work.nact_mapping as
@@ -297,12 +355,14 @@ proc sql;
         adsl.*,
         pd.pd_dt,
         pain.pain_prog_dt,
-        nact.nactdt
+        nact.nactdt,
+        eval.last_eval_dt
     from adam.adsl(keep=studyid usubjid subjid siteid trt01p trt01pn ittfl saffl
                         randdt dthfl dthdt lstalvdt) as adsl
     left join work.pd_dates as pd on adsl.usubjid = pd.usubjid
     left join work.pain_pfs_prog_dates as pain on adsl.usubjid = pain.usubjid
     left join work.nact_mapping as nact on adsl.usubjid = nact.usubjid
+    left join work.pfs_last_eval_dates as eval on adsl.usubjid = eval.usubjid
     where adsl.ittfl = 'Y';
 quit;
 
@@ -340,7 +400,14 @@ data work.pfs_derived;
             /* Event: Progression */
             ADT = _prog_dt;
             CNSR = 0;
-            EVNTDESC = 'DISEASE PROGRESSION';
+            /* Preserve the earliest composite component in the existing
+               ADTTE traceability field.  A non-pain component wins a same-day
+               tie deterministically; the SAP supporting-disease decision for
+               pain remains an explicit Section 3 residual. */
+            if not missing(pain_prog_dt) and
+               (missing(pd_dt) or pain_prog_dt < pd_dt) then
+                EVNTDESC = 'PAIN PROGRESSION';
+            else EVNTDESC = 'DISEASE PROGRESSION';
             CNSDTDSC = '';
         end;
     end;
@@ -362,18 +429,26 @@ data work.pfs_derived;
         end;
     end;
     else do;
-        /* Censor: No event, censor at last alive (capped at data cutoff #10) */
+        /* Censor: NACT outranks all other censoring.  Otherwise use the last
+           evaluable post-baseline assessment; if none exists, censor at
+           randomisation per SAP v4.0. */
         if _nact_found then do;
             ADT = nactdt - 1;
             CNSR = 1;
             EVNTDESC = '';
             CNSDTDSC = 'NEW ANTI-CANCER THERAPY START';
         end;
-        else do;
-            ADT = min(lstalvdt, &STUDY_CUTOFF_DT.);
+        else if not missing(last_eval_dt) then do;
+            ADT = min(last_eval_dt, &STUDY_CUTOFF_DT.);
             CNSR = 1;
             EVNTDESC = '';
-            CNSDTDSC = 'LAST EVALUABLE TUMOR ASSESSMENT';
+            CNSDTDSC = 'LAST EVALUABLE ASSESSMENT';
+        end;
+        else do;
+            ADT = randdt;
+            CNSR = 1;
+            EVNTDESC = '';
+            CNSDTDSC = 'NO POST-BASELINE ASSESSMENT';
         end;
     end;
 
@@ -630,9 +705,12 @@ run;
 /* -------------------------------------------------------------------------- */
 proc sql;
     create table work.psa_prog_dates as
-    select usubjid, ADT as psa_prog_dt
-    from adam.adrs
-    where PARAMCD = 'PSPROG' and AVALC = 'Y';
+    select r.usubjid, r.ADT as psa_prog_dt
+    from adam.adrs as r
+    inner join adam.adsl(keep=usubjid randdt) as a
+        on r.usubjid = a.usubjid
+    where r.PARAMCD = 'PSPROG' and r.AVALC = 'Y'
+      and not missing(r.ADT) and r.ADT > a.RANDDT;
 quit;
 
 proc sql;
@@ -701,18 +779,26 @@ run;
 /* -------------------------------------------------------------------------- */
 proc sql;
     create table work.tumor_prog_dates as
-    select usubjid, min(ADT) as tumor_prog_dt format=yymmdd10.
-    from adam.adrs
-    where PARAMCD = 'OVRLRESP' and AVALC = 'PD'
-    group by usubjid;
+    select r.usubjid, min(r.ADT) as tumor_prog_dt format=yymmdd10.
+    from adam.adrs as r
+    inner join adam.adsl(keep=usubjid randdt) as a
+        on r.usubjid = a.usubjid
+    where r.PARAMCD = 'OVRLRESP' and r.AVALC = 'PD'
+      and not missing(r.ADT) and r.ADT > a.RANDDT
+    group by r.usubjid;
 quit;
 
 proc sql;
     create table work.tumor_censor_dates as
-    select usubjid, max(ADT) as last_tumor_dt format=yymmdd10.
-    from adam.adrs
-    where PARAMCD = 'OVRLRESP' and not missing(ADT)
-    group by usubjid;
+    select r.usubjid, max(r.ADT) as last_tumor_dt format=yymmdd10.
+    from adam.adrs as r
+    inner join adam.adsl(keep=usubjid randdt) as a
+        on r.usubjid = a.usubjid
+    where r.PARAMCD = 'OVRLRESP'
+      and r.AVALC in ('CR', 'PR', 'SD', 'PD')
+      and not missing(r.ADT)
+      and r.ADT > a.RANDDT
+    group by r.usubjid;
 quit;
 
 proc sql;
@@ -783,6 +869,8 @@ run;
 proc delete data=work.pd_dates work.sae_dates work.os_ttsae_raw work.nact_mapping work.pfs_raw
             work.pn_trt_tte work.pn_base_tte work.pn_post_daily work.pn_first_day
             work.pn_cycle_min_date work.cycle_comp_raw work.confirmed_triggers work.prog_dates
+            work.pain_pfs_prog_dates work.pfs_tumor_eval_dates work.pfs_psa_eval_dates
+            work.pfs_pain_eval_dates work.pfs_eval_candidates work.pfs_last_eval_dates
             work.censor_dates work.ttpain_derived work.psa_prog_dates work.psa_censor_dates
             work.ttpsa_derived work.tumor_prog_dates work.tumor_censor_dates work.ttum_derived
             work.tte_base work.pfs_derived work.pn_base_final work.pn_cycle_med work.cycle_comp
