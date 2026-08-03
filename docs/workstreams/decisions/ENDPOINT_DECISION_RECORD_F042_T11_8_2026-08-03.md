@@ -1,7 +1,7 @@
 # Endpoint Decision Record — F-042 / T-11-8
 
 **Record ID:** `EDR-F042-T11-8-2026-08-03`<br>
-**Version:** `0.2.0`<br>
+**Version:** `0.2.1`<br>
 **Status:** **APPROVAL-READY — PENDING NAMED SIGNATURES**<br>
 **Product path:** Path A — controlled non-submission demonstration<br>
 **Baseline commit:** `a213667` (`codex/submission-pipeline-rc`)<br>
@@ -51,10 +51,8 @@ The numerical agreement above proves reproducibility of the current rule. It doe
 
 ## 4. Required approval record
 
-No approval is recorded by this document.
+No approval is recorded by this document. Use the [`F-042 Endpoint Approver Review Packet`](F042_APPROVER_REVIEW_PACKET_2026-08-03.md) to conduct the review, then record the authoritative disposition below.
 
-| Role | Required action | Name / signature | Date | Status |
-|---|---|---|---|---|
 ### Approval election
 
 - [ ] **APPROVE AS WRITTEN** — approve `ED-01` through `ED-07` and authorize implementation of Approval Specification §§3–10.
@@ -102,6 +100,7 @@ If approval is not obtained, retain the current Path A labels and the explicit F
 
 ## 6. Companion evidence
 
+- [Approver review packet](F042_APPROVER_REVIEW_PACKET_2026-08-03.md)
 - [F-042 impact appendix](F042_PFS_PAIN_IMPACT_APPENDIX_2026-08-03.md)
 - [Approval-ready executable specification](F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md)
 - [Machine-readable decision state](endpoint_decision_record_F042_T11_8_2026-08-03.yaml)

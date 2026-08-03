@@ -5,7 +5,7 @@
 **As of:** 2026-08-03
 **Authorities:** SAP v4.0 · `config/study_config.yaml` · `config/tfl_output_catalog.yaml` · ADRG · [Section 2 audit](../../06_qc_evidence/audit/section_reviews/SECTION_02_POPULATIONS_ENDPOINTS_AUDIT_2026-08-03.md)
 
-**Decision handoff:** Endpoint decisions are presented for signature in the [F-042 / T-11-8 Endpoint Decision Record](decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md), the [approval specification](decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md), its [quantified impact appendix](decisions/F042_PFS_PAIN_IMPACT_APPENDIX_2026-08-03.md), and the [CM/PR source qualification audit](decisions/F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.md). The package is approval-ready/pending signatures and does not change current Path A outputs.
+**Decision handoff:** Begin with the [F-042 approver review packet](decisions/F042_APPROVER_REVIEW_PACKET_2026-08-03.md), then record signatures in the [F-042 / T-11-8 Endpoint Decision Record](decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md). The controlled evidence includes the [approval specification](decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md), [quantified impact appendix](decisions/F042_PFS_PAIN_IMPACT_APPENDIX_2026-08-03.md), and [CM/PR source qualification audit](decisions/F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.md). The package is approval-ready/pending signatures and does not change current Path A outputs.
 
 ---
 

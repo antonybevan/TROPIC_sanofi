@@ -86,6 +86,7 @@ workstreams:
     residual_findings: [F-012, F-042]
     packs:
       - docs/workstreams/WS2_POPULATION_ENDPOINT_CONTROL.md
+      - docs/workstreams/decisions/F042_APPROVER_REVIEW_PACKET_2026-08-03.md
       - docs/workstreams/decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md
       - 06_qc_evidence/audit/section_reviews/SECTION_02_POPULATIONS_ENDPOINTS_AUDIT_2026-08-03.md
 

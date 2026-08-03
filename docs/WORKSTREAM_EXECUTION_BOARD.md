@@ -90,7 +90,7 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | **Owned artifacts** | SAP v4.0 · `config/study_config.yaml` · CTQ/estimand register · ANALYSIS_REPORT · population rules (ITT/Safety/MEASDISF) · [Section 2 audit](../06_qc_evidence/audit/section_reviews/SECTION_02_POPULATIONS_ENDPOINTS_AUDIT_2026-08-03.md) |
 | **Current status** | **AMBER** — approval-ready ED-01–ED-07 package filed; current sealed pain derivation, TTUMOR denominator and `T-11-3`–`T-11-8` mappings remain unchanged/non-conforming pending named signatures |
 | **Open risks** | Pain thresholds/AS summary/confirmation/date/CM+PR handling require replacement; TTUMOR is measurable-only in code but ITT is the recommended primary; physical/catalog T-11 mappings do not match SAP |
-| **Required evidence pack** | (1) signed endpoint decision record · (2) approval specification · (3) CM/PR source audit and sensitivities · (4) subject-level reclassification · (5) independent SAS/R implementation and full rerun/reseal |
+| **Required evidence pack** | (1) approver review packet and signed endpoint decision record · (2) approval specification · (3) CM/PR source audit and sensitivities · (4) subject-level reclassification · (5) independent SAS/R implementation and full rerun/reseal |
 | **Release gate** | G02 before claiming SAP-complete TFLs |
 | **Next action** | Obtain named statistical/medical/programming/QC signatures on ED-01–ED-07 or exact replacement wording; do not implement or reseal beforehand |
 

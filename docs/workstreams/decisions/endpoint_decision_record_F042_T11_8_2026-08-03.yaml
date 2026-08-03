@@ -3,7 +3,7 @@
 
 record:
   id: EDR-F042-T11-8-2026-08-03
-  version: 0.2.0
+  version: 0.2.1
   status: approval_ready_pending_signatures
   executable: false
   consumption: documentation_only
@@ -26,6 +26,7 @@ record:
     pr_source_qualification_audit: docs/workstreams/decisions/F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.md
     pr_source_profile: docs/workstreams/decisions/F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.yaml
     approval_specification: docs/workstreams/decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md
+    approver_review_packet: docs/workstreams/decisions/F042_APPROVER_REVIEW_PACKET_2026-08-03.md
 
 pre_implementation:
   status: approval_evidence_complete_endpoint_use_blocked
