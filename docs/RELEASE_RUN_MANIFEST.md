@@ -1,19 +1,19 @@
 # TROPIC Release-Run Manifest
 
-Generated: 2026-08-04 06:56:10 UTC
+Generated: 2026-08-04 06:58:20 UTC
 
 > Hash-sealed run manifest for current artifacts. This is not an electronic signature or Part 11 attestation.
 
 ## Verdict
 
-- Status: `REMEDIATION`
-- Evidence grade: `remediation_partial_or_dirty`
-- Manifest SHA-256 seal: `70367f1729f0529374baa728eb30dfd9aeadbf5dd4a299c5eded5ac68f4c343e`
+- Status: `PASS`
+- Evidence grade: `release_candidate`
+- Manifest SHA-256 seal: `4b17c6f659bdca3139a62b8211d0eba03ecf957a3aff22f55ac3558c06d1c0c6`
 - SAS execution mode: `oda`
 - Pipeline health: `GREEN`
 - Run scope: `full_dag` (34 recorded / 33 release-required upstream stages)
-- Git HEAD: `e967d692bbc2b99db7d69ff3947c576768db3f3b`
-- Worktree dirty: `True`
+- Git HEAD: `78000ea934e76ede6f1730683ed1baa03a11d38f`
+- Worktree dirty: `False`
 - SAS companion figures: `in_dag_real_sas_companion`; current with health=`True`
 
 ## Status meanings
@@ -25,10 +25,6 @@ Generated: 2026-08-04 06:56:10 UTC
 ## Problems
 
 No release-run binding problems detected.
-
-## Remediation reasons (block release-candidate PASS)
-
-- git worktree is dirty (65 porcelain entries); release-candidate lock requires a clean committed state
 
 ## Dataset Binding
 
