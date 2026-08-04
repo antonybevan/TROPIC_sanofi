@@ -579,12 +579,12 @@ f042_pain_response_events <- function(adsl, visits) {
         (coalesce(base_eval_ppi, FALSE) & !is.na(base_ppi) & base_ppi >= 2) |
         (coalesce(base_eval_an, FALSE) & !is.na(base_an) & base_an >= 10),
       ppi_response = baseline_eligible & ppi_evaluable & as_evaluable &
-        !is.na(ppi_value) & !is.na(as_value) & !is.na(base_ppi) &
-        !is.na(base_an) & (base_ppi - ppi_value >= 2) & (as_value <= base_an),
+      !is.na(ppi_value) & !is.na(as_value) & !is.na(base_ppi) &
+      !is.na(base_an) & (base_ppi - ppi_value >= 2) & (as_value <= base_an),
       as_response = baseline_eligible & ppi_evaluable & as_evaluable &
-        !is.na(ppi_value) & !is.na(as_value) & !is.na(base_ppi) &
-        !is.na(base_an) & base_an > 0 &
-        ((base_an - as_value) / base_an > 0.5) & (ppi_value <= base_ppi)
+      !is.na(ppi_value) & !is.na(as_value) & !is.na(base_ppi) &
+      !is.na(base_an) & base_an > 0 &
+      ((base_an - as_value) / base_an > 0.5) & (ppi_value <= base_ppi)
     ) |>
     arrange(USUBJID, VISITNUM) |>
     group_by(USUBJID) |>
@@ -665,6 +665,10 @@ f042_derive <- function(adsl, pn, sv, cm, pr, adrs, ds, adtte = NULL) {
   primary <- f042_primary_events(adsl, diary_qualified, rt)
   comparison <- f042_compare_current(adsl, primary, adtte)
   sensitivities <- f042_sensitivity_events(adsl, diary_qualified, rt)
+  pain_bl_itt <- adsl$ITTFL == "Y" &
+    toupper(f042_text(
+      if ("PAINBL" %in% names(adsl)) adsl$PAINBL else rep("N", nrow(adsl))
+    )) == "Y"
   list(
     phase_2_authorized = TRUE,
     provisional = FALSE,
@@ -693,8 +697,7 @@ f042_derive <- function(adsl, pn, sv, cm, pr, adrs, ds, adtte = NULL) {
       rt_complete_date_records = sum(sensitivities$date_bound_rt$date_status == "COMPLETE"),
       rt_missing_or_partial_date_records = sum(sensitivities$date_bound_rt$date_status == "MISSING_OR_PARTIAL"),
       pain_response_evaluable_subjects = n_distinct(visits$USUBJID[
-        visits$USUBJID %in% adsl$USUBJID[adsl$ITTFL == "Y" &
-          toupper(f042_text(if ("PAINBL" %in% names(adsl)) adsl$PAINBL else rep("N", nrow(adsl)))) == "Y"] &
+        visits$USUBJID %in% adsl$USUBJID[pain_bl_itt] &
           (coalesce(visits$base_eval_ppi, FALSE) & !is.na(visits$base_ppi) & visits$base_ppi >= 2 |
              coalesce(visits$base_eval_an, FALSE) & !is.na(visits$base_an) & visits$base_an >= 10)
       ]),
