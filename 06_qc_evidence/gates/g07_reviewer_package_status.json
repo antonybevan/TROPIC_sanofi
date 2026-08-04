@@ -2,7 +2,7 @@
   "gate": "G07",
   "name": "reviewer_package_lock",
   "status": "PASS",
-  "generated_at": "2026-08-04T08:00:30Z",
+  "generated_at": "2026-08-04T16:32:53Z",
   "checks": [
     {
       "name": "exists:07_reviewer_explanation/guides/ADRG.md",

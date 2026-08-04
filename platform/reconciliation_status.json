@@ -11,6 +11,9 @@
     "ADRS": "PASS",
     "ADTTE": "PASS",
     "CLINSITE": "PASS"
+  },
+  "endpoint_controls": {
+    "F042_PAIN_RESPONSE": "PASS"
   }
 }
 
