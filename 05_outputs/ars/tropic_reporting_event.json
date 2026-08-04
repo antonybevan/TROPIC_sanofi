@@ -16,10 +16,14 @@
       },
       {
         "order": 3,
-        "analysisId": "AN.TTPSA"
+        "analysisId": "AN.TTPAIN"
       },
       {
         "order": 4,
+        "analysisId": "AN.TTPSA"
+      },
+      {
+        "order": 5,
         "analysisId": "AN.TTUMOR"
       }
     ]
@@ -231,8 +235,8 @@
               "groupId": "G.MP"
             }
           ],
-          "rawValue": 327,
-          "formattedValue": "327"
+          "rawValue": 322,
+          "formattedValue": "322"
         },
         {
           "operationId": "OP.MEDD",
@@ -242,8 +246,8 @@
               "groupId": "G.MP"
             }
           ],
-          "rawValue": 42.0,
-          "formattedValue": "42.0"
+          "rawValue": 43.0,
+          "formattedValue": "43.0"
         },
         {
           "operationId": "OP.MEDM",
@@ -253,8 +257,81 @@
               "groupId": "G.MP"
             }
           ],
-          "rawValue": 1.38,
-          "formattedValue": "1.38"
+          "rawValue": 1.41,
+          "formattedValue": "1.41"
+        }
+      ]
+    },
+    {
+      "id": "AN.TTPAIN",
+      "name": "Time to Pain Progression",
+      "description": "Kaplan-Meier Time to Pain Progression on the real MP arm.",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "controlledTerm": "SECONDARY OUTCOME MEASURE"
+      },
+      "dataset": "ADTTE",
+      "variable": "AVAL",
+      "analysisSetId": "AS.ITT",
+      "methodId": "MTH.KMTTE",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "GF.TRT"
+        }
+      ],
+      "sourceRecordCount": 371,
+      "analyzedRecordCount": 371,
+      "excludedRecordCounts": {
+        "missingAVALOrCNSR": 0,
+        "notMatchingDeclaredConditions": 0
+      },
+      "results": [
+        {
+          "operationId": "OP.N",
+          "resultGroups": [
+            {
+              "groupingId": "GF.TRT",
+              "groupId": "G.MP"
+            }
+          ],
+          "rawValue": 371,
+          "formattedValue": "371"
+        },
+        {
+          "operationId": "OP.EVNT",
+          "resultGroups": [
+            {
+              "groupingId": "GF.TRT",
+              "groupId": "G.MP"
+            }
+          ],
+          "rawValue": 45,
+          "formattedValue": "45"
+        },
+        {
+          "operationId": "OP.MEDD",
+          "resultGroups": [
+            {
+              "groupingId": "GF.TRT",
+              "groupId": "G.MP"
+            }
+          ],
+          "rawValue": null,
+          "formattedValue": "Not reached"
+        },
+        {
+          "operationId": "OP.MEDM",
+          "resultGroups": [
+            {
+              "groupingId": "GF.TRT",
+              "groupId": "G.MP"
+            }
+          ],
+          "rawValue": null,
+          "formattedValue": "Not reached"
         }
       ]
     },
@@ -351,8 +428,8 @@
           "groupingId": "GF.TRT"
         }
       ],
-      "sourceRecordCount": 203,
-      "analyzedRecordCount": 203,
+      "sourceRecordCount": 371,
+      "analyzedRecordCount": 371,
       "excludedRecordCounts": {
         "missingAVALOrCNSR": 0,
         "notMatchingDeclaredConditions": 0
@@ -366,8 +443,8 @@
               "groupId": "G.MP"
             }
           ],
-          "rawValue": 203,
-          "formattedValue": "203"
+          "rawValue": 371,
+          "formattedValue": "371"
         },
         {
           "operationId": "OP.EVNT",
@@ -377,8 +454,8 @@
               "groupId": "G.MP"
             }
           ],
-          "rawValue": 185,
-          "formattedValue": "185"
+          "rawValue": 328,
+          "formattedValue": "328"
         },
         {
           "operationId": "OP.MEDD",
@@ -388,8 +465,8 @@
               "groupId": "G.MP"
             }
           ],
-          "rawValue": 78.0,
-          "formattedValue": "78.0"
+          "rawValue": 72.0,
+          "formattedValue": "72.0"
         },
         {
           "operationId": "OP.MEDM",
@@ -399,8 +476,8 @@
               "groupId": "G.MP"
             }
           ],
-          "rawValue": 2.56,
-          "formattedValue": "2.56"
+          "rawValue": 2.37,
+          "formattedValue": "2.37"
         }
       ]
     }

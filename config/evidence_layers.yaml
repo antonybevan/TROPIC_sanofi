@@ -277,6 +277,9 @@ layers:
       - path: 06_qc_evidence/audit/findings_register.csv
         status: required
         role: "Audit findings register."
+      - path: docs/workstreams/reviews/F042_DELAYED_SECOND_PASS_REVIEW_2026-08-04.md
+        status: required
+        role: "Delayed second-pass review record for the adopted F-042 Phase 2 implementation."
       - path: 06_qc_evidence/audit/output_hash_binding.csv
         status: generated
         role: "Per-file hash binding extract from release-run manifest rebuild (local; not portfolio surface)."

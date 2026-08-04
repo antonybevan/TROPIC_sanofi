@@ -116,7 +116,11 @@ After accountable-author adoption, the implementation order is:
 
 Until the Phase 2 rerun and reseal complete, retain the current Path A labels as historical evidence alongside the adopted-rule implementation outputs. Do not describe the current sealed analysis as corrected merely because the decision has been adopted.
 
-## 6. Companion evidence
+## 6. Phase 2 implementation closure — 2026-08-04
+
+The adopted implementation is now present in separate SAS and R tracks. SV and PR are staged; the F-042 module produces primary, diary-only, RT-only, date-bound and pain-response evidence; TTUMOR is ITT-primary; the controlled catalog and reviewer-facing mappings are restored to SAP-native `T-11-3` through `T-11-8`; and the real MP SAS/R/admiral checks pass for the current implementation. A delayed second-pass author review and a clean full 34-stage real-SAS DAG/reseal remain required to bind the final evidence. This remains a Path A controlled non-submission demonstration and not a sponsor, independent, medical, Part 11 or regulated approval.
+
+## 7. Companion evidence
 
 - [Approver review packet](F042_APPROVER_REVIEW_PACKET_2026-08-03.md)
 - [F-042 impact appendix](F042_PFS_PAIN_IMPACT_APPENDIX_2026-08-03.md)

@@ -3,14 +3,14 @@
 **Workstream:** Regulatory Writing / Reviewer Explanation  
 **Gates:** G07 (primary), G08 narrative  
 **Product claim:** Path A only  
-**As of:** 2026-07-09  
-**Current board status:** AMBER  
+**As of:** 2026-08-04
+**Current board status:** GREEN for Path A; external qualified review required
 
-**Section 2 review addendum (2026-08-03):** F-011 is resolved for the current PSA response set using observed baseline PSA (MP 61/329; CbzP 145/361). The remaining reviewer-facing specification risks are the SAP `T-11-8` TTPAIN/response ID collision, the TTUMOR population wording, and the pain/RT component decision; these are handed to WS-2/WS-4 rather than described as closed.
+**Section 2 review addendum (2026-08-03):** F-011 is resolved for the current PSA response set using observed baseline PSA (MP 61/329; CbzP 145/361). The SAP `T-11-8` TTPAIN/response collision, TTUMOR population wording and pain/RT component decision were handed to WS-2/WS-4 for controlled implementation.
 
-**Section 3/4 review addendum (2026-08-03):** ADRG, SDRG, BDRG, and the traceability matrix were rechecked against the corrected ADTTE derivations. PFS now exposes pain-led versus non-pain component labels, TTUMOR excludes death milestones, and no-post-baseline PFS censoring is explicit. F-042 remains an accepted Path A residual pending the adopted-rule implementation, reconciliation, rerun, and reseal; it is not described as a filing-ready closure.
+**Section 3/4 review addendum (2026-08-03):** ADRG, SDRG, BDRG, and the traceability matrix were rechecked against the corrected ADTTE derivations. PFS now exposes pain-led versus non-pain component labels, TTUMOR excludes death milestones, and no-post-baseline PFS censoring is explicit.
 
-**Author-decision addendum (2026-08-04):** Antony Bevan adopted ED-01–ED-07 as written under the disclosed single-author Path A governance model. The current pain derivation remains non-conforming in thresholds, AS summary, confirmation and event dating; TTUMOR must move to ITT; SAP-native `T-11-3`–`T-11-8` mappings must be restored. Reviewer guides must continue describing the pre-rerun sealed output as Path A historical evidence until implementation and reseal, and must never imply independent or sponsor approval.
+**Author-decision addendum (2026-08-04):** Antony Bevan adopted ED-01–ED-07 as written under the disclosed single-author Path A governance model. The corrected pain/CM+PR derivation, TTUMOR ITT primary and SAP-native `T-11-3`–`T-11-8` mappings are implemented and internally reconciled. Reviewer guides must still distinguish the pre-Phase-2 sealed baseline from the change set until the final full-DAG reseal, and must never imply independent or sponsor approval.
 
 ---
 

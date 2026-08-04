@@ -176,7 +176,7 @@ ORR remains restricted to ITT subjects with measurable disease. TTUMOR must not 
 
 The accountable author must select one in the parent decision record:
 
-- [ ] **ADOPT AS WRITTEN FOR PATH A** — authorize implementation of §§3–10 for the controlled non-submission demonstration.
+- [x] **ADOPT AS WRITTEN FOR PATH A** — authorize implementation of §§3–10 for the controlled non-submission demonstration. Antony Bevan, 2026-08-04; the parent decision record is authoritative.
 - [ ] **ADOPT WITH DOCUMENTED MODIFICATIONS FOR PATH A** — attach exact replacement wording; no verbal-only change is executable.
 - [ ] **REJECT / RETURN FOR REVISION** — state the rejected decision IDs and rationale.
 

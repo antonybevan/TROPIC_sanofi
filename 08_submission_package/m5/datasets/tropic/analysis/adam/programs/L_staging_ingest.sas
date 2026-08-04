@@ -119,6 +119,8 @@
 %transpose_supp(vs);
 %transpose_supp(ls);
 %transpose_supp(pn);
+%transpose_supp(pr);
+%transpose_supp(sv);
 
 /* Clean up temporary utility datasets in work library */
 proc delete data=work._supp_sorted work._supp_transposed work._main_sorted work._supp_sorted2 work._supp_ready;

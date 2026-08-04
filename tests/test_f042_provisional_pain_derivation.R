@@ -1,4 +1,4 @@
-# F-042 provisional derivation regression tests ------------------------------
+# F-042 Phase 2 controlled derivation regression tests ------------------------
 #
 # These tests use synthetic records only.  They exercise the high-risk rule
 # boundaries without reading or writing the sealed production ADTTE:
@@ -22,6 +22,7 @@ adsl <- data.frame(
   RANDDT = as.Date("2020-01-01"),
   TRTSDT = as.Date("2020-01-01"),
   ITTFL = "Y",
+  PAINBL = "Y",
   LSTALVDT = as.Date("2021-12-31"),
   stringsAsFactors = FALSE
 )
@@ -169,6 +170,96 @@ stopifnot(!rt$rt_autoqualifies[rt$USUBJID == "S3"],
 stopifnot(!rt$rt_autoqualifies[rt$USUBJID == "S6"],
           is.na(rt$event_date[rt$USUBJID == "S6"]),
           grepl("MISSING_START_DATE", rt$exclusion_reasons[rt$USUBJID == "S6"]))
+
+# Exact CM/PR same-date duplicates collapse with both source keys; non-exact
+# cross-domain dates remain separate candidates; missing-date records remain
+# one row per source key for bounded adjudication.
+cm_dup <- data.frame(
+  USUBJID = "S1", CMSEQ = 101, CMSTDTC = "2020-02-05",
+  CMTRT = "PALLIATIVE RADIATION", CMDECOD = "", CMCAT = "POST TREATMENT",
+  CMINDC = "", stringsAsFactors = FALSE
+)
+pr_dup <- data.frame(
+  USUBJID = c("S1", "S1"), PRSEQ = c(201, 202),
+  PRDTC = c("2020-02-05", "2020-02-06"),
+  PRTRT = c("PALLIATIVE RADIATION", "PALLIATIVE RADIATION"),
+  PRCAT = "OTHER", stringsAsFactors = FALSE
+)
+rt_dup <- f042_env$f042_direct_rt(adsl, cm_dup, pr_dup)
+stopifnot(nrow(rt_dup) == 2L)
+same_day <- rt_dup |> filter(event_date == as.Date("2020-02-05"))
+stopifnot(nrow(same_day) == 1L,
+          same_day$source_record_count == 2L,
+          same_day$source_domains == "CM;PR",
+          same_day$rt_autoqualifies)
+
+cm_missing <- rbind(cm_dup, transform(cm_dup, CMSEQ = 102, CMSTDTC = ""))
+rt_missing <- f042_env$f042_direct_rt(adsl, cm_missing, data.frame(
+  USUBJID = character(), PRSEQ = numeric(), PRDTC = character(),
+  PRTRT = character(), PRCAT = character(), stringsAsFactors = FALSE
+))
+stopifnot(sum(is.na(rt_missing$event_date)) == 1L)
+
+# SV-first dating falls back to the maximum complete PN date when the matching
+# SV date is absent; the fallback is explicit and never uses the minimum date.
+fallback_adsl <- data.frame(
+  USUBJID = "S9", RANDDT = as.Date("2020-01-01"),
+  TRTSDT = as.Date("2020-01-01"), ITTFL = "Y",
+  LSTALVDT = as.Date("2021-12-31"), stringsAsFactors = FALSE
+)
+fallback_pn <- data.frame(
+  USUBJID = rep("S9", 5), PNTESTCD = "PAININT", PNSTRESN = 2,
+  PNDTC = paste0("2020-02-", sprintf("%02d", 18:22)),
+  VISITNUM = 2, VISIT = "Cycle 2", stringsAsFactors = FALSE
+)
+fallback_sv <- data.frame(
+  USUBJID = "S9", VISITNUM = 2, VISIT = "Cycle 2", SVSTDTC = "",
+  stringsAsFactors = FALSE
+)
+fallback_schedule <- f042_env$f042_build_schedule(
+  fallback_adsl, f042_env$f042_prepare_pn(fallback_pn), fallback_sv
+)
+stopifnot(nrow(fallback_schedule) == 1L,
+          fallback_schedule$visit_date == as.Date("2020-02-22"),
+          fallback_schedule$visit_date_source == "PN_MAX_FALLBACK")
+
+# DS progression-week uncertainty is represented as point date +4 for the
+# conservative primary boundary.
+boundary_evidence <- f042_env$f042_supporting_evidence(
+  fallback_adsl,
+  data.frame(USUBJID = character(), PARAMCD = character(), AVALC = character(),
+             ADT = character(), stringsAsFactors = FALSE),
+  data.frame(USUBJID = "S9", DSDECOD = "PROGRESSION", DSSTWK = 2,
+             DSSEQ = 1, stringsAsFactors = FALSE),
+  rt_missing[0, ]
+)
+stopifnot(boundary_evidence$evidence_date == as.Date("2020-01-08"),
+          boundary_evidence$latest_possible_date == as.Date("2020-01-12"))
+
+# Pain-response fixture: a two-point PPI reduction without analgesic increase
+# maintained at the next scheduled assessment for >=21 days is one response;
+# a terminal response or a missing companion component is not.
+response_adsl <- data.frame(
+  USUBJID = c("R1", "R2"), ITTFL = "Y", PAINBL = "Y",
+  stringsAsFactors = FALSE
+)
+response_visits <- data.frame(
+  USUBJID = c("R1", "R1", "R2", "R2"),
+  VISITNUM = c(2, 3, 2, 3),
+  visit_date = as.Date(c("2020-02-01", "2020-02-23", "2020-02-01", "2020-02-23")),
+  visit_date_source = "SVSTDTC",
+  base_ppi = 4, base_an = 10, base_eval_ppi = TRUE, base_eval_an = TRUE,
+  ppi_value = c(2, 2, 2, NA), as_value = c(10, 10, 10, NA),
+  ppi_evaluable = c(TRUE, TRUE, TRUE, FALSE),
+  as_evaluable = c(TRUE, TRUE, TRUE, FALSE),
+  stringsAsFactors = FALSE
+)
+response_events <- f042_env$f042_pain_response_events(response_adsl, response_visits)
+stopifnot(nrow(response_events) == 1L,
+          response_events$USUBJID == "R1",
+          response_events$response_component == "PPI",
+          response_events$event_date == as.Date("2020-02-01"),
+          response_events$confirming_date == as.Date("2020-02-23"))
 
 adrs <- data.frame(
   USUBJID = c("S1", "S1"), PARAMCD = "OVRLRESP", AVALC = "PD",

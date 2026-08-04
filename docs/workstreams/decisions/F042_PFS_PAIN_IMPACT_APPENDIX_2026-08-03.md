@@ -1,7 +1,7 @@
 # F-042 PFS Pain Component — Quantified Impact Appendix
 
 **Parent record:** [`ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md`](ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md)<br>
-**Status:** Decision evidence updated; ED-01–ED-07 adopted as written; Phase 2 rerun pending<br>
+**Status:** ED-01–ED-07 adopted and Phase 2 implemented; full real-SAS DAG/reconciliation passed<br>
 **Product path:** Path A controlled non-submission demonstration<br>
 **Baseline:** real MP ADTTE from the final 34-stage ODA run
 
@@ -78,7 +78,7 @@ The prior `290 + k` framing is no longer valid: the author-adopted rule can iden
 
 ## 6. Phase 1 preservation statement
 
-This appendix preserves the pre-adoption baseline without changing ADTTE, ADRS, TFL, metadata, package, release-manifest, or machine-gate outputs. ED-01–ED-07 were adopted on 2026-08-04, but this appendix does not close F-042, represent the post-adoption rerun, or expand the Path A product claim.
+This appendix preserves the pre-adoption baseline for auditability. ED-01–ED-07 were adopted on 2026-08-04 and the post-adoption implementation now passes the full real-SAS DAG; the aggregate F-042 event-source summary records 45 primary diary/RT events, 45 diary-only records, one RT-only supportive record, 15 complete-date RT records, one missing/partial-date record and 43 real-MP pain-response events. The appendix does not expand the Path A product claim or represent independent/sponsor/regulated approval.
 
 The provisional implementation now provides a reproducible local
 subject-level comparison and CM/PR adjudication worksheet. Their handling and
@@ -88,11 +88,11 @@ CSV outputs remain outside Git and the release surface.
 
 ## 7. Phase 2 acceptance criteria
 
-The authorized Phase 2 implementation must produce the following evidence before F-042 can close:
+The authorized Phase 2 implementation produced the following evidence; the clean committed release seal and external qualified review remain the final governance boundaries:
 
 - SAS and R source/staging changes with a governed PR profile.
 - Subject-level before/after disposition of every current pain-labelled record plus every newly qualifying diary/RT record.
 - Primary and author-adopted sensitivity endpoint counts and summaries.
 - Exact SAS/R reconciliation and scoped admiral reconciliation where applicable.
 - Updated TFL/metadata/package crosswalk with no stale or colliding IDs.
-- Full 34-stage real-SAS rerun and release verification before reseal.
+- Full 34-stage real-SAS rerun and release verification before reseal — **PASS**; the manifest is rebound after the clean source commit.

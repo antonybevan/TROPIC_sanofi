@@ -26,8 +26,12 @@ CONTROLLED_CATALOG_PATH = "config/tfl_output_catalog.yaml"
 # bijection gate catches missing IDs but would not catch a stable T-11-6/T-11-7
 # title swap, so keep the SAP endpoint tokens executable here.
 SEMANTIC_ENDPOINT_TOKENS = {
+    "T-11-3": "psa",
+    "T-11-4": "objective response",
+    "T-11-5": "pain response",
     "T-11-6": "tumor",
     "T-11-7": "psa",
+    "T-11-8": "pain progression",
 }
 
 
@@ -109,6 +113,36 @@ CATALOG = {
         "arm": "RD.OPTIMUS.ER",
         "qc": "ADEX/ADLB reconciliation; R primary output hash; SAS companion rendered in real-SAS Stage 14",
     },
+    "T-11-3": {
+        "title": "PSA Response Rate",
+        "class": "table",
+        "file": "05_outputs/tfl/output/tables/T-11-Efficacy_Tables.txt",
+        "sap_ref": "SAP v4.0 sections 5.2, 10.2 / Appendix D Table 22",
+        "adam_inputs": "ADRS, ADLB, ADSL",
+        "generator": "05_outputs/tfl/tfl_generation.R SAP-native response block",
+        "arm": "RD.EFFICACY.SECONDARY",
+        "qc": "ADRS/ADLB/ADSL reconciliation; TFL generation gate; output hash",
+    },
+    "T-11-4": {
+        "title": "Objective Response Rate per RECIST v1.0",
+        "class": "table",
+        "file": "05_outputs/tfl/output/tables/T-11-Efficacy_Tables.txt",
+        "sap_ref": "SAP v4.0 sections 5.3, 10.3 / Appendix D Table 22",
+        "adam_inputs": "ADRS, ADSL",
+        "generator": "05_outputs/tfl/tfl_generation.R SAP-native response block",
+        "arm": "RD.EFFICACY.SECONDARY",
+        "qc": "ADRS/ADSL reconciliation; TFL generation gate; output hash",
+    },
+    "T-11-5": {
+        "title": "Pain Response Rate",
+        "class": "table",
+        "file": "05_outputs/tfl/output/tables/T-11-Efficacy_Tables.txt",
+        "sap_ref": "SAP v4.0 sections 6.4, 10.4 / Appendix D Table 22",
+        "adam_inputs": "PN, SV, ADSL",
+        "generator": "05_outputs/tfl/tfl_generation.R F-042 pain-response block",
+        "arm": "RD.EFFICACY.SECONDARY",
+        "qc": "F-042 regression fixtures; aggregate event-source evidence; TFL generation gate",
+    },
     "T-11-6": {
         "title": "KM Analysis of Time to Tumor Progression",
         "class": "table",
@@ -130,14 +164,14 @@ CATALOG = {
         "qc": "ADTTE/ADSL reconciliation; TFL generation gate; output hash",
     },
     "T-11-8": {
-        "title": "Best Clinical Response Endpoints",
+        "title": "Time to Pain Progression",
         "class": "table",
         "file": "05_outputs/tfl/output/tables/T-11-Efficacy_Tables.txt",
-        "sap_ref": "SAP v4.0 sections 4.3-5.3",
-        "adam_inputs": "ADRS, ADLB, ADSL",
-        "generator": "05_outputs/tfl/tfl_generation.R response summary block",
+        "sap_ref": "SAP v4.0 sections 6.5, 10.4 / Appendix D Table 22",
+        "adam_inputs": "ADTTE, ADSL",
+        "generator": "05_outputs/tfl/tfl_generation.R TTPAIN KM/Cox block",
         "arm": "RD.EFFICACY.SECONDARY",
-        "qc": "ADRS/ADLB/ADSL reconciliation; TFL generation gate; output hash",
+        "qc": "ADTTE reconciliation; numerical results reconciliation; TFL generation gate; output hash",
     },
     "T-11-8b": {
         "title": "Objective Response Rate - Response-Evaluable Denominator",

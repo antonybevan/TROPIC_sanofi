@@ -107,15 +107,15 @@ Machine gates can be green while **residual risks** remain. This memo is the hum
 | **Why Path A holds** | Bound to controlled TFL catalog |
 | **Close condition** | Expand ARM with every promoted output |
 
-#### F-042 — PFS pain component/supporting disease evidence (Major) · **ACCEPTED FOR PATH A**
+#### F-042 — PFS pain component/supporting disease evidence (Major) · **IMPLEMENTED FOR PATH A; EXTERNAL REVIEW REQUIRED**
 **Class:** `scope_out_with_disclosure` · **Owner:** WS-2 + WS-4 + medical/statistical reviewer
 
 | | |
 |---|---|
-| **Difference** | The sealed pain derivation is reproducible but non-conforming: median AS, `PPI >=2`, absolute `AS >=10`, combined-component/terminal confirmation, minimum diary date, no author-adopted cancer-related qualification and no CM+PR RT consumption. Its 37 pain-led PFS labels are historical output inventory, not an adoption denominator. |
+| **Difference** | The pre-Phase-2 sealed pain derivation used median AS, `PPI >=2`, absolute `AS >=10`, combined-component/terminal confirmation, minimum diary date, no author-adopted cancer-related qualification and no CM+PR RT consumption. Those labels remain historical baseline evidence; the adopted replacement is implemented separately in SAS and R. |
 | **Impact if ignored** | TTPAIN/PFS event dates and event sets can be wrong in both directions; numerical SAS/R/admiral parity would only reproduce the same clinical-rule error. |
-| **Why Path A holds** | The residual is explicit in the Section 3 audit, findings register, board, and reviewer-facing guide posture; no filing or SAP-complete claim is made. |
-| **Close condition** | Accountable-author sign-off on ED-01–ED-07 (or exact replacement wording) with the single-author limitation acknowledged, followed by corrected component-specific pain derivation, CM+PR union, TTUMOR ITT, T-11 remap, subject-level impact analysis, separately programmed SAS/R reconciliation, delayed second-pass author review and full rerun/reseal. This closes the Path A implementation residual only; external qualified review remains required before regulated reuse. |
+| **Why Path A holds** | Antony Bevan adopted ED-01–ED-07 on 2026-08-04; the corrected component-specific pain derivation, CM+PR union, TTUMOR ITT, SAP-native T-11 remap, aggregate source-lineage evidence and separate SAS/R reconciliation are now controlled. No independent, sponsor, medical or regulated approval is claimed. |
+| **Close condition** | Complete the full 34-stage real-SAS rerun, delayed second-pass review and release reseal. This closes the Path A implementation residual only; external qualified statistical/medical review and sponsor governance remain required before regulated reuse. |
 
 ---
 
@@ -268,3 +268,4 @@ Under `docs/PRODUCT_CLAIM.md` Path A and the residual register above:
 | 1.1 | 2026-08-03 | Section 3 corrections, F-011 observed-baseline update, and F-042 pain/RT residual |
 | 1.2 | 2026-08-03 | F-042 approval-ready specification: corrected pain algorithm, CM+PR union, TTUMOR ITT and SAP-native T-11 mappings |
 | 1.3 | 2026-08-03 | F-042 single-author governance: accountable-author Path A decision, disclosed non-independence and external-review boundary |
+| 1.4 | 2026-08-04 | F-042 adopted-rule implementation, CM+PR staging, TTUMOR ITT and SAP-native T-11 mapping; final full-DAG/reseal pending |

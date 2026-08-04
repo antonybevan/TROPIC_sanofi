@@ -33,7 +33,7 @@ The two controlled CT dispositions remain warnings rather than hidden failures. 
 | Unindexed physical outputs | 0 |
 | Endpoint-semantic problems | 0 |
 
-The catalog retains the explicit SAP `T-11-8` response/TTPAIN collision. T-11-6 and T-11-7 are controlled as TTUMOR and TTPSA respectively. The response denominator uses observed baseline PSA (MP 329; CbzP 361) and is regression-tested.
+The historical catalog snapshot retained the SAP `T-11-8` response/TTPAIN collision. The Phase 2 control surface now restores the SAP-native mapping: T-11-3 PSA response, T-11-4 ORR, T-11-5 pain response, T-11-6 TTUMOR, T-11-7 TTPSA and T-11-8 TTPAIN; T-11-8b is an explicit ORR response-evaluable sensitivity. TTUMOR is ITT-primary and the observed-baseline PSA denominator remains MP 329 / CbzP 361.
 
 ARS is present for the controlled survival core (16 AR rows and a reporting event). Full SAP-catalog ARS coverage remains outside Path A and is not implied by the ARS artifact.
 
@@ -42,7 +42,7 @@ ARS is present for the controlled survival core (16 AR rows and a reporting even
 - ADRG, SDRG, and BDRG carry the Path A product claim, explicit “is/is not” boundaries, document control, provenance limits, and known-differences pointer.
 - ADRG now states the corrected time origins, PFS last-evaluable/no-post-baseline rule, TTUMOR RECIST-only censor pool, observed-baseline PSA rule, and the S3-04 pain/RT residual.
 - `TRACEABILITY_MATRIX.md` maps ADTTE to the corrected programs and describes the component-label and censoring controls.
-- The findings register and disposition board carry F-040/F-041 as corrected and F-042 as an accepted Path A residual.
+- The findings register and disposition board carry F-040/F-041 as corrected and F-042 as implemented for Path A with external qualified review still required.
 
 ## 4. eCTD-style package integrity
 
@@ -54,6 +54,19 @@ Structural limitations remain intentionally visible:
 2. CbzP is a synthetic/reconstructed comparator and is TFL-only; it is not patient-level trial IPD.
 3. Git/hash controls are reproducibility controls, not a validated Part 11 system or electronic signature.
 
+## Phase 2 closure addendum — 2026-08-04
+
+Following Antony Bevan's ED-01–ED-07 adoption, the controlled catalog contains 21
+in-scope IDs and 18 explicitly deferred SAP IDs. The F-042 module and aggregate
+event-source evidence are packaged, and the full 34-stage real-SAS run passed
+metadata, TFL, package and log gates. The clean committed release-manifest rebind
+is the final seal operation; no independent, sponsor, medical or regulated approval
+is claimed.
+
 ## 5. Handoff to final reseal
 
-After this memo and the orchestrator-map correction are included, rerun the clean full DAG, commit the intentional factory/document/control changes, and run `scripts/verify_release.py`. A release-candidate PASS is valid only when the current material worktree is clean and the release manifest is resealed against that exact source tree.
+The full DAG has now passed. Commit the intentional factory/document/control changes,
+rebind the release manifest against the clean source tree, and run
+`scripts/verify_release.py`. A release-candidate PASS is valid only when the current
+material worktree is clean and the release manifest is resealed against that exact
+source tree.

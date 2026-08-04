@@ -98,6 +98,10 @@ The final ODA run records 37 reviewed ADTTE time-origin exceptions (20 OS, 15 PF
 
 The green DAG demonstrates reproducible execution and cross-language agreement. It does not resolve the S3-04 clinical interpretation decision; correlated tracks can reproduce the same unresolved rule.
 
+## Phase 2 closure addendum — 2026-08-04
+
+The S3-04 disposition is superseded for the controlled Path A implementation by Antony Bevan's adoption of ED-01–ED-07. Separate SAS and R tracks now consume staged SV/PN/CM/PR, apply the adopted pain and CM+PR rules, retain diary/RT/date-bound source lineages, and reconcile against TTUMOR ITT-primary ADTTE. The historical baseline remains in this audit for auditability. Final full-DAG/reseal and external qualified statistical/medical review remain required before any regulated or filing-facing use.
+
 ## 5. Handoff to Section 4
 
 Section 4 should verify Define/ARM/TFL metadata against the corrected ADTTE fields and counts, ensure package copies are byte-aligned with the factory, and carry S3-04 into the reviewer guide and known-differences board. The release posture remains **Path A controlled demonstration**, not a sponsor-approved submission package.

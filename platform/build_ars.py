@@ -50,6 +50,7 @@ DPM = 30.4375
 ANALYSES = [
     ("OS",     "Overall Survival",            "PRIMARY OUTCOME MEASURE"),
     ("PFS",    "Progression-Free Survival",   "SECONDARY OUTCOME MEASURE"),
+    ("TTPAIN", "Time to Pain Progression",   "SECONDARY OUTCOME MEASURE"),
     ("TTPSA",  "Time to PSA Progression",     "SECONDARY OUTCOME MEASURE"),
     ("TTUMOR", "Time to Tumor Progression",   "SECONDARY OUTCOME MEASURE"),
 ]

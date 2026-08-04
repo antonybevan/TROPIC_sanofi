@@ -208,13 +208,13 @@
       <file-tag name="analysis-program" info-type="us"/>
     </doc-content>
     <doc-content xlink:href="../../../../../../index.xml#L0067">
-      <file-tag name="analysis-data-reviewers-guide" info-type="us"/>
+      <file-tag name="analysis-program" info-type="us"/>
     </doc-content>
     <doc-content xlink:href="../../../../../../index.xml#L0068">
-      <file-tag name="study-report-body" info-type="ich"/>
+      <file-tag name="analysis-program" info-type="us"/>
     </doc-content>
     <doc-content xlink:href="../../../../../../index.xml#L0069">
-      <file-tag name="study-report-body" info-type="ich"/>
+      <file-tag name="analysis-data-reviewers-guide" info-type="us"/>
     </doc-content>
     <doc-content xlink:href="../../../../../../index.xml#L0070">
       <file-tag name="study-report-body" info-type="ich"/>
@@ -265,6 +265,12 @@
       <file-tag name="study-report-body" info-type="ich"/>
     </doc-content>
     <doc-content xlink:href="../../../../../../index.xml#L0086">
+      <file-tag name="study-report-body" info-type="ich"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0087">
+      <file-tag name="study-report-body" info-type="ich"/>
+    </doc-content>
+    <doc-content xlink:href="../../../../../../index.xml#L0088">
       <file-tag name="study-report-body" info-type="ich"/>
     </doc-content>
   </study-document>

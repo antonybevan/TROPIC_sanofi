@@ -116,6 +116,10 @@ The current dual-language TTPAIN derivation enforces five-of-seven diary evaluab
 **To Section 4:** reconcile metadata/ARM/TFL catalog wording after the S2-01 decision; do not regenerate a “SAP-complete” TFL index before that decision.  
 **Release posture:** Path A controlled demonstration may continue with the explicit limitations above. Submission-readiness or SAP-complete language remains blocked.
 
+## Phase 2 closure addendum — 2026-08-04
+
+The historical findings above are retained as the pre-adoption baseline. Antony Bevan adopted ED-01–ED-07 on 2026-08-04. The controlled implementation now uses ITT as the TTUMOR primary population (with measurable disease supportive), stages SV/PR alongside CM/PN, applies the adopted component-specific pain and CM+PR qualification rules, and restores the SAP-native `T-11-3` PSA response, `T-11-4` ORR, `T-11-5` pain response, `T-11-6` TTUMOR, `T-11-7` TTPSA and `T-11-8` TTPAIN mappings. The final full-DAG rerun and release reseal remain the evidence gate; this addendum does not represent independent, sponsor, medical or regulated approval.
+
 ## Section 3 correction addendum — 2026-08-03
 
 The Section 2 live-data snapshot counted one MP subject whose ADSL baseline PSA (`PSABL=110`) was a controlled fallback (`PSABLIF='Y'`) as PSA-eligible. Section 3 rechecked the source baseline and corrected the governed response eligibility rule to exclude fallback values while retaining synthetic comparator rows with no `PSABLIF` field. The corrected current denominator is **690 unique subjects: MP 329 and CbzP 361; responders remain MP 61 and CbzP 145**. This supersedes the Section 2 snapshot values 691 / MP 330 for current output generation; the original values remain above as historical audit evidence rather than being silently overwritten.

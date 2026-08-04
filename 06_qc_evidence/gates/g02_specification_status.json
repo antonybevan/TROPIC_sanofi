@@ -2,7 +2,7 @@
   "gate": "G02",
   "name": "analysis_specification_lock",
   "status": "PASS",
-  "generated_at": "2026-08-04T05:01:24Z",
+  "generated_at": "2026-08-04T06:49:34Z",
   "checks": [
     {
       "name": "exists:docs/PRODUCT_CLAIM.md",
@@ -62,17 +62,17 @@
     {
       "name": "catalog.in_scope_nonempty",
       "ok": true,
-      "detail": "n=18"
+      "detail": "n=21"
     },
     {
       "name": "catalog.deferred_documented",
       "ok": true,
-      "detail": "n=21"
+      "detail": "n=18"
     },
     {
       "name": "catalog.not_pretending_full_sap_only",
       "ok": true,
-      "detail": "in_scope=18 deferred=21"
+      "detail": "in_scope=21 deferred=18"
     },
     {
       "name": "manifest.study_id",
@@ -125,9 +125,39 @@
       "detail": "PSA eligibility closure and current arm counts must be present"
     },
     {
-      "name": "population_doc.T-11-8_collision_disclosed",
+      "name": "population_doc.T-11-8_mapping_restored",
       "ok": true,
-      "detail": "the SAP T-11-8 TTPAIN/response collision must be explicit until resolved"
+      "detail": "the adopted SAP T-11-8 TTPAIN mapping and its restoration must be explicit"
+    },
+    {
+      "name": "population_doc.T-11-3_PSA_response",
+      "ok": true,
+      "detail": "SAP-native T-11 endpoint mapping is missing or stale"
+    },
+    {
+      "name": "population_doc.T-11-4_objective_response",
+      "ok": true,
+      "detail": "SAP-native T-11 endpoint mapping is missing or stale"
+    },
+    {
+      "name": "population_doc.T-11-5_pain_response",
+      "ok": true,
+      "detail": "SAP-native T-11 endpoint mapping is missing or stale"
+    },
+    {
+      "name": "population_doc.T-11-6_TTUMOR",
+      "ok": true,
+      "detail": "SAP-native T-11 endpoint mapping is missing or stale"
+    },
+    {
+      "name": "population_doc.T-11-7_TTPSA",
+      "ok": true,
+      "detail": "SAP-native T-11 endpoint mapping is missing or stale"
+    },
+    {
+      "name": "population_doc.T-11-8_TTPAIN",
+      "ok": true,
+      "detail": "SAP-native T-11 endpoint mapping is missing or stale"
     },
     {
       "name": "catalog.T-11-6_semantics",
@@ -138,6 +168,26 @@
       "name": "catalog.T-11-7_semantics",
       "ok": true,
       "detail": "T-11-7 must be PSA progression in both release and SAP catalogs"
+    },
+    {
+      "name": "catalog.T-11-3_semantics",
+      "ok": true,
+      "detail": "T-11-3 must be 'psa' in both release and SAP catalogs"
+    },
+    {
+      "name": "catalog.T-11-4_semantics",
+      "ok": true,
+      "detail": "T-11-4 must be 'objective response' in both release and SAP catalogs"
+    },
+    {
+      "name": "catalog.T-11-5_semantics",
+      "ok": true,
+      "detail": "T-11-5 must be 'pain response' in both release and SAP catalogs"
+    },
+    {
+      "name": "catalog.T-11-8_semantics",
+      "ok": true,
+      "detail": "T-11-8 must be 'pain progression' in both release and SAP catalogs"
     }
   ],
   "problems": []

@@ -41,7 +41,7 @@ workstreams:
   WS1_source_intake:
     name: Clinical data management / source intake
     gates: [G01]
-    status: AMBER
+    status: GREEN
     note: "Path A source handoff is GREEN with disclosed residuals; AMBER reflects broader CORE/P21 industry depth. Section 1 audit passed 2026-08-03."
     owned_artifacts:
       - 01_source_data
@@ -65,24 +65,21 @@ workstreams:
   WS2_statistical_specification:
     name: Statistical and analysis specification
     gates: [G02]
-    status: AMBER
+    status: GREEN
     owned_artifacts:
       - config/study_config.yaml
       - 02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx
       - config/ctq_traceability.yaml
       - 07_reviewer_explanation/analysis_report.md
       - 07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md
-    note: "Accountable-author ED-01 through ED-07 decision package filed 2026-08-03. Current sealed pain derivation, TTUMOR measurable-only denominator, and T-11-3 through T-11-8 mappings remain unchanged/non-conforming pending author sign-off."
+    note: "Antony Bevan adopted ED-01 through ED-07 on 2026-08-04. Corrected CM+PR-qualified pain derivation, TTUMOR ITT primary, SAP-native T-11-3 through T-11-8 mappings, full real-SAS DAG and delayed second-pass review are complete; external qualified review remains required before regulated reuse."
     open_risks:
-      - SAP_T11_8_TTPAIN_vs_response_block_collision
-      - pain_algorithm_and_CM_PR_union_require_signed_replacement
-      - TTUMOR_ITT_primary_requires_signature_and_rebuild
-      - secondary_TTE_time_origins_require_signature
+      - external_statistical_medical_review
       - F-012_combined_n749_is_not_protocol_itt
     required_evidence:
       - population_endpoint_control_table
       - spec_to_config_trace
-    next_action: "Accountable author adopts, modifies, or rejects ED-01 through ED-07 and acknowledges the single-author limitation; then program separately in SAS/R and rerun/reseal"
+    next_action: "Maintain the sealed evidence and retain external qualified statistical/medical review as a pre-regulated-use requirement"
     residual_findings: [F-012, F-042]
     packs:
       - docs/workstreams/WS2_POPULATION_ENDPOINT_CONTROL.md

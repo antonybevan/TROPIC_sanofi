@@ -2,10 +2,10 @@
 
 **Workstream:** Statistical Specification (G02)  
 **Product claim:** Path A  
-**As of:** 2026-08-03
+**As of:** 2026-08-04
 **Authorities:** SAP v4.0 · `config/study_config.yaml` · `config/tfl_output_catalog.yaml` · ADRG · [Section 2 audit](../../06_qc_evidence/audit/section_reviews/SECTION_02_POPULATIONS_ENDPOINTS_AUDIT_2026-08-03.md)
 
-**Decision handoff:** The F-042 accountable-author review packet and [F-042 / T-11-8 Endpoint Decision Record](decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md) now record Antony Bevan's 2026-08-04 adoption of ED-01–ED-07 as written. Phase 2 implementation may proceed under the [approval specification](decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md), [quantified impact appendix](decisions/F042_PFS_PAIN_IMPACT_APPENDIX_2026-08-03.md), and [CM/PR source qualification audit](decisions/F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.md). Current Path A outputs remain unchanged until rerun/reseal, and no independent, sponsor, or regulated approval is claimed.
+**Decision handoff:** The F-042 accountable-author review packet and [F-042 / T-11-8 Endpoint Decision Record](decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md) record Antony Bevan's 2026-08-04 adoption of ED-01–ED-07 as written. Phase 2 implementation is now present in separate SAS and R tracks under the [approval specification](decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md), [quantified impact appendix](decisions/F042_PFS_PAIN_IMPACT_APPENDIX_2026-08-03.md), and [CM/PR source qualification audit](decisions/F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.md). A final full-DAG rerun, delayed second-pass review, and release reseal remain required before this change set can be called sealed. No independent, sponsor, or regulated approval is claimed.
 
 ---
 
@@ -26,12 +26,12 @@ If it is not in this table, programming should not invent it for Path A.
 
 | Population | Flag / rule | ADaM | Used in controlled outputs | Notes / residual |
 |---|---|---|---|---|
-| **ITT** | `ITTFL='Y'` | ADSL → carried to ADTTE | OS, PFS, TTPSA; author-decision proposal also requires TTUMOR and TTPAIN | MP N=371; synthetic CbzP N=378; combined N=749 is not protocol ITT N=755. |
+| **ITT** | `ITTFL='Y'` | ADSL → carried to ADTTE | OS, PFS, TTPSA, TTUMOR and TTPAIN | MP N=371; synthetic CbzP N=378; combined N=749 is not protocol ITT N=755. |
 | **Safety** | `SAFFL='Y'` | ADSL | ADAE TEAE tables T-20; lab shifts T-21; exposure | MP N=371; synthetic CbzP N=371. Denominators use SAFFL, not AE-distinct N. |
-| **Measurable disease** | `MEASDISF='Y'` | ADSL | ORR response summary; current TTUMOR implementation only | Current ORR dens = **all** MEAS subjects left-join ADRS OBJRESP: MP N=203, CbzP N=179. Signed proposal moves primary TTUMOR to ITT and retains MEAS only as support. |
+| **Measurable disease** | `MEASDISF='Y'` | ADSL | ORR response summary; TTUMOR supportive subgroup/sensitivity | ORR dens = **all** MEAS subjects left-join ADRS OBJRESP: MP N=203, CbzP N=179. TTUMOR primary is now ITT; MEAS remains supportive. |
 | **Package combined display** | Real MP + synthetic CbzP | TFL merge only | Comparative figures/tables | **Not** protocol ITT 755 (F-012) |
 | **PSA response analysis set** | `PSARESP` rows joined to ADSL baseline PSA, excluding controlled fallback (`PSABLIF='Y'`), and filtered `PSABL >= 20` | ADRS + ADSL | PSA response in the current T-11 response block and F-13-1 | **F-011 resolved:** MP 61/329; CbzP 145/361; 690 unique eligible subjects. Synthetic rows without `PSABLIF` are treated as observed. |
-| **Pain progression** | Current ADTTE `PARAMCD='TTPAIN'`; author-decision proposal replaces the non-conforming pain algorithm | ADTTE | Not a separate controlled Path A TFL | SAP assigns TTPAIN to T-11-8. Approval Specification ED-07 corrects visit summaries, thresholds, confirmation, RT handling and event dating before implementation. |
+| **Pain progression** | ADTTE `PARAMCD='TTPAIN'`; ED-01–ED-03/ED-07 CM+PR-qualified, component-specific rule | ADTTE | T-11-8 | SAP assigns TTPAIN to T-11-8. The implemented rule uses component-specific summaries, same-component confirmation, the SV date hierarchy, direct-intent CM+PR union, diary/RT lineages and bounded date sensitivity. |
 
 ### Population hard rules
 
@@ -47,11 +47,12 @@ If it is not in this table, programming should not invent it for Path A.
 |---|---|---|---|---|---|
 | Overall survival | OS | ITT | ADTTE | F-11-1, forest F-12-1 | Results recon LIFETEST; randomization origin |
 | Progression-free survival | PFS (composite: tumour/PSA/pain/death + NACT censor) | ITT | ADTTE | F-11-2 | SAP v4 PFS hierarchy; randomization origin |
-| Time to tumor progression | TTUMOR | Current: ITT ∩ `MEASDISF='Y'`; author-adopted proposal: ITT primary, MEAS supportive | ADTTE | T-11-6 | Protocol/publication and SAP Table 22 support ITT; current denominator must be replaced after author sign-off. |
+| Time to tumor progression | TTUMOR | ITT primary; `MEASDISF='Y'` supportive subgroup/sensitivity | ADTTE | T-11-6 | Protocol/publication and SAP Table 22 support ITT. The reconstructed CbzP arm now carries one record per ITT subject; ORR retains the measurable-disease denominator. |
 | Time to PSA progression | TTPSA | ITT | ADTTE | T-11-7 | Physical block and index agree; current CbzP parameter is PH-scaled demonstration data. |
-| Time to pain progression | TTPAIN | ITT with author-adopted endpoint evaluability/qualification | ADTTE | SAP target T-11-8; not currently controlled as a TFL | Current five-of-seven/trigger implementation is reproducible but non-conforming; ED-01/02/03/07 define its replacement. |
-| PSA response | PSARESP | Observed ADSL baseline PSA >=20 (`PSABLIF != 'Y'`) plus unique PSARESP row | ADRS + ADSL | SAP `T-11-3` after signed remap | F-011 resolved: MP 61/329; CbzP 145/361. |
-| Objective response | OBJRESP | MEAS TFL dens; ADRS row = BOR spine | ADRS + TFL left-join | SAP `T-11-4`; response-evaluable `T-11-8b` remains sensitivity | MEAS dens MP 203/CbzP 179; response-evaluable spine MP 351/CbzP 378. |
+| Time to pain progression | TTPAIN | ITT with ED-01–ED-03/ED-07 qualification | ADTTE | T-11-8 | Start is randomization; primary diary/RT evidence and diary-only, RT-only, and date-bound supporting lineages are retained. |
+| PSA response | PSARESP | Observed ADSL baseline PSA >=20 (`PSABLIF != 'Y'`) plus unique PSARESP row | ADRS + ADSL | T-11-3 | F-011 resolved: MP 61/329; CbzP 145/361. |
+| Objective response | OBJRESP | MEAS TFL dens; ADRS row = BOR spine | ADRS + TFL left-join | T-11-4; response-evaluable T-11-8b sensitivity | MEAS dens MP 203/CbzP 179; response-evaluable spine MP 351/CbzP 378. |
+| Pain response | PN/SV-derived response event | ITT PAINBL='Y' with evaluable baseline and consecutive assessment | F-042 event evidence + TFL | T-11-5 | MP is computed from real PN/SV; CbzP is explicitly N/A because PN is unavailable in the synthetic arm. |
 | TEAE summary | ADAE TRTEMFL etc. | Safety | ADAE | T-20-1, T-20-2 | OCCDS + episode merge |
 | Lab CTCAE shift | ADLB grades | Safety | ADLB | T-21-1, T-21-2 | T-21-2 synthetic arm demo |
 | Exposure / RDI | ADEX | Safety / treated | ADEX | F-14-1, T-17-*, F-17-1 | Optimus demonstration |
@@ -87,7 +88,7 @@ All IDs in `config/tfl_output_catalog.yaml` → `deferred_not_in_scope` (21 SAP 
 
 ## 5. SAP/TFL alignment note
 
-The current Path A TFL text is internally reproducible, but the `T-11-3`–`T-11-8` mappings do not match SAP Appendix D/Table 22. The `T-11-8` TTPAIN/response collision therefore remains explicit and unresolved until the author-adopted rules are implemented and resealed. The proposed Path A disposition restores `T-11-3` PSA response, `T-11-4` ORR, `T-11-5` pain response, `T-11-6` TTUMOR, `T-11-7` TTPSA and `T-11-8` TTPAIN. Primary PSA/ORR results do not require an invented extension ID. No mapping changes occur until accountable-author sign-off.
+The adopted Path A implementation restores the SAP-native `T-11-3` PSA response, `T-11-4` ORR, `T-11-5` pain response, `T-11-6` TTUMOR, `T-11-7` TTPSA and `T-11-8` TTPAIN mapping. The T-11-8 collision is therefore resolved/mapping restored in the controlled catalog, physical table block, CTQ register, ARM/ARS and reviewer guides; `T-11-8b` remains an explicitly labelled ORR response-evaluable sensitivity. Primary PSA/ORR results do not require an invented extension ID. The final full-DAG rerun and release reseal are still the controlling evidence of the implementation state.
 
 ## 6. Estimand posture (honest)
 
@@ -100,7 +101,7 @@ CTQ register: `config/ctq_traceability.yaml` + `docs/CTQ_TRACEABILITY_REPORT.md`
 
 ## 7. G02 gap acknowledgment
 
-The orchestrator **does stage-gate G02** through `platform/check_gate_g02_specification.py`. That gate confirms the required authority files and structural population tokens; it does not replace this semantic review or approve the S2-01 SAP/TFL decision.
+The orchestrator **does stage-gate G02** through `platform/check_gate_g02_specification.py`. The gate now checks the ITT/MEAS distinction and the restored SAP-native endpoint-ID semantics (`T-11-3` through `T-11-8`) in both this table and the controlled catalog; it does not replace independent clinical/statistical review or approve a regulated filing.
 
 **Next engineering:** strengthen the G02 machine check so it asserts the endpoint-ID tokens and the explicit S2-01 disclosure whenever this pack changes.
 
@@ -123,6 +124,9 @@ The orchestrator **does stage-gate G02** through `platform/check_gate_g02_specif
 - [x] F-011 closure and F-012 limitation linked
 - [x] Section 2 review note filed
 - [x] Runtime G02 gate exists
-- [ ] ED-01–ED-07 adopted by the accountable author with limitation acknowledgement, then SAP-native `T-11-3`–`T-11-8` mapping implemented/resealed
+- [x] ED-01–ED-07 adopted by Antony Bevan with single-author limitation acknowledgement
+- [x] SAP-native `T-11-3`–`T-11-8` mapping implemented in code, catalog, metadata and reviewer guides
+- [x] TTUMOR ITT primary and CM+PR-qualified pain derivation implemented in separate SAS/R tracks
+- [ ] Full 34-stage real-SAS DAG, delayed second-pass review and release reseal recorded for this change set
 
-Board status: **AMBER** — T-11-8 decision adopted; Phase 2 endpoint-origin/diary implementation and rerun/reseal remain open.
+Board status: **GREEN for Path A implementation** — the full 34-stage real-SAS DAG and delayed second-pass review passed; external qualified review remains required before regulated reuse.

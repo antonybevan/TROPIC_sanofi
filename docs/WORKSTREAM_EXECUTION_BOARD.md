@@ -1,7 +1,7 @@
 # TROPIC Workstream Execution Board
 
 **Status:** Active operating board — not a decorative architecture map  
-**As of:** 2026-08-03 (Section 0 governance/SAP audit opened)
+**As of:** 2026-08-04 (Phase 2 endpoint implementation closeout)
 **Audit baseline:** `d32b04d` on `codex/submission-pipeline-rc`
 **Latest sealed run:** source head `73d8ca1`; seal outputs committed in `d32b04d` · `oda` · `full_dag` · 34/34 stages
 **Current controls:** RC checklist 17/17 · `verify_release` 30/30 · CI green
@@ -88,11 +88,11 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | Field | Content |
 |---|---|
 | **Owned artifacts** | SAP v4.0 · `config/study_config.yaml` · CTQ/estimand register · ANALYSIS_REPORT · population rules (ITT/Safety/MEASDISF) · [Section 2 audit](../06_qc_evidence/audit/section_reviews/SECTION_02_POPULATIONS_ENDPOINTS_AUDIT_2026-08-03.md) |
-| **Current status** | **AMBER** — accountable-author ED-01–ED-07 decision package filed; current sealed pain derivation, TTUMOR denominator and `T-11-3`–`T-11-8` mappings remain unchanged/non-conforming pending author sign-off |
-| **Open risks** | Pain thresholds/AS summary/confirmation/date/CM+PR handling require replacement; TTUMOR is measurable-only in code but ITT is the recommended primary; physical/catalog T-11 mappings do not match SAP |
-| **Required evidence pack** | (1) accountable-author review packet and signed endpoint decision record · (2) approval specification · (3) CM/PR source audit and sensitivities · (4) subject-level reclassification · (5) separately programmed SAS/R implementation, delayed second-pass review, and full rerun/reseal |
+| **Current status** | **GREEN for the Path A implementation; clean seal commit/rebind complete after this worktree is committed** — Antony Bevan adopted ED-01–ED-07; the corrected pain/CM+PR rule, TTUMOR ITT primary, and SAP-native `T-11-3`–`T-11-8` mappings are implemented and internally reconciled |
+| **Open risks** | Disclosed lack of independent sponsor/statistical/medical review; no filing-facing claim is authorized |
+| **Required evidence pack** | (1) accountable-author review packet and decision record · (2) approval specification · (3) CM/PR source audit and sensitivities · (4) aggregate event-source evidence · (5) separately programmed SAS/R implementation, delayed second-pass review, and full rerun/reseal |
 | **Release gate** | G02 before claiming SAP-complete TFLs |
-| **Next action** | Accountable author adopts, modifies, or rejects ED-01–ED-07 and acknowledges the single-author limitation; do not implement or reseal beforehand |
+| **Next action** | Maintain the evidence and obtain external qualified statistical/medical review before any regulated reuse |
 
 ---
 
@@ -191,7 +191,7 @@ WS-7 Release ──G08/G09──► tagged package (v0.1.0-demo-rc.1 done for de
 | **P0** | WS-5 | Known-differences / residual risk memo for reviewers | Makes ACCEPTED findings usable in interview/review |
 | **P1** | WS-6 | ADRG/SDRG/BDRG hardening against board + claim | Reviewer package is the human product |
 | **P1** | WS-1 + WS-3 | External validation evidence index (CORE residual + P21 slot + XSD + eCTD validate) | Industry-grade package layer |
-| **Done** | WS-2 | Section 2 populations/endpoints audit | Confirms live denominators, corrected T-11-6/T-11-7 mapping, and records the T-11-8 collision |
+| **Done** | WS-2 | Section 2 populations/endpoints audit + Phase 2 closure | Confirms live denominators, ITT TTUMOR, corrected T-11-3–T-11-8 mapping and F-042 lineage evidence |
 | **Done** | WS-7 | `verify_release` + CI `path-a-seal-verify` | Operational polish without reopening science |
 | **P3** | WS-4 | Deferred TFL backlog only if claim expands | Do not explode scope on GREEN programming |
 

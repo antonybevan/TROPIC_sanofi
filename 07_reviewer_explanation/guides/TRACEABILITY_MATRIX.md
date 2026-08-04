@@ -79,7 +79,7 @@ variable-label artifacts for both tracks (`platform/gen_adam_labels.R`).
 **Not claimed:** full SAP Appendix D (21 IDs deferred with reasons).  
 **Regenerate local index (optional):** `python3 platform/build_tfl_output_index.py` (report is gitignored under portfolio surface policy).
 
-### 3.1 Controlled in-scope (18 IDs)
+### 3.1 Controlled in-scope (21 IDs)
 
 | Catalog ID | File / delivery form | Primary ADaM | Notes |
 |---|---|---|---|
@@ -90,10 +90,13 @@ variable-label artifacts for both tracks (`platform/gen_adam_labels.R`).
 | F-13-1 | `F-13-1_PSA_Waterfall.png` | ADLB PSA + ADSL | |
 | F-14-1 | `F-14-1_Swimmer_Plot.png` | ADEX + ADSL | |
 | F-17-1 | `F-17-1_Optimus_Scatter.png` | ADEX RDI + ADLB ANCNADIR | Synthetic/comparative caution |
+| T-11-3 | inside `T-11-Efficacy_Tables.txt` | ADRS/ADLB + ADSL | PSA response rate; observed baseline PSA denominator |
+| T-11-4 | inside `T-11-Efficacy_Tables.txt` | ADRS + ADSL | Confirmed ORR per RECIST v1.0; measurable-disease denominator |
+| T-11-5 | inside `T-11-Efficacy_Tables.txt` | PN/SV + ADSL | Pain response; CbzP explicitly N/A where PN is unavailable |
 | T-11-6 | inside `T-11-Efficacy_Tables.txt` | ADTTE TTUMOR | Catalog ID ≠ separate file per row |
 | T-11-7 | inside `T-11-Efficacy_Tables.txt` | ADTTE TTPSA | |
-| T-11-8 | inside `T-11-Efficacy_Tables.txt` | ADRS | Best clinical response |
-| T-11-8b | inside `T-11-Efficacy_Tables.txt` | ADRS | ORR response-evaluable sensitivity |
+| T-11-8 | inside `T-11-Efficacy_Tables.txt` | ADTTE TTPAIN | Time to pain progression; randomization origin |
+| T-11-8b | inside `T-11-Efficacy_Tables.txt` | ADRS | ORR response-evaluable sensitivity; explicit extension |
 | T-17-1 | inside `T-17-Optimus_Tables.txt` | ADEX | RDI categories |
 | T-17-2 | inside `T-17-Optimus_Tables.txt` | ADLB + ADEX | ANC nadir by G-CSF |
 | T-17-4 | inside `T-17-Optimus_Tables.txt` | ADEX/ADLB/ADTTE | Benefit–risk by RDI tertile |
@@ -102,7 +105,7 @@ variable-label artifacts for both tracks (`platform/gen_adam_labels.R`).
 | T-21-1 | inside `T-21-Lab_Shift_Tables.txt` | ADLB | CTCAE shift MP |
 | T-21-2 | inside `T-21-Lab_Shift_Tables.txt` | ADLB | CTCAE shift CbzP (synthetic arm display) |
 
-### 3.2 Explicitly deferred (21 IDs) — sample of policy
+### 3.2 Explicitly deferred (18 IDs) — sample of policy
 
 Not listed above = **not** Path A controlled delivery. Examples: standalone T-11-1/T-11-2 OS/PFS table shells (evidence via F-11-1/F-11-2 + results recon instead), F-12-2, T-12-*, many T-20 detail shells. Full list and reasons: `config/tfl_output_catalog.yaml` → `deferred_not_in_scope`.
 

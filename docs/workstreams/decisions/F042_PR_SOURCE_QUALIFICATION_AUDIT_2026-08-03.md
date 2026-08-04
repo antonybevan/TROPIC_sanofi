@@ -100,6 +100,10 @@ With ED-02 adopted, the staging layer shall:
 
 This is a proposed technical staging design, not an independently or medically approved clinical derivation.
 
+## Phase 2 implementation closure addendum — 2026-08-04
+
+Antony Bevan adopted ED-02 as written. The staging and endpoint layers now implement the CM+PR direct-intent union, exact duplicate collapse with source provenance, complete-date hierarchy, partial-date exclusion from the primary exact-date event pool, and diary-only/RT-only/date-bound supporting lineages. This closes the staging-readiness action for the controlled Path A demonstration; it does not substitute for independent medical adjudication or sponsor approval.
+
 ## 6. Release and data-integrity boundary
 
 This audit did not modify or regenerate:

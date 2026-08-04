@@ -6,15 +6,15 @@
 
 ---
 
-## Current endpoint decision handoff (2026-08-03)
+## Current endpoint decision handoff and closure (2026-08-04)
 
 The next controlled work item is specification closure, not an unapproved ADTTE rewrite.
 
 | ID | Pri | Owner | Work | Why it matters | Exit |
 |---|---|---|---|---|---|
-| **W-ENDPOINT-01** | **P0** | WS-2 / WS-4 + accountable author | **Author-decision recorded; Phase 2 implementation authorized.** Implement ED-01–ED-07: corrected pain algorithm, cancer-related evidence, CM+PR union, RT sensitivities, SAP-native `T-11-3`–`T-11-8` mappings, TTUMOR ITT population and TTE origins. | Numerical parity cannot prove clinical correctness; the pre-rerun sealed pain and TTUMOR rules remain historical until dual-language implementation, reconciliation, delayed second-pass review, rerun, and reseal. | [`EDR-F042-T11-8-2026-08-03.md`](decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md) records Antony Bevan's 2026-08-04 adoption; then Phase 2 rerun/reseal. External statistical/medical review remains required before regulated reuse. |
+| **W-ENDPOINT-01** | **P0** | WS-2 / WS-4 + accountable author | **Closed for Path A implementation.** ED-01–ED-07 are adopted and implemented: corrected pain algorithm, cancer-related evidence, CM+PR union, RT sensitivities, SAP-native `T-11-3`–`T-11-8` mappings, TTUMOR ITT population and TTE origins. | Numerical parity does not replace independent clinical review; the pre-rerun pain/TTUMOR records remain historical baseline evidence. | [`EDR-F042-T11-8-2026-08-03.md`](decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md) records Antony Bevan's adoption; full 34-stage real-SAS DAG and delayed second-pass review pass. External statistical/medical review remains required before regulated reuse. |
 
-The author-adopted record, executable proposal and impact appendix authorize Phase 2 implementation while leaving the current Path A outputs untouched until rerun/reseal. The historical backlog below remains useful evidence, but this handoff supersedes its older “next session” ordering for endpoint work.
+The author-adopted record, executable specification and impact appendix are now implemented and reconciled. The historical backlog below remains useful evidence, but this handoff supersedes its older “next session” ordering for endpoint work.
 
 ---
 

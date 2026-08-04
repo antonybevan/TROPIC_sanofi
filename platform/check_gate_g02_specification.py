@@ -107,10 +107,34 @@ def main() -> int:
             "PSA eligibility closure and current arm counts must be present",
         )
         add(
-            "population_doc.T-11-8_collision_disclosed",
-            "t-11-8" in lower and "ttpain" in lower and "collision" in lower,
-            "the SAP T-11-8 TTPAIN/response collision must be explicit until resolved",
+            "population_doc.T-11-8_mapping_restored",
+            "t-11-8" in lower
+            and "ttpain" in lower
+            and ("mapping restored" in lower or "mapping resolved" in lower),
+            "the adopted SAP T-11-8 TTPAIN mapping and its restoration must be explicit",
         )
+        endpoint_doc_checks = {
+            "T-11-3_PSA_response": ("t-11-3" in lower and "psa response" in lower),
+            "T-11-4_objective_response": (
+                "t-11-4" in lower and "objective response" in lower
+            ),
+            "T-11-5_pain_response": ("t-11-5" in lower and "pain response" in lower),
+            "T-11-6_TTUMOR": (
+                "t-11-6" in lower and "time to tumor progression" in lower
+            ),
+            "T-11-7_TTPSA": (
+                "t-11-7" in lower and "time to psa progression" in lower
+            ),
+            "T-11-8_TTPAIN": (
+                "t-11-8" in lower and "time to pain progression" in lower
+            ),
+        }
+        for check_name, ok in endpoint_doc_checks.items():
+            add(
+                f"population_doc.{check_name}",
+                ok,
+                "SAP-native T-11 endpoint mapping is missing or stale",
+            )
 
     cat_path = ROOT / "config/tfl_output_catalog.yaml"
     if yaml is not None and cat_path.is_file():
@@ -135,6 +159,18 @@ def main() -> int:
             "psa" in in_scope.get("T-11-7", "") and "psa" in full.get("T-11-7", ""),
             "T-11-7 must be PSA progression in both release and SAP catalogs",
         )
+        catalog_semantics = {
+            "T-11-3": "psa",
+            "T-11-4": "objective response",
+            "T-11-5": "pain response",
+            "T-11-8": "pain progression",
+        }
+        for output_id, token in catalog_semantics.items():
+            add(
+                f"catalog.{output_id}_semantics",
+                token in in_scope.get(output_id, "") and token in full.get(output_id, ""),
+                f"{output_id} must be '{token}' in both release and SAP catalogs",
+            )
 
     status = "PASS" if not problems else "FAIL"
     payload = {
