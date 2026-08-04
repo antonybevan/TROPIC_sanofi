@@ -2,7 +2,7 @@
   "gate": "G02",
   "name": "analysis_specification_lock",
   "status": "PASS",
-  "generated_at": "2026-07-09T16:41:18Z",
+  "generated_at": "2026-08-04T17:55:47Z",
   "checks": [
     {
       "name": "exists:docs/PRODUCT_CLAIM.md",
@@ -40,6 +40,16 @@
       "detail": "present"
     },
     {
+      "name": "exists:03_metadata/adam/ADaM_spec.xlsx",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:03_metadata/define/define.xml",
+      "ok": true,
+      "detail": "present"
+    },
+    {
       "name": "config.STUDYID",
       "ok": true,
       "detail": "TROPIC-NCT00417079"
@@ -62,17 +72,17 @@
     {
       "name": "catalog.in_scope_nonempty",
       "ok": true,
-      "detail": "n=18"
+      "detail": "n=21"
     },
     {
       "name": "catalog.deferred_documented",
       "ok": true,
-      "detail": "n=21"
+      "detail": "n=18"
     },
     {
       "name": "catalog.not_pretending_full_sap_only",
       "ok": true,
-      "detail": "in_scope=18 deferred=21"
+      "detail": "in_scope=21 deferred=18"
     },
     {
       "name": "manifest.study_id",
@@ -108,6 +118,146 @@
       "name": "population_doc.PFS",
       "ok": true,
       "detail": "ok"
+    },
+    {
+      "name": "population_doc.T-11-6_TTUMOR",
+      "ok": true,
+      "detail": "T-11-6 must be the TTUMOR mapping"
+    },
+    {
+      "name": "population_doc.T-11-7_TTPSA",
+      "ok": true,
+      "detail": "T-11-7 must be the TTPSA mapping"
+    },
+    {
+      "name": "population_doc.F-011_closure",
+      "ok": true,
+      "detail": "PSA eligibility closure and current arm counts must be present"
+    },
+    {
+      "name": "population_doc.T-11-8_mapping_restored",
+      "ok": true,
+      "detail": "the adopted SAP T-11-8 TTPAIN mapping and its restoration must be explicit"
+    },
+    {
+      "name": "population_doc.T-11-3_PSA_response",
+      "ok": true,
+      "detail": "SAP-native T-11 endpoint mapping is missing or stale"
+    },
+    {
+      "name": "population_doc.T-11-4_objective_response",
+      "ok": true,
+      "detail": "SAP-native T-11 endpoint mapping is missing or stale"
+    },
+    {
+      "name": "population_doc.T-11-5_pain_response",
+      "ok": true,
+      "detail": "SAP-native T-11 endpoint mapping is missing or stale"
+    },
+    {
+      "name": "population_doc.T-11-6_TTUMOR",
+      "ok": true,
+      "detail": "SAP-native T-11 endpoint mapping is missing or stale"
+    },
+    {
+      "name": "population_doc.T-11-7_TTPSA",
+      "ok": true,
+      "detail": "SAP-native T-11 endpoint mapping is missing or stale"
+    },
+    {
+      "name": "population_doc.T-11-8_TTPAIN",
+      "ok": true,
+      "detail": "SAP-native T-11 endpoint mapping is missing or stale"
+    },
+    {
+      "name": "catalog.T-11-6_semantics",
+      "ok": true,
+      "detail": "T-11-6 must be tumor progression in both release and SAP catalogs"
+    },
+    {
+      "name": "catalog.T-11-7_semantics",
+      "ok": true,
+      "detail": "T-11-7 must be PSA progression in both release and SAP catalogs"
+    },
+    {
+      "name": "catalog.T-11-3_semantics",
+      "ok": true,
+      "detail": "T-11-3 must be 'psa' in both release and SAP catalogs"
+    },
+    {
+      "name": "catalog.T-11-4_semantics",
+      "ok": true,
+      "detail": "T-11-4 must be 'objective response' in both release and SAP catalogs"
+    },
+    {
+      "name": "catalog.T-11-5_semantics",
+      "ok": true,
+      "detail": "T-11-5 must be 'pain response' in both release and SAP catalogs"
+    },
+    {
+      "name": "catalog.T-11-8_semantics",
+      "ok": true,
+      "detail": "T-11-8 must be 'pain progression' in both release and SAP catalogs"
+    },
+    {
+      "name": "define.where.TTPAIN",
+      "ok": true,
+      "detail": "Define-XML must carry the TTPAIN ARM where-clause"
+    },
+    {
+      "name": "define.where.controlled_tables",
+      "ok": true,
+      "detail": "response and Optimus clauses present"
+    },
+    {
+      "name": "define.ADTTE_description",
+      "ok": true,
+      "detail": "ADTTE description must enumerate the current controlled endpoint set"
+    },
+    {
+      "name": "define.arm_survival_truth",
+      "ok": true,
+      "detail": "survival ARM must disclose current SAP authority and CbzP evidence boundary"
+    },
+    {
+      "name": "define.arm_secondary_truth",
+      "ok": true,
+      "detail": "secondary ARM must match SAP v4.0, ITT populations, and synthetic limitations"
+    },
+    {
+      "name": "define.arm_TTUMOR_ITT",
+      "ok": true,
+      "detail": "TTUMOR ARM must be ITT-primary and must not retain the superseded subset claim"
+    },
+    {
+      "name": "define.arm_TTPAIN_result",
+      "ok": true,
+      "detail": "TTPAIN requires a dedicated ARM result bound to the TTPAIN where-clause"
+    },
+    {
+      "name": "define.arm_survival_covariates",
+      "ok": true,
+      "detail": "OS/PFS ADSL stratification variables declared"
+    },
+    {
+      "name": "define.arm_controlled_table_results",
+      "ok": true,
+      "detail": "controlled response and Optimus table results present"
+    },
+    {
+      "name": "define.arm_TFL_name_binding",
+      "ok": true,
+      "detail": "controlled display names bind physical TFL IDs"
+    },
+    {
+      "name": "define.arm_coverage",
+      "ok": true,
+      "detail": "result_displays=10 analysis_results=18"
+    },
+    {
+      "name": "define.arm_CbzP_disclosure",
+      "ok": true,
+      "detail": "all displays"
     }
   ],
   "problems": []

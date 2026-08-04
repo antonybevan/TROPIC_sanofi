@@ -54,11 +54,13 @@ The secondary time-to-event endpoints (TTPSA, TTUMOR, TTPAIN) use the synthetic 
 | Endpoint | Synthetic CbzP† | Real MP | Pipeline HR / test | Pipeline p | Published (de Bono 2010) |
 |---|---|---|---|---|---|
 | Time to PSA Progression‡ | 2.7 mo (286/378) | 2.2 mo (265/371) | HR 0.85 (0.72–1.00) | 0.0514 | median 6.4 mo, HR 0.75 |
-| Time to Tumour Progression‡§ | 3.4 mo (166/179) | 2.1 mo (186/203) | HR 0.67 (0.54–0.83) | 0.0002 | median 8.8 mo, HR 0.61 |
-| PSA Response (≥50% decrease) | 39.2% (148/378) | 18.6% (69/371) | Fisher's exact | 4.6e-10 | 39% vs 24% (p = 0.0002) |
-| Overall Response Rate (ORR, confirmed)§ | 16.8% (30/179) | 6.4% (13/203) | Fisher's exact | 0.0019 | 14.4% vs 4.4% (p = 0.005) |
+| Time to Tumour Progression‡ | 9.1 mo (166/378) | 2.4 mo (328/371) | descriptive KM | — | publication-era endpoint context |
+| Time to Pain Progression‡ | 7.9 mo (130/378) | NA (45/371) | HR 2.36 (1.68–3.32) | <0.0001 | SAP T-11-8 mapping restored |
+| PSA Response (≥50% decrease; baseline PSA ≥20 ug/L) | 40.2% (145/361) | 18.5% (61/329) | Fisher's exact | 5.2e-10 | 39% vs 24% (p = 0.0002) |
+| Overall Response Rate (ORR, confirmed)§ | 16.8% (30/179) | 6.4% (13/203) | Fisher's exact | 0.0018 | 14.4% vs 4.4% (p = 0.005) |
+| Pain Response (F-042) | N/A (PN unavailable) | 28.1% (43/153) | descriptive responder rate | — | source-qualified PN/SV implementation |
 
-†Synthetic, illustrative — not real patient data. ‡PH-scaled from the real MP arm; the HR is **circular by construction** (descriptive of synthetic data only, not a treatment-effect estimate). §Restricted to the measurable-disease subpopulation (CbzP N=179, MP N=203). The OS/PFS primary endpoints — which **are** non-circular Guyot reconstructions — are in §2.
+†Synthetic, illustrative — not real patient data. ‡PH-scaled from the real MP arm where applicable; any HR is **circular by construction** (descriptive of synthetic data only, not a treatment-effect estimate). §ORR is restricted to the measurable-disease subpopulation (CbzP N=179, MP N=203). TTUMOR is ITT-primary (CbzP N=378, MP N=371), with measurable disease retained as supportive. Pain response is unavailable for CbzP because no PN domain is reconstructed. The OS/PFS primary endpoints — which **are** non-circular Guyot reconstructions — are in §2.
 
 ---
 
@@ -154,4 +156,3 @@ FDA Project Optimus alignment: RDI in Cycle 1 was used as the E-R exposure proxy
 
 de Bono JS, Oudard S, Ozguroglu M, et al. **Prednisone plus cabazitaxel or mitoxantrone for metastatic castration-resistant prostate cancer progressing after docetaxel treatment: a randomised open-label trial.** *Lancet.* 2010;376(9747):1147–1154.
 * Local Copy: [de_bono_lancet_2010.pdf](file:///Users/apple/Desktop/TROPIC/01_source_data/reference_literature/de_bono_lancet_2010.pdf)
-

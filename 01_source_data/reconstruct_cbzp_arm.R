@@ -150,7 +150,7 @@ reconstruct_ph_arm <- function(mp_data, hr, n_cbzp, n_target_events, label) {
 
 ttpain_ipd <- reconstruct_ph_arm(ttpain_mp, hr = 0.80, n_cbzp = 378, n_target_events = 130, label = "PAIN")
 ttpsa_ipd  <- reconstruct_ph_arm(ttpsa_mp,  hr = 0.75, n_cbzp = 378, n_target_events = 286, label = "PSA ")
-ttumor_ipd <- reconstruct_ph_arm(ttumor_mp, hr = 0.61, n_cbzp = N_meas, n_target_events = 166, label = "TMR ")
+ttumor_ipd <- reconstruct_ph_arm(ttumor_mp, hr = 0.61, n_cbzp = 378, n_target_events = 166, label = "TMR ")
 
 log_lines <- c(log_lines,
   "--- Primary Endpoints (Guyot-Framework Reconstruction) ---",
@@ -163,7 +163,7 @@ log_lines <- c(log_lines,
           summary(survival::survfit(survival::Surv(time, status) ~ 1, data = ttpain_ipd))$table["median"]),
   sprintf("PSA  PH-scaled: N=378, events=%d, median=%.0f days", sum(ttpsa_ipd$status),
           summary(survival::survfit(survival::Surv(time, status) ~ 1, data = ttpsa_ipd))$table["median"]),
-  sprintf("TMR  PH-scaled: N=179, events=%d, median=%.0f days", sum(ttumor_ipd$status),
+  sprintf("TMR  PH-scaled: N=378, events=%d, median=%.0f days", sum(ttumor_ipd$status),
           summary(survival::survfit(survival::Surv(time, status) ~ 1, data = ttumor_ipd))$table["median"])
 )
 
@@ -192,9 +192,9 @@ visc_raw <- sample(c("Y", "N"), N_cbzp, replace = TRUE, prob = c(0.26, 0.74))
 # Pain at baseline: 59% (Table 1)
 pain_raw <- sample(c("Y", "N"), N_cbzp, replace = TRUE, prob = c(0.59, 0.41))
 
-# Measurable disease: exactly N_meas RECIST-evaluable subjects (the TTUMOR
-# analysis population), randomly placed across the cohort. Drawing an exact count
-# (rather than a Bernoulli rate) keeps MEASDISF=="Y" locked to nrow(ttumor_ipd).
+# Measurable disease: exactly N_meas RECIST-evaluable subjects for ORR and
+# measurable-disease support. TTUMOR is now ITT-primary and is generated for all
+# N_cbzp subjects; MEASDISF remains the separate ORR population flag.
 meas_raw <- sample(c(rep("Y", N_meas), rep("N", N_cbzp - N_meas)))
 
 # Prior docetaxel: progressed during = 34%, progressed after = 66%
@@ -451,7 +451,7 @@ adtte_cbzp <- bind_rows(
   make_adtte(pfs_ipd,     adsl_cbzp, "PFS",     "Progression-Free Survival"),
   make_adtte(ttpain_ipd,  adsl_cbzp, "TTPAIN",  "Time to Pain Progression"),
   make_adtte(ttpsa_ipd,   adsl_cbzp, "TTPSA",   "Time to PSA Progression"),
-  make_adtte(ttumor_ipd,  adsl_cbzp_meas, "TTUMOR",  "Time to Tumor Progression")
+  make_adtte(ttumor_ipd,  adsl_cbzp,      "TTUMOR",  "Time to Tumor Progression")
 )
 
 
@@ -933,7 +933,7 @@ log_lines <- c(log_lines,
   sprintf("  ADTTE TTPSA : %d rows, %d events (expected ~286)",
           nrow(adtte_cbzp %>% filter(PARAMCD == "TTPSA")),
           sum(adtte_cbzp$CNSR[adtte_cbzp$PARAMCD == "TTPSA"] == 0)),
-  sprintf("  ADTTE TTUMOR: %d rows, %d events (expected ~166)",
+  sprintf("  ADTTE TTUMOR: %d rows, %d events (ITT-primary; expected ~166)",
           nrow(adtte_cbzp %>% filter(PARAMCD == "TTUMOR")),
           sum(adtte_cbzp$CNSR[adtte_cbzp$PARAMCD == "TTUMOR"] == 0))
 )

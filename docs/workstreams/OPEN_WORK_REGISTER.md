@@ -1,8 +1,21 @@
 # Open Work Register — Path A (post D-012)
 
 **Purpose:** What a principal programmer still treats as **real work**, not “green JSON theater.”  
-**As of:** 2026-07-09  
+**As of:** 2026-08-04
 **Seals:** Path A demo RC can remain green while these are open if dispositioned.
+
+---
+
+## Current endpoint decision handoff and closure (2026-08-04)
+
+The next controlled work item is specification closure, not an unapproved ADTTE rewrite.
+
+| ID | Pri | Owner | Work | Why it matters | Exit |
+|---|---|---|---|---|---|
+| **W-ENDPOINT-01** | **P0** | WS-2 / WS-4 + accountable author | **Closed for Path A implementation.** ED-01–ED-07 are adopted and implemented: corrected pain algorithm, cancer-related evidence, CM+PR union, RT sensitivities, SAP-native `T-11-3`–`T-11-8` mappings, TTUMOR ITT population and TTE origins. | Numerical parity does not replace independent clinical review; the pre-rerun pain/TTUMOR records remain historical baseline evidence. | [`EDR-F042-T11-8-2026-08-03.md`](decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md) records Antony Bevan's adoption; full 34-stage real-SAS DAG and delayed second-pass review pass. External statistical/medical review remains required before regulated reuse. |
+| **W-ENDPOINT-02** | **P0** | WS-2 / WS-4 / WS-5 | **Conditional closure.** The statistical-governance assessment found `GOV-STAT-01` (SAS T-11-5 initial-visit-only response check), corrected it, and added an exact subject-level endpoint reconciliation gate. | The prior TFL value was correct, but its claimed independent SAS challenge was not. | Current-head real-SAS DAG, `F042_PAIN_RESPONSE=PASS`, reseal and CI; then retain external human review as the regulated-use boundary. |
+
+The author-adopted record, executable specification and impact appendix are now implemented and reconciled. The historical backlog below remains useful evidence, but this handoff supersedes its older “next session” ordering for endpoint work.
 
 ---
 
@@ -22,7 +35,7 @@
 | **W-AE-03** | P2 | WS-1 / WS-5 | CORE AESER residual | No overwrite | Residual matrix |
 | **W-CRF-01** | P2 | WS-6 / WS-7 | Full aCRF + real app IDs | Path B | Deferred |
 | **W-PKG-01** | P3 | WS-7 | Re-package guide PDFs into `m5/` | Optional | Optional |
-| **W-PKG-02** | **P0** | WS-7 | Sync git-tracked **m5 programs** from factory (arm map + dens) | Review face shows pre-arm-map ADSL | Meta-audit M-01 |
+| **W-PKG-02** | **P0** | WS-7 | Sync git-tracked **m5 programs** from factory (arm map + dens) | Review face shows pre-arm-map ADSL | Meta-audit M-01 — **DONE** 2026-08-01: m5 program copies byte-identical to factory (ADSL/ADAE/ADEX/ADRS/ADTTE SAS+R, TFL); pending package refresh for output artifacts (W-PKG-01) |
 | **W-CI-01** | Done | WS-7 | Data-free CI green | Done | CI success |
 
 **SDTM E2E audit pack:** `docs/workstreams/reviews/WS1_SDTM_E2E_AUDIT_2026-07-09.md`  
@@ -33,7 +46,7 @@
 | ID | Pri | Work | Status |
 |---|---|---|---|
 | **W-ADAM-00** | P0 | Arm from DM; dens ADSL SAFFL; TEAE=TRTEMFL; no EXTRT arm | **PASS** — `WS4_ADAM_PHASE_ENTRY_2026-07-09.md` |
-| **W-ADAM-01** | P0 | Dual-lang rebuild ADSL/ADAE + recon after arm map change | **OPEN** — when SAS/ODA available |
+| **W-ADAM-01** | P0 | Dual-lang rebuild ADSL/ADAE + recon after arm map change | **DONE** — current ODA run (pipeline_health 2026-07-10T01:20Z) records SAS production, cross-language audit, and admiral core all PASS post-arm-map |
 | **W-ADAM-02** | P1 | Hard gate TEAE blank AESER | Soft QC present |
 | **W-ADAM-03** | P1 | ADTTE/ADRS dens audit same ADSL rule | **DONE** — `WS4_ADAM_DENS_AUDIT_2026-07-09.md` |
 | **W-ADAM-04** | P2 | ADEX dens SAFFL + ADSL arm docs | **DONE** — dens audit pack |
@@ -57,11 +70,13 @@
 
 ## Priority order for next session
 
-1. **W-PKG-02** — sync m5 programs from factory (no ODA required; closes review-face drift)  
-2. **W-ADAM-01** — dual-lang rebuild when SAS/ODA available (seals post arm-map change)  
-3. **W-ADAM-02** — promote TEAE AESER soft QC after rebuild  
-4. **W-PKG-01** — PDF refresh if demoing package face  
-5. Otherwise hold Path A with meta-audit + dens + D-012  
+1. **Governance closure / review handoff** — enforce the
+   [statistical governance assessment](reviews/PATH_A_STATISTICAL_GOVERNANCE_ASSESSMENT_2026-08-04.md)
+   on every release; obtain external qualified statistical/medical review before
+   regulated reuse.
+2. **W-PKG-01** — optionally refresh guide PDFs and eCTD presentation artifacts when a package refresh is operationally useful.
+3. **W-ADAM-02** — consider promoting TEAE AESER soft QC to a hard gate only if the validation scope is formally expanded.
+4. Otherwise hold Path A with the disclosed residuals; do not expand the deferred TFL catalog or claim commercial P21/CORE cleanliness.
 
 **Meta-audit (2026-07-09):** `docs/workstreams/reviews/WS_META_AUDIT_PATH_A_2026-07-09.md`  
 Source decision: `WS1_CRF_GROUNDING_D012_2026-07-09.md` · dens: `WS4_ADAM_DENS_AUDIT_2026-07-09.md`

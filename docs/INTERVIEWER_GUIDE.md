@@ -1,6 +1,6 @@
 # Interviewer Guide — 10 minutes
 
-**What this repo is:** Path A controlled **clinical biometrics programming demonstration**  
+**What this repo is:** Path A controlled **clinical biometrics programming demonstration**
 (not an FDA filing, not Part 11, not a re-analysis of trial efficacy).
 
 **Binding claim:** [`PRODUCT_CLAIM.md`](PRODUCT_CLAIM.md)
@@ -11,15 +11,15 @@
 
 Open:
 
-1. Root [`README.md`](../README.md)  
+1. Root [`README.md`](../README.md)
 2. [`PRODUCT_CLAIM.md`](PRODUCT_CLAIM.md)
 
 You should hear:
 
-- Real MP arm (N=371) SDTM → dual SAS/R ADaM + recon  
-- Synthetic CbzP for TFLs only  
-- Module 5–style package + hash-sealed demo RC  
-- Single-author tracks ≠ org GxP double programming  
+- Real MP arm (N=371) SDTM → dual SAS/R ADaM + recon
+- Synthetic CbzP for TFLs only
+- Module 5–style package + hash-sealed demo RC
+- Single-author tracks ≠ org GxP double programming
 
 ---
 
@@ -40,9 +40,9 @@ Tour doc: [`../08_submission_package/README.md`](../08_submission_package/README
 
 Guides (markdown sources):
 
-- [`../07_reviewer_explanation/guides/ADRG.md`](../07_reviewer_explanation/guides/ADRG.md)  
-- [`../07_reviewer_explanation/guides/SDRG.md`](../07_reviewer_explanation/guides/SDRG.md)  
-- [`../07_reviewer_explanation/guides/BDRG.md`](../07_reviewer_explanation/guides/BDRG.md)  
+- [`../07_reviewer_explanation/guides/ADRG.md`](../07_reviewer_explanation/guides/ADRG.md)
+- [`../07_reviewer_explanation/guides/SDRG.md`](../07_reviewer_explanation/guides/SDRG.md)
+- [`../07_reviewer_explanation/guides/BDRG.md`](../07_reviewer_explanation/guides/BDRG.md)
 
 **Patient-level XPT is not in git** (standard data hygiene). Structure, define, programs, and TFLs are.
 
@@ -77,9 +77,9 @@ Expected: **VERIFY_RELEASE: PASS** on the committed seal set (no ODA required).
 
 Also open:
 
-- [`RELEASE_NOTE_v0.1.0-demo-rc.1.md`](RELEASE_NOTE_v0.1.0-demo-rc.1.md)  
-- [`workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)  
-- Frozen ODA snapshot: `platform/evidence/`  
+- [`RELEASE_NOTE_v0.2.0-portfolio.md`](RELEASE_NOTE_v0.2.0-portfolio.md)
+- [`workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)
+- Frozen ODA snapshot: `platform/evidence/`
 
 ---
 
@@ -105,5 +105,5 @@ python3 scripts/verify_release.py      # seal re-check
 python3 platform/cibuild.py --demo     # smoke: syntax + recon method
 ```
 
-Full dual-language rebuild requires licensed SDTM + SAS (ODA or local) — see  
+Full dual-language rebuild requires licensed SDTM + SAS (ODA or local) — see
 [`../00_governance/REPRODUCIBILITY.md`](../00_governance/REPRODUCIBILITY.md).

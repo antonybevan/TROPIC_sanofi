@@ -3,8 +3,8 @@
 **Workstream:** Clinical Data Management / Source Intake  
 **Gate:** G01  
 **Product claim:** Path A (`docs/PRODUCT_CLAIM.md`)  
-**As of:** 2026-07-09  
-**Board status:** AMBER → improving (pack + **CORE residual matrix filed** 2026-07-09; not “CORE clean”)
+**As of:** 2026-08-03
+**Board status:** **GREEN for Path A with disclosed residuals; AMBER for broader CORE/P21 industry depth** (Section 1 audit rechecked source facts and handoff)
 
 ---
 
@@ -29,6 +29,7 @@ Prove we know **what source data we have**, **what we may redistribute**, **what
 | CRF PDF | Source form booklet | `01_source_data/Sanofi CRF Tropic.pdf` · package `blankcrf.pdf` | Present (not full aCRF claim) |
 | CRF grounding decision | Form vs PDS classification | `docs/workstreams/reviews/WS1_CRF_GROUNDING_D012_2026-07-09.md` | Filed 2026-07-09 |
 | Disposition | F-015, F-017, F-005 (CRF/aCRF precision) | findings register + known-differences memo | ACCEPTED on record |
+| Section 1 audit note | Independent source/SDTM recheck | `06_qc_evidence/audit/section_reviews/SECTION_01_SOURCE_SDTM_AUDIT_2026-08-03.md` | PASS with disclosed limitations |
 
 ---
 
@@ -40,17 +41,20 @@ Prove we know **what source data we have**, **what we may redistribute**, **what
 4. **Week-offset / partial dates** are source properties; do not invent day precision (F-017).  
 5. Package SDTM for submission-style tree is the **uplifted 3.4 layer**, not raw 3.1.1 dump alone.
 
+6. The latest independent source recheck found **34 domains / 458,333 records / DM N=371** and reproduced the current ODA source-manifest SHA. Real source `.sas7bdat` and package `.xpt` files remain local and ignored by Git.
+
 ---
 
 ## 4. Machine evidence at Path A seal
 
 | Check | Expected for pack green |
 |---|---|
-| Source profile status | `pass` |
+| Source profile status | `pass` (34 domains; 458,333 records; DM N=371) |
 | DM unique subjects | 371 |
 | Staging ingest stage | PASS in full_dag health |
 | SDTM validation stage | PASS in full_dag health |
 | Metadata drift (SDTM package) | 0 problem rows (F-002 RESOLVED) |
+| ODA source binding | `sdtm_manifest_sha` matches local 34-domain source |
 
 **How to re-read without ODA:**
 
@@ -105,7 +109,7 @@ python3 -c "import json; h=json.load(open('platform/pipeline_health.json')); pri
 2. Walk source profile: domains, N=371, missingness highlights.  
 3. Open SDTM validation log: classify WARNING vs ERROR.  
 4. Read F-017 text aloud from known-differences memo.  
-5. Assign owner + date for CORE residual matrix.  
+5. Review CORE residual matrix classifications and ownership; do not call the run “CORE clean”.
 6. No ADaM programming discussion in this review.
 
 ---
@@ -116,7 +120,7 @@ python3 -c "import json; h=json.load(open('platform/pipeline_health.json')); pri
 - [x] Staging + SDTM val in sealed full DAG  
 - [x] Redistribution boundary documented  
 - [x] F-017 ACCEPTED with SDRG language  
-- [ ] CORE residual matrix file exists and is linked from SDRG  
-- [ ] WS-1 pack reviewed once with notes filed under `docs/workstreams/reviews/`  
+- [x] CORE residual matrix file exists and is linked from SDRG
+- [x] WS-1 pack reviewed once with notes filed under `06_qc_evidence/audit/section_reviews/`
 
-Until the last two boxes are checked, board status remains **AMBER**.
+The Path A source handoff is **GREEN with disclosed residuals**. The workstream remains **AMBER for broader industry depth** because the CORE residuals are classified rather than zero and commercial P21 evidence is unavailable.

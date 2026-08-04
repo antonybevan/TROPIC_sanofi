@@ -1,7 +1,14 @@
-# Program: v_adae_io_validation.R | Version: 3.5.0
-# Author: Antony Bevan, Clinical Programming | Date: 2026-06-12
+# Program: v_adae_io_validation.R | Version: 3.5.1
+# Author: Antony Bevan, Clinical Programming | Date: 2026-06-12 (header 2026-07-09)
 # Standard: ADaMIG v1.3 OCCDS v1.0 | renv.lock hash: locked
 # Description: R Independent Validation double-programming for TROPIC ADAE.
+#
+# CRF grounding (D-012 — Sanofi CRF Adverse Event Form O.1_AE_1):
+#   Sponsor collected seriousness, causality (relationship to study treatment),
+#   action taken, outcome, and calendar dates. PDS largely retains AESER/AEREL/
+#   AEACN/AEOUT; AE timing arrives as week offsets (Class B precision reduction).
+#   Do not narrate "trial never collected seriousness." See
+#   docs/workstreams/reviews/WS1_CRF_GROUNDING_D012_2026-07-09.md and SDRG §0A.
 
 library(dplyr)
 library(haven)
@@ -229,6 +236,15 @@ adae <- adae_final |>
 # Assertions and Error Guards (QC-03)
 if (nrow(adae) == 0) {
   stop("ERROR: [VALIDATION] ADAE output dataset is empty!")
+}
+
+# D-012 follow-on: TEAE must carry AESER; baseline skeleton AEs often blank AESER
+n_teae_blank <- sum(adae$TRTEMFL == "Y" & (is.na(adae$AESER) | adae$AESER == ""), na.rm = TRUE)
+n_nte_blank <- sum(adae$TRTEMFL == "N" & (is.na(adae$AESER) | adae$AESER == ""), na.rm = TRUE)
+cat(sprintf("NOTE: [ADAE-QC] Non-TE blank AESER (baseline skeleton expected) = %d\n", n_nte_blank))
+cat(sprintf("NOTE: [ADAE-QC] TEAE blank AESER (expect 0 or near-0) = %d\n", n_teae_blank))
+if (n_teae_blank > 5) {
+  warning("ADAE-QC: TEAE blank AESER exceeds soft cap 5 — review extract fidelity.")
 }
 
 # XPT v5 compliance (clean log): uppercase variable names + SAS date formats

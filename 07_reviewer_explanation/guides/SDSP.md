@@ -57,15 +57,16 @@ two Define-XML files, and the traceability matrix.
    2024-03-29 to the current CDISC/NCI CT package **2026-03-27**.
 3. **Synthetic comparator arm.** The reconciled ADaM is the real Mitoxantrone arm
    (N=371) only; the Cabazitaxel arm is reconstructed (Guyot IPD / PH-scaling) for TFL
-   demonstration and is **not** part of the conformed deliverables. The submission is a
-   methodological re-analysis, not a marketing application (see FDA-reviewer audit R-1).
+   demonstration and is **not** part of the conformed deliverables. The package is a
+   **controlled non-submission programming demonstration** — not a filing and not a
+   confirmatory re-analysis of trial efficacy (see `docs/PRODUCT_CLAIM.md` §2, Path A).
 4. **Source date precision.** AE/disposition timing is week-offset (±3.5 days); a
    sensitivity analysis (`date_precision_sensitivity.py`) shows the KM medians are robust
    to this precision.
 5. **Single-author validation.** SAS production and R validation are independently coded
    but by one programmer — implementation reconciliation, not two-programmer GxP.
-6. **Non-discriminating population flags / no DV domain;** placeholder baseline
-   albumin/LDH; placeholder geography — all disclosed in the ADRG/SDRG.
+6. **Non-discriminating population flags / no DV domain;** ALB/LDH not collected
+   (missing, flags blank); no geography assigned — all disclosed in the ADRG/SDRG.
 
 ## 4. Deliverables index
 

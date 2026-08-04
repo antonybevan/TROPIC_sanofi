@@ -26,6 +26,7 @@ import build_usdm as USDM
 import adam_conf_parse_define as ADEF
 import ct_cross_validation as CTV
 import generate_config as GC
+import cibuild as C
 
 
 class FakeClock:
@@ -916,6 +917,49 @@ class TestOdaRenderTflHelpers(unittest.TestCase):
     def test_purge_remote_outputs_accepts_marker(self):
         sas = type("S", (), {"submit": lambda self, code: {"LOG": "TROPIC_PURGE_TFL|DONE"}})()
         self.R._purge_remote_outputs(sas)
+
+
+class TestCibuildOdaStage(unittest.TestCase):
+    def test_stage10_fails_before_program_upload_when_remote_pgmdir_missing(self):
+        class Sas:
+            def __init__(self):
+                self.uploaded = []
+
+            def submit(self, code):
+                if "TROPIC_ODA_HOME" in code:
+                    return {"LOG": "TROPIC_ODA_HOME=/home/test\n"}
+                if "TROPIC_SAS_VER" in code:
+                    return {"LOG": "TROPIC_SAS_VER=9.04.01M8\n"}
+                return {"LOG": ""}
+
+            def upload(self, local, remote):
+                self.uploaded.append((local, remote))
+
+        sas = Sas()
+        conn = type("Conn", (), {"sas": sas, "endpoint": "fake-oda"})()
+        with mock.patch.object(B, "preflight", return_value={"oda_preflight_ok": True}), \
+             mock.patch.object(B, "connect", return_value=conn), \
+             mock.patch.object(S, "seed", return_value={
+                 "status": "already-resident",
+                 "manifest_sha": "a" * 64,
+                 "uploaded": 0,
+                 "skipped": 34,
+             }), \
+             mock.patch.object(S, "_ensure_remote_dir", return_value=False):
+            old_seed = os.environ.get("TROPIC_ODA_SEED_INLINE")
+            try:
+                os.environ["TROPIC_ODA_SEED_INLINE"] = "TRUE"
+                rc, _, stderr, meta = C._run_saspy_stage10()
+            finally:
+                if old_seed is None:
+                    os.environ.pop("TROPIC_ODA_SEED_INLINE", None)
+                else:
+                    os.environ["TROPIC_ODA_SEED_INLINE"] = old_seed
+
+        self.assertEqual(rc, 2)
+        self.assertIn("Could not create required ODA directory", stderr)
+        self.assertEqual(meta["oda_endpoint"], "fake-oda")
+        self.assertEqual(sas.uploaded, [])
 
 
 class _FakeKillSas:

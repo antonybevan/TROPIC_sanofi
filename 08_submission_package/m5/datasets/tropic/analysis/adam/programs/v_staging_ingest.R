@@ -72,7 +72,7 @@ transpose_supp <- function(domain_name) {
   return(main_df)
 }
 
-domains <- c("dm", "ae", "ex", "cm", "lb", "ds", "vs", "ls", "pn")
+domains <- c("dm", "ae", "ex", "cm", "lb", "ds", "vs", "ls", "pn", "pr", "sv")
 for (dom in domains) {
   transpose_supp(dom)
 }

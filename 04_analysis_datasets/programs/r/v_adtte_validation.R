@@ -1,4 +1,4 @@
-# Program: v_adtte_validation.R | Version: 2.4.0
+# Program: v_adtte_validation.R | Version: 2.5.0
 # Author: Antony Bevan, Clinical Programming | Date: 2026-06-13
 # Standard: ADaMIG v1.3 BDS-TTE | renv.lock hash: locked
 # Description: R Independent Validation double-programming for TROPIC ADTTE.
@@ -13,7 +13,7 @@
 #   Rule 4  Population per parameter, carried on-record (ITTFL + SAFFL):
 #         OS, PFS, TTPSA, TTPAIN -> one row per ADSL ITTFL=="Y" (Path A: 371)
 #         TTSAE                  -> one row per ADSL SAFFL=="Y"
-#         TTUMOR                 -> ADSL ITTFL=="Y" & MEASDISF=="Y"
+#         TTUMOR                 -> ADSL ITTFL=="Y" (MEASDISF sensitivity)
 #         TRT01P always from ADSL (DM arm; never EXTRT)
 #   Rule 3  PSA-progression censoring date read from ADLB (adlb_v.xpt,
 #       where PARAMCD is "PSA"), an ADaM input -- not raw staging LB.
@@ -41,6 +41,77 @@ adrs    <- read_xpt("04_analysis_datasets/adam/adrs_v.xpt")
 adcm    <- read_xpt("04_analysis_datasets/adam/adcm_v.xpt")
 adae    <- read_xpt("04_analysis_datasets/adam/adae_v.xpt")
 adlb    <- read_xpt("04_analysis_datasets/adam/adlb_v.xpt")
+
+# F-042 Phase 2 R track.  The controlled module consumes the governed staged
+# PN/SV/CM/PR/DS inputs and returns the primary diary-or-RT event pool plus
+# traceable sensitivity lineages.  The SAS program implements the same adopted
+# rules independently; this is not code copied into the production track.
+source("04_analysis_datasets/programs/r/f042_provisional_pain_derivation.R")
+f042_phase2 <- f042_derive(
+  df_adsl,
+  readRDS("01_source_data/real_sdtm/staging/pn.rds"),
+  readRDS("01_source_data/real_sdtm/staging/sv.rds"),
+  readRDS("01_source_data/real_sdtm/staging/cm.rds"),
+  readRDS("01_source_data/real_sdtm/staging/pr.rds"),
+  adrs,
+  readRDS("01_source_data/real_sdtm/staging/ds.rds")
+)
+
+# Aggregate-only F-042 lineage evidence.  Patient-level adjudication worksheets
+# remain local/non-versioned; this controlled artifact records the event-source
+# counts needed to connect the primary result to the adopted sensitivities.
+dir.create("06_qc_evidence/reconciliation", recursive = TRUE, showWarnings = FALSE)
+f042_event_source_summary <- tibble(
+  analysis = c(
+    "primary_diary_or_direct_rt",
+    "diary_only_sensitivity",
+    "rt_only_supportive",
+    "rt_complete_date_inventory",
+    "rt_missing_or_partial_date_inventory",
+    "pain_response_events"
+  ),
+  subject_count = c(
+    n_distinct(f042_phase2$primary_events$USUBJID[!is.na(f042_phase2$primary_events$event_date)]),
+    n_distinct(f042_phase2$sensitivity_events$diary_only$USUBJID),
+    n_distinct(f042_phase2$sensitivity_events$rt_only$USUBJID),
+    sum(f042_phase2$sensitivity_events$date_bound_rt$date_status == "COMPLETE"),
+    sum(f042_phase2$sensitivity_events$date_bound_rt$date_status == "MISSING_OR_PARTIAL"),
+    n_distinct(f042_phase2$pain_response_events$USUBJID)
+  ),
+  record_count = c(
+    sum(!is.na(f042_phase2$primary_events$event_date)),
+    nrow(f042_phase2$sensitivity_events$diary_only),
+    nrow(f042_phase2$sensitivity_events$rt_only),
+    sum(f042_phase2$sensitivity_events$date_bound_rt$date_status == "COMPLETE"),
+    sum(f042_phase2$sensitivity_events$date_bound_rt$date_status == "MISSING_OR_PARTIAL"),
+    nrow(f042_phase2$pain_response_events)
+  )
+)
+write.csv(
+  f042_event_source_summary,
+  "06_qc_evidence/reconciliation/f042_phase2_event_source_summary.csv",
+  row.names = FALSE
+)
+
+phase2_primary_pain <- f042_phase2$primary_events |>
+  filter(!is.na(event_date)) |>
+  transmute(
+    USUBJID,
+    pain_prog_dt = event_date,
+    pain_event_source = event_source,
+    pain_event_component = event_component,
+    pain_support_types = support_types,
+    pain_source_keys = source_keys
+  )
+
+phase2_pain_lastassess <- f042_phase2$visits |>
+  inner_join(df_adsl |> select(USUBJID, RANDDT), by = "USUBJID") |>
+  filter(
+    !is.na(visit_date), visit_date > as.Date(RANDDT, origin = "1960-01-01"),
+    ppi_evaluable | as_evaluable
+  ) |>
+  group_by(USUBJID) |>
+  summarise(last_eval_dt = max(visit_date), .groups = "drop")
 
 # ------------------------------------------------------------------------------
 # Standard BDS-TTE output contract: one finalize step shared by every parameter,
@@ -80,14 +151,17 @@ finalize_tte <- function(d) {
 
 # First event dates per subject, pulled once from the relevant ADaM domains.
 first_pd <- adrs |>
+  mutate(PDDT = as.Date(ADT, origin = "1960-01-01")) |>
   filter(
     (PARAMCD == "OVRLRESP" & AVALC == "PD") |
       (PARAMCD == "BSGRESP"  & AVALC == "PROGRESSION") |
       (PARAMCD == "PSPROG"   & AVALC == "Y")
   ) |>
+  inner_join(df_adsl |> select(USUBJID, RANDDT), by = "USUBJID") |>
+  filter(!is.na(PDDT) & PDDT > RANDDT) |>
   group_by(USUBJID) |>
   summarise(
-    pd_dt = min(as.Date(ADT, origin = "1960-01-01")),
+    pd_dt = min(PDDT),
     .groups = "drop"
   )
 
@@ -107,83 +181,35 @@ first_nact <- adcm |>
     .groups = "drop"
   )
 
-# SAP v4.0 PFS component: pain progression can contribute to composite PFS, but
-# visit-level diary summaries require at least 5 distinct daily records out of
-# the expected 7-day window before a pain progression event is eligible.
-pn <- readRDS("01_source_data/real_sdtm/staging/pn.rds")
-
-pn_anchored_pfs <- pn |>
-  inner_join(
-    df_adsl |> select(USUBJID, TRTSDT, RANDDT, LSTALVDT, ITTFL),
-    by = "USUBJID"
-  ) |>
-  filter(ITTFL == "Y") |>
-  mutate(
-    PNDT = if_else(
-      grepl("^\\d{4}-\\d{1,2}-\\d{1,2}", trimws(PNDTC)),
-      ymd(trimws(PNDTC), quiet = TRUE),
-      as.Date(NA)
-    ),
-    PNSTRESN = as.numeric(PNSTRESN)
-  )
-
-pain_baseline_pfs <- pn_anchored_pfs |>
-  filter(PNDT <= TRTSDT & !is.na(PNSTRESN)) |>
-  group_by(USUBJID, PNTESTCD) |>
-  summarise(base_val = median(PNSTRESN, na.rm = TRUE), .groups = "drop") |>
-  pivot_wider(
-    id_cols = USUBJID,
-    names_from = PNTESTCD,
-    values_from = base_val
-  ) |>
-  rename(base_ppi = PAININT, base_an = ANSCORE)
-
-pain_days_pfs <- pn_anchored_pfs |>
-  filter(PNDT > TRTSDT & !is.na(PNSTRESN)) |>
-  group_by(USUBJID, VISITNUM, VISIT) |>
-  filter(n_distinct(PNDT) >= 5) |>
-  ungroup() |>
-  group_by(USUBJID, VISITNUM, VISIT, PNDT, PNTESTCD) |>
-  summarise(day_val = min(PNSTRESN, na.rm = TRUE), .groups = "drop")
-
-cycle_dates_pfs <- pain_days_pfs |>
-  group_by(USUBJID, VISITNUM, VISIT) |>
-  summarise(cycle_date = min(PNDT, na.rm = TRUE), .groups = "drop")
-
-cycle_vals_pfs <- pain_days_pfs |>
-  group_by(USUBJID, VISITNUM, VISIT, PNTESTCD) |>
-  summarise(cycle_val = median(day_val, na.rm = TRUE), .groups = "drop") |>
-  pivot_wider(
-    id_cols = c(USUBJID, VISITNUM, VISIT),
-    names_from = PNTESTCD,
-    values_from = cycle_val
-  ) |>
-  rename(cycle_ppi = PAININT, cycle_an = ANSCORE)
-
-pain_triggers_pfs <- cycle_vals_pfs |>
-  left_join(cycle_dates_pfs, by = c("USUBJID", "VISITNUM", "VISIT")) |>
-  left_join(pain_baseline_pfs, by = "USUBJID") |>
-  arrange(USUBJID, VISITNUM) |>
-  mutate(
-    base_ppi = coalesce(base_ppi, 0),
-    base_an = coalesce(base_an, 0),
-    trig = if_else(
-      (!is.na(cycle_ppi - base_ppi) & (cycle_ppi - base_ppi) >= 2) |
-        (!is.na(cycle_an - base_an) & (cycle_an - base_an) >= 10),
-      1, 0
-    )
-  )
-
-pain_prog_pfs <- pain_triggers_pfs |>
+# SAP v4.0 PFS censoring: use the last evaluable post-baseline RECIST, PSA, or
+# five-of-seven pain visit when there is no event; randomisation is the censor
+# date when none of those assessments exists.  Death milestones are excluded
+# from the tumour assessment pool.
+pfs_tumor_lastassess <- adrs |>
+  filter(PARAMCD == "OVRLRESP", AVALC %in% c("CR", "PR", "SD", "PD")) |>
+  transmute(USUBJID, last_eval_dt = as.Date(ADT, origin = "1960-01-01")) |>
+  inner_join(df_adsl |> select(USUBJID, RANDDT), by = "USUBJID") |>
+  filter(!is.na(last_eval_dt) & last_eval_dt > RANDDT) |>
   group_by(USUBJID) |>
-  mutate(
-    confirmed = if_else(
-      trig == 1 & (coalesce(lead(trig), 0) == 1 | row_number() == n()),
-      1, 0
-    )
-  ) |>
-  filter(confirmed == 1) |>
-  summarise(pain_prog_dt = min(cycle_date), .groups = "drop")
+  summarise(last_eval_dt = max(last_eval_dt), .groups = "drop")
+
+pfs_psa_lastassess <- adlb |>
+  filter(PARAMCD == "PSA", !is.na(AVAL), !is.na(ADT)) |>
+  transmute(USUBJID, last_eval_dt = as.Date(ADT, origin = "1960-01-01")) |>
+  inner_join(df_adsl |> select(USUBJID, RANDDT), by = "USUBJID") |>
+  filter(last_eval_dt > RANDDT) |>
+  group_by(USUBJID) |>
+  summarise(last_eval_dt = max(last_eval_dt), .groups = "drop")
+
+pfs_pain_lastassess <- phase2_pain_lastassess
+
+pfs_lastassess <- bind_rows(
+  pfs_tumor_lastassess,
+  pfs_psa_lastassess,
+  pfs_pain_lastassess
+) |>
+  group_by(USUBJID) |>
+  summarise(last_eval_dt = max(last_eval_dt), .groups = "drop")
 
 # ------------------------------------------------------------------------------
 # OS — Overall Survival (ITT, anchored at randomisation)
@@ -227,8 +253,9 @@ ttsae <- df_adsl |>
 pfs <- df_adsl |>
   filter(ITTFL == "Y") |>
   left_join(first_pd, by = "USUBJID") |>
-  left_join(pain_prog_pfs, by = "USUBJID") |>
+  left_join(phase2_primary_pain, by = "USUBJID") |>
   left_join(first_nact, by = "USUBJID") |>
+  left_join(pfs_lastassess, by = "USUBJID") |>
   mutate(
     PARAMCD = "PFS", PARAM = "Progression Free Survival", PARAMN = 2,
     PARCAT1 = "EFFICACY",
@@ -239,6 +266,13 @@ pfs <- df_adsl |>
       !is.na(pain_prog_dt)                 ~ pain_prog_dt,
       TRUE                                 ~ as.Date(NA)
     ),
+    prog_event_desc = case_when(
+      !is.na(pain_prog_dt) & (is.na(pd_dt) | pain_prog_dt < pd_dt) ~
+        "PAIN PROGRESSION",
+      !is.na(pd_dt) ~ "DISEASE PROGRESSION",
+      !is.na(pain_prog_dt) ~ "PAIN PROGRESSION",
+      TRUE ~ ""
+    ),
     pd_found   = !is.na(prog_dt),
     nact_found = !is.na(nactdt),
     branch = case_when(
@@ -247,130 +281,51 @@ pfs <- df_adsl |>
       DTHFL == "Y" & nact_found & nactdt < DTHDT        ~ "NACT_PRE_DEATH",
       DTHFL == "Y"                                      ~ "DEATH",
       nact_found                                        ~ "NACT_ONLY",
-      TRUE                                              ~ "CENSOR_LASTEVAL"
+      !is.na(last_eval_dt)                               ~ "CENSOR_LASTEVAL",
+      TRUE                                               ~ "CENSOR_NO_POST"
     ),
     ADT = case_when(
       branch == "PD"    ~ prog_dt,
       branch == "DEATH" ~ DTHDT,
       branch %in% c("NACT_PRE_PD", "NACT_PRE_DEATH", "NACT_ONLY") ~
         nactdt - days(1),
-      TRUE ~ pmin(LSTALVDT, STUDY_CUTOFF_DT)
+      branch == "CENSOR_LASTEVAL" ~ pmin(last_eval_dt, STUDY_CUTOFF_DT),
+      branch == "CENSOR_NO_POST"  ~ RANDDT
     ),
     CNSR     = if_else(branch %in% c("PD", "DEATH"), 0, 1),
     EVNTDESC = case_when(
-      branch == "PD"    ~ "DISEASE PROGRESSION",
+      branch == "PD"    ~ prog_event_desc,
       branch == "DEATH" ~ "DEATH",
       TRUE ~ ""
     ),
     CNSDTDSC = case_when(
       branch %in% c("NACT_PRE_PD", "NACT_PRE_DEATH", "NACT_ONLY") ~
         "NEW ANTI-CANCER THERAPY START",
-      branch == "CENSOR_LASTEVAL" ~ "LAST EVALUABLE TUMOR ASSESSMENT",
+      branch == "CENSOR_LASTEVAL" ~ "LAST EVALUABLE ASSESSMENT",
+      branch == "CENSOR_NO_POST"  ~ "NO POST-BASELINE ASSESSMENT",
       TRUE ~ ""
     )
   ) |>
   finalize_tte()
 
 # ------------------------------------------------------------------------------
-# TTPAIN — Time to Pain Progression (ITT with diary evaluability). PN has no ADaM
-# intermediate; both tracks derive from the same reconciled staging PN
-# (documented in ADRG/SDRG). Same-day scores aggregated with min() (#2).
+# TTPAIN — Time to Pain Progression (Path A Phase 2).
+# The primary event pool is the earliest qualified diary-or-direct-intent-RT
+# event from the controlled F-042 R track.  Non-events censor at the last
+# evaluable scheduled pain assessment, never at an arbitrary raw PN date.
 # ------------------------------------------------------------------------------
-pn <- readRDS("01_source_data/real_sdtm/staging/pn.rds")
-
-pn_anchored <- pn |>
-  inner_join(
-    df_adsl |> select(USUBJID, TRTSDT, RANDDT, LSTALVDT, ITTFL, SAFFL),
-    by = "USUBJID"
-  ) |>
-  filter(ITTFL == "Y") |>
-  mutate(
-    PNDT     = if_else(
-      grepl("^\\d{4}-\\d{1,2}-\\d{1,2}", trimws(PNDTC)),
-      ymd(trimws(PNDTC), quiet = TRUE),
-      as.Date(NA)
-    ),
-    PNSTRESN = as.numeric(PNSTRESN)
-  )
-
-pain_baseline <- pn_anchored |>
-  filter(PNDT <= TRTSDT & !is.na(PNSTRESN)) |>
-  group_by(USUBJID, PNTESTCD) |>
-  summarise(base_val = median(PNSTRESN, na.rm = TRUE), .groups = "drop") |>
-  pivot_wider(
-    id_cols = USUBJID,
-    names_from = PNTESTCD,
-    values_from = base_val
-  ) |>
-  rename(base_ppi = PAININT, base_an = ANSCORE)
-
-pain_days <- pn_anchored |>
-  filter(PNDT > TRTSDT & !is.na(PNSTRESN)) |>
-  group_by(USUBJID, VISITNUM, VISIT) |>
-  filter(n_distinct(PNDT) >= 5) |>
-  ungroup() |>
-  group_by(USUBJID, VISITNUM, VISIT, PNDT, PNTESTCD) |>
-  summarise(day_val = min(PNSTRESN, na.rm = TRUE), .groups = "drop")
-
-cycle_dates <- pain_days |>
-  group_by(USUBJID, VISITNUM, VISIT) |>
-  summarise(cycle_date = min(PNDT, na.rm = TRUE), .groups = "drop")
-
-cycle_vals <- pain_days |>
-  group_by(USUBJID, VISITNUM, VISIT, PNTESTCD) |>
-  summarise(cycle_val = median(day_val, na.rm = TRUE), .groups = "drop") |>
-  pivot_wider(
-    id_cols = c(USUBJID, VISITNUM, VISIT),
-    names_from = PNTESTCD,
-    values_from = cycle_val
-  ) |>
-  rename(cycle_ppi = PAININT, cycle_an = ANSCORE)
-
-pain_cycles <- cycle_vals |>
-  left_join(cycle_dates, by = c("USUBJID", "VISITNUM", "VISIT")) |>
-  arrange(USUBJID, VISITNUM)
-
-pain_triggers <- pain_cycles |>
-  left_join(pain_baseline, by = "USUBJID") |>
-  mutate(
-    base_ppi = coalesce(base_ppi, 0),
-    base_an  = coalesce(base_an, 0),
-    trig = if_else(
-      (!is.na(cycle_ppi - base_ppi) & (cycle_ppi - base_ppi) >= 2) |
-        (!is.na(cycle_an  - base_an)  & (cycle_an  - base_an)  >= 10),
-      1, 0
-    )
-  )
-
-# Sustained confirmation: a trigger counts if the next consecutive cycle also
-# triggers, or if it is the subject's last observed cycle (terminal trigger).
-pain_prog <- pain_triggers |>
-  group_by(USUBJID) |>
-  mutate(
-    confirmed = if_else(
-      trig == 1 & (coalesce(lead(trig), 0) == 1 | row_number() == n()),
-      1, 0
-    )
-  ) |>
-  filter(confirmed == 1) |>
-  summarise(prog_date = min(cycle_date), .groups = "drop")
-
-pain_lastassess <- pn_anchored |>
-  group_by(USUBJID) |>
-  summarise(last_pn_dt = max(PNDT, na.rm = TRUE), .groups = "drop")
-
 ttpain <- df_adsl |>
   filter(ITTFL == "Y") |>
-  left_join(pain_prog, by = "USUBJID") |>
-  left_join(pain_lastassess, by = "USUBJID") |>
+  left_join(phase2_primary_pain, by = "USUBJID") |>
+  left_join(phase2_pain_lastassess, by = "USUBJID") |>
   mutate(
     PARAMCD = "TTPAIN", PARAM = "Time to Pain Progression", PARAMN = 5,
     PARCAT1 = "EFFICACY",
     STARTDT  = RANDDT,
-    progressed = !is.na(prog_date),
+    progressed = !is.na(pain_prog_dt),
     ADT = case_when(
-      progressed          ~ prog_date,
-      !is.na(last_pn_dt)  ~ pmin(last_pn_dt, STUDY_CUTOFF_DT),
+      progressed          ~ pain_prog_dt,
+      !is.na(last_eval_dt) ~ pmin(last_eval_dt, STUDY_CUTOFF_DT),
       TRUE                ~ RANDDT
     ),
     CNSR     = if_else(progressed, 0, 1),
@@ -378,9 +333,8 @@ ttpain <- df_adsl |>
     CNSDTDSC = if_else(
       progressed, "",
       if_else(
-        !is.na(last_pn_dt),
-        "LAST PAIN ASSESSMENT DATE",
-        "NO PAIN ASSESSMENT"
+        !is.na(last_eval_dt), "LAST EVALUABLE PAIN ASSESSMENT",
+        "NO EVALUABLE PAIN ASSESSMENT"
       )
     )
   ) |>
@@ -391,7 +345,10 @@ ttpain <- df_adsl |>
 # ------------------------------------------------------------------------------
 psa_event <- adrs |>
   filter(PARAMCD == "PSPROG" & AVALC == "Y") |>
-  transmute(USUBJID, psa_prog_dt = as.Date(ADT, origin = "1960-01-01"))
+  transmute(USUBJID, psa_prog_dt = as.Date(ADT, origin = "1960-01-01")) |>
+  inner_join(df_adsl |> select(USUBJID, RANDDT), by = "USUBJID") |>
+  filter(!is.na(psa_prog_dt) & psa_prog_dt > RANDDT) |>
+  select(USUBJID, psa_prog_dt)
 
 psa_lastassess <- adlb |>
   filter(PARAMCD == "PSA" & !is.na(AVAL) & !is.na(ADT)) |>
@@ -429,26 +386,32 @@ ttpsa <- df_adsl |>
   finalize_tte()
 
 # ------------------------------------------------------------------------------
-# TTUMOR — Time to Tumor Progression (ITT & measurable-disease subpopulation)
+# TTUMOR — Time to Tumor Progression (ITT; measurable-disease sensitivity)
 # ------------------------------------------------------------------------------
 tumor_event <- adrs |>
   filter(PARAMCD == "OVRLRESP" & AVALC == "PD") |>
+  transmute(USUBJID, tumor_prog_dt = as.Date(ADT, origin = "1960-01-01")) |>
+  inner_join(df_adsl |> select(USUBJID, RANDDT), by = "USUBJID") |>
+  filter(!is.na(tumor_prog_dt) & tumor_prog_dt > RANDDT) |>
   group_by(USUBJID) |>
   summarise(
-    tumor_prog_dt = min(as.Date(ADT, origin = "1960-01-01")),
+    tumor_prog_dt = min(tumor_prog_dt),
     .groups = "drop"
   )
 
 tumor_lastassess <- adrs |>
-  filter(PARAMCD == "OVRLRESP" & !is.na(ADT)) |>
+  filter(PARAMCD == "OVRLRESP" & AVALC %in% c("CR", "PR", "SD", "PD") & !is.na(ADT)) |>
+  transmute(USUBJID, last_tumor_dt = as.Date(ADT, origin = "1960-01-01")) |>
+  inner_join(df_adsl |> select(USUBJID, RANDDT), by = "USUBJID") |>
+  filter(last_tumor_dt > RANDDT) |>
   group_by(USUBJID) |>
   summarise(
-    last_tumor_dt = max(as.Date(ADT, origin = "1960-01-01")),
+    last_tumor_dt = max(last_tumor_dt),
     .groups = "drop"
   )
 
 ttumor <- df_adsl |>
-  filter(ITTFL == "Y" & MEASDISF == "Y") |>
+  filter(ITTFL == "Y") |>
   left_join(tumor_event, by = "USUBJID") |>
   left_join(tumor_lastassess, by = "USUBJID") |>
   mutate(

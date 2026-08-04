@@ -44,8 +44,8 @@ predecessor_rules:
     SITEID: SDTM.DM.SITEID.
     TRT01P: Randomized/planned treatment assignment from SDTM.DM.ARM and config/study_config.yaml treatment map.
     TRT01PN: Numeric planned treatment assignment from config/study_config.yaml treatment map.
-    TRT01A: Actual treatment assignment from first non-missing SDTM.EX exposure record and config/study_config.yaml treatment map.
-    TRT01AN: Numeric actual treatment assignment from first non-missing SDTM.EX exposure record and config/study_config.yaml treatment map.
+    TRT01A: Actual treatment assignment from SDTM.DM.ARM/ARMCD using the same Path A arm authority as TRT01P; EXTRT is not used because F-028 documents an inconsistent exposure treatment value.
+    TRT01AN: Numeric actual treatment assignment from SDTM.DM.ARM/ARMCD using the same Path A arm authority as TRT01PN; EXTRT is not used because F-028 documents an inconsistent exposure treatment value.
     TRTA: Actual treatment assignment inherited from ADSL.TRT01A.
     TRTAN: Numeric actual treatment assignment inherited from ADSL.TRT01AN.
     TRTSDT: Treatment start date inherited from ADSL.TRTSDT unless defined directly for ADSL.
@@ -80,7 +80,7 @@ predecessor_rules:
       AGEGR1: Derived age group from SDTM.DM.AGE and protocol age group definitions.
       AGEGR1N: Numeric age group from AGEGR1.
       RACE: SDTM.DM.RACE.
-      ETHNIC: SDTM.DM.ETHNIC.
+      ETHNIC: Not collected in the public SDTM.DM release; assigned NOT REPORTED with the disposition documented in ADRG §5.1.
       SEX: SDTM.DM.SEX.
       RANDDT: Randomization date from SDTM.DM.RFSTDTC or randomization source record.
       TRTSDT: First exposure start date from SDTM.EX.EXSTDTC.
@@ -99,8 +99,8 @@ predecessor_rules:
       PAINBL: Baseline pain score from pain assessment source before treatment start.
       PSABL: Baseline PSA from SDTM.LB prostate-specific antigen records.
       ALPBL: Baseline alkaline phosphatase from SDTM.LB records.
-      ALBBL: Baseline albumin from SDTM.LB records.
-      LDHBL: Baseline lactate dehydrogenase from SDTM.LB records.
+      ALBBL: Not collected in the public SDTM.LB release; left missing with a blank imputation flag (ADRG §5.1).
+      LDHBL: Not collected in the public SDTM.LB release; left missing with a blank imputation flag (ADRG §5.1).
       HGBBL: Baseline hemoglobin from SDTM.LB records.
       DOCPROG: Investigator-assessed progression source records.
       DOCRESP: Investigator-assessed response source records.
@@ -213,6 +213,7 @@ method_expansion:
     MT.ADTTE_AVALU: Time-to-event unit assigned by ADTTE parameter derivation.
 
 origin_overrides:
+  ADSL.ETHNIC: Assigned
   ADCM.ASTDT: Derived
   ADCM.AENDT: Derived
   ADCM.ASTDY: Derived

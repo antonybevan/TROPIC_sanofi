@@ -81,6 +81,8 @@ adae <- read_xpt("04_analysis_datasets/adam/adae_v.xpt")
 adlb <- read_xpt("04_analysis_datasets/adam/adlb_v.xpt")
 adtte <- read_xpt("04_analysis_datasets/adam/adtte_v.xpt")
 adrs <- read_xpt("04_analysis_datasets/adam/adrs_v.xpt")
+adsl_real <- adsl
+adrs_real <- adrs
 
 # Dynamically load and merge reconstructed CbzP data
 adsl_cbzp <- readRDS("01_source_data/cbzp_reconstructed/adsl_cbzp.rds")
@@ -100,6 +102,21 @@ adae <- bind_rows(adae, adae_cbzp)
 adlb <- bind_rows(adlb, adlb_cbzp)
 adtte <- bind_rows(adtte, adtte_cbzp)
 adrs <- bind_rows(adrs, adrs_cbzp)
+
+# F-042 Phase 2 aggregate lineage for the SAP-native pain-response/TTPAIN
+# mappings.  The controlled module is evaluated on the real MP source domains;
+# the synthetic CbzP arm has no patient-level PN diary source and is therefore
+# never assigned fabricated pain-response counts.
+source("04_analysis_datasets/programs/r/f042_provisional_pain_derivation.R")
+f042_phase2 <- f042_derive(
+  adsl_real,
+  readRDS("01_source_data/real_sdtm/staging/pn.rds"),
+  readRDS("01_source_data/real_sdtm/staging/sv.rds"),
+  readRDS("01_source_data/real_sdtm/staging/cm.rds"),
+  readRDS("01_source_data/real_sdtm/staging/pr.rds"),
+  adrs_real,
+  readRDS("01_source_data/real_sdtm/staging/ds.rds")
+)
 
 # Enforce presence of both treatment arms for comparative analysis
 if (length(unique(adsl$TRT01P)) < 2) {
@@ -136,12 +153,23 @@ cat(sprintf("  Step 2: PFS Significance check -> p = %f (Significant & Tested: %
     as.character(pfs_significant))) # nolint
 
 # Step 3: PSA Response (Tested only if PFS is significant)
+# SAP v4.0 §5.2 / Table 12: baseline PSA >=20 ug/L plus an evaluable
+# PSARESP analysis record.  Reuse this exact analysis set for the response
+# table below so gatekeeping and display denominators cannot diverge.
 psa_resp_data <- adrs |>
   filter(PARAMCD == "PSARESP") |>
+  inner_join(adsl |> select(USUBJID, PSABL, any_of("PSABLIF")), by = "USUBJID") |>
+  # ADSL's PSABL may be a controlled fallback for missing source baseline
+  # (PSABLIF='Y').  SAP eligibility is based on observed baseline PSA; retain
+  # synthetic comparator rows whose flag is absent by treating NA as observed.
+  filter(coalesce(PSABLIF, "N") != "Y", !is.na(PSABL), PSABL >= 20) |>
   mutate(
     TRT01P = factor(TRT01P, levels = c("MP", "CbzP")),
     AVALC = factor(AVALC, levels = c("N", "Y"))
   )
+if (anyDuplicated(psa_resp_data$USUBJID) > 0) {
+  stop("ERROR: [TFL] PSARESP must be unique per subject after SAP eligibility filtering.")
+}
 psa_table <- table(psa_resp_data$TRT01P, psa_resp_data$AVALC)
 psa_test <- fisher.test(psa_table)
 psa_pval <- psa_test$p.value
@@ -355,7 +383,7 @@ render_km(
   data = os_data,
   stats = os_stats,
   x_max = 24,
-  title = "F-11-1: Kaplan-Meier Overall Survival (OS) Analysis — ITT Population", # nolint
+  title = "F-11-1: Kaplan-Meier Overall Survival (OS) Analysis - Demonstration Analysis Cohort", # nolint
   subtitle_endpoint = sprintf(
     "Primary Endpoint: Cabazitaxel + Prednisone (CbzP) vs Mitoxantrone + Prednisone (MP)\nHR = %.2f (95%% CI: %.2f-%.2f), Stratified Log-Rank %s", # nolint
     os_stats$hr, os_stats$lcl, os_stats$ucl,
@@ -428,7 +456,16 @@ cat("  [TFL] Rendering Subgroup Forest Plot...\n")
 # Filter OS data and join with ADSL covariates
 os_sub_data <- adtte |>
   filter(PARAMCD == "OS") |>
-  left_join(select(adsl, USUBJID, AGEGR1, ECOGBL, MEASDISF, VISCFL, PAINBL, DOCPROG), by = "USUBJID") # nolint
+  left_join(select(adsl, USUBJID, AGEGR1, ECOGBL, MEASDISF, VISCFL, PAINBL, DOCPROG), by = "USUBJID") |>
+  mutate(
+    # Randomisation stratum is ECOG 0-1 versus ECOG 2; do not split 0 and 1.
+    ECOGBLGRP = case_when(
+      is.na(ECOGBL) ~ NA_character_,
+      ECOGBL <= 1 ~ "0-1",
+      ECOGBL == 2 ~ "2",
+      TRUE ~ as.character(ECOGBL)
+    )
+  ) # nolint
 
 # Use the dual-arm subgroup data directly from ADaM
 
@@ -441,7 +478,7 @@ run_subgroup_cox <- function(factor_name, level_val, display_label) {
   n_total <- nrow(df)
 
   if (n_total < 5) {
-    data.frame(Subgroup = display_label, N = n_total, HR = 1.0, LCL = 1.0, UCL = 1.0) # nolint
+    return(data.frame(Subgroup = display_label, N = n_total, HR = 1.0, LCL = 1.0, UCL = 1.0)) # nolint
   }
 
   fit <- coxph(Surv(AVAL, 1 - CNSR) ~ TREAT, data = df)
@@ -473,8 +510,8 @@ subgroups <- rbind(
   ),
   run_subgroup_cox("AGEGR1", "<65", "Age < 65"),
   run_subgroup_cox("AGEGR1", ">=65", "Age >= 65"),
-  run_subgroup_cox("ECOGBL", 0, "ECOG Performance Status 0"),
-  run_subgroup_cox("ECOGBL", 1, "ECOG Performance Status 1"),
+  run_subgroup_cox("ECOGBLGRP", "0-1", "ECOG Performance Status 0-1"),
+  run_subgroup_cox("ECOGBLGRP", "2", "ECOG Performance Status 2"),
   run_subgroup_cox("MEASDISF", "N", "Measurable Disease: No"),
   run_subgroup_cox("MEASDISF", "Y", "Measurable Disease: Yes"),
   run_subgroup_cox("VISCFL", "N", "Visceral Metastasis: No"),
@@ -551,23 +588,29 @@ ggsave("05_outputs/tfl/output/figures/F-12-1_Subgroup_Forest.png", final_forest,
 # ==============================================================================
 cat("  [TFL] Compiling clinical table summaries...\n")
 
-# Dynamic calculations for T-17-1
-rdi_mp_85 <- sum(adex$TRT01P == "MP" & adex$PARAMCD == "RDIDL" &
-    adex$AVALC == ">=85%") # nolint
-rdi_mp_65 <- sum(adex$TRT01P == "MP" & adex$PARAMCD == "RDIDL" &
-    adex$AVALC == "65-<85%") # nolint
-rdi_mp_low <- sum(adex$TRT01P == "MP" & adex$PARAMCD == "RDIDL" &
-    adex$AVALC == "<65%") # nolint
+# Dynamic calculations for T-17-1 (SAP population: CbzP/MP Safety = ADSL SAFFL='Y' only).
+# RDI rows exist for non-safety CbzP subjects (7 with no TRTSDT); they must NOT enter
+# a Safety-population exposure table (audit BLOCKER: previously N=378, now N=371).
+adex_safety <- adex |>
+  left_join(adsl |> select(USUBJID, SAFFL), by = "USUBJID") |>
+  filter(SAFFL == "Y")
 
-rdi_cbzp_85 <- sum(adex$TRT01P == "CbzP" & adex$PARAMCD == "RDIDL" &
-    adex$AVALC == ">=85%") # nolint
-rdi_cbzp_65 <- sum(adex$TRT01P == "CbzP" & adex$PARAMCD == "RDIDL" &
-    adex$AVALC == "65-<85%") # nolint
-rdi_cbzp_low <- sum(adex$TRT01P == "CbzP" & adex$PARAMCD == "RDIDL" &
-    adex$AVALC == "<65%") # nolint
+rdi_mp_85 <- sum(adex_safety$TRT01P == "MP" & adex_safety$PARAMCD == "RDIDL" &
+    adex_safety$AVALC == ">=85%") # nolint
+rdi_mp_65 <- sum(adex_safety$TRT01P == "MP" & adex_safety$PARAMCD == "RDIDL" &
+    adex_safety$AVALC == "65-<85%") # nolint
+rdi_mp_low <- sum(adex_safety$TRT01P == "MP" & adex_safety$PARAMCD == "RDIDL" &
+    adex_safety$AVALC == "<65%") # nolint
 
-n_mp_rdi <- sum(adex$TRT01P == "MP" & adex$PARAMCD == "RDIDL")
-n_cbzp_rdi <- sum(adex$TRT01P == "CbzP" & adex$PARAMCD == "RDIDL")
+rdi_cbzp_85 <- sum(adex_safety$TRT01P == "CbzP" & adex_safety$PARAMCD == "RDIDL" &
+    adex_safety$AVALC == ">=85%") # nolint
+rdi_cbzp_65 <- sum(adex_safety$TRT01P == "CbzP" & adex_safety$PARAMCD == "RDIDL" &
+    adex_safety$AVALC == "65-<85%") # nolint
+rdi_cbzp_low <- sum(adex_safety$TRT01P == "CbzP" & adex_safety$PARAMCD == "RDIDL" &
+    adex_safety$AVALC == "<65%") # nolint
+
+n_mp_rdi <- sum(adex_safety$TRT01P == "MP" & adex_safety$PARAMCD == "RDIDL")
+n_cbzp_rdi <- sum(adex_safety$TRT01P == "CbzP" & adex_safety$PARAMCD == "RDIDL")
 
 # Dynamic calculations for T-17-2
 optimus_gcsf <- adlb |>
@@ -586,8 +629,8 @@ gcsf_n_g12 <- sum(optimus_gcsf$GCSF_PROP == "N" & optimus_gcsf$ATOXGR <= 2)
 gcsf_n_g3 <- sum(optimus_gcsf$GCSF_PROP == "N" & optimus_gcsf$ATOXGR == 3)
 gcsf_n_g4 <- sum(optimus_gcsf$GCSF_PROP == "N" & optimus_gcsf$ATOXGR == 4)
 
-# Dynamic calculations for T-17-4
-cbzp_rdi <- adex |>
+# Dynamic calculations for T-17-4 (Safety population, same as T-17-1)
+cbzp_rdi <- adex_safety |>
   filter(TRT01P == "CbzP" & PARAMCD == "RDIDL" & AVISIT == "ALL CYCLES") |>
   select(USUBJID, RDIDL = AVALC)
 
@@ -659,6 +702,7 @@ writeLines(paste0(synth_banner, table_content),
 
 # ==============================================================================
 # TABLES T-11-6 / T-11-7: Dynamic Efficacy Summaries for Secondary Endpoints
+# (T-11-6 = TTUMOR, T-11-7 = TTPSA per SAP v4.0 Appendix D)
 # ==============================================================================
 cat("  [TFL] Calculating dynamic KM and Cox PH statistics for TTPSA and TTUMOR...\n") # nolint
 
@@ -671,10 +715,24 @@ cox_psa <- coxph(Surv(AVAL, 1 - CNSR) ~ TRT01P, data = psa_data)
 sum_fit_psa <- summary(fit_psa)$table
 sum_cox_psa <- summary(cox_psa)
 
+fmt_tte_value <- function(x, digits = 1) {
+  if (length(x) != 1L || !is.finite(x)) return("NE")
+  formatC(x, format = "f", digits = digits)
+}
+fmt_tte_ci <- function(lcl, ucl) {
+  if (!is.finite(lcl) || !is.finite(ucl)) return("NE")
+  sprintf("%.1f-%.1f", lcl, ucl)
+}
+fmt_pvalue <- function(x) {
+  if (!is.finite(x)) return("NE")
+  if (x < 0.0001) return("<0.0001")
+  sprintf("%.4f", x)
+}
+
 med_psa_cbzp <- sum_fit_psa["TRT01P=CbzP", "median"]
 med_psa_mp <- sum_fit_psa["TRT01P=MP", "median"]
-ci_psa_cbzp <- sprintf("(95%% CI: %.1f-%.1f)", sum_fit_psa["TRT01P=CbzP", "0.95LCL"], sum_fit_psa["TRT01P=CbzP", "0.95UCL"]) # nolint
-ci_psa_mp <- sprintf("(95%% CI: %.1f-%.1f)", sum_fit_psa["TRT01P=MP", "0.95LCL"], sum_fit_psa["TRT01P=MP", "0.95UCL"]) # nolint
+ci_psa_cbzp <- fmt_tte_ci(sum_fit_psa["TRT01P=CbzP", "0.95LCL"], sum_fit_psa["TRT01P=CbzP", "0.95UCL"]) # nolint
+ci_psa_mp <- fmt_tte_ci(sum_fit_psa["TRT01P=MP", "0.95LCL"], sum_fit_psa["TRT01P=MP", "0.95UCL"]) # nolint
 
 hr_psa <- sum_cox_psa$conf.int[1]
 hr_psa_lcl <- sum_cox_psa$conf.int[3]
@@ -697,8 +755,8 @@ sum_cox_tumor <- summary(cox_tumor)
 
 med_tumor_cbzp <- sum_fit_tumor["TRT01P=CbzP", "median"]
 med_tumor_mp <- sum_fit_tumor["TRT01P=MP", "median"]
-ci_tumor_cbzp <- sprintf("(95%% CI: %.1f-%.1f)", sum_fit_tumor["TRT01P=CbzP", "0.95LCL"], sum_fit_tumor["TRT01P=CbzP", "0.95UCL"]) # nolint
-ci_tumor_mp <- sprintf("(95%% CI: %.1f-%.1f)", sum_fit_tumor["TRT01P=MP", "0.95LCL"], sum_fit_tumor["TRT01P=MP", "0.95UCL"]) # nolint
+ci_tumor_cbzp <- fmt_tte_ci(sum_fit_tumor["TRT01P=CbzP", "0.95LCL"], sum_fit_tumor["TRT01P=CbzP", "0.95UCL"]) # nolint
+ci_tumor_mp <- fmt_tte_ci(sum_fit_tumor["TRT01P=MP", "0.95LCL"], sum_fit_tumor["TRT01P=MP", "0.95UCL"]) # nolint
 
 hr_tumor <- sum_cox_tumor$conf.int[1]
 hr_tumor_lcl <- sum_cox_tumor$conf.int[3]
@@ -710,8 +768,28 @@ total_tumor_cbzp <- sum_fit_tumor["TRT01P=CbzP", "n.max"]
 events_tumor_mp <- sum_fit_tumor["TRT01P=MP", "events"]
 total_tumor_mp <- sum_fit_tumor["TRT01P=MP", "n.max"]
 
-# Best Clinical Response Endpoints Analysis (PSA response and ORR)
-psa_resp_data <- adrs |> filter(PARAMCD == "PSARESP")
+# TTPAIN Analysis (SAP-native T-11-8 mapping).
+ttpain_data <- adtte |> filter(PARAMCD == "TTPAIN")
+fit_ttpain <- survfit(Surv(AVAL / 30.4375, 1 - CNSR) ~ TRT01P, data = ttpain_data)
+ttpain_data$TRT01P <- factor(ttpain_data$TRT01P, levels = c("MP", "CbzP"))
+cox_ttpain <- coxph(Surv(AVAL, 1 - CNSR) ~ TRT01P, data = ttpain_data)
+sum_fit_ttpain <- summary(fit_ttpain)$table
+sum_cox_ttpain <- summary(cox_ttpain)
+med_ttpain_cbzp <- sum_fit_ttpain["TRT01P=CbzP", "median"]
+med_ttpain_mp <- sum_fit_ttpain["TRT01P=MP", "median"]
+ci_ttpain_cbzp <- fmt_tte_ci(sum_fit_ttpain["TRT01P=CbzP", "0.95LCL"], sum_fit_ttpain["TRT01P=CbzP", "0.95UCL"]) # nolint
+ci_ttpain_mp <- fmt_tte_ci(sum_fit_ttpain["TRT01P=MP", "0.95LCL"], sum_fit_ttpain["TRT01P=MP", "0.95UCL"]) # nolint
+hr_ttpain <- sum_cox_ttpain$conf.int[1]
+hr_ttpain_lcl <- sum_cox_ttpain$conf.int[3]
+hr_ttpain_ucl <- sum_cox_ttpain$conf.int[4]
+p_ttpain <- sum_cox_ttpain$coefficients[1, "Pr(>|z|)"]
+events_ttpain_cbzp <- sum_fit_ttpain["TRT01P=CbzP", "events"]
+total_ttpain_cbzp <- sum_fit_ttpain["TRT01P=CbzP", "n.max"]
+events_ttpain_mp <- sum_fit_ttpain["TRT01P=MP", "events"]
+total_ttpain_mp <- sum_fit_ttpain["TRT01P=MP", "n.max"]
+
+# T-11-3 PSA response: reuse the SAP-eligible PSARESP set created for
+# hierarchical gatekeeping above so the denominator cannot diverge.
 psa_cbzp_resp <- sum(psa_resp_data$AVALC == "Y" & psa_resp_data$TRT01P == "CbzP") # nolint
 psa_cbzp_total <- sum(psa_resp_data$TRT01P == "CbzP")
 psa_cbzp_pct <- psa_cbzp_resp / psa_cbzp_total * 100
@@ -736,70 +814,129 @@ orr_mp_resp <- sum(orr_resp_data$AVALC == "Y" & orr_resp_data$TRT01P == "MP")
 orr_mp_total <- sum(meas_subj$TRT01P == "MP")
 orr_mp_pct <- orr_mp_resp / max(orr_mp_total, 1) * 100
 
-n_cbzp_itt <- sum(adsl$TRT01P == "CbzP")
-n_mp_itt <- sum(adsl$TRT01P == "MP")
+# T-11-5 pain response: derive only the real MP pain-evaluable population from
+# staged PN/SV.  The CbzP comparator is synthetic and has no patient-level PN;
+# it is shown as not estimable rather than populated by a reconstructed count.
+pain_eval_real <- f042_phase2$visits |>
+  inner_join(adsl_real |> select(USUBJID, ITTFL, PAINBL, TRT01P), by = "USUBJID") |>
+  filter(
+    ITTFL == "Y", PAINBL == "Y",
+    (coalesce(base_eval_ppi, FALSE) & !is.na(base_ppi) & base_ppi >= 2) |
+      (coalesce(base_eval_an, FALSE) & !is.na(base_an) & base_an >= 10)
+  ) |>
+  distinct(USUBJID, TRT01P)
+pain_response_real <- f042_phase2$pain_response_events |>
+  distinct(USUBJID) |>
+  inner_join(pain_eval_real, by = "USUBJID")
+pain_mp_resp <- sum(pain_response_real$TRT01P == "MP")
+pain_mp_total <- sum(pain_eval_real$TRT01P == "MP")
+pain_mp_pct <- if (pain_mp_total > 0) 100 * pain_mp_resp / pain_mp_total else NA_real_
+
+n_cbzp_demo <- sum(adsl$TRT01P == "CbzP")
+n_mp_demo <- sum(adsl$TRT01P == "MP")
 
 # nolint start: line_length_linter.
-efficacy_tables <- sprintf(
-  "
-TROPIC (Study EFC6193 / XRP6258) Secondary Efficacy Tables
-==========================================================
-
-T-11-6: Kaplan-Meier Analysis of Time to PSA Progression (TTPSA) - ITT Population
----------------------------------------------------------------------------------
-Statistic                                 CbzP (N=%d)        MP (N=%d)
-Number of Events / Total N                %d/%d               %d/%d
-Median Survival Time (Months)             %.1f                %.1f
-95%% Confidence Interval                   %s      %s
-Unstratified Hazard Ratio (CbzP vs MP)     %.2f (95%% CI: %.2f-%.2f)
-Wald Log-Rank p-value                     %.4f
-
-
-T-11-7: Kaplan-Meier Analysis of Time to Tumor Progression (TTUMOR) - Measurable Subpopulation
-------------------------------------------------------------------------------------------------
-Statistic                                 CbzP (N=%d)        MP (N=%d)
-Number of Events / Total N                %d/%d               %d/%d
-Median Survival Time (Months)             %.1f                %.1f
-95%% Confidence Interval                   %s      %s
-Unstratified Hazard Ratio (CbzP vs MP)     %.2f (95%% CI: %.2f-%.2f)
-Wald Log-Rank p-value                     %.4f
-
-
-T-11-8: Analysis of Best Clinical Response Endpoints
-----------------------------------------------------
-Statistic                                 CbzP                MP
-PSA Response Rate (>=50%% decline) - ITT Population
-  Responders / N (%%)                      %d/%d (%.1f%%)      %d/%d (%.1f%%)
-  Fisher's Exact p-value                  %.4e
-
-Objective Response Rate (ORR) - Measurable ITT Population†
-  Responders / N (%%)                      %d/%d (%.1f%%)      %d/%d (%.1f%%)
-  Fisher's Exact p-value                  %.4f
-
-†Restricted to patients with measurable disease at baseline (CbzP N=%d, MP N=%d).
-",
-  n_cbzp_itt, n_mp_itt,
-  as.integer(events_psa_cbzp), as.integer(total_psa_cbzp),
-  as.integer(events_psa_mp), as.integer(total_psa_mp),
-  med_psa_cbzp, med_psa_mp, ci_psa_cbzp, ci_psa_mp,
-  hr_psa, hr_psa_lcl, hr_psa_ucl, p_psa,
-  total_tumor_cbzp, total_tumor_mp,
-  as.integer(events_tumor_cbzp), as.integer(total_tumor_cbzp),
-  as.integer(events_tumor_mp), as.integer(total_tumor_mp),
-  med_tumor_cbzp, med_tumor_mp, ci_tumor_cbzp, ci_tumor_mp,
-  hr_tumor, hr_tumor_lcl, hr_tumor_ucl, p_tumor,
-  as.integer(psa_cbzp_resp), as.integer(psa_cbzp_total), psa_cbzp_pct,
-  as.integer(psa_mp_resp), as.integer(psa_mp_total), psa_mp_pct,
-  psa_pval,
-  as.integer(orr_cbzp_resp), as.integer(orr_cbzp_total), orr_cbzp_pct,
-  as.integer(orr_mp_resp), as.integer(orr_mp_total), orr_mp_pct,
-  orr_pval,
-  total_tumor_cbzp, total_tumor_mp
+efficacy_tables <- paste0(
+  "\nTROPIC (Study EFC6193 / XRP6258) SAP-Native T-11 Efficacy Tables\n",
+  "===============================================================\n\n",
+  sprintf(
+    paste0(
+      "T-11-3: PSA Response Rate (>=50%% confirmed decline; baseline PSA >=20 ug/L)\n",
+      "----------------------------------------------------------------------------\n",
+      "Statistic                                 CbzP (N=%d)        MP (N=%d)\n",
+      "Responders / N (%%)                        %d/%d (%.1f%%)      %d/%d (%.1f%%)\n",
+      "Fisher's exact p-value                    %.4e\n\n"
+    ),
+    as.integer(psa_cbzp_total), as.integer(psa_mp_total),
+    as.integer(psa_cbzp_resp), as.integer(psa_cbzp_total), psa_cbzp_pct,
+    as.integer(psa_mp_resp), as.integer(psa_mp_total), psa_mp_pct, psa_pval
+  ),
+  sprintf(
+    paste0(
+      "T-11-4: Objective Response Rate (ORR) per RECIST v1.0 (measurable disease)\n",
+      "----------------------------------------------------------------------------\n",
+      "Statistic                                 CbzP (N=%d)        MP (N=%d)\n",
+      "Responders / N (%%)                        %d/%d (%.1f%%)      %d/%d (%.1f%%)\n",
+      "Fisher's exact p-value                    %.4f\n",
+      "Footnote: denominator is all ADSL MEASDISF='Y' subjects; missing OBJRESP is non-response.\n\n"
+    ),
+    as.integer(orr_cbzp_total), as.integer(orr_mp_total),
+    as.integer(orr_cbzp_resp), as.integer(orr_cbzp_total), orr_cbzp_pct,
+    as.integer(orr_mp_resp), as.integer(orr_mp_total), orr_mp_pct, orr_pval
+  ),
+  sprintf(
+    paste0(
+      "T-11-5: Pain Response Rate (PAINBL='Y' subset; maintained >=3 weeks)\n",
+      "--------------------------------------------------------------------\n",
+      "Statistic                                 CbzP (synthetic)      MP (real)\n",
+      "Responders / N (%%)                        N/A (PN unavailable)   %d/%d (%.1f%%)\n",
+      "Footnote: MP uses staged PN/SV, component-specific 5-of-7 evaluability,\n",
+      "PPI/analgesic response criteria and >=21-day confirmation. No CbzP PN\n",
+      "source exists in this demonstration; no synthetic pain-response count is imputed.\n\n"
+    ),
+    as.integer(pain_mp_resp), as.integer(pain_mp_total), pain_mp_pct
+  ),
+  sprintf(
+    paste0(
+      "T-11-6: Time to Tumour Progression (TTUMOR; ITT primary)\n",
+      "---------------------------------------------------------\n",
+      "Statistic                                 CbzP (N=%d)        MP (N=%d)\n",
+      "Number of Events / Total N                %d/%d               %d/%d\n",
+      "Median Survival Time (Months)             %s                %s\n",
+      "95%% Confidence Interval                   %s                %s\n",
+      "Unstratified Hazard Ratio (CbzP vs MP)     %.2f (95%% CI: %.2f-%.2f)\n",
+      "Wald p-value                               %s\n\n"
+    ),
+    as.integer(total_tumor_cbzp), as.integer(total_tumor_mp),
+    as.integer(events_tumor_cbzp), as.integer(total_tumor_cbzp),
+    as.integer(events_tumor_mp), as.integer(total_tumor_mp),
+    fmt_tte_value(med_tumor_cbzp), fmt_tte_value(med_tumor_mp),
+    ci_tumor_cbzp, ci_tumor_mp,
+    hr_tumor, hr_tumor_lcl, hr_tumor_ucl, fmt_pvalue(p_tumor)
+  ),
+  sprintf(
+    paste0(
+      "T-11-7: Time to PSA Progression (TTPSA; ITT)\n",
+      "----------------------------------------------\n",
+      "Statistic                                 CbzP (N=%d)        MP (N=%d)\n",
+      "Number of Events / Total N                %d/%d               %d/%d\n",
+      "Median Survival Time (Months)             %s                %s\n",
+      "95%% Confidence Interval                   %s                %s\n",
+      "Unstratified Hazard Ratio (CbzP vs MP)     %.2f (95%% CI: %.2f-%.2f)\n",
+      "Wald p-value                               %s\n\n"
+    ),
+    as.integer(total_psa_cbzp), as.integer(total_psa_mp),
+    as.integer(events_psa_cbzp), as.integer(total_psa_cbzp),
+    as.integer(events_psa_mp), as.integer(total_psa_mp),
+    fmt_tte_value(med_psa_cbzp), fmt_tte_value(med_psa_mp),
+    ci_psa_cbzp, ci_psa_mp,
+    hr_psa, hr_psa_lcl, hr_psa_ucl, fmt_pvalue(p_psa)
+  ),
+  sprintf(
+    paste0(
+      "T-11-8: Time to Pain Progression (TTPAIN; ITT)\n",
+      "-----------------------------------------------\n",
+      "Statistic                                 CbzP (N=%d)        MP (N=%d)\n",
+      "Number of Events / Total N                %d/%d               %d/%d\n",
+      "Median Survival Time (Months)             %s                %s\n",
+      "95%% Confidence Interval                   %s                %s\n",
+      "Unstratified Hazard Ratio (CbzP vs MP)     %.2f (95%% CI: %.2f-%.2f)\n",
+      "Wald p-value                               %s\n",
+      "Footnote: primary MP events use the adopted diary-or-direct-intent-RT\n",
+      "F-042 rule; diary-only and RT-only source sensitivities are in QC evidence.\n"
+    ),
+    as.integer(total_ttpain_cbzp), as.integer(total_ttpain_mp),
+    as.integer(events_ttpain_cbzp), as.integer(total_ttpain_cbzp),
+    as.integer(events_ttpain_mp), as.integer(total_ttpain_mp),
+    fmt_tte_value(med_ttpain_cbzp), fmt_tte_value(med_ttpain_mp),
+    ci_ttpain_cbzp, ci_ttpain_mp,
+    hr_ttpain, hr_ttpain_lcl, hr_ttpain_ucl, fmt_pvalue(p_ttpain)
+  )
 )
 # nolint end
 
 # Objective Response Rate (ORR) with response-evaluable denominator (review-board SR-1). # nolint
-# The T-11-8 block above uses the SAP measurable-disease ITT denominator.
+# The T-11-4 block above uses the SAP baseline measurable-disease denominator.
 # Report the response-evaluable denominator version here for full transparency.
 orr_ev_resp_data <- adrs |> filter(PARAMCD == "OBJRESP")
 orr_ev_cbzp_resp <- sum(orr_ev_resp_data$AVALC == "Y" & orr_ev_resp_data$TRT01P == "CbzP") # nolint
@@ -812,8 +949,8 @@ orr_md_addendum <- sprintf(
     "--------------------------------------------------------------------------------------\n", # nolint
     "Denominator basis        CbzP (evaluable)          MP (evaluable)\n",
     "Responders / N (%%)       %d/%d (%.1f%%)             %d/%d (%.1f%%)\n",
-    "Note: T-11-8 above uses the SAP-specified measurable-disease ITT denominator. The response-\n", # nolint
-    "evaluable denominator version is reported here for full traceability.\n"
+    "Note: T-11-4 uses the SAP-specified baseline measurable-disease denominator on the\n", # nolint
+    "combined demonstration cohort; T-11-8b uses only subjects with an OBJRESP record.\n"
   ),
   orr_ev_cbzp_resp, orr_ev_cbzp_total, 100 * orr_ev_cbzp_resp / max(orr_ev_cbzp_total, 1), # nolint
   orr_ev_mp_resp, orr_ev_mp_total,
@@ -840,9 +977,9 @@ render_km(
   stats = pfs_stats,
   x_max = 18,
   title = paste0(
-      "F-11-2: Kaplan-Meier Progression-Free Survival (PFS) Analysis ", # nolint
-      "— ITT Population"
-    ),
+    "F-11-2: Kaplan-Meier Progression-Free Survival (PFS) Analysis ", # nolint
+    "- Demonstration Analysis Cohort"
+  ),
   subtitle_endpoint = sprintf(
     paste0(
       "Secondary Endpoint: Cabazitaxel + Prednisone (CbzP) vs ",
@@ -865,12 +1002,17 @@ render_km(
 # ==============================================================================
 cat("  [TFL] Rendering PSA Waterfall Plot...\n")
 
-# Best PSA % change from baseline per subject
+# Best PSA % change from baseline per subject.  The controlled catalog places
+# this display under SAP v4.0 §5.2, so it uses the same baseline PSA >=20 ug/L
+# eligibility as the PSA response endpoint.
+psa_response_eligible <- adsl |>
+  filter(!is.na(PSABL), PSABL >= 20) |>
+  select(USUBJID, TRT01P)
 psa_lb <- adlb |>
   filter(PARAMCD == "PSA", !is.na(PCHG)) |>
   group_by(USUBJID) |>
   summarise(best_pchg = min(PCHG, na.rm = TRUE), .groups = "drop") |>
-  left_join(select(adsl, USUBJID, TRT01P), by = "USUBJID") |>
+  inner_join(psa_response_eligible, by = "USUBJID") |>
   filter(!is.na(TRT01P))
 
 # Use the dual-arm PSA data directly from ADaM
@@ -913,10 +1055,10 @@ waterfall_plot <- ggplot(psa_lb, aes(
   ) +
   facet_wrap(~TRT_LABEL, scales = "free_x", ncol = 2) +
   labs(
-    title = "F-13-1: PSA Best Percentage Change from Baseline — Waterfall Plot",
+    title = "F-13-1: PSA Best Percentage Change from Baseline - Waterfall Plot (Baseline PSA >=20 ug/L)",
     subtitle = paste0(
       "Each bar represents one subject's maximum PSA decrease (or increase), sorted within arm.\n",
-      "Dashed line denotes the 50% decrease response threshold."
+      "Population: baseline PSA >=20 ug/L; dashed line denotes the 50% decrease response threshold."
     ),
     x = "Subjects (ranked by PSA response within arm)",
     y = "Best PSA % Change from Baseline",
@@ -1004,7 +1146,13 @@ swimmer_plot <- ggplot(swimmer_data, aes(
     axis.ticks.y = element_blank(),
     panel.grid.major.y = element_blank(),
     strip.text = element_text(face = "bold", size = 9.5),
-    legend.position = "bottom"
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold", size = 7),
+    legend.text = element_text(size = 7),
+    plot.caption = element_text(
+      size = 5.2, lineheight = 0.9, color = "#A6192E", face = "bold",
+      hjust = 0, margin = margin(t = 5)
+    )
   )
 
 ggsave("05_outputs/tfl/output/figures/F-14-1_Swimmer_Plot.png", swimmer_plot,
@@ -1220,7 +1368,7 @@ cat("  [TFL] Rendering Patient Population Flow Diagram...\n")
 # ADSL has no completion/discontinuation status, so treatment duration must not
 # be used as a surrogate for disposition (for example, TRTDURD >= 60 days).
 n_total <- nrow(adsl)
-n_itt <- nrow(adsl |> filter(ITTFL == "Y"))
+n_demo <- nrow(adsl |> filter(ITTFL == "Y"))
 saf <- adsl |> filter(SAFFL == "Y")
 n_safety <- nrow(saf)
 n_deaths <- nrow(saf |> filter(DTHFL == "Y"))
@@ -1239,7 +1387,7 @@ consort <- ggplot() +
   ) +
   annotate("text",
     x = 0.5, y = 0.93,
-    label = sprintf("Patients enrolled\nN = %d", n_total),
+    label = sprintf("Combined demonstration cohort\nN = %d", n_total),
     size = 3.2, fontface = "bold", color = "#1e3a5f", family = "serif"
   ) +
   # Arrow down
@@ -1255,8 +1403,8 @@ consort <- ggplot() +
   annotate("text",
     x = 0.5, y = 0.735,
     label = sprintf(
-      "ITT Population: N = %d\nSafety Population: N = %d (100%%)",
-      n_itt, n_safety
+      "Demonstration Analysis Cohort: N = %d\nSafety Population: N = %d (100%%)",
+      n_demo, n_safety
     ),
     size = 3.2, fontface = "bold", color = "#065f46", family = "serif"
   ) +

@@ -1,11 +1,11 @@
 # WS-5 Known Differences & Residual Risk Memo
 
-**Workstream:** WS-5 QC / Validation (G06)  
-**Audience:** Reviewer, hiring manager, audit challenge  
-**Product claim:** Path A — controlled non-submission demo (`docs/PRODUCT_CLAIM.md`)  
-**Source of truth for IDs:** `06_qc_evidence/audit/findings_register.csv` · `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md`  
-**As of:** 2026-07-09  
-**Machine QC grade at seal:** validation_strategy PASS · recon PASS (non-sim) · admiral PASS · log cleanliness PASS · RC PASS  
+**Workstream:** WS-5 QC / Validation (G06)
+**Audience:** Reviewer, hiring manager, audit challenge
+**Product claim:** Path A — controlled non-submission demo (`docs/PRODUCT_CLAIM.md`)
+**Source of truth for IDs:** `06_qc_evidence/audit/findings_register.csv` · `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md`
+**As of:** 2026-08-04
+**Machine QC grade at seal:** validation_strategy PASS · recon PASS (non-sim) · admiral PASS · log cleanliness PASS · RC PASS
 
 ---
 
@@ -13,9 +13,9 @@
 
 Machine gates can be green while **residual risks** remain. This memo is the human QC product:
 
-- What we still know is imperfect, limited, or out of scope  
-- Why that does **not** invalidate the Path A seal  
-- What would be required to close each item for a harder product claim  
+- What we still know is imperfect, limited, or out of scope
+- Why that does **not** invalidate the Path A seal
+- What would be required to close each item for a harder product claim
 
 **Rule:** ACCEPTED ≠ ignored. ACCEPTED = on-record residual owned by a workstream.
 
@@ -37,8 +37,8 @@ Machine gates can be green while **residual risks** remain. This memo is the hum
 
 ### 3.1 Scientific / data provenance
 
-#### F-003 — Synthetic / reconstructed CbzP (Critical) · **ACCEPTED**  
-**Class:** `non_submission_demo_limit` · **Owner:** WS-0 + WS-4 + WS-6  
+#### F-003 — Synthetic / reconstructed CbzP (Critical) · **ACCEPTED**
+**Class:** `non_submission_demo_limit` · **Owner:** WS-0 + WS-4 + WS-6
 
 | | |
 |---|---|
@@ -48,8 +48,8 @@ Machine gates can be green while **residual risks** remain. This memo is the hum
 | **Why Path A still holds** | MP ADaM recon is real; CbzP is explicitly non-confirmatory demonstration |
 | **Close condition (Path B/C)** | Authoritative CbzP IPD + re-derive + independent QC |
 
-#### F-012 — N=749 vs protocol ITT 755 (Major) · **ACCEPTED**  
-**Class:** `non_submission_demo_limit` · **Owner:** WS-2 + WS-4 + WS-6  
+#### F-012 — N=749 vs protocol ITT 755 (Major) · **ACCEPTED**
+**Class:** `non_submission_demo_limit` · **Owner:** WS-2 + WS-4 + WS-6
 
 | | |
 |---|---|
@@ -62,8 +62,8 @@ Machine gates can be green while **residual risks** remain. This memo is the hum
 
 ### 3.2 Package / regulatory structure
 
-#### F-005 — EXAMPLE eCTD metadata / incomplete aCRF package (Critical) · **ACCEPTED**  
-**Class:** `external_dependency` + `non_submission_demo_limit` · **Owner:** WS-7 + WS-6  
+#### F-005 — EXAMPLE eCTD metadata / incomplete aCRF package (Critical) · **ACCEPTED**
+**Class:** `external_dependency` + `non_submission_demo_limit` · **Owner:** WS-7 + WS-6
 
 | | |
 |---|---|
@@ -73,8 +73,8 @@ Machine gates can be green while **residual risks** remain. This memo is the hum
 | **Close condition** | Assigned application IDs + true aCRF + origin links |
 | **Related** | CRF **domain grounding** for programming honesty is D-012 (`WS1_CRF_GROUNDING_D012_2026-07-09.md`) — separate from aCRF package completeness |
 
-#### F-025 — Part 11 controls (Major) · **ACCEPTED**  
-**Class:** `non_submission_demo_limit` · **Owner:** WS-0 + WS-7  
+#### F-025 — Part 11 controls (Major) · **ACCEPTED**
+**Class:** `non_submission_demo_limit` · **Owner:** WS-0 + WS-7
 
 | | |
 |---|---|
@@ -87,33 +87,43 @@ Machine gates can be green while **residual risks** remain. This memo is the hum
 
 ### 3.3 Analysis / population / outputs
 
-#### F-011 — PSA response population shell (Major) · **ACCEPTED**  
-**Class:** `scope_out_with_disclosure` · **Owner:** WS-2 + WS-4  
+#### F-011 — PSA response population shell (Major) · **RESOLVED 2026-08-03**
+**Class:** `resolve_now` (closed for the current Path A response output) · **Owner:** WS-2 + WS-4
 
 | | |
 |---|---|
-| **Difference** | Controlled TFL uses ADRS `PSARESP` analysis records; a stricter SAP “baseline PSA eligible” shell is not implemented as a separate controlled deliverable. |
+| **Difference** | The controlled TFL joins `PSARESP` to ADSL baseline PSA, excludes the ADSL controlled fallback (`PSABLIF='Y'`), and applies a duplicate-subject guard. Synthetic rows without the flag are treated as observed for the demonstration arm. |
 | **Impact if ignored** | Population mismatch under SAP challenge |
-| **Why Path A holds** | Catalog/ADRG define delivered shell; not claimed as full SAP shell set |
-| **Close condition** | Code + shell + recon for eligibility flag |
+| **Why Path A holds** | The same eligible set drives the hierarchy gate, response TFL, SAS companion evidence, and regression contract; current counts are CbzP 145/361 and MP 61/329 (690 unique eligible subjects). |
+| **Close evidence** | `05_outputs/tfl/tfl_generation.R`, `tests/test_tfl_population_contract.R`, `06_qc_evidence/audit/section_reviews/SECTION_02_POPULATIONS_ENDPOINTS_AUDIT_2026-08-03.md` plus its Section 3 correction addendum, and the post-correction rerun evidence. |
 
-#### F-014 — ARM completeness (Major) · **ACCEPTED**  
-**Class:** `scope_out_with_disclosure` · **Owner:** WS-3  
+#### F-014 — ARM completeness (Major) · **RESOLVED 2026-08-04**
+**Class:** `resolve_now` · **Owner:** WS-3
 
 | | |
 |---|---|
-| **Difference** | ARM covers controlled statistical TFL core (order of 8 displays / 10 analyses), not every deferred SAP analysis or full ADSL covariate declarations everywhere. |
+| **Difference** | The prior ARM covered only 8 displays / 10 analyses and omitted promoted response/Optimus results, TTPAIN, survival covariate declarations, and explicit TFL bindings. |
 | **Impact if ignored** | Metadata completeness overclaim |
-| **Why Path A holds** | Bound to controlled TFL catalog |
-| **Close condition** | Expand ARM with every promoted output |
+| **Resolution** | Define-XML now carries 10 ResultDisplays / 18 AnalysisResults for every controlled analysis output except the non-analysis F-01-1 flow diagram, with TTPAIN, response and Optimus results; ITT-primary TTUMOR; OS/PFS ADSL covariates; TFL-name binding; and Path A disclosure on every display. |
+| **Close evidence** | `platform/define_arm_contract.py`, `tests/test_define_arm_contract.py`, G02, XSD/ARM validation, spec→Define validation, and `TRACEABILITY_MATRIX.md`. Deferred SAP outputs remain explicitly outside the controlled catalog. |
+
+#### F-042 — PFS pain component/supporting disease evidence (Major) · **IMPLEMENTED FOR PATH A; EXTERNAL REVIEW REQUIRED**
+**Class:** `scope_out_with_disclosure` · **Owner:** WS-2 + WS-4 + medical/statistical reviewer
+
+| | |
+|---|---|
+| **Difference** | The pre-Phase-2 sealed pain derivation used median AS, `PPI >=2`, absolute `AS >=10`, combined-component/terminal confirmation, minimum diary date, no author-adopted cancer-related qualification and no CM+PR RT consumption. Those labels remain historical baseline evidence; the adopted replacement is implemented separately in SAS and R. |
+| **Impact if ignored** | TTPAIN/PFS event dates and event sets can be wrong in both directions; numerical SAS/R/admiral parity would only reproduce the same clinical-rule error. |
+| **Why Path A holds** | Antony Bevan adopted ED-01–ED-07 on 2026-08-04. The later statistical-governance review found and corrected `GOV-STAT-01`: SAS T-11-5 tested only the initial response visit; replaying that defective logic yields 65 instead of the correct 43. The current control now requires exact subject-level SAS/R pain-response parity in addition to the corrected CM+PR pain derivation, TTUMOR ITT, SAP-native T-11 remap and aggregate lineage evidence. No independent, sponsor, medical or regulated approval is claimed. |
+| **Close condition** | **Path A only:** the current source tree must pass the full 34-stage real-SAS DAG, `endpoint_controls.F042_PAIN_RESPONSE=PASS`, release reseal and CI verification. External qualified statistical/medical review and sponsor governance remain required before regulated reuse. |
 
 ---
 
 ### 3.4 Conformance / standards tooling
 
-#### F-015 — CORE residual / domain breadth (Major) · **ACCEPTED**  
-**Disposition matrix:** [`docs/workstreams/WS1_CORE_RESIDUAL_MATRIX.csv`](WS1_CORE_RESIDUAL_MATRIX.csv) (filed 2026-07-09; rule/domain/disposition)  
-**Class:** `external_dependency` + `scope_out_with_disclosure` · **Owner:** WS-1 + WS-3 + WS-5  
+#### F-015 — CORE residual / domain breadth (Major) · **ACCEPTED**
+**Disposition matrix:** [`docs/workstreams/WS1_CORE_RESIDUAL_MATRIX.csv`](WS1_CORE_RESIDUAL_MATRIX.csv) (filed 2026-07-09; rule/domain/disposition)
+**Class:** `external_dependency` + `scope_out_with_disclosure` · **Owner:** WS-1 + WS-3 + WS-5
 
 | | |
 |---|---|
@@ -122,8 +132,8 @@ Machine gates can be green while **residual risks** remain. This memo is the hum
 | **Why Path A holds** | Run record + SDRG §5.1 + residual matrix; no zero-finding claim |
 | **Close condition (harder claim)** | Commercial validator program + residual closure beyond Path A accept/waive classes; matrix already filed for Path A honesty |
 
-#### F-016 — Commercial P21 ADaM (Major) · **ACCEPTED**  
-**Class:** `external_dependency` · **Owner:** WS-3 + WS-5  
+#### F-016 — Commercial P21 ADaM (Major) · **ACCEPTED**
+**Class:** `external_dependency` · **Owner:** WS-3 + WS-5
 
 | | |
 |---|---|
@@ -132,8 +142,8 @@ Machine gates can be green while **residual risks** remain. This memo is the hum
 | **Why Path A holds** | Explicitly not claimed |
 | **Close condition** | Tool access + full report + disposition |
 
-#### F-017 — Partial ISO dates / week-offset AE timing (Major) · **ACCEPTED**  
-**Class:** `scope_out_with_disclosure` · **Owner:** WS-1  
+#### F-017 — Partial ISO dates / week-offset AE timing (Major) · **ACCEPTED**
+**Class:** `scope_out_with_disclosure` · **Owner:** WS-1
 
 | | |
 |---|---|
@@ -146,8 +156,8 @@ Machine gates can be green while **residual risks** remain. This memo is the hum
 
 ### 3.5 Documentation / exploratory layers
 
-#### F-019 — Document / approval gaps (Major) · **ACCEPTED**  
-**Class:** partial resolve + `non_submission_demo_limit` · **Owner:** WS-6 + WS-0  
+#### F-019 — Document / approval gaps (Major) · **ACCEPTED**
+**Class:** partial resolve + `non_submission_demo_limit` · **Owner:** WS-6 + WS-0
 
 | | |
 |---|---|
@@ -156,24 +166,24 @@ Machine gates can be green while **residual risks** remain. This memo is the hum
 | **Why Path A holds** | Unsigned remediation SAP disclosed in lock memo |
 | **Close condition** | Real sponsor document control |
 
-#### F-020 — Dataset-JSON lifecycle (Major) · **ACCEPTED**  
-**Class:** partial hardening + exploratory · **Owner:** WS-3  
+#### F-020 — Dataset-JSON lifecycle (Major) · **ACCEPTED**
+**Class:** partial hardening + exploratory · **Owner:** WS-3
 
 | | |
 |---|---|
 | **Difference** | Dataset-JSON hardened (keys/MDV/empty fail-closed) but **not** an eCTD consumer; exploratory exchange layer. |
 | **Close condition** | Defined delivery route + full row recon program |
 
-#### F-021 — USDM reproducibility (Major) · **ACCEPTED**  
-**Class:** partial fix (deterministic IDs + CT version) + exploratory · **Owner:** WS-3  
+#### F-021 — USDM reproducibility (Major) · **ACCEPTED**
+**Class:** partial fix (deterministic IDs + CT version) + exploratory · **Owner:** WS-3
 
 | | |
 |---|---|
 | **Difference** | USDM now deterministic; still not packaged as submission study definition deliverable. |
 | **Close condition** | Official schema gate + packaging decision |
 
-#### F-022 — ARS completeness (Major) · **ACCEPTED**  
-**Class:** `scope_out_with_disclosure` · **Owner:** WS-3 + WS-4  
+#### F-022 — ARS completeness (Major) · **ACCEPTED**
+**Class:** `scope_out_with_disclosure` · **Owner:** WS-3 + WS-4
 
 | | |
 |---|---|
@@ -199,15 +209,17 @@ These are **not** residuals; cite them when challenged on quality culture:
 | F-013 | Variable lineage | Traceability |
 | F-018 | Log cleanliness gate | Execution hygiene |
 | F-023 | Traceability matrix fix | Doc integrity |
+| F-040 | TTUMOR censor pool | Death milestones excluded from tumor censor dates |
+| F-041 | PFS censoring hierarchy | Last-evaluable/no-post-baseline branches now match SAP |
 
 ---
 
 ## 5. Independence limitation (always state)
 
-All production, validation, and admiral tracks were implemented under a **single programmer of record**.  
+All production, validation, and admiral tracks were implemented under a **single programmer of record**.
 
-- **Present:** multi-engine methodological challenge (SAS / R / admiral), automated gates, disposition discipline.  
-- **Absent:** second human organization, independent QC unit, sponsor medical review.  
+- **Present:** multi-engine methodological challenge (SAS / R / admiral), automated gates, disposition discipline.
+- **Absent:** second human organization, independent QC unit, sponsor medical review.
 
 This is structural to a portfolio demo—not a temporary bug.
 
@@ -215,9 +227,9 @@ This is structural to a portfolio demo—not a temporary bug.
 
 ## 6. Log cleanliness residual (operational)
 
-Log cleanliness **PASS** means: configured **persisted** logs are clean under `config/log_cleanliness.yaml`, with reviewed ADTTE time-origin exceptions capped.  
+Log cleanliness **PASS** means: configured **persisted** logs are clean under `config/log_cleanliness.yaml`, with reviewed ADTTE time-origin exceptions capped.
 
-It does **not** mean every rscript/python stdout line from all 30 stages is archived and scanned. Coverage is explicit: `configured_persisted_logs_only`.
+It does **not** mean every R/Python stdout line from all 34 stages is archived and scanned. Coverage is explicit: `configured_persisted_logs_only`.
 
 ---
 
@@ -225,13 +237,13 @@ It does **not** mean every rscript/python stdout line from all 30 stages is arch
 
 Under `docs/PRODUCT_CLAIM.md` Path A and the residual register above:
 
-1. Critical scientific comparators are disclosed as non-confirmatory.  
-2. Package structural placeholders are disclosed.  
-3. Validation engines appropriate to risk were run under real SAS for the sealed proof.  
-4. Residuals are named, owned, and close-conditioned.  
+1. Critical scientific comparators are disclosed as non-confirmatory.
+2. Package structural placeholders are disclosed.
+3. Validation engines appropriate to risk were run under real SAS for the sealed proof.
+4. Residuals are named, owned, and close-conditioned.
 5. No Part 11 or filing claim is made.
 
-**Therefore:** Path A release-candidate PASS is **compatible** with this residual stack.  
+**Therefore:** Path A release-candidate PASS is **compatible** with this residual stack.
 **Path B/C is not** until the close conditions in §3 are met.
 
 ---
@@ -243,7 +255,8 @@ Under `docs/PRODUCT_CLAIM.md` Path A and the residual register above:
 | F-003, F-012 | WS-6 language consistency every guide revision |
 | F-005, F-025 | WS-7 package + PRODUCT_CLAIM enforcement |
 | F-015, F-016, F-017 | WS-1/WS-3 external validation evidence index |
-| F-011, F-014, F-022 | WS-2/WS-4 only if scope expands |
+| F-011, F-042 | WS-2/WS-4 and medical/statistical review before any filing-facing expansion |
+| F-022 | WS-3/WS-4 ARS scope review before promoting additional analyses |
 | F-020, F-021 | WS-3 exploratory inventory in standards pack |
 
 ---
@@ -253,3 +266,10 @@ Under `docs/PRODUCT_CLAIM.md` Path A and the residual register above:
 | Version | Date | Change |
 |---|---|---|
 | 1.0 | 2026-07-09 | Initial residual memo for Path A / v0.1.0-demo-rc.1 train |
+| 1.1 | 2026-08-03 | Section 3 corrections, F-011 observed-baseline update, and F-042 pain/RT residual |
+| 1.2 | 2026-08-03 | F-042 approval-ready specification: corrected pain algorithm, CM+PR union, TTUMOR ITT and SAP-native T-11 mappings |
+| 1.3 | 2026-08-03 | F-042 single-author governance: accountable-author Path A decision, disclosed non-independence and external-review boundary |
+| 1.4 | 2026-08-04 | F-042 adopted-rule implementation, CM+PR staging, TTUMOR ITT and SAP-native T-11 mapping; final full-DAG/reseal pending |
+| 1.5 | 2026-08-04 | Full-DAG/reseal/CI closure and governance handoff; external qualified review remains required |
+| 1.6 | 2026-08-04 | Statistical-governance review found and remediated GOV-STAT-01; T-11-5 subject-level SAS/R parity is now a release condition |
+| 1.7 | 2026-08-04 | F-014 resolved with 10 ResultDisplays / 18 AnalysisResults, controlled-output binding, covariate declarations, disclosure, and an executable Define/ARM contract |

@@ -1,14 +1,17 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: A_adex_generation.sas
-   Version: 2.2.0
+   Version: 2.3.0
    Author: Antony Bevan, Clinical Programming
-   Date: 2026-05-27
+   Date: 2026-05-27 (ADaM dens 2026-07-09)
    Standard: ADaMIG v1.3 BDS
    Input: sdtm.ex, adam.adsl
    Output: adam.adex
    Description: Characterizes cycle-level and cumulative drug exposure, BSA resets,
                 dose adjustments, delays, and relative dose intensity (RDI).
+
+   ADaM dens: one subject-level BDS spine per ADSL SAFFL='Y'; TRT01P from ADSL
+   (DM arm). EX used for dose metrics only — never for treatment arm (F-028).
    ============================================================================= */
 
 /* PGMDIR guard: define only when running standalone; master driver pre-defines this. */

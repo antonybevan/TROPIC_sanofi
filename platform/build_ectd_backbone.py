@@ -106,7 +106,9 @@ def classify(rel: str):
     if base == "bdrg.pdf":
         return ("data-tabulation-data-reviewers-guide", "us")
     if base == "blankcrf.pdf":
-        return ("annotated-crf", "us")
+        # Source (blank) CRF — NOT an annotated CRF (Path A: no aCRF claim,
+        # PRODUCT_CLAIM §8). Filed with the CSR body, never tagged annotated-crf.
+        return ("study-report-body", "ich")
     is_define_xml = base.startswith("define") and ext == ".xml"
     if is_define_xml and "/analysis/adam/" in p:
         return ("analysis-data-definition", "us")

@@ -17,6 +17,23 @@ from datetime import datetime, timezone
 # The tracked data-free Module 5 preview must only change when content changes, not on every rebuild.
 _PDF_DATE = datetime(2026, 6, 17, tzinfo=timezone.utc)
 
+# The package renderer intentionally uses the standard Helvetica/Latin-1 PDF
+# font for deterministic, portable output.  Convert the symbols used by the
+# reviewer Markdown to readable ASCII before the font encoder sees them;
+# silently emitting '?' changes clinical thresholds and is not acceptable.
+_ASCII_REPLACEMENTS = {
+    "\u2013": "-", "\u2014": "--", "\u2011": "-", "\u2212": "-",
+    "\u201c": '"', "\u201d": '"', "\u2018": "'", "\u2019": "'",
+    "\u2022": "*", "\u2026": "...", "\u00b7": "*",
+    "\u2020": "(1) ", "\u2021": "(2) ",
+    "\u00a7": "Section ", "\u2190": "<-", "\u2192": "->",
+    "\u2194": "<->", "\u21d2": "=>", "\u2260": "!=",
+    "\u2264": "<=", "\u2265": ">=", "\u2248": "~", "\u2208": "in",
+    "\u2227": "and", "\u00b1": "+/-", "\u00d7": "x",
+    "\u03bc": "u", "\u00b5": "u", "\u00b2": "2", "\u00b3": "3",
+    "\u2033": '"',
+}
+
 def clean_text(text, counter=None):
     """Replaces Unicode characters not supported by standard latin-1/Helvetica in FPDF.
 
@@ -24,17 +41,8 @@ def clean_text(text, counter=None):
     substituted with '?' -- a rendered reviewer's guide/CSR is meant to accurately represent its
     markdown source, so a caller can report how many characters were altered instead of that
     substitution being completely invisible."""
-    text = text.replace('\u2013', '-')
-    text = text.replace('\u2014', '--')
-    text = text.replace('\u201c', '"')
-    text = text.replace('\u201d', '"')
-    text = text.replace('\u2018', "'")
-    text = text.replace('\u2019', "'")
-    text = text.replace('\u2022', '*')
-    text = text.replace('\u2026', '...')
-    text = text.replace('\u2020', '[dagger]')
-    text = text.replace('\u2021', '[double-dagger]')
-    text = text.replace('\xb7', '*')
+    for source, replacement in _ASCII_REPLACEMENTS.items():
+        text = text.replace(source, replacement)
     text = text.replace('\xe0', 'a')
     text = text.replace('\xe9', 'e')
     # Clean other non-latin-1 characters
@@ -48,6 +56,13 @@ def clean_text(text, counter=None):
             if counter is not None:
                 counter[0] += 1
     return "".join(cleaned)
+
+
+def clean_markdown(text, counter=None):
+    """Return readable plain text for every Markdown block type."""
+    cleaned = clean_text(text, counter)
+    cleaned = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', cleaned)
+    return cleaned.replace('**', '').replace('__', '').replace('*', '').replace('`', '')
 
 def md_to_pdf(md_path, pdf_path):
     """Converts a Markdown file to a styled PDF using fpdf2."""
@@ -87,7 +102,7 @@ def md_to_pdf(md_path, pdf_path):
             is_sep = all(c in '|- :+*' for c in line_str) and len(line_str.replace('|', '').strip()) > 0
             if is_sep:
                 continue
-            cells = [clean_text(c.strip(), replaced) for c in line_str.split('|')[1:-1]]
+            cells = [clean_markdown(c.strip(), replaced) for c in line_str.split('|')[1:-1]]
             table_data.append(cells)
             in_table = True
             continue
@@ -134,7 +149,7 @@ def md_to_pdf(md_path, pdf_path):
                 if not line_str:
                     continue
             pdf.set_font("helvetica", "I", size=9)
-            pdf.multi_cell(0, 5, clean_text(line_str, replaced))
+            pdf.multi_cell(0, 5, clean_markdown(line_str, replaced))
             pdf.set_font("helvetica", size=10)
             pdf.ln(2)
             continue
@@ -142,25 +157,25 @@ def md_to_pdf(md_path, pdf_path):
         if line_str.startswith('# '):
             pdf.ln(4)
             pdf.set_font("helvetica", "B", size=15)
-            pdf.multi_cell(0, 8, clean_text(line_str[2:], replaced))
+            pdf.multi_cell(0, 8, clean_markdown(line_str[2:], replaced))
             pdf.set_font("helvetica", size=10)
             pdf.ln(2)
         elif line_str.startswith('## '):
             pdf.ln(3)
             pdf.set_font("helvetica", "B", size=12)
-            pdf.multi_cell(0, 7, clean_text(line_str[3:], replaced))
+            pdf.multi_cell(0, 7, clean_markdown(line_str[3:], replaced))
             pdf.set_font("helvetica", size=10)
             pdf.ln(2)
         elif line_str.startswith('### '):
             pdf.ln(2)
             pdf.set_font("helvetica", "B", size=11)
-            pdf.multi_cell(0, 6, clean_text(line_str[4:], replaced))
+            pdf.multi_cell(0, 6, clean_markdown(line_str[4:], replaced))
             pdf.set_font("helvetica", size=10)
             pdf.ln(2)
         elif line_str.startswith('#### '):
             pdf.ln(2)
             pdf.set_font("helvetica", "B", size=10)
-            pdf.multi_cell(0, 5, clean_text(line_str[5:], replaced))
+            pdf.multi_cell(0, 5, clean_markdown(line_str[5:], replaced))
             pdf.set_font("helvetica", size=10)
             pdf.ln(1)
         elif line_str.startswith('---'):
@@ -170,14 +185,10 @@ def md_to_pdf(md_path, pdf_path):
             pdf.line(x, y + 2, x + 190, y + 2)
             pdf.ln(4)
         elif line_str.startswith('* ') or line_str.startswith('- '):
-            pdf.multi_cell(0, 5, " * " + clean_text(line_str[2:], replaced))
+            pdf.multi_cell(0, 5, " * " + clean_markdown(line_str[2:], replaced))
             pdf.ln(1)
         else:
-            cleaned = clean_text(line_str, replaced)
-            # Remove markdown links [label](url) -> label
-            cleaned = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', cleaned)
-            cleaned = cleaned.replace('**', '').replace('*', '').replace('`', '')
-            pdf.multi_cell(0, 5, cleaned)
+            pdf.multi_cell(0, 5, clean_markdown(line_str, replaced))
             pdf.ln(1.5)
             
     # Handle end of file table edge case

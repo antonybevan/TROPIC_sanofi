@@ -1,6 +1,11 @@
-# Program: v_adex_validation.R | Version: 2.0 | Author: Antony Bevan, Clinical Programming | Date: 2026-05-23
+# Program: v_adex_validation.R | Version: 2.1.0
+# Author: Antony Bevan, Clinical Programming | Date: 2026-05-23
+# (ADaM dens contract 2026-07-09)
 # Standard: ADaMIG v1.3 BDS | renv.lock hash: locked
 # Description: R Independent Validation double-programming for TROPIC ADEX.
+#
+# Dens: subject-level BDS spine = ADSL SAFFL=="Y"; TRT01P from ADSL (DM arm).
+# EX used for dose metrics only — never for treatment arm (F-028).
 
 library(dplyr)
 library(haven)

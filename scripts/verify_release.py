@@ -7,18 +7,129 @@ Exit 0 only if all hard checks pass.
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
+import subprocess
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+SEAL_SELF_PATH_PREFIXES = (
+    "platform/release_run_manifest/",
+    "platform/release_candidate/",
+    "docs/RELEASE_RUN_MANIFEST.md",
+    "docs/RELEASE_CANDIDATE_CHECKLIST.md",
+    "06_qc_evidence/audit/output_hash_binding.csv",
+)
 
 
 def load(rel: str):
     path = ROOT / rel
     if not path.is_file():
         return None
-    return json.loads(path.read_text(encoding="utf-8"))
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+
+
+def sha256(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def git_head() -> str:
+    try:
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True, stderr=subprocess.DEVNULL
+        ).strip()
+    except (OSError, subprocess.CalledProcessError):
+        return ""
+
+
+def porcelain_path(line: str) -> str:
+    body = line[3:] if len(line) >= 4 else line
+    if " -> " in body:
+        body = body.split(" -> ", 1)[1]
+    return body.strip()
+
+
+def is_seal_self_path(path: str) -> bool:
+    return any(path == prefix or path.startswith(prefix) for prefix in SEAL_SELF_PATH_PREFIXES)
+
+
+def git_material_worktree_clean() -> bool:
+    """Match the release-manifest dirty gate: ignore files rewritten by sealing itself."""
+    try:
+        status = subprocess.check_output(
+            ["git", "status", "--porcelain=v1"], cwd=ROOT, text=True, stderr=subprocess.DEVNULL
+        )
+        material_lines = [
+            line for line in status.splitlines()
+            if line and not is_seal_self_path(porcelain_path(line))
+        ]
+        return not material_lines
+    except (OSError, subprocess.CalledProcessError):
+        return False
+
+
+def manifest_sha256(manifest: dict) -> str:
+    """Recompute the canonical release-manifest self-seal."""
+    unsigned = dict(manifest)
+    unsigned.pop("manifest_sha256", None)
+    encoded = json.dumps(unsigned, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def sealed_source_problems(manifest: dict) -> list[str]:
+    """Return changed/missing source files recorded by the release seal.
+
+    Only controls and programs are checked: those are versioned source available in a
+    bare clone. Data-bearing and runtime artifact groups are deliberately excluded.
+    """
+    problems = []
+    artifacts = manifest.get("artifacts") or {}
+    for group in ("controls", "programs"):
+        for row in artifacts.get(group) or []:
+            rel = row.get("path")
+            expected = row.get("sha256")
+            if not rel or not expected:
+                problems.append(f"{group}: invalid seal entry {row!r}")
+                continue
+            path = ROOT / rel
+            if not path.is_file():
+                problems.append(f"{rel}: missing")
+            elif sha256(path) != expected:
+                problems.append(rel)
+    return problems
+
+
+def source_tree_sha256(manifest: dict) -> str:
+    """Recompute the seal's source-tree digest from files currently on disk.
+
+    Only rows whose on-disk bytes still match the recorded hash enter the digest,
+    so a single changed source file both fails sealed_source_problems() and
+    changes this digest. Seal outputs are not in controls/programs, so the digest
+    is stable across the seal's own commit (audit CRITICAL: a tracked seal can
+    never satisfy a recorded-head == current-HEAD equality check).
+    """
+    rows = []
+    artifacts = manifest.get("artifacts") or {}
+    for group in ("controls", "programs"):
+        for row in artifacts.get(group) or []:
+            rel = row.get("path")
+            expected = row.get("sha256")
+            if not rel or not expected:
+                continue
+            path = ROOT / rel
+            if path.is_file() and sha256(path) == expected:
+                rows.append((rel, expected))
+    h = hashlib.sha256()
+    h.update(b"\n".join(f"{rel}\0{expected}".encode("utf-8") for rel, expected in sorted(rows)))
+    return h.hexdigest()
 
 
 def main() -> int:
@@ -48,6 +159,8 @@ def main() -> int:
     r = load("platform/reconciliation_status.json") or {}
     add("recon.PASS", r.get("overall") == "PASS", str(r.get("overall")))
     add("recon.not_sim", r.get("simulated") is False, str(r.get("simulated")))
+    f042_recon = (r.get("endpoint_controls") or {}).get("F042_PAIN_RESPONSE")
+    add("recon.F042_PAIN_RESPONSE", f042_recon == "PASS", str(f042_recon))
 
     rr = load("platform/results_reconciliation_status.json") or {}
     add("results_recon.PASS", rr.get("overall") == "PASS", str(rr.get("overall")))
@@ -72,6 +185,23 @@ def main() -> int:
     add("log_cleanliness.PASS", lg.get("status") == "PASS", str(lg.get("status")))
 
     rm = load("platform/release_run_manifest/release_run_manifest.json") or {}
+    expected_manifest_sha = rm.get("manifest_sha256", "")
+    actual_manifest_sha = manifest_sha256(rm) if rm else ""
+    add("release_manifest.seal", bool(expected_manifest_sha) and expected_manifest_sha == actual_manifest_sha,
+        "manifest SHA-256 does not match payload" if expected_manifest_sha != actual_manifest_sha else "")
+    sealed_tree = (rm.get("source_control") or {}).get("source_tree_sha256")
+    actual_tree = source_tree_sha256(rm) if rm else ""
+    add("release_manifest.source_tree_matches", bool(sealed_tree) and sealed_tree == actual_tree,
+        "sealed source-tree digest does not match the current checkout"
+        if sealed_tree != actual_tree else "")
+    recorded_clean = (rm.get("source_control") or {}).get("dirty") is False
+    add("release_manifest.recorded_clean_worktree", recorded_clean,
+        str((rm.get("source_control") or {}).get("dirty")))
+    add("release_manifest.current_material_worktree_clean", git_material_worktree_clean(),
+        "git worktree has material dirt outside release seal outputs")
+    source_problems = sealed_source_problems(rm) if rm else ["release manifest missing"]
+    add("release_manifest.source_hashes", not source_problems,
+        ", ".join(source_problems[:8]) + (" ..." if len(source_problems) > 8 else ""))
     add("release_manifest.PASS", rm.get("status") == "PASS", str(rm.get("status")))
     add(
         "release_manifest.grade",

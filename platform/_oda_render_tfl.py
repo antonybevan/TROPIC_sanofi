@@ -24,6 +24,7 @@ sys.path.insert(0, PROJECT_ROOT)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # platform/, for oda_broker
 
 import oda_broker  # noqa: E402 — governed helper for ODA connect/teardown (slot hygiene)
+import seed_sdtm  # noqa: E402 — reuses ODA mkdir helper before uploads
 
 # No developer account id is hard-coded (roadmap #10): default to a ~/TROPIC layout that is
 # resolved against the connected account's $HOME after login; override via TROPIC_ODA_PROJ_ROOT.
@@ -182,10 +183,18 @@ def main(argv=None):
             if (not TFL_ONLY) or os.path.basename(f) in ("T_tfl_generation.sas", "00_config.sas")
         ]
         print(f"Uploading {len(upload_pgms)} SAS programs...", flush=True)
+        if not seed_sdtm._ensure_remote_dir(sas, PGMDIR_ODA):
+            sys.exit(f"ERROR: could not create ODA SAS program directory: {PGMDIR_ODA}")
         for f in upload_pgms:
             sas.upload(f, f"{PGMDIR_ODA}/{os.path.basename(f)}")
         if not TFL_ONLY:
             print(f"Uploading {len(cbz_xpts)} CbzP bridge XPTs...", flush=True)
+            if not seed_sdtm._ensure_remote_dir(sas, CBZ_ODA):
+                sys.exit(f"ERROR: could not create ODA CbzP bridge directory: {CBZ_ODA}")
+            if not seed_sdtm._ensure_remote_dir(sas, ADAM_ODA):
+                sys.exit(f"ERROR: could not create ODA ADaM directory: {ADAM_ODA}")
+            if not seed_sdtm._ensure_remote_dir(sas, f"{ADAM_ODA}/sdtm_mapped"):
+                sys.exit(f"ERROR: could not create ODA mapped SDTM directory: {ADAM_ODA}/sdtm_mapped")
             sas.submit(f"""
 data _null_;
   if fileexist("{PROJ_ROOT_ODA}/01_source_data/cbzp_reconstructed") = 0 then
@@ -226,6 +235,8 @@ filename drv "{PGMDIR_ODA}/00_master_driver.sas";
             print("\n=== Skipping master driver (--tfl-only); using existing adam.* on ODA ===",
                   flush=True)
 
+        if not seed_sdtm._ensure_remote_dir(sas, SASFIG_ODA):
+            sys.exit(f"ERROR: could not create ODA SAS figure directory: {SASFIG_ODA}")
         print("Purging prior ODA TFL outputs before render...", flush=True)
         _purge_remote_outputs(sas)
         print("\n=== Running T_tfl_generation.sas ===", flush=True)

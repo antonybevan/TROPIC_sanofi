@@ -42,12 +42,12 @@ sap_full_catalog:
   tables:
     - { id: T-11-1, title: "Primary efficacy summary — OS (SAP catalog)" }
     - { id: T-11-2, title: "Primary efficacy summary — PFS (SAP catalog)" }
-    - { id: T-11-3, title: "Secondary efficacy summary — TTPAIN (SAP catalog)" }
-    - { id: T-11-4, title: "Secondary efficacy summary — additional (SAP catalog)" }
-    - { id: T-11-5, title: "Secondary efficacy summary — additional (SAP catalog)" }
-    - { id: T-11-6, title: "KM Analysis of Time to PSA Progression" }
-    - { id: T-11-7, title: "KM Analysis of Time to Tumor Progression" }
-    - { id: T-11-8, title: "Best Clinical Response Endpoints" }
+    - { id: T-11-3, title: "PSA Response Rate" }
+    - { id: T-11-4, title: "Objective Response Rate per RECIST v1.0" }
+    - { id: T-11-5, title: "Pain Response Rate" }
+    - { id: T-11-6, title: "KM Analysis of Time to Tumor Progression" }
+    - { id: T-11-7, title: "KM Analysis of Time to PSA Progression" }
+    - { id: T-11-8, title: "Time to Pain Progression" }
     - { id: T-12-1, title: "Subgroup efficacy table (SAP catalog)" }
     - { id: T-12-2, title: "Subgroup efficacy table (SAP catalog)" }
     - { id: T-13-1, title: "Response / PSA table (SAP catalog)" }
@@ -106,24 +106,39 @@ controlled_in_scope:
     basis: "SAP v4.0 §10 / Appendix D (methodological demonstration)"
   - id: T-11-6
     class: table
-    title: KM Analysis of Time to PSA Progression
+    title: KM Analysis of Time to Tumor Progression
     disposition: sap_full_catalog
     basis: "SAP v4.0 §§4.3–5.3 / Appendix D"
   - id: T-11-7
     class: table
-    title: KM Analysis of Time to Tumor Progression
+    title: KM Analysis of Time to PSA Progression
     disposition: sap_full_catalog
     basis: "SAP v4.0 §§4.3–5.3 / Appendix D"
+  - id: T-11-3
+    class: table
+    title: PSA Response Rate
+    disposition: sap_full_catalog
+    basis: "SAP v4.0 §§5.2, 10.2 / Appendix D Table 22"
+  - id: T-11-4
+    class: table
+    title: Objective Response Rate per RECIST v1.0
+    disposition: sap_full_catalog
+    basis: "SAP v4.0 §§5.3, 10.3 / Appendix D Table 22"
+  - id: T-11-5
+    class: table
+    title: Pain Response Rate
+    disposition: sap_full_catalog
+    basis: "SAP v4.0 §§6.4, 10.4 / Appendix D Table 22"
   - id: T-11-8
     class: table
-    title: Best Clinical Response Endpoints
+    title: Time to Pain Progression
     disposition: sap_full_catalog
-    basis: "SAP v4.0 §§4.3–5.3 / Appendix D"
+    basis: "SAP v4.0 §§6.5, 10.4 / Appendix D Table 22"
   - id: T-11-8b
     class: table
     title: Objective Response Rate - Response-Evaluable Denominator
     disposition: approved_extension
-    basis: "Review-board SR-1 sensitivity; companion to T-11-8, not a silent extra"
+    basis: "Review-board SR-1 sensitivity; explicit ORR response-evaluable extension, not a silent extra"
   - id: T-17-1
     class: table
     title: Relative Dose Intensity Category Distribution
@@ -168,18 +183,12 @@ deferred_not_in_scope:
     reason: "Primary OS table shell not separately programmed; OS evidence delivered via F-11-1 + results recon"
   - id: T-11-2
     reason: "Primary PFS table shell not separately programmed; PFS evidence delivered via F-11-2 + results recon"
-  - id: T-11-3
-    reason: "TTPAIN standalone table deferred; parameter exists in ADTTE"
-  - id: T-11-4
-    reason: "SAP catalog secondary table not programmed in current release scope"
-  - id: T-11-5
-    reason: "SAP catalog secondary table not programmed in current release scope"
   - id: T-12-1
     reason: "Subgroup efficacy tables deferred; F-12-1 forest is the controlled subgroup display"
   - id: T-12-2
     reason: "Subgroup efficacy tables deferred"
   - id: T-13-1
-    reason: "Additional response/PSA tables deferred; F-13-1 + T-11-8 cover controlled PSA/response displays"
+    reason: "Additional response/PSA tables deferred; F-13-1 + T-11-3/T-11-4 cover controlled PSA/response displays"
   - id: T-13-2
     reason: "Deferred pending approved shells"
   - id: T-13-3
@@ -211,9 +220,9 @@ out_of_scope_explicit:
     reason: "False placeholder listing removed (F-004). No listing is in controlled scope."
 
 sas_companion_figures:
-  generation_scope: out_of_dag_capability_demo
+  generation_scope: in_dag_real_sas_companion
   policy: |
-    SAS companion PNGs under 05_outputs/tfl/output/figures/sas/ are capability demos rendered by
-    platform/_oda_render_tfl.py outside config/study_manifest.yaml. They are inventoried and
-    hashed but do not gate controlled-scope completeness or release-candidate TFL promotion.
+    SAS companion PNGs under 05_outputs/tfl/output/figures/sas/ are rendered by the real-SAS
+    Stage 14 session, with figure-driving CSVs reconciled against the R track before release
+    sealing. platform/_oda_render_tfl.py remains a manual diagnostic renderer only.
   linked_primary_ids: [F-11-1, F-11-2, F-12-1, F-13-1, F-14-1, F-17-1]

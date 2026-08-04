@@ -2,15 +2,15 @@
 
 # TROPIC — Controlled Clinical Biometrics Demonstration
 
-### Study EFC6193 / XRP6258 · NCT00417079  
-**Cabazitaxel vs Mitoxantrone in mCRPC — Phase III RCT**  
+### Study EFC6193 / XRP6258 · NCT00417079
+**Cabazitaxel vs Mitoxantrone in mCRPC — Phase III RCT**
 *Sanofi · de Bono et al., Lancet 2010*
 
 [![Claim](https://img.shields.io/badge/Product-Path%20A%20controlled%20demo-important?style=flat-square)](docs/PRODUCT_CLAIM.md)
 [![CDISC](https://img.shields.io/badge/CDISC-ADaMIG%20v1.3%20%7C%20SDTMIG%20v3.4-005A9C?style=flat-square)](https://www.cdisc.org/)
 [![Define-XML](https://img.shields.io/badge/Define--XML-2.1%20%2B%20ARM-005A9C?style=flat-square)](03_metadata/define/)
 [![eCTD](https://img.shields.io/badge/eCTD-Module%205%20style-005A9C?style=flat-square)](08_submission_package/m5/)
-[![Release](https://img.shields.io/badge/Seal-v0.1.0--demo--rc.1-success?style=flat-square)](docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md)
+[![Release](https://img.shields.io/badge/Seal-v0.2.0--portfolio-success?style=flat-square)](docs/RELEASE_NOTE_v0.2.0-portfolio.md)
 
 </div>
 
@@ -27,10 +27,14 @@
 | Risk-tiered admiral third engine (ADSL, OS, PFS) | “Independent clinical confirmation of CbzP benefit” |
 | Hash-sealed demo release-candidate under Path A | “Part 11 compliant” |
 
-**Binding claim:** [`docs/PRODUCT_CLAIM.md`](docs/PRODUCT_CLAIM.md)  
-**Sealed release narrative:** [`docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md`](docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md)  
-**What GitHub is allowed to contain:** [`docs/REPO_SURFACE_POLICY.md`](docs/REPO_SURFACE_POLICY.md)  
+**Binding claim:** [`docs/PRODUCT_CLAIM.md`](docs/PRODUCT_CLAIM.md)
+**Current release narrative:** [`docs/RELEASE_NOTE_v0.2.0-portfolio.md`](docs/RELEASE_NOTE_v0.2.0-portfolio.md)
+**What GitHub is allowed to contain:** [`docs/REPO_SURFACE_POLICY.md`](docs/REPO_SURFACE_POLICY.md)
 **10-minute interviewer walk:** [`docs/INTERVIEWER_GUIDE.md`](docs/INTERVIEWER_GUIDE.md)
+
+> `v0.1.0-demo-rc.1` remains an immutable historical Path A tag record. The
+> current portfolio release is `v0.2.0-portfolio`, with its connected-evidence
+> disposition recorded in [`SECTION_05_PORTFOLIO_FINALIZATION_AUDIT_2026-08-04.md`](06_qc_evidence/audit/section_reviews/SECTION_05_PORTFOLIO_FINALIZATION_AUDIT_2026-08-04.md).
 
 > **Portfolio surface:** this repo tracks the **review package face**, **spine programs**, **config**, and a **minimal seal pack** — not patient data, not secrets, not regenerable factory status piles. That is standard practice, not incompleteness.
 
@@ -46,12 +50,12 @@ There are **two surfaces**. Industry does not present a Git monorepo as “the s
 | 2 | [`docs/PRODUCT_CLAIM.md`](docs/PRODUCT_CLAIM.md) | What you may assert — Path A only |
 | 3 | [`08_submission_package/README.md`](08_submission_package/README.md) → [`m5/`](08_submission_package/m5/) | **Review surface** (Module 5 style) |
 | 4 | [`07_reviewer_explanation/guides/`](07_reviewer_explanation/guides/) | ADRG · SDRG · BDRG · SDSP |
-| 5 | [`docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md`](docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md) | Seal anchors for the demo RC |
+| 5 | [`docs/RELEASE_NOTE_v0.2.0-portfolio.md`](docs/RELEASE_NOTE_v0.2.0-portfolio.md) | Current portfolio seal and review anchors |
 | 6 | `python3 scripts/verify_release.py` | Re-check machine grades (no SAS needed) |
 | 7 | `python3 platform/cibuild.py --demo` | Bare-clone smoke (no patient data) |
 
-**Navigation index:** [`docs/INDEX.md`](docs/INDEX.md) — Reviewer · Engineer · QC  
-**Repo surface policy:** [`docs/REPO_SURFACE_POLICY.md`](docs/REPO_SURFACE_POLICY.md) — what is / isn’t in git  
+**Navigation index:** [`docs/INDEX.md`](docs/INDEX.md) — Reviewer · Engineer · QC
+**Repo surface policy:** [`docs/REPO_SURFACE_POLICY.md`](docs/REPO_SURFACE_POLICY.md) — what is / isn’t in git
 **Script map:** [`docs/SCRIPT_MAP.md`](docs/SCRIPT_MAP.md) · **Factory triage:** [`platform/README.md`](platform/README.md)
 
 ### Interview line (use this)
@@ -91,7 +95,7 @@ There are **two surfaces**. Industry does not present a Git monorepo as “the s
 
 ## Repository structure (evidence chain + factory)
 
-The numbered folders are an **internal evidence-chain model** (source → package).  
+The numbered folders are an **internal evidence-chain model** (source → package).
 The **FDA-shaped tree** lives *inside* `08_submission_package/` only.
 
 ```text
@@ -101,7 +105,7 @@ TROPIC/
 ├── README.md                         ← you are here
 ├── docs/PRODUCT_CLAIM.md             ← binding Path A claim
 ├── docs/INDEX.md                     ← Reviewer / Engineer / QC tours
-├── docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md
+├── docs/RELEASE_NOTE_v0.2.0-portfolio.md
 │
 │  ── LAYER 1  Review surface ─────────────────────────────────
 ├── 08_submission_package/            ← THE deliverable face
@@ -141,8 +145,8 @@ TROPIC/
 | **MP (control)** | 371 | Real de-identified SDTM (Sanofi 2013 / Project Data Sphere) | Reconciled ADaM (`*_prod.xpt` / `*_v.xpt`); **not committed to git** |
 | **CbzP (comparator)** | 378 | **Synthetic / reconstructed** (Guyot OS/PFS; PH secondary) | TFL merge only — never in reconciled package ADaM |
 
-- **Programming authority:** `02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx` (lock memo: package is **not** submission-passed).  
-- **Bare clone:** real MP SDTM and ODA credentials are not in git — see [`00_governance/REPRODUCIBILITY.md`](00_governance/REPRODUCIBILITY.md). Use `--demo` for a data-free smoke path.  
+- **Programming authority:** `02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx` (lock memo: package is **not** submission-passed).
+- **Bare clone:** real MP SDTM and ODA credentials are not in git — see [`00_governance/REPRODUCIBILITY.md`](00_governance/REPRODUCIBILITY.md). Use `--demo` for a data-free smoke path.
 - **SAS mode honesty:** check `sas_execution_mode` in `platform/pipeline_health.json`. Default (no engine) is `sim` — zero-diff recon is **tautological**. Genuine dual-language evidence requires `oda` / `local` with provenance guard PASS.
 
 Full Guyot validation notes: [`01_source_data/guyot_validation_report.md`](01_source_data/guyot_validation_report.md).
@@ -153,7 +157,7 @@ Full Guyot validation notes: [`01_source_data/guyot_validation_report.md`](01_so
 
 ### Prerequisites
 - **R 4.6.0+** · **Python 3.10+**
-- **SAS 9.4** or **SAS OnDemand for Academics** *(optional — default is simulation mode)*  
+- **SAS 9.4** or **SAS OnDemand for Academics** *(optional — default is simulation mode)*
   ODA setup: [`docs/runbooks/ODA_GUIDE.md`](docs/runbooks/ODA_GUIDE.md)
 
 ### Run / verify
@@ -181,7 +185,7 @@ Multi-study proof: `python3 platform/cibuild.py --study DEMO02` — see [`studie
 
 ## Pipeline (factory summary)
 
-Manifest-driven **~30-stage DAG** (`config/study_manifest.yaml` · `platform/cibuild.py`):
+Manifest-driven **34-stage DAG** (`config/study_manifest.yaml` · `platform/cibuild.py`):
 
 ```text
 01 real SDTM (local, not in git)
@@ -196,11 +200,11 @@ Manifest-driven **~30-stage DAG** (`config/study_manifest.yaml` · `platform/cib
   → log cleanliness + release-run hash seal
 ```
 
-**Dual-language model:** SAS `*_prod.xpt` ↔ R `*_v.xpt` on real MP only.  
-**Third track (risk-based):** admiral for ADSL + OS/PFS — see [`06_qc_evidence/reconciliation/ADMIRAL_RECONCILIATION.md`](06_qc_evidence/reconciliation/ADMIRAL_RECONCILIATION.md).  
+**Dual-language model:** SAS `*_prod.xpt` ↔ R `*_v.xpt` on real MP only.
+**Third track (risk-based):** admiral for ADSL + OS/PFS — see [`06_qc_evidence/reconciliation/ADMIRAL_RECONCILIATION.md`](06_qc_evidence/reconciliation/ADMIRAL_RECONCILIATION.md).
 **Single-author tracks** = implementation independence, **not** organizational GxP double programming.
 
-Architecture redesign map: [`docs/PIPELINE_ARCHITECTURE_REDESIGN.md`](docs/PIPELINE_ARCHITECTURE_REDESIGN.md)  
+Architecture redesign map: [`docs/PIPELINE_ARCHITECTURE_REDESIGN.md`](docs/PIPELINE_ARCHITECTURE_REDESIGN.md)
 Operating model: [`docs/BIOMETRICS_DELIVERY_OPERATING_MODEL.md`](docs/BIOMETRICS_DELIVERY_OPERATING_MODEL.md)
 
 ---
@@ -220,10 +224,10 @@ Paths: development `04_analysis_datasets/adam/` · package `08_submission_packag
 
 ### TFL (catalog-controlled)
 
-In-scope IDs live in [`config/tfl_output_catalog.yaml`](config/tfl_output_catalog.yaml).  
+In-scope IDs live in [`config/tfl_output_catalog.yaml`](config/tfl_output_catalog.yaml).
 Gallery / outputs: [`05_outputs/tfl/`](05_outputs/tfl/) · package CSR appendices under `m5/53-clin-stud-rep/…`.
 
-Representative figures: KM OS/PFS · forest · waterfall · swimmer · Optimus ER.  
+Representative figures: KM OS/PFS · forest · waterfall · swimmer · Optimus ER.
 Tables: T-11 efficacy · T-17 Optimus · T-20 AE summary · T-21 lab shifts.
 
 ### Reviewer guides
@@ -237,7 +241,7 @@ Tables: T-11 efficacy · T-17 Optimus · T-20 AE summary · T-21 lab shifts.
 
 ### Standards alignment (demonstration scope)
 
-CDISC ADaMIG 1.3 · SDTMIG 3.4 uplift · Define-XML 2.1 + ARM · FDA sdTCG Module 5 layout · BIMO clinsite pattern · Dataset-JSON / ARS / USDM additive layers.  
+CDISC ADaMIG 1.3 · SDTMIG 3.4 uplift · Define-XML 2.1 + ARM · FDA sdTCG Module 5 layout · BIMO clinsite pattern · Dataset-JSON / ARS / USDM additive layers.
 **Pattern demonstrated ≠ certified commercial validator clearance.** Details: historical section content retained in package README and ADRG.
 
 ---
@@ -251,7 +255,7 @@ CDISC ADaMIG 1.3 · SDTMIG 3.4 uplift · Define-XML 2.1 + ARM · FDA sdTCG Modul
 | `--use-cached-sas` | `cached` | Prior prod XPT only — not a new SAS run |
 | default / no engine | `sim` | **Not** double programming |
 
-Recorded in `platform/pipeline_health.json`. Frozen GREEN ODA snapshot: [`platform/evidence/`](platform/evidence/).  
+Recorded in `platform/pipeline_health.json`. Frozen GREEN ODA snapshot: [`platform/evidence/`](platform/evidence/).
 Operator runbook: [`docs/runbooks/ODA_GUIDE.md`](docs/runbooks/ODA_GUIDE.md).
 
 ---

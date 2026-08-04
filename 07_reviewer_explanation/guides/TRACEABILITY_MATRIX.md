@@ -47,7 +47,7 @@ OS / PFS / TTSAE / TTPSA / TTUMOR inherit this limitation (SDRG §2).
 | **ADAE** | `A_adae_io_respec.sas` | `v_adae_io_validation.R` | `IG.ADAE` | TRTEMFL; **custom continuous-episode merging** (OCCDS v1.0 base; CQ02 hematologic irAE, ≤3-day gap, §7.7); AEOCCFL denominator flag; ATOXGR | `USUBJID,AESEQ` (unique) | ″ |
 | **ADLB** | `A_adlb_generation.sas` | `v_adlb_validation.R` | `IG.ADLB` | Analysis windows (§11.1.3); ATOXGR baseline→worst shift; ANL01FL; ANCNADIR / ANCRECDY (§10) | `USUBJID,PARAMCD,AVISITN,LBDY` (multiset) | ″ |
 | **ADRS** | `A_adrs_generation.sas` | `v_adrs_validation.R` | `IG.ADRS` | OVRLRESP (integrated RECIST v1.0 target+non-target+new-lesion, SAP v4.0 §10.3); BSGRESP (PCWG3 bone 2+2 — exploratory demonstration unless promoted by SAP amendment); PSPROG / PSARESP (SAP v4.0 §10.2); OBJRESP (SAP v4.0 §10.3) | `USUBJID,PARAMCD,AVISIT` (multiset) | ″ |
-| **ADTTE** | `A_adtte_generation.sas` | `v_adtte_validation.R` | `IG.ADTTE` | OS; PFS composite includes tumour, PSA, pain progression and death with NACT censoring; **TTSAE** (was `TTOS`); TTPAIN uses ITT + 5-of-7 diary evaluability; TTPSA uses ITT/randomization origin; TTUMOR uses ITT measurable-disease/randomization origin | `USUBJID,PARAMCD` (multiset) | ″ |
+| **ADTTE** | `A_adtte_generation.sas` | `v_adtte_validation.R` | `IG.ADTTE` | OS; PFS composite includes tumour, PSA, pain progression and death with NACT censoring plus last-evaluable/no-post-baseline censoring; **TTSAE** (was `TTOS`); TTPAIN uses ITT + 5-of-7 diary evaluability; TTPSA and TTUMOR use ITT/randomization origin; TTUMOR uses RECIST-only post-baseline assessments and excludes death milestones | `USUBJID,PARAMCD` (multiset) | ″ |
 | **CLINSITE** (BIMO) | `B_bimo_generation.sas` | `v_bimo_validation.R` | *(BIMO — not in ADaM define; documented in [BDRG](BDRG.md))* | Site-level roll-up of ADSL populations + ADAE safety: `N_RAND/N_SAF/N_ITT/N_PPROT/N_DEATH/N_SAE/N_TEAE` (per FDA BIMO TCG subset) | `STUDYID,SITEID` (unique) | ″ |
 
 **Reconciliation engine:** `06_qc_evidence/reconciliation/cross_lang_audit.R` (diffdf), **8 domains**.
@@ -79,7 +79,7 @@ variable-label artifacts for both tracks (`platform/gen_adam_labels.R`).
 **Not claimed:** full SAP Appendix D (21 IDs deferred with reasons).  
 **Regenerate local index (optional):** `python3 platform/build_tfl_output_index.py` (report is gitignored under portfolio surface policy).
 
-### 3.1 Controlled in-scope (18 IDs)
+### 3.1 Controlled in-scope (21 IDs)
 
 | Catalog ID | File / delivery form | Primary ADaM | Notes |
 |---|---|---|---|
@@ -90,10 +90,13 @@ variable-label artifacts for both tracks (`platform/gen_adam_labels.R`).
 | F-13-1 | `F-13-1_PSA_Waterfall.png` | ADLB PSA + ADSL | |
 | F-14-1 | `F-14-1_Swimmer_Plot.png` | ADEX + ADSL | |
 | F-17-1 | `F-17-1_Optimus_Scatter.png` | ADEX RDI + ADLB ANCNADIR | Synthetic/comparative caution |
-| T-11-6 | inside `T-11-Efficacy_Tables.txt` | ADTTE TTPSA | Catalog ID ≠ separate file per row |
-| T-11-7 | inside `T-11-Efficacy_Tables.txt` | ADTTE TTUMOR | |
-| T-11-8 | inside `T-11-Efficacy_Tables.txt` | ADRS | Best clinical response |
-| T-11-8b | inside `T-11-Efficacy_Tables.txt` | ADRS | ORR response-evaluable sensitivity |
+| T-11-3 | inside `T-11-Efficacy_Tables.txt` | ADRS/ADLB + ADSL | PSA response rate; observed baseline PSA denominator |
+| T-11-4 | inside `T-11-Efficacy_Tables.txt` | ADRS + ADSL | Confirmed ORR per RECIST v1.0; measurable-disease denominator |
+| T-11-5 | inside `T-11-Efficacy_Tables.txt` | PN/SV + ADSL | Pain response; CbzP explicitly N/A where PN is unavailable |
+| T-11-6 | inside `T-11-Efficacy_Tables.txt` | ADTTE TTUMOR | Catalog ID ≠ separate file per row |
+| T-11-7 | inside `T-11-Efficacy_Tables.txt` | ADTTE TTPSA | |
+| T-11-8 | inside `T-11-Efficacy_Tables.txt` | ADTTE TTPAIN | Time to pain progression; randomization origin |
+| T-11-8b | inside `T-11-Efficacy_Tables.txt` | ADRS | ORR response-evaluable sensitivity; explicit extension |
 | T-17-1 | inside `T-17-Optimus_Tables.txt` | ADEX | RDI categories |
 | T-17-2 | inside `T-17-Optimus_Tables.txt` | ADLB + ADEX | ANC nadir by G-CSF |
 | T-17-4 | inside `T-17-Optimus_Tables.txt` | ADEX/ADLB/ADTTE | Benefit–risk by RDI tertile |
@@ -102,7 +105,7 @@ variable-label artifacts for both tracks (`platform/gen_adam_labels.R`).
 | T-21-1 | inside `T-21-Lab_Shift_Tables.txt` | ADLB | CTCAE shift MP |
 | T-21-2 | inside `T-21-Lab_Shift_Tables.txt` | ADLB | CTCAE shift CbzP (synthetic arm display) |
 
-### 3.2 Explicitly deferred (21 IDs) — sample of policy
+### 3.2 Explicitly deferred (18 IDs) — sample of policy
 
 Not listed above = **not** Path A controlled delivery. Examples: standalone T-11-1/T-11-2 OS/PFS table shells (evidence via F-11-1/F-11-2 + results recon instead), F-12-2, T-12-*, many T-20 detail shells. Full list and reasons: `config/tfl_output_catalog.yaml` → `deferred_not_in_scope`.
 
@@ -125,18 +128,23 @@ that link key results to their ADaM data + method — the define-level complemen
 | ResultDisplay (define ARM) | Covers | This matrix's outputs |
 |---|---|---|
 | `RD.EFFICACY.SURVIVAL` | OS / PFS KM + Cox | `F-11-1`, `F-11-2`, `T-11` |
-| `RD.EFFICACY.SECONDARY` | Secondary efficacy (TTPSA/TTUMOR, response) | `T-11`, `ADRS`-derived |
+| `RD.EFFICACY.SECONDARY` | ITT secondary TTE analyses (TTPSA/TTUMOR/TTPAIN) | `T-11-6`, `T-11-7`, `T-11-8` |
+| `RD.EFFICACY.RESPONSE` | PSA, objective and pain response plus ORR sensitivity | `T-11-3`, `T-11-4`, `T-11-5`, `T-11-8b` |
 | `RD.SAFETY.TEAE` | TEAE summary | `T-20` |
 | `RD.EFFICACY.SUBGROUP` | OS treatment-effect subgroup hazard ratios | `F-12-1` |
 | `RD.EFFICACY.PSA.RESPONSE` | PSA best % change from baseline | `F-13-1` |
 | `RD.SAFETY.EXPOSURE` | Treatment exposure duration / cycles | `F-14-1` |
 | `RD.OPTIMUS.ER` | Project Optimus RDI vs ANC-nadir exposure-response | `F-17-1` |
-| `RD.SAFETY.LABSHIFT` | CTCAE grade shift, baseline → worst (ANC/PSA) | `T-21-1` |
+| `RD.OPTIMUS.TABLES` | RDI distribution, ANC/G-CSF and descriptive benefit-risk | `T-17-1`, `T-17-2`, `T-17-4` |
+| `RD.SAFETY.LABSHIFT` | CTCAE grade shift, baseline → worst | `T-21-1`, `T-21-2` |
 
-> **ARM coverage (2026-06-17).** ARM now spans **8 ResultDisplays / 10 AnalysisResults** — every
-> analysis display has a dedicated ResultDisplay linking result → method → ADaM dataset/variables
-> (each `Name` cites its TFL ID for ARM↔TFL traceability; referential integrity is gated by
-> `03_metadata/define/validate_define.py`). The analysis-population overview (`F-01`, legacy
+> **ARM coverage (2026-08-04).** ARM now spans **10 ResultDisplays / 18 AnalysisResults**.
+> Every controlled analysis output is mapped to a ResultDisplay except the analysis-population
+> flow diagram `F-01-1`, which is not a statistical analysis result. The response display
+> records the staged PN/SV dependency for T-11-5 and its exact subject-level
+> `F042_PAIN_RESPONSE` SAS/R control; all ResultDisplays carry the Path A synthetic-comparator
+> disclosure. Referential integrity and endpoint semantics are gated by
+> `validate_define.py`, `define_arm_contract.py`, and G02. The analysis-population overview (`F-01`, legacy
 > `CONSORT` filename) and the
 > discontinuation listing is intentionally **out of scope** (F-004 removed; no listing in
 > `config/tfl_output_catalog.yaml` controlled scope). Flow diagram `F-01-1` is out of ARM scope.
@@ -164,24 +172,25 @@ Stage numbers are **manifest-derived** (not hard-coded). Optional local gate map
 
 | Stage | Control | Evidence artifact |
 |---|---|---|
-| 13 (cross-language audit) | `cross_lang_audit.R` | `reconciliation_status.json`, reconciliation report |
-| 14 (admiral ADSL) | `admiral_adsl.R` | third-engine ADSL derivation evidence |
-| 15 (admiral ADTTE OS/PFS) | `admiral_adtte.R` | third-engine TTE derivation evidence |
-| 16 (admiral core reconciliation) | `admiral_reconcile.R` | `admiral_reconciliation_status.json` |
-| 17 (synthetic comparator bridge parity) | `check_cbzp_bridge.R` | CBZP RDS/XPT bridge parity status |
-| 18 (TFL) | `tfl_generation.R` | `05_outputs/tfl/output/tables/*`, `05_outputs/tfl/output/figures/*` |
-| 19 (numerical results reconciliation) | `results_reconcile.R` — SAS `PROC LIFETEST` vs R `survfit` (MP-arm KM medians / events / N) | `results_reconciliation_status.json` |
-| 20 (forest-HR reconciliation) | `forest_reconcile.R` | figure-driving subgroup HR reconciliation status |
-| 21 (spec → define conformance) | `03_metadata/define/check_define_conformance.R` — `define.xml` checked against `ADaM_spec.xlsx` (C-4 inversion; `--self-test` proves drift detection) | `platform/conformance/spec_define_conformance.json` |
-| 22 (spec → data conformance) | `04_analysis_datasets/programs/r/spec_data_checks.R` — metacore/metatools/xportr vs `04_analysis_datasets/adam/*_prod.xpt` | `platform/conformance/spec_data_conformance.json` |
-| 23 (Dataset-JSON v1.1 export) | `export_datasetjson.py` | `04_analysis_datasets/datasetjson/**/*.json` (ephemeral) |
-| 24 (Analysis Results Standard v1.0) | `build_ars.py` | `05_outputs/ars/` (ephemeral) |
-| 25 (USDM v3.0 study definition) | `build_usdm.py` | `03_metadata/usdm/tropic_usdm.json` (also a data-free CI gate) |
-| 26 (eCTD Module 5 packaging) | `package_ectd.py` | `08_submission_package/m5/` |
-| 27 (eCTD backbone + STF, sequence 0000) | `build_ectd_backbone.py` | `08_submission_package/ectd/0000/index.xml`, `index-md5.txt`, `stf-tropic.xml` |
-| 28 (materialize eCTD sequence + MD5 re-verify) | `materialize_ectd.py` | `08_submission_package/ectd/0000/` leaves (every leaf MD5-verified) |
-| 29 (log cleanliness) | `check_log_cleanliness.py` | configured persisted log cleanliness status |
-| 30 (release manifest binding) | `build_release_run_manifest.py` | `release_run_manifest.json`, release grade |
+| 15 (cross-language audit) | `cross_lang_audit.R` | `reconciliation_status.json`, reconciliation report |
+| 16 (admiral ADSL) | `admiral_adsl.R` | third-engine ADSL derivation evidence |
+| 17 (admiral ADTTE OS/PFS) | `admiral_adtte.R` | third-engine TTE derivation evidence |
+| 18 (admiral core reconciliation) | `admiral_reconcile.R` | `admiral_reconciliation_status.json` |
+| 19 (synthetic comparator bridge parity) | `check_cbzp_bridge.R` | CBZP RDS/XPT bridge parity status |
+| 20 (TFL) | `tfl_generation.R` | `05_outputs/tfl/output/tables/*`, `05_outputs/tfl/output/figures/*` |
+| 21 (numerical results reconciliation) | `results_reconcile.R` — SAS `PROC LIFETEST` vs R `survfit` (MP-arm KM medians / events / N) | `results_reconciliation_status.json` |
+| 22 (forest-HR reconciliation) | `forest_reconcile.R` | figure-driving subgroup HR reconciliation status |
+| 23 (figure-data reconciliation) | `figure_data_reconcile.R` | figure-driving SAS/R data parity status |
+| 24 (spec → define conformance) | `03_metadata/define/check_define_conformance.R` — `define.xml` checked against `ADaM_spec.xlsx` (C-4 inversion; `--self-test` proves drift detection) | `platform/conformance/spec_define_conformance.json` |
+| 25 (spec → data conformance) | `04_analysis_datasets/programs/r/spec_data_checks.R` — metacore/metatools/xportr vs `04_analysis_datasets/adam/*_prod.xpt` | `platform/conformance/spec_data_conformance.json` |
+| 27 (Dataset-JSON v1.1 export) | `export_datasetjson.py` | `04_analysis_datasets/datasetjson/**/*.json` (ephemeral) |
+| 28 (Analysis Results Standard v1.0) | `build_ars.py` | `05_outputs/ars/` (ephemeral) |
+| 29 (USDM v3.0 study definition) | `build_usdm.py` | `03_metadata/usdm/tropic_usdm.json` (also a data-free CI gate) |
+| 30 (eCTD Module 5 packaging) | `package_ectd.py` | `08_submission_package/m5/` |
+| 31 (eCTD backbone + STF, sequence 0000) | `build_ectd_backbone.py` | `08_submission_package/ectd/0000/index.xml`, `index-md5.txt`, `stf-tropic.xml` |
+| 32 (materialize eCTD sequence + MD5 re-verify) | `materialize_ectd.py` | `08_submission_package/ectd/0000/` leaves (every leaf MD5-verified) |
+| 33 (log cleanliness) | `check_log_cleanliness.py` | configured persisted log cleanliness status |
+| 34 (release manifest binding) | `build_release_run_manifest.py` | `release_run_manifest.json`, release grade |
 | *(offline)* CDISC CORE conformance | `platform/run_core_conformance.sh` — SDTMIG **3.4** rules on the uplifted layer (authoritative) + SDTMIG 3.2 baseline on the pristine 3.1.1 source + executable ADaM rules (`conformance_rules/adam/`, `--local-rules`) | `platform/conformance/core_sdtm34_report.json` + `core_{sdtm,adam}_report.json`; `CORE_SDTM34_RUN_RECORD.md`, `CORE_RUN_RECORD.md` |
 
 Run reproducibility: R toolchain pinned by `renv.lock`; self-contained demo

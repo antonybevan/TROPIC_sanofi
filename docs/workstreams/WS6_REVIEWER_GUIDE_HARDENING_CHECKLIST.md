@@ -3,8 +3,14 @@
 **Workstream:** Regulatory Writing / Reviewer Explanation  
 **Gates:** G07 (primary), G08 narrative  
 **Product claim:** Path A only  
-**As of:** 2026-07-09  
-**Current board status:** AMBER  
+**As of:** 2026-08-04
+**Current board status:** GREEN for Path A; external qualified review required
+
+**Section 2 review addendum (2026-08-03):** F-011 is resolved for the current PSA response set using observed baseline PSA (MP 61/329; CbzP 145/361). The SAP `T-11-8` TTPAIN/response collision, TTUMOR population wording and pain/RT component decision were handed to WS-2/WS-4 for controlled implementation.
+
+**Section 3/4 review addendum (2026-08-03):** ADRG, SDRG, BDRG, and the traceability matrix were rechecked against the corrected ADTTE derivations. PFS now exposes pain-led versus non-pain component labels, TTUMOR excludes death milestones, and no-post-baseline PFS censoring is explicit.
+
+**Author-decision addendum (2026-08-04):** Antony Bevan adopted ED-01–ED-07 as written under the disclosed single-author Path A governance model. The corrected pain/CM+PR derivation, TTUMOR ITT primary and SAP-native `T-11-3`–`T-11-8` mappings are implemented, internally reconciled and bound by the final full-DAG release seal. Reviewer guides must preserve the Path A boundary and must never imply independent or sponsor approval.
 
 ---
 
@@ -34,7 +40,7 @@ Each of ADRG, SDRG, BDRG must contain—near the top:
 | Data provenance | MP real / CbzP synthetic; Guyot vs PH | **Done (S1)** §1 + §7 |
 | Populations | ITT/Safety/MEASDISF consistent with WS-2 table | Present §5.4 — recheck at S2 |
 | Validation | Dual-lang + admiral + single-author disclosure | **Done (S1)** §6.0 Path A talk track |
-| Residuals | F-003, F-011, F-012, F-014 language | **Done (S1)** — memo linked; F-003/012 in §7 |
+| Residuals | F-003, F-012, F-014 language; F-011 closure | **Updated (S2)** — F-011 closure evidence and the Section 2 SAP/TFL findings are linked; F-003/012 remain in §7 |
 | TFL scope | Controlled catalog 18 IDs; deferred 21 | **Done (S1)** §6.0 table |
 | OCCDS | v1.0 + custom episode merge; no OCCDS v1.1 | Present |
 | Part 11 | Explicit non-claim | **Done (S1)** §0 table |
@@ -102,8 +108,9 @@ Each of ADRG, SDRG, BDRG must contain—near the top:
 | S1 | ADRG: PRODUCT_CLAIM + known-differences; Path A validation talk track | **DONE** (`ADRG.md` v1.1) |
 | S2 | SDRG: CORE residual honesty + WS-1 pack link; precision § audit | **DONE** (`SDRG.md` v1.1) |
 | S3 | BDRG depth pass + TRACEABILITY_MATRIX catalog alignment | **DONE** (`BDRG.md` + `TRACEABILITY_MATRIX.md` v1.1) |
+| S4 | Corrected ADTTE/PSA reviewer-language and package crosswalk | **DONE** (Section 3/4 audit memos, ADRG, WS-5/board updates) |
 
-After S1–S3: review notes under `docs/workstreams/reviews/WS6_S*_*.md`. Board may move toward **GREEN** for Path A narrative once PDF package re-render is optional ops.
+S1–S4 are complete; review notes are under `docs/workstreams/reviews/WS6_S*_*.md`. The board is **GREEN** for the Path A narrative; PDF re-packaging remains optional operations work.
 
 ---
 

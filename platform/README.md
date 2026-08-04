@@ -57,7 +57,7 @@ QC recon scripts live under `06_qc_evidence/reconciliation/`.
 | `generate_config.py` | YAML → generated SAS config |
 | `build_release_candidate_checklist.py` | RC checklist machine grade |
 | `verify_evidence.py` | Evidence checks |
-| `_oda_render_tfl.py` | **OUT_OF_DAG** SAS figure render (capability; not spine seal proof) |
+| `_oda_render_tfl.py` | Manual SAS figure renderer/diagnostic; the release DAG renders companions in Stage 14 |
 
 Release re-check from repo root: `python3 scripts/verify_release.py`
 

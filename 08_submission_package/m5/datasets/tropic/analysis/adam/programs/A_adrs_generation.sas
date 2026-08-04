@@ -1,14 +1,25 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: A_adrs_generation.sas
-   Version: 2.0
+   Version: 2.1.0
    Author: Antony Bevan, Clinical Programming
-   Date: 2026-05-23
+   Date: 2026-05-23 (ADaM dens contract 2026-07-09)
    Standard: CDISC ADaMIG v1.3 BDS
    Input: staging.ls, sdtm.rs, sdtm.lb, adam.adsl
    Output: adam.adrs
    Description: Efficacy response ADaM (ADRS) combining progression and
                 death milestones with PSA progression metrics.
+
+   ADaM dens contract (TRT01P always from ADSL / DM arm — never EXTRT):
+     PSARESP, PSPROG, BSGRESP  -> one row per ADSL SAFFL='Y' (Path A: 371)
+     OVRLRESP                  -> visit-level RECIST for lesion-evaluable spine
+                                   (Path A: 351 subj; multi-row)
+     BESTRESP, OBJRESP         -> one row per BOR spine subject (351), NOT the
+                                   SAP ORR dens. OBJRESP is confirmed CR/PR among
+                                   subjects with evaluable RECIST timepoints.
+     ORR TFL dens (MEASDISF='Y', N=203) is applied in tfl_generation.R via
+     left-join of ADSL MEAS subjects to OBJRESP (missing AVALC -> non-responder).
+     Do not use nrow(OBJRESP) as the ORR denominator.
    ============================================================================= */
 
 /* PGMDIR guard: define only when running standalone; master driver pre-defines this. */

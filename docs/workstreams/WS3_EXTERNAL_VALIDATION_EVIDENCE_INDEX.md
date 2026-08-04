@@ -1,9 +1,9 @@
 # WS-3 External Validation Evidence Index
 
-**Workstream:** Standards & Metadata (with WS-1/WS-5 inputs)  
-**Gates:** G03 primary; feeds G06  
-**Product claim:** Path A  
-**As of:** 2026-07-09  
+**Workstream:** Standards & Metadata (with WS-1/WS-5 inputs)
+**Gates:** G03 primary; feeds G06
+**Product claim:** Path A
+**As of:** 2026-08-04
 **Purpose:** Separate **what we have run** from **what industry still expects** so we never fake a P21/FDA story.
 
 ---
@@ -78,7 +78,7 @@ Every row is a **slot**:
 | Dataset-JSON export | **RUN** (hardened) | **No** | F-020 exploratory |
 | USDM study JSON | **RUN** (deterministic IDs) | **No** | F-021 exploratory |
 | ARS / ARD | **PARTIAL** | **No** | F-022 controlled core only |
-| ARM in define.xml | **PARTIAL** | In define | Controlled TFL core (F-014) |
+| ARM in define.xml | **RUN** | In define | 10 ResultDisplays / 18 AnalysisResults; all controlled analysis outputs mapped except the non-analysis F-01-1 flow diagram; CbzP disclosure on every ResultDisplay |
 
 ---
 
@@ -94,29 +94,32 @@ Every row is a **slot**:
 
 ## 4. Immediate work items (ordered)
 
-1. Create `WS1_CORE_RESIDUAL_MATRIX.csv` from latest CORE JSON (WS-1 lead, WS-3 support).  
-2. Add one-page “how we ran XSD / CORE” runbook pointers in SDRG (WS-6).  
-3. If P21 becomes available: drop report under `platform/conformance/p21/` and flip slot to RUN.  
+1. **DONE:** `WS1_CORE_RESIDUAL_MATRIX.csv` filed from the latest CORE evidence.
+2. **DONE:** SDRG links the XSD/CORE run records and states the residual boundary.
+3. If P21 becomes available: drop report under `platform/conformance/p21/` and flip slot to RUN.
 4. Keep Dataset-JSON/USDM/ARS labeled **exploratory** in ADRG until packaging decision.
 
 ---
 
 ## 5. Review agenda (Standards workstream, 45 min)
 
-1. Walk this index row by row—status only, no coding.  
-2. Confirm no public doc says “P21 clean.”  
-3. Assign residual matrix owner.  
+1. Walk this index row by row—status only, no coding.
+2. Confirm no public doc says “P21 clean.”
+3. Assign residual matrix owner.
 4. Decide whether ARS/USDM remain exploratory for next tag train.
 
 ---
 
 ## 6. Exit criteria for WS-3 GREEN (Path A)
 
-- [x] Spec→define / spec→data PASS at seal  
-- [x] XSD path documented  
-- [x] Exploratory layers not in eCTD  
-- [x] P21 explicitly NOT_AVAILABLE  
-- [ ] CORE residual matrix filed  
-- [ ] Standards pack reviewed once  
+- [x] Spec→define / spec→data PASS at seal
+- [x] XSD path documented
+- [x] Exploratory layers not in eCTD
+- [x] P21 explicitly NOT_AVAILABLE
+- [x] CORE residual matrix filed
+- [x] Standards pack reviewed once
+- [x] ARM endpoint semantics and synthetic-comparator disclosure executable under G02
 
-Until residual matrix exists: **AMBER**.
+**Disposition:** **GREEN for Path A portfolio scope; AMBER for broader commercial-validator depth.**
+The missing commercial P21/FDA validator slot remains an honest capability boundary, not a
+Path A defect.

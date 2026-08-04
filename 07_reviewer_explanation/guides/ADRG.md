@@ -6,9 +6,9 @@
 | **Study** | TROPIC / EFC6193 / NCT00417079 |
 | **Compound** | Cabazitaxel (CbzP) vs Mitoxantrone (MP) |
 | **Standards** | CDISC ADaMIG v1.3 · OCCDS v1.0 (+ custom episode-merge; **not** “OCCDS v1.1”) |
-| **Document version** | 1.1 (Path A hardened) |
-| **Effective** | 2026-07-09 |
-| **Supersedes** | ADRG narrative drafts prior to `v0.1.0-demo-rc.1` Path A freeze |
+| **Document version** | 1.2 (portfolio finalization) |
+| **Effective** | 2026-08-04 |
+| **Supersedes** | ADRG v1.1 from the `v0.1.0-demo-rc.1` Path A baseline |
 | **Product claim** | **Path A only** — controlled non-submission demonstration |
 
 ---
@@ -20,13 +20,13 @@
 | SDTM → ADaM → TFL → Define → eCTD-**style** programming demonstration | An FDA filing / NDA package |
 | Dual-language (SAS 9.4 / R) recon on **real MP** ADaM under a genuine SAS engine when seals say `oda`/`local` | Organizational GxP two-programmer double programming |
 | Risk-tiered **admiral** third engine for ADSL + OS/PFS | Full ADaM re-derived in admiral |
-| Controlled TFL catalog (18 in-scope IDs; 21 SAP IDs deferred) | Full SAP Appendix D TFL inventory |
+| Controlled TFL catalog (21 in-scope IDs; 18 SAP IDs deferred) | Full SAP Appendix D TFL inventory |
 | Hash-sealed Path A demo RC | 21 CFR Part 11 validated system |
 | Comparative TFLs that may include **synthetic/reconstructed CbzP** | Independent clinical confirmation of CbzP efficacy |
 
-**Binding claim:** [`docs/PRODUCT_CLAIM.md`](../../docs/PRODUCT_CLAIM.md)  
-**Residual risks (ACCEPTED findings):** [`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)  
-**Sealed demo RC:** tag `v0.1.0-demo-rc.1` · [`docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md`](../../docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md) · `python3 scripts/verify_release.py`  
+**Binding claim:** [`docs/PRODUCT_CLAIM.md`](../../docs/PRODUCT_CLAIM.md)
+**Residual risks (ACCEPTED findings):** [`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)
+**Current portfolio release:** tag `v0.2.0-portfolio` · [`docs/RELEASE_NOTE_v0.2.0-portfolio.md`](../../docs/RELEASE_NOTE_v0.2.0-portfolio.md) · `python3 scripts/verify_release.py`
 **Review package face:** [`08_submission_package/m5/`](../../08_submission_package/m5/) · [`08_submission_package/README.md`](../../08_submission_package/README.md)
 
 > **SAP v4.0 lock:** `02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx` is the **programming** authority for this demonstration (lock memo: `06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md`). It is **not** a sponsor-approved filing SAP. This ADRG explains implementation; it does not invent new analysis decisions.
@@ -39,7 +39,7 @@ The **TROPIC Phase III Trial (NCT00417079)** evaluated cabazitaxel (25 mg/m² IV
 
 This repository is a **Path A programming demonstration** built on:
 
-- **Real MP arm (N=371)** de-identified SDTM (Sanofi 2013 / Project Data Sphere) → dual-language ADaM + recon  
+- **Real MP arm (N=371)** de-identified SDTM (Sanofi 2013 / Project Data Sphere) → dual-language ADaM + recon
 - **Synthetic / reconstructed CbzP (N=378)** merged **only at TFL** for comparative displays (non-confirmatory; F-003)
 
 In the **published** trial, cabazitaxel carried a substantial safety burden (~82% Grade 3/4 neutropenia; ~8% febrile neutropenia). Synthetic lab outputs in this package approximate published rates for pipeline exercise only (see T-21); they are **not** a re-analysis of trial safety.
@@ -69,17 +69,20 @@ To support dose-toxicity modeling, two continuous parameters were derived per cy
 For Progression-Free Survival (PFS), progression is defined using the SAP v4.0 locked hierarchy: trial-era RECIST v1.0 radiological progression, SAP-supported PSA progression where source data permit, and death. Post-2010 PCWG3 bone-scan logic remains an exploratory/methodological extension unless explicitly promoted by SAP v4.0 and revalidated.
 * **Censoring Hierarchy:**
   1. If a patient starts a new systemic anti-cancer therapy (`NACTDT`) prior to a documented PFS event, the time-to-event is censored at **`NACTDT - 1 day`** (`CNSDTDSC = 'NEW ANTI-CANCER THERAPY START'`).
-  2. If no event or NACT occurs, the time-to-event is censored at the last evaluable tumor assessment or last known alive date.
+  2. If no event or NACT occurs, the time-to-event is censored at the latest valid post-baseline RECIST, PSA, or evaluable pain assessment (capped at the administrative cutoff). If no post-baseline assessment exists, it is censored at randomization (`CNSDTDSC = 'NO POST-BASELINE ASSESSMENT'`).
+
+  The existing ADTTE `EVNTDESC` field records the earliest composite component: `DISEASE PROGRESSION`, `PAIN PROGRESSION`, or `DEATH` (same-day ties use the non-pain component). The 2026-08-03 Section 3 audit identifies the SAP supporting-disease and palliative-radiotherapy qualification as an open medical/statistical decision; the current Path A output must not be described as SAP-complete for that component.
 
 * **Other Time-to-Event Parameters Censoring Rules (VAL-06):**
   * **Overall Survival (OS) (PARAMCD: OS):** Start date is `RANDDT`. Event is death (`DTHFL = 'Y'`). Censored at last known alive date (`LSTALVDT`).
   * **Time to First Serious AE (TTSAE) (PARAMCD: TTSAE):** Start date is `TRTSDT`. Event is first treatment-emergent Serious AE. Censored at last known alive date (`LSTALVDT`, `CNSDTDSC = 'LAST KNOWN ALIVE DATE'`). *(Renamed from the prior `TTOS` mnemonic, which was confusable with `OS`; the parameter is unchanged.)*
-  * **Time to PSA Progression (TTPSA) (PARAMCD: TTPSA):** Start date is `TRTSDT`. Event is PSA progression (`PARAMCD = 'PSPROG' & AVAL = 1.0`). Censored at last PSA assessment date or last known alive date.
-  * **Time to Tumor Progression (TTUMOR) (PARAMCD: TTUMOR):** Start date is `TRTSDT`. Event is the first radiographic PD across the enriched ADRS — integrated RECIST v1.0 `OVRLRESP = 'PD'` (now incorporating new-lesion and non-target progression, §4A) **or** confirmed PCWG3 bone progression (`BSGRESP = 'PROGRESSION'`). Censored at last tumor assessment date (`last_tumor_dt`) or last known alive date. The consumer logic in `A_adtte_generation.sas` (`work.pd_dates`) was already written to take the earliest of `OVRLRESP='PD'`, `BSGRESP='PROGRESSION'`, `PSPROG='Y'`; the ADRS enrichment now supplies the previously-missing `BSGRESP` and the richer `OVRLRESP`. **Note: Restrictive analysis population is the measurable disease subpopulation (MEASDISF = 'Y'); SAP v3.0 §3.4 cites 204 MP / 201 CbzP measurable at baseline. The real MP arm yields N=203 here; the synthetic CbzP arm carries N=179 by reconstruction.**
+  * **Time to PSA Progression (TTPSA) (PARAMCD: TTPSA):** Start date is `RANDDT`. Event is post-randomization PSA progression (`PARAMCD = 'PSPROG' & AVALC = 'Y'`). Censored at the last PSA assessment date or, when none is available, the last known alive date.
+  * **Time to Tumor Progression (TTUMOR) (PARAMCD: TTUMOR):** Start date is `RANDDT`. Event is the first post-randomization RECIST assessment with `OVRLRESP = 'PD'`; confirmed `BSGRESP` is retained as an exploratory ADRS parameter and does **not** feed the current TTUMOR derivation. Censored at the latest post-baseline evaluable RECIST assessment (`last_tumor_dt`) or randomization if none exists. **Primary population is ITT** (one record per ITT subject; reconstructed CbzP N=378 and real MP N=371); measurable disease (`MEASDISF = 'Y'`) is retained as a supportive subgroup/sensitivity (CbzP N=179; MP N=203).
+  * **Time to Pain Progression (TTPAIN) (PARAMCD: TTPAIN):** Start date is `RANDDT`. The adopted F-042 derivation uses component-specific PPI/AS summaries, same-component confirmation at consecutive scheduled assessments at least 21 days apart, the SV visit-date hierarchy, and a direct-intent CM+PR palliative/antalgic radiotherapy union. Diary-only, RT-only, and partial/missing-date lineages are retained as supporting evidence; no terminal single-trigger exception is used. This is the restored SAP `T-11-8` endpoint mapping.
 
 ### 4.1 Time-to-Event Analysis Conventions (audit MO-4 / MO-5)
 * **Duration convention.** `AVAL = (event/censor date − time origin) + 1` day, so an event on the origin date contributes 1 day (not 0); applied uniformly across all parameters.
-* **Time origin per parameter is explicit and deliberate.** OS and PFS are anchored at randomization (`RANDDT`, ITT); TTSAE, TTPSA and TTUMOR are anchored at first dose (`TRTSDT`, safety). Efficacy ITT endpoints run from randomization, safety/treatment endpoints from exposure; the origin is recorded on every record via `STARTDT`.
+* **Time origin per parameter is explicit and deliberate.** OS, PFS, TTPAIN, TTPSA, and TTUMOR are anchored at randomization (`RANDDT`, ITT); TTSAE is anchored at first dose (`TRTSDT`, safety). The origin is recorded on every record via `STARTDT`.
 * **Negative durations are surfaced, not silently masked (audit MO-4).** A small number of source records carry an event/censor date marginally before the time origin — an artefact of the week-precision source dates (±3.5 days; SDRG §2). They are floored to 1 day so the record stays in the risk set, **and** both tracks emit an explicit warning (SAS `putlog`, R `warning()`) identifying the subject so the anomaly is investigable rather than hidden.
 
 ---
@@ -89,12 +92,13 @@ For Progression-Free Survival (PFS), progression is defined using the SAP v4.0 l
 To pre-empt reviewer challenge on the response rates, the exact derivation of the response endpoints (as implemented in the SAS/R ADRS track and consumed by `tfl_generation.R`) is:
 
 * **Overall Response (`PARAMCD = OVRLRESP`) — integrated RECIST v1.0 timepoint response.** The per-visit overall response is the standard RECIST integration of **three** components, all sourced from `ls`: (1) **target** lesions (sum-of-diameters vs nadir/baseline, thresholds `RECIST_PD_PCT/PR_PCT/PD_ABS`); (2) **non-target** lesion status (`LSCAT='NON-TARGET'`, worst-per-visit collapse of `LSSTRESC`); (3) **new lesions** (`LSTESTCD='NEWLES'`). Override rules: **any new lesion ⇒ PD**; **non-target unequivocal PD ⇒ PD** (even with target CR/PR); target CR with a non-CR non-target ⇒ PR. The derivation is *defensive* — when non-target / new-lesion rows are absent for a subject-visit it reproduces the prior target-only result. The label remains "Overall Response per RECIST v1.0": new-lesion and non-target integration are part of RECIST 1.0; this is a **correctness fix**, not a version change. (Earlier revisions derived `OVRLRESP` from target SOD only and discarded the new-lesion and non-target signal that is present in the source.)
-* **Objective Response Rate (ORR, `PARAMCD = OBJRESP`):** Responder = a **confirmed** CR or PR per RECIST v1.0 (`AVALC = 'Y'`). Confirmation (audit M-2) requires a subsequent CR/PR at least `RECIST_CONFIRM_DAYS` (28) days after the first (CR confirmed by CR; PR confirmed by CR or PR), evaluated on the lesion-derived RECIST timepoints that both the SAS and R tracks compute identically. **Denominator = ITT population restricted to patients with measurable disease at baseline** (`MEASDISF == 'Y'`), per SAP v3.0 §3.4 / §5.3 and the publication (de Bono 2010). The real MP arm yields **13/203 = 6.4%** on the measurable subpopulation.
+* **Objective Response Rate (ORR, `PARAMCD = OBJRESP`):** Responder = a **confirmed** CR or PR per RECIST v1.0 (`AVALC = 'Y'`). Confirmation (audit M-2) requires a subsequent CR/PR at least `RECIST_CONFIRM_DAYS` (28) days after the first (CR confirmed by CR; PR confirmed by CR or PR), evaluated on the lesion-derived RECIST timepoints that both the SAS and R tracks compute identically. **Denominator = ITT population restricted to patients with measurable disease at baseline** (`MEASDISF == 'Y'`), per SAP v4.0 §3.4 / §5.3 and the publication (de Bono 2010). The real MP arm yields **13/203 = 6.4%** on the measurable subpopulation.
   * **Reconciliation to the publication:** The published MP ORR was **4.4%**. With confirmation enforced and overall response now integrated across target + non-target + new lesions (§4A), the pipeline yields **6.4%** on the measurable-disease denominator and **3.7%** (13/351) on the response-evaluable denominator (T-11-8b) — both close to the published rate. The prior best-of-any-assessment logic, with no confirmation, overstated this roughly four-fold (18.2%); enforcing the RECIST confirmation rule removed that overstatement. The small residual reflects lesion-sum-derived RECIST vs investigator adjudication and the ±3.5-day source date precision, not a calculation error.
-* **PSA Response (`PARAMCD = PSARESP`):** Responder = ≥50% confirmed decline in PSA from baseline (PCWG3) (`AVALC = 'Y'`); denominator = subjects with a baseline and ≥1 post-baseline PSA. MP arm: **69/371 = 18.6%**.
+* **PSA Response (`PARAMCD = PSARESP`):** Responder = ≥50% confirmed decline in PSA from baseline (PCWG3) (`AVALC = 'Y'`); denominator = subjects with observed baseline PSA ≥20 ug/L (excluding `PSABLIF='Y'` fallback values) and an evaluable confirmatory PSARESP record, per SAP v4.0 §5.2/Table 12. Current demonstration output: **CbzP 145/361 = 40.2%** (synthetic) and **MP 61/329 = 18.5%** (real).
+* **Pain Response (F-042 / `T-11-5`):** ITT subjects with `PAINBL='Y'` and evaluable baseline PPI/AS are assessed at the immediate next scheduled visit at least 21 days later. Response requires a component-specific PPI reduction of at least 2 points without AS worsening or an AS reduction of more than 50% without PPI worsening, with both components evaluable. The real MP arm yields **43/153 = 28.1%**; the synthetic CbzP arm is reported as **N/A (PN unavailable)** rather than fabricated.
 * **Bone Scan Progression (`PARAMCD = BSGRESP`) — PCWG3 2+2 rule (methodological demonstration).** Bone is the dominant mCRPC metastatic site and is largely non-measurable by RECIST, so progression is tracked separately from new bone lesions (`LSTESTCD='NEWLES' & LSLOC='BONE'`, scintigraphy). A first post-baseline scan with `≥ BONE_PROG_MIN_NEW` (2) new bone lesions is **PDu** (`AVALC='PROGRESSION UNCONFIRMED'`); it is **confirmed** (`AVALC='PROGRESSION'`, the only state that feeds TTUMOR) when a later scan adds `≥ BONE_PROG_CONFIRM_NEW` (2) further new bone lesions, with the PD date backdated to the PDu scan; otherwise `AVALC='NO PROGRESSION'`. This rule (Scher 2016, PCWG3) post-dates the 2010 trial and is **not in the trial-era SAP** — it is a clearly-labelled methodological demonstration, consistent with how `PSPROG` already applies PCWG3 here. On the real MP arm the strict 2+2 is **stringent relative to the source granularity**: **5 subjects reach PDu, 0 are confirmed** — reported honestly rather than tuning the thresholds to manufacture events.
 
-All response counts/percentages are emitted by `05_outputs/tfl/tfl_generation.R` to `05_outputs/tfl/output/tables/T-11-Efficacy_Tables.txt` for the current implementation. SAP v4.0 remains the authority for what is planned; generated TFLs are evidence of implementation, not the source of analysis requirements.
+All response counts/percentages are emitted by `05_outputs/tfl/tfl_generation.R` to `05_outputs/tfl/output/tables/T-11-Efficacy_Tables.txt` for the current implementation. The controlled SAP-native mapping is `T-11-3` PSA response, `T-11-4` ORR, `T-11-5` pain response, `T-11-6` TTUMOR, `T-11-7` TTPSA and `T-11-8` TTPAIN; `T-11-8b` is an explicitly labelled ORR response-evaluable sensitivity. SAP v4.0 remains the authority for what is planned; generated TFLs are evidence of implementation, not the source of analysis requirements.
 
 ---
 
@@ -121,16 +125,16 @@ Several baseline laboratory variables are carried on ADSL to satisfy the ADaM sc
 | `PSABL` | 110.0 | µg/L | Yes (real, per subject) — constant used only as fallback |
 | `ALPBL` | 140.0 | U/L | Yes (real, per subject) — constant used only as fallback |
 | `HGBBL` | 11.5 | g/dL | Yes (real, per subject) — constant used only as fallback |
-| `ALBBL` | 38.0 | g/L | **No** — single constant for all subjects (placeholder) |
-| `LDHBL` | 220.0 | U/L | **No** — single constant for all subjects (placeholder) |
+| `ALBBL` | **Missing** | g/L | **No** — not collected; left missing (no imputation) |
+| `LDHBL` | **Missing** | U/L | **No** — not collected; left missing (no imputation) |
 
 > [!IMPORTANT]
-> **Correction (audit F-9):** These imputed/constant covariates are **not used as covariates or stratification factors in any efficacy model.** The primary and secondary Cox / log-rank analyses stratify **only on `ECOGBL` and `MEASDISF`** (see `05_outputs/tfl/tfl_generation.R`, `compute_tte_stats()` → `strata(ECOGBL, MEASDISF)`). Albumin (`ALBBL`) and LDH (`LDHBL`) were never collected in the public MP SDTM release; a single constant column conveys no subject-level information and a degenerate (constant) covariate would in any case contribute nothing to a model. They are retained purely as schema placeholders and should be read as "not available," not as analysis inputs.
+> **Correction (audit F-9 / 2026-07-09 + 2026-08-01):** These covariates are **not used as covariates or stratification factors in any efficacy model.** The primary and secondary Cox / log-rank analyses stratify **only on the pooled randomization strata** (`ECOGBL` 0–1 vs 2 and `MEASDISF`; see `05_outputs/tfl/tfl_generation.R`, `compute_tte_stats()` → `strata(ECOGBLGRP, MEASDISF)`). Albumin (`ALBBL`) and LDH (`LDHBL`) were never collected in the public MP SDTM release: both tracks set them to **missing with blank imputation flags** (`A_adsl_generation.sas` / `v_adsl_validation.R`), so they carry no subject-level information and are read as "not available," not as analysis inputs.
 
-**Imputation method and flags (audit F-5).** The method is a single **published population-median constant** per variable (values in `config/study_config.yaml`); it is *not* model-based or multiple imputation, and is applied only where the per-subject value is absent. Every imputed/placeholder baseline carries a companion **imputation flag** — `ECOGBLIF`, `PSABLIF`, `ALPBLIF`, `HGBBLIF`, `ALBBLIF`, `LDHBLIF` (= `'Y'` when imputed) — computed identically in SAS (`case when missing(...)`) and R (`is.na(...)` pre-coalesce), so a reviewer can isolate every imputed cell. `ALBBL`/`LDHBL` (a single constant for all subjects) are flagged imputed on all rows and carry `def:Origin = Assigned` in `define.xml`.
+**Imputation method and flags (audit F-5).** The method is a single **published population-median constant** per variable (values in `config/study_config.yaml`); it is *not* model-based or multiple imputation, and is applied only where the per-subject value is absent. Every imputed/placeholder baseline carries a companion **imputation flag** — `ECOGBLIF`, `PSABLIF`, `ALPBLIF`, `HGBBLIF` (= `'Y'` when imputed) — computed identically in SAS (`case when missing(...)`) and R (`is.na(...)` pre-coalesce), so a reviewer can isolate every imputed cell. `ALBBL`/`LDHBL` are **not collected and are left missing with blank flags** (no constant, no imputation; `def:Origin = Assigned` in `define.xml`).
 
 ### 5.2 Analysis Window Gaps (ADLB)
-The ADLB windowing schema leaves Days 35–38 unassigned (between the C2D8 window [Days 25–34] and C3D1 window [Days 39–45]). Laboratory assessments on Days 35–38 are assigned `AVISITN = 99` (Unscheduled) and are excluded from the primary `ANL01FL = 'Y'` worst-case analysis. This is consistent with the protocol visit schedule and **SAP v3.0 §11.1.3 (ADLB Analysis Windows — CBC Schedule)**, which does not specify a Day 35–38 nominal visit.
+The ADLB windowing schema leaves Days 35–38 unassigned (between the C2D8 window [Days 25–34] and C3D1 window [Days 39–45]). Laboratory assessments on Days 35–38 are assigned `AVISITN = 99` (Unscheduled) and are excluded from the primary `ANL01FL = 'Y'` worst-case analysis. This is consistent with the protocol visit schedule and **SAP v4.0 §11.1.3 (ADLB Analysis Windows — CBC Schedule)**, which does not specify a Day 35–38 nominal visit.
 
 ### 5.3 Demographic Covariates
 All subjects are assigned `SEX = 'M'` in `A_adsl_generation.sas`. This demographic assignment matches the actual study cohort (metastatic castration-resistant prostate cancer, which is exclusively male). `RACE` is carried from the source SDTM `DM`. `ETHNIC` was **not collected** in the de-identified public release; it is therefore set to the CDISC controlled-terminology value `'NOT REPORTED'` and carries `def:Origin Type="Assigned"` (not `Collected`) in the define, so it is not presented as observed data. Geographic indicators `COUNTRY` and `REGION` are **not present** in the de-identified release and are not derived (see the note in `B_bimo_generation.sas`); no placeholder geography is assigned.
@@ -155,8 +159,8 @@ All subjects are assigned `SEX = 'M'` in `A_adsl_generation.sas`. This demograph
 | Metadata | Spec→define / spec→data gates; Define XSD; local CORE ADaM rules | Commercial full Pinnacle 21 clearance |
 | Seals | Hash-sealed Path A demo RC; `scripts/verify_release.py` | Part 11 e-signature / validated CSV system |
 
-**Always read residuals here:** [`WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md) (F-003, F-005, F-011, F-012, F-014, F-025, …).  
-**Machine re-check (no SAS required):** `python3 scripts/verify_release.py`  
+**Always read residuals here:** [`WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md) (F-003, F-005, F-011, F-012, F-014, F-025, …).
+**Machine re-check (no SAS required):** `python3 scripts/verify_release.py`
 **Risk tiers:** [`RISK_BASED_VALIDATION.md`](RISK_BASED_VALIDATION.md) · `config/validation_strategy.yaml`
 
 > **Validation is allocated by risk.** Primary efficacy (OS, PFS) and ADSL get three derivation engines; supporting ADaM two; metadata automated conformance. This section documents the mechanics those tiers use.
@@ -178,7 +182,7 @@ The authoritative analysis-dataset metadata specification is `03_metadata/adam/A
 
 Two automated gates enforce conformance to the spec — both run in the pipeline (cibuild Stages 15–16) and in CI:
 
-* **spec → define** (`03_metadata/define/check_define_conformance.R`): every dataset, variable, label, type, length, order, mandatory flag, codelist and method in `define.xml` is checked against the spec; any drift fails the build. The gate ships a `--self-test` that injects synthetic drift and confirms detection, so it is demonstrably not a no-op. Latest run: **PASS** (7 datasets / 157 variables, 0 findings; `platform/conformance/spec_define_conformance.json`).
+* **spec → define** (`03_metadata/define/check_define_conformance.R`): every dataset, variable, label, type, length, order, mandatory flag, codelist and method in `define.xml` is checked against the spec; any drift fails the build. The gate ships a `--self-test` that injects synthetic drift and confirms detection, so it is demonstrably not a no-op. Latest run: **PASS** (7 datasets / 159 variables, 0 findings; `platform/conformance/spec_define_conformance.json`).
 * **spec → data** (`04_analysis_datasets/programs/r/spec_data_checks.R`): the produced ADaM datasets (`04_analysis_datasets/adam/*_prod.xpt`, the SAS production track) are checked against the spec with the pharmaverse **metacore + metatools + xportr** toolchain — `check_variables` (variable presence), `check_ct_data` (controlled-terminology conformance) and `xportr_type`/`xportr_length` (type/length conformance). Because the data is produced independently of the define, this is genuine (non-circular) verification. Latest run: **PASS** across all 7 datasets (`platform/conformance/spec_data_conformance.json`).
 
 The spec also drives the variable-label artifacts applied by both tracks (`platform/gen_adam_labels.R` → `04_analysis_datasets/programs/r/adam_var_labels.csv` for R and `04_analysis_datasets/programs/sas/_adam_labels.sas` for SAS), so production and validation carry identical, spec-sourced labels. Together these close the loop **spec → {define, data}**.
@@ -256,8 +260,8 @@ The KM estimator is inverted (`IPDfromKM`) from the digitised published curve pl
 **Secondary endpoints (TTPAIN, TTPSA, TTUMOR) — PH-scaled (circular):**
 Reconstructed using proportional-hazards scaling of the real MP event times (t_CbzP = t_MP / HR), with event counts calibrated to match published totals. These HRs are **circular by construction** and carry no evidentiary weight:
 * **Time to PSA Progression (TTPSA):** PH-scaled with HR = 0.75 (286/378 events).
-* **Time to Tumor Progression (TTUMOR):** PH-scaled with HR = 0.61 (166/179 events, measurable-disease subpopulation).
-* **Time to Pain Progression (TTPAIN):** PH-scaled with HR = 0.80 (130/378 events).
+* **Time to Tumor Progression (TTUMOR):** PH-scaled with HR = 0.61 (166/378 events, ITT population; measurable-disease CbzP N=179 is retained as a supportive sensitivity).
+* **Time to Pain Progression (TTPAIN):** PH-scaled with HR = 0.80 (130/378 events, ITT population).
 * **Time to Serious AE (TTSAE):** Derived dynamically from the first Serious AE occurrence date in ADAE, or censored at `LSTALVDT` if no SAE occurred.
 
 ### 7.5 Adverse Events (ADAE) & Exposure (ADEX)

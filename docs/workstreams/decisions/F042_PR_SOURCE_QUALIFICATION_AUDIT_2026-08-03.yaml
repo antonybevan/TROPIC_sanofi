@@ -1,0 +1,98 @@
+# Documentation-only aggregate profile for the CM/PR radiotherapy sources.
+# It is not an executable staging or endpoint specification.
+
+profile:
+  id: F042-PR-SOURCE-QUAL-2026-08-03
+  version: 0.2.1
+  status: author_decision_evidence_complete
+  executable: false
+  endpoint_consumption_allowed: false
+  parent_decision: EDR-F042-T11-8-2026-08-03
+  author_decision_dependency: ED-02
+  source: 01_source_data/real_sdtm/pr.sas7bdat
+  target_staging: 01_source_data/real_sdtm/staging/pr.rds
+
+source_shape:
+  domain: PR
+  studyid: EFC6193
+  rows: 151
+  subjects: 65
+  unique_prtrt_terms: 106
+  prcat_values: [OTHER PROCEDURES]
+  visitnum_values: [99]
+  visit_values: [UNSCHEDULED]
+  duplicate_usubjid_prseq_keys: 0
+  missing_prdtc: 0
+  complete_iso_prdtc: 148
+  year_month_prdtc: 3
+  missing_prtrt: 0
+  missing_prcat: 0
+  usubjid_subjid_mismatches: 0
+
+linkage:
+  adsl_subjects_matched: 65
+  adsl_subjects_unmatched: 0
+  matched_real_mp_itt_subjects: 65
+
+radiation_screen:
+  method: case_insensitive_PRTRT_contains_radi
+  rows: 11
+  subjects: 9
+  palliative_radiation_to_spine_rows: 3
+  complete_iso_dates: 11
+  after_randdt: 11
+  after_trtsdt: 11
+  pain_candidate_subjects_with_any_radiation_pr: 1
+  radiation_rows_on_or_before_pain_event: 0
+  radiation_rows_after_pain_event: 3
+  post_event_day_range: [23, 25]
+
+direct_intent_screen:
+  rule:
+    radiation_concept_required: true
+    explicit_intent_terms: [PALLIATIVE, ANTALGIC]
+    generic_radiotherapy_autoqualifies: false
+    prior_radiation_category_autoqualifies: false
+    substring_false_positives_autoqualify: false
+  cm:
+    source: 01_source_data/real_sdtm/staging/cm.rds
+    rows: 13
+    subjects: 10
+    complete_start_dates: 12
+    missing_start_dates: 1
+    complete_dates_after_randdt: 12
+    current_pain_label_subjects_with_direct_rt: 1
+    direct_rt_rows_after_current_pain_label: 2
+    post_event_day_range: [115, 181]
+  pr:
+    rows: 3
+    subjects: 1
+    complete_start_dates: 3
+    complete_dates_after_randdt: 3
+    current_pain_label_subjects_with_direct_rt: 1
+    direct_rt_rows_after_current_pain_label: 3
+    post_event_day_range: [23, 25]
+  cm_pr_subject_overlap: 0
+  recommended_source_model: provenance_preserving_union
+
+controls:
+  preserve_all_pr_rows: true
+  preserve_source_text: true
+  no_day_imputation: true
+  no_treatment_intent_inference_at_ingest: true
+  endpoint_consumption_authorized_after: 2026-08-04
+  no_output_change_until_phase_2_rerun: true
+  no_current_output_change: true
+  no_pr_only_precedence: true
+  exact_subject_date_auto_dedup_only: true
+
+proposed_staging:
+  preserve_prdtc: true
+  derive_complete_date_only: true
+  carry_date_precision_flag: true
+  retain_lineage_keys: [USUBJID, PRSEQ, SUBJID]
+  filter_radiation_at_ingest: false
+  require_sas_r_reconciliation: true
+  require_subject_level_impact_report: true
+  consume_cm_and_pr_union: true
+  direct_intent_only_for_automatic_rt_event: true

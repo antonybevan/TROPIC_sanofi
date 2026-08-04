@@ -21,7 +21,7 @@
         </leaf>
         <leaf ID="L0002" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/bimo/datasets/clinsite.xpt"
-              checksum-type="MD5" checksum="ef3bc205ba75ba6c6ee4000150c36d6c">
+              checksum-type="MD5" checksum="eba467aebc9b50e270e8174661dd4a22">
           <title>clinsite.xpt</title>
         </leaf>
         <leaf ID="L0003" operation="new" xlink:type="simple"
@@ -115,123 +115,123 @@
           <title>vs.xpt</title>
         </leaf>
         <leaf ID="L0021" operation="new" xlink:type="simple"
-              xlink:href="m5/datasets/tropic/tabulations/sdtm/blankcrf.pdf"
-              checksum-type="MD5" checksum="0616f5b75d7df476fd78b9005ecf9004">
-          <title>blankcrf.pdf</title>
-        </leaf>
-        <leaf ID="L0022" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/bimo/datasets/bdrg.pdf"
-              checksum-type="MD5" checksum="603c3de8737c66161c888b2722611c9e">
+              checksum-type="MD5" checksum="fd999fa17d4aa9d963afbe174e13f00e">
           <title>bdrg.pdf</title>
         </leaf>
-        <leaf ID="L0023" operation="new" xlink:type="simple"
+        <leaf ID="L0022" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/tabulations/sdtm/sdrg.pdf"
-              checksum-type="MD5" checksum="963488bba3225ec5aaffc70966b69aa9">
+              checksum-type="MD5" checksum="290c4d5780a90f43aa4dd4df39168a09">
           <title>sdrg.pdf</title>
         </leaf>
-        <leaf ID="L0024" operation="new" xlink:type="simple"
+        <leaf ID="L0023" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/ADaM_spec.xlsx"
-              checksum-type="MD5" checksum="8be28fddecbd7787921a03cf3937b978">
+              checksum-type="MD5" checksum="77bafbcd5492e5d332ebdef134dfa3b8">
           <title>ADaM_spec.xlsx</title>
         </leaf>
-        <leaf ID="L0025" operation="new" xlink:type="simple"
+        <leaf ID="L0024" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/datasets/define.xml"
-              checksum-type="MD5" checksum="611fca81cebf4b1444bccab669d287a4">
+              checksum-type="MD5" checksum="b012de64f527e91fc5cc76667273b670">
           <title>define.xml</title>
         </leaf>
-        <leaf ID="L0026" operation="new" xlink:type="simple"
+        <leaf ID="L0025" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/datasets/adae.xpt"
-              checksum-type="MD5" checksum="904f2e110c5c09a8cff597ed666a4b55">
+              checksum-type="MD5" checksum="0fcf81d30f703865c720d4d40d2177c7">
           <title>adae.xpt</title>
         </leaf>
-        <leaf ID="L0027" operation="new" xlink:type="simple"
+        <leaf ID="L0026" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/datasets/adcm.xpt"
-              checksum-type="MD5" checksum="5c0702cd4c2f1c671e6640698a7485e9">
+              checksum-type="MD5" checksum="208406d2a084fb50b3b725c4b781e29f">
           <title>adcm.xpt</title>
         </leaf>
-        <leaf ID="L0028" operation="new" xlink:type="simple"
+        <leaf ID="L0027" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/datasets/adex.xpt"
-              checksum-type="MD5" checksum="717cdca2457f3eba7ccd06a38a7577fb">
+              checksum-type="MD5" checksum="3937dc929f98eba707b7a3c56e20b957">
           <title>adex.xpt</title>
         </leaf>
-        <leaf ID="L0029" operation="new" xlink:type="simple"
+        <leaf ID="L0028" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/datasets/adlb.xpt"
-              checksum-type="MD5" checksum="24046922705d1158a832560509e125b5">
+              checksum-type="MD5" checksum="fdef20964ff00c24d39aa1e6c3b60cd3">
           <title>adlb.xpt</title>
         </leaf>
-        <leaf ID="L0030" operation="new" xlink:type="simple"
+        <leaf ID="L0029" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/datasets/adrs.xpt"
-              checksum-type="MD5" checksum="59946e567f7e1d6c6fb7732607c407c4">
+              checksum-type="MD5" checksum="1ebb4096b669d54b44187dec93396b5d">
           <title>adrs.xpt</title>
         </leaf>
-        <leaf ID="L0031" operation="new" xlink:type="simple"
+        <leaf ID="L0030" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/datasets/adsl.xpt"
-              checksum-type="MD5" checksum="d9cfee91cdb096cc2e43ae99c8ad619e">
+              checksum-type="MD5" checksum="7b68e93b09c5ba5cbed911ff71c34d61">
           <title>adsl.xpt</title>
         </leaf>
-        <leaf ID="L0032" operation="new" xlink:type="simple"
+        <leaf ID="L0031" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/datasets/adtte.xpt"
-              checksum-type="MD5" checksum="2dbf1810c71cc23ae315bb36735cf2c1">
+              checksum-type="MD5" checksum="97eac491d283520be593567775234871">
           <title>adtte.xpt</title>
         </leaf>
-        <leaf ID="L0033" operation="new" xlink:type="simple"
+        <leaf ID="L0032" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/00_config.sas"
               checksum-type="MD5" checksum="a185b838e0ab3ef350d2badab8c2c53f">
           <title>00_config.sas</title>
         </leaf>
-        <leaf ID="L0034" operation="new" xlink:type="simple"
+        <leaf ID="L0033" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/00_config_generated.sas"
-              checksum-type="MD5" checksum="ce4f0fc4022cf5de80f82b139cc2ed0d">
+              checksum-type="MD5" checksum="e13a7efd295183727835a683e2bbff8d">
           <title>00_config_generated.sas</title>
         </leaf>
-        <leaf ID="L0035" operation="new" xlink:type="simple"
+        <leaf ID="L0034" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/00_master_driver.sas"
               checksum-type="MD5" checksum="306fa2358eb5fc5745cadeba71b88f5b">
           <title>00_master_driver.sas</title>
         </leaf>
-        <leaf ID="L0036" operation="new" xlink:type="simple"
+        <leaf ID="L0035" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/A_adae_io_respec.sas"
-              checksum-type="MD5" checksum="b16927a8f09bab0e645ff4b4c5fd385f">
+              checksum-type="MD5" checksum="a766942d6d144d1751df933ea876c6d8">
           <title>A_adae_io_respec.sas</title>
         </leaf>
-        <leaf ID="L0037" operation="new" xlink:type="simple"
+        <leaf ID="L0036" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/A_adcm_generation.sas"
-              checksum-type="MD5" checksum="18cb5b8631a9953931f38284fb0e4c06">
+              checksum-type="MD5" checksum="c53b503cb3e6c13b2925d9a9c58d1408">
           <title>A_adcm_generation.sas</title>
         </leaf>
-        <leaf ID="L0038" operation="new" xlink:type="simple"
+        <leaf ID="L0037" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/A_adex_generation.sas"
-              checksum-type="MD5" checksum="51b625f73439199880e6d33a9d8f3fae">
+              checksum-type="MD5" checksum="5c0a4a7e9928942e457afc8bbc4aaed0">
           <title>A_adex_generation.sas</title>
         </leaf>
-        <leaf ID="L0039" operation="new" xlink:type="simple"
+        <leaf ID="L0038" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/A_adlb_generation.sas"
-              checksum-type="MD5" checksum="3f69ba59736d3a70154f14b2c4cb138f">
+              checksum-type="MD5" checksum="36bad06e1034b6cace07b611c2acbd87">
           <title>A_adlb_generation.sas</title>
         </leaf>
-        <leaf ID="L0040" operation="new" xlink:type="simple"
+        <leaf ID="L0039" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/A_adrs_generation.sas"
-              checksum-type="MD5" checksum="81ac2e96ffdaebac6ac32b2111fdf319">
+              checksum-type="MD5" checksum="a233b486c8e1fa0aa9c9a625929b83aa">
           <title>A_adrs_generation.sas</title>
         </leaf>
-        <leaf ID="L0041" operation="new" xlink:type="simple"
+        <leaf ID="L0040" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/A_adsl_generation.sas"
-              checksum-type="MD5" checksum="e429cc7ab065cbb7cc017bb2f38fe9a8">
+              checksum-type="MD5" checksum="854a68fcc91b34638240bf7a2094e858">
           <title>A_adsl_generation.sas</title>
         </leaf>
-        <leaf ID="L0042" operation="new" xlink:type="simple"
+        <leaf ID="L0041" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/A_adtte_generation.sas"
-              checksum-type="MD5" checksum="2beedd286fea5646cdefc858d108b467">
+              checksum-type="MD5" checksum="b1fe81e8560475f1c0f490f4d7e38eaf">
           <title>A_adtte_generation.sas</title>
         </leaf>
-        <leaf ID="L0043" operation="new" xlink:type="simple"
+        <leaf ID="L0042" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/B_bimo_generation.sas"
               checksum-type="MD5" checksum="d2dadf3af96080fc97cf24021bb425b9">
           <title>B_bimo_generation.sas</title>
         </leaf>
+        <leaf ID="L0043" operation="new" xlink:type="simple"
+              xlink:href="m5/datasets/tropic/analysis/adam/programs/F042_phase2_pain_derivation.sas"
+              checksum-type="MD5" checksum="06be8414f4add1d42146cae95f72d94b">
+          <title>F042_phase2_pain_derivation.sas</title>
+        </leaf>
         <leaf ID="L0044" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/L_staging_ingest.sas"
-              checksum-type="MD5" checksum="e83bfaf76b268db28469fe2604db8b2e">
+              checksum-type="MD5" checksum="92e79a25dce2b523848c644ef0c54dcd">
           <title>L_staging_ingest.sas</title>
         </leaf>
         <leaf ID="L0045" operation="new" xlink:type="simple"
@@ -241,7 +241,7 @@
         </leaf>
         <leaf ID="L0046" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/T_tfl_generation.sas"
-              checksum-type="MD5" checksum="dde3b81075f5067c210fade4111485f0">
+              checksum-type="MD5" checksum="1133988dc73421c4811f81c42232194a">
           <title>T_tfl_generation.sas</title>
         </leaf>
         <leaf ID="L0047" operation="new" xlink:type="simple"
@@ -266,7 +266,7 @@
         </leaf>
         <leaf ID="L0051" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/admiral_adtte.R"
-              checksum-type="MD5" checksum="1d0af8eb62d29f3a538fd90b8b6f488f">
+              checksum-type="MD5" checksum="df1063257ae6aef26c7b484118b88521">
           <title>admiral_adtte.R</title>
         </leaf>
         <leaf ID="L0052" operation="new" xlink:type="simple"
@@ -280,176 +280,186 @@
           <title>config_study.R</title>
         </leaf>
         <leaf ID="L0054" operation="new" xlink:type="simple"
+              xlink:href="m5/datasets/tropic/analysis/adam/programs/f042_provisional_pain_derivation.R"
+              checksum-type="MD5" checksum="623e6a633c00812c2214f2b236d03d4d">
+          <title>f042_provisional_pain_derivation.R</title>
+        </leaf>
+        <leaf ID="L0055" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/load_spec.R"
               checksum-type="MD5" checksum="6d5bca1cada09996fc752a065e3a52c7">
           <title>load_spec.R</title>
         </leaf>
-        <leaf ID="L0055" operation="new" xlink:type="simple"
+        <leaf ID="L0056" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/spec_data_checks.R"
-              checksum-type="MD5" checksum="572ea07bdd830ab109d75fee834dc91a">
+              checksum-type="MD5" checksum="48cf551fcc8aff8d000ddd439071b54b">
           <title>spec_data_checks.R</title>
         </leaf>
-        <leaf ID="L0056" operation="new" xlink:type="simple"
+        <leaf ID="L0057" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/tfl_generation.R"
-              checksum-type="MD5" checksum="731745e28499c90bdc4127365f2ba72e">
+              checksum-type="MD5" checksum="bb5487902fee5ecd0c509f4a933821ba">
           <title>tfl_generation.R</title>
         </leaf>
-        <leaf ID="L0057" operation="new" xlink:type="simple"
+        <leaf ID="L0058" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/tfl_stats.R"
-              checksum-type="MD5" checksum="fc8f4c5a1fbb4bb9f50c2be1a2522f66">
+              checksum-type="MD5" checksum="e6e273cbc58b0b10f0786fc9527cd53e">
           <title>tfl_stats.R</title>
         </leaf>
-        <leaf ID="L0058" operation="new" xlink:type="simple"
+        <leaf ID="L0059" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/v_adae_io_validation.R"
-              checksum-type="MD5" checksum="afe00e2153f79f892b013eead1d2ec4f">
+              checksum-type="MD5" checksum="697a6e1700cebb323b05d82a5b5e0665">
           <title>v_adae_io_validation.R</title>
         </leaf>
-        <leaf ID="L0059" operation="new" xlink:type="simple"
+        <leaf ID="L0060" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/v_adcm_validation.R"
               checksum-type="MD5" checksum="9a25c516eb030a0c3760c4f53eb4ad4b">
           <title>v_adcm_validation.R</title>
         </leaf>
-        <leaf ID="L0060" operation="new" xlink:type="simple"
+        <leaf ID="L0061" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/v_adex_validation.R"
-              checksum-type="MD5" checksum="62f3eb56baeca60c46f4a3a6282b4def">
+              checksum-type="MD5" checksum="0e3d513e33cc9e6ccec1d2f85148c9a6">
           <title>v_adex_validation.R</title>
         </leaf>
-        <leaf ID="L0061" operation="new" xlink:type="simple"
+        <leaf ID="L0062" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/v_adlb_validation.R"
               checksum-type="MD5" checksum="365b9e01fe5d7486dd20ff167af164f5">
           <title>v_adlb_validation.R</title>
         </leaf>
-        <leaf ID="L0062" operation="new" xlink:type="simple"
+        <leaf ID="L0063" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/v_adrs_validation.R"
-              checksum-type="MD5" checksum="014f0d3c1106244e78872ba84fe9feb7">
+              checksum-type="MD5" checksum="e8d9cf8524184b2b8873dd24cdce6b38">
           <title>v_adrs_validation.R</title>
         </leaf>
-        <leaf ID="L0063" operation="new" xlink:type="simple"
+        <leaf ID="L0064" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/v_adsl_validation.R"
-              checksum-type="MD5" checksum="1f6040acaf250ff8ae03a095dad7e2a3">
+              checksum-type="MD5" checksum="4a7926771b7a332ad83decc6cdedbfbb">
           <title>v_adsl_validation.R</title>
         </leaf>
-        <leaf ID="L0064" operation="new" xlink:type="simple"
+        <leaf ID="L0065" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/v_adtte_validation.R"
-              checksum-type="MD5" checksum="af7ff8e9c2274ac77858107b3965c43f">
+              checksum-type="MD5" checksum="bc0d03a310bfa487d03236731b66411c">
           <title>v_adtte_validation.R</title>
         </leaf>
-        <leaf ID="L0065" operation="new" xlink:type="simple"
+        <leaf ID="L0066" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/v_bimo_validation.R"
               checksum-type="MD5" checksum="1ab1ccda10fc3715e8c898af305aaafd">
           <title>v_bimo_validation.R</title>
         </leaf>
-        <leaf ID="L0066" operation="new" xlink:type="simple"
+        <leaf ID="L0067" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/v_sdtm_validation.R"
               checksum-type="MD5" checksum="37cfd93b38ed38daeaad3eb18f90d678">
           <title>v_sdtm_validation.R</title>
         </leaf>
-        <leaf ID="L0067" operation="new" xlink:type="simple"
+        <leaf ID="L0068" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/programs/v_staging_ingest.R"
-              checksum-type="MD5" checksum="d34d34efc22dec6aa48fd9702e7ed48b">
+              checksum-type="MD5" checksum="c504da8ca5acbe24e97053b0146d0042">
           <title>v_staging_ingest.R</title>
         </leaf>
-        <leaf ID="L0068" operation="new" xlink:type="simple"
+        <leaf ID="L0069" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/adrg.pdf"
-              checksum-type="MD5" checksum="f26d578dc5395cc19a83abf7ccf8d7cf">
+              checksum-type="MD5" checksum="458660f516445c3bebd5c8c3e0f90ff2">
           <title>adrg.pdf</title>
         </leaf>
-        <leaf ID="L0069" operation="new" xlink:type="simple"
+        <leaf ID="L0070" operation="new" xlink:type="simple"
               xlink:href="m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf"
-              checksum-type="MD5" checksum="f3d3de4a94c925678c6f3630b662417c">
+              checksum-type="MD5" checksum="a1ff9c265a1b6d17ea372c05699bbb6d">
           <title>csr.pdf</title>
         </leaf>
-        <leaf ID="L0070" operation="new" xlink:type="simple"
+        <leaf ID="L0071" operation="new" xlink:type="simple"
               xlink:href="m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/figures/F-01-1_CONSORT_Disposition.png"
-              checksum-type="MD5" checksum="1a790e0e8e4e482493557b8c3952928c">
+              checksum-type="MD5" checksum="503d6eb50baa2ea6e997d771e39d8ebb">
           <title>F-01-1_CONSORT_Disposition.png</title>
         </leaf>
-        <leaf ID="L0071" operation="new" xlink:type="simple"
+        <leaf ID="L0072" operation="new" xlink:type="simple"
               xlink:href="m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/figures/F-11-1_KM_OS.png"
-              checksum-type="MD5" checksum="d011d981ce848b8a42e5c79b133e9d0b">
+              checksum-type="MD5" checksum="2dd8a4113b55ec6d0b72bde47591d382">
           <title>F-11-1_KM_OS.png</title>
         </leaf>
-        <leaf ID="L0072" operation="new" xlink:type="simple"
+        <leaf ID="L0073" operation="new" xlink:type="simple"
               xlink:href="m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/figures/F-11-2_KM_PFS.png"
-              checksum-type="MD5" checksum="0ce502d832bc2e61352e611e5378f86a">
+              checksum-type="MD5" checksum="3df16f2822f173f9ac2f8c7e5a1ec2fc">
           <title>F-11-2_KM_PFS.png</title>
         </leaf>
-        <leaf ID="L0073" operation="new" xlink:type="simple"
+        <leaf ID="L0074" operation="new" xlink:type="simple"
               xlink:href="m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/figures/F-12-1_Subgroup_Forest.png"
-              checksum-type="MD5" checksum="21005d527158bf9d8ed0a560227c4b87">
+              checksum-type="MD5" checksum="3635299f3a726cf573acc65dc2db774a">
           <title>F-12-1_Subgroup_Forest.png</title>
         </leaf>
-        <leaf ID="L0074" operation="new" xlink:type="simple"
+        <leaf ID="L0075" operation="new" xlink:type="simple"
               xlink:href="m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/figures/F-13-1_PSA_Waterfall.png"
-              checksum-type="MD5" checksum="445a759f3017726a54240e40ab3b1304">
+              checksum-type="MD5" checksum="c2c76a372e03995c568d7f9c9ca36262">
           <title>F-13-1_PSA_Waterfall.png</title>
         </leaf>
-        <leaf ID="L0075" operation="new" xlink:type="simple"
+        <leaf ID="L0076" operation="new" xlink:type="simple"
               xlink:href="m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/figures/F-14-1_Swimmer_Plot.png"
-              checksum-type="MD5" checksum="931b572633b7b7d08f874567f6a4b259">
+              checksum-type="MD5" checksum="fd48b0a2327175775e52e4ac7d39ef26">
           <title>F-14-1_Swimmer_Plot.png</title>
         </leaf>
-        <leaf ID="L0076" operation="new" xlink:type="simple"
+        <leaf ID="L0077" operation="new" xlink:type="simple"
               xlink:href="m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/figures/F-17-1_Optimus_Scatter.png"
               checksum-type="MD5" checksum="94d97d72e8bd660494104f16c40f3d06">
           <title>F-17-1_Optimus_Scatter.png</title>
         </leaf>
-        <leaf ID="L0077" operation="new" xlink:type="simple"
+        <leaf ID="L0078" operation="new" xlink:type="simple"
               xlink:href="m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/figures/sas/F-11-1_KM_OS_SAS.png"
-              checksum-type="MD5" checksum="6e01de8364b710c5b94102d420bbefdf">
+              checksum-type="MD5" checksum="cd81d243974f61527ecc26119051472f">
           <title>F-11-1_KM_OS_SAS.png</title>
         </leaf>
-        <leaf ID="L0078" operation="new" xlink:type="simple"
+        <leaf ID="L0079" operation="new" xlink:type="simple"
               xlink:href="m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/figures/sas/F-11-2_KM_PFS_SAS.png"
-              checksum-type="MD5" checksum="c36998a3197d29ef62739cfbfb74d9e8">
+              checksum-type="MD5" checksum="e0e6ae68955850dbde2669ec06714023">
           <title>F-11-2_KM_PFS_SAS.png</title>
         </leaf>
-        <leaf ID="L0079" operation="new" xlink:type="simple"
+        <leaf ID="L0080" operation="new" xlink:type="simple"
               xlink:href="m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/figures/sas/F-12-1_Subgroup_Forest_SAS.png"
-              checksum-type="MD5" checksum="224890a91856ff1db27ea1ee6bb4d0c2">
+              checksum-type="MD5" checksum="e9155870bfce0a5c9ae426f33e14afec">
           <title>F-12-1_Subgroup_Forest_SAS.png</title>
         </leaf>
-        <leaf ID="L0080" operation="new" xlink:type="simple"
+        <leaf ID="L0081" operation="new" xlink:type="simple"
               xlink:href="m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/figures/sas/F-13-1_PSA_Waterfall_SAS.png"
-              checksum-type="MD5" checksum="e8aac7f63b82185eb343727612ce99ac">
+              checksum-type="MD5" checksum="b4a5752bc19366b82b996e1aa603c422">
           <title>F-13-1_PSA_Waterfall_SAS.png</title>
         </leaf>
-        <leaf ID="L0081" operation="new" xlink:type="simple"
+        <leaf ID="L0082" operation="new" xlink:type="simple"
               xlink:href="m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/figures/sas/F-14-1_Swimmer_Plot_SAS.png"
               checksum-type="MD5" checksum="2829e5ccbd5dbe4b5968ec00d786b808">
           <title>F-14-1_Swimmer_Plot_SAS.png</title>
         </leaf>
-        <leaf ID="L0082" operation="new" xlink:type="simple"
+        <leaf ID="L0083" operation="new" xlink:type="simple"
               xlink:href="m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/figures/sas/F-17-1_Optimus_Scatter_SAS.png"
               checksum-type="MD5" checksum="d87fde7d66a35b019498356be2a855d6">
           <title>F-17-1_Optimus_Scatter_SAS.png</title>
         </leaf>
-        <leaf ID="L0083" operation="new" xlink:type="simple"
+        <leaf ID="L0084" operation="new" xlink:type="simple"
               xlink:href="m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/tables/T-11-Efficacy_Tables.txt"
-              checksum-type="MD5" checksum="be8f2f59f00c224cf369e107973a0b36">
+              checksum-type="MD5" checksum="a0c996e92f03f7abe73b6e5fe4045aba">
           <title>T-11-Efficacy_Tables.txt</title>
         </leaf>
-        <leaf ID="L0084" operation="new" xlink:type="simple"
+        <leaf ID="L0085" operation="new" xlink:type="simple"
               xlink:href="m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/tables/T-17-Optimus_Tables.txt"
-              checksum-type="MD5" checksum="c30bddf1accf71a0488df4406ee3b8ab">
+              checksum-type="MD5" checksum="4222e8c759d886636a1bb82ecdee7700">
           <title>T-17-Optimus_Tables.txt</title>
         </leaf>
-        <leaf ID="L0085" operation="new" xlink:type="simple"
+        <leaf ID="L0086" operation="new" xlink:type="simple"
               xlink:href="m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/tables/T-20-AE_Summary_Tables.txt"
               checksum-type="MD5" checksum="ab45796931716c43a9ee1902e53d60b6">
           <title>T-20-AE_Summary_Tables.txt</title>
         </leaf>
-        <leaf ID="L0086" operation="new" xlink:type="simple"
+        <leaf ID="L0087" operation="new" xlink:type="simple"
               xlink:href="m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/tables/T-21-Lab_Shift_Tables.txt"
               checksum-type="MD5" checksum="362e47002adf4a889caf6c8cbe4db8cc">
           <title>T-21-Lab_Shift_Tables.txt</title>
         </leaf>
-        <leaf ID="L0087" operation="new" xlink:type="simple"
+        <leaf ID="L0088" operation="new" xlink:type="simple"
+              xlink:href="m5/datasets/tropic/tabulations/sdtm/blankcrf.pdf"
+              checksum-type="MD5" checksum="0616f5b75d7df476fd78b9005ecf9004">
+          <title>blankcrf.pdf</title>
+        </leaf>
+        <leaf ID="L0089" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/analysis/adam/datasets/define2-1.xsl"
               checksum-type="MD5" checksum="16521f8975f25c1c9f30c90025b72d83">
           <title>define2-1.xsl</title>
         </leaf>
-        <leaf ID="L0088" operation="new" xlink:type="simple"
+        <leaf ID="L0090" operation="new" xlink:type="simple"
               xlink:href="m5/datasets/tropic/tabulations/sdtm/datasets/define2-1.xsl"
               checksum-type="MD5" checksum="16521f8975f25c1c9f30c90025b72d83">
           <title>define2-1.xsl</title>
@@ -457,7 +467,7 @@
         <leaf ID="Lstf0001" operation="new" xlink:type="simple"
               xlink:href="m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/stf-tropic.xml"
               version="stf version 2.3"
-              checksum-type="MD5" checksum="492ad96d279079e71ffc7c34b80b89cd">
+              checksum-type="MD5" checksum="159072502b4021965efe52fa9a0a2558">
           <title>TROPIC Study Tagging File</title>
         </leaf>
         </m5-3-5-1-study-reports-of-controlled-clinical-studies-pertinent-to-the-claimed-indication>

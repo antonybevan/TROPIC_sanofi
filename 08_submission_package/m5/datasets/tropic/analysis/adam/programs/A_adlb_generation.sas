@@ -1,14 +1,17 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: A_adlb_generation.sas
-   Version: 2.2.0
+   Version: 2.2.1
    Author: Antony Bevan, Clinical Programming
-   Date: 2026-05-27
+   Date: 2026-05-27 (ADaM dens note 2026-07-09)
    Standard: ADaMIG v1.3 BDS
    Input: sdtm.lb, adam.adsl
    Output: adam.adlb
    Description: Generates Laboratory BDS ADaM (ADLB) with analysis windowing, Worst
                 Analysis flag (ANL01FL), and Project Optimus parameters.
+
+   ADaM dens: event/visit rows restricted to ADSL SAFFL='Y'; TRT01P from ADSL.
+   Shift-table dens = ADSL SAFFL (TFL), not distinct ADLB subjects alone.
    ============================================================================= */
 
 /* PGMDIR guard: define only when running standalone; master driver pre-defines this. */

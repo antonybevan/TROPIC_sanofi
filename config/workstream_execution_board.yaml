@@ -4,9 +4,14 @@
 
 version: 1
 study: TROPIC-NCT00417079
-as_of: "2026-07-09"
+as_of: "2026-08-04"
 product_claim_in_force: controlled_non_submission_demo
-pipeline_seal_tag: v0.1.0-demo-rc.1
+pipeline_seal_tag: v0.2.0-portfolio
+historical_tag_note: "v0.1.0-demo-rc.1 is immutable historical evidence; v0.2.0-portfolio is the current Path A portfolio release."
+audit_baseline_commit: "v0.2.0-portfolio^{commit}"
+latest_sealed_run_source_head: "v0.2.0-portfolio^{commit}"
+latest_pipeline_health: "oda/full_dag/GREEN, 34 of 34 stages"
+latest_release_verification: "31 of 31 checks"
 board_doc: docs/WORKSTREAM_EXECUTION_BOARD.md
 product_claim_doc: docs/PRODUCT_CLAIM.md
 disposition_board: 06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md
@@ -21,7 +26,7 @@ workstreams:
       - 06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md
       - 06_qc_evidence/audit/findings_register.csv
       - 06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md
-      - docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md
+      - docs/RELEASE_NOTE_v0.2.0-portfolio.md
       - docs/PRODUCT_CLAIM.md
       - README.md
       - 00_governance/REPRODUCIBILITY.md
@@ -36,7 +41,8 @@ workstreams:
   WS1_source_intake:
     name: Clinical data management / source intake
     gates: [G01]
-    status: AMBER
+    status: GREEN
+    note: "Path A source handoff is GREEN with disclosed residuals; AMBER reflects broader CORE/P21 industry depth. Section 1 audit passed 2026-08-03."
     owned_artifacts:
       - 01_source_data
       - 04_analysis_datasets/programs/r/v_staging_ingest.R
@@ -51,7 +57,7 @@ workstreams:
     required_evidence:
       - docs/workstreams/WS1_SOURCE_INTAKE_PACK.md
       - CORE residual disposition matrix
-    next_action: "Produce WS1_CORE_RESIDUAL_MATRIX.csv from CORE JSON; file WS-1 review note"
+    next_action: "Maintain WS1_CORE_RESIDUAL_MATRIX.csv on re-run; hand off to the Section 2 population/endpoint audit"
     residual_findings: [F-015, F-017]
     packs:
       - docs/workstreams/WS1_SOURCE_INTAKE_PACK.md
@@ -59,28 +65,36 @@ workstreams:
   WS2_statistical_specification:
     name: Statistical and analysis specification
     gates: [G02]
-    status: AMBER
+    status: GREEN
     owned_artifacts:
       - config/study_config.yaml
       - 02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx
       - config/ctq_traceability.yaml
       - 07_reviewer_explanation/analysis_report.md
       - 07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md
+    note: "Conditional GREEN for Path A. The statistical-governance review found and corrected GOV-STAT-01 in SAS T-11-5; current-head promotion now requires exact subject-level F042_PAIN_RESPONSE SAS/R parity plus the full real-SAS DAG and reseal. External qualified review remains required before regulated reuse."
     open_risks:
-      - G02_not_stage_gated
-      - F-011_psa_population_shell
+      - external_statistical_medical_review
+      - F-012_combined_n749_is_not_protocol_itt
     required_evidence:
       - population_endpoint_control_table
       - spec_to_config_trace
-    next_action: "Record WS-2 review note against population/endpoint control table; optional machine G02 check"
-    residual_findings: [F-011, F-012]
+      - statistical_governance_assessment
+      - f042_pain_response_subject_level_reconciliation
+    next_action: "Require endpoint_controls.F042_PAIN_RESPONSE=PASS on the current source tree and retain external qualified statistical/medical review as a pre-regulated-use requirement"
+    residual_findings: [F-012, F-042]
     packs:
       - docs/workstreams/WS2_POPULATION_ENDPOINT_CONTROL.md
+      - docs/workstreams/decisions/F042_APPROVER_REVIEW_PACKET_2026-08-03.md
+      - docs/workstreams/decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md
+      - docs/workstreams/reviews/PATH_A_STATISTICAL_GOVERNANCE_ASSESSMENT_2026-08-04.md
+      - 06_qc_evidence/audit/section_reviews/SECTION_02_POPULATIONS_ENDPOINTS_AUDIT_2026-08-03.md
 
   WS3_standards_metadata:
     name: Standards and metadata governance
     gates: [G03]
-    status: AMBER
+    status: GREEN
+    note: "GREEN for Path A; AMBER for broader commercial-validator depth. F-014 is resolved with 10 ResultDisplays / 18 AnalysisResults and an executable Define/ARM contract."
     owned_artifacts:
       - 03_metadata/adam/ADaM_spec.xlsx
       - 03_metadata/define/define.xml
@@ -91,14 +105,13 @@ workstreams:
       - 03_metadata/usdm
       - 04_analysis_datasets/datasetjson
     open_risks:
-      - F-014_arm_limited
       - F-016_no_commercial_p21
       - exploratory_layers_overclaim
     required_evidence:
       - external_validation_evidence_index
       - package_vs_exploratory_inventory
-    next_action: "Support CORE residual matrix; keep exploratory layers non-eCTD"
-    residual_findings: [F-014, F-016, F-020, F-021, F-022]
+    next_action: "Maintain the external-validation index and Define/ARM contract; keep Dataset-JSON, USDM and ARS claims within their documented exploratory scope"
+    residual_findings: [F-016, F-020, F-021, F-022]
     packs:
       - docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md
 
@@ -118,7 +131,7 @@ workstreams:
     open_risks:
       - deferred_sap_tfl_ids
       - synthetic_cbzp_in_tfls
-      - out_of_dag_sas_companion_figures
+      - manual_sas_figure_renderer_diagnostic_only
     required_evidence:
       - controlled_catalog_pass
       - dual_lang_and_admiral_pass
@@ -147,28 +160,27 @@ workstreams:
     required_evidence:
       - docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md
     next_action: "Keep residual memo current; co-own CORE residual matrix with WS-1"
-    residual_findings: [F-003, F-005, F-011, F-012, F-014, F-015, F-016, F-017, F-019, F-020, F-021, F-022, F-025]
+    residual_findings: [F-003, F-005, F-012, F-015, F-016, F-017, F-019, F-020, F-021, F-022, F-025]
 
   WS6_regulatory_writing:
     name: Reviewer explanation and regulatory writing
     gates: [G07, G08]
-    status: AMBER
+    status: GREEN
     owned_artifacts:
       - 07_reviewer_explanation/guides/ADRG.md
       - 07_reviewer_explanation/guides/SDRG.md
       - 07_reviewer_explanation/guides/BDRG.md
       - 07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md
-      - docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md
+      - docs/RELEASE_NOTE_v0.2.0-portfolio.md
       - 07_reviewer_explanation/analysis_report.md
     open_risks:
-      - guides_still_repo_voice
-      - G07_not_stage_gated
+      - optional_pdf_repackage_lag
       - overclaim_under_interview_pressure
     required_evidence:
       - hardened_adrg_sdrg_bdrg
       - guide_signoff_checklist
-    next_action: "Execute WS6 hardening checklist S1-S3 (ADRG then SDRG then BDRG)"
-    residual_findings: [F-003, F-005, F-019, F-023]
+    next_action: "Maintain guide claim language; optionally re-package PDFs; preserve Path A limitations"
+    residual_findings: [F-003, F-005, F-019]
     packs:
       - docs/workstreams/WS6_REVIEWER_GUIDE_HARDENING_CHECKLIST.md
 
@@ -189,19 +201,22 @@ workstreams:
       - scripts/verify_release.sh
     open_risks:
       - seal_confused_with_submission
-      - ci_release_job_not_wired
+      - ci_release_job_requires_regression_monitoring
     required_evidence:
       - scripts/verify_release.py
       - ci_release_job
-    next_action: "Wire scripts/verify_release.py into CI; optional evidence snapshot"
+    next_action: "Maintain CI seal verification and issue a successor release note only after the full section audit"
     residual_findings: [F-005, F-025]
 
 priority_queue:
+  - { id: DONE-SECTION0, workstream: WS0_governance, action: "Section 0 governance/SAP consistency audit", status: DONE }
+  - { id: DONE-SECTION1, workstream: WS1_source_intake, action: "Section 1 source/SDTM provenance and CORE residual audit", status: DONE }
+  - { id: DONE-SECTION2, workstream: WS2_statistical_specification, action: "Section 2 population/endpoint/SAP dot-connection audit", status: DONE }
   - { id: DONE-WS0, workstream: WS0_governance, action: "PRODUCT_CLAIM.md", status: DONE }
   - { id: DONE-WS5, workstream: WS5_qc_validation, action: "KNOWN_DIFFERENCES_MEMO.md", status: DONE }
   - { id: DONE-WS3, workstream: WS3_standards_metadata, action: "external validation index", status: DONE }
-  - { id: DONE-WS2, workstream: WS2_statistical_specification, action: "population/endpoint control table", status: DONE_DRAFT }
+  - { id: DONE-WS2, workstream: WS2_statistical_specification, action: "population/endpoint control table", status: DONE }
   - { id: DONE-WS7-verify, workstream: WS7_release_engineering, action: "verify_release.py", status: DONE }
-  - { id: P1-WS6, workstream: WS6_regulatory_writing, action: "ADRG/SDRG/BDRG hardening S1-S3", status: OPEN }
-  - { id: P1-WS1, workstream: WS1_source_intake, action: "CORE residual matrix CSV", status: OPEN }
-  - { id: P2-WS7-ci, workstream: WS7_release_engineering, action: "CI wire verify_release", status: OPEN }
+  - { id: DONE-WS6, workstream: WS6_regulatory_writing, action: "ADRG/SDRG/BDRG hardening S1-S4", status: DONE }
+  - { id: DONE-WS1, workstream: WS1_source_intake, action: "CORE residual matrix CSV", status: DONE }
+  - { id: DONE-WS7-ci, workstream: WS7_release_engineering, action: "CI wire verify_release", status: DONE }

@@ -29,6 +29,9 @@ jobs:
         # shell wrapper parity
         bash scripts/verify_release.sh
 
+    - name: Test release-seal verifier
+      run: python3 tests/test_verify_release.py
+
   validate:
     name: Run Tests & Conformance Gates
     runs-on: ubuntu-latest
@@ -50,7 +53,7 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libxml2-dev libssl-dev libcurl4-openssl-dev libxml2-utils
+        sudo apt-get install -y libxml2-dev libssl-dev libcurl4-openssl-dev libxml2-utils poppler-utils
 
     - name: Cache renv packages
       uses: actions/cache@v5
@@ -99,14 +102,24 @@ jobs:
     - name: Run unit tests (Broker + Seeder)
       run: |
         python3 platform/test_oda_broker.py
+        python3 tests/test_phase2_staging.py
 
     - name: Run clinical pipeline smoke test (Demo)
       run: |
         python3 platform/cibuild.py --demo
 
+    - name: Run TFL regression and rendered-figure QC tests
+      run: |
+        Rscript tests/test_lab_shift_table.R
+        Rscript tests/test_figure_outputs.R
+        Rscript tests/test_tfl_population_contract.R
+        # Re-check the committed G07 evidence without rewriting its timestamp;
+        # the final release seal requires a clean material worktree.
+        python3 platform/check_gate_g07_reviewer_package.py --check-only
+
     - name: Run ADaM conformance check gate
       run: |
-        bash platform/run_adam_conformance.sh
+        bash platform/run_adam_conformance.sh --check-only
 
     - name: Validate Define-XML Metadata (ADaM & SDTM)
       run: |

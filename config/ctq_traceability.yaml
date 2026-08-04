@@ -53,7 +53,7 @@ ctq_factors:
   - id: CTQ-EFF-SECONDARY-TTE
     domain: efficacy
     risk_tier: high
-    clinical_question: "What are the supportive time-to-event results for PSA progression and tumor progression?"
+    clinical_question: "What are the supportive time-to-event results for PSA, tumor and pain progression?"
     estimand:
       population: "Intent-to-treat analysis population, with endpoint-specific evaluability where applicable."
       variable: "Time from randomization to endpoint-specific progression event."
@@ -63,8 +63,8 @@ ctq_factors:
       - "SAP v4.0 sections 4.3-5.3"
     adam_datasets: [ADSL, ADTTE]
     key_variables: [USUBJID, ITTFL, PARAMCD, AVAL, CNSR]
-    outputs: [T-11-6, T-11-7]
-    ars_analyses: [AN.TTPSA, AN.TTUMOR]
+    outputs: [T-11-6, T-11-7, T-11-8]
+    ars_analyses: [AN.TTPSA, AN.TTUMOR, AN.TTPAIN]
     validation_artifacts: [adtte_secondary, adsl, tfl_primary_secondary]
     reviewer_guides: [07_reviewer_explanation/guides/ADRG.md, 07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md]
 
@@ -82,7 +82,7 @@ ctq_factors:
       - "review-board SR-1 sensitivity trace"
     adam_datasets: [ADSL, ADRS, ADLB]
     key_variables: [USUBJID, PARAMCD, AVAL, AVALC]
-    outputs: [T-11-8, T-11-8b, F-13-1]
+    outputs: [T-11-3, T-11-4, T-11-5, T-11-8b, F-13-1]
     ars_analyses: []
     validation_artifacts: [response_adam, safety_adam, tfl_primary_secondary]
     reviewer_guides: [07_reviewer_explanation/guides/ADRG.md, 07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md]
@@ -160,4 +160,3 @@ ctq_factors:
     ars_analyses: []
     validation_artifacts: [metadata_package, reviewer_explanation, platform_release_controls]
     reviewer_guides: [07_reviewer_explanation/guides/ADRG.md, 07_reviewer_explanation/guides/SDRG.md, 07_reviewer_explanation/guides/BDRG.md, 07_reviewer_explanation/guides/SDSP.md]
-

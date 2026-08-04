@@ -43,8 +43,8 @@ vars <- bind_rows(lapply(ds_order, function(ds) {
 labs <- vars %>% filter(!is.na(label) & nzchar(trimws(label)))
 
 # ----------------------------------------------------------------- CSV (R) -----
-# Minimally-quoted, CRLF line endings to match the historical (python csv) format
-# exactly -- so the only change vs the retired generator is provenance, not bytes.
+# Minimally quoted, LF line endings keep the generated control artifact byte-stable
+# across macOS/Linux checkouts and make the release source seal reproducible.
 csv_out <- "04_analysis_datasets/programs/r/adam_var_labels.csv"
 csv_lines <- "dataset,variable,label"
 for (i in seq_len(nrow(labs))) {
@@ -53,7 +53,7 @@ for (i in seq_len(nrow(labs))) {
   csv_lines <- c(csv_lines, paste(labs$dataset[i], labs$variable[i], lab, sep = ","))
 }
 con <- file(csv_out, open = "wb", encoding = "UTF-8")
-writeLines(csv_lines, con, sep = "\r\n")
+writeLines(csv_lines, con, sep = "\n")
 close(con)
 
 # --------------------------------------------------------------- SAS macros ----

@@ -1,0 +1,189 @@
+# Controlled decision state for EDR-F042-T11-8-2026-08-03.
+# Phase 2 may use this adopted authority record; it does not itself generate outputs.
+
+record:
+  id: EDR-F042-T11-8-2026-08-03
+  version: 0.4.0
+  status: author_adopted_phase_2_authorized
+  executable: false
+  consumption: phase_2_authority_record
+  product_path: A_controlled_non_submission_demonstration
+  baseline_commit: a213667
+  current_outputs_unchanged: true
+  author_decision_required: false
+  decision_roles:
+    - accountable_author
+  single_author_project: true
+  independent_human_review_available: false
+  independent_human_review_required_for_path_a: false
+  external_statistical_medical_review_required_for_regulated_reuse: true
+  authority:
+    product_claim: docs/PRODUCT_CLAIM.md
+    sap_lock_memo: 06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md
+    findings_board: 06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md
+    section_2_audit: 06_qc_evidence/audit/section_reviews/SECTION_02_POPULATIONS_ENDPOINTS_AUDIT_2026-08-03.md
+    section_3_audit: 06_qc_evidence/audit/section_reviews/SECTION_03_ADAM_DERIVATION_AUDIT_2026-08-03.md
+    section_4_audit: 06_qc_evidence/audit/section_reviews/SECTION_04_METADATA_TFL_REVIEWER_PACKAGE_AUDIT_2026-08-03.md
+    pr_source_qualification_audit: docs/workstreams/decisions/F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.md
+    pr_source_profile: docs/workstreams/decisions/F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.yaml
+    approval_specification: docs/workstreams/decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md
+    approver_review_packet: docs/workstreams/decisions/F042_APPROVER_REVIEW_PACKET_2026-08-03.md
+    provisional_implementation_note: docs/workstreams/decisions/F042_PROVISIONAL_IMPLEMENTATION_NOTE_2026-08-03.md
+    adjudication_worksheet_spec: docs/workstreams/decisions/F042_ADJUDICATION_WORKSHEET_SPEC_2026-08-03.md
+
+pre_implementation:
+  status: author_adopted_phase_2_ready
+  source_profile_rows: 151
+  source_profile_subjects: 65
+  source_profile_adsl_linkage: 65/65
+  duplicate_usubjid_prseq_keys: 0
+  endpoint_consumption_allowed: true
+  clinical_rule_author_adopted: true
+  pn_subject_visits: 1937
+  pn_subject_visits_with_exact_sv_match: 1931
+  current_pain_algorithm_conforms_to_authority: false
+  provisional_exploratory_work:
+    status: superseded_by_author_adopted_phase_2
+    implementation_scope: isolated_f042_r_derivation_and_synthetic_regression_tests
+    production_consumption_allowed: false
+    production_outputs_modified: false
+    release_reseal_allowed: false
+    formal_signoff_required_before_integration: false
+
+decisions:
+  - id: ED-01
+    status: adopted_as_written
+    author_disposition: adopt_as_written
+    author_initials: AB
+    decision_date: 2026-08-04
+    question: TTPAIN/PFS pain progression supporting disease evidence
+    current_state: The protocol requires cancer-related clinical and/or radiological evidence; no author-adopted operational rule exists.
+    proposed_direction: Apply Approval Specification sections 3-5; accept qualifying evidence no later than the confirming visit or direct-intent palliative/antalgic RT; do not use PSA alone or later backdating.
+    decision_roles: [accountable_author]
+    external_review_before_regulated_reuse: [statistician, medical_reviewer]
+    blocks:
+      - pfs_derivation_change
+      - filing_facing_endpoint_claim
+
+  - id: ED-02
+    status: adopted_as_written
+    author_disposition: adopt_as_written
+    author_initials: AB
+    decision_date: 2026-08-04
+    question: Palliative radiotherapy source and precedence
+    current_state: Direct-intent RT evidence occurs in 13 CM rows/10 subjects and 3 PR rows/1 different subject; PR is not staged.
+    proposed_direction: Stage full PR and use a provenance-preserving CM+PR union; require radiation plus explicit PALLIATIVE or ANTALGIC text; auto-collapse exact subject/date duplicates only.
+    decision_roles: [accountable_author]
+    external_review_before_regulated_reuse: [statistician, medical_reviewer]
+    blocks:
+      - pr_staging
+      - palliative_rt_derivation
+
+  - id: ED-03
+    status: adopted_as_written
+    author_disposition: adopt_as_written
+    author_initials: AB
+    decision_date: 2026-08-04
+    question: Palliative-RT-only sensitivity
+    current_state: SAP mentions palliative radiotherapy, but no controlled sensitivity output is produced.
+    proposed_direction: Primary diary-or-RT analysis plus diary-only sensitivity, RT-only supportive analysis, and bounded missing-date review.
+    decision_roles: [accountable_author]
+    external_review_before_regulated_reuse: [statistician]
+    blocks:
+      - sensitivity_programming
+
+  - id: ED-04
+    status: adopted_as_written
+    author_disposition: adopt_as_written
+    author_initials: AB
+    decision_date: 2026-08-04
+    question: SAP T-11-8 collision
+    current_state: SAP T-11-8 is TTPAIN; current physical T-11-8 is response summary.
+    proposed_direction: Restore SAP-native mappings T-11-3 PSA response, T-11-4 ORR, T-11-5 pain response, T-11-6 TTUMOR, T-11-7 TTPSA, and T-11-8 TTPAIN.
+    recommended_option: restore_complete_sap_native_t_11_3_through_t_11_8_mapping
+    decision_roles: [accountable_author]
+    external_review_before_regulated_reuse: [statistician, sponsor_sap_authority]
+    blocks:
+      - tfl_catalog_change
+      - metadata_reseal
+
+  - id: ED-05
+    status: adopted_as_written
+    author_disposition: adopt_as_written
+    author_initials: AB
+    decision_date: 2026-08-04
+    question: TTUMOR population
+    current_state: Path A uses ITT measurable disease; SAP Table 22 wording requires clarification.
+    proposed_direction: Use ITT as the primary TTUMOR population; retain measurable disease as supportive subgroup/sensitivity only.
+    decision_roles: [accountable_author]
+    external_review_before_regulated_reuse: [statistician, sponsor_sap_authority]
+
+  - id: ED-06
+    status: adopted_as_written
+    author_disposition: adopt_as_written
+    author_initials: AB
+    decision_date: 2026-08-04
+    question: Secondary TTE time origins
+    current_state: RANDDT anchors OS/PFS/TTPAIN/TTPSA/TTUMOR; TRTSDT anchors TTSAE; one reviewer-guide passage conflicts.
+    proposed_direction: Adopt parameter-level origins for Path A and synchronize reviewer-facing documentation.
+    decision_roles: [accountable_author]
+    external_review_before_regulated_reuse: [statistician, sponsor_sap_authority]
+
+  - id: ED-07
+    status: adopted_as_written
+    author_disposition: adopt_as_written
+    author_initials: AB
+    decision_date: 2026-08-04
+    question: Exact pain progression algorithm
+    current_state: Current code uses median AS, PPI >=2, absolute AS >=10, combined-component confirmation, minimum diary date, and a terminal-trigger exception.
+    proposed_direction: Apply Approval Specification sections 3-4 with component-specific 5-of-7 summaries, PPI >=1, mean AS >=25% from positive baseline, same-component confirmation at consecutive scheduled evaluations at least 21 days apart without bridging a missing/non-evaluable visit, no terminal exception, RT standalone, and SV date hierarchy.
+    decision_roles: [accountable_author]
+    external_review_before_regulated_reuse: [statistician, medical_reviewer]
+    blocks:
+      - ttpain_derivation_change
+      - pfs_pain_component_change
+
+impact_baseline:
+  dataset: 04_analysis_datasets/adam/adtte_prod.xpt
+  arm: MP
+  pfs_itt_rows: 371
+  pfs_event_rows: 327
+  disease_progression_events: 282
+  pain_progression_candidate_events: 37
+  death_events: 8
+  censored_rows: 44
+  radiation_pr_rows: 11
+  radiation_pr_subjects: 9
+  pain_event_subjects_with_any_radiation_pr: 1
+  radiation_pr_rows_on_or_before_pain_event: 0
+  direct_intent_cm_rows: 13
+  direct_intent_cm_subjects: 10
+  direct_intent_cm_complete_start_dates: 12
+  direct_intent_pr_rows: 3
+  direct_intent_pr_subjects: 1
+  direct_intent_cm_pr_subject_overlap: 0
+  source_pr_dataset: 01_source_data/real_sdtm/pr.sas7bdat
+  source_pr_staged: false
+  current_pain_counts_approval_eligible: false
+
+implementation_gate:
+  phase_2_allowed: true
+  required_author_adopted_decisions: [ED-01, ED-02, ED-03, ED-04, ED-05, ED-06, ED-07]
+  accountable_author_limitation_acknowledgement_required: true
+  required_clarifications_before_reseal: []
+  no_silent_rule_inference: true
+  no_output_regeneration_in_phase_1: true
+
+signoffs:
+  accountable_author:
+    status: adopted_as_written
+    name: Antony Bevan
+    initials: AB
+    decision_date: 2026-08-04
+    limitation_acknowledged: true
+    recording_basis: explicit_approval_in_controlled_task_conversation
+    part11_signature_claimed: false
+  external_statistician: not_performed_not_required_for_path_a
+  external_medical_reviewer: not_performed_not_required_for_path_a
+  independent_qc_reviewer: not_available_single_author_project
+  external_reviews_required_before_regulated_reuse: true

@@ -43,8 +43,8 @@ subgroup_defs <- list(
   list(label = "All Patients",            var = NA,         level = NA),
   list(label = "Age < 65",                var = "AGEGR1",   level = "<65"),
   list(label = "Age >= 65",               var = "AGEGR1",   level = ">=65"),
-  list(label = "ECOG 0",                  var = "ECOGBL",   level = "0"),
-  list(label = "ECOG 1",                  var = "ECOGBL",   level = "1"),
+  list(label = "ECOG 0-1",                var = "ECOGBLGRP", level = "0-1"),
+  list(label = "ECOG 2",                  var = "ECOGBLGRP", level = "2"),
   list(label = "Measurable Disease: Yes", var = "MEASDISF", level = "Y"),
   list(label = "Measurable Disease: No",  var = "MEASDISF", level = "N"),
   list(label = "Visceral Mets: Yes",      var = "VISCFL",   level = "Y"),
@@ -77,6 +77,17 @@ if (!file.exists(sas_path)) {
   quit(save = "no", status = 0)
 }
 
+# The SAS figure renderer is now part of a real-SAS DAG run, but a developer may
+# still invoke this reconciliation script directly.  Never consume a CSV left
+# by a prior run when the current pipeline has a run-start marker.
+run_start <- suppressWarnings(as.numeric(Sys.getenv("TROPIC_PIPELINE_RUN_START_EPOCH", "")))
+if (is.finite(run_start) && file.info(sas_path)$mtime < as.POSIXct(run_start, origin = "1970-01-01", tz = "UTC")) {
+  msg <- paste0("SAS forest CSV predates current pipeline run (", sas_path, "); not_available")
+  cat("NOTE: [FOREST-RECON] ", msg, "\n", sep = "")
+  write_status("not_available", list(note = msg))
+  quit(save = "no", status = 0)
+}
+
 # --- Assemble the dual-arm OS analysis set (same inputs as the figure) ---------
 read_arm <- function(adtte_path, adsl_path, reader) {
   tte <- reader(adtte_path)
@@ -84,7 +95,11 @@ read_arm <- function(adtte_path, adsl_path, reader) {
   names(tte) <- toupper(names(tte))
   names(sl) <- toupper(names(sl))
   tte <- tte[tte$PARAMCD == "OS", c("USUBJID", "TRT01P", "AVAL", "CNSR")]
-  sg <- c("AGEGR1", "ECOGBL", "MEASDISF", "VISCFL", "PAINBL", "DOCPROG")
+  sl$ECOGBLGRP <- ifelse(
+    is.na(as.numeric(sl$ECOGBL)), NA_character_,
+    ifelse(as.numeric(sl$ECOGBL) <= 1, "0-1", "2")
+  )
+  sg <- c("AGEGR1", "ECOGBLGRP", "MEASDISF", "VISCFL", "PAINBL", "DOCPROG")
   for (v in sg) sl[[v]] <- as.character(haven::zap_labels(sl[[v]]))
   out <- merge(tte, sl[, c("USUBJID", sg)], by = "USUBJID")
   out$AVAL <- as.numeric(haven::zap_labels(out$AVAL))

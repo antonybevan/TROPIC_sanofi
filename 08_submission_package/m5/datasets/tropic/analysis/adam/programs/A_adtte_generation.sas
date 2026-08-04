@@ -1,13 +1,19 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: A_adtte_generation.sas
-   Version: 2.4.0
+   Version: 3.0.0
    Author: Antony Bevan, Clinical Programming
-   Date: 2026-06-13
+   Date: 2026-06-13 (ADaM dens contract 2026-07-09)
    Standard: ADaMIG v1.3 / CDISC BDS TTE v1.0
    Input: adam.adsl, adam.adrs, adam.adcm, adam.adae, adam.adlb, staging.pn
    Output: adam.adtte
    Description: Time-to-Event ADaM (ADTTE) with standard censoring (CNSR=0/1).
+
+   ADaM dens contract (from ADSL — never EXTRT arm; never AE-distinct dens):
+           OS, PFS, TTPSA, TTPAIN -> one row per ADSL ITTFL='Y' (Path A: 371)
+           TTSAE                  -> one row per ADSL SAFFL='Y' (Path A: 371)
+           TTUMOR                 -> one row per ADSL ITTFL='Y' (MEASDISF sensitivity)
+           TRT01P/TRT01PN always from ADSL (DM-derived)
 
    Remediation v2.4.0 (roadmap #2/#3/#4/#7):
      #4  Analysis population per parameter is explicit and recorded on-record
@@ -16,13 +22,12 @@
            TTPAIN         -> ITT with diary evaluability (ITTFL='Y') [anchored at RANDDT]
            TTPSA          -> ITT  (ITTFL='Y')   [anchored at RANDDT]
            TTSAE          -> SAFETY (SAFFL='Y') [anchored at TRTSDT]
-           TTUMOR         -> ITT & MEASDISF='Y' (measurable-disease subpop, anchored at RANDDT)
+           TTUMOR         -> ITT (measurable-disease subgroup retained as sensitivity, anchored at RANDDT)
      #3  PSA-progression censoring date is sourced from ADLB (adam.adlb,
          PARAMCD='PSA') -- an ADaM input -- NOT from raw sdtm.lb. The R
          validation track reads the same ADaM (adlb_v.xpt) for parity.
-     #2  Same-day pain scores are aggregated with MIN (order-independent;
-         deterministic across SAS and R). Population filtering is identical to
-         the R track per the rules above.
+     #2  F-042 Phase 2 uses component-specific exact-duplicate collapse and
+         discordance flags; SAS/R implement the adopted rule independently.
      #7  PARAMN, PARCAT1, AVALU carried for BDS-TTE metadata completeness.
      #10 Administrative data-cutoff (&STUDY_CUTOFF_DT.) is applied consistently
          to the censoring branch of EVERY parameter (was TTPSA/TTUMOR only).
@@ -38,17 +43,22 @@
 %set_pgmdir;
 %include "&PGMDIR./00_config.sas";
 
-/* 1. Retrieve first PD date per subject across all source domains */
+/* 1. Retrieve first post-randomisation PD date per subject across all source
+   domains.  Baseline milestones are not PFS/TTE events under SAP v4.0. */
 proc sql;
     create table work.pd_dates as
     select
-        usubjid,
-        min(ADT) as pd_dt format=yymmdd10.
-    from adam.adrs
-    where (PARAMCD = 'OVRLRESP' and AVALC = 'PD') or
-          (PARAMCD = 'BSGRESP' and AVALC = 'PROGRESSION') or
-          (PARAMCD = 'PSPROG' and AVALC = 'Y')
-    group by usubjid;
+        r.usubjid,
+        min(r.ADT) as pd_dt format=yymmdd10.
+    from adam.adrs as r
+    inner join adam.adsl(keep=usubjid randdt) as a
+        on r.usubjid = a.usubjid
+    where ((r.PARAMCD = 'OVRLRESP' and r.AVALC = 'PD') or
+           (r.PARAMCD = 'BSGRESP' and r.AVALC = 'PROGRESSION') or
+           (r.PARAMCD = 'PSPROG' and r.AVALC = 'Y'))
+      and not missing(r.ADT)
+      and r.ADT > a.RANDDT
+    group by r.usubjid;
 quit;
 
 /* Retrieve first Serious AE date per subject */
@@ -143,136 +153,56 @@ data work.tte_base;
     end;
 run;
 
-/* SAP v4.0 pain-progression component for PFS: diary-derived visits require at
-   least 5 distinct diary days out of the expected 7-day window before they can
-   contribute a pain progression event. This block intentionally precedes PFS so
-   the composite PFS event pool includes tumour, PSA, pain and death. */
-proc sql;
-    create table work.pain_pfs_trt as
-    select pn.usubjid, pn.pntestcd, pn.pnstresn,
-           input(pn.pndtc, ? yymmdd10.) as pndt format=yymmdd10.,
-           pn.visit, pn.visitnum,
-           adsl.trtsdt, adsl.randdt
-    from staging.pn as pn
-    inner join adam.adsl as adsl on pn.usubjid = adsl.usubjid
-    where adsl.ittfl = 'Y';
-quit;
+/* F-042 Phase 2 controlled pain derivation.  This separately programmed SAS
+   module creates the governed diary/RT event and censor-date work tables used
+   by both PFS and TTPAIN. */
+%include "&PGMDIR./F042_phase2_pain_derivation.sas";
 
+/* SAP v4.0 PFS censoring uses the last evaluable post-baseline assessment when
+   no progression/death/NACT event exists, and randomisation when there is no
+   post-baseline assessment.  Build one governed date from the valid RECIST,
+   PSA, and evaluable pain-visit sources.  Death milestones are excluded from
+   the RECIST pool; they are not tumour assessments. */
 proc sql;
-    create table work.pain_pfs_base as
-    select usubjid, pntestcd, pnstresn
-    from work.pain_pfs_trt
-    where not missing(pndt) and pndt <= trtsdt;
-quit;
+    create table work.pfs_tumor_eval_dates as
+    select r.usubjid, max(r.ADT) as last_tumor_eval_dt format=yymmdd10.
+    from adam.adrs as r
+    inner join adam.adsl(keep=usubjid randdt) as a
+        on r.usubjid = a.usubjid
+    where r.PARAMCD = 'OVRLRESP'
+      and r.AVALC in ('CR', 'PR', 'SD', 'PD')
+      and not missing(r.ADT)
+      and r.ADT > a.RANDDT
+    group by r.usubjid;
 
-proc sort data=work.pain_pfs_base; by usubjid pntestcd; run;
-proc summary data=work.pain_pfs_base median;
-    by usubjid pntestcd;
-    var pnstresn;
-    output out=work.pain_pfs_base_med(drop=_type_ _freq_) median=base_val;
-run;
-proc transpose data=work.pain_pfs_base_med out=work.pain_pfs_base_wide(drop=_name_);
-    by usubjid;
-    id pntestcd;
-    var base_val;
-run;
-data work.pain_pfs_base_final;
-    set work.pain_pfs_base_wide;
-    base_ppi = coalesce(PAININT, 0);
-    base_an = coalesce(ANSCORE, 0);
-    drop PAININT ANSCORE;
-run;
+    create table work.pfs_psa_eval_dates as
+    select l.usubjid, max(l.ADT) as last_psa_eval_dt format=yymmdd10.
+    from adam.adlb as l
+    inner join adam.adsl(keep=usubjid randdt) as a
+        on l.usubjid = a.usubjid
+    where l.PARAMCD = 'PSA'
+      and not missing(l.AVAL)
+      and not missing(l.ADT)
+      and l.ADT > a.RANDDT
+    group by l.usubjid;
 
-proc sql;
-    create table work.pain_pfs_post_daily as
-    select usubjid, visitnum, visit, pntestcd, pnstresn, pndt
-    from work.pain_pfs_trt
-    where pndt > trtsdt;
-quit;
+    create table work.pfs_eval_candidates as
+    select usubjid, last_tumor_eval_dt as last_eval_dt
+    from work.pfs_tumor_eval_dates
+    union all
+    select usubjid, last_psa_eval_dt as last_eval_dt
+    from work.pfs_psa_eval_dates
+    union all
+    select p.usubjid, p.last_pain_eval_dt as last_eval_dt
+    from work.pfs_pain_eval_dates as p
+    inner join adam.adsl(keep=usubjid randdt) as a
+      on p.usubjid = a.usubjid
+    where not missing(p.last_pain_eval_dt)
+      and p.last_pain_eval_dt > a.RANDDT;
 
-proc sql;
-    create table work.pain_pfs_evaluable_visit as
-    select usubjid, visitnum, visit, count(distinct pndt) as diary_days
-    from work.pain_pfs_post_daily
-    where not missing(pndt) and not missing(pnstresn)
-    group by usubjid, visitnum, visit
-    having calculated diary_days >= 5;
-quit;
-
-proc sql;
-    create table work.pain_pfs_first_day as
-    select d.usubjid, d.visitnum, d.visit, d.pndt, d.pntestcd, min(d.pnstresn) as day_val
-    from work.pain_pfs_post_daily as d
-    inner join work.pain_pfs_evaluable_visit as e
-      on d.usubjid = e.usubjid and d.visitnum = e.visitnum and d.visit = e.visit
-    group by d.usubjid, d.visitnum, d.visit, d.pndt, d.pntestcd;
-quit;
-
-proc sort data=work.pain_pfs_first_day; by usubjid visitnum visit pntestcd; run;
-proc summary data=work.pain_pfs_first_day median;
-    by usubjid visitnum visit pntestcd;
-    var day_val;
-    output out=work.pain_pfs_cycle_med(drop=_type_ _freq_) median=cycle_val;
-run;
-proc transpose data=work.pain_pfs_cycle_med out=work.pain_pfs_cycle_wide(drop=_name_);
-    by usubjid visitnum visit;
-    id pntestcd;
-    var cycle_val;
-run;
-proc sql;
-    create table work.pain_pfs_cycle_min_date as
-    select usubjid, visitnum, visit, min(pndt) as cycle_date format=yymmdd10.
-    from work.pain_pfs_first_day
-    group by usubjid, visitnum, visit;
-quit;
-proc sort data=work.pain_pfs_cycle_wide; by usubjid visitnum visit; run;
-proc sort data=work.pain_pfs_cycle_min_date; by usubjid visitnum visit; run;
-proc sort data=work.pain_pfs_base_final; by usubjid; run;
-
-proc sql;
-    create table work.pain_pfs_cycle_comp_raw as
-    select w.usubjid, w.visitnum, w.visit, d.cycle_date,
-           w.PAININT as cycle_ppi, w.ANSCORE as cycle_an,
-           b.base_ppi, b.base_an
-    from work.pain_pfs_cycle_wide as w
-    left join work.pain_pfs_cycle_min_date as d on w.usubjid = d.usubjid and w.visitnum = d.visitnum and w.visit = d.visit
-    left join work.pain_pfs_base_final as b on w.usubjid = b.usubjid;
-quit;
-proc sort data=work.pain_pfs_cycle_comp_raw; by usubjid visitnum; run;
-data work.pain_pfs_cycle_comp;
-    set work.pain_pfs_cycle_comp_raw;
-    by usubjid visitnum;
-    _b_ppi = coalesce(base_ppi, 0);
-    _b_an = coalesce(base_an, 0);
-    if not missing(cycle_ppi) then ppi_diff = cycle_ppi - _b_ppi;
-    if not missing(cycle_an)  then an_diff  = cycle_an  - _b_an;
-    if (not missing(ppi_diff) and ppi_diff >= 2) or (not missing(an_diff) and an_diff >= 10) then prog_trigger = 1;
-    else prog_trigger = 0;
-run;
-
-proc sql;
-    create table work.pain_pfs_confirmed as
-    select a.usubjid, a.visitnum as trig_visitnum, a.cycle_date as trig_date
-    from work.pain_pfs_cycle_comp as a
-    where a.prog_trigger = 1
-    and (
-        exists (
-            select 1 from work.pain_pfs_cycle_comp as b
-            where b.usubjid = a.usubjid
-              and b.prog_trigger = 1
-              and b.visitnum = (select min(c.visitnum)
-                                from work.pain_pfs_cycle_comp as c
-                                where c.usubjid = a.usubjid and c.visitnum > a.visitnum)
-        )
-        or
-        a.visitnum = (select max(d.visitnum) from work.pain_pfs_cycle_comp as d where d.usubjid = a.usubjid)
-    );
-quit;
-
-proc sql;
-    create table work.pain_pfs_prog_dates as
-    select usubjid, min(trig_date) as pain_prog_dt format=yymmdd10.
-    from work.pain_pfs_confirmed
+    create table work.pfs_last_eval_dates as
+    select usubjid, max(last_eval_dt) as last_eval_dt format=yymmdd10.
+    from work.pfs_eval_candidates
     group by usubjid;
 quit;
 
@@ -291,12 +221,14 @@ proc sql;
         adsl.*,
         pd.pd_dt,
         pain.pain_prog_dt,
-        nact.nactdt
+        nact.nactdt,
+        eval.last_eval_dt
     from adam.adsl(keep=studyid usubjid subjid siteid trt01p trt01pn ittfl saffl
                         randdt dthfl dthdt lstalvdt) as adsl
     left join work.pd_dates as pd on adsl.usubjid = pd.usubjid
     left join work.pain_pfs_prog_dates as pain on adsl.usubjid = pain.usubjid
     left join work.nact_mapping as nact on adsl.usubjid = nact.usubjid
+    left join work.pfs_last_eval_dates as eval on adsl.usubjid = eval.usubjid
     where adsl.ittfl = 'Y';
 quit;
 
@@ -334,7 +266,14 @@ data work.pfs_derived;
             /* Event: Progression */
             ADT = _prog_dt;
             CNSR = 0;
-            EVNTDESC = 'DISEASE PROGRESSION';
+            /* Preserve the earliest composite component in the existing
+               ADTTE traceability field.  A non-pain component wins a same-day
+               tie deterministically; the SAP supporting-disease decision for
+               pain remains an explicit Section 3 residual. */
+            if not missing(pain_prog_dt) and
+               (missing(pd_dt) or pain_prog_dt < pd_dt) then
+                EVNTDESC = 'PAIN PROGRESSION';
+            else EVNTDESC = 'DISEASE PROGRESSION';
             CNSDTDSC = '';
         end;
     end;
@@ -356,18 +295,26 @@ data work.pfs_derived;
         end;
     end;
     else do;
-        /* Censor: No event, censor at last alive (capped at data cutoff #10) */
+        /* Censor: NACT outranks all other censoring.  Otherwise use the last
+           evaluable post-baseline assessment; if none exists, censor at
+           randomisation per SAP v4.0. */
         if _nact_found then do;
             ADT = nactdt - 1;
             CNSR = 1;
             EVNTDESC = '';
             CNSDTDSC = 'NEW ANTI-CANCER THERAPY START';
         end;
-        else do;
-            ADT = min(lstalvdt, &STUDY_CUTOFF_DT.);
+        else if not missing(last_eval_dt) then do;
+            ADT = min(last_eval_dt, &STUDY_CUTOFF_DT.);
             CNSR = 1;
             EVNTDESC = '';
-            CNSDTDSC = 'LAST EVALUABLE TUMOR ASSESSMENT';
+            CNSDTDSC = 'LAST EVALUABLE ASSESSMENT';
+        end;
+        else do;
+            ADT = randdt;
+            CNSR = 1;
+            EVNTDESC = '';
+            CNSDTDSC = 'NO POST-BASELINE ASSESSMENT';
         end;
     end;
 
@@ -379,191 +326,10 @@ data work.pfs_derived;
 run;
 
 /* -------------------------------------------------------------------------- */
-/* PARAMETER 5: TIME TO PAIN PROGRESSION (TTPAIN)  (ITT with evaluable diary, anchored RANDDT) */
-/* Same-day scores aggregated with MIN (order-independent; matches R, #2).    */
+/* PARAMETER 5: TIME TO PAIN PROGRESSION (TTPAIN)  (ITT, RANDDT origin)       */
+/* F-042 Phase 2 primary event = qualified diary OR direct-intent RT.         */
+/* Non-events censor at the last evaluable scheduled pain assessment.          */
 /* -------------------------------------------------------------------------- */
-proc sql;
-    create table work.pn_trt_tte as
-    select pn.usubjid, pn.pntestcd, pn.pnstresn,
-           input(pn.pndtc, ? yymmdd10.) as pndt format=yymmdd10.,
-           pn.visit, pn.visitnum,
-           adsl.trtsdt, adsl.randdt
-    from staging.pn as pn
-    inner join adam.adsl as adsl on pn.usubjid = adsl.usubjid
-    where adsl.ittfl = 'Y';
-quit;
-
-proc sql;
-    create table work.pn_base_tte as
-    select usubjid, pntestcd, pnstresn
-    from work.pn_trt_tte
-    where not missing(pndt) and pndt <= trtsdt;
-quit;
-
-proc sort data=work.pn_base_tte;
-    by usubjid pntestcd;
-run;
-
-proc summary data=work.pn_base_tte median;
-    by usubjid pntestcd;
-    var pnstresn;
-    output out=work.pn_base_med(drop=_type_ _freq_) median=base_val;
-run;
-
-proc sort data=work.pn_base_med;
-    by usubjid;
-run;
-
-proc transpose data=work.pn_base_med out=work.pn_base_wide(drop=_name_);
-    by usubjid;
-    id pntestcd;
-    var base_val;
-run;
-
-data work.pn_base_final;
-    set work.pn_base_wide;
-    base_ppi = coalesce(PAININT, 0);
-    base_an = coalesce(ANSCORE, 0);
-    drop PAININT ANSCORE;
-run;
-
-proc sql;
-    create table work.pn_post_daily as
-    select usubjid, visitnum, visit, pntestcd, pnstresn, pndt
-    from work.pn_trt_tte
-    where pndt > trtsdt;
-quit;
-
-proc sql;
-    create table work.pn_evaluable_visit as
-    select usubjid, visitnum, visit, count(distinct pndt) as diary_days
-    from work.pn_post_daily
-    where not missing(pndt) and not missing(pnstresn)
-    group by usubjid, visitnum, visit
-    having calculated diary_days >= 5;
-quit;
-
-proc sort data=work.pn_post_daily;
-    by usubjid visitnum visit pndt pntestcd;
-run;
-
-proc sql;
-    create table work.pn_first_day as
-    select d.usubjid, d.visitnum, d.visit, d.pndt, d.pntestcd, min(d.pnstresn) as day_val
-    from work.pn_post_daily as d
-    inner join work.pn_evaluable_visit as e
-      on d.usubjid = e.usubjid and d.visitnum = e.visitnum and d.visit = e.visit
-    group by d.usubjid, d.visitnum, d.visit, d.pndt, d.pntestcd;
-quit;
-
-proc sort data=work.pn_first_day;
-    by usubjid visitnum visit pntestcd;
-run;
-
-proc summary data=work.pn_first_day median;
-    by usubjid visitnum visit pntestcd;
-    var day_val;
-    output out=work.pn_cycle_med(drop=_type_ _freq_) median=cycle_val;
-run;
-
-data work.pn_cycle_med;
-    set work.pn_cycle_med;
-    label cycle_val = 'Cycle Value';
-run;
-
-proc sql;
-    create table work.pn_cycle_min_date as
-    select usubjid, visitnum, visit, min(pndt) as cycle_date format=yymmdd10.
-    from work.pn_post_daily
-    group by usubjid, visitnum, visit;
-quit;
-
-proc sort data=work.pn_cycle_med;
-    by usubjid visitnum visit;
-run;
-
-proc transpose data=work.pn_cycle_med out=work.pn_cycle_wide(drop=_name_);
-    by usubjid visitnum visit;
-    id pntestcd;
-    var cycle_val;
-run;
-
-proc sort data=work.pn_cycle_wide; by usubjid visitnum visit; run;
-proc sort data=work.pn_cycle_min_date; by usubjid visitnum visit; run;
-proc sort data=work.pn_base_final; by usubjid; run;
-
-proc sql;
-    create table work.cycle_comp_raw as
-    select w.usubjid, w.visitnum, w.visit, d.cycle_date,
-           w.PAININT as cycle_ppi, w.ANSCORE as cycle_an,
-           b.base_ppi, b.base_an
-    from work.pn_cycle_wide as w
-    left join work.pn_cycle_min_date as d on w.usubjid = d.usubjid and w.visitnum = d.visitnum and w.visit = d.visit
-    left join work.pn_base_final as b on w.usubjid = b.usubjid;
-quit;
-
-proc sort data=work.cycle_comp_raw;
-    by usubjid visitnum;
-run;
-
-data work.cycle_comp;
-    set work.cycle_comp_raw;
-    by usubjid visitnum;
-
-    _b_ppi = coalesce(base_ppi, 0);
-    _b_an = coalesce(base_an, 0);
-
-    /* Guard the baseline-diff arithmetic so a missing cycle value does not emit a
-       benign "missing values generated" NOTE. Result is unchanged (a missing cycle
-       value yields a missing diff either way), and the prog_trigger test below
-       already requires a non-missing diff. */
-    if not missing(cycle_ppi) then ppi_diff = cycle_ppi - _b_ppi;
-    if not missing(cycle_an)  then an_diff  = cycle_an  - _b_an;
-
-    if (not missing(ppi_diff) and ppi_diff >= 2) or (not missing(an_diff) and an_diff >= 10) then prog_trigger = 1;
-    else prog_trigger = 0;
-run;
-
-/* Sustained confirmation: trigger confirmed if NEXT consecutive visit also triggers,
-   OR if the triggered visit is the last observation for that subject.
-   Uses PROC SQL self-join to emulate R lead()-based look-ahead. */
-proc sql;
-    /* Step 1: Find the minimum visitnum of the next trigger visit per subject */
-    create table work.confirmed_triggers as
-    select a.usubjid, a.visitnum as trig_visitnum, a.cycle_date as trig_date
-    from work.cycle_comp as a
-    where a.prog_trigger = 1
-    and (
-        /* Next consecutive visit also triggers (confirmed pair) */
-        exists (
-            select 1 from work.cycle_comp as b
-            where b.usubjid = a.usubjid
-              and b.prog_trigger = 1
-              and b.visitnum = (select min(c.visitnum)
-                                from work.cycle_comp as c
-                                where c.usubjid = a.usubjid and c.visitnum > a.visitnum)
-        )
-        or
-        /* OR this is the last observation for the subject (terminal trigger) */
-        a.visitnum = (select max(d.visitnum) from work.cycle_comp as d where d.usubjid = a.usubjid)
-    );
-quit;
-
-proc sql;
-    /* Step 2: Earliest confirmed trigger date per subject = pain progression date */
-    create table work.prog_dates as
-    select usubjid, min(trig_date) as prog_date format=yymmdd10.
-    from work.confirmed_triggers
-    group by usubjid;
-quit;
-
-proc sql;
-    create table work.censor_dates as
-    select usubjid, max(pndt) as last_pn_dt format=yymmdd10.
-    from work.pn_trt_tte
-    group by usubjid;
-quit;
-
 proc sql;
     create table work.ttpain_derived as
     select
@@ -581,28 +347,17 @@ proc sql;
         'EFFICACY' as PARCAT1 length=20,
         'DAYS' as AVALU length=8,
         adsl.randdt as STARTDT format=yymmdd10.,
-
         case
             when not missing(p.prog_date) then p.prog_date
             when not missing(c.last_pn_dt) then min(c.last_pn_dt, &STUDY_CUTOFF_DT.)
             else adsl.randdt
         end as ADT format=yymmdd10.,
-
-        case
-            when not missing(p.prog_date) then 0
-            else 1
-        end as CNSR,
-
-        case
-            when not missing(p.prog_date) then 'PAIN PROGRESSION'
-            else ''
-        end as EVNTDESC length=100,
-
-        case
-            when not missing(p.prog_date) then ''
-            when not missing(c.last_pn_dt) then 'LAST PAIN ASSESSMENT DATE'
-            else 'NO PAIN ASSESSMENT'
-        end as CNSDTDSC length=100
+        case when not missing(p.prog_date) then 0 else 1 end as CNSR,
+        case when not missing(p.prog_date) then 'PAIN PROGRESSION'
+             else '' end as EVNTDESC length=100,
+        case when not missing(p.prog_date) then ''
+             when not missing(c.last_pn_dt) then 'LAST EVALUABLE PAIN ASSESSMENT'
+             else 'NO EVALUABLE PAIN ASSESSMENT' end as CNSDTDSC length=100
     from adam.adsl as adsl
     left join work.prog_dates as p on adsl.usubjid = p.usubjid
     left join work.censor_dates as c on adsl.usubjid = c.usubjid
@@ -612,8 +367,8 @@ quit;
 data work.ttpain_final;
     set work.ttpain_derived;
     if not missing(ADT) and not missing(STARTDT) and ADT < STARTDT then
-            putlog "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. " PARAMCD= USUBJID=;
-        if ADT < STARTDT then ADT = STARTDT;
+        putlog "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. " PARAMCD= USUBJID=;
+    if ADT < STARTDT then ADT = STARTDT;
     AVAL = ADT - STARTDT + 1;
 run;
 
@@ -624,9 +379,12 @@ run;
 /* -------------------------------------------------------------------------- */
 proc sql;
     create table work.psa_prog_dates as
-    select usubjid, ADT as psa_prog_dt
-    from adam.adrs
-    where PARAMCD = 'PSPROG' and AVALC = 'Y';
+    select r.usubjid, r.ADT as psa_prog_dt
+    from adam.adrs as r
+    inner join adam.adsl(keep=usubjid randdt) as a
+        on r.usubjid = a.usubjid
+    where r.PARAMCD = 'PSPROG' and r.AVALC = 'Y'
+      and not missing(r.ADT) and r.ADT > a.RANDDT;
 quit;
 
 proc sql;
@@ -691,22 +449,30 @@ data work.ttpsa_final;
 run;
 
 /* -------------------------------------------------------------------------- */
-/* PARAMETER 4: TIME TO TUMOR PROGRESSION (TTUMOR)  (ITT & MEASDISF='Y')      */
+/* PARAMETER 4: TIME TO TUMOR PROGRESSION (TTUMOR)  (ITT, RANDDT origin)       */
 /* -------------------------------------------------------------------------- */
 proc sql;
     create table work.tumor_prog_dates as
-    select usubjid, min(ADT) as tumor_prog_dt format=yymmdd10.
-    from adam.adrs
-    where PARAMCD = 'OVRLRESP' and AVALC = 'PD'
-    group by usubjid;
+    select r.usubjid, min(r.ADT) as tumor_prog_dt format=yymmdd10.
+    from adam.adrs as r
+    inner join adam.adsl(keep=usubjid randdt) as a
+        on r.usubjid = a.usubjid
+    where r.PARAMCD = 'OVRLRESP' and r.AVALC = 'PD'
+      and not missing(r.ADT) and r.ADT > a.RANDDT
+    group by r.usubjid;
 quit;
 
 proc sql;
     create table work.tumor_censor_dates as
-    select usubjid, max(ADT) as last_tumor_dt format=yymmdd10.
-    from adam.adrs
-    where PARAMCD = 'OVRLRESP' and not missing(ADT)
-    group by usubjid;
+    select r.usubjid, max(r.ADT) as last_tumor_dt format=yymmdd10.
+    from adam.adrs as r
+    inner join adam.adsl(keep=usubjid randdt) as a
+        on r.usubjid = a.usubjid
+    where r.PARAMCD = 'OVRLRESP'
+      and r.AVALC in ('CR', 'PR', 'SD', 'PD')
+      and not missing(r.ADT)
+      and r.ADT > a.RANDDT
+    group by r.usubjid;
 quit;
 
 proc sql;
@@ -751,7 +517,7 @@ proc sql;
     from adam.adsl as adsl
     left join work.tumor_prog_dates as p on adsl.usubjid = p.usubjid
     left join work.tumor_censor_dates as c on adsl.usubjid = c.usubjid
-    where adsl.ittfl = 'Y' and adsl.measdisf = 'Y';
+    where adsl.ittfl = 'Y';
 quit;
 
 data work.ttum_final;
@@ -775,11 +541,23 @@ run;
 
 /* Clean up work library */
 proc delete data=work.pd_dates work.sae_dates work.os_ttsae_raw work.nact_mapping work.pfs_raw
-            work.pn_trt_tte work.pn_base_tte work.pn_post_daily work.pn_first_day
-            work.pn_cycle_min_date work.cycle_comp_raw work.confirmed_triggers work.prog_dates
+            work.prog_dates
+            work.pain_pfs_prog_dates work.pfs_tumor_eval_dates work.pfs_psa_eval_dates
+            work.pfs_pain_eval_dates work.pfs_eval_candidates work.pfs_last_eval_dates
             work.censor_dates work.ttpain_derived work.psa_prog_dates work.psa_censor_dates
             work.ttpsa_derived work.tumor_prog_dates work.tumor_censor_dates work.ttum_derived
-            work.tte_base work.pfs_derived work.pn_base_final work.pn_cycle_med work.cycle_comp
-            work.ttpain_final work.ttpsa_final work.ttum_final;
+            work.tte_base work.pfs_derived work.ttpain_final work.ttpsa_final work.ttum_final
+            work.f042_pn work.f042_base_daily work.f042_base_component work.f042_base_values
+            work.f042_base_ndays work.f042_base_discordant work.f042_base_eval work.f042_base
+            work.f042_sv_dates work.f042_sv_summary0 work.f042_sv_summary work.f042_pn_visit_dates
+            work.f042_schedule_raw work.f042_schedule work.f042_post_window work.f042_visit_daily
+            work.f042_visit_component work.f042_visit_values work.f042_visit_ndays
+            work.f042_visit_discordant work.f042_visit_eval work.f042_visits work.f042_visit_triggers
+            work.f042_confirm_candidates work.f042_diary_events work.f042_rt_cm work.f042_rt_pr
+            work.f042_rt_candidate_rows work.f042_rt_events work.f042_evidence_adrs
+            work.f042_evidence_ds work.f042_evidence_rt work.f042_evidence work.f042_diary_qualified
+            work.f042_primary_candidates work.f042_primary_event_dates work.f042_pain_pfs_prog_dates
+            work.f042_pain_lastassess work.f042_pain_response_candidates
+            work.f042_pain_response_events;
 run;
 quit;

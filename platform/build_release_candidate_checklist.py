@@ -25,6 +25,7 @@ PATHS = {
     "reconciliation": "platform/reconciliation_status.json",
     "results_reconciliation": "platform/results_reconciliation_status.json",
     "forest_reconciliation": "platform/forest_reconciliation_status.json",
+    "figure_data_reconciliation": "platform/figure_data_reconciliation_status.json",
     "cbzp_bridge": "platform/cbzp_bridge_status.json",
     "admiral": "platform/admiral_reconciliation_status.json",
     "release_run_manifest": "platform/release_run_manifest/release_run_manifest.json",
@@ -110,6 +111,7 @@ def build_release_checklist(out_dir, report_path):
     recon = _load_json(PATHS["reconciliation"], {})
     results = _load_json(PATHS["results_reconciliation"], {})
     forest = _load_json(PATHS["forest_reconciliation"], {})
+    figure_data = _load_json(PATHS["figure_data_reconciliation"], {})
     cbzp = _load_json(PATHS["cbzp_bridge"], {})
     admiral = _load_json(PATHS["admiral"], {})
     release_manifest = _load_json(PATHS["release_run_manifest"], {})
@@ -156,6 +158,18 @@ def build_release_checklist(out_dir, report_path):
         _status(recon.get("overall") == "PASS" and not recon.get("simulated")),
         f"{PATHS['reconciliation']} overall={recon.get('overall', 'missing')}; simulated={recon.get('simulated', 'missing')}",
         "" if recon.get("overall") == "PASS" and not recon.get("simulated") else "Re-run reconciliation from a real SAS production track; simulated zero-diff is tautological.",
+    )
+    f042_recon = (recon.get("endpoint_controls") or {}).get("F042_PAIN_RESPONSE")
+    _add(
+        rows, "G06 qc_signoff", "F-042 pain-response subject-level SAS/R reconciliation passes",
+        _status(f042_recon == "PASS"),
+        f"{PATHS['reconciliation']} endpoint_controls.F042_PAIN_RESPONSE={f042_recon or 'missing'}",
+        (
+            "Run the real-SAS F-042 response extract and reconcile every subject/event date, "
+            "confirmation date, component, and date source against the R derivation."
+            if f042_recon != "PASS"
+            else ""
+        ),
     )
     _add(
         rows, "G04 analysis_dataset_promotion", "Committed ODA evidence snapshot exists",
@@ -223,6 +237,13 @@ def build_release_checklist(out_dir, report_path):
         "Resolve forest HR reconciliation mismatches." if forest.get("overall") != "PASS" else "",
     )
     _add(
+        rows, "G06 qc_signoff", "Figure-driving data reconciliation passes",
+        _status(figure_data.get("overall") == "PASS"),
+        f"{PATHS['figure_data_reconciliation']} overall={figure_data.get('overall', 'missing')}",
+        "Produce and reconcile all SAS figure-data exports before release promotion."
+        if figure_data.get("overall") != "PASS" else "",
+    )
+    _add(
         rows, "G06 qc_signoff", "Synthetic comparator bridge parity passes",
         _status(cbzp.get("overall") == "PASS"),
         f"{PATHS['cbzp_bridge']} overall={cbzp.get('overall', 'missing')}",
@@ -233,6 +254,10 @@ def build_release_checklist(out_dir, report_path):
         or health.get("run_scope")
         or "missing"
     )
+    # The pipeline-health check must judge pipeline_health.json alone (audit MAJOR:
+    # manifest run_scope previously leaked into the health check, producing a false
+    # full-DAG BLOCKER whenever the manifest was partial/dirty).
+    health_run_scope = health.get("run_scope") or "missing"
     _add(
         rows, "G09 release_candidate_lock", "Current release-run manifest is release-candidate grade (full DAG, clean tree)",
         _status(release_manifest.get("status") == "PASS"),
@@ -250,9 +275,9 @@ def build_release_checklist(out_dir, report_path):
     )
     _add(
         rows, "G09 release_candidate_lock", "Pipeline health records a full current DAG run",
-        _status(run_scope == "full_dag" and health.get("pipeline_health_status") == "GREEN"),
+        _status(health_run_scope == "full_dag" and health.get("pipeline_health_status") == "GREEN"),
         (
-            f"{PATHS['pipeline_health']} run_scope={health.get('run_scope', 'missing')}; "
+            f"{PATHS['pipeline_health']} run_scope={health_run_scope}; "
             f"stages_recorded={health.get('stages_recorded', len(health.get('stages') or {}))}; "
             f"stages_expected={health.get('stages_expected', 'missing')}; "
             f"stages_not_run={len(health.get('stages_not_run') or [])}"
@@ -260,7 +285,7 @@ def build_release_checklist(out_dir, report_path):
         (
             "Run the full DAG from stage 1 (no --from-stage) under --real-sas so pipeline_health "
             "covers every study_manifest stage."
-            if run_scope != "full_dag"
+            if health_run_scope != "full_dag"
             else ""
         ),
     )

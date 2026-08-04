@@ -66,7 +66,7 @@ Leaf counts below were re-verified against the current on-disk sequence on **202
   supply the real FDA application/submission identifiers before submission.
 - TFL appendix files under the controlled-study-report folder (figures/tables/listings)
   are included as study-report-body leaves; datasets, programs, defines, reviewer guides,
-  annotated CRF, CSR PDFs, and CSR appendices are all wired and tagged.
+  blank CRF (source, not annotated), CSR PDFs, and CSR appendices are all wired and tagged.
 - First submission ⇒ every leaf `operation="new"`. Lifecycle (`replace`/`append`/
   `delete`) applies to later sequences per the ICH STF spec §IV–V.
 

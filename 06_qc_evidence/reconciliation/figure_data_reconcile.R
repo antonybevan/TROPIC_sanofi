@@ -26,9 +26,10 @@ write_status <- function(overall, detail = NULL) {
 }
 
 cat("========== R <-> SAS FIGURE-DATA RECONCILIATION ==========\n")
-ok <- TRUE
+state <- new.env(parent = emptyenv())
+state$ok <- TRUE
 fail <- function(label, detail) {
-  ok <<- FALSE
+  state$ok <- FALSE
   cat(sprintf("  [FAIL] %-22s %s\n", label, detail))
 }
 pass <- function(label, detail) cat(sprintf("  [PASS] %-22s %s\n", label, detail))
@@ -48,6 +49,20 @@ if (length(missing)) {
   quit(save = "no", status = 0)
 }
 
+run_start <- suppressWarnings(as.numeric(Sys.getenv("TROPIC_PIPELINE_RUN_START_EPOCH", "")))
+if (is.finite(run_start)) {
+  stale <- required[vapply(required, function(p) {
+    file.info(p)$mtime < as.POSIXct(run_start, origin = "1970-01-01", tz = "UTC")
+  }, logical(1))]
+  if (length(stale)) {
+    msg <- paste0("SAS figure-data CSV predates current pipeline run: ", paste(stale, collapse = ", "))
+    cat("  [SKIP] ", msg, " — not_available\n", sep = "")
+    write_status("not_available", msg)
+    cat("FIGURE-DATA RECONCILIATION: NOT_AVAILABLE\n")
+    quit(save = "no", status = 0)
+  }
+}
+
 adsl <- bind_rows(read_xpt("04_analysis_datasets/adam/adsl_v.xpt"),
                   readRDS("01_source_data/cbzp_reconstructed/adsl_cbzp.rds"))
 adtte <- bind_rows(read_xpt("04_analysis_datasets/adam/adtte_v.xpt"),
@@ -60,6 +75,8 @@ adex <- bind_rows(read_xpt("04_analysis_datasets/adam/adex_v.xpt"),
 # KM hazard ratios/CIs and displayed risk counts.
 sas_km <- read.csv(required[1], check.names = FALSE) |>
   rename_with(toupper)
+km_delta_os <- NA_real_
+km_delta_pfs <- NA_real_
 for (endpoint in c("OS", "PFS")) {
   d <- adtte |>
     filter(PARAMCD == endpoint) |>
@@ -68,6 +85,7 @@ for (endpoint in c("OS", "PFS")) {
   s <- sas_km[sas_km$PARAMCD == endpoint, ]
   delta <- max(abs(c(r$hr - s$HAZARDRATIO, r$lcl - s$WALDLOWER,
                      r$ucl - s$WALDUPPER)))
+  if (endpoint == "OS") km_delta_os <- delta else km_delta_pfs <- delta
   if (nrow(s) == 1L && delta <= 0.01) pass(paste("KM", endpoint), sprintf("HR/CI max delta %.5f", delta)) else
     fail(paste("KM", endpoint), sprintf("HR/CI max delta %.5f", delta))
 }
@@ -89,6 +107,8 @@ r_water <- adlb |>
   filter(PARAMCD == "PSA", !is.na(PCHG)) |>
   group_by(USUBJID, TRT01P) |>
   summarise(BEST = min(PCHG), .groups = "drop") |>
+  inner_join(adsl |> select(USUBJID, PSABL), by = "USUBJID") |>
+  filter(!is.na(PSABL), PSABL >= 20) |>
   mutate(RESPCAT = case_when(
     BEST <= -50 ~ "PSA Response (>=50% dec)",
     BEST < 0 ~ "PSA Decrease (<50%)",
@@ -152,9 +172,21 @@ if (er_ok) pass("Exposure-response", sprintf("%d joined observations identical",
   fail("Exposure-response", "figure-driving records differ")
 
 cat("==========================================================\n")
-if (!ok) {
+if (!state$ok) {
   write_status("FAIL", "one or more figure-driving checks failed")
   quit(save = "no", status = 1)
 }
-write_status("PASS")
+
+# Durable per-check evidence (audit MAJOR: a bare PASS with empty detail cannot be
+# audited). Record counts, max deltas and tolerances for every figure family.
+write_status("PASS", list(
+  km_hr_ci = list(
+    os = list(max_delta = km_delta_os, tolerance = 0.01),
+    pfs = list(max_delta = km_delta_pfs, tolerance = 0.01)
+  ),
+  km_risk = list(rows_checked = nrow(sas_risk), identical = risk_ok),
+  waterfall = list(rows_checked = nrow(r_water), identical = water_ok),
+  swimmer = list(rows_checked = nrow(r_swim), identical = swim_ok),
+  exposure_response = list(rows_checked = nrow(r_er), identical = er_ok)
+))
 cat("FIGURE-DATA RECONCILIATION: PASS\n")
