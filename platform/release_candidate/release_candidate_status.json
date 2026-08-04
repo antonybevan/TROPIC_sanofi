@@ -1,8 +1,8 @@
 {
   "status": "PASS",
-  "generated_at": "2026-08-03 05:31:19 UTC",
-  "checks": 17,
-  "pass": 17,
+  "generated_at": "2026-08-04 16:34:18 UTC",
+  "checks": 18,
+  "pass": 18,
   "warning": 0,
   "blocker": 0,
   "active_audit_findings": 0,
@@ -34,7 +34,7 @@
       "gate": "G06 qc_signoff",
       "check": "Execution logs have no unapproved warnings, errors, invalid-input notes, or uninitialized-variable findings",
       "status": "PASS",
-      "evidence": "platform/log_cleanliness/log_cleanliness_status.json status=PASS; unapproved=0; reviewed_exceptions=39",
+      "evidence": "platform/log_cleanliness/log_cleanliness_status.json status=PASS; unapproved=0; reviewed_exceptions=22",
       "required_action": ""
     },
     {
@@ -49,6 +49,13 @@
       "check": "Dataset reconciliation is non-simulated",
       "status": "PASS",
       "evidence": "platform/reconciliation_status.json overall=PASS; simulated=False",
+      "required_action": ""
+    },
+    {
+      "gate": "G06 qc_signoff",
+      "check": "F-042 pain-response subject-level SAS/R reconciliation passes",
+      "status": "PASS",
+      "evidence": "platform/reconciliation_status.json endpoint_controls.F042_PAIN_RESPONSE=PASS",
       "required_action": ""
     },
     {
@@ -69,7 +76,7 @@
       "gate": "G05 output_promotion",
       "check": "TFL output index is complete for controlled catalog scope",
       "status": "PASS",
-      "evidence": "platform/tfl_output_index_status.json status=pass; controlled_catalog=pass; in_scope=18; deferred=21; stale_sas_companions_nongating=0",
+      "evidence": "platform/tfl_output_index_status.json status=pass; controlled_catalog=pass; in_scope=21; deferred=18; stale_sas_companions_nongating=0",
       "required_action": ""
     },
     {
@@ -104,7 +111,7 @@
       "gate": "G09 release_candidate_lock",
       "check": "Current release-run manifest is release-candidate grade (full DAG, clean tree)",
       "status": "PASS",
-      "evidence": "platform/release_run_manifest/release_run_manifest.json status=PASS; evidence_grade=release_candidate; run_scope=full_dag; seal=070232617a258217662d056a7471b28bd3c4e081d612ae509518a76696f67230",
+      "evidence": "platform/release_run_manifest/release_run_manifest.json status=PASS; evidence_grade=release_candidate; run_scope=full_dag; seal=a6f078ae0e49ecfb77fd3189ff3a1b17c20a5b1eea5ae3578d030cf5924b8593",
       "required_action": ""
     },
     {
