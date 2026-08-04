@@ -271,7 +271,8 @@ f042_confirm_diary <- function(visits) {
 }
 
 f042_direct_rt <- function(adsl, cm, pr) {
-  names(cm) <- toupper(names(cm)); names(pr) <- toupper(names(pr))
+  names(cm) <- toupper(names(cm))
+  names(pr) <- toupper(names(pr))
   f042_require_columns(cm, c("USUBJID", "CMSEQ", "CMSTDTC"), "CM")
   f042_require_columns(pr, c("USUBJID", "PRSEQ", "PRDTC"), "PR")
 
@@ -340,7 +341,7 @@ f042_direct_rt <- function(adsl, cm, pr) {
       (!is.na(event_date) & !is.na(RANDDT) & event_date > RANDDT) |
         is.na(event_date)
     ) |>
-  group_by(USUBJID, event_date) |>
+    group_by(USUBJID, event_date) |>
     summarise(
       event_source = "RT",
       source_domains = paste(sort(unique(source_domain)), collapse = ";"),
@@ -358,7 +359,8 @@ f042_direct_rt <- function(adsl, cm, pr) {
 }
 
 f042_supporting_evidence <- function(adsl, adrs, ds, rt_candidates) {
-  names(adrs) <- toupper(names(adrs)); names(ds) <- toupper(names(ds))
+  names(adrs) <- toupper(names(adrs))
+  names(ds) <- toupper(names(ds))
   f042_require_columns(adrs, c("USUBJID", "PARAMCD", "AVALC", "ADT"), "ADRS")
   f042_require_columns(ds, c("USUBJID", "DSDECOD", "DSSTWK", "DSSEQ"), "DS")
   adrs_evidence <- adrs |>
@@ -449,8 +451,18 @@ f042_primary_events <- function(adsl, diary_events, rt_candidates) {
     )
   candidates <- bind_rows(diary, rt)
   if (!nrow(candidates)) {
-    return(adsl |> filter(ITTFL == "Y") |> transmute(USUBJID, event_date = as.Date(NA),
-      event_source = "", event_component = "", support_types = "", source_keys = ""))
+    return(
+      adsl |>
+        filter(ITTFL == "Y") |>
+        transmute(
+          USUBJID,
+          event_date = as.Date(NA),
+          event_source = "",
+          event_component = "",
+          support_types = "",
+          source_keys = ""
+        )
+    )
   }
   candidates |>
     group_by(USUBJID, event_date) |>
@@ -486,7 +498,7 @@ f042_compare_current <- function(adsl, primary_events, adtte = NULL) {
     select(USUBJID) |>
     left_join(current, by = "USUBJID") |>
     left_join(primary_events |> transmute(USUBJID, provisional_ttpain_date = event_date,
-                                           provisional_source = event_source), by = "USUBJID") |>
+                                          provisional_source = event_source), by = "USUBJID") |>
     mutate(
       disposition = case_when(
         is.na(current_ttpain_date) & !is.na(provisional_ttpain_date) ~ "ADDED_PROVISIONAL",
@@ -539,8 +551,8 @@ f042_derive <- function(adsl, pn, sv, cm, pr, adrs, ds, adtte = NULL) {
 }
 
 f042_run_provisional <- function(
-    project_root = ".",
-    out_dir = NULL
+  project_root = ".",
+  out_dir = NULL
 ) {
   root <- normalizePath(project_root, mustWork = TRUE)
   adsl <- read_xpt(file.path(root, "04_analysis_datasets/adam/adsl_v.xpt"))
