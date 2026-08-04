@@ -2,14 +2,15 @@
 
 **Version:** 0.1.0
 **Date:** 2026-08-03
-**Execution status:** **PROVISIONAL AUTHOR-DIRECTED — FORMAL SIGN-OFF PENDING**
+**Execution status:** **PROVISIONAL PRE-ADOPTION ARTIFACT — ED-01–ED-07 ADOPTED 2026-08-04**
 **Production status:** **NO PRODUCTION CONSUMPTION; SEALED PATH A OUTPUTS UNCHANGED**
 
 ## Purpose and boundary
 
 The project author directed exploratory implementation to continue and indicated
-that the formal author signature will be supplied later. This note records that
-bounded instruction without fabricating an identity, signature, date, sponsor
+that Phase 2 adoption was pending. The controlled decision record now records
+Antony Bevan's adoption of ED-01–ED-07 as written on 2026-08-04. This note
+remains a bounded, non-production artifact and does not fabricate sponsor
 approval, independent review, or regulated authorization.
 
 The implementation is isolated in
@@ -17,8 +18,8 @@ The implementation is isolated in
 It is not sourced by the production DAG, does not overwrite or reseal
 `04_analysis_datasets/adam/adtte_prod.xpt`, and writes only to an explicitly
 supplied temporary/output directory. The controlled decision record remains
-`author_decision_ready_pending_signoff`; `implementation_gate.phase_2_allowed`
-remains `false`.
+`author_adopted_phase_2_authorized`; `implementation_gate.phase_2_allowed` is
+now `true`, but this isolated script is not the production ADTTE consumer.
 
 The local output also includes the patient-level RT review file specified by the
 [CM/PR adjudication worksheet specification](F042_ADJUDICATION_WORKSHEET_SPEC_2026-08-03.md)
@@ -27,8 +28,8 @@ local because patient-level source/output records are not part of the Git review
 surface.
 
 This provisional step does not change the production SAS program. A separate
-SAS implementation and SAS/R reconciliation are required only after the signed
-decision record authorizes controlled integration.
+SAS implementation and SAS/R reconciliation are required under the adopted
+Phase 2 plan before any controlled output is regenerated.
 
 This is an exploratory programming artifact for author review. It is not an
 approved endpoint derivation, a filing-ready result, a substitute for a signed
@@ -100,9 +101,7 @@ results and must not be copied into a submission package.
 ## Required path to formal adoption
 
 Before any production integration, output regeneration, release reseal, or
-filing-facing claim, the author must complete the controlled decision record
-and sign/date the ED-01–ED-07 disposition. The subsequent controlled work must
-then program the adopted rule separately in SAS and R, reconcile subject-level
-lineage, run the full DAG and TFL/metadata checks, complete the delayed
-second-pass review, and obtain qualified external statistical/medical review
-before any regulated reuse.
+filing-facing claim, the adopted rule must be programmed separately in SAS and
+R, reconciled at subject level, run through the full DAG and TFL/metadata
+checks, reviewed in the delayed second pass, and subjected to qualified
+external statistical/medical review before any regulated reuse.

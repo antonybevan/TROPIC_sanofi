@@ -93,6 +93,6 @@ the release seal.
 
 The worksheet is complete only when every retained CM/PR record has a controlled
 author disposition, rationale, and date, and the parent decision record has the
-matching ED-02 election. It remains non-production until the signed ED-01–ED-07
-record authorizes integration, after which SAS/R implementations must reconcile
-the same subject/date lineage independently.
+matching adopted ED-02 election. It remains a non-production review artifact;
+the regenerated SAS/R endpoint outputs must reconcile the same subject/date
+lineage independently before any record is treated as a controlled event.

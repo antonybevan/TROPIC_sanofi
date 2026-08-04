@@ -1,7 +1,7 @@
 # F-042 PFS Pain Component — Quantified Impact Appendix
 
 **Parent record:** [`ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md`](ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md)<br>
-**Status:** Decision evidence updated; no clinical rule author-adopted<br>
+**Status:** Decision evidence updated; ED-01–ED-07 adopted as written; Phase 2 rerun pending<br>
 **Product path:** Path A controlled non-submission demonstration<br>
 **Baseline:** real MP ADTTE from the final 34-stage ODA run
 
@@ -78,7 +78,7 @@ The prior `290 + k` framing is no longer valid: the author-adopted rule can iden
 
 ## 6. Phase 1 preservation statement
 
-This appendix was prepared without changing ADTTE, ADRS, TFL, metadata, package, release-manifest, or machine-gate outputs. It does not close F-042, author-adopt T-11-8, or expand the Path A product claim.
+This appendix preserves the pre-adoption baseline without changing ADTTE, ADRS, TFL, metadata, package, release-manifest, or machine-gate outputs. ED-01–ED-07 were adopted on 2026-08-04, but this appendix does not close F-042, represent the post-adoption rerun, or expand the Path A product claim.
 
 The provisional implementation now provides a reproducible local
 subject-level comparison and CM/PR adjudication worksheet. Their handling and
@@ -88,7 +88,7 @@ CSV outputs remain outside Git and the release surface.
 
 ## 7. Phase 2 acceptance criteria
 
-The next implementation may begin only when the parent record contains the accountable-author decision and single-author limitation acknowledgement. Its evidence package must include:
+The authorized Phase 2 implementation must produce the following evidence before F-042 can close:
 
 - SAS and R source/staging changes with a governed PR profile.
 - Subject-level before/after disposition of every current pain-labelled record plus every newly qualifying diary/RT record.

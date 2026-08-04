@@ -12,9 +12,9 @@ The next controlled work item is specification closure, not an unapproved ADTTE 
 
 | ID | Pri | Owner | Work | Why it matters | Exit |
 |---|---|---|---|---|---|
-| **W-ENDPOINT-01** | **P0** | WS-2 / WS-4 + accountable author | **Author-decision package ready.** Use the [review packet](decisions/F042_APPROVER_REVIEW_PACKET_2026-08-03.md) to adopt, revise, or reject ED-01–ED-07 for Path A: corrected pain algorithm, cancer-related evidence, CM+PR union, RT sensitivities, SAP-native `T-11-3`–`T-11-8` mappings, TTUMOR ITT population and TTE origins. | Numerical parity cannot prove clinical correctness; the sealed pain and TTUMOR rules require replacement after controlled author authorization. | [`EDR-F042-T11-8-2026-08-03.md`](decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md) signed by the accountable author or returned with exact replacement wording; then Phase 2 rerun. External statistical/medical review remains required before regulated reuse. |
+| **W-ENDPOINT-01** | **P0** | WS-2 / WS-4 + accountable author | **Author-decision recorded; Phase 2 implementation authorized.** Implement ED-01–ED-07: corrected pain algorithm, cancer-related evidence, CM+PR union, RT sensitivities, SAP-native `T-11-3`–`T-11-8` mappings, TTUMOR ITT population and TTE origins. | Numerical parity cannot prove clinical correctness; the pre-rerun sealed pain and TTUMOR rules remain historical until dual-language implementation, reconciliation, delayed second-pass review, rerun, and reseal. | [`EDR-F042-T11-8-2026-08-03.md`](decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md) records Antony Bevan's 2026-08-04 adoption; then Phase 2 rerun/reseal. External statistical/medical review remains required before regulated reuse. |
 
-The author-decision-ready record, executable proposal and impact appendix are documentation-only until accountable-author sign-off and leave the current Path A outputs untouched. The historical backlog below remains useful evidence, but this handoff supersedes its older “next session” ordering for endpoint work.
+The author-adopted record, executable proposal and impact appendix authorize Phase 2 implementation while leaving the current Path A outputs untouched until rerun/reseal. The historical backlog below remains useful evidence, but this handoff supersedes its older “next session” ordering for endpoint work.
 
 ---
 
@@ -69,7 +69,7 @@ The author-decision-ready record, executable proposal and impact appendix are do
 
 ## Priority order for next session
 
-1. **W-ENDPOINT-01** — obtain the controlled endpoint/catalog decision before changing ADTTE or TFL outputs
+1. **W-ENDPOINT-01** — implement the adopted endpoint/catalog decision, reconcile, rerun and reseal
 2. **W-PKG-01** — refresh package outputs (TFLs, guides PDFs, eCTD leaves) only after any approved endpoint rerun
 3. **W-ADAM-02** — promote TEAE AESER soft QC to hard gate after rebuild
 4. Otherwise hold Path A with the 2026-08-01 remediation audit trail (T-17 Safety dens, ECOG pooling, T-11-6/7 IDs, seal source-tree binding, CRF tag, guide sync)

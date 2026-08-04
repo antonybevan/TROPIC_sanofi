@@ -1,10 +1,10 @@
 # F-042 Endpoint Approval Specification
 
 **Specification ID:** `F042-ENDPOINT-APPROVAL-SPEC-2026-08-03`<br>
-**Version:** `0.3.2`<br>
-**Status:** **AUTHOR-DECISION READY — PENDING ACCOUNTABLE-AUTHOR SIGN-OFF**<br>
+**Version:** `0.4.0`<br>
+**Status:** **AUTHOR-ADOPTED FOR PATH A — PHASE 2 IMPLEMENTATION AUTHORIZED**<br>
 **Parent record:** [`ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md`](ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md)<br>
-**Execution state:** Documentation only for production; no program may consume this specification as production authority until the accountable author signs the parent record. A bounded exploratory implementation is tracked separately in the provisional implementation note and may not modify or reseal Path A outputs.
+**Execution state:** The accountable author adopted ED-01–ED-07 as written on 2026-08-04. Phase 2 may implement this specification in separate SAS and R tracks; current sealed Path A outputs remain unchanged until the full rerun, reconciliation, delayed second-pass review, and reseal pass.
 
 ## 1. Authority and interpretation boundary
 

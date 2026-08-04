@@ -5,7 +5,7 @@
 **As of:** 2026-08-03
 **Authorities:** SAP v4.0 · `config/study_config.yaml` · `config/tfl_output_catalog.yaml` · ADRG · [Section 2 audit](../../06_qc_evidence/audit/section_reviews/SECTION_02_POPULATIONS_ENDPOINTS_AUDIT_2026-08-03.md)
 
-**Decision handoff:** Begin with the [F-042 accountable-author review packet](decisions/F042_APPROVER_REVIEW_PACKET_2026-08-03.md), then record the author decision in the [F-042 / T-11-8 Endpoint Decision Record](decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md). The controlled evidence includes the [approval specification](decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md), [quantified impact appendix](decisions/F042_PFS_PAIN_IMPACT_APPENDIX_2026-08-03.md), and [CM/PR source qualification audit](decisions/F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.md). The package is author-decision ready/pending accountable-author sign-off and does not change current Path A outputs. It does not claim independent, sponsor, or regulated approval.
+**Decision handoff:** The F-042 accountable-author review packet and [F-042 / T-11-8 Endpoint Decision Record](decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md) now record Antony Bevan's 2026-08-04 adoption of ED-01–ED-07 as written. Phase 2 implementation may proceed under the [approval specification](decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md), [quantified impact appendix](decisions/F042_PFS_PAIN_IMPACT_APPENDIX_2026-08-03.md), and [CM/PR source qualification audit](decisions/F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.md). Current Path A outputs remain unchanged until rerun/reseal, and no independent, sponsor, or regulated approval is claimed.
 
 ---
 
@@ -125,4 +125,4 @@ The orchestrator **does stage-gate G02** through `platform/check_gate_g02_specif
 - [x] Runtime G02 gate exists
 - [ ] ED-01–ED-07 adopted by the accountable author with limitation acknowledgement, then SAP-native `T-11-3`–`T-11-8` mapping implemented/resealed
 
-Board status: **AMBER** until the T-11-8 decision and the Section 3 endpoint-origin/diary handoff are closed.
+Board status: **AMBER** — T-11-8 decision adopted; Phase 2 endpoint-origin/diary implementation and rerun/reseal remain open.

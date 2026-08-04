@@ -1,15 +1,15 @@
 # Endpoint Decision Record — F-042 / T-11-8
 
 **Record ID:** `EDR-F042-T11-8-2026-08-03`<br>
-**Version:** `0.3.2`<br>
-**Status:** **AUTHOR-DECISION READY — PENDING ACCOUNTABLE-AUTHOR SIGN-OFF**<br>
+**Version:** `0.4.0`<br>
+**Status:** **AUTHOR-ADOPTED FOR PATH A — PHASE 2 IMPLEMENTATION AUTHORIZED**<br>
 **Product path:** Path A — controlled non-submission demonstration<br>
 **Baseline commit:** `a213667` (`codex/submission-pipeline-rc`)<br>
 **Change class:** Analysis-specification and output-catalog decision; no derivation change in this record
 
 ## 1. Purpose and control boundary
 
-This record turns the open endpoint issues into explicit decisions that can be adopted, revised, rejected, or superseded. It is a decision-control artifact, not sponsor or medical approval. The exact recommended implementation is defined in the [`F-042 Endpoint Approval Specification`](F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md), which remains non-executable until the accountable author signs this record.
+This record turns the open endpoint issues into explicit decisions that can be adopted, revised, rejected, or superseded. It is a decision-control artifact, not sponsor or medical approval. On 2026-08-04, accountable author Antony Bevan adopted ED-01 through ED-07 as written for the controlled Path A demonstration. The exact implementation remains bounded by the [`F-042 Endpoint Approval Specification`](F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md) and the acceptance criteria below.
 
 The current validated ADTTE, TFL, metadata, and release outputs remain unchanged. Until the required decisions are author-adopted, no program may silently promote the current pain component to an SAP-complete PFS rule or treat the current response block as the SAP `T-11-8` TTPAIN deliverable.
 
@@ -17,7 +17,7 @@ The separate [provisional implementation note](F042_PROVISIONAL_IMPLEMENTATION_N
 records a bounded author-directed exploratory program. That artifact may inspect
 the proposed rules and quantify provisional impact, but it cannot consume the
 decision as production authority, modify/reseal Path A outputs, or represent
-formal author adoption before the signed record is complete.
+formal author adoption before the controlled author decision is recorded.
 
 The associated [CM/PR adjudication worksheet specification](F042_ADJUDICATION_WORKSHEET_SPEC_2026-08-03.md)
 defines the local, patient-level review fields and disposition controls. It does
@@ -40,9 +40,9 @@ The baseline is the final real-SAS run used by the current Path A release eviden
 - Release verification at the baseline: 30/30 checks passed.
 - Current PFS component labels: 282 disease-progression events, 37 pain-progression candidate events, 8 death events, and 44 censored records in the real MP ADTTE.
 - Raw SDTM PR exists, but PR is not in the current staging handoff or ADaM derivation.
-- Pre-implementation PR source profile is complete: 151 rows, 65 subjects, 0 duplicate `USUBJID/PRSEQ` keys, 148 complete ISO dates, and 65/65 ADSL linkages; endpoint consumption remains blocked.
+- Pre-implementation PR source profile is complete: 151 rows, 65 subjects, 0 duplicate `USUBJID/PRSEQ` keys, 148 complete ISO dates, and 65/65 ADSL linkages; Phase 2 endpoint implementation is now authorized while current sealed outputs remain unchanged until rerun.
 - A direct-intent CM review found 13 palliative/antalgic radiotherapy rows across 10 subjects, including 12 complete post-randomization start dates. Direct-intent PR contains 3 rows for 1 different subject. PR therefore cannot be the sole endpoint source.
-- The current pain implementation does not match the protocol/corrected-publication rule: it uses median AS, `PPI >=2`, absolute `AS >=10`, combined-component confirmation, and a terminal-trigger exception. These rules must be replaced after accountable-author adoption and before the endpoint can be represented as corrected for Path A.
+- The current pain implementation does not match the protocol/corrected-publication rule: it uses median AS, `PPI >=2`, absolute `AS >=10`, combined-component confirmation, and a terminal-trigger exception. ED-07 authorizes replacement under the controlled Phase 2 implementation and rerun criteria below; the current sealed output remains historical evidence until that rerun completes.
 - PN-to-SV profiling found exact SV visit-date matches for 1,931 of 1,937 PN subject-visits, supporting a controlled `SVSTDTC` event-date hierarchy with a flagged fallback.
 
 The numerical agreement above proves reproducibility of the current rule. It does not approve the unresolved clinical interpretation.
@@ -59,13 +59,13 @@ The numerical agreement above proves reproducibility of the current rule. It doe
 | `ED-06` | What are the time origins for secondary TTE parameters? | Code uses `RANDDT` for OS/PFS/TTPAIN/TTPSA/TTUMOR and `TRTSDT` for TTSAE; one reviewer-guide passage conflicts. | **Recommended:** adopt the current parameter-level origins in Approval Specification §9 and correct reviewer-facing text. | Accountable author for Path A; sponsor/SAP authority before regulated reuse | `STARTDT`, `AVAL`, ADRG, traceability, and Define methods. |
 | `ED-07` | What exact pain progression algorithm is authorized? | Current code uses the wrong PPI/AS thresholds and AS summary, can confirm across different components, and accepts a terminal single trigger. | **Recommended:** component-specific 5-of-7 summaries; PPI median increase `>=1`; mean AS increase `>=25%` with positive baseline; same component at two consecutive scheduled evaluations at least 21 days apart; do not bridge an intervening missing/non-evaluable visit; no terminal exception; RT standalone; SV visit-date hierarchy. | Accountable author for Path A; external statistical/medical review before regulated reuse | TTPAIN and PFS derivations, event dating, censoring, source traceability and regression scope. |
 
-## 4. Required accountable-author decision
+## 4. Recorded accountable-author decision
 
-No decision is recorded by this unsigned document. Use the [`F-042 Endpoint Approver Review Packet`](F042_APPROVER_REVIEW_PACKET_2026-08-03.md) to conduct the review, then record the accountable Path A disposition below.
+On 2026-08-04, accountable author Antony Bevan adopted ED-01 through ED-07 **as written for Path A** and acknowledged the single-author limitation. The approval was recorded in the controlled task conversation and is not represented as a Part 11 electronic signature, sponsor approval, or independent statistical/medical review.
 
 ### Author decision election
 
-- [ ] **ADOPT AS WRITTEN FOR PATH A** — adopt `ED-01` through `ED-07` and authorize implementation of Approval Specification §§3–10.
+- [x] **ADOPT AS WRITTEN FOR PATH A** — adopt `ED-01` through `ED-07` and authorize implementation of Approval Specification §§3–10.
 - [ ] **ADOPT WITH DOCUMENTED MODIFICATIONS FOR PATH A** — attach exact replacement wording and identify affected decision IDs.
 - [ ] **REJECT / RETURN FOR REVISION** — identify rejected decision IDs and rationale.
 
@@ -73,17 +73,17 @@ If decisions are dispositioned individually, complete every row:
 
 | Decision | Adopt as written | Modify (attach wording) | Reject | Accountable-author initials |
 |---|---|---|---|---|
-| `ED-01` | [ ] | [ ] | [ ] | — |
-| `ED-02` | [ ] | [ ] | [ ] | — |
-| `ED-03` | [ ] | [ ] | [ ] | — |
-| `ED-04` | [ ] | [ ] | [ ] | — |
-| `ED-05` | [ ] | [ ] | [ ] | — |
-| `ED-06` | [ ] | [ ] | [ ] | — |
-| `ED-07` | [ ] | [ ] | [ ] | — |
+| `ED-01` | [x] | [ ] | [ ] | AB |
+| `ED-02` | [x] | [ ] | [ ] | AB |
+| `ED-03` | [x] | [ ] | [ ] | AB |
+| `ED-04` | [x] | [ ] | [ ] | AB |
+| `ED-05` | [x] | [ ] | [ ] | AB |
+| `ED-06` | [x] | [ ] | [ ] | AB |
+| `ED-07` | [x] | [ ] | [ ] | AB |
 
 | Role | Required action | Name / signature | Date | Status |
 |---|---|---|---|---|
-| Accountable author / project owner | Adopt, modify, or reject ED-01–ED-07; acknowledge the single-author limitations below | — | — | **Pending** |
+| Accountable author / project owner | Adopt, modify, or reject ED-01–ED-07; acknowledge the single-author limitations below | Antony Bevan — approval recorded in controlled task conversation | 2026-08-04 | **Adopted as written** |
 | External statistician/medical reviewer | Required before regulated, sponsor, or filing use; optional enhancement for Path A | Not available | — | **Not performed** |
 
 ### Single-author limitation acknowledgement
@@ -102,7 +102,7 @@ By signing, the author confirms that any modification is written into the contro
 
 ## 5. Implementation gate for the next phase
 
-Phase 2 programming is **blocked** until the accountable author has signed and dated an explicit disposition for ED-01 through ED-07 and acknowledged the single-author limitations. A partially dispositioned record is non-executable unless the signed text explicitly authorizes a bounded subset that has no dependency on unresolved decisions.
+Phase 2 programming is **authorized** for the adopted ED-01 through ED-07 scope. The production ADTTE/TFL outputs remain unchanged until the implementation, dual-language reconciliation, delayed second-pass review, full DAG rerun, and release reseal all pass. No filing-facing or regulated claim is authorized by this project decision.
 
 After accountable-author adoption, the implementation order is:
 
@@ -114,7 +114,7 @@ After accountable-author adoption, the implementation order is:
 6. Reconcile separately programmed SAS/R results and scoped admiral checks; quantify every event and denominator reclassification.
 7. Rerun the complete DAG and reseal only after all output and traceability checks pass.
 
-If author adoption is not recorded, retain the current Path A labels and the explicit F-042 residual. Do not change the validated analysis merely to make the catalog appear complete.
+Until the Phase 2 rerun and reseal complete, retain the current Path A labels as historical evidence alongside the adopted-rule implementation outputs. Do not describe the current sealed analysis as corrected merely because the decision has been adopted.
 
 ## 6. Companion evidence
 

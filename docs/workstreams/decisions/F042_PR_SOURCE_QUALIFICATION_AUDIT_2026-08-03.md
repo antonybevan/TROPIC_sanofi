@@ -2,7 +2,7 @@
 
 **Audit ID:** `F042-PR-SOURCE-QUAL-2026-08-03`<br>
 **Version:** `0.2.0`<br>
-**Status:** **APPROVAL EVIDENCE COMPLETE — NOT SIGNED FOR ENDPOINT USE**<br>
+**Status:** **APPROVAL EVIDENCE COMPLETE — ED-02 ADOPTED; PHASE 2 IMPLEMENTATION IN PROGRESS**<br>
 **Parent decision:** [`ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md`](ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md)<br>
 **Approval dependency:** `ED-02` — PR source, precedence, intent, and date handling<br>
 **Product path:** Path A controlled non-submission demonstration
@@ -81,11 +81,11 @@ The direct-intent CM and PR subject sets do not overlap. Therefore, the prior pr
 | Date derivation | 148 complete dates; 3 year-month dates | **Required** — retain source precision; no day imputation. |
 | Key integrity | No duplicate `USUBJID/PRSEQ`; subject mapping complete | **PASS** for staging readiness. |
 | ADSL linkage | 65/65 PR subjects link to real MP ITT ADSL | **PASS** for linkage readiness. |
-| Endpoint qualification | No author-adopted rule | **BLOCKED** pending accountable-author disposition of ED-01/ED-02/ED-03. |
+| Endpoint qualification | ED-02 CM+PR union and intent rule adopted | **AUTHORIZED** for Phase 2 implementation; post-rerun event consumption remains subject to reconciliation and adjudication controls. |
 
-## 5. Author-decision-ready staging/source specification — pending author sign-off
+## 5. Adopted staging/source specification — Phase 2 implementation
 
-If ED-02 is author-adopted, the staging layer should:
+With ED-02 adopted, the staging layer shall:
 
 1. Create `01_source_data/real_sdtm/staging/pr.rds` from the raw PR domain using the existing uppercase-domain ingestion convention.
 2. Preserve all 151 rows and all source variables; do not filter to radiotherapy at ingestion.
@@ -113,10 +113,10 @@ The raw patient-level PR file remains outside git under the repository data-righ
 
 ## 7. Exit criteria for ED-02 implementation
 
-Before CM or PR is consumed by an endpoint program, the parent decision record must contain:
+Before CM or PR is consumed by a regenerated controlled endpoint output, the implementation must demonstrate:
 
 - author-adopted CM+PR union and exact-duplicate precedence;
 - author-adopted treatment-intent classification rule;
 - author-adopted date precision and window handling;
-- accountable-author identity, sign-off date, and single-author limitation acknowledgement;
+- accountable-author identity, decision date, and single-author limitation acknowledgement;
 - a planned SAS/R reconciliation and subject-level impact report.
