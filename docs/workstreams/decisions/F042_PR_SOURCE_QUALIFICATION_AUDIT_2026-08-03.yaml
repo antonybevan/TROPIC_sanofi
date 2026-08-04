@@ -80,7 +80,8 @@ controls:
   preserve_source_text: true
   no_day_imputation: true
   no_treatment_intent_inference_at_ingest: true
-  no_endpoint_consumption_before_author_adoption: true
+  endpoint_consumption_authorized_after: 2026-08-04
+  no_output_change_until_phase_2_rerun: true
   no_current_output_change: true
   no_pr_only_precedence: true
   exact_subject_date_auto_dedup_only: true

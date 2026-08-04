@@ -561,8 +561,8 @@ f042_run_provisional <- function(
   pn <- readRDS(file.path(root, "01_source_data/real_sdtm/staging/pn.rds"))
   cm <- readRDS(file.path(root, "01_source_data/real_sdtm/staging/cm.rds"))
   ds <- readRDS(file.path(root, "01_source_data/real_sdtm/staging/ds.rds"))
+  pr <- readRDS(file.path(root, "01_source_data/real_sdtm/staging/pr.rds"))
   sv <- read_sas(file.path(root, "01_source_data/real_sdtm/sv.sas7bdat"))
-  pr <- read_sas(file.path(root, "01_source_data/real_sdtm/pr.sas7bdat"))
   result <- f042_derive(adsl, pn, sv, cm, pr, adrs, ds, adtte)
   if (!is.null(out_dir)) {
     dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)

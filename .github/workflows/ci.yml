@@ -102,6 +102,7 @@ jobs:
     - name: Run unit tests (Broker + Seeder)
       run: |
         python3 platform/test_oda_broker.py
+        python3 tests/test_phase2_staging.py
 
     - name: Run clinical pipeline smoke test (Demo)
       run: |
