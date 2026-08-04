@@ -4,7 +4,7 @@
 **Product path:** Path A — controlled non-submission demonstration
 **Accountable author:** Antony Bevan
 **Review date:** 2026-08-04
-**Status:** **PASS — full real-SAS DAG, release seal and CI verification complete**
+**Status:** **HISTORICAL PASS; NOT SUFFICIENT AS SOLE APPROVAL EVIDENCE — see statistical governance assessment**
 
 ## Purpose and independence boundary
 
@@ -41,14 +41,28 @@ and no sponsor, medical, statistical, Part 11 or regulated approval is represent
 | Log challenge | Missing arithmetic values are guarded; only reviewed F-017 time-origin warnings remain | PASS — current log gate |
 | Final execution | Full 34-stage real-SAS DAG, health `full_dag`, release manifest `PASS`, clean tree | PASS — 34/34, ODA, bridge/recon/package/log gates green; release manifest and CI verification passed |
 
+## Post-review exception
+
+The later [Path A Statistical Governance Assessment](PATH_A_STATISTICAL_GOVERNANCE_ASSESSMENT_2026-08-04.md)
+identified `GOV-STAT-01`: the SAS T-11-5 branch required a confirming visit at least
+21 days later but tested response only at the initial visit. That SAS branch produced
+65 responder subjects versus the correct R-derived 43, while the displayed TFL
+happened to use the correct R value. The prior dual-language checklist assertion was
+therefore too broad: ADTTE parity was valid, but T-11-5 subject-level response parity
+had not been tested.
+
+The SAS rule and release gate have been corrected. This record remains the historical
+delayed-pass evidence and must be read with the governance assessment and the current
+`endpoint_controls.F042_PAIN_RESPONSE` result.
+
 ## Disposition
 
-No implementation defect was identified in this delayed pass. The complete real-SAS
-DAG passed 34/34 stages on ODA (SAS 9.04.01M8P022223), with exact SAS/R dataset and
-results reconciliation, zero scoped admiral cell differences, synthetic bridge parity
-across six domains, metadata/package gates, and log cleanliness PASS (22 reviewed
-F-017 time-origin exceptions, zero unapproved). The release manifest is PASS at
-release-candidate grade, and both local and GitHub CI release verification passed.
+At the time of this pass, no implementation defect was identified and the complete
+real-SAS DAG passed 34/34 stages on ODA (SAS 9.04.01M8P022223). `GOV-STAT-01`
+subsequently showed that the review did not cover the independent T-11-5 subject set.
+This record cannot authorize release of a changed source tree. Current Path A
+promotion is governed by the statistical-governance assessment and its mandatory
+real-SAS endpoint-level reconciliation condition.
 
 **Author acknowledgement:** Antony Bevan — delayed second-pass review conducted under
 the disclosed single-author limitation; this acknowledgement is a project control

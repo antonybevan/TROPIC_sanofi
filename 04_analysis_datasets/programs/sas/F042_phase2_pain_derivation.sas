@@ -326,7 +326,7 @@ proc sql;
               and x.base_ppi - x.ppi_value >= 2
               and x.as_value <= x.base_an
              then 1 else 0
-           end as ppi_response,
+           end as ppi_response_initial,
            case
              when calculated baseline_eligible = 1
               and x.ppi_evaluable = 1 and x.as_evaluable = 1
@@ -336,7 +336,36 @@ proc sql;
               and (x.base_an - x.as_value) / x.base_an > 0.5
               and x.ppi_value <= x.base_ppi
              then 1 else 0
-           end as as_response
+           end as as_response_initial,
+           case
+             when calculated baseline_eligible = 1
+              and y.ppi_evaluable = 1 and y.as_evaluable = 1
+              and not missing(x.base_ppi) and not missing(x.base_an)
+              and not missing(y.ppi_value) and not missing(y.as_value)
+              and x.base_ppi - y.ppi_value >= 2
+              and y.as_value <= x.base_an
+             then 1 else 0
+           end as ppi_response_confirming,
+           case
+             when calculated baseline_eligible = 1
+              and y.ppi_evaluable = 1 and y.as_evaluable = 1
+              and not missing(x.base_ppi) and not missing(x.base_an)
+              and not missing(y.ppi_value) and not missing(y.as_value)
+              and x.base_an > 0
+              and (x.base_an - y.as_value) / x.base_an > 0.5
+              and y.ppi_value <= x.base_ppi
+             then 1 else 0
+           end as as_response_confirming,
+           case
+             when calculated ppi_response_initial = 1
+              and calculated ppi_response_confirming = 1
+             then 1 else 0
+           end as ppi_confirmed,
+           case
+             when calculated as_response_initial = 1
+              and calculated as_response_confirming = 1
+             then 1 else 0
+           end as as_confirmed
     from work.f042_visit_triggers as x
     inner join adam.adsl as a
       on x.usubjid = a.usubjid
@@ -358,12 +387,12 @@ proc sql;
            confirming_date,
            event_date_source,
            confirming_date_source,
-           case when ppi_response = 1 and as_response = 1 then 'PPI+AS'
-                when ppi_response = 1 then 'PPI'
-                when as_response = 1 then 'AS'
+           case when ppi_confirmed = 1 and as_confirmed = 1 then 'PPI+AS'
+                when ppi_confirmed = 1 then 'PPI'
+                when as_confirmed = 1 then 'AS'
                 else '' end as response_component length=8
     from work.f042_pain_response_candidates
-    where ppi_response = 1 or as_response = 1;
+    where ppi_confirmed = 1 or as_confirmed = 1;
 quit;
 
 proc sort data=work.f042_pain_response_events;
@@ -373,6 +402,17 @@ data work.f042_pain_response_events;
     set work.f042_pain_response_events;
     by usubjid event_date;
     if first.usubjid;
+run;
+
+/*
+   Export the independently derived subject-level response set for the local
+   cross-language gate.  The orchestrator downloads this transient file from
+   ODA, reconciles it to the R derivation, and removes it after comparison; only
+   aggregate PASS/FAIL evidence is retained in the repository.
+*/
+proc export data=work.f042_pain_response_events
+    outfile="&PROJ_ROOT.&PATH_SEP.04_analysis_datasets&PATH_SEP.adam&PATH_SEP.f042_pain_response_prod.csv"
+    dbms=csv replace;
 run;
 
 proc sql;

@@ -128,5 +128,9 @@ The orchestrator **does stage-gate G02** through `platform/check_gate_g02_specif
 - [x] SAP-native `T-11-3`–`T-11-8` mapping implemented in code, catalog, metadata and reviewer guides
 - [x] TTUMOR ITT primary and CM+PR-qualified pain derivation implemented in separate SAS/R tracks
 - [x] Full 34-stage real-SAS DAG, delayed second-pass review and release reseal recorded for this change set
+- [x] T-11-5 same-component maintenance corrected in SAS and a subject-level SAS/R endpoint gate made release-blocking
 
-Board status: **GREEN for Path A implementation** — the full 34-stage real-SAS DAG and delayed second-pass review passed; external qualified review remains required before regulated reuse.
+Board status: **GREEN for Path A only when the current machine evidence satisfies the
+[statistical governance assessment](reviews/PATH_A_STATISTICAL_GOVERNANCE_ASSESSMENT_2026-08-04.md)
+conditions**, including `endpoint_controls.F042_PAIN_RESPONSE=PASS`. External
+qualified review remains required before regulated reuse.

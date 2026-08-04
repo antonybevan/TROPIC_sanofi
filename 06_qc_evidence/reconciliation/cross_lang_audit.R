@@ -42,6 +42,12 @@ datasets <- vapply(.manifest$datasets, function(d) d$name, character(1))
 
 cat("NOTE: [RECONCILIATION] Starting Cross-Language Audit...\n")
 
+# Carry the execution mode into every reconciliation decision. A transient
+# subject-level SAS endpoint extract is mandatory only for a current real-SAS
+# run; sim/cached modes remain explicitly non-release evidence.
+execution_mode <- Sys.getenv("TROPIC_SAS_MODE", unset = "sim")
+is_simulated <- Sys.getenv("TROPIC_SAS_SIMULATION") == "TRUE"
+
 compare_datasets <- function(ds_name) {
   prod_path <- paste0("04_analysis_datasets/adam/", ds_name, "_prod.xpt")
   val_path <- paste0("04_analysis_datasets/adam/", ds_name, "_v.xpt")
@@ -153,6 +159,120 @@ compare_datasets <- function(ds_name) {
   }
 }
 
+parse_endpoint_date <- function(x) {
+  if (inherits(x, "Date")) return(x)
+  if (is.numeric(x)) return(as.Date(x, origin = "1960-01-01"))
+  value <- trimws(as.character(x))
+  value[value %in% c("", ".")] <- NA_character_
+  out <- as.Date(rep(NA_character_, length(value)))
+  for (fmt in c("%Y-%m-%d", "%m/%d/%Y", "%d%b%Y")) {
+    pending <- is.na(out) & !is.na(value)
+    if (any(pending)) {
+      out[pending] <- as.Date(value[pending], format = fmt)
+    }
+  }
+  numeric_value <- suppressWarnings(as.numeric(value))
+  numeric_pending <- is.na(out) & !is.na(numeric_value)
+  out[numeric_pending] <- as.Date(numeric_value[numeric_pending], origin = "1960-01-01")
+  out
+}
+
+compare_f042_pain_response <- function() {
+  sas_path <- "04_analysis_datasets/adam/f042_pain_response_prod.csv"
+  if (!file.exists(sas_path)) {
+    if (execution_mode %in% c("oda", "local")) {
+      return(list(
+        status = "FAIL",
+        reason = "Current real-SAS run did not produce the required F-042 response extract"
+      ))
+    }
+    return(list(
+      status = "SKIPPED",
+      reason = paste("Endpoint extract unavailable in", execution_mode, "mode")
+    ))
+  }
+  on.exit(unlink(sas_path), add = TRUE)
+
+  tryCatch({
+    sas <- read.csv(
+      sas_path,
+      stringsAsFactors = FALSE,
+      check.names = FALSE,
+      na.strings = c("", ".")
+    )
+    names(sas) <- toupper(names(sas))
+    required <- c(
+      "USUBJID", "EVENT_DATE", "CONFIRMING_DATE", "RESPONSE_COMPONENT",
+      "EVENT_DATE_SOURCE", "CONFIRMING_DATE_SOURCE"
+    )
+    missing_sas <- setdiff(required, names(sas))
+    if (length(missing_sas)) {
+      return(list(
+        status = "FAIL",
+        reason = paste("SAS F-042 extract missing columns:", paste(missing_sas, collapse = ", "))
+      ))
+    }
+
+    source(
+      "04_analysis_datasets/programs/r/f042_provisional_pain_derivation.R",
+      local = TRUE
+    )
+    r_result <- f042_derive(
+      read_xpt("04_analysis_datasets/adam/adsl_v.xpt"),
+      readRDS("01_source_data/real_sdtm/staging/pn.rds"),
+      readRDS("01_source_data/real_sdtm/staging/sv.rds"),
+      readRDS("01_source_data/real_sdtm/staging/cm.rds"),
+      readRDS("01_source_data/real_sdtm/staging/pr.rds"),
+      read_xpt("04_analysis_datasets/adam/adrs_v.xpt"),
+      readRDS("01_source_data/real_sdtm/staging/ds.rds")
+    )
+
+    sas_cmp <- sas |>
+      transmute(
+        USUBJID = trimws(as.character(USUBJID)),
+        EVENT_DATE = format(parse_endpoint_date(EVENT_DATE), "%Y-%m-%d"),
+        CONFIRMING_DATE = format(parse_endpoint_date(CONFIRMING_DATE), "%Y-%m-%d"),
+        RESPONSE_COMPONENT = trimws(as.character(RESPONSE_COMPONENT)),
+        EVENT_DATE_SOURCE = trimws(as.character(EVENT_DATE_SOURCE)),
+        CONFIRMING_DATE_SOURCE = trimws(as.character(CONFIRMING_DATE_SOURCE))
+      ) |>
+      arrange(USUBJID, EVENT_DATE, CONFIRMING_DATE, RESPONSE_COMPONENT) |>
+      as.data.frame()
+
+    r_cmp <- r_result$pain_response_events |>
+      transmute(
+        USUBJID = trimws(as.character(USUBJID)),
+        EVENT_DATE = format(event_date, "%Y-%m-%d"),
+        CONFIRMING_DATE = format(confirming_date, "%Y-%m-%d"),
+        RESPONSE_COMPONENT = trimws(as.character(response_component)),
+        EVENT_DATE_SOURCE = trimws(as.character(event_date_source)),
+        CONFIRMING_DATE_SOURCE = trimws(as.character(confirming_date_source))
+      ) |>
+      arrange(USUBJID, EVENT_DATE, CONFIRMING_DATE, RESPONSE_COMPONENT) |>
+      as.data.frame()
+
+    sas_rows <- do.call(paste, c(sas_cmp, sep = "\u001f"))
+    r_rows <- do.call(paste, c(r_cmp, sep = "\u001f"))
+    sas_only <- sum(!sas_rows %in% r_rows)
+    r_only <- sum(!r_rows %in% sas_rows)
+    if (identical(sas_cmp, r_cmp)) {
+      return(list(
+        status = "PASS",
+        reason = paste(nrow(r_cmp), "subject-level response records agree exactly")
+      ))
+    }
+    list(
+      status = "FAIL",
+      reason = paste0(
+        "SAS/R F-042 response mismatch: SAS n=", nrow(sas_cmp),
+        ", R n=", nrow(r_cmp), ", SAS-only=", sas_only, ", R-only=", r_only
+      )
+    )
+  }, error = function(e) {
+    list(status = "FAIL", reason = paste("F-042 comparison error:", conditionMessage(e)))
+  })
+}
+
 # `datasets` is defined at the top of this script from config/study_manifest.yaml
 # (single source of truth); do not redeclare it here.
 results <- list()
@@ -163,8 +283,13 @@ for (ds in datasets) {
   cat(paste("NOTE: [RECONCILIATION] Dataset:", toupper(ds), "-", res$status, "-", res$reason, "\n"))
 }
 
-# Determine if simulation mode is active
-is_simulated <- Sys.getenv("TROPIC_SAS_SIMULATION") == "TRUE"
+f042_pain_response <- compare_f042_pain_response()
+cat(
+  paste(
+    "NOTE: [RECONCILIATION] Endpoint control: F042_PAIN_RESPONSE -",
+    f042_pain_response$status, "-", f042_pain_response$reason, "\n"
+  )
+)
 
 banner_html <- ""
 if (is_simulated) {
@@ -204,6 +329,20 @@ for (ds in datasets) {
   )
 }
 
+endpoint_status_class <- if (f042_pain_response$status == "PASS") {
+  "pass"
+} else if (f042_pain_response$status == "FAIL") {
+  "fail"
+} else {
+  ""
+}
+html_content <- paste0(
+  html_content,
+  "<tr><td><strong>F042_PAIN_RESPONSE</strong></td><td class='",
+  endpoint_status_class, "'>", f042_pain_response$status,
+  "</td><td>", f042_pain_response$reason, "</td></tr>"
+)
+
 html_content <- paste0(html_content, "</tbody></table></div></body></html>")
 # nolint end
 
@@ -215,11 +354,11 @@ cat("NOTE: [RECONCILIATION] Visual HTML audit saved to platform/reconciliation_r
 # Previously this script logged FAILs but exited 0, allowing the orchestrator to
 # report GREEN while a domain had cell-level differences. The orchestrator now
 # also reads this file to gate Stage 11.
-any_fail <- any(vapply(results, function(r) r$status != "PASS", logical(1)))
+any_fail <- any(vapply(results, function(r) r$status != "PASS", logical(1))) ||
+  f042_pain_response$status == "FAIL"
 # Carry the execution mode into the machine-readable status so a tautological sim PASS is
 # distinguishable from a genuine double-programmed PASS (audit M-1). The orchestrator exports
 # TROPIC_SAS_MODE; default to "sim" if absent (safer than implying a real run).
-execution_mode <- Sys.getenv("TROPIC_SAS_MODE", unset = "sim")
 status_json <- paste0(
   "{\n  \"overall\": \"", if (any_fail) "FAIL" else "PASS", "\",\n",
   "  \"simulated\": ", if (is_simulated) "true" else "false", ",\n",
@@ -228,12 +367,18 @@ status_json <- paste0(
   paste(sprintf("    \"%s\": \"%s\"", toupper(datasets),
                 vapply(datasets, function(d) results[[d]]$status, character(1))),
         collapse = ",\n"),
-  "\n  }\n}\n"
+  "\n  },\n",
+  "  \"endpoint_controls\": {\n",
+  "    \"F042_PAIN_RESPONSE\": \"", f042_pain_response$status, "\"\n",
+  "  }\n}\n"
 )
 writeLines(status_json, "platform/reconciliation_status.json")
 
 if (any_fail) {
   failed <- toupper(names(Filter(function(r) r$status != "PASS", results)))
-  stop(sprintf("RECONCILIATION FAILED: cell-level differences in %s. See cross_lang_audit.log.",
+  if (f042_pain_response$status == "FAIL") {
+    failed <- c(failed, "F042_PAIN_RESPONSE")
+  }
+  stop(sprintf("RECONCILIATION FAILED: differences in %s. See cross_lang_audit.log.",
                paste(failed, collapse = ", ")))
 }

@@ -159,6 +159,8 @@ def main() -> int:
     r = load("platform/reconciliation_status.json") or {}
     add("recon.PASS", r.get("overall") == "PASS", str(r.get("overall")))
     add("recon.not_sim", r.get("simulated") is False, str(r.get("simulated")))
+    f042_recon = (r.get("endpoint_controls") or {}).get("F042_PAIN_RESPONSE")
+    add("recon.F042_PAIN_RESPONSE", f042_recon == "PASS", str(f042_recon))
 
     rr = load("platform/results_reconciliation_status.json") or {}
     add("results_recon.PASS", rr.get("overall") == "PASS", str(rr.get("overall")))

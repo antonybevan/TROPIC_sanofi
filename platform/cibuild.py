@@ -244,6 +244,9 @@ SAS_TFL_DATA_FILES = [
     "forest_hr_prod.csv", "figure_km_stats_prod.csv", "figure_km_risk_prod.csv",
     "figure_waterfall_prod.csv", "figure_swimmer_prod.csv", "figure_er_prod.csv",
 ]
+SAS_ENDPOINT_CONTROL_FILES = [
+    "f042_pain_response_prod.csv",
+]
 
 # --- Study structure from the manifest (I/J platform generalisation) ----------
 # config/study_manifest.yaml declares the reconciled datasets and the study identity so
@@ -564,6 +567,13 @@ filename tfl "{PGMDIR_ODA}/T_tfl_generation.sas";
                 f"{SASFIG_ODA}/{fig}.png",
             )
         for data_file in SAS_TFL_DATA_FILES:
+            _atomic_download(
+                sas,
+                f"04_analysis_datasets/adam/{data_file}",
+                f"{ADAM_ODA}/{data_file}",
+            )
+        print("  [ODA] Downloading SAS endpoint-control reconciliation data...")
+        for data_file in SAS_ENDPOINT_CONTROL_FILES:
             _atomic_download(
                 sas,
                 f"04_analysis_datasets/adam/{data_file}",
@@ -1003,6 +1013,13 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
 
     # Detect, and honestly label, how the SAS production track will be obtained.
     sas_mode = _resolve_sas_mode(real_sas, use_cached_sas)
+    # Never let a prior ODA run's transient endpoint-control extract satisfy the
+    # current run. Real SAS must regenerate it; simulated/cached modes will
+    # explicitly record the endpoint comparison as unavailable.
+    for data_file in SAS_ENDPOINT_CONTROL_FILES:
+        stale_endpoint_file = os.path.join("04_analysis_datasets", "adam", data_file)
+        if os.path.exists(stale_endpoint_file):
+            os.remove(stale_endpoint_file)
     # Only a literal byte-copy simulation counts as "simulation" for the audit flag.
     os.environ["TROPIC_SAS_SIMULATION"] = "TRUE" if sas_mode == "sim" else "FALSE"
     # Pass the precise mode so the reconciliation status records execution_mode (audit M-1).

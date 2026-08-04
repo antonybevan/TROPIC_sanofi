@@ -114,8 +114,8 @@ Machine gates can be green while **residual risks** remain. This memo is the hum
 |---|---|
 | **Difference** | The pre-Phase-2 sealed pain derivation used median AS, `PPI >=2`, absolute `AS >=10`, combined-component/terminal confirmation, minimum diary date, no author-adopted cancer-related qualification and no CM+PR RT consumption. Those labels remain historical baseline evidence; the adopted replacement is implemented separately in SAS and R. |
 | **Impact if ignored** | TTPAIN/PFS event dates and event sets can be wrong in both directions; numerical SAS/R/admiral parity would only reproduce the same clinical-rule error. |
-| **Why Path A holds** | Antony Bevan adopted ED-01–ED-07 on 2026-08-04; the corrected component-specific pain derivation, CM+PR union, TTUMOR ITT, SAP-native T-11 remap, aggregate source-lineage evidence and separate SAS/R reconciliation are now controlled. No independent, sponsor, medical or regulated approval is claimed. |
-| **Close condition** | **Complete for Path A implementation:** full 34-stage real-SAS rerun, delayed second-pass review, release reseal and CI verification passed. External qualified statistical/medical review and sponsor governance remain required before regulated reuse. |
+| **Why Path A holds** | Antony Bevan adopted ED-01–ED-07 on 2026-08-04. The later statistical-governance review found and corrected `GOV-STAT-01`: SAS T-11-5 tested only the initial response visit; replaying that defective logic yields 65 instead of the correct 43. The current control now requires exact subject-level SAS/R pain-response parity in addition to the corrected CM+PR pain derivation, TTUMOR ITT, SAP-native T-11 remap and aggregate lineage evidence. No independent, sponsor, medical or regulated approval is claimed. |
+| **Close condition** | **Path A only:** the current source tree must pass the full 34-stage real-SAS DAG, `endpoint_controls.F042_PAIN_RESPONSE=PASS`, release reseal and CI verification. External qualified statistical/medical review and sponsor governance remain required before regulated reuse. |
 
 ---
 
@@ -270,3 +270,4 @@ Under `docs/PRODUCT_CLAIM.md` Path A and the residual register above:
 | 1.3 | 2026-08-03 | F-042 single-author governance: accountable-author Path A decision, disclosed non-independence and external-review boundary |
 | 1.4 | 2026-08-04 | F-042 adopted-rule implementation, CM+PR staging, TTUMOR ITT and SAP-native T-11 mapping; final full-DAG/reseal pending |
 | 1.5 | 2026-08-04 | Full-DAG/reseal/CI closure and governance handoff; external qualified review remains required |
+| 1.6 | 2026-08-04 | Statistical-governance review found and remediated GOV-STAT-01; T-11-5 subject-level SAS/R parity is now a release condition |

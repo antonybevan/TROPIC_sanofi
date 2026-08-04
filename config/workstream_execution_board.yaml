@@ -72,19 +72,22 @@ workstreams:
       - config/ctq_traceability.yaml
       - 07_reviewer_explanation/analysis_report.md
       - 07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md
-    note: "Antony Bevan adopted ED-01 through ED-07 on 2026-08-04. Corrected CM+PR-qualified pain derivation, TTUMOR ITT primary, SAP-native T-11-3 through T-11-8 mappings, full real-SAS DAG and delayed second-pass review are complete; external qualified review remains required before regulated reuse."
+    note: "Conditional GREEN for Path A. The statistical-governance review found and corrected GOV-STAT-01 in SAS T-11-5; current-head promotion now requires exact subject-level F042_PAIN_RESPONSE SAS/R parity plus the full real-SAS DAG and reseal. External qualified review remains required before regulated reuse."
     open_risks:
       - external_statistical_medical_review
       - F-012_combined_n749_is_not_protocol_itt
     required_evidence:
       - population_endpoint_control_table
       - spec_to_config_trace
-    next_action: "Maintain the sealed evidence and retain external qualified statistical/medical review as a pre-regulated-use requirement"
+      - statistical_governance_assessment
+      - f042_pain_response_subject_level_reconciliation
+    next_action: "Require endpoint_controls.F042_PAIN_RESPONSE=PASS on the current source tree and retain external qualified statistical/medical review as a pre-regulated-use requirement"
     residual_findings: [F-012, F-042]
     packs:
       - docs/workstreams/WS2_POPULATION_ENDPOINT_CONTROL.md
       - docs/workstreams/decisions/F042_APPROVER_REVIEW_PACKET_2026-08-03.md
       - docs/workstreams/decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md
+      - docs/workstreams/reviews/PATH_A_STATISTICAL_GOVERNANCE_ASSESSMENT_2026-08-04.md
       - 06_qc_evidence/audit/section_reviews/SECTION_02_POPULATIONS_ENDPOINTS_AUDIT_2026-08-03.md
 
   WS3_standards_metadata:

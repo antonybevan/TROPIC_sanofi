@@ -462,6 +462,8 @@ def _binding_problems(payload: dict) -> list[str]:
         problems.append("pipeline provenance_guard did not pass")
     if recon.get("overall") != "PASS" or recon.get("simulated"):
         problems.append("dataset reconciliation is not non-simulated PASS")
+    if (recon.get("endpoint_controls") or {}).get("F042_PAIN_RESPONSE") != "PASS":
+        problems.append("F-042 pain-response SAS/R reconciliation is not PASS")
     if results.get("overall") != "PASS":
         problems.append("results reconciliation is not PASS")
     if forest.get("overall") != "PASS":

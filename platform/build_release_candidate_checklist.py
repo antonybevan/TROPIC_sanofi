@@ -159,6 +159,18 @@ def build_release_checklist(out_dir, report_path):
         f"{PATHS['reconciliation']} overall={recon.get('overall', 'missing')}; simulated={recon.get('simulated', 'missing')}",
         "" if recon.get("overall") == "PASS" and not recon.get("simulated") else "Re-run reconciliation from a real SAS production track; simulated zero-diff is tautological.",
     )
+    f042_recon = (recon.get("endpoint_controls") or {}).get("F042_PAIN_RESPONSE")
+    _add(
+        rows, "G06 qc_signoff", "F-042 pain-response subject-level SAS/R reconciliation passes",
+        _status(f042_recon == "PASS"),
+        f"{PATHS['reconciliation']} endpoint_controls.F042_PAIN_RESPONSE={f042_recon or 'missing'}",
+        (
+            "Run the real-SAS F-042 response extract and reconcile every subject/event date, "
+            "confirmation date, component, and date source against the R derivation."
+            if f042_recon != "PASS"
+            else ""
+        ),
+    )
     _add(
         rows, "G04 analysis_dataset_promotion", "Committed ODA evidence snapshot exists",
         _status(

@@ -4,7 +4,7 @@
 **As of:** 2026-08-04 (Phase 2 endpoint implementation closeout)
 **Audit baseline:** `5f986f6` endpoint implementation closeout on `codex/submission-pipeline-rc`
 **Latest sealed run:** source head `5f986f6` · `oda` · `full_dag` · 34/34 stages; current release manifest is hash-bound at the final seal commit
-**Current controls:** RC checklist 17/17 · `verify_release` 30/30 · CI green
+**Current controls:** RC checklist 18/18 · `verify_release` 31/31 · CI green
 **Historical Path A tag:** `v0.1.0-demo-rc.1` (its release note remains immutable)
 **Product claim in force:** **Path A controlled non-submission demonstration** (`docs/PRODUCT_CLAIM.md`)  
 **Authority:** SAP v4.0 remediation lock · `06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md` · `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md`  
@@ -88,11 +88,11 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | Field | Content |
 |---|---|
 | **Owned artifacts** | SAP v4.0 · `config/study_config.yaml` · CTQ/estimand register · ANALYSIS_REPORT · population rules (ITT/Safety/MEASDISF) · [Section 2 audit](../06_qc_evidence/audit/section_reviews/SECTION_02_POPULATIONS_ENDPOINTS_AUDIT_2026-08-03.md) |
-| **Current status** | **GREEN for the Path A implementation; clean seal commit/rebind complete** — Antony Bevan adopted ED-01–ED-07; the corrected pain/CM+PR rule, TTUMOR ITT primary, and SAP-native `T-11-3`–`T-11-8` mappings are implemented and internally reconciled |
+| **Current status** | **CONDITIONAL GREEN for Path A** — the statistical-governance review found and corrected `GOV-STAT-01`; current-head promotion requires exact T-11-5 subject-level SAS/R parity in addition to the full rerun/reseal |
 | **Open risks** | Disclosed lack of independent sponsor/statistical/medical review; no filing-facing claim is authorized |
-| **Required evidence pack** | (1) accountable-author review packet and decision record · (2) approval specification · (3) CM/PR source audit and sensitivities · (4) aggregate event-source evidence · (5) separately programmed SAS/R implementation, delayed second-pass review, and full rerun/reseal |
+| **Required evidence pack** | (1) accountable-author review packet and decision record · (2) approval specification · (3) CM/PR source audit and sensitivities · (4) aggregate event-source evidence · (5) statistical governance assessment · (6) separately programmed SAS/R implementation, endpoint-level parity, delayed review, and full rerun/reseal |
 | **Release gate** | G02 before claiming SAP-complete TFLs |
-| **Next action** | Maintain the evidence and obtain external qualified statistical/medical review before any regulated reuse |
+| **Next action** | Require `endpoint_controls.F042_PAIN_RESPONSE=PASS` on the current source tree; obtain external qualified statistical/medical review before any regulated reuse |
 
 ---
 
