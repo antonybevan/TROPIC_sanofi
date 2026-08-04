@@ -190,7 +190,7 @@ Source of truth for this section:
 | Dataset-JSON / ARS / USDM outputs | Built on DAG; **not** eCTD primary path | CLASSIFIED_ADDITIVE (folder READMEs) |
 | `tools/archive/**` | Dead / one-time / migration | Do not run as prod |
 | Manual CbzP reconstruct scripts | Pre-req, not every DAG tick | Documented; bind hashes on release |
-| 21 deferred TFLs in catalog | Explicitly **not in scope** | Not “missing bugs” — deferred by control |
+| 18 deferred TFLs in catalog | Explicitly **not in scope** | Not “missing bugs” — deferred by control |
 
 **Done vs not done is not “count files.”** It is:
 
@@ -198,7 +198,7 @@ Source of truth for this section:
 |---|---|
 | Dual-lang ADaM + recon on MP | Org GxP double programming |
 | admiral core (ADSL, OS, PFS) | Full admiral every domain |
-| Controlled TFL set (18 in catalog) | 21 deferred SAP TFLs |
+| Controlled TFL set (21 in catalog) | 18 deferred SAP TFLs |
 | Module 5 style package + seals | Real FDA app IDs / filing |
 | Findings dispositioned | Full commercial P21 clearance |
 

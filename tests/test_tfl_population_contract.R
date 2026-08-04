@@ -52,7 +52,7 @@ stopifnot(identical(eco$ECOGBLGRP, c("0-1", "2")))
 stopifnot(identical(eco$n, c(691L, 58L)))
 
 tfl_text <- paste(readLines("05_outputs/tfl/output/tables/T-11-Efficacy_Tables.txt", warn = FALSE), collapse = "\n")
-stopifnot(grepl("T-11-6:.*Tumor Progression", tfl_text))
+stopifnot(grepl("T-11-6: Time to Tumou?r Progression \\(TTUMOR; ITT primary\\)", tfl_text))
 stopifnot(grepl("T-11-7:.*PSA Progression", tfl_text))
 stopifnot(grepl("145/361", tfl_text), grepl("61/329", tfl_text))
 stopifnot(!grepl("148/378|69/371", tfl_text))

@@ -6,9 +6,9 @@
 | **Study** | TROPIC / EFC6193 / NCT00417079 |
 | **Compound** | Cabazitaxel (CbzP) vs Mitoxantrone (MP) |
 | **Standards** | CDISC ADaMIG v1.3 · OCCDS v1.0 (+ custom episode-merge; **not** “OCCDS v1.1”) |
-| **Document version** | 1.1 (Path A hardened) |
-| **Effective** | 2026-07-09 |
-| **Supersedes** | ADRG narrative drafts prior to `v0.1.0-demo-rc.1` Path A freeze |
+| **Document version** | 1.2 (portfolio finalization) |
+| **Effective** | 2026-08-04 |
+| **Supersedes** | ADRG v1.1 from the `v0.1.0-demo-rc.1` Path A baseline |
 | **Product claim** | **Path A only** — controlled non-submission demonstration |
 
 ---
@@ -24,9 +24,9 @@
 | Hash-sealed Path A demo RC | 21 CFR Part 11 validated system |
 | Comparative TFLs that may include **synthetic/reconstructed CbzP** | Independent clinical confirmation of CbzP efficacy |
 
-**Binding claim:** [`docs/PRODUCT_CLAIM.md`](../../docs/PRODUCT_CLAIM.md)  
-**Residual risks (ACCEPTED findings):** [`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)  
-**Sealed demo RC:** tag `v0.1.0-demo-rc.1` · [`docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md`](../../docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md) · `python3 scripts/verify_release.py`  
+**Binding claim:** [`docs/PRODUCT_CLAIM.md`](../../docs/PRODUCT_CLAIM.md)
+**Residual risks (ACCEPTED findings):** [`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)
+**Current portfolio release:** tag `v0.2.0-portfolio` · [`docs/RELEASE_NOTE_v0.2.0-portfolio.md`](../../docs/RELEASE_NOTE_v0.2.0-portfolio.md) · `python3 scripts/verify_release.py`
 **Review package face:** [`08_submission_package/m5/`](../../08_submission_package/m5/) · [`08_submission_package/README.md`](../../08_submission_package/README.md)
 
 > **SAP v4.0 lock:** `02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx` is the **programming** authority for this demonstration (lock memo: `06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md`). It is **not** a sponsor-approved filing SAP. This ADRG explains implementation; it does not invent new analysis decisions.
@@ -39,7 +39,7 @@ The **TROPIC Phase III Trial (NCT00417079)** evaluated cabazitaxel (25 mg/m² IV
 
 This repository is a **Path A programming demonstration** built on:
 
-- **Real MP arm (N=371)** de-identified SDTM (Sanofi 2013 / Project Data Sphere) → dual-language ADaM + recon  
+- **Real MP arm (N=371)** de-identified SDTM (Sanofi 2013 / Project Data Sphere) → dual-language ADaM + recon
 - **Synthetic / reconstructed CbzP (N=378)** merged **only at TFL** for comparative displays (non-confirmatory; F-003)
 
 In the **published** trial, cabazitaxel carried a substantial safety burden (~82% Grade 3/4 neutropenia; ~8% febrile neutropenia). Synthetic lab outputs in this package approximate published rates for pipeline exercise only (see T-21); they are **not** a re-analysis of trial safety.
@@ -92,7 +92,7 @@ For Progression-Free Survival (PFS), progression is defined using the SAP v4.0 l
 To pre-empt reviewer challenge on the response rates, the exact derivation of the response endpoints (as implemented in the SAS/R ADRS track and consumed by `tfl_generation.R`) is:
 
 * **Overall Response (`PARAMCD = OVRLRESP`) — integrated RECIST v1.0 timepoint response.** The per-visit overall response is the standard RECIST integration of **three** components, all sourced from `ls`: (1) **target** lesions (sum-of-diameters vs nadir/baseline, thresholds `RECIST_PD_PCT/PR_PCT/PD_ABS`); (2) **non-target** lesion status (`LSCAT='NON-TARGET'`, worst-per-visit collapse of `LSSTRESC`); (3) **new lesions** (`LSTESTCD='NEWLES'`). Override rules: **any new lesion ⇒ PD**; **non-target unequivocal PD ⇒ PD** (even with target CR/PR); target CR with a non-CR non-target ⇒ PR. The derivation is *defensive* — when non-target / new-lesion rows are absent for a subject-visit it reproduces the prior target-only result. The label remains "Overall Response per RECIST v1.0": new-lesion and non-target integration are part of RECIST 1.0; this is a **correctness fix**, not a version change. (Earlier revisions derived `OVRLRESP` from target SOD only and discarded the new-lesion and non-target signal that is present in the source.)
-* **Objective Response Rate (ORR, `PARAMCD = OBJRESP`):** Responder = a **confirmed** CR or PR per RECIST v1.0 (`AVALC = 'Y'`). Confirmation (audit M-2) requires a subsequent CR/PR at least `RECIST_CONFIRM_DAYS` (28) days after the first (CR confirmed by CR; PR confirmed by CR or PR), evaluated on the lesion-derived RECIST timepoints that both the SAS and R tracks compute identically. **Denominator = ITT population restricted to patients with measurable disease at baseline** (`MEASDISF == 'Y'`), per SAP v3.0 §3.4 / §5.3 and the publication (de Bono 2010). The real MP arm yields **13/203 = 6.4%** on the measurable subpopulation.
+* **Objective Response Rate (ORR, `PARAMCD = OBJRESP`):** Responder = a **confirmed** CR or PR per RECIST v1.0 (`AVALC = 'Y'`). Confirmation (audit M-2) requires a subsequent CR/PR at least `RECIST_CONFIRM_DAYS` (28) days after the first (CR confirmed by CR; PR confirmed by CR or PR), evaluated on the lesion-derived RECIST timepoints that both the SAS and R tracks compute identically. **Denominator = ITT population restricted to patients with measurable disease at baseline** (`MEASDISF == 'Y'`), per SAP v4.0 §3.4 / §5.3 and the publication (de Bono 2010). The real MP arm yields **13/203 = 6.4%** on the measurable subpopulation.
   * **Reconciliation to the publication:** The published MP ORR was **4.4%**. With confirmation enforced and overall response now integrated across target + non-target + new lesions (§4A), the pipeline yields **6.4%** on the measurable-disease denominator and **3.7%** (13/351) on the response-evaluable denominator (T-11-8b) — both close to the published rate. The prior best-of-any-assessment logic, with no confirmation, overstated this roughly four-fold (18.2%); enforcing the RECIST confirmation rule removed that overstatement. The small residual reflects lesion-sum-derived RECIST vs investigator adjudication and the ±3.5-day source date precision, not a calculation error.
 * **PSA Response (`PARAMCD = PSARESP`):** Responder = ≥50% confirmed decline in PSA from baseline (PCWG3) (`AVALC = 'Y'`); denominator = subjects with observed baseline PSA ≥20 ug/L (excluding `PSABLIF='Y'` fallback values) and an evaluable confirmatory PSARESP record, per SAP v4.0 §5.2/Table 12. Current demonstration output: **CbzP 145/361 = 40.2%** (synthetic) and **MP 61/329 = 18.5%** (real).
 * **Pain Response (F-042 / `T-11-5`):** ITT subjects with `PAINBL='Y'` and evaluable baseline PPI/AS are assessed at the immediate next scheduled visit at least 21 days later. Response requires a component-specific PPI reduction of at least 2 points without AS worsening or an AS reduction of more than 50% without PPI worsening, with both components evaluable. The real MP arm yields **43/153 = 28.1%**; the synthetic CbzP arm is reported as **N/A (PN unavailable)** rather than fabricated.
@@ -134,7 +134,7 @@ Several baseline laboratory variables are carried on ADSL to satisfy the ADaM sc
 **Imputation method and flags (audit F-5).** The method is a single **published population-median constant** per variable (values in `config/study_config.yaml`); it is *not* model-based or multiple imputation, and is applied only where the per-subject value is absent. Every imputed/placeholder baseline carries a companion **imputation flag** — `ECOGBLIF`, `PSABLIF`, `ALPBLIF`, `HGBBLIF` (= `'Y'` when imputed) — computed identically in SAS (`case when missing(...)`) and R (`is.na(...)` pre-coalesce), so a reviewer can isolate every imputed cell. `ALBBL`/`LDHBL` are **not collected and are left missing with blank flags** (no constant, no imputation; `def:Origin = Assigned` in `define.xml`).
 
 ### 5.2 Analysis Window Gaps (ADLB)
-The ADLB windowing schema leaves Days 35–38 unassigned (between the C2D8 window [Days 25–34] and C3D1 window [Days 39–45]). Laboratory assessments on Days 35–38 are assigned `AVISITN = 99` (Unscheduled) and are excluded from the primary `ANL01FL = 'Y'` worst-case analysis. This is consistent with the protocol visit schedule and **SAP v3.0 §11.1.3 (ADLB Analysis Windows — CBC Schedule)**, which does not specify a Day 35–38 nominal visit.
+The ADLB windowing schema leaves Days 35–38 unassigned (between the C2D8 window [Days 25–34] and C3D1 window [Days 39–45]). Laboratory assessments on Days 35–38 are assigned `AVISITN = 99` (Unscheduled) and are excluded from the primary `ANL01FL = 'Y'` worst-case analysis. This is consistent with the protocol visit schedule and **SAP v4.0 §11.1.3 (ADLB Analysis Windows — CBC Schedule)**, which does not specify a Day 35–38 nominal visit.
 
 ### 5.3 Demographic Covariates
 All subjects are assigned `SEX = 'M'` in `A_adsl_generation.sas`. This demographic assignment matches the actual study cohort (metastatic castration-resistant prostate cancer, which is exclusively male). `RACE` is carried from the source SDTM `DM`. `ETHNIC` was **not collected** in the de-identified public release; it is therefore set to the CDISC controlled-terminology value `'NOT REPORTED'` and carries `def:Origin Type="Assigned"` (not `Collected`) in the define, so it is not presented as observed data. Geographic indicators `COUNTRY` and `REGION` are **not present** in the de-identified release and are not derived (see the note in `B_bimo_generation.sas`); no placeholder geography is assigned.
@@ -159,8 +159,8 @@ All subjects are assigned `SEX = 'M'` in `A_adsl_generation.sas`. This demograph
 | Metadata | Spec→define / spec→data gates; Define XSD; local CORE ADaM rules | Commercial full Pinnacle 21 clearance |
 | Seals | Hash-sealed Path A demo RC; `scripts/verify_release.py` | Part 11 e-signature / validated CSV system |
 
-**Always read residuals here:** [`WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md) (F-003, F-005, F-011, F-012, F-014, F-025, …).  
-**Machine re-check (no SAS required):** `python3 scripts/verify_release.py`  
+**Always read residuals here:** [`WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md) (F-003, F-005, F-011, F-012, F-014, F-025, …).
+**Machine re-check (no SAS required):** `python3 scripts/verify_release.py`
 **Risk tiers:** [`RISK_BASED_VALIDATION.md`](RISK_BASED_VALIDATION.md) · `config/validation_strategy.yaml`
 
 > **Validation is allocated by risk.** Primary efficacy (OS, PFS) and ADSL get three derivation engines; supporting ADaM two; metadata automated conformance. This section documents the mechanics those tiers use.

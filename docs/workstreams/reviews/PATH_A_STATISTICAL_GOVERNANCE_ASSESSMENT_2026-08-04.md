@@ -1,7 +1,7 @@
 # Path A Statistical Governance Assessment
 
 **Record ID:** `PATHA-STAT-GOV-2026-08-04`<br>
-**Version:** `1.0.0`<br>
+**Version:** `1.1.0`<br>
 **Assessment date:** 2026-08-04<br>
 **Accountable author / project owner:** Antony Bevan<br>
 **Assessment mode:** AI-assisted internal governance-style review under the disclosed single-author model<br>
@@ -120,7 +120,9 @@ The following remain accepted only within Path A:
 - incomplete aCRF/application identifiers and example eCTD metadata;
 - no commercial P21 ADaM validation and broader CORE residuals;
 - partial-date/time-origin source limitations;
-- partial ARM/ARS and exploratory Dataset-JSON/USDM scope;
+- partial ARS and exploratory Dataset-JSON/USDM scope; ARM is complete for the
+  controlled analysis-output catalog (10 ResultDisplays / 18 AnalysisResults)
+  but does not claim deferred SAP analyses;
 - no independent organization, medical reviewer, sponsor document control, validated
   environment, or Part 11 signature.
 

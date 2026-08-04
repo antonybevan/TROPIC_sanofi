@@ -7,9 +7,9 @@
 | **Compound** | Cabazitaxel (CbzP) vs Mitoxantrone (MP) |
 | **Standard (package layer)** | CDISC SDTMIG **v3.4** + CDISC/NCI CT 2026-03-27 (uplifted; §5) |
 | **Standard (pristine source)** | CDISC SDTMIG **v3.1.1** (PDS 2013; local `01_source_data/real_sdtm/`) |
-| **Document version** | 1.1 (Path A hardened) |
-| **Effective** | 2026-07-09 |
-| **Supersedes** | SDRG narrative drafts prior to `v0.1.0-demo-rc.1` Path A freeze |
+| **Document version** | 1.2 (portfolio finalization) |
+| **Effective** | 2026-08-04 |
+| **Supersedes** | SDRG v1.1 from the `v0.1.0-demo-rc.1` Path A baseline |
 | **Product claim** | **Path A only** — controlled non-submission demonstration |
 
 ---
@@ -25,13 +25,13 @@
 | Week-offset / partial-date source honesty (F-017) | Day-level AE timing precision that the source never had |
 | Path A demo with patient XPT **not redistributed** | Part 11 validated system |
 
-**Binding claim:** [`docs/PRODUCT_CLAIM.md`](../../docs/PRODUCT_CLAIM.md)  
-**Source intake pack (WS-1):** [`docs/workstreams/WS1_SOURCE_INTAKE_PACK.md`](../../docs/workstreams/WS1_SOURCE_INTAKE_PACK.md)  
-**Residual risks:** [`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)  
-**External validation slots:** [`docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md`](../../docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md)  
-**Sealed demo RC:** tag `v0.1.0-demo-rc.1` · [`docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md`](../../docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md) · `python3 scripts/verify_release.py`  
-**Review package face:** [`08_submission_package/m5/datasets/tropic/tabulations/sdtm/`](../../08_submission_package/m5/datasets/tropic/tabulations/sdtm/)  
-**Analysis narrative:** [`ADRG.md`](ADRG.md)  
+**Binding claim:** [`docs/PRODUCT_CLAIM.md`](../../docs/PRODUCT_CLAIM.md)
+**Source intake pack (WS-1):** [`docs/workstreams/WS1_SOURCE_INTAKE_PACK.md`](../../docs/workstreams/WS1_SOURCE_INTAKE_PACK.md)
+**Residual risks:** [`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)
+**External validation slots:** [`docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md`](../../docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md)
+**Current portfolio release:** tag `v0.2.0-portfolio` · [`docs/RELEASE_NOTE_v0.2.0-portfolio.md`](../../docs/RELEASE_NOTE_v0.2.0-portfolio.md) · `python3 scripts/verify_release.py`
+**Review package face:** [`08_submission_package/m5/datasets/tropic/tabulations/sdtm/`](../../08_submission_package/m5/datasets/tropic/tabulations/sdtm/)
+**Analysis narrative:** [`ADRG.md`](ADRG.md)
 **Findings disposition:** `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md`
 
 > **Redistribution:** Real `*.sas7bdat` and package `*.xpt` are **not** in git (data rights + portfolio surface policy). Structure, define, SDRG/ADRG, and programs are.
@@ -40,8 +40,8 @@
 
 ## 0A. CRF grounding (principal source-fidelity rule)
 
-**CRF PDF (source):** `01_source_data/Sanofi CRF Tropic.pdf` (EFC6193, FINAL 21-Nov-2006)  
-**In package:** `blankcrf.pdf` under tabulations/sdtm (source CRF copy — **not** claimed as a complete annotated aCRF with page-level define origins)  
+**CRF PDF (source):** `01_source_data/Sanofi CRF Tropic.pdf` (EFC6193, FINAL 21-Nov-2006)
+**In package:** `blankcrf.pdf` under tabulations/sdtm (source CRF copy — **not** claimed as a complete annotated aCRF with page-level define origins)
 **Decision record:** [`docs/workstreams/reviews/WS1_CRF_GROUNDING_D012_2026-07-09.md`](../../docs/workstreams/reviews/WS1_CRF_GROUNDING_D012_2026-07-09.md)
 
 ### Rule
@@ -70,8 +70,8 @@
 | **Pristine PDS (local)** | 34 `*.sas7bdat` domains (incl. EG, MH, PE, SV, IE, CD, CX, trial design fragments, etc.) |
 | **Package / `define_sdtm.xml`** | **18** datasets: DM, EX, AE, LB, CM, DS, VS, LS, PN + SUPPAE/CM/DM/DS/EX/LB/LS + **TA, TS** |
 
-Domains present in PDS but **not** packaged (by design for this Path A analysis package):  
-`CD, CX, EG, IE, MH, PE, PR, SC, SV, TE, TI, TV` (+ related SUPP*).  
+Domains present in PDS but **not** packaged (by design for this Path A analysis package):
+`CD, CX, EG, IE, MH, PE, PR, SC, SV, TE, TI, TV` (+ related SUPP*).
 Do **not** claim the Module 5 SDTM folder is a full copy of every PDS domain.
 
 **Full E2E audit:** [`docs/workstreams/reviews/WS1_SDTM_E2E_AUDIT_2026-07-09.md`](../../docs/workstreams/reviews/WS1_SDTM_E2E_AUDIT_2026-07-09.md)
@@ -126,7 +126,7 @@ Standard SDTM mapping structures were built in `S_sdtm_mapping.sas` from trial-e
 ### 4.1 Baseline Laboratory Imputation
 For subjects with missing baseline laboratory values (PSABL, ALPBL, HGBBL), population-median proxy values have been imputed in ADSL:
 - `PSABL` default: 110.0 ng/mL
-- `ALPBL` default: 140.0 U/L  
+- `ALPBL` default: 140.0 U/L
 - `HGBBL` default: 11.5 g/dL
 - `ALBBL` **missing** (not collected; no imputation)
 - `LDHBL` **missing** (not collected; no imputation)
@@ -163,8 +163,8 @@ The pristine source SDTM (`01_source_data/real_sdtm/`, PDS 2013) was authored to
 
 ### 5.1 CORE SDTMIG 3.4 — honesty (F-015)
 
-**Run record:** [`platform/conformance/CORE_SDTM34_RUN_RECORD.md`](../../platform/conformance/CORE_SDTM34_RUN_RECORD.md)  
-**Engine:** cdisc-rules-engine (CORE) v0.16.0 · standard SDTMIG 3.4 · CT 2026-03-27  
+**Run record:** [`platform/conformance/CORE_SDTM34_RUN_RECORD.md`](../../platform/conformance/CORE_SDTM34_RUN_RECORD.md)
+**Engine:** cdisc-rules-engine (CORE) v0.16.0 · standard SDTMIG 3.4 · CT 2026-03-27
 **Headline:** targeted **structural uplift rules cleared**; overall issue count is **not zero** and must not be marketed as “CORE clean.”
 
 | Class | Examples | Disposition (Path A) |
@@ -175,9 +175,9 @@ The pristine source SDTM (`01_source_data/real_sdtm/`, PDS 2013) was authored to
 | **Cross-domain N/A** | RELREC/FAOBJ (CORE-000767) without FA in analysis-scoped package | **Waive / N/A** for this package scope |
 | **Engine-internal** | CORE-000929 / CORE-001081 evaluation dataset failed to build | **Accept with note** — tool noise, not silent data fix |
 
-**Rule for reviewers:**  
-- **Do claim:** “Uplifted package layer; CORE run recorded; structural targets cleared; residuals classified.”  
-- **Do not claim:** “Full commercial conformance” or “zero CORE findings.”  
+**Rule for reviewers:**
+- **Do claim:** “Uplifted package layer; CORE run recorded; structural targets cleared; residuals classified.”
+- **Do not claim:** “Full commercial conformance” or “zero CORE findings.”
 - **Rule-level disposition matrix (WS-1):** [`docs/workstreams/WS1_CORE_RESIDUAL_MATRIX.csv`](../../docs/workstreams/WS1_CORE_RESIDUAL_MATRIX.csv) — filed; still not a “CORE clean” claim.
 
 **Related residual:** week-offset / partial ISO dates — **F-017** (§2 AE note, §4.5). Never invent day precision.

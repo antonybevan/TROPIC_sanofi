@@ -11,6 +11,8 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+from define_arm_contract import evaluate as evaluate_define_arm
+
 try:
     import yaml
 except ImportError:  # pragma: no cover
@@ -27,6 +29,8 @@ REQUIRED_FILES = [
     "config/tfl_output_catalog.yaml",
     "config/ctq_traceability.yaml",
     "docs/workstreams/WS2_POPULATION_ENDPOINT_CONTROL.md",
+    "03_metadata/adam/ADaM_spec.xlsx",
+    "03_metadata/define/define.xml",
 ]
 
 CONFIG_KEYS = [
@@ -171,6 +175,18 @@ def main() -> int:
                 token in in_scope.get(output_id, "") and token in full.get(output_id, ""),
                 f"{output_id} must be '{token}' in both release and SAP catalogs",
             )
+
+    define_path = ROOT / "03_metadata/define/define.xml"
+    if define_path.is_file():
+        try:
+            for check in evaluate_define_arm(define_path):
+                add(
+                    str(check["name"]),
+                    bool(check["ok"]),
+                    str(check["detail"]),
+                )
+        except Exception as exc:
+            add("define.parse", False, str(exc))
 
     status = "PASS" if not problems else "FAIL"
     payload = {

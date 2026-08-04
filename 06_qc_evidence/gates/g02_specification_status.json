@@ -2,7 +2,7 @@
   "gate": "G02",
   "name": "analysis_specification_lock",
   "status": "PASS",
-  "generated_at": "2026-08-04T16:27:03Z",
+  "generated_at": "2026-08-04T17:55:47Z",
   "checks": [
     {
       "name": "exists:docs/PRODUCT_CLAIM.md",
@@ -36,6 +36,16 @@
     },
     {
       "name": "exists:docs/workstreams/WS2_POPULATION_ENDPOINT_CONTROL.md",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:03_metadata/adam/ADaM_spec.xlsx",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:03_metadata/define/define.xml",
       "ok": true,
       "detail": "present"
     },
@@ -188,6 +198,66 @@
       "name": "catalog.T-11-8_semantics",
       "ok": true,
       "detail": "T-11-8 must be 'pain progression' in both release and SAP catalogs"
+    },
+    {
+      "name": "define.where.TTPAIN",
+      "ok": true,
+      "detail": "Define-XML must carry the TTPAIN ARM where-clause"
+    },
+    {
+      "name": "define.where.controlled_tables",
+      "ok": true,
+      "detail": "response and Optimus clauses present"
+    },
+    {
+      "name": "define.ADTTE_description",
+      "ok": true,
+      "detail": "ADTTE description must enumerate the current controlled endpoint set"
+    },
+    {
+      "name": "define.arm_survival_truth",
+      "ok": true,
+      "detail": "survival ARM must disclose current SAP authority and CbzP evidence boundary"
+    },
+    {
+      "name": "define.arm_secondary_truth",
+      "ok": true,
+      "detail": "secondary ARM must match SAP v4.0, ITT populations, and synthetic limitations"
+    },
+    {
+      "name": "define.arm_TTUMOR_ITT",
+      "ok": true,
+      "detail": "TTUMOR ARM must be ITT-primary and must not retain the superseded subset claim"
+    },
+    {
+      "name": "define.arm_TTPAIN_result",
+      "ok": true,
+      "detail": "TTPAIN requires a dedicated ARM result bound to the TTPAIN where-clause"
+    },
+    {
+      "name": "define.arm_survival_covariates",
+      "ok": true,
+      "detail": "OS/PFS ADSL stratification variables declared"
+    },
+    {
+      "name": "define.arm_controlled_table_results",
+      "ok": true,
+      "detail": "controlled response and Optimus table results present"
+    },
+    {
+      "name": "define.arm_TFL_name_binding",
+      "ok": true,
+      "detail": "controlled display names bind physical TFL IDs"
+    },
+    {
+      "name": "define.arm_coverage",
+      "ok": true,
+      "detail": "result_displays=10 analysis_results=18"
+    },
+    {
+      "name": "define.arm_CbzP_disclosure",
+      "ok": true,
+      "detail": "all displays"
     }
   ],
   "problems": []

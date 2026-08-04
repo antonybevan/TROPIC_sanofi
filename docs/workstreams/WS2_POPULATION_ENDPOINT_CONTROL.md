@@ -76,7 +76,7 @@ From `config/study_config.yaml` (non-exhaustive):
 
 ## 4. Deferred endpoints / displays (not Path A deliverables)
 
-All IDs in `config/tfl_output_catalog.yaml` → `deferred_not_in_scope` (21 SAP full-catalog IDs), including additional efficacy tables T-11-1…5, T-12-*, T-13-*, T-14-*, T-15/16, F-12-2, T-17-3.
+All IDs in `config/tfl_output_catalog.yaml` marked `deferred_not_in_scope` (18 SAP full-catalog IDs) remain outside the controlled release. The promoted T-11-3, T-11-4, and T-11-5 response outputs are no longer deferred; the catalog itself is authoritative for the remaining IDs.
 
 **Programming must not silently implement these without:**
 

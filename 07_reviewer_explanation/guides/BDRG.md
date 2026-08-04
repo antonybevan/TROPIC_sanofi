@@ -6,9 +6,9 @@
 | **Study** | TROPIC / EFC6193 / XRP6258 · NCT00417079 |
 | **Cohort in clinsite** | Real Mitoxantrone (MP) de-identified arm only (N=371 subjects → site roll-up) |
 | **Standard** | FDA *Bioresearch Monitoring Technical Conformance Guide* (clinsite pattern; Appendix 3 **subset**) |
-| **Document version** | 1.1 (Path A hardened) |
-| **Effective** | 2026-07-09 |
-| **Supersedes** | BDRG drafts prior to `v0.1.0-demo-rc.1` Path A freeze |
+| **Document version** | 1.2 (portfolio finalization) |
+| **Effective** | 2026-08-04 |
+| **Supersedes** | BDRG v1.1 from the `v0.1.0-demo-rc.1` Path A baseline |
 | **Product claim** | **Path A only** — controlled non-submission demonstration |
 
 ---
@@ -22,10 +22,10 @@
 | Honest omissions where PDS has no PI/CTMS/DV data | Real investigator identity / financial disclosure / full DV counts |
 | Path A demo deliverable under `m5/.../bimo/` | FDA filing BIMO package |
 
-**Binding claim:** [`docs/PRODUCT_CLAIM.md`](../../docs/PRODUCT_CLAIM.md)  
-**Residuals:** [`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)  
-**Sealed demo RC:** tag `v0.1.0-demo-rc.1` · [`docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md`](../../docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md) · `python3 scripts/verify_release.py`  
-**Package path:** [`08_submission_package/m5/datasets/tropic/bimo/`](../../08_submission_package/m5/datasets/tropic/bimo/)  
+**Binding claim:** [`docs/PRODUCT_CLAIM.md`](../../docs/PRODUCT_CLAIM.md)
+**Residuals:** [`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)
+**Current portfolio release:** tag `v0.2.0-portfolio` · [`docs/RELEASE_NOTE_v0.2.0-portfolio.md`](../../docs/RELEASE_NOTE_v0.2.0-portfolio.md) · `python3 scripts/verify_release.py`
+**Package path:** [`08_submission_package/m5/datasets/tropic/bimo/`](../../08_submission_package/m5/datasets/tropic/bimo/)
 **Related guides:** [`ADRG.md`](ADRG.md) · [`SDRG.md`](SDRG.md) · [`TRACEABILITY_MATRIX.md`](TRACEABILITY_MATRIX.md)
 
 ---

@@ -1,11 +1,11 @@
 # TROPIC Workstream Execution Board
 
 **Status:** Active operating board — not a decorative architecture map  
-**As of:** 2026-08-04 (Phase 2 endpoint implementation closeout)
-**Audit baseline:** `5f986f6` endpoint implementation closeout on `codex/submission-pipeline-rc`
-**Latest sealed run:** source head `5f986f6` · `oda` · `full_dag` · 34/34 stages; current release manifest is hash-bound at the final seal commit
+**As of:** 2026-08-04 (portfolio finalization)
+**Audit baseline:** annotated tag `v0.2.0-portfolio` on `codex/submission-pipeline-rc`
+**Latest sealed run:** tag commit · `oda` · `full_dag` · 34/34 stages; the release manifest is hash-bound to the controlled source tree
 **Current controls:** RC checklist 18/18 · `verify_release` 31/31 · CI green
-**Historical Path A tag:** `v0.1.0-demo-rc.1` (its release note remains immutable)
+**Current Path A tag:** `v0.2.0-portfolio` (`v0.1.0-demo-rc.1` remains immutable historical evidence)
 **Product claim in force:** **Path A controlled non-submission demonstration** (`docs/PRODUCT_CLAIM.md`)  
 **Authority:** SAP v4.0 remediation lock · `06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md` · `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md`  
 **Portfolio surface:** `docs/REPO_SURFACE_POLICY.md` · `docs/INTERVIEWER_GUIDE.md` · dual-surface README
@@ -59,7 +59,7 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 
 | Field | Content |
 |---|---|
-| **Owned artifacts** | SAP v4.0 · SAP lock memo · README · REPRODUCIBILITY · findings register · disposition board · release note · tag `v0.1.0-demo-rc.1` · product claim language |
+| **Owned artifacts** | SAP v4.0 · SAP lock memo · README · REPRODUCIBILITY · findings register · disposition board · release note · tag `v0.2.0-portfolio` · product claim language |
 | **Current status** | **GREEN** — `docs/PRODUCT_CLAIM.md` freezes the controlled demo claim and v0.2 submission-simulation path |
 | **Open risks** | Language drift back to “submission-ready”; ACCEPTED Crits (F-003, F-005, F-025) misread as closed science |
 | **Required evidence for GREEN** | `docs/PRODUCT_CLAIM.md` freezes demo vs submission simulation; disposition board linked from ADRG/SDRG (done for tag) |
@@ -102,11 +102,11 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | Field | Content |
 |---|---|
 | **Owned artifacts** | ADaM_spec.xlsx · define.xml · define_sdtm.xml · XSD validation · metadata lineage · metadata control report · ARM · Dataset-JSON / USDM / ARS (scope) · F-014/F-020/F-021/F-022 residuals |
-| **Current status** | **AMBER** — metadata control PASS; lineage tools exist; ARM limited to controlled core; Dataset-JSON/USDM/ARS exploratory or partial |
+| **Current status** | **GREEN for Path A; AMBER for broader commercial-validator depth** — metadata control, lineage, XSD, spec→Define and spec→data pass; ARM covers every controlled analysis output except the non-analysis F-01-1 flow diagram (10 ResultDisplays / 18 AnalysisResults); Dataset-JSON/USDM/ARS remain explicitly exploratory or partial |
 | **Open risks** | Reviewer asks for full ARM/VLM/CT story; exploratory layers over-claimed; commercial P21 not run (F-016) |
 | **Required evidence pack** | (1) Spec→define + spec→data status · (2) XSD validate run record · (3) Lineage check PASS · (4) Explicit “in package / exploratory” inventory for Dataset-JSON, USDM, ARS · (5) P21 slot: RUN or NOT_AVAILABLE with reason |
 | **Release gate** | G03 before metadata promotion language |
-| **Next action** | External validation index filed (`docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md`). **Next:** fill CORE residual matrix; keep P21 NOT_AVAILABLE until tool access |
+| **Next action** | Maintain the filed external-validation index and CORE residual matrix; keep commercial P21/FDA validator slots `NOT_AVAILABLE` until genuine tool access; require the G02 ARM semantic contract on every release |
 
 ---
 
@@ -117,7 +117,7 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 |---|---|
 | **Owned artifacts** | SAS production + R validation programs · ADaM XPTs · BIMO clinsite · TFL suite · `config/tfl_output_catalog.yaml` · forest/results drivers · safety ADaM (ADAE/ADLB/ADEX) |
 | **Current status** | **GREEN for demo claim** — dual-lang recon PASS; TFL controlled catalog PASS; admiral T1 in DAG PASS; safety programming present |
-| **Open risks** | 21 deferred SAP TFL IDs; synthetic CbzP in TFLs; F-012 N=749 vs 755; manual SAS renderer remains diagnostic-only |
+| **Open risks** | 18 deferred SAP TFL IDs; synthetic CbzP in TFLs; F-012 N=749 vs 755; manual SAS renderer remains diagnostic-only |
 | **Required evidence pack** | (1) Program inventory by domain · (2) Catalog in-scope vs deferred · (3) Recon status JSON · (4) Admiral status · (5) TFL index + hashes · (6) Safety table list (T-20/T-21) |
 | **Release gate** | G04/G05 — currently satisfied for controlled scope |
 | **Next action** | **Do not expand scope casually.** Programming workstream review: walk ADSL → ADTTE → ADAE → T-20 with catalog and recon evidence only |
@@ -176,7 +176,7 @@ WS-3 Metadata ──G03──► WS-4 Programming + WS-5 QC
 WS-4 Programming ──G04/G05──► WS-5 QC + WS-6 Writing
 WS-5 QC ──G06──► WS-6 Writing + WS-7 Release
 WS-6 Writing ──G07──► WS-7 Release
-WS-7 Release ──G08/G09──► tagged package (v0.1.0-demo-rc.1 done for demo claim)
+WS-7 Release ──G08/G09──► tagged package (`v0.2.0-portfolio` current)
 ```
 
 **Rule:** If you cannot name the upstream pack you consumed, you are not operating the model.
@@ -188,9 +188,9 @@ WS-7 Release ──G08/G09──► tagged package (v0.1.0-demo-rc.1 done for de
 | Priority | Workstream | Deliverable | Why |
 |---:|---|---|---|
 | **Done** | WS-0 | `docs/PRODUCT_CLAIM.md` | Stops claim drift; career protection |
-| **P0** | WS-5 | Known-differences / residual risk memo for reviewers | Makes ACCEPTED findings usable in interview/review |
-| **P1** | WS-6 | ADRG/SDRG/BDRG hardening against board + claim | Reviewer package is the human product |
-| **P1** | WS-1 + WS-3 | External validation evidence index (CORE residual + P21 slot + XSD + eCTD validate) | Industry-grade package layer |
+| **Done** | WS-5 | Known-differences / residual risk memo for reviewers | Makes ACCEPTED findings usable in interview/review |
+| **Done** | WS-6 | ADRG/SDRG/BDRG hardening against board + claim | Reviewer package is the human product |
+| **Done** | WS-1 + WS-3 | External validation evidence index (CORE residual + P21 slot + XSD + eCTD validate) | Industry-grade package layer |
 | **Done** | WS-2 | Section 2 populations/endpoints audit + Phase 2 closure | Confirms live denominators, ITT TTUMOR, corrected T-11-3–T-11-8 mapping and F-042 lineage evidence |
 | **Done** | WS-7 | `verify_release` + CI `path-a-seal-verify` | Operational polish without reopening science |
 | **P3** | WS-4 | Deferred TFL backlog only if claim expands | Do not explode scope on GREEN programming |
@@ -202,7 +202,7 @@ WS-7 Release ──G08/G09──► tagged package (v0.1.0-demo-rc.1 done for de
 1. **Weekly workstream review (one WS per session):** walk owned artifacts → status → risks → next action only.  
 2. **No review without a pack list** (files + statuses).  
 3. **G09 re-seal** only when a workstream changes promotion-class evidence (not for doc typos alone).  
-4. **Tag policy:** new tag only when product claim or evidence grade changes (`v0.1.0-demo-rc.1` frozen).
+4. **Tag policy:** new tag only when product claim or evidence grade changes (`v0.1.0-demo-rc.1` frozen; `v0.2.0-portfolio` current).
 
 ---
 

@@ -1,19 +1,19 @@
 # TROPIC Release-Run Manifest
 
-Generated: 2026-08-04 16:34:16 UTC
+Generated: 2026-08-04 17:51:26 UTC
 
 > Hash-sealed run manifest for current artifacts. This is not an electronic signature or Part 11 attestation.
 
 ## Verdict
 
-- Status: `PASS`
-- Evidence grade: `release_candidate`
-- Manifest SHA-256 seal: `a6f078ae0e49ecfb77fd3189ff3a1b17c20a5b1eea5ae3578d030cf5924b8593`
+- Status: `REMEDIATION`
+- Evidence grade: `remediation_partial_or_dirty`
+- Manifest SHA-256 seal: `650cdee004dca5bb39dce719325ada6214abf8a7b36026e44227001cd32de4b3`
 - SAS execution mode: `oda`
 - Pipeline health: `GREEN`
 - Run scope: `full_dag` (34 recorded / 33 release-required upstream stages)
-- Git HEAD: `d0020b4da2ec951b58ccefc2b4c7968fe1d8eb6e`
-- Worktree dirty: `False`
+- Git HEAD: `77f6b5a4b859a4d7ee4e1b30829333012353e7e0`
+- Worktree dirty: `True`
 - SAS companion figures: `in_dag_real_sas_companion`; current with health=`True`
 
 ## Status meanings
@@ -26,18 +26,22 @@ Generated: 2026-08-04 16:34:16 UTC
 
 No release-run binding problems detected.
 
+## Remediation reasons (block release-candidate PASS)
+
+- git worktree is dirty (43 porcelain entries); release-candidate lock requires a clean committed state
+
 ## Dataset Binding
 
 | Dataset | Prod MD5 | Validation MD5 | Distinct | Package match | Sequence match |
 | --- | --- | --- | --- | --- | --- |
-| ADSL | d12e4528c3ba8bf7dbbc9ffa98e65654 | 1c3fd98f40e2823bdc01905d2b796b43 | yes | yes | yes |
-| ADEX | 0ffe22691909add72fd691201adf250d | 851a37836b053695f89ff485dd5bceaa | yes | yes | yes |
-| ADCM | 2609a53cab59cee80b6e7f71cd8e3831 | 64c38b6cbd1e4bb1ed764043628bc918 | yes | yes | yes |
-| ADAE | 58c1220f64c530c00b6c160da8eeb82f | 2f4911bc34490feb1cf9f66be2dfe56c | yes | yes | yes |
-| ADLB | d1975a7d8b0266c3dffaf660f98b40b1 | 9cfab8ed40994d0089d85c7b703ef341 | yes | yes | yes |
-| ADRS | b9a9f3dfca176343d9a33546313389a0 | cc8199636a12ee31217e10540ca2b311 | yes | yes | yes |
-| ADTTE | 11999a2a046c75ab6d4094e631b12e64 | 753919e8fe649e9c2c32628b73f1a586 | yes | yes | yes |
-| CLINSITE | f6f584af76d9da584865632921f98e07 | 5c35fa1a6dcb6cf540ecbbebef26171f | yes | yes | yes |
+| ADSL | 7b68e93b09c5ba5cbed911ff71c34d61 | 6680ebf77f9bda438d41c6fada98060a | yes | yes | yes |
+| ADEX | 3937dc929f98eba707b7a3c56e20b957 | 1c64b7388603da159d48f9a801409e08 | yes | yes | yes |
+| ADCM | 208406d2a084fb50b3b725c4b781e29f | 4e053f4dd106240a5992736ecf5df1c4 | yes | yes | yes |
+| ADAE | 0fcf81d30f703865c720d4d40d2177c7 | ae252d8dbae0046e2f8d9ee9e22928cd | yes | yes | yes |
+| ADLB | fdef20964ff00c24d39aa1e6c3b60cd3 | 9aacf93ebf3d623160a1a1400baf243e | yes | yes | yes |
+| ADRS | 1ebb4096b669d54b44187dec93396b5d | b9bed0e3531a4fdfaeb5acd589d618ef | yes | yes | yes |
+| ADTTE | 97eac491d283520be593567775234871 | 4f25fcbdb7661fe9e05b0ae42bdde2d8 | yes | yes | yes |
+| CLINSITE | eba467aebc9b50e270e8174661dd4a22 | d1e830e766bdda4dce271e40c21d1167 | yes | yes | yes |
 
 ## QC Verdicts
 
@@ -53,7 +57,7 @@ No release-run binding problems detected.
 | spec_data | PASS | platform/conformance/spec_data_conformance.json |
 | metadata_control | pass | platform/metadata_control/metadata_control_status.json |
 | log_cleanliness | PASS | platform/log_cleanliness/log_cleanliness_status.json |
-| tfl_output_index | pass | platform/tfl_output_index_status.json |
+| tfl_output_index | fail | platform/tfl_output_index_status.json |
 | validation_strategy | PASS | platform/validation_strategy/validation_strategy_status.json |
 
 ## Machine-Readable Outputs

@@ -715,10 +715,24 @@ cox_psa <- coxph(Surv(AVAL, 1 - CNSR) ~ TRT01P, data = psa_data)
 sum_fit_psa <- summary(fit_psa)$table
 sum_cox_psa <- summary(cox_psa)
 
+fmt_tte_value <- function(x, digits = 1) {
+  if (length(x) != 1L || !is.finite(x)) return("NE")
+  formatC(x, format = "f", digits = digits)
+}
+fmt_tte_ci <- function(lcl, ucl) {
+  if (!is.finite(lcl) || !is.finite(ucl)) return("NE")
+  sprintf("%.1f-%.1f", lcl, ucl)
+}
+fmt_pvalue <- function(x) {
+  if (!is.finite(x)) return("NE")
+  if (x < 0.0001) return("<0.0001")
+  sprintf("%.4f", x)
+}
+
 med_psa_cbzp <- sum_fit_psa["TRT01P=CbzP", "median"]
 med_psa_mp <- sum_fit_psa["TRT01P=MP", "median"]
-ci_psa_cbzp <- sprintf("(95%% CI: %.1f-%.1f)", sum_fit_psa["TRT01P=CbzP", "0.95LCL"], sum_fit_psa["TRT01P=CbzP", "0.95UCL"]) # nolint
-ci_psa_mp <- sprintf("(95%% CI: %.1f-%.1f)", sum_fit_psa["TRT01P=MP", "0.95LCL"], sum_fit_psa["TRT01P=MP", "0.95UCL"]) # nolint
+ci_psa_cbzp <- fmt_tte_ci(sum_fit_psa["TRT01P=CbzP", "0.95LCL"], sum_fit_psa["TRT01P=CbzP", "0.95UCL"]) # nolint
+ci_psa_mp <- fmt_tte_ci(sum_fit_psa["TRT01P=MP", "0.95LCL"], sum_fit_psa["TRT01P=MP", "0.95UCL"]) # nolint
 
 hr_psa <- sum_cox_psa$conf.int[1]
 hr_psa_lcl <- sum_cox_psa$conf.int[3]
@@ -741,8 +755,8 @@ sum_cox_tumor <- summary(cox_tumor)
 
 med_tumor_cbzp <- sum_fit_tumor["TRT01P=CbzP", "median"]
 med_tumor_mp <- sum_fit_tumor["TRT01P=MP", "median"]
-ci_tumor_cbzp <- sprintf("(95%% CI: %.1f-%.1f)", sum_fit_tumor["TRT01P=CbzP", "0.95LCL"], sum_fit_tumor["TRT01P=CbzP", "0.95UCL"]) # nolint
-ci_tumor_mp <- sprintf("(95%% CI: %.1f-%.1f)", sum_fit_tumor["TRT01P=MP", "0.95LCL"], sum_fit_tumor["TRT01P=MP", "0.95UCL"]) # nolint
+ci_tumor_cbzp <- fmt_tte_ci(sum_fit_tumor["TRT01P=CbzP", "0.95LCL"], sum_fit_tumor["TRT01P=CbzP", "0.95UCL"]) # nolint
+ci_tumor_mp <- fmt_tte_ci(sum_fit_tumor["TRT01P=MP", "0.95LCL"], sum_fit_tumor["TRT01P=MP", "0.95UCL"]) # nolint
 
 hr_tumor <- sum_cox_tumor$conf.int[1]
 hr_tumor_lcl <- sum_cox_tumor$conf.int[3]
@@ -763,8 +777,8 @@ sum_fit_ttpain <- summary(fit_ttpain)$table
 sum_cox_ttpain <- summary(cox_ttpain)
 med_ttpain_cbzp <- sum_fit_ttpain["TRT01P=CbzP", "median"]
 med_ttpain_mp <- sum_fit_ttpain["TRT01P=MP", "median"]
-ci_ttpain_cbzp <- sprintf("(95%% CI: %.1f-%.1f)", sum_fit_ttpain["TRT01P=CbzP", "0.95LCL"], sum_fit_ttpain["TRT01P=CbzP", "0.95UCL"]) # nolint
-ci_ttpain_mp <- sprintf("(95%% CI: %.1f-%.1f)", sum_fit_ttpain["TRT01P=MP", "0.95LCL"], sum_fit_ttpain["TRT01P=MP", "0.95UCL"]) # nolint
+ci_ttpain_cbzp <- fmt_tte_ci(sum_fit_ttpain["TRT01P=CbzP", "0.95LCL"], sum_fit_ttpain["TRT01P=CbzP", "0.95UCL"]) # nolint
+ci_ttpain_mp <- fmt_tte_ci(sum_fit_ttpain["TRT01P=MP", "0.95LCL"], sum_fit_ttpain["TRT01P=MP", "0.95UCL"]) # nolint
 hr_ttpain <- sum_cox_ttpain$conf.int[1]
 hr_ttpain_lcl <- sum_cox_ttpain$conf.int[3]
 hr_ttpain_ucl <- sum_cox_ttpain$conf.int[4]
@@ -868,16 +882,17 @@ efficacy_tables <- paste0(
       "---------------------------------------------------------\n",
       "Statistic                                 CbzP (N=%d)        MP (N=%d)\n",
       "Number of Events / Total N                %d/%d               %d/%d\n",
-      "Median Survival Time (Months)             %.1f                %.1f\n",
-      "95%% Confidence Interval                   %s      %s\n",
+      "Median Survival Time (Months)             %s                %s\n",
+      "95%% Confidence Interval                   %s                %s\n",
       "Unstratified Hazard Ratio (CbzP vs MP)     %.2f (95%% CI: %.2f-%.2f)\n",
-      "Wald p-value                               %.4f\n\n"
+      "Wald p-value                               %s\n\n"
     ),
     as.integer(total_tumor_cbzp), as.integer(total_tumor_mp),
     as.integer(events_tumor_cbzp), as.integer(total_tumor_cbzp),
     as.integer(events_tumor_mp), as.integer(total_tumor_mp),
-    med_tumor_cbzp, med_tumor_mp, ci_tumor_cbzp, ci_tumor_mp,
-    hr_tumor, hr_tumor_lcl, hr_tumor_ucl, p_tumor
+    fmt_tte_value(med_tumor_cbzp), fmt_tte_value(med_tumor_mp),
+    ci_tumor_cbzp, ci_tumor_mp,
+    hr_tumor, hr_tumor_lcl, hr_tumor_ucl, fmt_pvalue(p_tumor)
   ),
   sprintf(
     paste0(
@@ -885,16 +900,17 @@ efficacy_tables <- paste0(
       "----------------------------------------------\n",
       "Statistic                                 CbzP (N=%d)        MP (N=%d)\n",
       "Number of Events / Total N                %d/%d               %d/%d\n",
-      "Median Survival Time (Months)             %.1f                %.1f\n",
-      "95%% Confidence Interval                   %s      %s\n",
+      "Median Survival Time (Months)             %s                %s\n",
+      "95%% Confidence Interval                   %s                %s\n",
       "Unstratified Hazard Ratio (CbzP vs MP)     %.2f (95%% CI: %.2f-%.2f)\n",
-      "Wald p-value                               %.4f\n\n"
+      "Wald p-value                               %s\n\n"
     ),
     as.integer(total_psa_cbzp), as.integer(total_psa_mp),
     as.integer(events_psa_cbzp), as.integer(total_psa_cbzp),
     as.integer(events_psa_mp), as.integer(total_psa_mp),
-    med_psa_cbzp, med_psa_mp, ci_psa_cbzp, ci_psa_mp,
-    hr_psa, hr_psa_lcl, hr_psa_ucl, p_psa
+    fmt_tte_value(med_psa_cbzp), fmt_tte_value(med_psa_mp),
+    ci_psa_cbzp, ci_psa_mp,
+    hr_psa, hr_psa_lcl, hr_psa_ucl, fmt_pvalue(p_psa)
   ),
   sprintf(
     paste0(
@@ -902,18 +918,19 @@ efficacy_tables <- paste0(
       "-----------------------------------------------\n",
       "Statistic                                 CbzP (N=%d)        MP (N=%d)\n",
       "Number of Events / Total N                %d/%d               %d/%d\n",
-      "Median Survival Time (Months)             %.1f                %.1f\n",
-      "95%% Confidence Interval                   %s      %s\n",
+      "Median Survival Time (Months)             %s                %s\n",
+      "95%% Confidence Interval                   %s                %s\n",
       "Unstratified Hazard Ratio (CbzP vs MP)     %.2f (95%% CI: %.2f-%.2f)\n",
-      "Wald p-value                               %.4f\n",
+      "Wald p-value                               %s\n",
       "Footnote: primary MP events use the adopted diary-or-direct-intent-RT\n",
       "F-042 rule; diary-only and RT-only source sensitivities are in QC evidence.\n"
     ),
     as.integer(total_ttpain_cbzp), as.integer(total_ttpain_mp),
     as.integer(events_ttpain_cbzp), as.integer(total_ttpain_cbzp),
     as.integer(events_ttpain_mp), as.integer(total_ttpain_mp),
-    med_ttpain_cbzp, med_ttpain_mp, ci_ttpain_cbzp, ci_ttpain_mp,
-    hr_ttpain, hr_ttpain_lcl, hr_ttpain_ucl, p_ttpain
+    fmt_tte_value(med_ttpain_cbzp), fmt_tte_value(med_ttpain_mp),
+    ci_ttpain_cbzp, ci_ttpain_mp,
+    hr_ttpain, hr_ttpain_lcl, hr_ttpain_ucl, fmt_pvalue(p_ttpain)
   )
 )
 # nolint end
@@ -960,9 +977,9 @@ render_km(
   stats = pfs_stats,
   x_max = 18,
   title = paste0(
-      "F-11-2: Kaplan-Meier Progression-Free Survival (PFS) Analysis ", # nolint
-      "- Demonstration Analysis Cohort (MP real; CbzP synthetic)"
-    ),
+    "F-11-2: Kaplan-Meier Progression-Free Survival (PFS) Analysis ", # nolint
+    "- Demonstration Analysis Cohort"
+  ),
   subtitle_endpoint = sprintf(
     paste0(
       "Secondary Endpoint: Cabazitaxel + Prednisone (CbzP) vs ",
@@ -1129,7 +1146,13 @@ swimmer_plot <- ggplot(swimmer_data, aes(
     axis.ticks.y = element_blank(),
     panel.grid.major.y = element_blank(),
     strip.text = element_text(face = "bold", size = 9.5),
-    legend.position = "bottom"
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold", size = 7),
+    legend.text = element_text(size = 7),
+    plot.caption = element_text(
+      size = 5.2, lineheight = 0.9, color = "#A6192E", face = "bold",
+      hjust = 0, margin = margin(t = 5)
+    )
   )
 
 ggsave("05_outputs/tfl/output/figures/F-14-1_Swimmer_Plot.png", swimmer_plot,

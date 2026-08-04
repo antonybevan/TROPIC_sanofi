@@ -36,16 +36,16 @@ T-11-6: Time to Tumour Progression (TTUMOR; ITT primary)
 Statistic                                 CbzP (N=378)        MP (N=371)
 Number of Events / Total N                166/378               328/371
 Median Survival Time (Months)             9.1                2.4
-95% Confidence Interval                   (95% CI: 7.2-10.2)      (95% CI: 2.1-2.8)
+95% Confidence Interval                   7.2-10.2                2.1-2.8
 Unstratified Hazard Ratio (CbzP vs MP)     0.32 (95% CI: 0.26-0.38)
-Wald p-value                               0.0000
+Wald p-value                               <0.0001
 
 T-11-7: Time to PSA Progression (TTPSA; ITT)
 ----------------------------------------------
 Statistic                                 CbzP (N=378)        MP (N=371)
 Number of Events / Total N                286/378               265/371
 Median Survival Time (Months)             2.7                2.2
-95% Confidence Interval                   (95% CI: 1.9-3.2)      (95% CI: 1.7-3.3)
+95% Confidence Interval                   1.9-3.2                1.7-3.3
 Unstratified Hazard Ratio (CbzP vs MP)     0.85 (95% CI: 0.72-1.00)
 Wald p-value                               0.0514
 
@@ -53,10 +53,10 @@ T-11-8: Time to Pain Progression (TTPAIN; ITT)
 -----------------------------------------------
 Statistic                                 CbzP (N=378)        MP (N=371)
 Number of Events / Total N                130/378               45/371
-Median Survival Time (Months)             7.9                NA
-95% Confidence Interval                   (95% CI: 6.9-9.9)      (95% CI: NA-NA)
+Median Survival Time (Months)             7.9                NE
+95% Confidence Interval                   6.9-9.9                NE
 Unstratified Hazard Ratio (CbzP vs MP)     2.36 (95% CI: 1.68-3.32)
-Wald p-value                               0.0000
+Wald p-value                               <0.0001
 Footnote: primary MP events use the adopted diary-or-direct-intent-RT
 F-042 rule; diary-only and RT-only source sensitivities are in QC evidence.
 

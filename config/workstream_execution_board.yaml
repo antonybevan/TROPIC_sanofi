@@ -6,12 +6,12 @@ version: 1
 study: TROPIC-NCT00417079
 as_of: "2026-08-04"
 product_claim_in_force: controlled_non_submission_demo
-pipeline_seal_tag: v0.1.0-demo-rc.1
-historical_tag_note: "The v0.1.0-demo-rc.1 release note is immutable; the current audit baseline is an untagged successor state."
-audit_baseline_commit: 5f986f6
-latest_sealed_run_source_head: 5f986f6
+pipeline_seal_tag: v0.2.0-portfolio
+historical_tag_note: "v0.1.0-demo-rc.1 is immutable historical evidence; v0.2.0-portfolio is the current Path A portfolio release."
+audit_baseline_commit: "v0.2.0-portfolio^{commit}"
+latest_sealed_run_source_head: "v0.2.0-portfolio^{commit}"
 latest_pipeline_health: "oda/full_dag/GREEN, 34 of 34 stages"
-latest_release_verification: "30 of 30 checks"
+latest_release_verification: "31 of 31 checks"
 board_doc: docs/WORKSTREAM_EXECUTION_BOARD.md
 product_claim_doc: docs/PRODUCT_CLAIM.md
 disposition_board: 06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md
@@ -26,7 +26,7 @@ workstreams:
       - 06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md
       - 06_qc_evidence/audit/findings_register.csv
       - 06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md
-      - docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md
+      - docs/RELEASE_NOTE_v0.2.0-portfolio.md
       - docs/PRODUCT_CLAIM.md
       - README.md
       - 00_governance/REPRODUCIBILITY.md
@@ -93,7 +93,8 @@ workstreams:
   WS3_standards_metadata:
     name: Standards and metadata governance
     gates: [G03]
-    status: AMBER
+    status: GREEN
+    note: "GREEN for Path A; AMBER for broader commercial-validator depth. F-014 is resolved with 10 ResultDisplays / 18 AnalysisResults and an executable Define/ARM contract."
     owned_artifacts:
       - 03_metadata/adam/ADaM_spec.xlsx
       - 03_metadata/define/define.xml
@@ -104,14 +105,13 @@ workstreams:
       - 03_metadata/usdm
       - 04_analysis_datasets/datasetjson
     open_risks:
-      - F-014_arm_limited
       - F-016_no_commercial_p21
       - exploratory_layers_overclaim
     required_evidence:
       - external_validation_evidence_index
       - package_vs_exploratory_inventory
-    next_action: "Maintain CORE residual handoff; keep exploratory layers non-eCTD; complete the Section 3 metadata audit"
-    residual_findings: [F-014, F-016, F-020, F-021, F-022]
+    next_action: "Maintain the external-validation index and Define/ARM contract; keep Dataset-JSON, USDM and ARS claims within their documented exploratory scope"
+    residual_findings: [F-016, F-020, F-021, F-022]
     packs:
       - docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md
 
@@ -160,7 +160,7 @@ workstreams:
     required_evidence:
       - docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md
     next_action: "Keep residual memo current; co-own CORE residual matrix with WS-1"
-    residual_findings: [F-003, F-005, F-012, F-014, F-015, F-016, F-017, F-019, F-020, F-021, F-022, F-025]
+    residual_findings: [F-003, F-005, F-012, F-015, F-016, F-017, F-019, F-020, F-021, F-022, F-025]
 
   WS6_regulatory_writing:
     name: Reviewer explanation and regulatory writing
@@ -171,7 +171,7 @@ workstreams:
       - 07_reviewer_explanation/guides/SDRG.md
       - 07_reviewer_explanation/guides/BDRG.md
       - 07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md
-      - docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md
+      - docs/RELEASE_NOTE_v0.2.0-portfolio.md
       - 07_reviewer_explanation/analysis_report.md
     open_risks:
       - optional_pdf_repackage_lag
