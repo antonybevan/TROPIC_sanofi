@@ -750,17 +750,17 @@
     ],
     "package_files": [
       {
-        "md5": "1ce3dc296ddb8c723ee1943acade98ca",
+        "md5": "493e8ae1bd0209d7d452ec1f7e670ff8",
         "path": "08_submission_package/ectd/0000/index.xml",
         "present": true,
-        "sha256": "b76ed0860efe6194faac22b9d60463b1ed00d3d6162fb78f9d4e229ba1ad1e91",
+        "sha256": "eceac63768742d6394591135d50c3b21e3da3dc8811a393b9e44a626fdb7ac5c",
         "size_bytes": 27916
       },
       {
-        "md5": "c038207874bb7524dfb32087bcd557e4",
+        "md5": "6d17ff4c36e6f51406d28ed1ed7c299b",
         "path": "08_submission_package/ectd/0000/index-md5.txt",
         "present": true,
-        "sha256": "7f642366ff0ac569b67524fb955576ca4becced85bdf3490a6188a2fe6f2916a",
+        "sha256": "132b10195c96991a3c72c75e56f49a2f478c83bf4b0f1ba9cce951214b10176f",
         "size_bytes": 33
       },
       {
@@ -778,10 +778,10 @@
         "size_bytes": 13431
       },
       {
-        "md5": "bdf848ad2317938f4597c7fb7172a013",
+        "md5": "b012de64f527e91fc5cc76667273b670",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/datasets/define.xml",
         "present": true,
-        "sha256": "fb3a5533dc76393d248bacae95543d536740a494a92ea333db4d8025f87dbeac",
+        "sha256": "be8122c20cd6e59ddc55e2cb6a097717926c882d0cb9ce440c15ab5d209d2600",
         "size_bytes": 114635
       },
       {
@@ -799,18 +799,18 @@
         "size_bytes": 11671
       },
       {
-        "md5": "340e24c9b1699631eaf927cee948f9d5",
+        "md5": "458660f516445c3bebd5c8c3e0f90ff2",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/adrg.pdf",
         "present": true,
-        "sha256": "22e10d1df1a57fcbd3a759263aba88dcfe53b6fd09e5dc5d0f5e0e199c2a58f1",
-        "size_bytes": 33237
+        "sha256": "bd966728d4d858e2065f628a14bcfdc5f11a3ce4265fa363199627b37bdfdbec",
+        "size_bytes": 33252
       },
       {
-        "md5": "a4ea666f896bf0da08308a0429561faa",
+        "md5": "fd999fa17d4aa9d963afbe174e13f00e",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
         "present": true,
-        "sha256": "e6d1bebf19228c12c77f5426d0f65061c86e3e304b6ae8edee91bd2d52affe5e",
-        "size_bytes": 8013
+        "sha256": "14cb8b2a6ef67ccb8e7c3982462fa16b78207b183cdeaef26a9d24bb7db628b2",
+        "size_bytes": 8067
       },
       {
         "md5": "0616f5b75d7df476fd78b9005ecf9004",
@@ -820,11 +820,11 @@
         "size_bytes": 3577369
       },
       {
-        "md5": "d499e8b5e3ee18fe666c5a6d20b70993",
+        "md5": "290c4d5780a90f43aa4dd4df39168a09",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/tabulations/sdtm/sdrg.pdf",
         "present": true,
-        "sha256": "f7a456adbe6c0e0a0045fa3e94755c8eb55360ce00af354ad5efcafdea73ac86",
-        "size_bytes": 16268
+        "sha256": "eb68fff0fc6ef2c238a7e297906bb5f9dae924d85c1265fbcf1735abdeb383ad",
+        "size_bytes": 16294
       },
       {
         "md5": "a0c996e92f03f7abe73b6e5fe4045aba",
@@ -1128,10 +1128,10 @@
         "size_bytes": 3074240
       },
       {
-        "md5": "bdf848ad2317938f4597c7fb7172a013",
+        "md5": "b012de64f527e91fc5cc76667273b670",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/datasets/define.xml",
         "present": true,
-        "sha256": "fb3a5533dc76393d248bacae95543d536740a494a92ea333db4d8025f87dbeac",
+        "sha256": "be8122c20cd6e59ddc55e2cb6a097717926c882d0cb9ce440c15ab5d209d2600",
         "size_bytes": 114635
       },
       {
@@ -1149,18 +1149,18 @@
         "size_bytes": 11671
       },
       {
-        "md5": "340e24c9b1699631eaf927cee948f9d5",
+        "md5": "458660f516445c3bebd5c8c3e0f90ff2",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
         "present": true,
-        "sha256": "22e10d1df1a57fcbd3a759263aba88dcfe53b6fd09e5dc5d0f5e0e199c2a58f1",
-        "size_bytes": 33237
+        "sha256": "bd966728d4d858e2065f628a14bcfdc5f11a3ce4265fa363199627b37bdfdbec",
+        "size_bytes": 33252
       },
       {
-        "md5": "a4ea666f896bf0da08308a0429561faa",
+        "md5": "fd999fa17d4aa9d963afbe174e13f00e",
         "path": "08_submission_package/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
         "present": true,
-        "sha256": "e6d1bebf19228c12c77f5426d0f65061c86e3e304b6ae8edee91bd2d52affe5e",
-        "size_bytes": 8013
+        "sha256": "14cb8b2a6ef67ccb8e7c3982462fa16b78207b183cdeaef26a9d24bb7db628b2",
+        "size_bytes": 8067
       },
       {
         "md5": "0616f5b75d7df476fd78b9005ecf9004",
@@ -1170,11 +1170,11 @@
         "size_bytes": 3577369
       },
       {
-        "md5": "d499e8b5e3ee18fe666c5a6d20b70993",
+        "md5": "290c4d5780a90f43aa4dd4df39168a09",
         "path": "08_submission_package/m5/datasets/tropic/tabulations/sdtm/sdrg.pdf",
         "present": true,
-        "sha256": "f7a456adbe6c0e0a0045fa3e94755c8eb55360ce00af354ad5efcafdea73ac86",
-        "size_bytes": 16268
+        "sha256": "eb68fff0fc6ef2c238a7e297906bb5f9dae924d85c1265fbcf1735abdeb383ad",
+        "size_bytes": 16294
       },
       {
         "md5": "a0c996e92f03f7abe73b6e5fe4045aba",
@@ -2154,11 +2154,11 @@
         "size_bytes": 14577
       },
       {
-        "md5": "5d483e78960bbad335dd0d3a5f367e75",
+        "md5": "4f70aadf3b79e95911cd65aa01a8c6a5",
         "path": "platform/tfl_output_index_status.json",
         "present": true,
-        "sha256": "b044f1f48a9d3ba39c6ad6d37fcf81a5b21d7d4f4a416838af00ad0eb2aeee56",
-        "size_bytes": 1046
+        "sha256": "61e4f16feeb292fadab8c2f179c5dcc768bb4a229c9908df4d4d9de778827d83",
+        "size_bytes": 960
       },
       {
         "md5": "ab8739af95fce309a2eb1b8bba6c1d05",
@@ -2582,9 +2582,9 @@
     "sas_version": "9.04.01M8P022223",
     "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007"
   },
-  "evidence_grade": "remediation_partial_or_dirty",
-  "generated_at": "2026-08-04 17:51:26 UTC",
-  "manifest_sha256": "650cdee004dca5bb39dce719325ada6214abf8a7b36026e44227001cd32de4b3",
+  "evidence_grade": "release_candidate",
+  "generated_at": "2026-08-04 17:56:05 UTC",
+  "manifest_sha256": "cd8b0d8f6db48cc7f4908532489052b25c6628dbfffab1d5e13cfa5b96a138cb",
   "problems": [],
   "qc_statuses": {
     "cbzp_bridge": {
@@ -2684,7 +2684,7 @@
         "simulated": null
       },
       "path": "platform/tfl_output_index_status.json",
-      "status": "fail"
+      "status": "pass"
     },
     "validation_strategy": {
       "detail": {
@@ -2696,9 +2696,7 @@
       "status": "PASS"
     }
   },
-  "remediation_reasons": [
-    "git worktree is dirty (43 porcelain entries); release-candidate lock requires a clean committed state"
-  ],
+  "remediation_reasons": [],
   "run_completeness": {
     "failed": [],
     "health_run_scope": "full_dag",
@@ -2751,144 +2749,15 @@
   },
   "source_control": {
     "branch": "codex/submission-pipeline-rc",
-    "dirty": true,
-    "dirty_including_seal_outputs": true,
-    "head": "77f6b5a4b859a4d7ee4e1b30829333012353e7e0",
+    "dirty": false,
+    "dirty_including_seal_outputs": false,
+    "head": "eaa1634db89352f99aaf16dce5372db4fcc9fcac",
     "source_tree_sha256": "fe78f9d639935acdffdb1501134806cd98011f1fa9fbcff2fb2658c5350792ba",
     "staged_diff_paths": [],
-    "status_porcelain": [
-      " M 03_metadata/adam/ADaM_spec.xlsx",
-      " M 03_metadata/define/define.xml",
-      " M 05_outputs/tfl/output/figures/F-11-2_KM_PFS.png",
-      " M 05_outputs/tfl/output/figures/F-14-1_Swimmer_Plot.png",
-      " M 05_outputs/tfl/output/tables/T-11-Efficacy_Tables.txt",
-      " M 05_outputs/tfl/tfl_generation.R",
-      " M 06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md",
-      " M 06_qc_evidence/audit/findings_register.csv",
-      " M 06_qc_evidence/gates/g00_governance_status.json",
-      " M 06_qc_evidence/gates/g02_specification_status.json",
-      " M 06_qc_evidence/gates/g07_reviewer_package_status.json",
-      " M 07_reviewer_explanation/guides/ADRG.md",
-      " M 07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md",
-      " M 08_submission_package/ectd/0000/index-md5.txt",
-      " M 08_submission_package/ectd/0000/index.xml",
-      " M 08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/figures/F-11-2_KM_PFS.png",
-      " M 08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/figures/F-14-1_Swimmer_Plot.png",
-      " M 08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/tables/T-11-Efficacy_Tables.txt",
-      " M 08_submission_package/m5/datasets/tropic/analysis/adam/ADaM_spec.xlsx",
-      " M 08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
-      " M 08_submission_package/m5/datasets/tropic/analysis/adam/datasets/define.xml",
-      " M 08_submission_package/m5/datasets/tropic/analysis/adam/programs/tfl_generation.R",
-      " M README.md",
-      " M config/workstream_execution_board.yaml",
-      " M docs/INTERVIEWER_GUIDE.md",
-      " M docs/PRODUCT_CLAIM.md",
-      " M docs/SCRIPT_MAP.md",
-      " M docs/WORKSTREAM_EXECUTION_BOARD.md",
-      " M docs/workstreams/WS2_POPULATION_ENDPOINT_CONTROL.md",
-      " M docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md",
-      " M docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md",
-      " M platform/admiral_reconciliation_status.json",
-      " M platform/build_tfl_output_index.py",
-      " M platform/check_gate_g02_specification.py",
-      " M platform/log_cleanliness/log_cleanliness_status.json",
-      " M platform/pipeline_health.json",
-      " M platform/tfl_output_index_status.json",
-      " M tests/test_tfl_population_contract.R",
-      "?? 06_qc_evidence/audit/section_reviews/SECTION_05_PORTFOLIO_FINALIZATION_AUDIT_2026-08-04.md",
-      "?? docs/RELEASE_NOTE_v0.2.0-portfolio.md",
-      "?? outputs/",
-      "?? platform/define_arm_contract.py",
-      "?? tests/test_define_arm_contract.py"
-    ],
-    "status_porcelain_all": [
-      " M 03_metadata/adam/ADaM_spec.xlsx",
-      " M 03_metadata/define/define.xml",
-      " M 05_outputs/tfl/output/figures/F-11-2_KM_PFS.png",
-      " M 05_outputs/tfl/output/figures/F-14-1_Swimmer_Plot.png",
-      " M 05_outputs/tfl/output/tables/T-11-Efficacy_Tables.txt",
-      " M 05_outputs/tfl/tfl_generation.R",
-      " M 06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md",
-      " M 06_qc_evidence/audit/findings_register.csv",
-      " M 06_qc_evidence/gates/g00_governance_status.json",
-      " M 06_qc_evidence/gates/g02_specification_status.json",
-      " M 06_qc_evidence/gates/g07_reviewer_package_status.json",
-      " M 07_reviewer_explanation/guides/ADRG.md",
-      " M 07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md",
-      " M 08_submission_package/ectd/0000/index-md5.txt",
-      " M 08_submission_package/ectd/0000/index.xml",
-      " M 08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/figures/F-11-2_KM_PFS.png",
-      " M 08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/figures/F-14-1_Swimmer_Plot.png",
-      " M 08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/tables/T-11-Efficacy_Tables.txt",
-      " M 08_submission_package/m5/datasets/tropic/analysis/adam/ADaM_spec.xlsx",
-      " M 08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
-      " M 08_submission_package/m5/datasets/tropic/analysis/adam/datasets/define.xml",
-      " M 08_submission_package/m5/datasets/tropic/analysis/adam/programs/tfl_generation.R",
-      " M README.md",
-      " M config/workstream_execution_board.yaml",
-      " M docs/INTERVIEWER_GUIDE.md",
-      " M docs/PRODUCT_CLAIM.md",
-      " M docs/RELEASE_RUN_MANIFEST.md",
-      " M docs/SCRIPT_MAP.md",
-      " M docs/WORKSTREAM_EXECUTION_BOARD.md",
-      " M docs/workstreams/WS2_POPULATION_ENDPOINT_CONTROL.md",
-      " M docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md",
-      " M docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md",
-      " M platform/admiral_reconciliation_status.json",
-      " M platform/build_tfl_output_index.py",
-      " M platform/check_gate_g02_specification.py",
-      " M platform/log_cleanliness/log_cleanliness_status.json",
-      " M platform/pipeline_health.json",
-      " M platform/release_run_manifest/release_run_manifest.json",
-      " M platform/tfl_output_index_status.json",
-      " M tests/test_tfl_population_contract.R",
-      "?? 06_qc_evidence/audit/section_reviews/SECTION_05_PORTFOLIO_FINALIZATION_AUDIT_2026-08-04.md",
-      "?? docs/RELEASE_NOTE_v0.2.0-portfolio.md",
-      "?? outputs/",
-      "?? platform/define_arm_contract.py",
-      "?? tests/test_define_arm_contract.py"
-    ],
-    "status_porcelain_sha256": "ed90e796a281ac9685c778054b8cfa254dde7be2edce91c071d636db7e39a293",
-    "tracked_diff_paths": [
-      "03_metadata/adam/ADaM_spec.xlsx",
-      "03_metadata/define/define.xml",
-      "05_outputs/tfl/output/figures/F-11-2_KM_PFS.png",
-      "05_outputs/tfl/output/figures/F-14-1_Swimmer_Plot.png",
-      "05_outputs/tfl/output/tables/T-11-Efficacy_Tables.txt",
-      "05_outputs/tfl/tfl_generation.R",
-      "06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md",
-      "06_qc_evidence/audit/findings_register.csv",
-      "06_qc_evidence/gates/g00_governance_status.json",
-      "06_qc_evidence/gates/g02_specification_status.json",
-      "06_qc_evidence/gates/g07_reviewer_package_status.json",
-      "07_reviewer_explanation/guides/ADRG.md",
-      "07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md",
-      "08_submission_package/ectd/0000/index-md5.txt",
-      "08_submission_package/ectd/0000/index.xml",
-      "08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/figures/F-11-2_KM_PFS.png",
-      "08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/figures/F-14-1_Swimmer_Plot.png",
-      "08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/tables/T-11-Efficacy_Tables.txt",
-      "08_submission_package/m5/datasets/tropic/analysis/adam/ADaM_spec.xlsx",
-      "08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
-      "08_submission_package/m5/datasets/tropic/analysis/adam/datasets/define.xml",
-      "08_submission_package/m5/datasets/tropic/analysis/adam/programs/tfl_generation.R",
-      "README.md",
-      "config/workstream_execution_board.yaml",
-      "docs/INTERVIEWER_GUIDE.md",
-      "docs/PRODUCT_CLAIM.md",
-      "docs/SCRIPT_MAP.md",
-      "docs/WORKSTREAM_EXECUTION_BOARD.md",
-      "docs/workstreams/WS2_POPULATION_ENDPOINT_CONTROL.md",
-      "docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md",
-      "docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md",
-      "platform/admiral_reconciliation_status.json",
-      "platform/build_tfl_output_index.py",
-      "platform/check_gate_g02_specification.py",
-      "platform/log_cleanliness/log_cleanliness_status.json",
-      "platform/pipeline_health.json",
-      "platform/tfl_output_index_status.json",
-      "tests/test_tfl_population_contract.R"
-    ]
+    "status_porcelain": [],
+    "status_porcelain_all": [],
+    "status_porcelain_sha256": "",
+    "tracked_diff_paths": []
   },
-  "status": "REMEDIATION"
+  "status": "PASS"
 }

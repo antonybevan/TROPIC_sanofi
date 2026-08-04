@@ -1,19 +1,19 @@
 # TROPIC Release-Run Manifest
 
-Generated: 2026-08-04 17:51:26 UTC
+Generated: 2026-08-04 17:56:05 UTC
 
 > Hash-sealed run manifest for current artifacts. This is not an electronic signature or Part 11 attestation.
 
 ## Verdict
 
-- Status: `REMEDIATION`
-- Evidence grade: `remediation_partial_or_dirty`
-- Manifest SHA-256 seal: `650cdee004dca5bb39dce719325ada6214abf8a7b36026e44227001cd32de4b3`
+- Status: `PASS`
+- Evidence grade: `release_candidate`
+- Manifest SHA-256 seal: `cd8b0d8f6db48cc7f4908532489052b25c6628dbfffab1d5e13cfa5b96a138cb`
 - SAS execution mode: `oda`
 - Pipeline health: `GREEN`
 - Run scope: `full_dag` (34 recorded / 33 release-required upstream stages)
-- Git HEAD: `77f6b5a4b859a4d7ee4e1b30829333012353e7e0`
-- Worktree dirty: `True`
+- Git HEAD: `eaa1634db89352f99aaf16dce5372db4fcc9fcac`
+- Worktree dirty: `False`
 - SAS companion figures: `in_dag_real_sas_companion`; current with health=`True`
 
 ## Status meanings
@@ -25,10 +25,6 @@ Generated: 2026-08-04 17:51:26 UTC
 ## Problems
 
 No release-run binding problems detected.
-
-## Remediation reasons (block release-candidate PASS)
-
-- git worktree is dirty (43 porcelain entries); release-candidate lock requires a clean committed state
 
 ## Dataset Binding
 
@@ -57,7 +53,7 @@ No release-run binding problems detected.
 | spec_data | PASS | platform/conformance/spec_data_conformance.json |
 | metadata_control | pass | platform/metadata_control/metadata_control_status.json |
 | log_cleanliness | PASS | platform/log_cleanliness/log_cleanliness_status.json |
-| tfl_output_index | fail | platform/tfl_output_index_status.json |
+| tfl_output_index | pass | platform/tfl_output_index_status.json |
 | validation_strategy | PASS | platform/validation_strategy/validation_strategy_status.json |
 
 ## Machine-Readable Outputs
