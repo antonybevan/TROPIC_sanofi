@@ -5,7 +5,7 @@
 **As of:** 2026-08-04
 **Authorities:** SAP v4.0 · `config/study_config.yaml` · `config/tfl_output_catalog.yaml` · ADRG · [Section 2 audit](../../06_qc_evidence/audit/section_reviews/SECTION_02_POPULATIONS_ENDPOINTS_AUDIT_2026-08-03.md)
 
-**Decision handoff:** The F-042 accountable-author review packet and [F-042 / T-11-8 Endpoint Decision Record](decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md) record Antony Bevan's 2026-08-04 adoption of ED-01–ED-07 as written. Phase 2 implementation is now present in separate SAS and R tracks under the [approval specification](decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md), [quantified impact appendix](decisions/F042_PFS_PAIN_IMPACT_APPENDIX_2026-08-03.md), and [CM/PR source qualification audit](decisions/F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.md). A final full-DAG rerun, delayed second-pass review, and release reseal remain required before this change set can be called sealed. No independent, sponsor, or regulated approval is claimed.
+**Decision handoff:** The F-042 accountable-author review packet and [F-042 / T-11-8 Endpoint Decision Record](decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md) record Antony Bevan's 2026-08-04 adoption of ED-01–ED-07 as written. Phase 2 implementation is now present in separate SAS and R tracks under the [approval specification](decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md), [quantified impact appendix](decisions/F042_PFS_PAIN_IMPACT_APPENDIX_2026-08-03.md), and [CM/PR source qualification audit](decisions/F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.md). The full 34-stage rerun, delayed second-pass review, release reseal and CI verification are complete for Path A. No independent, sponsor, or regulated approval is claimed.
 
 ---
 
@@ -88,7 +88,7 @@ All IDs in `config/tfl_output_catalog.yaml` → `deferred_not_in_scope` (21 SAP 
 
 ## 5. SAP/TFL alignment note
 
-The adopted Path A implementation restores the SAP-native `T-11-3` PSA response, `T-11-4` ORR, `T-11-5` pain response, `T-11-6` TTUMOR, `T-11-7` TTPSA and `T-11-8` TTPAIN mapping. The T-11-8 collision is therefore resolved/mapping restored in the controlled catalog, physical table block, CTQ register, ARM/ARS and reviewer guides; `T-11-8b` remains an explicitly labelled ORR response-evaluable sensitivity. Primary PSA/ORR results do not require an invented extension ID. The final full-DAG rerun and release reseal are still the controlling evidence of the implementation state.
+The adopted Path A implementation restores the SAP-native `T-11-3` PSA response, `T-11-4` ORR, `T-11-5` pain response, `T-11-6` TTUMOR, `T-11-7` TTPSA and `T-11-8` TTPAIN mapping. The T-11-8 collision is therefore resolved/mapping restored in the controlled catalog, physical table block, CTQ register, ARM/ARS and reviewer guides; `T-11-8b` remains an explicitly labelled ORR response-evaluable sensitivity. Primary PSA/ORR results do not require an invented extension ID. The completed full-DAG rerun, release reseal and CI verification are the controlling evidence of the implementation state.
 
 ## 6. Estimand posture (honest)
 
@@ -103,7 +103,7 @@ CTQ register: `config/ctq_traceability.yaml` + `docs/CTQ_TRACEABILITY_REPORT.md`
 
 The orchestrator **does stage-gate G02** through `platform/check_gate_g02_specification.py`. The gate now checks the ITT/MEAS distinction and the restored SAP-native endpoint-ID semantics (`T-11-3` through `T-11-8`) in both this table and the controlled catalog; it does not replace independent clinical/statistical review or approve a regulated filing.
 
-**Next engineering:** strengthen the G02 machine check so it asserts the endpoint-ID tokens and the explicit S2-01 disclosure whenever this pack changes.
+**Next engineering:** maintain the G02 machine check so it asserts the endpoint-ID tokens and the explicit S2-01 disclosure whenever this pack changes.
 
 ---
 
@@ -127,6 +127,6 @@ The orchestrator **does stage-gate G02** through `platform/check_gate_g02_specif
 - [x] ED-01–ED-07 adopted by Antony Bevan with single-author limitation acknowledgement
 - [x] SAP-native `T-11-3`–`T-11-8` mapping implemented in code, catalog, metadata and reviewer guides
 - [x] TTUMOR ITT primary and CM+PR-qualified pain derivation implemented in separate SAS/R tracks
-- [ ] Full 34-stage real-SAS DAG, delayed second-pass review and release reseal recorded for this change set
+- [x] Full 34-stage real-SAS DAG, delayed second-pass review and release reseal recorded for this change set
 
 Board status: **GREEN for Path A implementation** — the full 34-stage real-SAS DAG and delayed second-pass review passed; external qualified review remains required before regulated reuse.

@@ -4,12 +4,12 @@
 
 version: 1
 study: TROPIC-NCT00417079
-as_of: "2026-08-03"
+as_of: "2026-08-04"
 product_claim_in_force: controlled_non_submission_demo
 pipeline_seal_tag: v0.1.0-demo-rc.1
 historical_tag_note: "The v0.1.0-demo-rc.1 release note is immutable; the current audit baseline is an untagged successor state."
-audit_baseline_commit: d32b04d
-latest_sealed_run_source_head: 73d8ca1
+audit_baseline_commit: 5f986f6
+latest_sealed_run_source_head: 5f986f6
 latest_pipeline_health: "oda/full_dag/GREEN, 34 of 34 stages"
 latest_release_verification: "30 of 30 checks"
 board_doc: docs/WORKSTREAM_EXECUTION_BOARD.md
@@ -162,7 +162,7 @@ workstreams:
   WS6_regulatory_writing:
     name: Reviewer explanation and regulatory writing
     gates: [G07, G08]
-    status: AMBER
+    status: GREEN
     owned_artifacts:
       - 07_reviewer_explanation/guides/ADRG.md
       - 07_reviewer_explanation/guides/SDRG.md
@@ -171,12 +171,12 @@ workstreams:
       - docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md
       - 07_reviewer_explanation/analysis_report.md
     open_risks:
-      - guide_content_requires_section_6_audit
+      - optional_pdf_repackage_lag
       - overclaim_under_interview_pressure
     required_evidence:
       - hardened_adrg_sdrg_bdrg
       - guide_signoff_checklist
-    next_action: "Complete the Section 6 reviewer-guide/package narrative audit; preserve Path A limitations"
+    next_action: "Maintain guide claim language; optionally re-package PDFs; preserve Path A limitations"
     residual_findings: [F-003, F-005, F-019]
     packs:
       - docs/workstreams/WS6_REVIEWER_GUIDE_HARDENING_CHECKLIST.md
@@ -208,12 +208,12 @@ workstreams:
 priority_queue:
   - { id: DONE-SECTION0, workstream: WS0_governance, action: "Section 0 governance/SAP consistency audit", status: DONE }
   - { id: DONE-SECTION1, workstream: WS1_source_intake, action: "Section 1 source/SDTM provenance and CORE residual audit", status: DONE }
-  - { id: P0-SECTION2, workstream: WS2_statistical_specification, action: "Section 2 population/endpoint/SAP dot-connection audit", status: IN_PROGRESS }
+  - { id: DONE-SECTION2, workstream: WS2_statistical_specification, action: "Section 2 population/endpoint/SAP dot-connection audit", status: DONE }
   - { id: DONE-WS0, workstream: WS0_governance, action: "PRODUCT_CLAIM.md", status: DONE }
   - { id: DONE-WS5, workstream: WS5_qc_validation, action: "KNOWN_DIFFERENCES_MEMO.md", status: DONE }
   - { id: DONE-WS3, workstream: WS3_standards_metadata, action: "external validation index", status: DONE }
-  - { id: DONE-WS2, workstream: WS2_statistical_specification, action: "population/endpoint control table", status: DONE_DRAFT }
+  - { id: DONE-WS2, workstream: WS2_statistical_specification, action: "population/endpoint control table", status: DONE }
   - { id: DONE-WS7-verify, workstream: WS7_release_engineering, action: "verify_release.py", status: DONE }
-  - { id: P1-WS6, workstream: WS6_regulatory_writing, action: "ADRG/SDRG/BDRG hardening S1-S3", status: OPEN }
+  - { id: DONE-WS6, workstream: WS6_regulatory_writing, action: "ADRG/SDRG/BDRG hardening S1-S4", status: DONE }
   - { id: DONE-WS1, workstream: WS1_source_intake, action: "CORE residual matrix CSV", status: DONE }
   - { id: DONE-WS7-ci, workstream: WS7_release_engineering, action: "CI wire verify_release", status: DONE }

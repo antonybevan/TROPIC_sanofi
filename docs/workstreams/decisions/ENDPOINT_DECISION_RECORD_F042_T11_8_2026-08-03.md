@@ -118,7 +118,7 @@ Until the Phase 2 rerun and reseal complete, retain the current Path A labels as
 
 ## 6. Phase 2 implementation closure — 2026-08-04
 
-The adopted implementation is now present in separate SAS and R tracks. SV and PR are staged; the F-042 module produces primary, diary-only, RT-only, date-bound and pain-response evidence; TTUMOR is ITT-primary; the controlled catalog and reviewer-facing mappings are restored to SAP-native `T-11-3` through `T-11-8`; and the real MP SAS/R/admiral checks pass for the current implementation. A delayed second-pass author review and a clean full 34-stage real-SAS DAG/reseal remain required to bind the final evidence. This remains a Path A controlled non-submission demonstration and not a sponsor, independent, medical, Part 11 or regulated approval.
+The adopted implementation is now present in separate SAS and R tracks. SV and PR are staged; the F-042 module produces primary, diary-only, RT-only, date-bound and pain-response evidence; TTUMOR is ITT-primary; the controlled catalog and reviewer-facing mappings are restored to SAP-native `T-11-3` through `T-11-8`; and the real MP SAS/R/admiral checks pass for the current implementation. The delayed second-pass author review, clean full 34-stage real-SAS rerun, release reseal and CI verification are complete. This remains a Path A controlled non-submission demonstration and not a sponsor, independent, medical, Part 11 or regulated approval.
 
 ## 7. Companion evidence
 

@@ -4,7 +4,7 @@
 **Product path:** Path A — controlled non-submission demonstration
 **Accountable author:** Antony Bevan
 **Review date:** 2026-08-04
-**Status:** **PASS — full real-SAS DAG complete; clean seal commit/rebind recorded below**
+**Status:** **PASS — full real-SAS DAG, release seal and CI verification complete**
 
 ## Purpose and independence boundary
 
@@ -27,7 +27,7 @@ and no sponsor, medical, statistical, Part 11 or regulated approval is represent
 
 ## Second-pass checklist
 
-| Check | Expected challenge | Status before final seal |
+| Check | Expected challenge | Status |
 |---|---|---|
 | Author adoption | ED-01–ED-07 are adopted as written and single-author limitation is explicit | PASS — record and approval specification |
 | Staging | SV and full PR are staged without patient-level Git artifacts | PASS — R/SAS staging regression |
@@ -39,7 +39,7 @@ and no sponsor, medical, statistical, Part 11 or regulated approval is represent
 | SAP-native mapping | T-11-3 PSA, T-11-4 ORR, T-11-5 pain response, T-11-6 TTUMOR, T-11-7 TTPSA, T-11-8 TTPAIN | PASS — catalog, physical block and guide review |
 | Dual-language challenge | R/SAS exact parity and scoped admiral checks remain green | PASS — full run; ADTTE/ADSL/OS/PFS controls passed |
 | Log challenge | Missing arithmetic values are guarded; only reviewed F-017 time-origin warnings remain | PASS — current log gate |
-| Final execution | Full 34-stage real-SAS DAG, health `full_dag`, release manifest `PASS`, clean tree | PASS — 34/34, ODA, bridge/recon/package/log gates green; manifest clean-state rebind follows commit |
+| Final execution | Full 34-stage real-SAS DAG, health `full_dag`, release manifest `PASS`, clean tree | PASS — 34/34, ODA, bridge/recon/package/log gates green; release manifest and CI verification passed |
 
 ## Disposition
 
@@ -47,9 +47,8 @@ No implementation defect was identified in this delayed pass. The complete real-
 DAG passed 34/34 stages on ODA (SAS 9.04.01M8P022223), with exact SAS/R dataset and
 results reconciliation, zero scoped admiral cell differences, synthetic bridge parity
 across six domains, metadata/package gates, and log cleanliness PASS (22 reviewed
-F-017 time-origin exceptions, zero unapproved). The release manifest was generated
-against this full run and is currently marked remediation only because the worktree is
-intentionally dirty before commit; it must be rebound after the clean source commit.
+F-017 time-origin exceptions, zero unapproved). The release manifest is PASS at
+release-candidate grade, and both local and GitHub CI release verification passed.
 
 **Author acknowledgement:** Antony Bevan — delayed second-pass review conducted under
 the disclosed single-author limitation; this acknowledgement is a project control

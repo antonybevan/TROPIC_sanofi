@@ -1,7 +1,7 @@
 # Open Work Register — Path A (post D-012)
 
 **Purpose:** What a principal programmer still treats as **real work**, not “green JSON theater.”  
-**As of:** 2026-07-09  
+**As of:** 2026-08-04
 **Seals:** Path A demo RC can remain green while these are open if dispositioned.
 
 ---
@@ -69,10 +69,10 @@ The author-adopted record, executable specification and impact appendix are now 
 
 ## Priority order for next session
 
-1. **W-ENDPOINT-01** — implement the adopted endpoint/catalog decision, reconcile, rerun and reseal
-2. **W-PKG-01** — refresh package outputs (TFLs, guides PDFs, eCTD leaves) only after any approved endpoint rerun
-3. **W-ADAM-02** — promote TEAE AESER soft QC to hard gate after rebuild
-4. Otherwise hold Path A with the 2026-08-01 remediation audit trail (T-17 Safety dens, ECOG pooling, T-11-6/7 IDs, seal source-tree binding, CRF tag, guide sync)
+1. **Governance closure / review handoff** — keep the sealed Path A evidence current and open the review PR; obtain external qualified statistical/medical review before regulated reuse.
+2. **W-PKG-01** — optionally refresh guide PDFs and eCTD presentation artifacts when a package refresh is operationally useful.
+3. **W-ADAM-02** — consider promoting TEAE AESER soft QC to a hard gate only if the validation scope is formally expanded.
+4. Otherwise hold Path A with the disclosed residuals; do not expand the deferred TFL catalog or claim commercial P21/CORE cleanliness.
 
 **Meta-audit (2026-07-09):** `docs/workstreams/reviews/WS_META_AUDIT_PATH_A_2026-07-09.md`  
 Source decision: `WS1_CRF_GROUNDING_D012_2026-07-09.md` · dens: `WS4_ADAM_DENS_AUDIT_2026-07-09.md`

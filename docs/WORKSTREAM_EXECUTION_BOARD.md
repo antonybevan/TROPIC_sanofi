@@ -2,8 +2,8 @@
 
 **Status:** Active operating board — not a decorative architecture map  
 **As of:** 2026-08-04 (Phase 2 endpoint implementation closeout)
-**Audit baseline:** `d32b04d` on `codex/submission-pipeline-rc`
-**Latest sealed run:** source head `73d8ca1`; seal outputs committed in `d32b04d` · `oda` · `full_dag` · 34/34 stages
+**Audit baseline:** `5f986f6` endpoint implementation closeout on `codex/submission-pipeline-rc`
+**Latest sealed run:** source head `5f986f6` · `oda` · `full_dag` · 34/34 stages; current release manifest is hash-bound at the final seal commit
 **Current controls:** RC checklist 17/17 · `verify_release` 30/30 · CI green
 **Historical Path A tag:** `v0.1.0-demo-rc.1` (its release note remains immutable)
 **Product claim in force:** **Path A controlled non-submission demonstration** (`docs/PRODUCT_CLAIM.md`)  
@@ -88,7 +88,7 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | Field | Content |
 |---|---|
 | **Owned artifacts** | SAP v4.0 · `config/study_config.yaml` · CTQ/estimand register · ANALYSIS_REPORT · population rules (ITT/Safety/MEASDISF) · [Section 2 audit](../06_qc_evidence/audit/section_reviews/SECTION_02_POPULATIONS_ENDPOINTS_AUDIT_2026-08-03.md) |
-| **Current status** | **GREEN for the Path A implementation; clean seal commit/rebind complete after this worktree is committed** — Antony Bevan adopted ED-01–ED-07; the corrected pain/CM+PR rule, TTUMOR ITT primary, and SAP-native `T-11-3`–`T-11-8` mappings are implemented and internally reconciled |
+| **Current status** | **GREEN for the Path A implementation; clean seal commit/rebind complete** — Antony Bevan adopted ED-01–ED-07; the corrected pain/CM+PR rule, TTUMOR ITT primary, and SAP-native `T-11-3`–`T-11-8` mappings are implemented and internally reconciled |
 | **Open risks** | Disclosed lack of independent sponsor/statistical/medical review; no filing-facing claim is authorized |
 | **Required evidence pack** | (1) accountable-author review packet and decision record · (2) approval specification · (3) CM/PR source audit and sensitivities · (4) aggregate event-source evidence · (5) separately programmed SAS/R implementation, delayed second-pass review, and full rerun/reseal |
 | **Release gate** | G02 before claiming SAP-complete TFLs |
@@ -144,9 +144,9 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | Field | Content |
 |---|---|
 | **Owned artifacts** | ADRG · SDRG · BDRG · TRACEABILITY_MATRIX · SDSP · ANALYSIS_REPORT · release note · limitation language · demo boundary |
-| **Current status** | **GREEN for Path A narrative** — S1 ADRG + S2 SDRG + S3 BDRG/TRACEABILITY v1.1; G07 executable; optional PDF re-package lag only |
+| **Current status** | **GREEN for Path A narrative** — S1–S4 reviewer-guide hardening complete; G07 executable; optional PDF re-package lag only |
 | **Open risks** | Package PDF copies may lag markdown until next `package_ectd`; over-claim if someone cites old PDFs only |
-| **Required evidence pack** | (1) ADRG/SDRG/BDRG revision IDs · (2) Traceability matrix catalog-aligned · (3) is/is-not · (4) S1–S3 review notes |
+| **Required evidence pack** | (1) ADRG/SDRG/BDRG revision IDs · (2) Traceability matrix catalog-aligned · (3) is/is-not · (4) S1–S4 review notes/addenda |
 | **Release gate** | G07 narrative satisfied for Path A; re-seal only if promotion-class science changes |
 | **Next action** | Maintain guides on claim drift; optional package PDF refresh; hand residual matrix to WS-1 |
 

@@ -10,7 +10,7 @@
 
 **Section 3/4 review addendum (2026-08-03):** ADRG, SDRG, BDRG, and the traceability matrix were rechecked against the corrected ADTTE derivations. PFS now exposes pain-led versus non-pain component labels, TTUMOR excludes death milestones, and no-post-baseline PFS censoring is explicit.
 
-**Author-decision addendum (2026-08-04):** Antony Bevan adopted ED-01–ED-07 as written under the disclosed single-author Path A governance model. The corrected pain/CM+PR derivation, TTUMOR ITT primary and SAP-native `T-11-3`–`T-11-8` mappings are implemented and internally reconciled. Reviewer guides must still distinguish the pre-Phase-2 sealed baseline from the change set until the final full-DAG reseal, and must never imply independent or sponsor approval.
+**Author-decision addendum (2026-08-04):** Antony Bevan adopted ED-01–ED-07 as written under the disclosed single-author Path A governance model. The corrected pain/CM+PR derivation, TTUMOR ITT primary and SAP-native `T-11-3`–`T-11-8` mappings are implemented, internally reconciled and bound by the final full-DAG release seal. Reviewer guides must preserve the Path A boundary and must never imply independent or sponsor approval.
 
 ---
 
@@ -110,7 +110,7 @@ Each of ADRG, SDRG, BDRG must contain—near the top:
 | S3 | BDRG depth pass + TRACEABILITY_MATRIX catalog alignment | **DONE** (`BDRG.md` + `TRACEABILITY_MATRIX.md` v1.1) |
 | S4 | Corrected ADTTE/PSA reviewer-language and package crosswalk | **DONE** (Section 3/4 audit memos, ADRG, WS-5/board updates) |
 
-After S1–S3: review notes under `docs/workstreams/reviews/WS6_S*_*.md`. Board may move toward **GREEN** for Path A narrative once PDF package re-render is optional ops.
+S1–S4 are complete; review notes are under `docs/workstreams/reviews/WS6_S*_*.md`. The board is **GREEN** for the Path A narrative; PDF re-packaging remains optional operations work.
 
 ---
 
