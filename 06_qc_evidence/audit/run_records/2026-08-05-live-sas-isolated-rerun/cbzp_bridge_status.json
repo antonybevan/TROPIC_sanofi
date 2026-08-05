@@ -1,0 +1,13 @@
+{
+  "overall": "PASS",
+  "scope": "synthetic CbzP bridge: <dom>_cbzp.xpt must equal the current export of <dom>_cbzp.rds",
+  "domains": {
+    "adsl": "PASS",
+    "adtte": "PASS",
+    "adae": "PASS",
+    "adlb": "PASS",
+    "adex": "PASS",
+    "adrs": "PASS"
+  }
+}
+
