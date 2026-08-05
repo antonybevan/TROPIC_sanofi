@@ -6,12 +6,20 @@ on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
+    inputs:
+      run_live_ct:
+        description: 'Run live CDISC Library controlled-terminology cross-validation'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # github.head_ref is the source branch for pull requests; ref_name is the source
+  # branch for pushes. This deduplicates a push and its same-branch PR run.
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
@@ -19,16 +27,16 @@ jobs:
   # Proves committed seals + claim docs still pass scripts/verify_release.py.
   path-a-seal-verify:
     name: Path A seal verify (verify_release)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
 
     - name: Set up Python
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
       with:
-        python-version: '3.10'
+        python-version: '3.10.20'
 
     - name: Path A release verification
       run: |
@@ -43,37 +51,42 @@ jobs:
 
   validate:
     name: Run Tests & Conformance Gates
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 90
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
 
     - name: Gitleaks secret scan (pinned v8.18.4, matches .pre-commit-config)
       run: |
         # Extract outside the checkout so the binary never dirties the worktree;
         # the final verify_release step fails on any untracked material file.
-        curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz | tar -xz -C "$RUNNER_TEMP" gitleaks
+        archive="$RUNNER_TEMP/gitleaks_8.18.4_linux_x64.tar.gz"
+        curl --fail --silent --show-error --location --retry 3 \
+          --output "$archive" \
+          https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz
+        echo "ba6dbb656933921c775ee5a2d1c13a91046e7952e9d919f9bac4cec61d628e7d  $archive" | sha256sum --check --strict
+        tar -xzf "$archive" -C "$RUNNER_TEMP" gitleaks
         "$RUNNER_TEMP/gitleaks" detect --source . --no-banner --redact
 
     - name: Set up R
-      uses: r-lib/actions/setup-r@v2
+      uses: r-lib/actions/setup-r@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
       with:
         r-version: '4.6.0'
 
     - name: Set up Python
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
       with:
-        python-version: '3.10'
+        python-version: '3.10.20'
 
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libxml2-dev libssl-dev libcurl4-openssl-dev libxml2-utils poppler-utils
+        sudo apt-get install --no-install-recommends -y libxml2-dev libssl-dev libcurl4-openssl-dev libxml2-utils poppler-utils
 
     - name: Cache renv packages
-      uses: actions/cache@v5
+      uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
       with:
         path: ~/.cache/R/renv
         key: ${{ runner.os }}-renv-${{ hashFiles('**/renv.lock') }}
@@ -82,7 +95,9 @@ jobs:
 
     - name: Restore renv environment
       run: |
-        Rscript -e "install.packages('renv', repos='https://cloud.r-project.org')"
+        export RENV_VERSION="$(python3 -c 'import json; print(json.load(open("renv.lock"))["Packages"]["renv"]["Version"])')"
+        Rscript -e 'v <- Sys.getenv("RENV_VERSION"); url <- sprintf("https://cran.r-project.org/src/contrib/Archive/renv/renv_%s.tar.gz", v); dest <- file.path(tempdir(), basename(url)); download.file(url, dest, mode="wb", quiet=TRUE); install.packages(dest, repos=NULL, type="source")'
+        test "$(Rscript -e 'cat(as.character(packageVersion("renv")))')" = "$RENV_VERSION"
         Rscript -e "renv::restore()"
 
     - name: Lint R sources (zero-warning gate)
@@ -91,13 +106,13 @@ jobs:
         # follow a compact style with ~290 purely-mechanical style lints (infix-spaces/commas/
         # semicolons — zero real defects); they are slated for a dedicated styler pass rather than
         # mass-reformatted here, so they are excluded from this gate, not silently un-linted.
-        Rscript -e 'if (!requireNamespace("lintr", quietly = TRUE)) install.packages("lintr", repos = "https://cloud.r-project.org")'
+        export LINTR_VERSION='3.3.0.1'
+        Rscript -e 'install.packages("lintr", repos="https://cloud.r-project.org", dependencies=TRUE); v <- Sys.getenv("LINTR_VERSION"); if (as.character(packageVersion("lintr")) != v) { url <- sprintf("https://cran.r-project.org/src/contrib/Archive/lintr/lintr_%s.tar.gz", v); dest <- file.path(tempdir(), basename(url)); download.file(url, dest, mode="wb", quiet=TRUE); install.packages(dest, repos=NULL, type="source") }; stopifnot(as.character(packageVersion("lintr")) == v)'
         Rscript -e 'files <- list.files(c("03_metadata/adam", "01_source_data", "04_analysis_datasets/programs/r", "06_qc_evidence/reconciliation", "03_metadata/define", "05_outputs/tfl", "tests"), pattern = "[.]R$", full.names = TRUE); n <- sum(vapply(files, function(f) length(lintr::lint(f)), integer(1))); if (n > 0) { for (f in files) print(lintr::lint(f)); stop(sprintf("lintr gate failed: %d issue(s)", n)) }; cat(sprintf("lintr gate passed: 0 issues across %d files\n", length(files)))'
 
     - name: Install Python dependencies
       run: |
-        python -m pip install --upgrade pip
-        python -m pip install -r requirements-ci.txt
+        python -m pip install --requirement requirements-ci.txt
 
     - name: Delivery architecture controls
       run: |
@@ -113,8 +128,10 @@ jobs:
 
     - name: CDISC CORE ADaM rule-pack validation (well-formedness gate)
       run: |
-        python -m pip install pyyaml
         python3 platform/validate_core_rules.py
+
+    - name: Validate manifest-to-executor DAG wiring
+      run: python3 platform/cibuild.py --validate-dag
 
     - name: Run unit tests (Broker + Seeder)
       run: |
@@ -176,19 +193,10 @@ jobs:
       run: |
         # Validates the ADaM spec's NCI controlled-terminology codes against authoritative CDISC CT
         # (audit F-13). Needs the CDISC Library API key (repo secret) or the offline CORE cache.
-        # Once CDISC_LIBRARY_API_KEY is configured in repository secrets this step runs as a hard
-        # gate (no --allow-skip). Until then the skip is explicit and visible in the log, and the
-        # conformance-coverage summary step below reports it -- a genuine CT mismatch can only be
-        # detected when the check actually runs.
-        if [ -n "$CDISC_LIBRARY_API_KEY" ]; then
-          echo "CT cross-validation: live CDISC Library mode (secret configured) -> hard gate."
-          python3 platform/ct_cross_validation.py
-        else
-          echo "CT cross-validation: no CDISC_LIBRARY_API_KEY and no offline cache in a fresh CI checkout -> SKIPPED (--allow-skip)."
-          python3 platform/ct_cross_validation.py --allow-skip
-        fi
-      env:
-        CDISC_LIBRARY_API_KEY: ${{ secrets.CDISC_LIBRARY_API_KEY }}
+        # Live CT is isolated to the trusted/manual job below; no secret is exposed
+        # to pull requests or codex/** pushes. This data-free job records the boundary.
+        echo "CT cross-validation: no live key is exposed to this untrusted/data-free job -> SKIPPED (--allow-skip)."
+        python3 platform/ct_cross_validation.py --allow-skip
 
     - name: Report data-free conformance coverage
       run: python3 platform/ci_coverage_summary.py
@@ -217,3 +225,33 @@ jobs:
         # Same gate as path-a-seal-verify job; kept at end of full suite so a full CI green
         # implies seals still PASS after other steps (no ODA re-run).
         python3 scripts/verify_release.py
+
+  ct-cross-validation:
+    name: CT cross-validation (trusted/manual)
+    # A repository variable enables the trusted main-branch run after the secret and
+    # optional environment approval are configured. Manual dispatch can opt in directly.
+    if: >-
+      (github.event_name == 'workflow_dispatch' && inputs.run_live_ct == true) ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.CDISC_LIBRARY_ENABLED == 'true')
+    runs-on: ubuntu-24.04
+    environment: cdisc-ct
+    permissions:
+      contents: read
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+
+    - name: Set up Python
+      uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+      with:
+        python-version: '3.10.20'
+
+    - name: Install locked Python dependencies
+      run: python -m pip install --requirement requirements-ci.txt
+
+    - name: Run live CT cross-validation
+      env:
+        CDISC_LIBRARY_API_KEY: ${{ secrets.CDISC_LIBRARY_API_KEY }}
+      run: |
+        test -n "$CDISC_LIBRARY_API_KEY" || { echo "CDISC_LIBRARY_API_KEY is required in the protected cdisc-ct environment"; exit 1; }
+        python3 platform/ct_cross_validation.py

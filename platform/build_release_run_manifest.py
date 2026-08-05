@@ -79,6 +79,19 @@ CONTROL_FILES = [
     "05_outputs/tfl/tfl_stats.R",
 ]
 
+# Pipeline controls are sealed separately from the clinical source-tree digest.
+# They govern how CI executes and verifies the release, but are not inputs to the
+# already-completed data-bearing run represented by pipeline_health.json.
+PIPELINE_CONTROL_FILES = [
+    ".github/CODEOWNERS",
+    ".github/workflows/ci.yml",
+    ".pre-commit-config.yaml",
+    "requirements-ci.txt",
+    "requirements-ci.lock",
+    "renv.lock",
+    "scripts/verify_release.py",
+]
+
 # Keep the source inventory in one place.  The same digest is written into
 # pipeline_health.json at run time and recomputed here during release sealing;
 # this prevents a green health snapshot from being paired with later-edited
@@ -283,6 +296,7 @@ def _run_completeness(health: dict, expected_stages: list[str]) -> dict:
     return {
         "run_scope": scope,
         "stages_expected": len(expected_stages),
+        "expected_stage_names": list(expected_stages),
         "stages_required_for_release": len(required),
         "stages_recorded_in_health": len(recorded),
         "missing_from_health": missing,
@@ -476,6 +490,16 @@ def _binding_problems(payload: dict) -> list[str]:
         problems.append("spec-to-data conformance is not PASS")
     if log_cleanliness.get("status") != "PASS":
         problems.append("log cleanliness gate is not PASS")
+
+    pipeline_controls = payload.get("artifacts", {}).get("pipeline_controls") or []
+    missing_pipeline_controls = [
+        path for path in PIPELINE_CONTROL_FILES
+        if not any(row.get("path") == path and row.get("present") for row in pipeline_controls)
+    ]
+    if missing_pipeline_controls:
+        problems.append(
+            "pipeline control seal is incomplete: " + ", ".join(missing_pipeline_controls)
+        )
 
     for row in payload["datasets"]:
         ds = row["dataset"]
@@ -676,8 +700,17 @@ def build_release_run_manifest(out_dir: Path = OUT_DIR) -> dict:
         "01_source_data/cbzp_reconstructed/*.xpt",
         ".core_run/sdtm34/*.xpt",
     ])
+    additive_outputs = _hash_globs([
+        "03_metadata/usdm/*.json",
+        "04_analysis_datasets/datasetjson/**/*.json",
+        "04_analysis_datasets/datasetjson/**/*.ndjson",
+        "05_outputs/ars/**/*.csv",
+        "05_outputs/ars/**/*.json",
+        "05_outputs/ars/**/*.ndjson",
+    ])
     programs = _hash_globs(PROGRAM_GLOBS, exclude_paths=GENERATED_SOURCE_EXCLUDES)
     controls = _hash_existing(CONTROL_FILES)
+    pipeline_controls = _hash_existing(PIPELINE_CONTROL_FILES)
 
     expected_stages = _expected_stage_names(manifest)
     run_completeness = _run_completeness(health, expected_stages)
@@ -685,6 +718,7 @@ def build_release_run_manifest(out_dir: Path = OUT_DIR) -> dict:
 
     git_state = _git_state()
     git_state["source_tree_sha256"] = _source_tree_sha256(controls, programs)
+    git_state["pipeline_control_sha256"] = _source_tree_sha256(pipeline_controls, [])
 
     payload = {
         "status": "PENDING",
@@ -708,12 +742,14 @@ def build_release_run_manifest(out_dir: Path = OUT_DIR) -> dict:
         "qc_statuses": qc_statuses,
         "artifacts": {
             "controls": controls,
+            "pipeline_controls": pipeline_controls,
             "inputs": inputs,
             "programs": programs,
             "qc_files": qc_hashes,
             "tfl_outputs": tfl_outputs,
             "logs": logs,
             "package_files": package_hashes,
+            "additive_outputs": additive_outputs,
         },
     }
     payload["problems"] = _binding_problems(payload)
