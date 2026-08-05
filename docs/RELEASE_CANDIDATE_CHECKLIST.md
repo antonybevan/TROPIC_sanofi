@@ -1,6 +1,6 @@
 # TROPIC Release-Candidate Checklist
 
-Generated: 2026-08-05 09:06:02 UTC
+Generated: 2026-08-05 13:27:00 UTC
 
 > Strict go/no-go checklist for the current working evidence set. This report is intentionally conservative and does not convert historical evidence into current release readiness.
 
@@ -42,7 +42,7 @@ No release-candidate warnings.
 | G06 qc_signoff | Forest HR reconciliation passes | PASS | platform/forest_reconciliation_status.json overall=PASS |  |
 | G06 qc_signoff | Figure-driving data reconciliation passes | PASS | platform/figure_data_reconciliation_status.json overall=PASS |  |
 | G06 qc_signoff | Synthetic comparator bridge parity passes | PASS | platform/cbzp_bridge_status.json overall=PASS | Still disclose CbzP as synthetic/reconstructed demonstration content. |
-| G09 release_candidate_lock | Current release-run manifest is release-candidate grade (full DAG, clean tree) | PASS | platform/release_run_manifest/release_run_manifest.json status=PASS; evidence_grade=release_candidate; run_scope=full_dag; seal=07b194c063ee7448778a7fb90e66e2141904685aeff04b21084b6e20582d1458 |  |
+| G09 release_candidate_lock | Current release-run manifest is release-candidate grade (full DAG, clean tree) | PASS | platform/release_run_manifest/release_run_manifest.json status=PASS; evidence_grade=release_candidate; run_scope=full_dag; seal=eca189cc03f5d093d5c5860e18e29ff5c092bfd96a94b7b5678cb2a705cc8361 |  |
 | G09 release_candidate_lock | Pipeline health records a full current DAG run | PASS | platform/pipeline_health.json run_scope=full_dag; stages_recorded=34; stages_expected=34; stages_not_run=0 |  |
 | G06 qc_signoff | Audit findings register has no active confirmed Critical/Major blockers | PASS | 06_qc_evidence/audit/findings_register.csv active=0; confirmed Critical/Major=0; severity_counts={} | Close, resolve, or formally disposition confirmed Critical/Major findings before any release-ready claim. |
 | G08 submission_package_materialization | eCTD backbone/run record present | PASS | 08_submission_package/ectd/0000/index.xml present=True; 08_submission_package/ectd/RUN_RECORD.md present=True | Rebuild/materialize eCTD sequence after upstream release candidate is clean. |
