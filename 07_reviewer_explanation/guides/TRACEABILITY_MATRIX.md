@@ -5,8 +5,8 @@
 | **Document** | Analysis Traceability Matrix |
 | **Study** | TROPIC (EFC6193 / XRP6258) · NCT00417079 |
 | **Standards** | SDTMIG v3.1.1 source → v3.4 uplift · ADaMIG v1.3 / OCCDS v1.0 + custom episode-merge |
-| **Document version** | 1.1 (Path A catalog-aligned) |
-| **Effective** | 2026-07-09 |
+| **Document version** | 1.2 (audit closure / Path A catalog-aligned) |
+| **Effective** | 2026-08-05 |
 | **Product claim** | **Path A only** (`docs/PRODUCT_CLAIM.md`) |
 | **TFL control authority** | `config/tfl_output_catalog.yaml` |
 
@@ -76,7 +76,7 @@ variable-label artifacts for both tracks (`platform/gen_adam_labels.R`).
 
 **Authority:** `config/tfl_output_catalog.yaml` only.  
 **Generator:** `05_outputs/tfl/tfl_generation.R` (reporting deliverable).  
-**Not claimed:** full SAP Appendix D (21 IDs deferred with reasons).  
+**Not claimed:** full SAP Appendix D (18 IDs deferred with reasons).
 **Regenerate local index (optional):** `python3 platform/build_tfl_output_index.py` (report is gitignored under portfolio surface policy).
 
 ### 3.1 Controlled in-scope (21 IDs)

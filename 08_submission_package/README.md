@@ -27,7 +27,8 @@ An **eCTD Module 5–style** clinical study data package assembled for portfolio
 | Part 11 validated system | Hash seals ≠ validated e-signature system |
 | Commercial Pinnacle 21 full clearance | Not asserted under Path A |
 
-**Sealed demo RC:** [`docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md`](../docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md) · tag `v0.1.0-demo-rc.1`
+**Current sealed portfolio release:** [`docs/RELEASE_NOTE_v0.2.1-portfolio.md`](../docs/RELEASE_NOTE_v0.2.1-portfolio.md) · tag `v0.2.1-portfolio`
+The earlier `v0.1.0-demo-rc.1` and `v0.2.0-portfolio` notes remain immutable historical release records.
 
 ---
 

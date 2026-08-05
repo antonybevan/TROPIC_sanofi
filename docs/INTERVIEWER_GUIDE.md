@@ -77,7 +77,7 @@ Expected: **VERIFY_RELEASE: PASS** on the committed seal set (no ODA required).
 
 Also open:
 
-- [`RELEASE_NOTE_v0.2.0-portfolio.md`](RELEASE_NOTE_v0.2.0-portfolio.md)
+- [`RELEASE_NOTE_v0.2.1-portfolio.md`](RELEASE_NOTE_v0.2.1-portfolio.md)
 - [`workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)
 - Frozen ODA snapshot: `platform/evidence/`
 

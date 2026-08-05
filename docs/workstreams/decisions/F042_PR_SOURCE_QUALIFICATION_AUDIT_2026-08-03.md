@@ -2,10 +2,12 @@
 
 **Audit ID:** `F042-PR-SOURCE-QUAL-2026-08-03`<br>
 **Version:** `0.2.0`<br>
-**Status:** **APPROVAL EVIDENCE COMPLETE — ED-02 ADOPTED; PHASE 2 IMPLEMENTATION IN PROGRESS**<br>
+**Status:** **ED-02 ADOPTED — PATH A IMPLEMENTATION SEALED; EXTERNAL QUALIFIED REVIEW REQUIRED**<br>
 **Parent decision:** [`ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md`](ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md)<br>
 **Approval dependency:** `ED-02` — PR source, precedence, intent, and date handling<br>
 **Product path:** Path A controlled non-submission demonstration
+
+> **Historical baseline notice (2026-08-05):** Sections 1–5 retain the pre-implementation staging-readiness assessment. The closure addendum below controls the current status: the adopted CM+PR implementation, full real-SAS rerun, release reseal, and CI verification are complete. This remains a single-author Path A demonstration; external qualified statistical/medical review is outstanding.
 
 ## 1. Audit purpose
 

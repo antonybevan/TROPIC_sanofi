@@ -1,11 +1,11 @@
 # TROPIC Product Claim Decision
 
 **Document ID:** PRODUCT_CLAIM
-**Version:** 1.1
-**Effective:** 2026-08-03
-**Status:** FROZEN for tag train `v0.1.0-demo-rc.1` and successors until amended
+**Version:** 1.2
+**Effective:** 2026-08-05
+**Status:** FROZEN for tag train `v0.2.1-portfolio` and successors until amended
 **Owner workstream:** WS-0 Governance & Scope Control (G00)
-**Binding companions:** `06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md` · `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md` · `docs/RELEASE_NOTE_v0.2.0-portfolio.md` · `docs/WORKSTREAM_EXECUTION_BOARD.md`
+**Binding companions:** `06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md` · `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md` · `docs/RELEASE_NOTE_v0.2.1-portfolio.md` · `docs/WORKSTREAM_EXECUTION_BOARD.md`
 **Presentation entry:** root `README.md` · `docs/INTERVIEWER_GUIDE.md` · `08_submission_package/README.md` · `docs/INDEX.md`
 **Git surface:** `docs/REPO_SURFACE_POLICY.md` (only review face + spine + seals in git — not factory noise)
 
@@ -25,7 +25,7 @@ If a sentence contradicts this file, the sentence is wrong—not this file.
 
 ---
 
-## 2. Active product claim (v0.1)
+## 2. Active product claim (v0.2.1)
 
 ### Claim (allowed)
 
@@ -59,7 +59,7 @@ If a sentence contradicts this file, the sentence is wrong—not this file.
 | **B — Submission simulation** | `sub-sim` | Only after G00 amendment + new tag train | Real/placeholder app metadata policy, aCRF plan, Part 11 process evidence stubs, CbzP claim resolved or removed from comparative primary story |
 | **C — True submission support** | `sub-real` | Outside this public repo’s data rights | Full two-arm IPD, sponsor SOPs, org double programming, commercial validators |
 
-**Decision for this repository at v0.1:** **Path A only.**
+**Decision for this repository at v0.2.1:** **Path A only.**
 Any public talk track, LinkedIn line, or interview answer must map to Path A unless PRODUCT_CLAIM is revised and re-tagged.
 
 ---
@@ -113,8 +113,8 @@ Sim mode (`sas_execution_mode=sim`) zero-diff is **not** double-programming evid
 
 Controlled release scope is defined solely by **`config/tfl_output_catalog.yaml`**:
 
-- **18** in-scope output IDs must exist and index clean.
-- **21** SAP full-catalog IDs are **deferred** with reasons—not silent gaps.
+- **21** in-scope output IDs must exist and index clean.
+- **18** SAP full-catalog IDs are **deferred** with reasons—not silent gaps.
 - Listings: **none** in controlled scope (false L-01 removed).
 
 Claiming “full SAP Appendix D TFL package” is **false** under Path A.
@@ -136,7 +136,7 @@ Claiming “full SAP Appendix D TFL package” is **false** under Path A.
 
 ## 9. Machine seal claims (what PASS means)
 
-At tag `v0.1.0-demo-rc.1` (and successive Path A seals):
+At tag `v0.2.1-portfolio` (and successive Path A seals):
 
 | Seal | Meaning |
 |---|---|
@@ -162,7 +162,7 @@ To change the product claim (e.g. Path B):
 1. Update this file (new version, date, what changes).
 2. Re-open G00 on the workstream board.
 3. Update disposition board and residual memo.
-4. New release note + tag train (e.g. `v0.2.0-…`).
+4. New release note + tag train (e.g. `v0.3.0-…`).
 5. Do **not** silently edit README badges or ADRG to over-claim.
 
 ---
@@ -173,6 +173,6 @@ To change the product claim (e.g. Path B):
 |---|---|---|
 | Product owner / programmer of record | Antony Bevan | 2026-07-09 |
 | SAP remediation authority | SAP v4.0 + lock memo | 2026-06-25 |
-| Machine seal reference | `v0.2.0-portfolio` / RC PASS | 2026-08-04 |
+| Machine seal reference | `v0.2.1-portfolio` / RC PASS | 2026-08-05 |
 
 *Electronic wet-ink sponsor signatures are out of scope under Path A (see F-025).*

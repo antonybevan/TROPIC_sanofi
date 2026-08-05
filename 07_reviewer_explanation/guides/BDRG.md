@@ -6,9 +6,9 @@
 | **Study** | TROPIC / EFC6193 / XRP6258 · NCT00417079 |
 | **Cohort in clinsite** | Real Mitoxantrone (MP) de-identified arm only (N=371 subjects → site roll-up) |
 | **Standard** | FDA *Bioresearch Monitoring Technical Conformance Guide* (clinsite pattern; Appendix 3 **subset**) |
-| **Document version** | 1.2 (portfolio finalization) |
-| **Effective** | 2026-08-04 |
-| **Supersedes** | BDRG v1.1 from the `v0.1.0-demo-rc.1` Path A baseline |
+| **Document version** | 1.3 (audit closure / portfolio release) |
+| **Effective** | 2026-08-05 |
+| **Supersedes** | BDRG v1.2 from the `v0.2.0-portfolio` release (which superseded the `v0.1.0-demo-rc.1` baseline) |
 | **Product claim** | **Path A only** — controlled non-submission demonstration |
 
 ---
@@ -24,7 +24,7 @@
 
 **Binding claim:** [`docs/PRODUCT_CLAIM.md`](../../docs/PRODUCT_CLAIM.md)
 **Residuals:** [`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)
-**Current portfolio release:** tag `v0.2.0-portfolio` · [`docs/RELEASE_NOTE_v0.2.0-portfolio.md`](../../docs/RELEASE_NOTE_v0.2.0-portfolio.md) · `python3 scripts/verify_release.py`
+**Current portfolio release:** tag `v0.2.1-portfolio` · [`docs/RELEASE_NOTE_v0.2.1-portfolio.md`](../../docs/RELEASE_NOTE_v0.2.1-portfolio.md) · `python3 scripts/verify_release.py`
 **Package path:** [`08_submission_package/m5/datasets/tropic/bimo/`](../../08_submission_package/m5/datasets/tropic/bimo/)
 **Related guides:** [`ADRG.md`](ADRG.md) · [`SDRG.md`](SDRG.md) · [`TRACEABILITY_MATRIX.md`](TRACEABILITY_MATRIX.md)
 

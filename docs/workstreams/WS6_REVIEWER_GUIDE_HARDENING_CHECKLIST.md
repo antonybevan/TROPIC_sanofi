@@ -3,7 +3,7 @@
 **Workstream:** Regulatory Writing / Reviewer Explanation  
 **Gates:** G07 (primary), G08 narrative  
 **Product claim:** Path A only  
-**As of:** 2026-08-04
+**As of:** 2026-08-05
 **Current board status:** GREEN for Path A; external qualified review required
 
 **Section 2 review addendum (2026-08-03):** F-011 is resolved for the current PSA response set using observed baseline PSA (MP 61/329; CbzP 145/361). The SAP `T-11-8` TTPAIN/response collision, TTUMOR population wording and pain/RT component decision were handed to WS-2/WS-4 for controlled implementation.
@@ -25,7 +25,7 @@ Make ADRG / SDRG / BDRG read like **controlled reviewer deliverables**, not engi
 Each of ADRG, SDRG, BDRG must contain—near the top:
 
 - [x] Link to **product claim** Path A  
-- [x] Link to tag / release note `v0.1.0-demo-rc.1`  
+- [x] Link to current tag / release note `v0.2.1-portfolio`
 - [x] Explicit **document version + date + supersedes** line — **ADRG + SDRG + BDRG done**  
 - [x] **what this package is / is not** — **ADRG + SDRG + BDRG done**  
 - [x] Pointer to **known-differences memo** — **ADRG + SDRG + BDRG done**  
@@ -41,7 +41,7 @@ Each of ADRG, SDRG, BDRG must contain—near the top:
 | Populations | ITT/Safety/MEASDISF consistent with WS-2 table | Present §5.4 — recheck at S2 |
 | Validation | Dual-lang + admiral + single-author disclosure | **Done (S1)** §6.0 Path A talk track |
 | Residuals | F-003, F-012, F-014 language; F-011 closure | **Updated (S2)** — F-011 closure evidence and the Section 2 SAP/TFL findings are linked; F-003/012 remain in §7 |
-| TFL scope | Controlled catalog 18 IDs; deferred 21 | **Done (S1)** §6.0 table |
+| TFL scope | Controlled catalog 21 IDs; deferred 18 | **Done (S1)** §6.0 table |
 | OCCDS | v1.0 + custom episode merge; no OCCDS v1.1 | Present |
 | Part 11 | Explicit non-claim | **Done (S1)** §0 table |
 
@@ -86,7 +86,7 @@ Each of ADRG, SDRG, BDRG must contain—near the top:
 | ADCM keys ASTDT | Fixed (F-023) |
 | T-17 present | Fixed |
 | Stage model + admiral | Fixed (manifest-derived) |
-| Aligns with controlled TFL catalog (18 / deferred 21) | **Done (S3)** §3.1–§3.2 |
+| Aligns with controlled TFL catalog (21 / deferred 18) | **Done (S3)** §3.1–§3.2 |
 | No L-01 claim | Fixed |
 | Path A front-matter | **Done (S3)** |
 
@@ -110,7 +110,7 @@ Each of ADRG, SDRG, BDRG must contain—near the top:
 | S3 | BDRG depth pass + TRACEABILITY_MATRIX catalog alignment | **DONE** (`BDRG.md` + `TRACEABILITY_MATRIX.md` v1.1) |
 | S4 | Corrected ADTTE/PSA reviewer-language and package crosswalk | **DONE** (Section 3/4 audit memos, ADRG, WS-5/board updates) |
 
-S1–S4 are complete; review notes are under `docs/workstreams/reviews/WS6_S*_*.md`. The board is **GREEN** for the Path A narrative; PDF re-packaging remains optional operations work.
+S1–S4 are complete; review notes are under `docs/workstreams/reviews/WS6_S*_*.md`. The board is **GREEN** for the Path A narrative, and the reviewer-guide PDFs were regenerated into the package during the v0.2.1 audit-closure release.
 
 ---
 
@@ -121,4 +121,4 @@ S1–S4 are complete; review notes are under `docs/workstreams/reviews/WS6_S*_*.
 - [x] No conflict with PRODUCT_CLAIM (self-check S1–S3)  
 - [x] Hostile-reader test passed (self with checklist)  
 - [x] Review notes filed (S1, S2, S3)  
-- [ ] Optional: re-package ADRG/SDRG/BDRG PDFs into `m5/` when next package_ectd run
+- [x] Re-package ADRG/SDRG/BDRG PDFs into `m5/` during the v0.2.1 audit-closure run

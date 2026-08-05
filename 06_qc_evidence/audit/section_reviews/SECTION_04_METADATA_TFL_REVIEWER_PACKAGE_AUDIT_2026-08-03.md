@@ -4,6 +4,8 @@
 **Product claim:** Path A controlled non-submission demonstration
 **Authority:** `03_metadata/adam/ADaM_spec.xlsx`, Define-XML 2.1 artifacts, `config/tfl_output_catalog.yaml`, ADRG/SDRG/BDRG, and the Section 3 ADaM audit
 
+> **Historical baseline notice (2026-08-05):** The counts and decision text below preserve the pre-adoption package snapshot. The closure addendum controls the current Path A state and records the corrected 21/18 catalog, 10/18 ARM, regenerated package, release reseal, and CI verification. External qualified statistical/medical review remains required.
+
 ## Decision
 
 **PASS for the controlled Path A metadata/output/package surface, subject to the final clean-worktree reseal.**
@@ -60,8 +62,8 @@ Following Antony Bevan's ED-01–ED-07 adoption, the controlled catalog contains
 in-scope IDs and 18 explicitly deferred SAP IDs. The F-042 module and aggregate
 event-source evidence are packaged, and the full 34-stage real-SAS run passed
 metadata, TFL, package and log gates. The clean committed release-manifest rebind
-is the final seal operation; no independent, sponsor, medical or regulated approval
-is claimed.
+and CI verification are complete; no independent, sponsor, medical or regulated
+approval is claimed.
 
 ## 5. Handoff to final reseal
 

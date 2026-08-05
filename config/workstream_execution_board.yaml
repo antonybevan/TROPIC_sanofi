@@ -4,12 +4,12 @@
 
 version: 1
 study: TROPIC-NCT00417079
-as_of: "2026-08-04"
+as_of: "2026-08-05"
 product_claim_in_force: controlled_non_submission_demo
-pipeline_seal_tag: v0.2.0-portfolio
-historical_tag_note: "v0.1.0-demo-rc.1 is immutable historical evidence; v0.2.0-portfolio is the current Path A portfolio release."
-audit_baseline_commit: "v0.2.0-portfolio^{commit}"
-latest_sealed_run_source_head: "v0.2.0-portfolio^{commit}"
+pipeline_seal_tag: v0.2.1-portfolio
+historical_tag_note: "v0.1.0-demo-rc.1 and v0.2.0-portfolio are immutable historical evidence; v0.2.1-portfolio is the current Path A portfolio release."
+audit_baseline_commit: "v0.2.1-portfolio^{commit}"
+latest_sealed_run_source_head: "v0.2.1-portfolio^{commit}"
 latest_pipeline_health: "oda/full_dag/GREEN, 34 of 34 stages"
 latest_release_verification: "31 of 31 checks"
 board_doc: docs/WORKSTREAM_EXECUTION_BOARD.md
@@ -26,7 +26,7 @@ workstreams:
       - 06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md
       - 06_qc_evidence/audit/findings_register.csv
       - 06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md
-      - docs/RELEASE_NOTE_v0.2.0-portfolio.md
+      - docs/RELEASE_NOTE_v0.2.1-portfolio.md
       - docs/PRODUCT_CLAIM.md
       - README.md
       - 00_governance/REPRODUCIBILITY.md
@@ -171,7 +171,7 @@ workstreams:
       - 07_reviewer_explanation/guides/SDRG.md
       - 07_reviewer_explanation/guides/BDRG.md
       - 07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md
-      - docs/RELEASE_NOTE_v0.2.0-portfolio.md
+      - docs/RELEASE_NOTE_v0.2.1-portfolio.md
       - 07_reviewer_explanation/analysis_report.md
     open_risks:
       - optional_pdf_repackage_lag
@@ -179,7 +179,7 @@ workstreams:
     required_evidence:
       - hardened_adrg_sdrg_bdrg
       - guide_signoff_checklist
-    next_action: "Maintain guide claim language; optionally re-package PDFs; preserve Path A limitations"
+    next_action: "Maintain guide claim language and regenerated PDFs; preserve Path A limitations"
     residual_findings: [F-003, F-005, F-019]
     packs:
       - docs/workstreams/WS6_REVIEWER_GUIDE_HARDENING_CHECKLIST.md
