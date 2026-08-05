@@ -2,7 +2,7 @@
   "gate": "G00",
   "name": "governance_scope_lock",
   "status": "PASS",
-  "generated_at": "2026-08-05T05:49:12Z",
+  "generated_at": "2026-08-05T06:50:35Z",
   "checks": [
     {
       "name": "exists:docs/PRODUCT_CLAIM.md",

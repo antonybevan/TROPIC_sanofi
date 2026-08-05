@@ -725,7 +725,24 @@ def run_stage_execution(stage, sas_mode):
     else:
         return run_command(stage["cmd"], timeout=STAGE_TIMEOUT_S)
 
-def run_single_stage(stage, from_stage, sas_mode, results):
+def _abort_pipeline(results, sas_mode, expected_stage_names=None):
+    """Record a failed run against the complete DAG before rolling back.
+
+    Failure telemetry must retain the manifest's full expected-stage set.  If it
+    is inferred only from ``results`` at the point of failure, an aborted run
+    can incorrectly report ``run_scope=full_dag`` even though later stages never
+    ran (audit finding F-043).
+    """
+    rollback()
+    write_telemetry(
+        results,
+        sas_mode,
+        expected_stage_names=expected_stage_names,
+    )
+    sys.exit(1)
+
+
+def run_single_stage(stage, from_stage, sas_mode, results, expected_stage_names=None):
     if stage["id"] < from_stage:
         # Record explicitly: omitted stages must never look like "not part of the DAG".
         # NOT_RUN = --from-stage skip (partial evidence). Distinct from SKIPPED
@@ -845,9 +862,7 @@ def run_single_stage(stage, from_stage, sas_mode, results):
         print(f"  [FAILED] Stage {stage['id']} failed. Reason: {stderr.strip()}")
         results[stage["name"]] = "FAIL"
         print("  [ERROR] Validation or execution error detected! Automated rollback initiated...")
-        rollback()
-        write_telemetry(results, sas_mode)
-        sys.exit(1)
+        _abort_pipeline(results, sas_mode, expected_stage_names)
 
 def _stage_cmd(script, runner, engine_root=None, relocate=False, is_engine=False):
     """Build the subprocess argv for a stage given its runner style.
@@ -901,7 +916,7 @@ def build_stages(manifest, engine_root=None, relocate=False):
     return stages
 
 
-def run_parallel_batch(batch, from_stage, sas_mode, results):
+def run_parallel_batch(batch, from_stage, sas_mode, results, expected_stage_names=None):
     """Execute a contiguous run of independent (parallel) validation stages concurrently.
     Mirrors the historical 'fan out the independent ADaM validations' behaviour: honour
     from_stage skipping, run via a ProcessPool, and roll back + exit on any failure."""
@@ -942,9 +957,7 @@ def run_parallel_batch(batch, from_stage, sas_mode, results):
     if failed_any:
         print("  [ERROR] Validation or execution error detected in parallel stages! "
               "Automated rollback initiated...")
-        rollback()
-        write_telemetry(results, sas_mode)
-        sys.exit(1)
+        _abort_pipeline(results, sas_mode, expected_stage_names)
 
 
 def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=False, force_upload_sdtm=False, seed_if_needed=False):
@@ -1080,7 +1093,13 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
             while j < len(stages) and stages[j].get("parallel"):
                 batch.append(stages[j])
                 j += 1
-            run_parallel_batch(batch, from_stage, sas_mode, results)
+            run_parallel_batch(
+                batch,
+                from_stage,
+                sas_mode,
+                results,
+                expected_stage_names=expected_stage_names,
+            )
             idx = j
         else:
             if stage["name"] == "Release Run Manifest Binding" and stage["id"] >= from_stage:
@@ -1094,7 +1113,13 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
                     if n != "Release Run Manifest Binding"
                 ]
                 write_telemetry(results, sas_mode, expected_stage_names=upstream_expected)
-            run_single_stage(stage, from_stage, sas_mode, results)
+            run_single_stage(
+                stage,
+                from_stage,
+                sas_mode,
+                results,
+                expected_stage_names=expected_stage_names,
+            )
             idx += 1
 
     clean_backup()
