@@ -2582,9 +2582,9 @@
     "sas_version": "9.04.01M8P022223",
     "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007"
   },
-  "evidence_grade": "remediation_partial_or_dirty",
-  "generated_at": "2026-08-05 08:11:54 UTC",
-  "manifest_sha256": "362520a629eb40c4480a0dc80690b84f8834dd01728316a8557cb0745d8a83b8",
+  "evidence_grade": "release_candidate",
+  "generated_at": "2026-08-05 08:13:14 UTC",
+  "manifest_sha256": "34712045d345636a1d17eed49111960117f6f2729b963d1d0c12631d8bc2192c",
   "problems": [],
   "qc_statuses": {
     "cbzp_bridge": {
@@ -2696,9 +2696,7 @@
       "status": "PASS"
     }
   },
-  "remediation_reasons": [
-    "git worktree is dirty (12 porcelain entries); release-candidate lock requires a clean committed state"
-  ],
+  "remediation_reasons": [],
   "run_completeness": {
     "failed": [],
     "health_run_scope": "full_dag",
@@ -2751,56 +2749,15 @@
   },
   "source_control": {
     "branch": "codex/f043-run-scope-telemetry",
-    "dirty": true,
-    "dirty_including_seal_outputs": true,
-    "head": "4fdc13bb0c3ed78822e14ded265a91f97096f50b",
+    "dirty": false,
+    "dirty_including_seal_outputs": false,
+    "head": "a8c7b5b51a1cc72935392571e6b0ca7793cc9fad",
     "source_tree_sha256": "5e56cd0fbafe26eb6e1067a15e636ac452e0c8f89a8d4b6e3e571f0c5200e600",
     "staged_diff_paths": [],
-    "status_porcelain": [
-      " M 04_analysis_datasets/datasetjson/README.md",
-      " M 06_qc_evidence/gates/g00_governance_status.json",
-      " M 06_qc_evidence/gates/g02_specification_status.json",
-      " M 06_qc_evidence/gates/g07_reviewer_package_status.json",
-      " M 08_submission_package/ectd/0000/index-md5.txt",
-      " M 08_submission_package/ectd/0000/index.xml",
-      " M config/evidence_layers.yaml",
-      " M platform/admiral_reconciliation_status.json",
-      " M platform/export_datasetjson.py",
-      " M platform/log_cleanliness/log_cleanliness_status.json",
-      " M platform/pipeline_health.json",
-      " M platform/test_oda_broker.py"
-    ],
-    "status_porcelain_all": [
-      " M 04_analysis_datasets/datasetjson/README.md",
-      " M 06_qc_evidence/gates/g00_governance_status.json",
-      " M 06_qc_evidence/gates/g02_specification_status.json",
-      " M 06_qc_evidence/gates/g07_reviewer_package_status.json",
-      " M 08_submission_package/ectd/0000/index-md5.txt",
-      " M 08_submission_package/ectd/0000/index.xml",
-      " M config/evidence_layers.yaml",
-      " M docs/RELEASE_RUN_MANIFEST.md",
-      " M platform/admiral_reconciliation_status.json",
-      " M platform/export_datasetjson.py",
-      " M platform/log_cleanliness/log_cleanliness_status.json",
-      " M platform/pipeline_health.json",
-      " M platform/release_run_manifest/release_run_manifest.json",
-      " M platform/test_oda_broker.py"
-    ],
-    "status_porcelain_sha256": "ada479c2cb57f28e9aab94f08b7170b32b52dde9433dbf4c199f8f6ba2a48080",
-    "tracked_diff_paths": [
-      "04_analysis_datasets/datasetjson/README.md",
-      "06_qc_evidence/gates/g00_governance_status.json",
-      "06_qc_evidence/gates/g02_specification_status.json",
-      "06_qc_evidence/gates/g07_reviewer_package_status.json",
-      "08_submission_package/ectd/0000/index-md5.txt",
-      "08_submission_package/ectd/0000/index.xml",
-      "config/evidence_layers.yaml",
-      "platform/admiral_reconciliation_status.json",
-      "platform/export_datasetjson.py",
-      "platform/log_cleanliness/log_cleanliness_status.json",
-      "platform/pipeline_health.json",
-      "platform/test_oda_broker.py"
-    ]
+    "status_porcelain": [],
+    "status_porcelain_all": [],
+    "status_porcelain_sha256": "",
+    "tracked_diff_paths": []
   },
-  "status": "REMEDIATION"
+  "status": "PASS"
 }
