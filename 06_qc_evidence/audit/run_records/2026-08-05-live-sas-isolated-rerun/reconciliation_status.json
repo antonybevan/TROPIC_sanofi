@@ -1,0 +1,19 @@
+{
+  "overall": "PASS",
+  "simulated": false,
+  "execution_mode": "oda",
+  "domains": {
+    "ADSL": "PASS",
+    "ADEX": "PASS",
+    "ADCM": "PASS",
+    "ADAE": "PASS",
+    "ADLB": "PASS",
+    "ADRS": "PASS",
+    "ADTTE": "PASS",
+    "CLINSITE": "PASS"
+  },
+  "endpoint_controls": {
+    "F042_PAIN_RESPONSE": "PASS"
+  }
+}
+

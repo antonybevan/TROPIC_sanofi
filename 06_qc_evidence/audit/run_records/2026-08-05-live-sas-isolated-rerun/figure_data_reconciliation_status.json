@@ -1,0 +1,33 @@
+{
+  "overall": "PASS",
+  "detail": {
+    "km_hr_ci": {
+      "os": {
+        "max_delta": 0.0004,
+        "tolerance": 0.01
+      },
+      "pfs": {
+        "max_delta": 0.0002,
+        "tolerance": 0.01
+      }
+    },
+    "km_risk": {
+      "rows_checked": 32,
+      "identical": true
+    },
+    "waterfall": {
+      "rows_checked": 689,
+      "identical": true
+    },
+    "swimmer": {
+      "rows_checked": 60,
+      "identical": true
+    },
+    "exposure_response": {
+      "rows_checked": 730,
+      "identical": true
+    }
+  },
+  "script": "06_qc_evidence/reconciliation/figure_data_reconcile.R",
+  "generated_at": "2026-08-05T11:00:20+0530"
+}
