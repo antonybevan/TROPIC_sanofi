@@ -52,8 +52,10 @@ jobs:
 
     - name: Gitleaks secret scan (pinned v8.18.4, matches .pre-commit-config)
       run: |
-        curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz | tar -xz gitleaks
-        ./gitleaks detect --source . --no-banner --redact
+        # Extract outside the checkout so the binary never dirties the worktree;
+        # the final verify_release step fails on any untracked material file.
+        curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz | tar -xz -C "$RUNNER_TEMP" gitleaks
+        "$RUNNER_TEMP/gitleaks" detect --source . --no-banner --redact
 
     - name: Set up R
       uses: r-lib/actions/setup-r@v2
