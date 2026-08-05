@@ -221,10 +221,18 @@ jobs:
         # checkable without a data-bearing checkout).
         python3 platform/verify_evidence.py
 
+    - name: Checkout clean seal copy
+      uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      with:
+        path: _seal_checkout
+        clean: true
+
     - name: Path A release verification (seal pack)
+      working-directory: _seal_checkout
       run: |
-        # Same gate as path-a-seal-verify job; kept at end of full suite so a full CI green
-        # implies seals still PASS after other steps (no ODA re-run).
+        # Validate the committed seal pack from a fresh checkout. Earlier data-free steps
+        # may regenerate CI-only status JSONs in the primary workspace; they must not alter
+        # the immutable release artifacts being verified here.
         python3 scripts/verify_release.py
 
   ct-cross-validation:
