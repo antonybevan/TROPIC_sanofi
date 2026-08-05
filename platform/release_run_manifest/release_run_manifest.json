@@ -191,11 +191,11 @@
         "size_bytes": 2905914
       },
       {
-        "md5": "556c84d0bdf699c853be96b83f04fe84",
+        "md5": "3a882ce8a6904187639915e78519830d",
         "path": "05_outputs/ars/tropic_ard.csv",
         "present": true,
-        "sha256": "340e48b3c4d785b583e4ea77be0486f9d0d73fc36e37e3f994674df73fa16512",
-        "size_bytes": 2022
+        "sha256": "62e6d45d88d3d5e5a8b1d02930ae04bdb678c56672f8c5556ce8d75b83c55f05",
+        "size_bytes": 2001
       },
       {
         "md5": "72138fc276c38b9930ddd601f13f4262",
@@ -2853,8 +2853,8 @@
     "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007"
   },
   "evidence_grade": "release_candidate",
-  "generated_at": "2026-08-05 13:26:31 UTC",
-  "manifest_sha256": "eca189cc03f5d093d5c5860e18e29ff5c092bfd96a94b7b5678cb2a705cc8361",
+  "generated_at": "2026-08-05 13:34:01 UTC",
+  "manifest_sha256": "f687623fb1da70da5297c763d4f2c5efabd6988dd33a864bc6ed5efc9e9885d9",
   "problems": [],
   "qc_statuses": {
     "cbzp_bridge": {
@@ -3057,13 +3057,15 @@
     "branch": "codex/pipeline-audit-closure-2026-08-05",
     "dirty": false,
     "dirty_including_seal_outputs": true,
-    "head": "5d91c5f59bc27ec786072feb4d7e1174f847d255",
+    "head": "1e1597f7df67f1403af156b7cfaa1c83c76561e8",
     "pipeline_control_sha256": "99df2e064eeffd8862bbf587c737553c178d7994749a2a92b85637bdce40fd42",
     "source_tree_sha256": "4bd5fcbb145c4abcaa50a2cf7869f633734f59512455db8d8bcd488b581069c0",
     "staged_diff_paths": [],
     "status_porcelain": [],
     "status_porcelain_all": [
+      " M docs/RELEASE_CANDIDATE_CHECKLIST.md",
       " M docs/RELEASE_RUN_MANIFEST.md",
+      " M platform/release_candidate/release_candidate_status.json",
       " M platform/release_run_manifest/release_run_manifest.json"
     ],
     "status_porcelain_sha256": "",
