@@ -896,6 +896,7 @@ def build_stages(manifest, engine_root=None, relocate=False):
         stages.append({"name": s["name"],
                        "cmd": _stage_cmd(s["script"], s.get("runner", "logrx"),
                                          engine_root, relocate, s.get("engine", False)),
+                       "script": s["script"],
                        "parallel": False, "gated": bool(s.get("gated"))})
     for d in manifest["datasets"]:
         label = d.get("val_stage", f"R {d['name'].upper()} Validation")
@@ -910,10 +911,79 @@ def build_stages(manifest, engine_root=None, relocate=False):
         stages.append({"name": s["name"],
                        "cmd": _stage_cmd(s["script"], s.get("runner", "logrx"),
                                          engine_root, relocate, s.get("engine", False)),
+                       "script": s["script"],
                        "parallel": False, "gated": bool(s.get("gated"))})
     for i, s in enumerate(stages, 1):
         s["id"] = i
     return stages
+
+
+IMPLEMENTED_GATES = {
+    "Governance Scope Lock (G00)",
+    "Analysis Specification Lock (G02)",
+    "Cross-Language Audit Reconcile",
+    "Admiral Core Reconciliation",
+    "Efficacy & Safety TFL Suite Compilation",
+    "Numerical Results Reconciliation (SAS vs R)",
+    "Reviewer Package Lock (G07)",
+}
+
+
+def validate_pipeline_dag(manifest, engine_root=None, relocate=False):
+    """Validate manifest-to-executor wiring without running clinical stages.
+
+    This is intentionally data-free: it checks that the manifest's declared order,
+    scripts, parallel fan-out, and name-keyed QC gates are all represented in the
+    stage list consumed by both ``--validate-dag`` and ``execute_pipeline``.
+    """
+    if not isinstance(manifest, dict):
+        return [], ["study manifest is not a mapping"]
+    try:
+        stages = build_stages(manifest, engine_root, relocate)
+    except (KeyError, TypeError) as exc:
+        return [], [f"manifest cannot build stages: {exc}"]
+
+    infra = manifest.get("infrastructure_stages", {}) or {}
+    expected = [s["name"] for s in infra.get("pre", []) or []]
+    expected.extend(
+        str(d.get("val_stage") or f"R {str(d['name']).upper()} Validation")
+        for d in manifest.get("datasets", []) or []
+        if d.get("name")
+    )
+    expected.append("SAS Production (ODA/Real/Simulated)")
+    expected.extend(s["name"] for s in infra.get("post", []) or [])
+
+    problems = []
+    actual = [s.get("name") for s in stages]
+    if actual != expected:
+        problems.append("built stage order/names do not match config/study_manifest.yaml")
+    ids = [s.get("id") for s in stages]
+    if ids != list(range(1, len(stages) + 1)):
+        problems.append("stage IDs are not contiguous and 1-based")
+    if len(actual) != len(set(actual)):
+        problems.append("stage names are not unique")
+
+    base = os.path.abspath(os.getcwd())
+    for stage in stages:
+        if stage.get("cmd") == "SIMULATE":
+            continue
+        script = stage.get("script")
+        if not script:
+            problems.append(f"{stage.get('name')}: stage has no declared script")
+            continue
+        script_root = engine_root if (stage.get("name") and relocate and engine_root
+                                      and script.startswith("platform/")) else base
+        script_path = os.path.join(script_root, script)
+        if not os.path.isfile(script_path):
+            problems.append(f"{stage.get('name')}: script missing: {script}")
+
+    unimplemented = {s["name"] for s in stages if s.get("gated")} - IMPLEMENTED_GATES
+    if unimplemented:
+        problems.append(f"gated stages have no executor gate: {sorted(unimplemented)}")
+    gated_parallel = sorted(s["name"] for s in stages if s.get("gated") and s.get("parallel"))
+    if gated_parallel:
+        problems.append(f"gated stages cannot be parallelized: {gated_parallel}")
+    return stages, problems
 
 
 def run_parallel_batch(batch, from_stage, sas_mode, results, expected_stage_names=None):
@@ -981,6 +1051,12 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
         print("  [ERROR] config/study_manifest.yaml could not be loaded; cannot build the pipeline DAG.")
         sys.exit(1)
     stages = build_stages(_MANIFEST, _ENGINE_ROOT, _RELOCATE_ENGINE)
+    _, dag_problems = validate_pipeline_dag(_MANIFEST, _ENGINE_ROOT, _RELOCATE_ENGINE)
+    if dag_problems:
+        print("  [DAG FAILED] Manifest-to-executor validation failed:")
+        for problem in dag_problems:
+            print(f"    - {problem}")
+        sys.exit(1)
 
     # M-1: a stale SAS analysis-stats file must not pollute a non-ODA run's results
     # reconciliation; it is (re)produced only by a real ODA Stage-10 execution. Compared
@@ -1044,15 +1120,7 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
     # study with no TFL/results-recon), so the check is: fail loudly if the manifest marks
     # a stage `gated` that the engine has NO gate logic for — a rename/typo that would
     # otherwise run silently ungated (the C-3 regression class).
-    implemented_gates = {
-        "Governance Scope Lock (G00)",
-        "Analysis Specification Lock (G02)",
-        "Cross-Language Audit Reconcile",
-        "Admiral Core Reconciliation",
-        "Efficacy & Safety TFL Suite Compilation",
-        "Numerical Results Reconciliation (SAS vs R)",
-        "Reviewer Package Lock (G07)",
-    }
+    implemented_gates = IMPLEMENTED_GATES
     unimplemented_gates = {s["name"] for s in stages if s.get("gated")} - implemented_gates
     if unimplemented_gates:
         raise RuntimeError(
@@ -1549,6 +1617,7 @@ def main():
     parser.add_argument("--real-sas", action="store_true", help="Run REAL SAS 9.4 this session (local engine if present, else ODA via SASPy). Errors if no engine is available.")
     parser.add_argument("--use-cached-sas", action="store_true", help="Reconcile against pre-existing *_prod.xpt WITHOUT re-running SAS (re-verifies a prior SAS run).")
     parser.add_argument("--demo", action="store_true", help="Run self-contained demo smoke test (tests/smoke_test.R).")
+    parser.add_argument("--validate-dag", action="store_true", help="Validate manifest-to-executor DAG wiring without running clinical stages.")
     parser.add_argument("--serial", action="store_true", help="Run stages serially rather than parallelizing Stages 4-8.")
     parser.add_argument("--force-upload-sdtm", action="store_true", help="ODA only: force a full re-upload of the ~200 MB SDTM source (default uploads only missing/changed files). Use after a source-data refresh.")
     parser.add_argument("--seed-if-needed", action="store_true", help="ODA only: seed the SDTM library inline within the Stage-10 session if it is not already resident (single ODA spawn for seed+run). Delta-aware: a resident library costs only a manifest check.")
@@ -1560,8 +1629,24 @@ def main():
         dry_run()
     elif args.rollback:
         rollback()
+    elif args.validate_dag:
+        stages, problems = validate_pipeline_dag(_MANIFEST, _ENGINE_ROOT, _RELOCATE_ENGINE)
+        print("=== PIPELINE MANIFEST DAG VALIDATION ===")
+        print(f"stages: {len(stages)}")
+        if problems:
+            for problem in problems:
+                print(f"FAIL: {problem}")
+            sys.exit(1)
+        print("PASS: manifest order, scripts, gate wiring, and parallel boundaries are valid")
+        sys.exit(0)
     elif args.demo:
         print("=== RUNNING SELF-CONTAINED DEMO (SMOKE TEST) ===")
+        stages, problems = validate_pipeline_dag(_MANIFEST, _ENGINE_ROOT, _RELOCATE_ENGINE)
+        if problems:
+            for problem in problems:
+                print(f"ERROR: {problem}")
+            sys.exit(1)
+        print(f"Manifest DAG validated ({len(stages)} stages); running data-free smoke tests.")
         for label, script in (("reconciliation engine", "tests/smoke_test.R"),
                               ("TFL survival-stats snapshot", "tests/test_tfl_stats.R")):
             print(f"--- demo: {label} ({script}) ---")

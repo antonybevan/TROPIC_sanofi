@@ -44,9 +44,9 @@ The release is valid only at a commit where:
 5. F-043 is resolved: abort telemetry now preserves the complete manifest stage
    map and reports `partial_dag` with `stages_not_run` for truncated runs; the
    historical failed-run record is retained.
-6. Release identity is explicit. `v0.2.0-portfolio` and `v0.1.0-demo-rc.1`
-   remain immutable predecessors; this note and the current seal belong to the
-   successor `v0.2.1-portfolio` tag.
+6. Release identity is explicit. `v0.2.1-portfolio` remains immutable at its
+   original tag; the post-release pipeline-integrity and governance closure is
+   recorded by the successor `v0.2.2-portfolio` note. No prior tag is moved.
 
 ## Evidence anchors
 
@@ -84,5 +84,6 @@ python3 platform/define_arm_contract.py
 python3 -m pytest -q
 ```
 
-The annotated tag `v0.2.1-portfolio` is created only after the merged PR head,
-release seal, and CI checks pass. The predecessor tags are not moved.
+The annotated tag `v0.2.1-portfolio` remains an immutable historical release.
+The subsequent governance-hardening release is `v0.2.2-portfolio`; predecessor
+tags are not moved.

@@ -22,6 +22,15 @@ SEAL_SELF_PATH_PREFIXES = (
     "06_qc_evidence/audit/output_hash_binding.csv",
 )
 
+ARTIFACT_GROUPS = (
+    "qc_files",
+    "tfl_outputs",
+    "package_files",
+    "additive_outputs",
+    "inputs",
+    "logs",
+)
+
 
 def load(rel: str):
     path = ROOT / rel
@@ -87,12 +96,15 @@ def manifest_sha256(manifest: dict) -> str:
 def sealed_source_problems(manifest: dict) -> list[str]:
     """Return changed/missing source files recorded by the release seal.
 
-    Only controls and programs are checked: those are versioned source available in a
-    bare clone. Data-bearing and runtime artifact groups are deliberately excluded.
+    Controls, programs, and pipeline controls are checked. Data-bearing and runtime
+    artifact groups are checked separately because a data-free CI checkout may not
+    contain ignored XPTs/logs.
     """
     problems = []
     artifacts = manifest.get("artifacts") or {}
-    for group in ("controls", "programs"):
+    for group in ("controls", "programs", "pipeline_controls"):
+        if group == "pipeline_controls" and group not in artifacts:
+            continue
         for row in artifacts.get(group) or []:
             rel = row.get("path")
             expected = row.get("sha256")
@@ -105,6 +117,103 @@ def sealed_source_problems(manifest: dict) -> list[str]:
             elif sha256(path) != expected:
                 problems.append(rel)
     return problems
+
+
+def _git_tracked(rel: str) -> bool:
+    """Return whether a missing path is versioned in the current checkout."""
+    try:
+        subprocess.check_output(
+            ["git", "ls-files", "--error-unmatch", "--", rel],
+            cwd=ROOT,
+            text=True,
+            stderr=subprocess.DEVNULL,
+        )
+        return True
+    except (OSError, subprocess.CalledProcessError):
+        return False
+
+
+def _safe_path(rel: str) -> Path | None:
+    """Resolve a manifest path without allowing it to escape the repository root."""
+    candidate = (ROOT / rel).resolve()
+    root = ROOT.resolve()
+    if candidate != root and root not in candidate.parents:
+        return None
+    return candidate
+
+
+def sealed_artifact_problems(manifest: dict) -> tuple[list[str], int, int]:
+    """Rehash sealed runtime artifacts that are present in this checkout.
+
+    A clean CI checkout intentionally omits ignored patient-level XPTs and some
+    package payloads. Missing untracked rows are therefore reported as skipped,
+    while every present row is always rehashed and every missing tracked row fails.
+    This catches post-seal edits to both tracked and ignored artifacts.
+    """
+    artifacts = manifest.get("artifacts") or {}
+    problems: list[str] = []
+    verified = 0
+    skipped = 0
+    for group in ARTIFACT_GROUPS:
+        if group not in artifacts:
+            problems.append(f"{group}: artifact group missing from release seal")
+            continue
+        for row in artifacts.get(group) or []:
+            rel = row.get("path")
+            expected = row.get("sha256")
+            if not rel or not expected:
+                # Dataset rows can legitimately carry present=false/sha256="";
+                # runtime artifact rows cannot.
+                if row.get("present") is not False:
+                    problems.append(f"{group}: invalid seal entry {row!r}")
+                continue
+            path = _safe_path(rel)
+            if path is None:
+                problems.append(f"{group}:{rel}: path escapes repository root")
+                continue
+            if not path.is_file():
+                if _git_tracked(rel):
+                    problems.append(f"{group}:{rel}: tracked artifact missing")
+                else:
+                    skipped += 1
+                continue
+            actual = sha256(path)
+            if actual != expected:
+                problems.append(f"{group}:{rel}: sha256 mismatch")
+            else:
+                verified += 1
+
+    for dataset in manifest.get("datasets") or []:
+        ds = dataset.get("dataset", "?")
+        for label in ("prod", "validation", "package_copy", "sequence_copy"):
+            row = dataset.get(label) or {}
+            rel = row.get("path")
+            expected = row.get("sha256")
+            if not rel or not expected:
+                continue
+            path = _safe_path(rel)
+            if path is None:
+                problems.append(f"datasets:{ds}:{label}: path escapes repository root")
+            elif not path.is_file():
+                if _git_tracked(rel):
+                    problems.append(f"datasets:{ds}:{label}: tracked artifact missing")
+                else:
+                    skipped += 1
+            elif sha256(path) != expected:
+                problems.append(f"datasets:{ds}:{label}: sha256 mismatch")
+            else:
+                verified += 1
+    return problems, verified, skipped
+
+
+def rows_sha256(rows: list[dict]) -> str:
+    """Digest a sealed path/hash row list in the same canonical form as the builder."""
+    encoded = "\n".join(
+        f"{row.get('path')}\0{row.get('sha256')}"
+        for row in sorted(rows, key=lambda item: (item.get("path", ""), item.get("sha256", "")))
+        if row.get("sha256")
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
 
 
 def source_tree_sha256(manifest: dict) -> str:
@@ -146,7 +255,8 @@ def main() -> int:
     add("health.full_dag", h.get("run_scope") == "full_dag", str(h.get("run_scope")))
     add(
         "health.full_stage_count",
-        # Phase-2 DAG is 33 stages (G00/G02/G07 + prior 30). Accept >=30 for forward/back compat.
+        # The exact stage-set check below is bound to the release manifest. Keep this
+        # count check as a readable health-snapshot sanity check as well.
         int(h.get("stages_expected") or 0) >= 30 and len(stages) >= 30
         and int(h.get("stages_expected") or 0) == len(stages),
         f"expected={h.get('stages_expected')} n={len(stages)}",
@@ -155,6 +265,15 @@ def main() -> int:
     non_pass = [k for k, v in stages.items() if v not in {"PASS", "SKIPPED"}]
     add("health.all_pass_or_skip", not non_pass, str(non_pass[:8]))
     add("health.provenance", (h.get("provenance_guard") or {}).get("passed") is True, "")
+    governance_reseal = h.get("governance_only_reseal") or {}
+    if governance_reseal:
+        add(
+            "health.governance_only_reseal",
+            governance_reseal.get("status") == "PASS"
+            and governance_reseal.get("clinical_run_was_not_reexecuted") is True
+            and governance_reseal.get("rebound_source_tree_sha256") == h.get("source_tree_sha256"),
+            "governance-only rebind disclosure is incomplete",
+        )
 
     r = load("platform/reconciliation_status.json") or {}
     add("recon.PASS", r.get("overall") == "PASS", str(r.get("overall")))
@@ -202,6 +321,36 @@ def main() -> int:
     source_problems = sealed_source_problems(rm) if rm else ["release manifest missing"]
     add("release_manifest.source_hashes", not source_problems,
         ", ".join(source_problems[:8]) + (" ..." if len(source_problems) > 8 else ""))
+    expected_stage_names = (rm.get("run_completeness") or {}).get("expected_stage_names") or []
+    actual_stage_names = list(stages)
+    add(
+        "release_manifest.stage_set_matches",
+        bool(expected_stage_names)
+        and len(actual_stage_names) == len(expected_stage_names)
+        and set(actual_stage_names) == set(expected_stage_names),
+        f"health={len(actual_stage_names)} manifest={len(expected_stage_names)}",
+    )
+    artifact_problems, verified_artifacts, skipped_artifacts = (
+        sealed_artifact_problems(rm) if rm else (["release manifest missing"], 0, 0)
+    )
+    add(
+        "release_manifest.artifact_hashes",
+        not artifact_problems,
+        "; ".join(artifact_problems[:8])
+        + (" ..." if len(artifact_problems) > 8 else "")
+        + f" (verified={verified_artifacts}, optional_missing={skipped_artifacts})",
+    )
+    pipeline_rows = (rm.get("artifacts") or {}).get("pipeline_controls") if rm else None
+    expected_pipeline_digest = (rm.get("source_control") or {}).get("pipeline_control_sha256")
+    pipeline_digest = rows_sha256(pipeline_rows or [])
+    add(
+        "release_manifest.pipeline_controls",
+        bool(pipeline_rows)
+        and not any(p.startswith("pipeline_controls:") for p in source_problems)
+        and bool(expected_pipeline_digest)
+        and pipeline_digest == expected_pipeline_digest,
+        "pipeline CI/control files are not bound to the release seal",
+    )
     add("release_manifest.PASS", rm.get("status") == "PASS", str(rm.get("status")))
     add(
         "release_manifest.grade",

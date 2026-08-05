@@ -70,6 +70,72 @@ class TestReleaseSealHelpers(unittest.TestCase):
         # recomputation is deterministic for an unchanged checkout
         self.assertEqual(d_after, verify_release.source_tree_sha256(manifest))
 
+    def test_artifact_hash_recheck_detects_present_drift(self):
+        artifact = verify_release.ROOT / "05_outputs" / "table.csv"
+        artifact.parent.mkdir(parents=True, exist_ok=True)
+        artifact.write_text("a,b\n1,2\n", encoding="utf-8")
+        manifest = {
+            "artifacts": {
+                "qc_files": [{
+                    "path": "05_outputs/table.csv",
+                    "present": True,
+                    "sha256": verify_release.sha256(artifact),
+                }],
+                "tfl_outputs": [],
+                "package_files": [],
+                "additive_outputs": [],
+                "inputs": [],
+                "logs": [],
+            },
+            "datasets": [],
+        }
+        problems, verified, skipped = verify_release.sealed_artifact_problems(manifest)
+        self.assertEqual([], problems)
+        self.assertEqual((1, 0), (verified, skipped))
+        artifact.write_text("a,b\n9,9\n", encoding="utf-8")
+        problems, _, _ = verify_release.sealed_artifact_problems(manifest)
+        self.assertIn("qc_files:05_outputs/table.csv: sha256 mismatch", problems)
+
+    def test_artifact_hash_recheck_allows_missing_untracked_data_row(self):
+        manifest = {
+            "artifacts": {
+                "qc_files": [{
+                    "path": "04_analysis_datasets/adam/adsl_prod.xpt",
+                    "present": True,
+                    "sha256": "a" * 64,
+                }],
+                "tfl_outputs": [],
+                "package_files": [],
+                "additive_outputs": [],
+                "inputs": [],
+                "logs": [],
+            },
+            "datasets": [],
+        }
+        problems, verified, skipped = verify_release.sealed_artifact_problems(manifest)
+        self.assertEqual([], problems)
+        self.assertEqual((0, 1), (verified, skipped))
+
+    def test_artifact_hash_recheck_rejects_missing_tracked_row(self):
+        manifest = {
+            "artifacts": {
+                "qc_files": [{
+                    "path": "tracked.csv",
+                    "present": True,
+                    "sha256": "b" * 64,
+                }],
+                "tfl_outputs": [],
+                "package_files": [],
+                "additive_outputs": [],
+                "inputs": [],
+                "logs": [],
+            },
+            "datasets": [],
+        }
+        with patch.object(verify_release, "_git_tracked", return_value=True):
+            problems, _, _ = verify_release.sealed_artifact_problems(manifest)
+        self.assertIn("qc_files:tracked.csv: tracked artifact missing", problems)
+
     def test_material_worktree_clean_ignores_release_seal_outputs(self):
         with patch.object(verify_release.subprocess, "check_output", return_value=""):
             self.assertTrue(verify_release.git_material_worktree_clean())

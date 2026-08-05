@@ -9,6 +9,6 @@
 # accidental `git add` of a secret regardless of path or filename.
 repos:
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.18.4
+    rev: 02808f45d038526bfcceebcbf6421c1047997ff9  # v8.18.4
     hooks:
       - id: gitleaks
