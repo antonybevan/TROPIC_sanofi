@@ -110,7 +110,14 @@ Committed under `06_qc_evidence/audit/run_records/2026-08-05-live-sas-isolated-r
 `reconciliation_status.json`, `admiral_reconciliation_status.json`,
 `results_reconciliation_status.json`, `forest_reconciliation_status.json`,
 `figure_data_reconciliation_status.json`, `cbzp_bridge_status.json`, `oda_status.json`,
-`stage_cache.json`, `oda_master_driver.log`, `oda_tfl.log`.
+`stage_cache.json`.
+
+The raw ODA SAS session logs (`oda_master_driver.log`, `oda_tfl.log`, 2026-08-05) are
+retained as local copies in the same directory and in the audit worktree
+(`/private/tmp/tropic-release-audit-e260/04_analysis_datasets/programs/sas/`) but are
+**excluded from git per the repo's `*.log` policy** (`.gitignore:73`); the log-derived
+evidence (`pipeline_health.json`, `pipeline_health_log.jsonl`, `oda_status.json`) is
+committed in their place.
 
 ## Exit
 
