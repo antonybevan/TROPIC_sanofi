@@ -1692,11 +1692,11 @@
         "size_bytes": 106
       },
       {
-        "md5": "a1cc3773001c78aa8bbdf73758cec814",
+        "md5": "042060724b4a5c674dfecf1d8b87f266",
         "path": ".github/workflows/ci.yml",
         "present": true,
-        "sha256": "07d2b0ce1ed19dca80406fc1c2f6affa3a3d53146185edc742922b59859470c0",
-        "size_bytes": 12783
+        "sha256": "30c8bcaff0092c000dc3db174303469a980593daae706f5df55b0a38d0cb532c",
+        "size_bytes": 12874
       },
       {
         "md5": "6751e3974d3e000a451141344a5b220e",
@@ -2853,8 +2853,8 @@
     "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007"
   },
   "evidence_grade": "release_candidate",
-  "generated_at": "2026-08-05 13:34:01 UTC",
-  "manifest_sha256": "f687623fb1da70da5297c763d4f2c5efabd6988dd33a864bc6ed5efc9e9885d9",
+  "generated_at": "2026-08-05 13:38:48 UTC",
+  "manifest_sha256": "03e61e26b73281fa9f2343fa4be2bda1ca024d3a92487fadc98d327cb116a78b",
   "problems": [],
   "qc_statuses": {
     "cbzp_bridge": {
@@ -3056,18 +3056,13 @@
   "source_control": {
     "branch": "codex/pipeline-audit-closure-2026-08-05",
     "dirty": false,
-    "dirty_including_seal_outputs": true,
-    "head": "1e1597f7df67f1403af156b7cfaa1c83c76561e8",
-    "pipeline_control_sha256": "99df2e064eeffd8862bbf587c737553c178d7994749a2a92b85637bdce40fd42",
+    "dirty_including_seal_outputs": false,
+    "head": "6d5742adabe5a7e0860ad9c092cabb4cbdaedc66",
+    "pipeline_control_sha256": "efb689d641d84c7f5b3b0a56885d6b848bdba370acea59d62a1ed06fc643a825",
     "source_tree_sha256": "4bd5fcbb145c4abcaa50a2cf7869f633734f59512455db8d8bcd488b581069c0",
     "staged_diff_paths": [],
     "status_porcelain": [],
-    "status_porcelain_all": [
-      " M docs/RELEASE_CANDIDATE_CHECKLIST.md",
-      " M docs/RELEASE_RUN_MANIFEST.md",
-      " M platform/release_candidate/release_candidate_status.json",
-      " M platform/release_run_manifest/release_run_manifest.json"
-    ],
+    "status_porcelain_all": [],
     "status_porcelain_sha256": "",
     "tracked_diff_paths": []
   },
