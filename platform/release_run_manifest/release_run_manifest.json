@@ -2582,9 +2582,9 @@
     "sas_version": "9.04.01M8P022223",
     "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007"
   },
-  "evidence_grade": "remediation_partial_or_dirty",
-  "generated_at": "2026-08-05 05:55:39 UTC",
-  "manifest_sha256": "33bf77733081a9108386744da24c96313fefe9f81d1331f14f1fe958d7db3e94",
+  "evidence_grade": "release_candidate",
+  "generated_at": "2026-08-05 05:57:11 UTC",
+  "manifest_sha256": "e8c0136b04cecb468340073f5dddc7979851f793a8b1bdc1f1d91f88f519d171",
   "problems": [],
   "qc_statuses": {
     "cbzp_bridge": {
@@ -2696,9 +2696,7 @@
       "status": "PASS"
     }
   },
-  "remediation_reasons": [
-    "git worktree is dirty (9 porcelain entries); release-candidate lock requires a clean committed state"
-  ],
+  "remediation_reasons": [],
   "run_completeness": {
     "failed": [],
     "health_run_scope": "full_dag",
@@ -2751,46 +2749,20 @@
   },
   "source_control": {
     "branch": "codex/complete-pipeline-audit-2026-08-05",
-    "dirty": true,
+    "dirty": false,
     "dirty_including_seal_outputs": true,
-    "head": "e260ad439232ca63af4ddeec8cfdb8b8c1c043ac",
+    "head": "79d868cfe2ebbad36ceadddeaaac73aac9651e93",
     "source_tree_sha256": "fe78f9d639935acdffdb1501134806cd98011f1fa9fbcff2fb2658c5350792ba",
     "staged_diff_paths": [],
-    "status_porcelain": [
-      " M 05_outputs/ars/tropic_ard.csv",
-      " M 06_qc_evidence/gates/g00_governance_status.json",
-      " M 06_qc_evidence/gates/g02_specification_status.json",
-      " M 06_qc_evidence/gates/g07_reviewer_package_status.json",
-      " M 08_submission_package/ectd/0000/index-md5.txt",
-      " M 08_submission_package/ectd/0000/index.xml",
-      " M platform/admiral_reconciliation_status.json",
-      " M platform/log_cleanliness/log_cleanliness_status.json",
-      " M platform/pipeline_health.json"
-    ],
+    "status_porcelain": [],
     "status_porcelain_all": [
-      " M 05_outputs/ars/tropic_ard.csv",
-      " M 06_qc_evidence/gates/g00_governance_status.json",
-      " M 06_qc_evidence/gates/g02_specification_status.json",
-      " M 06_qc_evidence/gates/g07_reviewer_package_status.json",
-      " M 08_submission_package/ectd/0000/index-md5.txt",
-      " M 08_submission_package/ectd/0000/index.xml",
+      " M docs/RELEASE_CANDIDATE_CHECKLIST.md",
       " M docs/RELEASE_RUN_MANIFEST.md",
-      " M platform/admiral_reconciliation_status.json",
-      " M platform/log_cleanliness/log_cleanliness_status.json",
-      " M platform/pipeline_health.json",
+      " M platform/release_candidate/release_candidate_status.json",
       " M platform/release_run_manifest/release_run_manifest.json"
     ],
-    "status_porcelain_sha256": "d0ad60d6cddcbd0d9f28bee21a4e36ceec600bea770fd49e22d513b03dbab55c",
-    "tracked_diff_paths": [
-      "06_qc_evidence/gates/g00_governance_status.json",
-      "06_qc_evidence/gates/g02_specification_status.json",
-      "06_qc_evidence/gates/g07_reviewer_package_status.json",
-      "08_submission_package/ectd/0000/index-md5.txt",
-      "08_submission_package/ectd/0000/index.xml",
-      "platform/admiral_reconciliation_status.json",
-      "platform/log_cleanliness/log_cleanliness_status.json",
-      "platform/pipeline_health.json"
-    ]
+    "status_porcelain_sha256": "",
+    "tracked_diff_paths": []
   },
-  "status": "REMEDIATION"
+  "status": "PASS"
 }
