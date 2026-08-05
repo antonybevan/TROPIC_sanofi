@@ -1,6 +1,6 @@
 # TROPIC Release-Candidate Checklist
 
-Generated: 2026-08-05 13:51:48 UTC
+Generated: 2026-08-05 13:52:02 UTC
 
 > Strict go/no-go checklist for the current working evidence set. This report is intentionally conservative and does not convert historical evidence into current release readiness.
 
