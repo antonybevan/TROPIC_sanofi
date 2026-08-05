@@ -1,12 +1,14 @@
 # TROPIC Findings Disposition Board
 
-**Date:** 2026-08-03
+**Date:** 2026-08-05
 **Product claim:** Controlled **non-submission demonstration** programming pipeline  
 **Authority:** SAP v4.0 locked for remediation (`06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md`); not sponsor-approved for filing  
 
 > Purpose: classify every active Critical/Major finding before and after a full ODA seal run, so the DAG proves a stable release scope rather than rediscovering open science/scope debt.
 
 > **2026-08-03 remediation update:** The corrected full real-SAS DAG completed 34/34 stages GREEN. F-011 now excludes the one ADSL fallback baseline PSA (MP 61/329; CbzP 145/361). Section 3 corrected TTUMOR death-milestone censoring, PFS last-evaluable/no-post-baseline censoring, and ADTTE composite event labels. The PFS pain/supporting-disease and palliative-RT decision remains an explicitly accepted Path A residual. F-012 remains an explicit non-submission demonstration limit: combined N=749 is not protocol ITT N=755.
+
+> **2026-08-05 control update:** F-042’s register row is synchronized with the implemented/sealed Path A state and the GOV-STAT-01 closure. F-043 records and remediates the abort-path telemetry defect that could label a truncated RED run as `full_dag`; the historical run record remains unchanged as evidence.
 
 ## Disposition classes
 
@@ -41,13 +43,14 @@
 | **F-025** | Major | `non_submission_demo_limit` | **ACCEPTED** (was UNVERIFIED) | Hash seals ≠ Part 11. Product is explicitly non-Part-11 until org CSV program exists. |
 | **F-040** | Major | `resolve_now` | **RESOLVED** | ADTTE TTUMOR censoring now excludes DS death milestones and baseline-only records; final output has zero death-date TTUMOR censors. Evidence: `SECTION_03_ADAM_DERIVATION_AUDIT_2026-08-03.md`. |
 | **F-041** | Major | `resolve_now` | **RESOLVED** | PFS now uses the latest valid post-baseline RECIST/PSA/evaluable-pain assessment, or randomization when none exists; NACT remains priority. SAS/R/admiral agree after the final 34-stage run. |
-| **F-042** | Major | `scope_out_with_disclosure` | **IMPLEMENTED FOR PATH A; EXTERNAL REVIEW REQUIRED** | Antony Bevan adopted ED-01–ED-07 on 2026-08-04. Separate SAS/R implementations now apply the corrected component-specific pain rule, CM+PR union, diary/RT sensitivities, TTUMOR ITT primary and SAP-native T-11 mapping, with aggregate source-lineage evidence and internal parity. Full 34-stage rerun/reseal and external qualified statistical/medical review remain required; this is not sponsor, medical, independent, or regulated approval. |
+| **F-042** | Major | `scope_out_with_disclosure` | **IMPLEMENTED FOR PATH A; EXTERNAL REVIEW REQUIRED** | Antony Bevan adopted ED-01–ED-07 on 2026-08-04. Separate SAS/R implementations now apply the corrected component-specific pain rule, CM+PR union, diary/RT sensitivities, TTUMOR ITT primary and SAP-native T-11 mapping; the exact subject-level `F042_PAIN_RESPONSE` gate passes 43 records/43 subjects on the current sealed run, with GOV-STAT-01 remediated. Full 34-stage rerun/reseal is complete; external qualified statistical/medical review remains required. This is not sponsor, medical, independent, or regulated approval. |
 
 ## Minor (not RC Crit/Major gate)
 
 | ID | Decision |
 |---|---|
 | **F-024** | Keep CONFIRMED as living orphan register hygiene; not a G06 Crit/Major blocker. |
+| **F-043** | **RESOLVED** — abort telemetry now binds the complete manifest stage map in serial and parallel failure paths; historical truncated-run evidence is retained and future failures must report `partial_dag` with `stages_not_run`. |
 
 ## Release-candidate implication
 

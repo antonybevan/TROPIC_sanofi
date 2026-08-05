@@ -1,6 +1,6 @@
 # TROPIC Release-Run Manifest
 
-Generated: 2026-08-05 05:57:11 UTC
+Generated: 2026-08-05 08:13:14 UTC
 
 > Hash-sealed run manifest for current artifacts. This is not an electronic signature or Part 11 attestation.
 
@@ -8,11 +8,11 @@ Generated: 2026-08-05 05:57:11 UTC
 
 - Status: `PASS`
 - Evidence grade: `release_candidate`
-- Manifest SHA-256 seal: `e8c0136b04cecb468340073f5dddc7979851f793a8b1bdc1f1d91f88f519d171`
+- Manifest SHA-256 seal: `34712045d345636a1d17eed49111960117f6f2729b963d1d0c12631d8bc2192c`
 - SAS execution mode: `oda`
 - Pipeline health: `GREEN`
 - Run scope: `full_dag` (34 recorded / 33 release-required upstream stages)
-- Git HEAD: `79d868cfe2ebbad36ceadddeaaac73aac9651e93`
+- Git HEAD: `a8c7b5b51a1cc72935392571e6b0ca7793cc9fad`
 - Worktree dirty: `False`
 - SAS companion figures: `in_dag_real_sas_companion`; current with health=`True`
 
@@ -30,14 +30,14 @@ No release-run binding problems detected.
 
 | Dataset | Prod MD5 | Validation MD5 | Distinct | Package match | Sequence match |
 | --- | --- | --- | --- | --- | --- |
-| ADSL | 4f6bfe5d4541f056b324f7790ec364f1 | 184fdb1b02100c302667b4072f5338b6 | yes | yes | yes |
-| ADEX | fb331cf2055d24c38da183bd8d67ca89 | 447ede5569149d092e192eca6afc5119 | yes | yes | yes |
-| ADCM | 1ab6884ab20f24091b17842861ee03f4 | 144cc515c2aa587c567e7d2de34e4fa9 | yes | yes | yes |
-| ADAE | 805bdc3192815fdbd589177c16c040a5 | d7b0978722c980609102753f845712fb | yes | yes | yes |
-| ADLB | 55124dea1735021ed4cae6b217208fe3 | ccd9e742ba1ed939fd8a6cf1d9d878b3 | yes | yes | yes |
-| ADRS | a00593d45faa6c44921ee0c79bab9ee4 | d8840b56079a9c6b49aee506c39297d4 | yes | yes | yes |
-| ADTTE | 481b18a9e5f6bf77888016366b991f4f | efc667968eb7df0e866cdf7bf66fc56a | yes | yes | yes |
-| CLINSITE | ed7bc6c6216381887a170591dacf2b62 | d772cd135ff47c265b54ec3a9568e17f | yes | yes | yes |
+| ADSL | 7b377eeaca0df74137f5c90344322222 | 5861d7d910e7a9d5c709d503e7cf580d | yes | yes | yes |
+| ADEX | b5e7d260fa156d83db35572969ae27da | 242781c69a93282a2c519b14ea34f42d | yes | yes | yes |
+| ADCM | 6661643b41b4b4f459ba074b08d0f0d9 | 2e886869e4c3221626cc9b5e08bb8b9d | yes | yes | yes |
+| ADAE | 3b802a8d60c1af45ab4856b3e5e55563 | f6949aecccba8ec86fef6ba8d40342f2 | yes | yes | yes |
+| ADLB | 59e20c9d97af131fdc5154f8a5775eba | f1d1d7baddb62f082a66d6dc49a4a586 | yes | yes | yes |
+| ADRS | 4805b8bc44653faaffbba43a21259036 | c97d1d7ffe36be693041baf7ab70da29 | yes | yes | yes |
+| ADTTE | e18470a2e8c69ae54a4868c3010b0336 | 66a8893625ae27cd4ce3fe0e7646e1a6 | yes | yes | yes |
+| CLINSITE | c399213d187448acb1a823981a5a7432 | 85854edc8bbbffe54a35029966133f1e | yes | yes | yes |
 
 ## QC Verdicts
 

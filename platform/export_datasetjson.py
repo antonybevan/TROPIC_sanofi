@@ -40,6 +40,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as _dt
+import glob
 import json
 import math
 import os
@@ -252,6 +253,29 @@ def _read_dataset_output(path: str, ndjson: bool) -> dict[str, Any]:
         return doc
 
 
+def _prepare_output_dir(out_dir: str, expected_names: list[str], ndjson: bool) -> list[str]:
+    """Make the generated output directory represent exactly this export.
+
+    Dataset-JSON outputs are ignored, regenerated artifacts rather than a source
+    of record.  Earlier runs could leave retired SDTM domains (or the alternate
+    JSON/NDJSON format) beside the current export, which made the directory look
+    like a mixed-version data package.  The selected format is therefore rebuilt
+    as a clean set on every invocation; the other format is removed rather than
+    being mistaken for current evidence.
+    """
+    os.makedirs(out_dir, exist_ok=True)
+    expected = {str(name).lower() for name in expected_names}
+    active_suffix = ".ndjson" if ndjson else ".json"
+    removed: list[str] = []
+    for suffix in (".json", ".ndjson"):
+        for path in glob.glob(os.path.join(out_dir, f"*{suffix}")):
+            stem = os.path.splitext(os.path.basename(path))[0].lower()
+            if suffix != active_suffix or stem not in expected:
+                os.remove(path)
+                removed.append(path)
+    return removed
+
+
 def _reconcile_output(path: str, xpt_path: str, ndjson: bool) -> None:
     out_doc = _read_dataset_output(path, ndjson)
     df, meta = _read_xpt(xpt_path)
@@ -270,7 +294,13 @@ def _reconcile_output(path: str, xpt_path: str, ndjson: bool) -> None:
 
 
 def convert_set(items, out_dir, mdv_oid, meta_ref, schema, ndjson_schema=None):
-    os.makedirs(out_dir, exist_ok=True)
+    removed = _prepare_output_dir(
+        out_dir,
+        [ds_name for _xpt_path, ds_name in items],
+        ndjson=ndjson_schema is not None,
+    )
+    if removed:
+        print(f"  [CLEAN] Removed {len(removed)} stale Dataset-JSON output(s) from {out_dir}.")
     results = []
     for xpt_path, ds_name in items:
         if not os.path.exists(xpt_path):
