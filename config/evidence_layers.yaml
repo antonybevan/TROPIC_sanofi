@@ -164,9 +164,6 @@ layers:
       - glob: "04_analysis_datasets/datasetjson/**/*.json"
         status: generated
         role: "Generated Dataset-JSON metadata and data files."
-      - glob: "04_analysis_datasets/datasetjson/**/*.ndjson"
-        status: generated
-        role: "Generated Dataset-JSON NDJSON payload files."
 
   output:
     objective: "Generate traceable tables, figures, listings, and analysis-results metadata."

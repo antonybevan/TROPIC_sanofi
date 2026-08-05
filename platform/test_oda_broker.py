@@ -124,6 +124,34 @@ class TestStatusPoller(unittest.TestCase):
 
 
 class TestDatasetJsonExporter(unittest.TestCase):
+    def test_prepare_output_dir_removes_retired_domains_and_alternate_format(self):
+        with tempfile.TemporaryDirectory() as td:
+            for name in ("keep.json", "retired.json", "keep.ndjson", "retired.ndjson"):
+                with open(os.path.join(td, name), "w", encoding="utf-8") as f:
+                    f.write("stale")
+
+            removed = DJ._prepare_output_dir(td, ["keep"], ndjson=False)
+
+            self.assertEqual(3, len(removed))
+            self.assertTrue(os.path.exists(os.path.join(td, "keep.json")))
+            self.assertFalse(os.path.exists(os.path.join(td, "retired.json")))
+            self.assertFalse(os.path.exists(os.path.join(td, "keep.ndjson")))
+            self.assertFalse(os.path.exists(os.path.join(td, "retired.ndjson")))
+
+    def test_prepare_output_dir_keeps_only_requested_ndjson_set(self):
+        with tempfile.TemporaryDirectory() as td:
+            for name in ("keep.json", "retired.json", "keep.ndjson", "retired.ndjson"):
+                with open(os.path.join(td, name), "w", encoding="utf-8") as f:
+                    f.write("stale")
+
+            removed = DJ._prepare_output_dir(td, ["keep"], ndjson=True)
+
+            self.assertEqual(3, len(removed))
+            self.assertFalse(os.path.exists(os.path.join(td, "keep.json")))
+            self.assertFalse(os.path.exists(os.path.join(td, "retired.json")))
+            self.assertTrue(os.path.exists(os.path.join(td, "keep.ndjson")))
+            self.assertFalse(os.path.exists(os.path.join(td, "retired.ndjson")))
+
     def test_format_map_uses_pyreadstat_original_variable_types(self):
         meta = type("M", (), {"original_variable_types": {"ADT": "YYMMDD10", "AVAL": None}})()
         self.assertEqual(DJ._format_map(meta, ["ADT", "AVAL"]), {"ADT": "YYMMDD10", "AVAL": ""})

@@ -16,8 +16,8 @@ the validated XPT path.
 
 | Path | Source | Standard metadata |
 |---|---|---|
-| `adam/<name>.json` | `04_analysis_datasets/adam/<name>_prod.xpt` (8 datasets) | `MDV…ADAM.1.3`, `define.xml` |
-| `sdtm/<name>.json` | `08_submission_package/m5/.../tabulations/sdtm/datasets/<name>.xpt` (34 datasets) | `MDV...SDTM.3.4`, `define_sdtm.xml` |
+| `adam/<name>.json` | `04_analysis_datasets/adam/<name>_prod.xpt` (current ADaM set) | `MDV…ADAM.1.3`, `define.xml` |
+| `sdtm/<name>.json` | `08_submission_package/m5/.../tabulations/sdtm/datasets/<name>.xpt` (current uplifted SDTM set) | `MDV...SDTM.3.4`, `define_sdtm.xml` |
 
 ## How it is built
 
@@ -42,10 +42,12 @@ python3 platform/export_datasetjson.py --sdtm   # SDTM only
 
 ## Conformance / QC status
 
-- 42 / 42 datasets schema-**VALID** (Dataset-JSON v1.1.0).
-- Round-trip verified lossless: every file re-read the way CORE's
-  `DatasetJSONReader` reads it, reconciled cell-for-cell against the source XPT
-  (0 mismatches; ADLB checked at 2,122,713 cells). No `NaN`/`Infinity` tokens.
+- Each invocation cleans retired domain files and the alternate JSON/NDJSON
+  format before writing the selected current source set.
+- The run must report every current source dataset as schema-**VALID** and
+  round-trip reconcile it cell-for-cell against its XPT (no mismatches and no
+  `NaN`/`Infinity` tokens). Use `--ndjson` when the streaming variant is needed;
+  it is a separate generated view, not an additional submission layer.
 
 ## Scope notes
 
