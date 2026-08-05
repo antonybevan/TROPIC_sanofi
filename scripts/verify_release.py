@@ -265,6 +265,15 @@ def main() -> int:
     non_pass = [k for k, v in stages.items() if v not in {"PASS", "SKIPPED"}]
     add("health.all_pass_or_skip", not non_pass, str(non_pass[:8]))
     add("health.provenance", (h.get("provenance_guard") or {}).get("passed") is True, "")
+    governance_reseal = h.get("governance_only_reseal") or {}
+    if governance_reseal:
+        add(
+            "health.governance_only_reseal",
+            governance_reseal.get("status") == "PASS"
+            and governance_reseal.get("clinical_run_was_not_reexecuted") is True
+            and governance_reseal.get("rebound_source_tree_sha256") == h.get("source_tree_sha256"),
+            "governance-only rebind disclosure is incomplete",
+        )
 
     r = load("platform/reconciliation_status.json") or {}
     add("recon.PASS", r.get("overall") == "PASS", str(r.get("overall")))

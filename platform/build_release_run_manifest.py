@@ -89,6 +89,7 @@ PIPELINE_CONTROL_FILES = [
     "requirements-ci.txt",
     "requirements-ci.lock",
     "renv.lock",
+    "scripts/rebind_governance_seal.py",
     "scripts/verify_release.py",
 ]
 
@@ -490,6 +491,15 @@ def _binding_problems(payload: dict) -> list[str]:
         problems.append("spec-to-data conformance is not PASS")
     if log_cleanliness.get("status") != "PASS":
         problems.append("log cleanliness gate is not PASS")
+
+    governance_reseal = health.get("governance_only_reseal") or {}
+    if governance_reseal:
+        if governance_reseal.get("status") != "PASS":
+            problems.append("governance-only seal rebind is not PASS")
+        if governance_reseal.get("rebound_source_tree_sha256") != expected_source_tree:
+            problems.append("governance-only seal rebind does not match current source tree")
+        if governance_reseal.get("clinical_run_was_not_reexecuted") is not True:
+            problems.append("governance-only seal rebind lacks its non-rerun disclosure")
 
     pipeline_controls = payload.get("artifacts", {}).get("pipeline_controls") or []
     missing_pipeline_controls = [
