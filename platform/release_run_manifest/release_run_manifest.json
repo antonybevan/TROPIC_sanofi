@@ -750,17 +750,17 @@
     ],
     "package_files": [
       {
-        "md5": "c72fc8a1abd87f431614f4fe6bd43d24",
+        "md5": "a82d0e83057e0e930ba7ce90f680edee",
         "path": "08_submission_package/ectd/0000/index.xml",
         "present": true,
-        "sha256": "00be977befd833aea1a1299856ddb42437027adc8c89a4d6c6619a91fe65acf2",
+        "sha256": "71e7e3050cd0b8b468d0f0ae460e779367fec680ab95ee7666d531fd4395d0a0",
         "size_bytes": 27916
       },
       {
-        "md5": "972db1ff52594f03e8b7a57bb615b519",
+        "md5": "ba2d31406efed5e12310e6efb8095793",
         "path": "08_submission_package/ectd/0000/index-md5.txt",
         "present": true,
-        "sha256": "f548eb48c5c9b81275da09b733fd0ecf596545164bba63fe370c88efdb2c3eab",
+        "sha256": "7746b1d1da706e567ee4822fb5d5c449d96f8b1fd4da872aa529d41c43269d35",
         "size_bytes": 33
       },
       {
@@ -792,25 +792,25 @@
         "size_bytes": 88503
       },
       {
-        "md5": "a1ff9c265a1b6d17ea372c05699bbb6d",
+        "md5": "2c9ec80c412b00ab8eb076aebbce8939",
         "path": "08_submission_package/ectd/0000/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
         "present": true,
-        "sha256": "fcff6c2f43e22e237ecf4986746e7d9f2c793d955f87e13c60398065d8d21f2f",
-        "size_bytes": 11671
+        "sha256": "60adf23ba5d1d2c8a2d13951c9d179ac8033b54e113d6c121851def7846fc1e7",
+        "size_bytes": 11680
       },
       {
-        "md5": "458660f516445c3bebd5c8c3e0f90ff2",
+        "md5": "8ad3c02c4792ef58d7a4a0de8ba75c34",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/adrg.pdf",
         "present": true,
-        "sha256": "bd966728d4d858e2065f628a14bcfdc5f11a3ce4265fa363199627b37bdfdbec",
-        "size_bytes": 33252
+        "sha256": "d956bc9309dd9f5e91396118563ca02a3abccb2fcb63124b87778f7731d656b2",
+        "size_bytes": 33692
       },
       {
-        "md5": "fd999fa17d4aa9d963afbe174e13f00e",
+        "md5": "c181b4a16e3bdfc8bd15b47278540dc8",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
         "present": true,
-        "sha256": "14cb8b2a6ef67ccb8e7c3982462fa16b78207b183cdeaef26a9d24bb7db628b2",
-        "size_bytes": 8067
+        "sha256": "712ac6db621cc21acf391198187210d0ba125f8805abcf8b5bbfb7b4e70bb580",
+        "size_bytes": 8076
       },
       {
         "md5": "0616f5b75d7df476fd78b9005ecf9004",
@@ -820,11 +820,11 @@
         "size_bytes": 3577369
       },
       {
-        "md5": "290c4d5780a90f43aa4dd4df39168a09",
+        "md5": "32156bec272f3cf2fd9546d1856460c4",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/tabulations/sdtm/sdrg.pdf",
         "present": true,
-        "sha256": "eb68fff0fc6ef2c238a7e297906bb5f9dae924d85c1265fbcf1735abdeb383ad",
-        "size_bytes": 16294
+        "sha256": "7e3d3341adcf8d8d1ce16eeda0c575f731916b4c54d2dfef671bc5ab7fc4d143",
+        "size_bytes": 16709
       },
       {
         "md5": "a0c996e92f03f7abe73b6e5fe4045aba",
@@ -1142,25 +1142,25 @@
         "size_bytes": 88503
       },
       {
-        "md5": "a1ff9c265a1b6d17ea372c05699bbb6d",
+        "md5": "2c9ec80c412b00ab8eb076aebbce8939",
         "path": "08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
         "present": true,
-        "sha256": "fcff6c2f43e22e237ecf4986746e7d9f2c793d955f87e13c60398065d8d21f2f",
-        "size_bytes": 11671
+        "sha256": "60adf23ba5d1d2c8a2d13951c9d179ac8033b54e113d6c121851def7846fc1e7",
+        "size_bytes": 11680
       },
       {
-        "md5": "458660f516445c3bebd5c8c3e0f90ff2",
+        "md5": "8ad3c02c4792ef58d7a4a0de8ba75c34",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
         "present": true,
-        "sha256": "bd966728d4d858e2065f628a14bcfdc5f11a3ce4265fa363199627b37bdfdbec",
-        "size_bytes": 33252
+        "sha256": "d956bc9309dd9f5e91396118563ca02a3abccb2fcb63124b87778f7731d656b2",
+        "size_bytes": 33692
       },
       {
-        "md5": "fd999fa17d4aa9d963afbe174e13f00e",
+        "md5": "c181b4a16e3bdfc8bd15b47278540dc8",
         "path": "08_submission_package/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
         "present": true,
-        "sha256": "14cb8b2a6ef67ccb8e7c3982462fa16b78207b183cdeaef26a9d24bb7db628b2",
-        "size_bytes": 8067
+        "sha256": "712ac6db621cc21acf391198187210d0ba125f8805abcf8b5bbfb7b4e70bb580",
+        "size_bytes": 8076
       },
       {
         "md5": "0616f5b75d7df476fd78b9005ecf9004",
@@ -1170,11 +1170,11 @@
         "size_bytes": 3577369
       },
       {
-        "md5": "290c4d5780a90f43aa4dd4df39168a09",
+        "md5": "32156bec272f3cf2fd9546d1856460c4",
         "path": "08_submission_package/m5/datasets/tropic/tabulations/sdtm/sdrg.pdf",
         "present": true,
-        "sha256": "eb68fff0fc6ef2c238a7e297906bb5f9dae924d85c1265fbcf1735abdeb383ad",
-        "size_bytes": 16294
+        "sha256": "7e3d3341adcf8d8d1ce16eeda0c575f731916b4c54d2dfef671bc5ab7fc4d143",
+        "size_bytes": 16709
       },
       {
         "md5": "a0c996e92f03f7abe73b6e5fe4045aba",
@@ -2583,8 +2583,8 @@
     "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007"
   },
   "evidence_grade": "release_candidate",
-  "generated_at": "2026-08-05 08:13:14 UTC",
-  "manifest_sha256": "34712045d345636a1d17eed49111960117f6f2729b963d1d0c12631d8bc2192c",
+  "generated_at": "2026-08-05 09:05:57 UTC",
+  "manifest_sha256": "07b194c063ee7448778a7fb90e66e2141904685aeff04b21084b6e20582d1458",
   "problems": [],
   "qc_statuses": {
     "cbzp_bridge": {
@@ -2748,10 +2748,10 @@
     "stale_paths": []
   },
   "source_control": {
-    "branch": "codex/f043-run-scope-telemetry",
+    "branch": "codex/audit-closure-docs",
     "dirty": false,
     "dirty_including_seal_outputs": false,
-    "head": "a8c7b5b51a1cc72935392571e6b0ca7793cc9fad",
+    "head": "f0f810a807b1a3f16a15d48357080faa17507417",
     "source_tree_sha256": "5e56cd0fbafe26eb6e1067a15e636ac452e0c8f89a8d4b6e3e571f0c5200e600",
     "staged_diff_paths": [],
     "status_porcelain": [],
