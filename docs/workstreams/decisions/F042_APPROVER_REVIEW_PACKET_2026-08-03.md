@@ -7,6 +7,8 @@
 **Approval specification:** [`F042-ENDPOINT-APPROVAL-SPEC-2026-08-03`](F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md)<br>
 **Product boundary:** Path A controlled non-submission demonstration
 
+> **Implementation closure (2026-08-05):** ED-01–ED-07 were implemented in separate SAS/R tracks, reconciled at subject level, reviewed in the delayed second pass, resealed in the full 34-stage ODA run, and CI-verified. The pre-rerun evidence tables below remain historical. F-042 is still an accepted Path A residual because external qualified statistical/medical review has not been performed.
+
 ## 1. Requested action
 
 As accountable author and project owner, Antony Bevan recorded **adopt all decisions as written for Path A** for `ED-01` through `ED-07` in the controlled [decision record](ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md) on 2026-08-04.
@@ -33,13 +35,13 @@ The lack of independent human review is mitigated through separately programmed 
 
 ## 3. Why an author decision is required
 
-The current sealed Path A outputs reproduce the implemented code, but the pain derivation is not clinically conforming and the TTUMOR population and SAP TFL mappings require correction. Reproducibility therefore does not establish endpoint correctness.
+The baseline sealed Path A outputs reproduced the pre-adoption code, but the pain derivation was not clinically conforming and the TTUMOR population and SAP TFL mappings required correction. That baseline context is retained below; the adopted implementation and corrected mappings are now sealed for Path A. Reproducibility still does not establish independent endpoint correctness.
 
 The controlled decision is now recorded. During Phase 2:
 
 - modify or regenerate the sealed ADTTE, TFL, metadata, or package outputs only through the controlled Phase 2 implementation and full rerun;
-- do not describe TTPAIN/PFS as corrected, sponsor-approved, SAP-complete, or filing-ready until the rerun, reconciliation, delayed second-pass review, and reseal pass; and
-- keep F-042 open as a disclosed Path A residual until those implementation exit criteria are met.
+- do not describe TTPAIN/PFS as sponsor-approved, independently reviewed, SAP-complete, or filing-ready; and
+- keep F-042 open as a disclosed Path A residual until external qualified statistical/medical review is completed.
 
 ## 4. Decision summary
 

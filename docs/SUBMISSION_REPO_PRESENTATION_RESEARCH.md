@@ -289,7 +289,7 @@ Serious repos lead with **≤15 lines** of orientation:
 1. Product claim → docs/PRODUCT_CLAIM.md
 2. Submission-style package → 08_submission_package/m5/
 3. Reviewer guides → 07_reviewer_explanation/guides/
-4. Release seal → docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md
+4. Current release seal → docs/RELEASE_NOTE_v0.2.1-portfolio.md
 5. Verify machine grades → python3 scripts/verify_release.py
 
 ## Factory (engineers)

@@ -7,9 +7,9 @@
 | **Compound** | Cabazitaxel (CbzP) vs Mitoxantrone (MP) |
 | **Standard (package layer)** | CDISC SDTMIG **v3.4** + CDISC/NCI CT 2026-03-27 (uplifted; §5) |
 | **Standard (pristine source)** | CDISC SDTMIG **v3.1.1** (PDS 2013; local `01_source_data/real_sdtm/`) |
-| **Document version** | 1.2 (portfolio finalization) |
-| **Effective** | 2026-08-04 |
-| **Supersedes** | SDRG v1.1 from the `v0.1.0-demo-rc.1` Path A baseline |
+| **Document version** | 1.3 (audit closure / portfolio release) |
+| **Effective** | 2026-08-05 |
+| **Supersedes** | SDRG v1.2 from the `v0.2.0-portfolio` release (which superseded the `v0.1.0-demo-rc.1` baseline) |
 | **Product claim** | **Path A only** — controlled non-submission demonstration |
 
 ---
@@ -29,7 +29,7 @@
 **Source intake pack (WS-1):** [`docs/workstreams/WS1_SOURCE_INTAKE_PACK.md`](../../docs/workstreams/WS1_SOURCE_INTAKE_PACK.md)
 **Residual risks:** [`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)
 **External validation slots:** [`docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md`](../../docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md)
-**Current portfolio release:** tag `v0.2.0-portfolio` · [`docs/RELEASE_NOTE_v0.2.0-portfolio.md`](../../docs/RELEASE_NOTE_v0.2.0-portfolio.md) · `python3 scripts/verify_release.py`
+**Current portfolio release:** tag `v0.2.1-portfolio` · [`docs/RELEASE_NOTE_v0.2.1-portfolio.md`](../../docs/RELEASE_NOTE_v0.2.1-portfolio.md) · `python3 scripts/verify_release.py`
 **Review package face:** [`08_submission_package/m5/datasets/tropic/tabulations/sdtm/`](../../08_submission_package/m5/datasets/tropic/tabulations/sdtm/)
 **Analysis narrative:** [`ADRG.md`](ADRG.md)
 **Findings disposition:** `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md`

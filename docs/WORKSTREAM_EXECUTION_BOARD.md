@@ -1,11 +1,11 @@
 # TROPIC Workstream Execution Board
 
 **Status:** Active operating board — not a decorative architecture map  
-**As of:** 2026-08-04 (portfolio finalization)
-**Audit baseline:** annotated tag `v0.2.0-portfolio` on `codex/submission-pipeline-rc`
-**Latest sealed run:** tag commit · `oda` · `full_dag` · 34/34 stages; the release manifest is hash-bound to the controlled source tree
+**As of:** 2026-08-05 (audit closure)
+**Audit baseline:** current `main` release candidate; predecessor tag `v0.2.0-portfolio` remains immutable historical evidence
+**Latest sealed run:** `v0.2.1-portfolio` · `oda` · `full_dag` · 34/34 stages; the release manifest is hash-bound to the controlled source tree
 **Current controls:** RC checklist 18/18 · `verify_release` 31/31 · CI green
-**Current Path A tag:** `v0.2.0-portfolio` (`v0.1.0-demo-rc.1` remains immutable historical evidence)
+**Current Path A tag:** `v0.2.1-portfolio` (`v0.2.0-portfolio` and `v0.1.0-demo-rc.1` remain immutable historical evidence)
 **Product claim in force:** **Path A controlled non-submission demonstration** (`docs/PRODUCT_CLAIM.md`)  
 **Authority:** SAP v4.0 remediation lock · `06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md` · `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md`  
 **Portfolio surface:** `docs/REPO_SURFACE_POLICY.md` · `docs/INTERVIEWER_GUIDE.md` · dual-surface README
@@ -59,8 +59,8 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 
 | Field | Content |
 |---|---|
-| **Owned artifacts** | SAP v4.0 · SAP lock memo · README · REPRODUCIBILITY · findings register · disposition board · release note · tag `v0.2.0-portfolio` · product claim language |
-| **Current status** | **GREEN** — `docs/PRODUCT_CLAIM.md` freezes the controlled demo claim and v0.2 submission-simulation path |
+| **Owned artifacts** | SAP v4.0 · SAP lock memo · README · REPRODUCIBILITY · findings register · disposition board · release note · tag `v0.2.1-portfolio` · product claim language |
+| **Current status** | **GREEN** — `docs/PRODUCT_CLAIM.md` freezes the v0.2.1 controlled-demo claim and keeps submission-simulation language out of scope |
 | **Open risks** | Language drift back to “submission-ready”; ACCEPTED Crits (F-003, F-005, F-025) misread as closed science |
 | **Required evidence for GREEN** | `docs/PRODUCT_CLAIM.md` freezes demo vs submission simulation; disposition board linked from ADRG/SDRG (done for tag) |
 | **Release gate** | G00 must hold before any new “submission simulation” language |
@@ -176,7 +176,7 @@ WS-3 Metadata ──G03──► WS-4 Programming + WS-5 QC
 WS-4 Programming ──G04/G05──► WS-5 QC + WS-6 Writing
 WS-5 QC ──G06──► WS-6 Writing + WS-7 Release
 WS-6 Writing ──G07──► WS-7 Release
-WS-7 Release ──G08/G09──► tagged package (`v0.2.0-portfolio` current)
+WS-7 Release ──G08/G09──► tagged package (`v0.2.1-portfolio` current)
 ```
 
 **Rule:** If you cannot name the upstream pack you consumed, you are not operating the model.
@@ -202,7 +202,7 @@ WS-7 Release ──G08/G09──► tagged package (`v0.2.0-portfolio` current)
 1. **Weekly workstream review (one WS per session):** walk owned artifacts → status → risks → next action only.  
 2. **No review without a pack list** (files + statuses).  
 3. **G09 re-seal** only when a workstream changes promotion-class evidence (not for doc typos alone).  
-4. **Tag policy:** new tag only when product claim or evidence grade changes (`v0.1.0-demo-rc.1` frozen; `v0.2.0-portfolio` current).
+4. **Tag policy:** new tag only when product claim or evidence grade changes (`v0.1.0-demo-rc.1` and `v0.2.0-portfolio` frozen; `v0.2.1-portfolio` current).
 
 ---
 

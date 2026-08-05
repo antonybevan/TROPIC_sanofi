@@ -7,6 +7,8 @@
 **Baseline commit:** `a213667` (`codex/submission-pipeline-rc`)<br>
 **Change class:** Analysis-specification and output-catalog decision; no derivation change in this record
 
+> **Historical baseline notice (2026-08-05):** The baseline language below records the pre-adoption decision state. ED-01–ED-07 were subsequently implemented, reconciled, resealed, and CI-verified for Path A; see the Phase 2 implementation closure addendum. External qualified statistical/medical review remains required.
+
 ## 1. Purpose and control boundary
 
 This record turns the open endpoint issues into explicit decisions that can be adopted, revised, rejected, or superseded. It is a decision-control artifact, not sponsor or medical approval. On 2026-08-04, accountable author Antony Bevan adopted ED-01 through ED-07 as written for the controlled Path A demonstration. The exact implementation remains bounded by the [`F-042 Endpoint Approval Specification`](F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md) and the acceptance criteria below.

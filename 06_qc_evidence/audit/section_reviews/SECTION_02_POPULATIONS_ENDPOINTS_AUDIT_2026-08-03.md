@@ -6,6 +6,8 @@
 **SAP reviewed:** `02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx`  
 **Rendered SAP QA:** 22 pages rendered with the documents workflow; pages 1–22 visually reviewed with no clipping, overlap, broken table, or unreadable continuation detected.
 
+> **Historical baseline notice (2026-08-05):** This dated review preserves the pre-adoption observations and decisions for auditability. The Phase 2 closure addendum below controls the current Path A state: ED-01–ED-07 were adopted, implemented, reconciled, resealed, and CI-verified. External qualified statistical/medical review remains required before any regulated or filing-facing use.
+
 ## Approval-preparation addendum
 
 The later protocol/publication/source-to-code review found that the original handoff understated the required correction. The accountable-author decision-ready [`F-042 Endpoint Approval Specification`](../../../docs/workstreams/decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md) supersedes this audit's former recommended dispositions for S2-01, S2-02 and S2-04:
@@ -118,7 +120,7 @@ The current dual-language TTPAIN derivation enforces five-of-seven diary evaluab
 
 ## Phase 2 closure addendum — 2026-08-04
 
-The historical findings above are retained as the pre-adoption baseline. Antony Bevan adopted ED-01–ED-07 on 2026-08-04. The controlled implementation now uses ITT as the TTUMOR primary population (with measurable disease supportive), stages SV/PR alongside CM/PN, applies the adopted component-specific pain and CM+PR qualification rules, and restores the SAP-native `T-11-3` PSA response, `T-11-4` ORR, `T-11-5` pain response, `T-11-6` TTUMOR, `T-11-7` TTPSA and `T-11-8` TTPAIN mappings. The final full-DAG rerun and release reseal remain the evidence gate; this addendum does not represent independent, sponsor, medical or regulated approval.
+The historical findings above are retained as the pre-adoption baseline. Antony Bevan adopted ED-01–ED-07 on 2026-08-04. The controlled implementation now uses ITT as the TTUMOR primary population (with measurable disease supportive), stages SV/PR alongside CM/PN, applies the adopted component-specific pain and CM+PR qualification rules, and restores the SAP-native `T-11-3` PSA response, `T-11-4` ORR, `T-11-5` pain response, `T-11-6` TTUMOR, `T-11-7` TTPSA and `T-11-8` TTPAIN mappings. The final full-DAG rerun, release reseal, and CI verification are complete for Path A; this addendum does not represent independent, sponsor, medical or regulated approval. External qualified statistical/medical review remains required before any regulated or filing-facing use.
 
 ## Section 3 correction addendum — 2026-08-03
 

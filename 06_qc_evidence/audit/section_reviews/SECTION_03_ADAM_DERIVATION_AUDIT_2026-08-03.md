@@ -6,6 +6,8 @@
 **Programs reviewed:** `A_adtte_generation.sas`, `v_adtte_validation.R`, `admiral_adtte.R`, `tfl_generation.R`
 **Evidence run:** real-SAS ODA DAG, 34/34 stages PASS, final run after the corrections described below
 
+> **Historical baseline notice (2026-08-05):** This dated review preserves the pre-adoption observations and decisions for auditability. The Phase 2 closure addendum below controls the current Path A state: ED-01–ED-07 were adopted, implemented, reconciled, resealed, and CI-verified. External qualified statistical/medical review remains required before any regulated or filing-facing use.
+
 ## Approval-preparation addendum
 
 The later protocol/corrected-publication comparison established that the pain implementation is not merely missing supporting-disease and PR handling. It also uses median rather than mean AS, `PPI >=2` rather than `>=1`, absolute `AS >=10` rather than `>=25%` from baseline, combined-component confirmation, minimum diary date and a terminal single-trigger exception. These reproducible rules are non-conforming and must be replaced after authorization.
@@ -100,7 +102,7 @@ The green DAG demonstrates reproducible execution and cross-language agreement. 
 
 ## Phase 2 closure addendum — 2026-08-04
 
-The S3-04 disposition is superseded for the controlled Path A implementation by Antony Bevan's adoption of ED-01–ED-07. Separate SAS and R tracks now consume staged SV/PN/CM/PR, apply the adopted pain and CM+PR rules, retain diary/RT/date-bound source lineages, and reconcile against TTUMOR ITT-primary ADTTE. The historical baseline remains in this audit for auditability. Final full-DAG/reseal and external qualified statistical/medical review remain required before any regulated or filing-facing use.
+The S3-04 disposition is superseded for the controlled Path A implementation by Antony Bevan's adoption of ED-01–ED-07. Separate SAS and R tracks now consume staged SV/PN/CM/PR, apply the adopted pain and CM+PR rules, retain diary/RT/date-bound source lineages, and reconcile against TTUMOR ITT-primary ADTTE. The historical baseline remains in this audit for auditability. Final full-DAG/reseal and CI verification are complete; external qualified statistical/medical review remains required before any regulated or filing-facing use.
 
 ## 5. Handoff to Section 4
 

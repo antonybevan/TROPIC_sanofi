@@ -17,7 +17,7 @@ This is **reproducible factory + honest sealed evidence + clean review face.**
 | 2 | `docs/PRODUCT_CLAIM.md` | What we may assert |
 | 3 | `08_submission_package/m5/` | Module 5–style **review package** (data-free preview) |
 | 4 | `07_reviewer_explanation/guides/` | ADRG · SDRG · BDRG |
-| 5 | `docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md` | Sealed demo RC narrative |
+| 5 | `docs/RELEASE_NOTE_v0.2.1-portfolio.md` | Current portfolio seal narrative |
 | 6 | `python3 scripts/verify_release.py` | Re-check seals without SAS |
 | 7 | `docs/SCRIPT_MAP.md` · `platform/README.md` | If they want the factory |
 
@@ -59,7 +59,7 @@ Full walk: [`INTERVIEWER_GUIDE.md`](INTERVIEWER_GUIDE.md).
 
 ### D. Sealed run evidence (honest Path A proof)
 
-Minimal machine grades so a **bare clone** can re-check the last sealed demo RC **without** patient data or ODA:
+Minimal machine grades so a **bare clone** can re-check the current sealed Path A release **without** patient data or ODA:
 
 | Artifact | Role |
 |---|---|
