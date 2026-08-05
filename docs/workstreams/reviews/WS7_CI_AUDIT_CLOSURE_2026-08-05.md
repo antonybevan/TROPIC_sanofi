@@ -40,11 +40,12 @@ and the data-free test surface) with in-repo fixes and governance records.
 | `python3 scripts/verify_release.py` | 31/31 PASS, exit 0 |
 | Worktree | clean before edits; changes are the intended fix set |
 | `ci.yml` YAML parse | OK (2 jobs: path-a-seal-verify, validate) |
+| GitHub Actions PR #11 (push + pull_request events) | Path A seal verify PASS; Run Tests & Conformance Gates PASS (both runs, 2026-08-05) |
 
 ## Honesty
 
-- The workflow changes were **not** executed on a real GitHub runner from this
-  environment; they require a push/PR to validate end-to-end.
+- The workflow changes were executed on GitHub Actions via PR #11 on 2026-08-05:
+  both jobs passed on both the push and pull_request events.
 - CI remains data-free by design: real XPTs, SAS/ODA, the CDISC Library key/cache,
   and the full CDISC CORE engine are not part of the runner. The coverage summary
   makes that boundary explicit rather than implied.
