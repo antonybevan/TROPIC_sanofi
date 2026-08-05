@@ -2853,8 +2853,8 @@
     "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007"
   },
   "evidence_grade": "release_candidate",
-  "generated_at": "2026-08-05 13:50:24 UTC",
-  "manifest_sha256": "675e0f1c9d884370c047c5041faa5fa09346e3bc484127460f8f631004ec9887",
+  "generated_at": "2026-08-05 13:51:43 UTC",
+  "manifest_sha256": "3f811d9d0dbefa1a8ba8ac302cd7260fa20ca09691be90876ef2e687d64c1bb7",
   "problems": [],
   "qc_statuses": {
     "cbzp_bridge": {
@@ -3056,16 +3056,13 @@
   "source_control": {
     "branch": "codex/pipeline-audit-closure-2026-08-05",
     "dirty": false,
-    "dirty_including_seal_outputs": true,
-    "head": "29d87fb16618c1af9b635a4e5368c3a0154c9771",
+    "dirty_including_seal_outputs": false,
+    "head": "576138042b5a7b9978a7410808b6b5dc95a38b36",
     "pipeline_control_sha256": "98820de94fc4ff930b7e17cbd06c40912d296f97560a9e7aab1f5ca33a30d19a",
     "source_tree_sha256": "4bd5fcbb145c4abcaa50a2cf7869f633734f59512455db8d8bcd488b581069c0",
     "staged_diff_paths": [],
     "status_porcelain": [],
-    "status_porcelain_all": [
-      " M docs/RELEASE_RUN_MANIFEST.md",
-      " M platform/release_run_manifest/release_run_manifest.json"
-    ],
+    "status_porcelain_all": [],
     "status_porcelain_sha256": "",
     "tracked_diff_paths": []
   },
