@@ -3,9 +3,9 @@
 **Status:** Active operating board — not a decorative architecture map  
 **As of:** 2026-08-05 (audit closure)
 **Audit baseline:** current `main` release candidate; predecessor tag `v0.2.0-portfolio` remains immutable historical evidence
-**Latest sealed run:** `v0.2.1-portfolio` · `oda` · `full_dag` · 34/34 stages; the release manifest is hash-bound to the controlled source tree
-**Current controls:** RC checklist 18/18 · `verify_release` 31/31 · CI green
-**Current Path A tag:** `v0.2.1-portfolio` (`v0.2.0-portfolio` and `v0.1.0-demo-rc.1` remain immutable historical evidence)
+**Latest sealed run:** `v0.2.2-portfolio` · inherited `oda` · `full_dag` · 34/34 stages; the release manifest is hash-bound to the controlled source tree
+**Current controls:** RC checklist 18/18 · `verify_release` 35/35 · CI green
+**Current Path A tag:** `v0.2.2-portfolio` (`v0.2.1-portfolio`, `v0.2.0-portfolio`, and `v0.1.0-demo-rc.1` remain immutable historical evidence)
 **Product claim in force:** **Path A controlled non-submission demonstration** (`docs/PRODUCT_CLAIM.md`)  
 **Authority:** SAP v4.0 remediation lock · `06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md` · `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md`  
 **Portfolio surface:** `docs/REPO_SURFACE_POLICY.md` · `docs/INTERVIEWER_GUIDE.md` · dual-surface README
@@ -176,7 +176,7 @@ WS-3 Metadata ──G03──► WS-4 Programming + WS-5 QC
 WS-4 Programming ──G04/G05──► WS-5 QC + WS-6 Writing
 WS-5 QC ──G06──► WS-6 Writing + WS-7 Release
 WS-6 Writing ──G07──► WS-7 Release
-WS-7 Release ──G08/G09──► tagged package (`v0.2.1-portfolio` current)
+WS-7 Release ──G08/G09──► tagged package (`v0.2.2-portfolio` current)
 ```
 
 **Rule:** If you cannot name the upstream pack you consumed, you are not operating the model.
@@ -202,7 +202,7 @@ WS-7 Release ──G08/G09──► tagged package (`v0.2.1-portfolio` current)
 1. **Weekly workstream review (one WS per session):** walk owned artifacts → status → risks → next action only.  
 2. **No review without a pack list** (files + statuses).  
 3. **G09 re-seal** only when a workstream changes promotion-class evidence (not for doc typos alone).  
-4. **Tag policy:** new tag only when product claim or evidence grade changes (`v0.1.0-demo-rc.1` and `v0.2.0-portfolio` frozen; `v0.2.1-portfolio` current).
+4. **Tag policy:** new tag only when product claim or evidence grade changes (`v0.1.0-demo-rc.1`, `v0.2.0-portfolio`, and `v0.2.1-portfolio` frozen; `v0.2.2-portfolio` current).
 
 ---
 

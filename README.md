@@ -10,7 +10,7 @@
 [![CDISC](https://img.shields.io/badge/CDISC-ADaMIG%20v1.3%20%7C%20SDTMIG%20v3.4-005A9C?style=flat-square)](https://www.cdisc.org/)
 [![Define-XML](https://img.shields.io/badge/Define--XML-2.1%20%2B%20ARM-005A9C?style=flat-square)](03_metadata/define/)
 [![eCTD](https://img.shields.io/badge/eCTD-Module%205%20style-005A9C?style=flat-square)](08_submission_package/m5/)
-[![Release](https://img.shields.io/badge/Seal-v0.2.1--portfolio-success?style=flat-square)](docs/RELEASE_NOTE_v0.2.1-portfolio.md)
+[![Release](https://img.shields.io/badge/Seal-v0.2.2--portfolio-success?style=flat-square)](docs/RELEASE_NOTE_v0.2.2-portfolio.md)
 
 </div>
 
@@ -28,12 +28,12 @@
 | Hash-sealed demo release-candidate under Path A | “Part 11 compliant” |
 
 **Binding claim:** [`docs/PRODUCT_CLAIM.md`](docs/PRODUCT_CLAIM.md)
-**Current release narrative:** [`docs/RELEASE_NOTE_v0.2.1-portfolio.md`](docs/RELEASE_NOTE_v0.2.1-portfolio.md)
+**Current release narrative:** [`docs/RELEASE_NOTE_v0.2.2-portfolio.md`](docs/RELEASE_NOTE_v0.2.2-portfolio.md)
 **What GitHub is allowed to contain:** [`docs/REPO_SURFACE_POLICY.md`](docs/REPO_SURFACE_POLICY.md)
 **10-minute interviewer walk:** [`docs/INTERVIEWER_GUIDE.md`](docs/INTERVIEWER_GUIDE.md)
 
 > `v0.1.0-demo-rc.1` remains an immutable historical Path A tag record. The
-> current portfolio release is `v0.2.1-portfolio`, with its connected-evidence
+> current portfolio release is `v0.2.2-portfolio`, with its connected-evidence
 > disposition recorded in [`SECTION_05_PORTFOLIO_FINALIZATION_AUDIT_2026-08-04.md`](06_qc_evidence/audit/section_reviews/SECTION_05_PORTFOLIO_FINALIZATION_AUDIT_2026-08-04.md).
 
 > **Portfolio surface:** this repo tracks the **review package face**, **spine programs**, **config**, and a **minimal seal pack** — not patient data, not secrets, not regenerable factory status piles. That is standard practice, not incompleteness.
@@ -50,7 +50,7 @@ There are **two surfaces**. Industry does not present a Git monorepo as “the s
 | 2 | [`docs/PRODUCT_CLAIM.md`](docs/PRODUCT_CLAIM.md) | What you may assert — Path A only |
 | 3 | [`08_submission_package/README.md`](08_submission_package/README.md) → [`m5/`](08_submission_package/m5/) | **Review surface** (Module 5 style) |
 | 4 | [`07_reviewer_explanation/guides/`](07_reviewer_explanation/guides/) | ADRG · SDRG · BDRG · SDSP |
-| 5 | [`docs/RELEASE_NOTE_v0.2.1-portfolio.md`](docs/RELEASE_NOTE_v0.2.1-portfolio.md) | Current portfolio seal and review anchors |
+| 5 | [`docs/RELEASE_NOTE_v0.2.2-portfolio.md`](docs/RELEASE_NOTE_v0.2.2-portfolio.md) | Current portfolio seal and review anchors |
 | 6 | `python3 scripts/verify_release.py` | Re-check machine grades (no SAS needed) |
 | 7 | `python3 platform/cibuild.py --demo` | Bare-clone smoke (no patient data) |
 
@@ -105,7 +105,7 @@ TROPIC/
 ├── README.md                         ← you are here
 ├── docs/PRODUCT_CLAIM.md             ← binding Path A claim
 ├── docs/INDEX.md                     ← Reviewer / Engineer / QC tours
-├── docs/RELEASE_NOTE_v0.2.1-portfolio.md
+├── docs/RELEASE_NOTE_v0.2.2-portfolio.md
 │
 │  ── LAYER 1  Review surface ─────────────────────────────────
 ├── 08_submission_package/            ← THE deliverable face

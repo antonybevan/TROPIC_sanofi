@@ -5,7 +5,7 @@
 **Effective:** 2026-08-05
 **Status:** FROZEN for tag train `v0.2.1-portfolio` and successors until amended
 **Owner workstream:** WS-0 Governance & Scope Control (G00)
-**Binding companions:** `06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md` · `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md` · `docs/RELEASE_NOTE_v0.2.1-portfolio.md` · `docs/WORKSTREAM_EXECUTION_BOARD.md`
+**Binding companions:** `06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md` · `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md` · `docs/RELEASE_NOTE_v0.2.2-portfolio.md` · `docs/WORKSTREAM_EXECUTION_BOARD.md`
 **Presentation entry:** root `README.md` · `docs/INTERVIEWER_GUIDE.md` · `08_submission_package/README.md` · `docs/INDEX.md`
 **Git surface:** `docs/REPO_SURFACE_POLICY.md` (only review face + spine + seals in git — not factory noise)
 
