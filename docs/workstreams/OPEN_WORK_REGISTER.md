@@ -1,7 +1,7 @@
 # Open Work Register — Path A (post D-012)
 
 **Purpose:** What a principal programmer still treats as **real work**, not “green JSON theater.”  
-**As of:** 2026-08-04
+**As of:** 2026-08-05
 **Seals:** Path A demo RC can remain green while these are open if dispositioned.
 
 ---
@@ -37,6 +37,7 @@ The author-adopted record, executable specification and impact appendix are now 
 | **W-PKG-01** | P3 | WS-7 | Re-package guide PDFs into `m5/` | Optional | Optional |
 | **W-PKG-02** | **P0** | WS-7 | Sync git-tracked **m5 programs** from factory (arm map + dens) | Review face shows pre-arm-map ADSL | Meta-audit M-01 — **DONE** 2026-08-01: m5 program copies byte-identical to factory (ADSL/ADAE/ADEX/ADRS/ADTTE SAS+R, TFL); pending package refresh for output artifacts (W-PKG-01) |
 | **W-CI-01** | Done | WS-7 | Data-free CI green | Done | CI success |
+| **W-CI-02** | Done | WS-7 | CI audit closure: wire data-free regression tests (ARM/abort/F-042), gitleaks, workflow hardening, conditional CT enforcement, and conformance-coverage summary | Green CI must not be read as full conformance | Done 2026-08-05 — [`WS7_CI_AUDIT_CLOSURE_2026-08-05.md`](reviews/WS7_CI_AUDIT_CLOSURE_2026-08-05.md); external `CDISC_LIBRARY_API_KEY` configuration tracked as F-047 |
 
 **SDTM E2E audit pack:** `docs/workstreams/reviews/WS1_SDTM_E2E_AUDIT_2026-07-09.md`  
 **Verdict:** **GO to ADaM** with residuals dispositioned.

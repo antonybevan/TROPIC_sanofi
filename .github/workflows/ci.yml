@@ -5,6 +5,14 @@ on:
     branches: [ main, 'codex/**' ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   # Path A seal re-check: no SAS, no patient data, no renv.
@@ -12,6 +20,7 @@ jobs:
   path-a-seal-verify:
     name: Path A seal verify (verify_release)
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
     - name: Checkout repository
       uses: actions/checkout@v5
@@ -35,15 +44,23 @@ jobs:
   validate:
     name: Run Tests & Conformance Gates
     runs-on: ubuntu-latest
+    timeout-minutes: 90
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v5
 
+    - name: Gitleaks secret scan (pinned v8.18.4, matches .pre-commit-config)
+      run: |
+        # Extract outside the checkout so the binary never dirties the worktree;
+        # the final verify_release step fails on any untracked material file.
+        curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz | tar -xz -C "$RUNNER_TEMP" gitleaks
+        "$RUNNER_TEMP/gitleaks" detect --source . --no-banner --redact
+
     - name: Set up R
       uses: r-lib/actions/setup-r@v2
       with:
-        r-version: 'release'
+        r-version: '4.6.0'
 
     - name: Set up Python
       uses: actions/setup-python@v6
@@ -80,7 +97,7 @@ jobs:
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install pyreadstat lxml saspy pyyaml openpyxl usdm==0.66.0 "jsonschema>=4"
+        python -m pip install -r requirements-ci.txt
 
     - name: Delivery architecture controls
       run: |
@@ -103,6 +120,11 @@ jobs:
       run: |
         python3 platform/test_oda_broker.py
         python3 tests/test_phase2_staging.py
+
+    - name: Run data-free regression tests (ARM, abort telemetry, F-042)
+      run: |
+        python3 -m pytest -q tests/test_pipeline_abort_scope.py tests/test_define_arm_contract.py tests/test_f042_sas_response_control.py
+        Rscript tests/test_f042_provisional_pain_derivation.R
 
     - name: Run clinical pipeline smoke test (Demo)
       run: |
@@ -154,14 +176,22 @@ jobs:
       run: |
         # Validates the ADaM spec's NCI controlled-terminology codes against authoritative CDISC CT
         # (audit F-13). Needs the CDISC Library API key (repo secret) or the offline CORE cache.
-        # Neither is present in this repo's CI (no CDISC_LIBRARY_API_KEY secret configured, and
-        # the offline cache is gitignored, so a fresh checkout never has it) -- the script's own
-        # distinct SKIP_EXIT=2 makes that visible in the log rather than silently passing, but
-        # --allow-skip is what turns that into a clean (exit 0) step instead of a hard job
-        # failure; a genuine violation (a real CT mismatch) still fails the step either way.
-        python3 platform/ct_cross_validation.py --allow-skip
+        # Once CDISC_LIBRARY_API_KEY is configured in repository secrets this step runs as a hard
+        # gate (no --allow-skip). Until then the skip is explicit and visible in the log, and the
+        # conformance-coverage summary step below reports it -- a genuine CT mismatch can only be
+        # detected when the check actually runs.
+        if [ -n "$CDISC_LIBRARY_API_KEY" ]; then
+          echo "CT cross-validation: live CDISC Library mode (secret configured) -> hard gate."
+          python3 platform/ct_cross_validation.py
+        else
+          echo "CT cross-validation: no CDISC_LIBRARY_API_KEY and no offline cache in a fresh CI checkout -> SKIPPED (--allow-skip)."
+          python3 platform/ct_cross_validation.py --allow-skip
+        fi
       env:
         CDISC_LIBRARY_API_KEY: ${{ secrets.CDISC_LIBRARY_API_KEY }}
+
+    - name: Report data-free conformance coverage
+      run: python3 platform/ci_coverage_summary.py
 
     - name: USDM study-definition build (data-free gate)
       run: |
