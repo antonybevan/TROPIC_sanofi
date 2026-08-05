@@ -46,7 +46,7 @@
   },
   "r_version": "R version 4.6.0 (2026-04-24)",
   "renv_lock_sha256": "a9ba2082ce1f227add5d2cb400fb70688ea5031fef238dcf1bf1928de2700630",
-  "source_tree_sha256": "5e56cd0fbafe26eb6e1067a15e636ac452e0c8f89a8d4b6e3e571f0c5200e600",
+  "source_tree_sha256": "4bd5fcbb145c4abcaa50a2cf7869f633734f59512455db8d8bcd488b581069c0",
   "oda_endpoint": "odaws01-apse1-2.oda.sas.com",
   "oda_attempts": 1,
   "oda_total_wait_s": 41.3,
@@ -100,5 +100,28 @@
     ],
     "byte_distinct": true,
     "sdtm_manifest_sha": "matches current SDTM source (329430f6361e)"
+  },
+  "governance_only_reseal": {
+    "status": "PASS",
+    "rebound_at": "2026-08-05T13:26:22.422447+00:00",
+    "base_revision": "d23a81ab932b98e779175edbb4ad1f9439ca6067",
+    "clinical_run_timestamp": "2026-08-05T08:11:51.762620+00:00",
+    "prior_source_tree_sha256": "5e56cd0fbafe26eb6e1067a15e636ac452e0c8f89a8d4b6e3e571f0c5200e600",
+    "rebound_source_tree_sha256": "4bd5fcbb145c4abcaa50a2cf7869f633734f59512455db8d8bcd488b581069c0",
+    "changed_paths": [
+      ".github/CODEOWNERS",
+      ".github/workflows/ci.yml",
+      ".pre-commit-config.yaml",
+      "platform/build_release_run_manifest.py",
+      "platform/cibuild.py",
+      "requirements-ci.lock",
+      "requirements-ci.txt",
+      "scripts/rebind_governance_seal.py",
+      "scripts/verify_release.py",
+      "tests/test_pipeline_dag.py",
+      "tests/test_verify_release.py"
+    ],
+    "clinical_run_was_not_reexecuted": true,
+    "reason": "Pipeline integrity, dependency, executor-validation, and test controls changed; clinical programs, study controls, datasets, and QC outputs did not."
   }
 }
