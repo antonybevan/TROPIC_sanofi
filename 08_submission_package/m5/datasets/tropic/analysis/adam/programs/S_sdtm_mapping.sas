@@ -121,16 +121,25 @@ proc sql;
         ae.aehlgt length=100,
         ae.aehlt length=100,
         ae.aellt length=100,
+        /* Week-precision source dates are represented at the start of the
+           reported study week: week 1 = RFSTDTC, week n = RFSTDTC+(n-1)*7.
+           Negative history weeks retain their signed week*7 offset because the
+           source has no week zero.
+           If a week-1 treatment-emergent onset would precede first dose, use
+           TRTSDT as the conservative within-week onset anchor. */
         case 
             when not missing(dm.rfstdtc) and not missing(ae.aestwk) then 
                 case 
-                    when ae.aestwk = 1 and (dm.rfstdtc + ae.aestwk * 7) < dm.trtsdt and not missing(dm.trtsdt) then dm.trtsdt
-                    else dm.rfstdtc + ae.aestwk * 7
+                    when ae.aestwk = 1 and dm.rfstdtc < dm.trtsdt and not missing(dm.trtsdt) then dm.trtsdt
+                    else dm.rfstdtc +
+                         (case when ae.aestwk > 0 then ae.aestwk - 1 else ae.aestwk end) * 7
                 end
             else .
         end as aestdt format=yymmdd10.,
         case 
-            when not missing(dm.rfstdtc) and not missing(ae.aeenwk) then dm.rfstdtc + ae.aeenwk * 7
+            when not missing(dm.rfstdtc) and not missing(ae.aeenwk) then
+                dm.rfstdtc +
+                (case when ae.aeenwk > 0 then ae.aeenwk - 1 else ae.aeenwk end) * 7
             else .
         end as aeendt format=yymmdd10.
     from staging.ae as ae
@@ -254,30 +263,22 @@ proc sql;
     left join work.trtsdt_map as t on dm.usubjid = t.usubjid;
 quit;
 
-/* 9. Derive RS Domain from Staging DS Efficacy Milestones (Standard Efficacy Fallback) */
+/* 9. Preserve disposition-reported clinical progression in RS without
+   misrepresenting it as investigator/sponsor RECIST. Death remains in DS. */
 proc sql;
     create table sdtm.rs as
     select 
         dm.studyid,
         dm.usubjid,
-        case 
-            when ds.dsdecod in ('DISEASE PROGRESSION', 'PROGRESSION') then 'PROGRESSIVE DISEASE'
-            else 'DEATH'
-        end as rstest length=40,
-        case 
-            when ds.dsdecod in ('DISEASE PROGRESSION', 'PROGRESSION') then 'PD'
-            else 'DEATH'
-        end as rsorres length=20,
-        case 
-            when ds.dsdecod in ('DISEASE PROGRESSION', 'PROGRESSION') then 'PD'
-            else 'DEATH'
-        end as rsstresc length=20,
+        'CLINICAL PROGRESSION MILESTONE' as rstest length=40,
+        'PROGRESSION' as rsorres length=20,
+        'PROGRESSION' as rsstresc length=20,
         case 
             when not missing(dm.rfstdtc) and not missing(ds.dsstwk) then dm.rfstdtc + (ds.dsstwk - 1) * 7
             else .
         end as rsdt format=yymmdd10.,
         ds.visit length=40,
-        'SPONSOR' as rseval length=40,
+        'NOT REPORTED' as rseval length=40,
         case 
             when not missing(t.trtsdt) and not missing(ds.dsstwk) then (dm.rfstdtc + (ds.dsstwk - 1) * 7) - t.trtsdt + 1
             else .
@@ -285,7 +286,7 @@ proc sql;
     from staging.ds as ds
     left join sdtm.dm as dm on ds.usubjid = dm.usubjid
     left join work.trtsdt_map as t on dm.usubjid = t.usubjid
-    where ds.dsdecod in ('DISEASE PROGRESSION', 'PROGRESSION', 'DEATH', 'DEAD');
+    where ds.dsdecod in ('DISEASE PROGRESSION', 'PROGRESSION');
 quit;
 
 /* Clean up work library */

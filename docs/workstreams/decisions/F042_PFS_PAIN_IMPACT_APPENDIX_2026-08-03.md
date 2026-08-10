@@ -5,6 +5,13 @@
 **Product path:** Path A controlled non-submission demonstration<br>
 **Baseline:** real MP ADTTE from the final 34-stage ODA run
 
+> **Superseded baseline — implementation update 2026-08-09.** Sections 1–5 preserve the
+> pre-adoption impact analysis and must not be read as current output. The live governed
+> derivation now has 37 primary pain-progression subjects (36 diary-only and 1 direct-RT-only),
+> 15 complete-date RT inventory records plus 1 missing/partial-date record, and 43 pain
+> responders among 156 response-evaluable subjects. Current PFS has 326 events (40 tumour,
+> 240 PSA, 11 pain, 35 death) and 45 censors.
+
 ## 1. What is being measured
 
 This appendix quantifies the records that could be affected by the unresolved pain progression and palliative-radiotherapy rules. It does not decide which records qualify.
@@ -78,7 +85,7 @@ The prior `290 + k` framing is no longer valid: the author-adopted rule can iden
 
 ## 6. Phase 1 preservation statement
 
-This appendix preserves the pre-adoption baseline for auditability. ED-01–ED-07 were adopted on 2026-08-04 and the post-adoption implementation now passes the full real-SAS DAG; the aggregate F-042 event-source summary records 45 primary diary/RT events, 45 diary-only records, one RT-only supportive record, 15 complete-date RT records, one missing/partial-date record and 43 real-MP pain-response events. The appendix does not expand the Path A product claim or represent independent/sponsor/regulated approval.
+This appendix preserves the pre-adoption baseline for auditability. ED-01–ED-07 were adopted on 2026-08-04. The earlier post-adoption snapshot recorded 45 primary diary/RT subjects; it is superseded by the 2026-08-09 controlled summary shown in the banner above (37 primary, 36 diary-only, 1 RT-only, 15 complete-date RT inventory records, 1 missing/partial-date inventory record, and 43/156 real-MP pain responses). The appendix does not expand the Path A product claim or represent independent/sponsor/regulated approval.
 
 The provisional implementation now provides a reproducible local
 subject-level comparison and CM/PR adjudication worksheet. Their handling and

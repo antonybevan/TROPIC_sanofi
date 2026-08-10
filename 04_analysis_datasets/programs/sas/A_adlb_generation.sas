@@ -1,9 +1,9 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: A_adlb_generation.sas
-   Version: 2.2.1
+   Version: 3.0.0
    Author: Antony Bevan, Clinical Programming
-   Date: 2026-05-27 (ADaM dens note 2026-07-09)
+   Date: 2026-08-09
    Standard: ADaMIG v1.3 BDS
    Input: sdtm.lb, adam.adsl
    Output: adam.adlb
@@ -36,18 +36,20 @@ proc sql;
         lb.visit,
         lb.visitnum,
         lb.lbseq,
+        lb.lbblfl,
         lb.lbtestcd as PARAMCD length=8,
         lb.lbtest as PARAM length=40,
         /* PARAMN is assigned 1:1 over the full PARAMCD set at the end of the program (audit F-02);
            the old NEUT/PSA/HGB/else=4 scheme collided across analytes and left ANCNADIR/ANCRECDY unset. */
         case
             when lb.lbtestcd = 'PSA' then 'TUMOR MARKER'
-            else 'HEMATOLOGY'
+            when not missing(lb.lbcat) then upcase(strip(lb.lbcat))
+            else 'UNCLASSIFIED'
         end as PARCAT1 length=20,
         lb.lbdt as ADT format=yymmdd10.,
         lb.lbdy as ADY,
         lb.lbstresn as AVAL,
-        lb.lborres as AVALC length=20,
+        lb.lbstresc as AVALC length=100,
         lb.lbornrlo as lbnrlo,
         lb.lbornrhi as lbnrhi,
         lb.lbnrind,
@@ -63,13 +65,15 @@ data work.lb_windows;
     
     length AVISIT $40;
     
-    if ADY <= &W_BL_HI. then do;
+    if missing(ADY) then do;
+        AVISITN = 99;
+        AVISIT = 'Unscheduled';
+        AWDIST = .;
+    end;
+    else if ADY <= &W_BL_HI. then do;
         AVISITN = 0;
         AVISIT = 'Baseline';
-        /* Missing ADY sorts into Baseline (. <= W_BL_HI); guard the distance calc so
-           it does not emit a "missing values generated" NOTE. AWDIST stays missing,
-           the window classification above is unchanged. */
-        if not missing(ADY) then AWDIST = abs(ADY - (-1));
+        AWDIST = abs(ADY - (-1));
     end;
     else if &W_C1D1_LO. <= ADY <= &W_C1D1_HI. then do;
         AVISITN = 1;
@@ -108,10 +112,10 @@ data work.lb_windows;
     end;
 run;
 
-/* Resolve Baseline values - stable sorting keeps first baseline record */
+/* Resolve the single source-flagged baseline record per subject/analyte. */
 proc sort data=work.lb_windows out=work.lb_base_pre;
     by usubjid PARAMCD descending ADT lbseq;
-    where AVISITN = 0;
+    where lbblfl = 'Y' and not missing(ADT);
 run;
 
 data work.baselines;
@@ -121,7 +125,8 @@ data work.baselines;
     BASE = AVAL;
     BASEC = AVALC;
     BTOXGR = ATOXGR;
-    keep usubjid PARAMCD BASE BASEC BTOXGR;
+    BASESEQ = lbseq;
+    keep usubjid PARAMCD BASE BASEC BTOXGR BASESEQ;
 run;
 
 /* Merge Baseline information */
@@ -132,6 +137,7 @@ proc sql;
         b.BASE,
         b.BASEC,
         b.BTOXGR,
+        b.BASESEQ,
         case when not missing(b.BASE) then (w.AVAL - b.BASE) else . end as CHG,
         case when not missing(b.BASE) and b.BASE > 0 then ((w.AVAL - b.BASE) / b.BASE) * 100 else . end as PCHG
     from work.lb_windows as w
@@ -160,7 +166,7 @@ data work.lb_anl01;
     end;
     
     /* Set BASEFL Baseline Flag */
-    if AVISITN = 0 then BASEFL = 'Y';
+    if not missing(BASESEQ) and lbseq = BASESEQ then BASEFL = 'Y';
     else BASEFL = 'N';
 run;
 
@@ -260,7 +266,7 @@ quit;
    no single assessment date and carry ADT missing. */
 data work.adlb_all(keep=STUDYID USUBJID SUBJID TRT01P TRTSDT PARAMCD PARAM PARCAT1 ADT
                         AVAL AVALC LBNRLO LBNRHI LBNRIND AVISIT AVISITN AWDIST ATOXGR BASE BASEC
-                        BTOXGR CHG PCHG ANL01FL BASEFL LBDY);
+                        BTOXGR CHG PCHG ANL01FL BASEFL LBDY LBSEQ);
     set work.lb_anl01(rename=(ADY=LBDY)) work.optimus_nadir work.optimus_rec;
     format ADT yymmdd10.;
 run;
@@ -282,13 +288,26 @@ proc sql;
     select a.STUDYID, a.USUBJID, a.SUBJID, a.TRT01P, a.TRTSDT, a.PARAMCD, a.PARAM,
            m.PARAMN, a.PARCAT1, a.ADT, a.AVAL, a.AVALC, a.LBNRLO, a.LBNRHI, a.LBNRIND,
            a.AVISIT, a.AVISITN, a.AWDIST, a.ATOXGR, a.BASE, a.BASEC, a.BTOXGR, a.CHG, a.PCHG,
-           a.ANL01FL, a.BASEFL, a.LBDY
+           a.ANL01FL, a.BASEFL, a.LBDY, a.LBSEQ
     from work.adlb_all as a
     left join work._pnmap as m on a.PARAMCD = m.PARAMCD;
 quit;
 
 proc sort data=adam.adlb;
-    by usubjid PARAMCD AVISITN lbdy;
+    by usubjid PARAMCD AVISITN lbdy LBSEQ;
+run;
+
+data _null_;
+    set adam.adlb;
+    by usubjid PARAMCD AVISITN lbdy LBSEQ;
+    if not first.LBSEQ then do;
+        putlog "ERROR: [ADLB-QC] Governed ADLB key is duplicated for " usubjid= PARAMCD= AVISITN= lbdy= LBSEQ=;
+        abort cancel;
+    end;
+    if missing(LBSEQ) and PARAMCD not in ('ANCNADIR', 'ANCRECDY') then do;
+        putlog "ERROR: [ADLB-QC] Source laboratory record is missing LBSEQ for " usubjid= PARAMCD=;
+        abort cancel;
+    end;
 run;
 
 /* Clean up work library */

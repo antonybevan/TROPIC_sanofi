@@ -4,6 +4,18 @@ purpose: >
   Govern ADaM variable predecessor documentation and sponsor-defined
   controlled-terminology dispositions used by metadata control gates.
 
+define_text_replacements:
+  - from: "'Y' if ECOGBL was imputed to the protocol default (no baseline ECOG on file), else 'N'."
+    to: "Set to 'N' because no ECOGBL imputation is performed; a missing source baseline remains missing."
+  - from: "'Y' if PSABL was imputed to the population-median fallback (no baseline PSA on file), else 'N'."
+    to: "Set to 'N' because no PSABL imputation is performed; a missing source baseline remains missing."
+  - from: "'Y' if ALPBL was imputed to the population-median fallback (no baseline ALP on file), else 'N'."
+    to: "Set to 'N' because no ALPBL imputation is performed; a missing source baseline remains missing."
+  - from: "'Y' if HGBBL was imputed to the population-median fallback (no baseline hemoglobin on file), else 'N'."
+    to: "Set to 'N' because no HGBBL imputation is performed; a missing source baseline remains missing."
+  - from: "Shift in CTCAE analysis toxicity grade (ATOXGR) from baseline to worst post-baseline analysis record, by laboratory parameter (ANC, PSA); rendered as table T-21-1, per SAP v3.0 §7.5. Path A limitation: CbzP is synthetic/reconstructed and TFL-only; comparative results are non-confirmatory and are not submission evidence."
+    to: "Shift in source-carried laboratory toxicity grade (ATOXGR, carried from SDTM.LB.LBTOXGR for real MP data) from baseline to worst post-baseline analysis record; no independent CTCAE re-grading algorithm is applied. Rendered as T-21-1/T-21-2. Path A limitation: CbzP is synthetic/reconstructed and TFL-only; comparative results are non-confirmatory and are not submission evidence."
+
 controlled_terminology_dispositions:
   CL.TRT01PN:
     status: sponsor_defined
@@ -44,8 +56,8 @@ predecessor_rules:
     SITEID: SDTM.DM.SITEID.
     TRT01P: Randomized/planned treatment assignment from SDTM.DM.ARM and config/study_config.yaml treatment map.
     TRT01PN: Numeric planned treatment assignment from config/study_config.yaml treatment map.
-    TRT01A: Actual treatment assignment from SDTM.DM.ARM/ARMCD using the same Path A arm authority as TRT01P; EXTRT is not used because F-028 documents an inconsistent exposure treatment value.
-    TRT01AN: Numeric actual treatment assignment from SDTM.DM.ARM/ARMCD using the same Path A arm authority as TRT01PN; EXTRT is not used because F-028 documents an inconsistent exposure treatment value.
+    TRT01A: Actual treatment derived from administered primary IV antineoplastic in SDTM.EX; falls back to planned treatment only when no qualifying IV exposure is present.
+    TRT01AN: Numeric actual-treatment code mapped from ADSL.TRT01A (CbzP=1, MP=2).
     TRTA: Actual treatment assignment inherited from ADSL.TRT01A.
     TRTAN: Numeric actual treatment assignment inherited from ADSL.TRT01AN.
     TRTSDT: Treatment start date inherited from ADSL.TRTSDT unless defined directly for ADSL.
@@ -66,13 +78,13 @@ predecessor_rules:
     ANL01FL: Analysis inclusion flag derived from dataset-specific record-selection rules.
 
   dataset_defaults:
-    ADSL: SDTM.DM, SDTM.EX, SDTM.DS, SDTM.VS, SDTM.LB, SDTM.RS/LS, and config/study_config.yaml subject-level rules.
+    ADSL: SDTM.DM, SDTM.EX, SDTM.DS, SDTM.AE, SDTM.VS, SDTM.LB, SDTM.LS, SDTM.PN, SDTM.SV, and config/study_config.yaml subject-level rules.
     ADEX: SDTM.EX plus ADSL treatment and subject-level attributes.
     ADCM: SDTM.CM plus ADSL treatment and subject-level attributes.
     ADAE: SDTM.AE/SUPPAE plus ADSL treatment and subject-level attributes.
     ADLB: SDTM.LB plus ADSL treatment, baseline, and subject-level attributes.
-    ADRS: SDTM.RS/TU/TR/LS response assessments plus ADSL treatment and subject-level attributes.
-    ADTTE: ADSL subject-level attributes plus SDTM.DS, SDTM.RS/LS, SDTM.AE, and death/progression source dates by PARAMCD.
+    ADRS: SDTM.LS lesion assessments, SDTM.LB PSA, SDTM.DS clinical progression, and ADSL treatment and subject-level attributes.
+    ADTTE: ADSL plus typed lesion-derived RECIST, reconstructed PSA, governed F-042 pain, treatment-emergent serious AE, death, and new anti-cancer therapy dates by PARAMCD.
 
   overrides:
     ADSL:
@@ -90,13 +102,13 @@ predecessor_rules:
       SAFFL: Population flag from treated subject records using SDTM.EX exposure evidence.
       PPROTFL: Protocol/per-protocol eligibility source records and protocol deviation review.
       DTHFL: Death flag from SDTM.DM.DTHFL and disposition/death records.
-      DTHDT: Death date from SDTM.DM.DTHDTC or disposition/death records.
+      DTHDT: Earliest complete SDTM.AE.AEDTHDTC is preferred; otherwise the earliest DS death week is anchored to randomization.
       DTHCAUS: Death cause from disposition/death source records.
-      LSTALVDT: Last known alive date from maximum non-death contact/assessment date across SDTM source domains.
+      LSTALVDT: Maximum dated observed contact or assessment across DS, EX, VS, LB, LS, PN, and SV, capped at DTHDT for deceased subjects.
       ECOGBL: Baseline ECOG from SDTM.QS/VS assessment source before treatment start.
       MEASDISF: Measurable disease flag from baseline tumor/response source assessments.
       VISCFL: Visceral disease flag from baseline lesion source assessments.
-      PAINBL: Baseline pain score from pain assessment source before treatment start.
+      PAINBL: Y when a component-specific 7-day pre-treatment diary has at least 5 non-discordant days and median pain intensity >=2 or mean analgesic score >=10; otherwise N.
       PSABL: Baseline PSA from SDTM.LB prostate-specific antigen records.
       ALPBL: Baseline alkaline phosphatase from SDTM.LB records.
       ALBBL: Not collected in the public SDTM.LB release; left missing with a blank imputation flag (ADRG §5.1).
@@ -104,47 +116,58 @@ predecessor_rules:
       HGBBL: Baseline hemoglobin from SDTM.LB records.
       DOCPROG: Investigator-assessed progression source records.
       DOCRESP: Investigator-assessed response source records.
-      ECOGBLIF: Imputation flag derived from ECOGBL source availability and baseline window rules.
-      PSABLIF: Imputation flag derived from PSABL source availability and baseline window rules.
-      ALPBLIF: Imputation flag derived from ALPBL source availability and baseline window rules.
-      HGBBLIF: Imputation flag derived from HGBBL source availability and baseline window rules.
-      ALBBLIF: Imputation flag derived from ALBBL source availability and baseline window rules.
-      LDHBLIF: Imputation flag derived from LDHBL source availability and baseline window rules.
+      ECOGBLIF: Set to N because the corresponding observed source baseline is not imputed.
+      PSABLIF: Set to N because the corresponding observed source baseline is not imputed.
+      ALPBLIF: Set to N because the corresponding observed source baseline is not imputed.
+      HGBBLIF: Set to N because the corresponding observed source baseline is not imputed.
+      ALBBLIF: Blank because the source analyte is unavailable and no imputation is performed.
+      LDHBLIF: Blank because the source analyte is unavailable and no imputation is performed.
     ADEX:
-      AVAL: Numeric exposure analysis value from SDTM.EX dose/duration fields by PARAMCD.
-      AVALC: Character exposure analysis value from SDTM.EX dose/duration fields by PARAMCD.
+      AVAL: "Parameter-specific value from qualifying primary IV SDTM.EX records: EXDOSE2, EXCUMD2, EXPDOSE, consistent EXTRINT, or derived count/flag as documented in the method."
+      AVALC: Character representation or category corresponding to the parameter-specific ADEX analysis value.
       PARAMN: Numeric parameter ordering from ADEX.PARAMCD.
-      AVISITN: Numeric analysis visit derived from ADEX.AVISIT and SDTM.EX sequence/date.
+      AVISITN: "Cycle number from SDTM.EX.VISITNUM; ALL CYCLES summary records are assigned 0."
+    ADCM:
+      CMSEQ: SDTM.CM.CMSEQ.
     ADAE:
       ATOXGR: Numeric toxicity grade derived from SDTM.AE toxicity grade/severity source fields.
       TRTEMFL: Treatment-emergent flag derived from ADAE.ASTDT and ADSL.TRTSDT.
       ADURN: Adverse event duration derived from ADAE.ASTDT and ADAE.AENDT.
       ADURU: Duration unit assigned by adverse-event derivation rule.
     ADLB:
+      PARCAT1: Assigned TUMOR MARKER for PSA; otherwise carried from SDTM.LB.LBCAT.
       AVAL: Numeric lab analysis value from SDTM.LB.LBSTRESN.
       AVALC: Character lab analysis value from SDTM.LB.LBSTRESC.
-      ATOXGR: Analysis toxicity grade derived from SDTM.LB result, normal range, and grading rules.
-      BASE: Baseline numeric value selected from pre-treatment ADLB.AVAL records.
-      BASEC: Baseline character value selected from pre-treatment ADLB.AVALC records.
+      ATOXGR: "SDTM.LB.LBTOXGR converted to numeric; no new grading algorithm is applied."
+      BASE: Numeric value from the deterministic SDTM.LB.LBBLFL=Y record selected by date and LBSEQ within subject and parameter.
+      BASEC: Character value from the same deterministic SDTM.LB.LBBLFL=Y record used for BASE.
       BTOXGR: Baseline toxicity grade selected from pre-treatment records.
       CHG: Change from baseline derived as ADLB.AVAL minus ADLB.BASE.
       PCHG: Percent change from baseline derived as ADLB.CHG divided by ADLB.BASE.
-      BASEFL: Baseline flag derived from pre-treatment record-selection rules.
+      BASEFL: "Y only on the SDTM.LB record selected as baseline from LBBLFL=Y; N otherwise."
       ADT: Analysis date from SDTM.LB.LBDTC.
+      LBSEQ: SDTM.LB.LBSEQ; blank on derived Optimus parameter rows.
     ADRS:
-      AVALC: Character response result from response source assessments and response derivation rules.
+      AVALC: "Parameter-specific result: lesion-derived RECIST v1.0, confirmed response, reconstructed PSA rule, exploratory bone 2+2 status, or separately typed disposition clinical progression."
       AVAL: Numeric response category from ADRS.AVALC response ordering map.
     ADTTE:
       ITTFL: Inherited from ADSL.ITTFL.
       SAFFL: Inherited from ADSL.SAFFL.
       PARAMN: Numeric parameter ordering from ADTTE.PARAMCD.
       PARCAT1: Time-to-event category from ADTTE.PARAMCD.
+      STARTDT: "RANDDT for OS, PFS, TTPSA, TTUMOR, and TTPAIN; TRTSDT for TTSAE."
+      ADT: Parameter-specific eligible event date or censoring date, not earlier than its time origin and bounded by the analysis cutoff.
       CNSR: Censoring indicator derived from event/censor source dates by ADTTE.PARAMCD.
+      EVNTDESC: Assigned from the eligible parameter-specific event component when CNSR=0.
+      CNSDTDSC: Assigned from the parameter-specific censoring rule when CNSR=1.
       AVAL: Time-to-event duration derived from ADTTE.STARTDT, ADTTE.ADT, and ADTTE.AVALU.
       AVALU: Time-to-event unit assigned by ADTTE parameter derivation.
 
 method_expansion:
   assignments:
+    ADSL.TRT01A: MT.TRT01A
+    ADSL.TRT01AN: MT.TRT01A
+    ADSL.PAINBL: MT.PAINBL
     ADSL.DTHDT: MT.DTHDT
     ADSL.LSTALVDT: MT.LSTALVDT
     ADSL.ECOGBLIF: MT.ECOGBLIF
@@ -163,6 +186,7 @@ method_expansion:
     ADAE.ATOXGR: MT.ADAE_ATOXGR
     ADLB.AVAL: MT.ADLB_AVAL
     ADLB.AVALC: MT.ADLB_AVALC
+    ADLB.PARCAT1: MT.ADLB_PARCAT1
     ADLB.ATOXGR: MT.ADLB_ATOXGR
     ADLB.BASE: MT.ADLB_BASE
     ADLB.BASEC: MT.ADLB_BASEC
@@ -176,47 +200,98 @@ method_expansion:
     ADTTE.SAFFL: MT.ADTTE_SAFFL
     ADTTE.PARAMN: MT.ADTTE_PARAMN
     ADTTE.PARCAT1: MT.ADTTE_PARCAT1
+    ADTTE.STARTDT: MT.ADTTE_ADT
+    ADTTE.ADT: MT.ADTTE_ADT
+    ADTTE.CNSR: MT.CNSR_TTE
+    ADTTE.EVNTDESC: MT.ADTTE_ADT
+    ADTTE.CNSDTDSC: MT.ADTTE_ADT
+    ADTTE.AVAL: MT.AVAL_TTE
     ADTTE.AVALU: MT.ADTTE_AVALU
 
   definitions:
-    MT.DTHDT: Death date derived from SDTM.DM.DTHDTC or disposition/death records.
-    MT.LSTALVDT: Last known alive date derived as the maximum non-death contact or assessment date across source domains.
-    MT.ECOGBLIF: Baseline ECOG imputation flag derived from ECOGBL source availability and baseline window rules.
-    MT.PSABLIF: Baseline PSA imputation flag derived from PSABL source availability and baseline window rules.
-    MT.ALPBLIF: Baseline alkaline phosphatase imputation flag derived from ALPBL source availability and baseline window rules.
-    MT.HGBBLIF: Baseline hemoglobin imputation flag derived from HGBBL source availability and baseline window rules.
-    MT.ALBBLIF: Baseline albumin imputation flag derived from ALBBL source availability and baseline window rules.
-    MT.LDHBLIF: Baseline lactate dehydrogenase imputation flag derived from LDHBL source availability and baseline window rules.
-    MT.ADEX_AVAL: Numeric exposure analysis value derived from SDTM.EX dose, duration, or cycle records according to ADEX.PARAMCD.
-    MT.ADEX_AVALC: Character exposure analysis value derived from SDTM.EX dose, duration, or cycle records according to ADEX.PARAMCD.
+    MT.TRT01A: >
+      Actual treatment is derived from administered qualifying primary IV antineoplastic in SDTM.EX
+      (cabazitaxel/XRP6258 or mitoxantrone). If no qualifying IV record exists, planned treatment is
+      retained; TRT01AN maps CbzP=1 and MP=2.
+    MT.PAINBL: >
+      Baseline pain flag from the 7 days ending on treatment start. Within each component and day,
+      discordant duplicates are excluded. A component requires at least 5 valid days; PAINBL=Y for
+      median pain intensity >=2 or mean analgesic score >=10, otherwise N.
+    MT.RDI: >
+      Source relative dose intensity carried from SDTM.EX.EXTRINT for the qualifying primary IV
+      antineoplastic when repeated subject values are internally consistent; no dose-intensity
+      formula is reconstructed.
+    MT.NCYCLE: >
+      Count of distinct SDTM.EX.VISITNUM cycles with a positive administered IV dose (EXDOSE2>0)
+      for the qualifying randomized antineoplastic.
+    MT.DTHDT: Earliest complete SDTM.AE.AEDTHDTC is preferred; otherwise the earliest DS death week is anchored to ADSL.RANDDT.
+    MT.LSTALVDT: Maximum dated observed contact or assessment across DS, EX, VS, LB, LS, PN, and SV, capped at DTHDT for deceased subjects.
+    MT.ECOGBLIF: Set to N because observed baseline ECOG is not imputed.
+    MT.PSABLIF: Set to N because observed baseline PSA is not imputed.
+    MT.ALPBLIF: Set to N because observed baseline alkaline phosphatase is not imputed.
+    MT.HGBBLIF: Set to N because observed baseline hemoglobin is not imputed.
+    MT.ALBBLIF: Blank because baseline albumin is unavailable in the source release and is not imputed.
+    MT.LDHBLIF: Blank because baseline lactate dehydrogenase is unavailable in the source release and is not imputed.
+    MT.ADEX_AVAL: >
+      Parameter-specific numeric value from qualifying primary IV SDTM.EX records: initial EXPDOSE,
+      cumulative EXCUMD2, positive administered-cycle count, delay/reduction counts, consistent source
+      EXTRINT, cycle EXDOSE2, or adjustment flag.
+    MT.ADEX_AVALC: Character representation or category corresponding to ADEX.AVAL and PARAMCD.
     MT.ADEX_PARAMN: Numeric ADEX parameter ordering derived from ADEX.PARAMCD.
-    MT.ADEX_AVISITN: Numeric ADEX analysis visit derived from ADEX.AVISIT and SDTM.EX date or sequence ordering.
+    MT.ADEX_AVISITN: "Cycle number from SDTM.EX.VISITNUM; summary records labelled ALL CYCLES are assigned AVISITN=0."
     MT.ADCM_ASTDT: Analysis medication start date derived from SDTM.CM.CMSTDTC.
     MT.ADCM_AENDT: Analysis medication end date derived from SDTM.CM.CMENDTC.
     MT.ADCM_ASTDY: Analysis medication start relative day derived from ADCM.ASTDT and ADSL.TRTSDT.
     MT.ADAE_ATOXGR: Numeric adverse-event toxicity grade derived from SDTM.AE toxicity grade or severity source fields.
     MT.ADLB_AVAL: Numeric laboratory analysis value derived from SDTM.LB.LBSTRESN after parameter-specific unit standardization.
     MT.ADLB_AVALC: Character laboratory analysis value derived from SDTM.LB.LBSTRESC.
-    MT.ADLB_ATOXGR: Analysis toxicity grade derived from laboratory result, normal range, and grading rules.
-    MT.ADLB_BASE: Baseline numeric value selected from the latest eligible pre-treatment ADLB.AVAL record.
-    MT.ADLB_BASEC: Baseline character value selected from the latest eligible pre-treatment ADLB.AVALC record.
+    MT.ADLB_PARCAT1: "PARCAT1 is assigned TUMOR MARKER for PARAMCD=PSA; otherwise it is carried from SDTM.LB.LBCAT."
+    MT.ADLB_ATOXGR: Numeric carry-forward of SDTM.LB.LBTOXGR. No independent CTCAE grading algorithm is applied.
+    MT.ADLB_BASE: Numeric value from the deterministic SDTM.LB.LBBLFL=Y record selected by date and LBSEQ within subject and parameter.
+    MT.ADLB_BASEC: Character value from the same deterministic SDTM.LB.LBBLFL=Y record used for BASE.
     MT.ADLB_CHG: Change from baseline calculated as ADLB.AVAL minus ADLB.BASE.
     MT.ADLB_PCHG: Percent change from baseline calculated as 100 times ADLB.CHG divided by ADLB.BASE.
-    MT.ADLB_BASEFL: Baseline flag set on the selected eligible pre-treatment laboratory record.
+    MT.ADLB_BASEFL: "Y only on the SDTM.LB record selected as baseline from LBBLFL=Y; N otherwise."
     MT.ADLB_ADT: Analysis date derived from SDTM.LB.LBDTC.
-    MT.ADRS_AVALC: Character response result derived from response source assessments and response derivation rules.
-    MT.ADRS_AVAL: Numeric response category derived from ADRS.AVALC response ordering.
+    MT.ADRS_AVALC: >
+      Parameter-specific response result. OVRLRESP is lesion-derived RECIST v1.0; BESTRESP/OBJRESP use
+      confirmed objective-response rules without an intervening PD; PSPROG is reconstructed with prior
+      nadir; BSGRESP is exploratory; CLINPROG remains separately typed.
+    MT.ADRS_AVAL: Numeric category mapped from the parameter-specific ADRS.AVALC value.
     MT.ADTTE_ITTFL: Intent-to-treat flag inherited from ADSL.ITTFL.
     MT.ADTTE_SAFFL: Safety population flag inherited from ADSL.SAFFL.
     MT.ADTTE_PARAMN: Numeric ADTTE parameter ordering derived from ADTTE.PARAMCD.
     MT.ADTTE_PARCAT1: Time-to-event parameter category derived from ADTTE.PARAMCD.
+    MT.ADTTE_ADT: >
+      OS, PFS, TTPSA, TTUMOR, and TTPAIN start at randomization; TTSAE starts at first dose. All are
+      bounded by the analysis cutoff. OS uses eligible death; PFS uses the earliest eligible
+      lesion-derived RECIST, reconstructed PSA, governed F-042 pain, or death component unless earlier
+      NACT censors; TTPSA, TTUMOR, and TTPAIN use their typed components; TTSAE uses the first
+      treatment-emergent serious AE through the earliest of last known alive, 30 days after last dose,
+      and the cutoff. Censor dates are parameter-specific and may not precede STARTDT.
+    MT.CNSR_TTE: >
+      CNSR=0 for an eligible event under the parameter-specific rule and CNSR=1 otherwise. New
+      anti-cancer therapy censors PFS only when it precedes the earliest eligible event.
+    MT.AVAL_TTE: >
+      Inclusive duration in days: ADT - STARTDT + 1. Missing or pre-origin dates are hard validation
+      failures; durations are never floored to one day.
     MT.ADTTE_AVALU: Time-to-event unit assigned by ADTTE parameter derivation.
 
 origin_overrides:
   ADSL.ETHNIC: Assigned
+  ADSL.TRT01A: Derived
+  ADSL.TRT01AN: Derived
   ADCM.ASTDT: Derived
   ADCM.AENDT: Derived
   ADCM.ASTDY: Derived
+  ADCM.CMSEQ: Predecessor
+  ADLB.PARCAT1: Derived
+  ADLB.ATOXGR: Predecessor
+  ADLB.LBSEQ: Predecessor
+  ADTTE.STARTDT: Derived
+  ADTTE.ADT: Derived
+  ADTTE.EVNTDESC: Derived
+  ADTTE.CNSDTDSC: Derived
 
 method_dispositions:
   status: resolved_by_method_expansion

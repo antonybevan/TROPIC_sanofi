@@ -35,7 +35,7 @@ OUTPUT  (new, additive - nothing existing is modified)
   08_submission_package/ectd/0000/index-md5.txt                   MD5 of index.xml
   08_submission_package/ectd/0000/m1/us/us-regional.xml           FDA regional stub (placeholders)
   08_submission_package/ectd/0000/m5/.../tropic/stf-tropic.xml    Study Tagging File
-  08_submission_package/ectd/0000/util/dtd/README...              which official DTDs to drop in
+  08_submission_package/ectd/0000/util/{dtd,style}/...            official support files
 
 SCOPE / HONESTY
 ---------------
@@ -43,7 +43,7 @@ SCOPE / HONESTY
   MD5 of the corresponding file in the repo `08_submission_package/m5/` tree. To finalize a gateway-ready
   sequence, materialize the `m5/` content under `08_submission_package/ectd/0000/` (package_ectd.py) -
   the hrefs and checksums already target that layout.
-- Official ICH/FDA DTDs are NOT fabricated; place them in `util/dtd/` (see README).
+- Official ICH/FDA DTDs and stylesheets are checksum-pinned under `util/`.
 - First submission => every leaf `operation="new"`.
 
 USAGE:  python3 platform/build_ectd_backbone.py
@@ -51,8 +51,12 @@ Requires: Python 3 stdlib only.
 """
 from __future__ import annotations
 
+import argparse
 import hashlib
+import io
 import os
+import urllib.request
+import zipfile
 from xml.sax.saxutils import escape, quoteattr
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -78,11 +82,30 @@ STF_DIR_REL = ("m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/"
                "5351-stud-rep-contr/tropic")
 STF_NAME = "stf-tropic.xml"
 
-DTDS_REQUIRED = [
-    ("ich-ectd-3-2.dtd", "ICH eCTD backbone DTD v3.2 (https://www.ich.org/) — index.xml"),
-    ("ich-stf-v2-2.dtd", "ICH eCTD Study Tagging File DTD v2.2 — stf-tropic.xml"),
-    ("us-regional-v3-3.dtd", "FDA US Regional DTD v3.3 (accessdata.fda.gov/static/eCTD/) — us-regional.xml"),
-]
+SUPPORT_FILES = {
+    "util/dtd/ich-ectd-3-2.dtd": {
+        "sha256": "9843b1b00055726ed3604b6f224aba52d4c396959e51def1441f8022057f60c9",
+    },
+    "util/dtd/ich-stf-v2-2.dtd": {
+        "sha256": "c9036b11ca6a50df707887fb113c5278a0ef29af86d8e9ed216e818bc0ede506",
+    },
+    "util/dtd/us-regional-v3-3.dtd": {
+        "sha256": "cf9500fe187365a47d51bb8b27a5c9d1b2b19258977da1c2687d4df571729b7c",
+    },
+    "util/style/ectd-2-0.xsl": {
+        "sha256": "41bf6aaf78fa1ba736951174c5e3dc6724410f4d5d9332034dac9b2c8d34dcd1",
+        "url": "https://admin.ich.org/sites/default/files/inline-files/ectd-2-0_0.xsl",
+    },
+    "util/style/ich-stf-stylesheet-2-3.xsl": {
+        "sha256": "9131de4db31b5c74d6559e8e92f0aecb82bbd45f7783b8adfead826dbb943023",
+        "url": "https://admin.ich.org/sites/default/files/inline-files/ich-stf-stylesheet-2-3.xsl",
+    },
+    "util/style/us-regional.xsl": {
+        "sha256": "41fe92721f947fb3bb1dbe6209bccc515d09eb67adbdf3b12e22ad889e963599",
+        "url": "https://www.accessdata.fda.gov/static/eCTD/us-regional.zip",
+        "zip_member": "us-regional.xsl",
+    },
+}
 
 
 def md5_of(path: str) -> str:
@@ -91,6 +114,58 @@ def md5_of(path: str) -> str:
         for chunk in iter(lambda: fh.read(1 << 20), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+def sha256_bytes(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def validate_support_files() -> None:
+    """Fail closed when an official eCTD support file is absent or altered."""
+    problems = []
+    for rel, metadata in SUPPORT_FILES.items():
+        path = os.path.join(SEQ_ROOT, *rel.split("/"))
+        if not os.path.isfile(path):
+            problems.append(f"missing {rel}")
+            continue
+        with open(path, "rb") as fh:
+            actual = sha256_bytes(fh.read())
+        if actual != metadata["sha256"]:
+            problems.append(
+                f"checksum mismatch {rel}: expected {metadata['sha256']}, got {actual}"
+            )
+    if problems:
+        raise RuntimeError(
+            "Official eCTD support-file validation failed:\n  - "
+            + "\n  - ".join(problems)
+            + "\nRun `python3 platform/build_ectd_backbone.py --sync-support-files`."
+        )
+
+
+def sync_style_support_files() -> None:
+    """Download checksum-pinned official stylesheets from the FDA/ICH sources."""
+    for rel, metadata in SUPPORT_FILES.items():
+        url = metadata.get("url")
+        if not url:
+            continue
+        request = urllib.request.Request(url, headers={"User-Agent": "TROPIC-eCTD-builder/1.0"})
+        with urllib.request.urlopen(request, timeout=60) as response:
+            data = response.read()
+        member = metadata.get("zip_member")
+        if member:
+            with zipfile.ZipFile(io.BytesIO(data)) as archive:
+                data = archive.read(member)
+        actual = sha256_bytes(data)
+        if actual != metadata["sha256"]:
+            raise RuntimeError(
+                f"Refusing changed official support file {rel}: expected "
+                f"{metadata['sha256']}, got {actual}"
+            )
+        path = os.path.join(SEQ_ROOT, *rel.split("/"))
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "wb") as fh:
+            fh.write(data)
+        print(f"Synced official support file: {rel}")
 
 
 def classify(rel: str):
@@ -199,7 +274,7 @@ def build_stf(items, stf_path):
     rel_dtd = os.path.relpath(os.path.join(SEQ_ROOT, "util", "dtd", "ich-stf-v2-2.dtd"),
                               os.path.dirname(stf_path)).replace(os.sep, "/")
     rel_style = os.path.relpath(
-        os.path.join(SEQ_ROOT, "util", "style", "us-stf-stylesheet.xsl"),
+        os.path.join(SEQ_ROOT, "util", "style", "ich-stf-stylesheet-2-3.xsl"),
         os.path.dirname(stf_path)).replace(os.sep, "/")
     docs = []
     for it in items:
@@ -320,6 +395,7 @@ def main():
     os.makedirs(os.path.join(SEQ_ROOT, "m1", "us"), exist_ok=True)
     os.makedirs(os.path.join(SEQ_ROOT, "util", "dtd"), exist_ok=True)
     os.makedirs(os.path.join(SEQ_ROOT, "util", "style"), exist_ok=True)
+    validate_support_files()
     stf_path = os.path.join(SEQ_ROOT, STF_DIR_REL, STF_NAME)
     os.makedirs(os.path.dirname(stf_path), exist_ok=True)
 
@@ -345,19 +421,6 @@ def main():
     with open(os.path.join(SEQ_ROOT, "index-md5.txt"), "w", encoding="utf-8") as fh:
         fh.write(md5_of(index_path) + "\n")
 
-    # util/dtd README — manifest of the official DTDs (ICH/FDA-controlled, not generated here)
-    dtd_dir = os.path.join(SEQ_ROOT, "util", "dtd")
-    # retire the old "place DTDs here" stub now that they are present
-    old_readme = os.path.join(dtd_dir, "README_PLACE_OFFICIAL_DTDS_HERE.txt")
-    if os.path.exists(old_readme):
-        os.remove(old_readme)
-    with open(os.path.join(dtd_dir, "README_DTDS.txt"), "w", encoding="utf-8") as fh:
-        fh.write("Official DTDs used to validate this eCTD sequence (ICH/FDA-controlled "
-                 "artifacts, not generated by this script):\n\n")
-        for name, src in DTDS_REQUIRED:
-            present = " [present]" if os.path.exists(os.path.join(dtd_dir, name)) else " [MISSING]"
-            fh.write(f"  - {name}: {src}{present}\n")
-
     tagged = sum(1 for it in items if it["tag"])
     print(f"eCTD sequence {SEQ} written under 08_submission_package/ectd/{SEQ}/")
     print(f"  content leaves : {len(items)} ({tagged} STF-tagged, "
@@ -373,4 +436,13 @@ def main():
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--sync-support-files",
+        action="store_true",
+        help="Download the checksum-pinned official ICH/FDA stylesheets before building.",
+    )
+    args = parser.parse_args()
+    if args.sync_support_files:
+        sync_style_support_files()
     raise SystemExit(main())

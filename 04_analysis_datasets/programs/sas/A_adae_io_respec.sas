@@ -1,9 +1,9 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: A_adae_io_respec.sas
-   Version: 2.2.1
+   Version: 3.0.0
    Author: Antony Bevan, Clinical Programming
-   Date: 2026-05-27 (header fidelity update 2026-07-09)
+   Date: 2026-08-09
    Standard: ADaMIG v1.3 OCCDS v1.0
    Input: sdtm.ae, adam.adsl
    Output: adam.adae
@@ -163,16 +163,37 @@ data work.ae_episodes;
     format CIAESDT CIAEEDT yymmdd10. CIAEDUR 8.2;
 run;
 
+/* Propagate final bounds to every member of a continuous episode. The running
+   CIAEEDT on an early row is provisional until later rows are processed. */
+proc sql;
+    create table work.ae_episode_bounds as
+    select usubjid, cq02nam, ciaeseq,
+           min(astdt) as episode_start format=yymmdd10.,
+           max(aendt) as episode_end format=yymmdd10.
+    from work.ae_episodes
+    where not missing(cq02nam) and not missing(ciaeseq)
+    group by usubjid, cq02nam, ciaeseq;
+
+    create table work.ae_episodes_final as
+    select a.*,
+           coalesce(b.episode_start, a.ciaesdt) as final_ciaesdt format=yymmdd10.,
+           coalesce(b.episode_end, a.ciaeedt) as final_ciaeedt format=yymmdd10.
+    from work.ae_episodes as a
+    left join work.ae_episode_bounds as b
+      on a.usubjid = b.usubjid and a.cq02nam = b.cq02nam
+     and a.ciaeseq = b.ciaeseq;
+quit;
+
 /* Resolve standard OCCDS v1.0 denominator flag for non-grouped AEDECODs.
    AENDT + AESEQ appended as deterministic tie-breakers (audit F-1). */
-proc sort data=work.ae_episodes;
+proc sort data=work.ae_episodes_final;
     by usubjid aedecod astdt aendt aeseq;
 run;
 
 data adam.adae(keep=STUDYID USUBJID TRTA TRTAN AEDECOD AEBODSYS AEHLT AESEV ATOXGR AESER AEREL
                     ASTDT AENDT ASTDY AENDY AEACN AEOUT CQ02NAM CQ02CD CQ02SC CIAESEQ CIAESDT
                     CIAEEDT CIAEDUR AEOCCFL TRTEMFL ADURN ADURU AESEQ);
-    set work.ae_episodes;
+    set work.ae_episodes_final;
     by usubjid aedecod;
     
     /* Standard Treatment Emergent Flag */
@@ -194,6 +215,14 @@ data adam.adae(keep=STUDYID USUBJID TRTA TRTAN AEDECOD AEBODSYS AEHLT AESEV ATOX
     if not missing(aendt) and not missing(astdt) then ADURN = aendt - astdt + 1;
     else ADURN = .;
     ADURU = 'DAYS';
+
+    if not missing(cq02nam) then do;
+        CIAESDT = final_ciaesdt;
+        CIAEEDT = final_ciaeedt;
+        if not missing(CIAESDT) and not missing(CIAEEDT) then
+            CIAEDUR = (CIAEEDT - CIAESDT + 1) / 30.4375;
+        else CIAEDUR = .;
+    end;
     
     label 
         TRTEMFL = 'Treatment Emergent AE Flag'
@@ -227,7 +256,19 @@ data _null_;
     end;
 run;
 
+proc sql noprint;
+    select count(*) into :_n_te_pretrt trimmed
+    from work.ae_episodes_final
+    where strip(aetrtem) = 'T' and not missing(astdt) and not missing(trtsdt)
+      and astdt < trtsdt;
+quit;
+%if &_n_te_pretrt. > 0 %then %do;
+    /* Source AETRTEM remains authoritative because these can represent
+       pre-existing events that worsened after treatment. */
+    %put WARNING: [ADAE-QC] &_n_te_pretrt. source-classified TEAE rows precede treatment.;
+%end;
+
 /* Clean up work library */
-proc delete data=work.ae_base work.ae_episodes;
+proc delete data=work.ae_base work.ae_episodes work.ae_episode_bounds work.ae_episodes_final;
 run;
 quit;

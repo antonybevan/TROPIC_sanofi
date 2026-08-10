@@ -35,12 +35,12 @@ ADSL,LDHBL,Baseline Lactate Dehydrogenase (U/L)
 ADSL,HGBBL,Baseline Hemoglobin (g/dL)
 ADSL,DOCPROG,Docetaxel Prior Progression Class
 ADSL,DOCRESP,Docetaxel Prior Response Flag
-ADSL,ECOGBLIF,Baseline ECOG Imputed Flag
-ADSL,PSABLIF,Baseline PSA Imputed Flag
-ADSL,ALPBLIF,Baseline ALP Imputed Flag
-ADSL,HGBBLIF,Baseline Hemoglobin Imputed Flag
-ADSL,ALBBLIF,Baseline Albumin Imputed Flag
-ADSL,LDHBLIF,Baseline LDH Imputed Flag
+ADSL,ECOGBLIF,Baseline ECOG Imputation Flag
+ADSL,PSABLIF,Baseline PSA Imputation Flag
+ADSL,ALPBLIF,Baseline ALP Imputation Flag
+ADSL,HGBBLIF,Baseline Hemoglobin Imputation Flag
+ADSL,ALBBLIF,Baseline Albumin Imputation Flag
+ADSL,LDHBLIF,Baseline LDH Imputation Flag
 ADEX,STUDYID,Study Identifier
 ADEX,USUBJID,Unique Subject Identifier
 ADEX,SUBJID,Subject Identifier for the Study
@@ -70,6 +70,7 @@ ADCM,NACTFL,New Anti-Cancer Therapy Flag
 ADCM,NACTDT,First Date of New Anti-Cancer Therapy
 ADCM,PREDNFL,Prednisone Co-Medication Flag
 ADCM,TRTEMFL,Treatment Emergent Med Flag
+ADCM,CMSEQ,Concomitant Medication Sequence Number
 ADAE,STUDYID,Study Identifier
 ADAE,USUBJID,Unique Subject Identifier
 ADAE,AEDECOD,Dictionary-Derived Term
@@ -126,6 +127,7 @@ ADLB,ANL01FL,Analysis Record Flag 01
 ADLB,BASEFL,Baseline Record Flag
 ADLB,LBDY,Analysis Day
 ADLB,ADT,Analysis Date
+ADLB,LBSEQ,Laboratory Test Sequence Number
 ADRS,STUDYID,Study Identifier
 ADRS,USUBJID,Unique Subject Identifier
 ADRS,SUBJID,Subject Identifier for the Study

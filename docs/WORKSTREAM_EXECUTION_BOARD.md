@@ -1,9 +1,9 @@
 # TROPIC Workstream Execution Board
 
 **Status:** Active operating board — not a decorative architecture map  
-**As of:** 2026-08-05 (audit closure)
+**As of:** 2026-08-10 (forensic remediation closure)
 **Audit baseline:** current `main` release candidate; predecessor tag `v0.2.0-portfolio` remains immutable historical evidence
-**Latest sealed run:** `v0.2.2-portfolio` · inherited `oda` · `full_dag` · 34/34 stages; the release manifest is hash-bound to the controlled source tree
+**Latest executed run:** uncommitted audited worktree · live `oda` · `full_dag` · 37/37 stages. Pipeline health and technical reconciliation are GREEN; the latest tagged portfolio release remains historical, and release verification correctly stays REMEDIATION until review, commit, and tag.
 **Current controls:** RC checklist 18/18 · `verify_release` 35/35 · CI green
 **Current Path A tag:** `v0.2.2-portfolio` (`v0.2.1-portfolio`, `v0.2.0-portfolio`, and `v0.1.0-demo-rc.1` remain immutable historical evidence)
 **Product claim in force:** **Path A controlled non-submission demonstration** (`docs/PRODUCT_CLAIM.md`)  

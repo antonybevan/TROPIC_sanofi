@@ -1,14 +1,14 @@
 # Offline Capability-Layer Runbook
 
-The 34-stage pipeline (`platform/cibuild.py`, gated by `.github/workflows/ci.yml`)
+The 37-stage pipeline (`platform/cibuild.py`, gated by `.github/workflows/ci.yml`)
 builds and validates the core ADaM/SDTM/TFL/Define/eCTD deliverables, third-engine
 admiral evidence, Dataset-JSON, ARS, USDM, log cleanliness, and release-manifest binding.
 A remaining **additive capability layer** runs on demand beside it: the SDTMIG-3.4 uplift,
 date-precision sensitivity analysis, and the CDISC CORE conformance run.
 
-**Wiring status.** The modern exports — `export_datasetjson.py` (stage 23),
-`build_ars.py` (24), `build_usdm.py` (25) — and the eCTD sequence controls
-(`build_ectd_backbone.py` stage 27, `materialize_ectd.py` stage 28) are manifest stages
+**Wiring status.** The modern exports — `export_datasetjson.py` (stage 30),
+`build_ars.py` (31), `build_usdm.py` (32) — and the eCTD sequence controls
+(`build_ectd_backbone.py` stage 34, `materialize_ectd.py` stage 35) are manifest stages
 gated by their own exit codes in the full pipeline. They remain documented here for
 **standalone reproduction**. The SDTM uplift, date-precision sensitivity analysis, and
 CDISC CORE runs stay **standalone — run on demand, not orchestrated by `cibuild.py` and
@@ -45,11 +45,11 @@ precedes materialize. The eCTD sequence keeps internal `m5/...` hrefs under
 |---|---|---|---|---|---|
 | 1 | `platform/uplift_sdtm_34.R` | `01_source_data/real_sdtm/*.sas7bdat` (3.1.1, pristine) | `.core_run/sdtm34/*.xpt` + `08_submission_package/m5/.../sdtm/datasets/*.xpt` (3.4) | yes | offline |
 | 2 | `03_metadata/define/uplift_define_34.py` | `03_metadata/define/define_sdtm.xml` (+ embedded 3.4 column metadata) | `03_metadata/define/define_sdtm.xml` (SDTMIG 3.4, CT 2026-03-27) | no (metadata-only) | offline |
-| 3 | `platform/export_datasetjson.py` | `04_analysis_datasets/adam/*_prod.xpt`, SDTM `*.xpt` | `04_analysis_datasets/datasetjson/**/*.json` (Dataset-JSON v1.1) | yes | **stage 23** |
-| 4 | `platform/build_ars.py` | MP-arm KM results | `05_outputs/ars/` (ARS v1.0 ReportingEvent + ARD) | yes | **stage 24** |
-| 5 | `platform/build_usdm.py` | study metadata / `config/study_config.yaml` | `03_metadata/usdm/` (USDM v3.0 study definition) | no (study-def only) | **stage 25 + CI** |
-| 6 | `platform/build_ectd_backbone.py` | `08_submission_package/m5/` tree | `08_submission_package/ectd/0000/` backbone + STF + `index-md5.txt` | yes (checksums package leaves) | **stage 27** |
-| 7 | `platform/materialize_ectd.py` | `08_submission_package/ectd/0000/` backbone + `08_submission_package/m5/` | content copied into `08_submission_package/ectd/0000/`, MD5 re-verified | yes | **stage 28** |
+| 3 | `platform/export_datasetjson.py` | `04_analysis_datasets/adam/*_prod.xpt`, SDTM `*.xpt` | `04_analysis_datasets/datasetjson/**/*.json` (Dataset-JSON v1.1) | yes | **stage 27** |
+| 4 | `platform/build_ars.py` | MP-arm KM results | `05_outputs/ars/` (ARS v1.0 ReportingEvent + ARD) | yes | **stage 28** |
+| 5 | `platform/build_usdm.py` | study metadata / `config/study_config.yaml` | `03_metadata/usdm/` (USDM v3.0 study definition) | no (study-def only) | **stage 29 + CI** |
+| 6 | `platform/build_ectd_backbone.py` | `08_submission_package/m5/` tree | `08_submission_package/ectd/0000/` backbone + STF + `index-md5.txt` | yes (checksums package leaves) | **stage 31** |
+| 7 | `platform/materialize_ectd.py` | `08_submission_package/ectd/0000/` backbone + `08_submission_package/m5/` | content copied into `08_submission_package/ectd/0000/`, MD5 re-verified | yes | **stage 32** |
 | 8 | `platform/date_precision_sensitivity.py` | real MP-arm time-to-event data | `platform/conformance/date_precision_sensitivity.json` | yes | offline |
 | 9 | `platform/run_core_conformance.sh` | uplifted 3.4 SDTM, 3.1.1 source, `*_prod.xpt`, defines | `platform/conformance/core_{sdtm34,sdtm,adam}_report.json` | yes + network + API key | offline |
 

@@ -1,28 +1,20 @@
-# Program: cross_lang_audit.R | Version: 3.5.0 | Author: Antony Bevan, Clinical Programming | Date: 2026-06-12
+# Program: cross_lang_audit.R | Version: 4.0.0 | Author: Antony Bevan, Clinical Programming | Date: 2026-08-10
 # Description: Cross-Language reconciliation comparing the SAS production track
 #   (*_prod.xpt) against the independent R validation track (*_v.xpt).
 #
-# METHODOLOGY (audit F-6): This is a KEYED RECORD-CONTENT (multiset) comparison.
-#   Some reconciled ADaM datasets carry a unique within-subject record identifier and
-#   some do not: ADAE retains AESEQ end-to-end in BOTH tracks, so it is compared on the
-#   unique key USUBJID+AESEQ (positional parity). The BDS/OCCDS datasets that have no
-#   unique record id (ADCM, ADLB, ADRS, ADEX) get the multiset test below. When no
-#   unique key exists, the only well-defined parity test is whether both tracks
-#   contain the SAME MULTISET of records within each business-key group. Records
-#   are therefore aligned by business keys and, within tie groups, by full record
-#   content to form a deterministic pairing; diffdf then compares cell values.
-#   A PASS means "both engines produced identical record content" -- it does NOT
-#   assert that an independent unique-key row index was reproduced. Neither track
-#   reads the other's output (the R track was decoupled from *_prod.xpt per F-1).
-#   RESIDUAL LIMITATION (documented, not a defect of the multiset test): like ALL
-#   double-programming, reconciliation cannot detect a CORRELATED error -- if both
-#   independent tracks compute the SAME wrong value, the comparison passes. This is
-#   inherent to dual-programming, not specific to the keyless path; the multiset test
-#   detects every single-track content difference (see tests/smoke_test.R Cases C-E).
+# METHODOLOGY (audit F-6): every reconciled dataset now has a governed, unique
+#   business key in config/study_manifest.yaml. Source sequence variables are
+#   retained where occurrence-level ties require them (ADCM.CMSEQ, ADAE.AESEQ,
+#   ADLB.LBSEQ); BDS keys include the analysis parameter/visit/date components.
+#   Both tracks must be unique on the declared key before diffdf compares values.
+#   This is direct keyed row parity, not positional or content-sorted pairing.
+#   Neither track reads the other's output. As with all double programming, a
+#   correlated error implemented independently in both tracks remains possible.
 
 library(haven)
 library(dplyr)
 library(diffdf)
+source("04_analysis_datasets/programs/r/config_study.R")
 
 # Study structure from the manifest (I/J platform generalisation): the reconciled
 # dataset list, their per-dataset business keys, and the study identity are declared
@@ -58,6 +50,15 @@ compare_datasets <- function(ds_name) {
 
   prod <- read_xpt(prod_path)
   val <- read_xpt(val_path)
+
+  diff_dir <- "06_qc_evidence/reconciliation/differences"
+  dir.create(diff_dir, recursive = TRUE, showWarnings = FALSE)
+  stale <- list.files(
+    diff_dir,
+    pattern = paste0("^", tolower(ds_name), "__"),
+    full.names = TRUE
+  )
+  if (length(stale)) unlink(stale)
 
   # Standardize column casing
   colnames(prod) <- toupper(colnames(prod))
@@ -110,39 +111,51 @@ compare_datasets <- function(ds_name) {
     }
   }
 
-  # Keyed multiset alignment (audit F-6/F-8): sort by business keys FIRST, then by ALL
-  # remaining columns to disambiguate records that share a (non-unique) business key.
-  # Because the sort spans every common column, two records that differ in ANY cell sort
-  # to distinct positions -> cell-level equivalence between the tracks IS guaranteed by a
-  # PASS. What a PASS does NOT assert is reproduction of an independent unique-key row
-  # index; rows that are identical in all columns are interchangeable by definition. This
-  # is a sound record-content/multiset test for keyless analysis datasets, not positional
-  # row parity (see methodology note in ADRG §6).
-  other_cols <- setdiff(common_cols, sort_keys)
-  prod <- prod %>% arrange(across(all_of(c(sort_keys, other_cols))))
-  val  <- val  %>% arrange(across(all_of(c(sort_keys, other_cols))))
+  missing_prod_keys <- setdiff(sort_keys, names(prod))
+  missing_val_keys <- setdiff(sort_keys, names(val))
+  if (length(missing_prod_keys) || length(missing_val_keys)) {
+    return(list(
+      status = "FAIL",
+      reason = paste0(
+        "Declared key missing (prod: ", paste(missing_prod_keys, collapse = ", "),
+        "; validation: ", paste(missing_val_keys, collapse = ", "), ")"
+      )
+    ))
+  }
+  prod_dups <- sum(duplicated(prod[sort_keys]))
+  val_dups <- sum(duplicated(val[sort_keys]))
+  if (prod_dups || val_dups) {
+    return(list(
+      status = "FAIL",
+      reason = paste0(
+        "Governed key is not unique (prod duplicates=", prod_dups,
+        ", validation duplicates=", val_dups, ")"
+      )
+    ))
+  }
 
-  # Add SEQ number within each business key group to guarantee uniqueness
-  prod <- prod %>%
-    group_by(across(all_of(sort_keys))) %>%
-    mutate(SEQ = row_number()) %>%
-    ungroup()
-
-  val <- val %>%
-    group_by(across(all_of(sort_keys))) %>%
-    mutate(SEQ = row_number()) %>%
-    ungroup()
-
-  keys <- c(sort_keys, "SEQ")
+  prod <- prod %>% arrange(across(all_of(sort_keys)))
+  val <- val %>% arrange(across(all_of(sort_keys)))
 
   # Compare using diffdf package
-  diff_res <- diffdf(prod, val, keys = keys, suppress_warnings = TRUE)
+  diff_res <- diffdf(prod, val, keys = sort_keys, suppress_warnings = TRUE)
 
   actual_issues <- setdiff(names(diff_res), c("DataSummary", "AttribDiffs"))
 
   if (length(actual_issues) == 0) {
     return(list(status = "PASS", reason = "Zero cell-level differences"))
   } else {
+    detail_names <- grep("^VarDiff_", names(diff_res), value = TRUE)
+    for (detail_name in detail_names) {
+      variable <- sub("^VarDiff_", "", detail_name)
+      detail_path <- file.path(
+        diff_dir,
+        paste0(tolower(ds_name), "__", tolower(variable), ".csv")
+      )
+      utils::write.csv(as.data.frame(diff_res[[detail_name]]), detail_path, row.names = FALSE)
+      cat("  [DETAIL] ", detail_path, "\n", sep = "")
+      print(utils::head(as.data.frame(diff_res[[detail_name]]), 10), row.names = FALSE)
+    }
     total_diffs <- 0
     if ("NumDiff" %in% names(diff_res)) {
       num_diff <- diff_res$NumDiff
@@ -219,12 +232,12 @@ compare_f042_pain_response <- function() {
     )
     r_result <- f042_derive(
       read_xpt("04_analysis_datasets/adam/adsl_v.xpt"),
-      readRDS("01_source_data/real_sdtm/staging/pn.rds"),
-      readRDS("01_source_data/real_sdtm/staging/sv.rds"),
-      readRDS("01_source_data/real_sdtm/staging/cm.rds"),
-      readRDS("01_source_data/real_sdtm/staging/pr.rds"),
+      readRDS(stage_file("pn")),
+      readRDS(stage_file("sv")),
+      readRDS(stage_file("cm")),
+      readRDS(stage_file("pr")),
       read_xpt("04_analysis_datasets/adam/adrs_v.xpt"),
-      readRDS("01_source_data/real_sdtm/staging/ds.rds")
+      readRDS(stage_file("ds"))
     )
 
     sas_cmp <- sas |>
@@ -314,9 +327,9 @@ html_content <- paste0(
   "th { background-color: #002d62; color: white; } .pass { color: green; font-weight: bold; } .fail { color: red; font-weight: bold; }</style></head>",
   "<body><div class='card'><h1>", .study_title, " (Study ", .study_code, ") Cross-Language Audit Dashboard</h1>",
   banner_html,
-  "<p>Keyed record-content (multiset) reconciliation comparing the SAS 9.4 production track vs the independent R 4.6.0 Pharmaverse validation track. ",
-  "Records are aligned by business keys (within tie groups, by full record content) and compared cell-by-cell with diffdf. ",
-  "A PASS confirms both engines produced identical record content for datasets that carry no unique row identifier; neither track reads the other's output.</p>",
+  "<p>Direct keyed reconciliation comparing the SAS 9.4 production track vs the independent R 4.6.0 Pharmaverse validation track. ",
+  "Each dataset must be unique on its governed business key before records are aligned and compared cell-by-cell with diffdf. ",
+  "A PASS confirms direct row and value parity; neither track reads the other's output.</p>",
   "<table><thead><tr><th>Dataset</th><th>Status</th><th>Audit Details</th></tr></thead><tbody>"
 )
 

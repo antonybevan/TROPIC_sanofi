@@ -49,7 +49,8 @@ Anything not on that list is not the main spine.
     05_outputs/tfl/tfl_generation.R
         │
 [6] PACKAGE
-    platform/package_ectd.py → 08_submission_package/m5/
+    package_ectd.py → build_ectd_backbone.py → materialize_ectd.py
+    → validate_ectd_sequence.py → 08_submission_package/ectd/0000/
         │
 [7] SEAL
     build_release_run_manifest.py · verify_release.py
@@ -134,6 +135,7 @@ Helpers included by SAS (not separate DAG rows): `00_config.sas`, `L_staging_ing
 | `platform/package_ectd.py` | Build `m5/` |
 | `platform/build_ectd_backbone.py` | eCTD index/STF |
 | `platform/materialize_ectd.py` | Sequence materialize |
+| `platform/validate_ectd_sequence.py` | Complete G08 sequence-surface validation |
 | `platform/check_log_cleanliness.py` | Log gate |
 | `platform/build_release_run_manifest.py` | Hash seal |
 

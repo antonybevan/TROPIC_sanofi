@@ -45,6 +45,17 @@ f042_require_columns <- function(x, required, object_name) {
   invisible(x)
 }
 
+f042_staging_dir <- function(root) {
+  config_path <- file.path(root, "config", "study_config.yaml")
+  cfg <- yaml::read_yaml(config_path)
+  staging <- normalizePath(file.path(root, cfg$STAGING_PATH), mustWork = TRUE)
+  source <- normalizePath(file.path(root, cfg$SOURCE_SDTM_PATH), mustWork = TRUE)
+  if (identical(staging, source) || startsWith(staging, paste0(source, .Platform$file.sep))) {
+    stop("F-042 staging path violates the immutable-source boundary", call. = FALSE)
+  }
+  staging
+}
+
 f042_prepare_adsl <- function(adsl) {
   names(adsl) <- toupper(names(adsl))
   f042_require_columns(
@@ -584,7 +595,7 @@ f042_pain_response_events <- function(adsl, visits) {
       as_response = baseline_eligible & ppi_evaluable & as_evaluable &
       !is.na(ppi_value) & !is.na(as_value) & !is.na(base_ppi) &
       !is.na(base_an) & base_an > 0 &
-      ((base_an - as_value) / base_an > 0.5) & (ppi_value <= base_ppi)
+      ((base_an - as_value) / base_an >= 0.5) & (ppi_value <= base_ppi)
     ) |>
     arrange(USUBJID, VISITNUM) |>
     group_by(USUBJID) |>
@@ -716,14 +727,15 @@ f042_run_provisional <- function(
   out_dir = NULL
 ) {
   root <- normalizePath(project_root, mustWork = TRUE)
+  staging <- f042_staging_dir(root)
   adsl <- read_xpt(file.path(root, "04_analysis_datasets/adam/adsl_v.xpt"))
   adtte <- read_xpt(file.path(root, "04_analysis_datasets/adam/adtte_prod.xpt"))
   adrs <- read_xpt(file.path(root, "04_analysis_datasets/adam/adrs_v.xpt"))
-  pn <- readRDS(file.path(root, "01_source_data/real_sdtm/staging/pn.rds"))
-  cm <- readRDS(file.path(root, "01_source_data/real_sdtm/staging/cm.rds"))
-  ds <- readRDS(file.path(root, "01_source_data/real_sdtm/staging/ds.rds"))
-  pr <- readRDS(file.path(root, "01_source_data/real_sdtm/staging/pr.rds"))
-  sv <- readRDS(file.path(root, "01_source_data/real_sdtm/staging/sv.rds"))
+  pn <- readRDS(file.path(staging, "pn.rds"))
+  cm <- readRDS(file.path(staging, "cm.rds"))
+  ds <- readRDS(file.path(staging, "ds.rds"))
+  pr <- readRDS(file.path(staging, "pr.rds"))
+  sv <- readRDS(file.path(staging, "sv.rds"))
   result <- f042_derive(adsl, pn, sv, cm, pr, adrs, ds, adtte)
   if (!is.null(out_dir)) {
     dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)

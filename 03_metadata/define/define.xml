@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<?xml-stylesheet type="text/xsl" href="define2-1.xsl"?><ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:def="http://www.cdisc.org/ns/def/v2.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:arm="http://www.cdisc.org/ns/arm/v1.0" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 http://schema.cdisc.org/define/v2.1/define2-1-0.xsd" ODMVersion="1.3.2" FileType="Snapshot" FileOID="TROPIC_ADAM_Metadata_v2.1" CreationDateTime="2026-06-12T21:52:12" AsOfDateTime="2026-08-04T23:21:19" Originator="Antony Bevan, Clinical Programming" def:Context="Submission"><Study OID="STDY.TROPIC">
+<?xml-stylesheet type="text/xsl" href="define2-1.xsl"?><ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:def="http://www.cdisc.org/ns/def/v2.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:arm="http://www.cdisc.org/ns/arm/v1.0" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 http://schema.cdisc.org/define/v2.1/define2-1-0.xsd" ODMVersion="1.3.2" FileType="Snapshot" FileOID="TROPIC_ADAM_Metadata_v2.1" CreationDateTime="2026-06-12T21:52:12" AsOfDateTime="2026-08-10T01:13:07" Originator="Antony Bevan, Clinical Programming" def:Context="Other"><Study OID="STDY.TROPIC">
     <GlobalVariables>
       <StudyName>TROPIC (EFC6193 / XRP6258)</StudyName>
       <StudyDescription>Cabazitaxel vs Mitoxantrone in mCRPC progressing after docetaxel (NCT00417079).</StudyDescription>
@@ -11,13 +11,13 @@
       <def:Standard OID="STD.ADaMCT.2026-03-27" Name="CDISC/NCI" Type="CT" PublishingSet="ADaM" Version="2026-03-27" Status="Final"/>
     </def:Standards>
     <def:ValueListDef OID="VL.ADLB.AVAL">
-      <ItemRef ItemOID="IT.ADLB.AVAL.NEUT" Mandatory="No">
+      <ItemRef ItemOID="IT.ADLB.AVAL.NEUT" Mandatory="No" MethodOID="MT.ADLB_AVAL">
         <def:WhereClauseRef WhereClauseOID="WC.ADLB.PARAMCD.EQ.NEUT"/>
       </ItemRef>
       <ItemRef ItemOID="IT.ADLB.AVAL.ANCNADIR" Mandatory="No" MethodOID="MT.ANCNADIR">
         <def:WhereClauseRef WhereClauseOID="WC.ADLB.PARAMCD.EQ.ANCNADIR"/>
       </ItemRef>
-      <ItemRef ItemOID="IT.ADLB.AVAL.PSA" Mandatory="No">
+      <ItemRef ItemOID="IT.ADLB.AVAL.PSA" Mandatory="No" MethodOID="MT.ADLB_AVAL">
         <def:WhereClauseRef WhereClauseOID="WC.ADLB.PARAMCD.EQ.PSA"/>
       </ItemRef>
     </def:ValueListDef>
@@ -30,11 +30,23 @@
       </ItemRef>
     </def:ValueListDef>
     <def:ValueListDef OID="VL.ADTTE.AVAL">
-      <ItemRef ItemOID="IT.ADTTE.AVAL.OS" Mandatory="No">
+      <ItemRef ItemOID="IT.ADTTE.AVAL.OS" Mandatory="No" MethodOID="MT.AVAL_TTE">
         <def:WhereClauseRef WhereClauseOID="WC.ADTTE.PARAMCD.EQ.OS"/>
       </ItemRef>
-      <ItemRef ItemOID="IT.ADTTE.AVAL.PFS" Mandatory="No">
+      <ItemRef ItemOID="IT.ADTTE.AVAL.PFS" Mandatory="No" MethodOID="MT.AVAL_TTE">
         <def:WhereClauseRef WhereClauseOID="WC.ADTTE.PARAMCD.EQ.PFS"/>
+      </ItemRef>
+      <ItemRef ItemOID="IT.ADTTE.AVAL.TTPSA" Mandatory="No" MethodOID="MT.AVAL_TTE">
+        <def:WhereClauseRef WhereClauseOID="WC.ADTTE.PARAMCD.EQ.TTPSA"/>
+      </ItemRef>
+      <ItemRef ItemOID="IT.ADTTE.AVAL.TTUMOR" Mandatory="No" MethodOID="MT.AVAL_TTE">
+        <def:WhereClauseRef WhereClauseOID="WC.ADTTE.PARAMCD.EQ.TTUMOR"/>
+      </ItemRef>
+      <ItemRef ItemOID="IT.ADTTE.AVAL.TTPAIN" Mandatory="No" MethodOID="MT.AVAL_TTE">
+        <def:WhereClauseRef WhereClauseOID="WC.ADTTE.PARAMCD.EQ.TTPAIN"/>
+      </ItemRef>
+      <ItemRef ItemOID="IT.ADTTE.AVAL.TTSAE" Mandatory="No" MethodOID="MT.AVAL_TTE">
+        <def:WhereClauseRef WhereClauseOID="WC.ADTTE.PARAMCD.EQ.TTSAE"/>
       </ItemRef>
     </def:ValueListDef>
     <def:WhereClauseDef OID="WC.ADLB.PARAMCD.EQ.NEUT">
@@ -82,7 +94,32 @@
         <CheckValue>TTUMOR</CheckValue>
       </RangeCheck>
     </def:WhereClauseDef>
-    <def:WhereClauseDef OID="WC.ADTTE.PARAMCD.EQ.TTPAIN"><RangeCheck Comparator="EQ" def:ItemOID="IT.ADTTE.PARAMCD" SoftHard="Soft"><CheckValue>TTPAIN</CheckValue></RangeCheck></def:WhereClauseDef><def:WhereClauseDef OID="WC.ADRS.PARAMCD.EQ.PSARESP"><RangeCheck Comparator="EQ" def:ItemOID="IT.ADRS.PARAMCD" SoftHard="Soft"><CheckValue>PSARESP</CheckValue></RangeCheck></def:WhereClauseDef><def:WhereClauseDef OID="WC.ADRS.PARAMCD.EQ.OBJRESP"><RangeCheck Comparator="EQ" def:ItemOID="IT.ADRS.PARAMCD" SoftHard="Soft"><CheckValue>OBJRESP</CheckValue></RangeCheck></def:WhereClauseDef><def:WhereClauseDef OID="WC.ADEX.PARAMCD.EQ.RDIDL"><RangeCheck Comparator="EQ" def:ItemOID="IT.ADEX.PARAMCD" SoftHard="Soft"><CheckValue>RDIDL</CheckValue></RangeCheck></def:WhereClauseDef><def:WhereClauseDef OID="WC.ADAE.TRTEMFL.EQ.Y">
+    <def:WhereClauseDef OID="WC.ADTTE.PARAMCD.EQ.TTPAIN">
+      <RangeCheck Comparator="EQ" def:ItemOID="IT.ADTTE.PARAMCD" SoftHard="Soft">
+        <CheckValue>TTPAIN</CheckValue>
+      </RangeCheck>
+    </def:WhereClauseDef>
+    <def:WhereClauseDef OID="WC.ADTTE.PARAMCD.EQ.TTSAE">
+      <RangeCheck Comparator="EQ" def:ItemOID="IT.ADTTE.PARAMCD" SoftHard="Soft">
+        <CheckValue>TTSAE</CheckValue>
+      </RangeCheck>
+    </def:WhereClauseDef>
+    <def:WhereClauseDef OID="WC.ADRS.PARAMCD.EQ.PSARESP">
+      <RangeCheck Comparator="EQ" def:ItemOID="IT.ADRS.PARAMCD" SoftHard="Soft">
+        <CheckValue>PSARESP</CheckValue>
+      </RangeCheck>
+    </def:WhereClauseDef>
+    <def:WhereClauseDef OID="WC.ADRS.PARAMCD.EQ.OBJRESP">
+      <RangeCheck Comparator="EQ" def:ItemOID="IT.ADRS.PARAMCD" SoftHard="Soft">
+        <CheckValue>OBJRESP</CheckValue>
+      </RangeCheck>
+    </def:WhereClauseDef>
+    <def:WhereClauseDef OID="WC.ADEX.PARAMCD.EQ.RDIDL">
+      <RangeCheck Comparator="EQ" def:ItemOID="IT.ADEX.PARAMCD" SoftHard="Soft">
+        <CheckValue>RDIDL</CheckValue>
+      </RangeCheck>
+    </def:WhereClauseDef>
+    <def:WhereClauseDef OID="WC.ADAE.TRTEMFL.EQ.Y">
       <RangeCheck Comparator="EQ" def:ItemOID="IT.ADAE.TRTEMFL" SoftHard="Soft">
         <CheckValue>Y</CheckValue>
       </RangeCheck>
@@ -91,8 +128,8 @@
       <Description>
         <TranslatedText xml:lang="en">Subject-level characteristics, treatment allocations, survival, and baseline covariates.</TranslatedText>
       </Description>
-      <ItemRef ItemOID="IT.ADSL.STUDYID" Mandatory="Yes" OrderNumber="1"/>
-      <ItemRef ItemOID="IT.ADSL.USUBJID" Mandatory="Yes" OrderNumber="2"/>
+      <ItemRef ItemOID="IT.ADSL.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
+      <ItemRef ItemOID="IT.ADSL.USUBJID" Mandatory="Yes" OrderNumber="2" KeySequence="2"/>
       <ItemRef ItemOID="IT.ADSL.SUBJID" Mandatory="Yes" OrderNumber="3"/>
       <ItemRef ItemOID="IT.ADSL.SITEID" Mandatory="Yes" OrderNumber="4"/>
       <ItemRef ItemOID="IT.ADSL.AGE" Mandatory="Yes" OrderNumber="5"/>
@@ -103,8 +140,8 @@
       <ItemRef ItemOID="IT.ADSL.SEX" Mandatory="Yes" OrderNumber="10"/>
       <ItemRef ItemOID="IT.ADSL.TRT01P" Mandatory="Yes" OrderNumber="11"/>
       <ItemRef ItemOID="IT.ADSL.TRT01PN" Mandatory="Yes" OrderNumber="12"/>
-      <ItemRef ItemOID="IT.ADSL.TRT01A" Mandatory="Yes" OrderNumber="13"/>
-      <ItemRef ItemOID="IT.ADSL.TRT01AN" Mandatory="Yes" OrderNumber="14"/>
+      <ItemRef ItemOID="IT.ADSL.TRT01A" Mandatory="Yes" OrderNumber="13" MethodOID="MT.TRT01A"/>
+      <ItemRef ItemOID="IT.ADSL.TRT01AN" Mandatory="Yes" OrderNumber="14" MethodOID="MT.TRT01A"/>
       <ItemRef ItemOID="IT.ADSL.RANDDT" Mandatory="Yes" OrderNumber="15"/>
       <ItemRef ItemOID="IT.ADSL.TRTSDT" Mandatory="Yes" MethodOID="MT.TRTSDT" OrderNumber="16"/>
       <ItemRef ItemOID="IT.ADSL.TRTEDT" Mandatory="No" MethodOID="MT.TRTEDT" OrderNumber="17"/>
@@ -140,20 +177,20 @@
     </ItemGroupDef>
     <ItemGroupDef OID="IG.ADEX" Name="ADEX" Repeating="Yes" IsReferenceData="No" Purpose="Analysis" def:Structure="One record per subject per parameter per visit" def:ArchiveLocationID="LF.ADEX" def:StandardOID="STD.ADaMIG.1.3">
       <Description>
-        <TranslatedText xml:lang="en">Cycle-level actual dose performance, cumulative exposure, actual/planned dose intensities, and RDI calculations.</TranslatedText>
+        <TranslatedText xml:lang="en">Primary randomized IV antineoplastic exposure: cycle-level administered dose and adjustments; subject-level source RDI, cumulative exposure, and administered-cycle counts.</TranslatedText>
       </Description>
-      <ItemRef ItemOID="IT.ADEX.STUDYID" Mandatory="Yes" OrderNumber="1"/>
-      <ItemRef ItemOID="IT.ADEX.USUBJID" Mandatory="Yes" OrderNumber="2"/>
+      <ItemRef ItemOID="IT.ADEX.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
+      <ItemRef ItemOID="IT.ADEX.USUBJID" Mandatory="Yes" OrderNumber="2" KeySequence="2"/>
       <ItemRef ItemOID="IT.ADEX.SUBJID" Mandatory="Yes" OrderNumber="3"/>
       <ItemRef ItemOID="IT.ADEX.TRT01P" Mandatory="Yes" OrderNumber="4"/>
       <ItemRef ItemOID="IT.ADEX.TRT01PN" Mandatory="Yes" OrderNumber="5"/>
       <ItemRef ItemOID="IT.ADEX.TRTSDT" Mandatory="Yes" OrderNumber="6"/>
-      <ItemRef ItemOID="IT.ADEX.PARAMCD" Mandatory="Yes" OrderNumber="7"/>
+      <ItemRef ItemOID="IT.ADEX.PARAMCD" Mandatory="Yes" OrderNumber="7" KeySequence="3"/>
       <ItemRef ItemOID="IT.ADEX.PARAM" Mandatory="Yes" OrderNumber="8"/>
       <ItemRef ItemOID="IT.ADEX.PARCAT1" Mandatory="Yes" OrderNumber="9"/>
       <ItemRef ItemOID="IT.ADEX.AVAL" Mandatory="No" OrderNumber="10" MethodOID="MT.ADEX_AVAL"/>
       <ItemRef ItemOID="IT.ADEX.AVALC" Mandatory="No" OrderNumber="11" MethodOID="MT.ADEX_AVALC"/>
-      <ItemRef ItemOID="IT.ADEX.AVISIT" Mandatory="Yes" OrderNumber="12"/>
+      <ItemRef ItemOID="IT.ADEX.AVISIT" Mandatory="Yes" OrderNumber="12" KeySequence="4"/>
       <ItemRef ItemOID="IT.ADEX.PARAMN" Mandatory="No" OrderNumber="13" MethodOID="MT.ADEX_PARAMN"/>
       <ItemRef ItemOID="IT.ADEX.AVISITN" Mandatory="No" OrderNumber="14" MethodOID="MT.ADEX_AVISITN"/>
       <def:Class Name="BASIC DATA STRUCTURE"/>
@@ -165,8 +202,8 @@
       <Description>
         <TranslatedText xml:lang="en">Concomitant medication usage including G-CSF prophylaxis markers, prednisone compliance, and NACT timelines.</TranslatedText>
       </Description>
-      <ItemRef ItemOID="IT.ADCM.STUDYID" Mandatory="Yes" OrderNumber="1"/>
-      <ItemRef ItemOID="IT.ADCM.USUBJID" Mandatory="Yes" OrderNumber="2"/>
+      <ItemRef ItemOID="IT.ADCM.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
+      <ItemRef ItemOID="IT.ADCM.USUBJID" Mandatory="Yes" OrderNumber="2" KeySequence="2"/>
       <ItemRef ItemOID="IT.ADCM.CMDECOD" Mandatory="Yes" OrderNumber="3"/>
       <ItemRef ItemOID="IT.ADCM.CMCAT" Mandatory="Yes" OrderNumber="4"/>
       <ItemRef ItemOID="IT.ADCM.CMINDC" Mandatory="No" OrderNumber="5"/>
@@ -180,6 +217,7 @@
       <ItemRef ItemOID="IT.ADCM.NACTDT" Mandatory="No" OrderNumber="13"/>
       <ItemRef ItemOID="IT.ADCM.PREDNFL" Mandatory="No" OrderNumber="14"/>
       <ItemRef ItemOID="IT.ADCM.TRTEMFL" Mandatory="No" OrderNumber="15"/>
+      <ItemRef ItemOID="IT.ADCM.CMSEQ" Mandatory="Yes" OrderNumber="16" KeySequence="3"/>
       <def:Class Name="OCCURRENCE DATA STRUCTURE"/>
       <def:leaf ID="LF.ADCM" xlink:href="adcm.xpt">
         <def:title>adcm.xpt</def:title>
@@ -189,14 +227,14 @@
       <Description>
         <TranslatedText xml:lang="en">Treatment-emergent adverse events, severity classifications, serious AEs, and custom myelosuppressive episode merging.</TranslatedText>
       </Description>
-      <ItemRef ItemOID="IT.ADAE.STUDYID" Mandatory="Yes" OrderNumber="1"/>
-      <ItemRef ItemOID="IT.ADAE.USUBJID" Mandatory="Yes" OrderNumber="2"/>
+      <ItemRef ItemOID="IT.ADAE.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
+      <ItemRef ItemOID="IT.ADAE.USUBJID" Mandatory="Yes" OrderNumber="2" KeySequence="2"/>
       <ItemRef ItemOID="IT.ADAE.AEDECOD" Mandatory="Yes" OrderNumber="3"/>
       <ItemRef ItemOID="IT.ADAE.AEBODSYS" Mandatory="Yes" OrderNumber="4"/>
       <ItemRef ItemOID="IT.ADAE.AEHLT" Mandatory="No" OrderNumber="5"/>
       <ItemRef ItemOID="IT.ADAE.AESEV" Mandatory="No" OrderNumber="6"/>
       <ItemRef ItemOID="IT.ADAE.ATOXGR" Mandatory="No" OrderNumber="7" MethodOID="MT.ADAE_ATOXGR"/>
-      <ItemRef ItemOID="IT.ADAE.AESSER" Mandatory="No" OrderNumber="8"/>
+      <ItemRef ItemOID="IT.ADAE.AESER" Mandatory="No" OrderNumber="8"/>
       <ItemRef ItemOID="IT.ADAE.AEREL" Mandatory="No" OrderNumber="9"/>
       <ItemRef ItemOID="IT.ADAE.ASTDT" Mandatory="No" OrderNumber="10"/>
       <ItemRef ItemOID="IT.ADAE.AENDT" Mandatory="No" OrderNumber="11"/>
@@ -215,7 +253,7 @@
       <ItemRef ItemOID="IT.ADAE.TRTEMFL" Mandatory="No" OrderNumber="24"/>
       <ItemRef ItemOID="IT.ADAE.ADURN" Mandatory="No" OrderNumber="25"/>
       <ItemRef ItemOID="IT.ADAE.ADURU" Mandatory="No" OrderNumber="26"/>
-      <ItemRef ItemOID="IT.ADAE.AESEQ" Mandatory="No" OrderNumber="27"/>
+      <ItemRef ItemOID="IT.ADAE.AESEQ" Mandatory="No" OrderNumber="27" KeySequence="3"/>
       <ItemRef ItemOID="IT.ADAE.TRTA" Mandatory="Yes" OrderNumber="28"/>
       <ItemRef ItemOID="IT.ADAE.TRTAN" Mandatory="Yes" OrderNumber="29"/>
       <def:Class Name="OCCURRENCE DATA STRUCTURE"/>
@@ -225,24 +263,24 @@
     </ItemGroupDef>
     <ItemGroupDef OID="IG.ADLB" Name="ADLB" Repeating="Yes" IsReferenceData="No" Purpose="Analysis" def:Structure="One record per subject per parameter per visit" def:ArchiveLocationID="LF.ADLB" def:StandardOID="STD.ADaMIG.1.3">
       <Description>
-        <TranslatedText xml:lang="en">Longitudinal absolute laboratory measurements, CTCAE grading, Worst-in-window flags (ANL01FL), and continuous nadir models.</TranslatedText>
+        <TranslatedText xml:lang="en">Longitudinal laboratory measurements with source-carried toxicity grades, source-flagged baselines, analysis-window flags (ANL01FL), and ANC nadir/recovery parameters.</TranslatedText>
       </Description>
-      <ItemRef ItemOID="IT.ADLB.STUDYID" Mandatory="Yes" OrderNumber="1"/>
-      <ItemRef ItemOID="IT.ADLB.USUBJID" Mandatory="Yes" OrderNumber="2"/>
+      <ItemRef ItemOID="IT.ADLB.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
+      <ItemRef ItemOID="IT.ADLB.USUBJID" Mandatory="Yes" OrderNumber="2" KeySequence="2"/>
       <ItemRef ItemOID="IT.ADLB.SUBJID" Mandatory="Yes" OrderNumber="3"/>
       <ItemRef ItemOID="IT.ADLB.TRT01P" Mandatory="Yes" OrderNumber="4"/>
       <ItemRef ItemOID="IT.ADLB.TRTSDT" Mandatory="Yes" OrderNumber="5"/>
-      <ItemRef ItemOID="IT.ADLB.PARAMCD" Mandatory="Yes" OrderNumber="6"/>
+      <ItemRef ItemOID="IT.ADLB.PARAMCD" Mandatory="Yes" OrderNumber="6" KeySequence="3"/>
       <ItemRef ItemOID="IT.ADLB.PARAM" Mandatory="Yes" OrderNumber="7"/>
       <ItemRef ItemOID="IT.ADLB.PARAMN" Mandatory="Yes" OrderNumber="8"/>
-      <ItemRef ItemOID="IT.ADLB.PARCAT1" Mandatory="Yes" OrderNumber="9"/>
+      <ItemRef ItemOID="IT.ADLB.PARCAT1" Mandatory="Yes" OrderNumber="9" MethodOID="MT.ADLB_PARCAT1"/>
       <ItemRef ItemOID="IT.ADLB.AVAL" Mandatory="No" OrderNumber="10" MethodOID="MT.ADLB_AVAL"/>
       <ItemRef ItemOID="IT.ADLB.AVALC" Mandatory="No" OrderNumber="11" MethodOID="MT.ADLB_AVALC"/>
       <ItemRef ItemOID="IT.ADLB.LBNRLO" Mandatory="No" OrderNumber="12"/>
       <ItemRef ItemOID="IT.ADLB.LBNRHI" Mandatory="No" OrderNumber="13"/>
       <ItemRef ItemOID="IT.ADLB.LBNRIND" Mandatory="No" OrderNumber="14"/>
       <ItemRef ItemOID="IT.ADLB.AVISIT" Mandatory="Yes" OrderNumber="15"/>
-      <ItemRef ItemOID="IT.ADLB.AVISITN" Mandatory="Yes" OrderNumber="16"/>
+      <ItemRef ItemOID="IT.ADLB.AVISITN" Mandatory="Yes" OrderNumber="16" KeySequence="4"/>
       <ItemRef ItemOID="IT.ADLB.AWDIST" Mandatory="No" OrderNumber="17"/>
       <ItemRef ItemOID="IT.ADLB.ATOXGR" Mandatory="No" OrderNumber="18" MethodOID="MT.ADLB_ATOXGR"/>
       <ItemRef ItemOID="IT.ADLB.BASE" Mandatory="No" OrderNumber="19" MethodOID="MT.ADLB_BASE"/>
@@ -252,8 +290,9 @@
       <ItemRef ItemOID="IT.ADLB.PCHG" Mandatory="No" OrderNumber="23" MethodOID="MT.ADLB_PCHG"/>
       <ItemRef ItemOID="IT.ADLB.ANL01FL" Mandatory="No" OrderNumber="24"/>
       <ItemRef ItemOID="IT.ADLB.BASEFL" Mandatory="No" OrderNumber="25" MethodOID="MT.ADLB_BASEFL"/>
-      <ItemRef ItemOID="IT.ADLB.LBDY" Mandatory="No" OrderNumber="26"/>
+      <ItemRef ItemOID="IT.ADLB.LBDY" Mandatory="No" OrderNumber="26" KeySequence="5"/>
       <ItemRef ItemOID="IT.ADLB.ADT" Mandatory="No" OrderNumber="27" MethodOID="MT.ADLB_ADT"/>
+      <ItemRef ItemOID="IT.ADLB.LBSEQ" Mandatory="No" OrderNumber="28" KeySequence="6"/>
       <def:Class Name="BASIC DATA STRUCTURE"/>
       <def:leaf ID="LF.ADLB" xlink:href="adlb.xpt">
         <def:title>adlb.xpt</def:title>
@@ -261,19 +300,19 @@
     </ItemGroupDef>
     <ItemGroupDef OID="IG.ADRS" Name="ADRS" Repeating="Yes" IsReferenceData="No" Purpose="Analysis" def:Structure="One record per subject per parameter per visit" def:ArchiveLocationID="LF.ADRS" def:StandardOID="STD.ADaMIG.1.3">
       <Description>
-        <TranslatedText xml:lang="en">RECIST v1.0 soft-tissue assessments, bone-lesion scan progression tracking, objective responses, and PSA progressions.</TranslatedText>
+        <TranslatedText xml:lang="en">Lesion-derived RECIST v1.0 assessments, confirmed objective response, reconstructed PSA endpoints, exploratory bone 2+2 status, and separately typed disposition clinical progression.</TranslatedText>
       </Description>
-      <ItemRef ItemOID="IT.ADRS.STUDYID" Mandatory="Yes" OrderNumber="1"/>
-      <ItemRef ItemOID="IT.ADRS.USUBJID" Mandatory="Yes" OrderNumber="2"/>
+      <ItemRef ItemOID="IT.ADRS.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
+      <ItemRef ItemOID="IT.ADRS.USUBJID" Mandatory="Yes" OrderNumber="2" KeySequence="2"/>
       <ItemRef ItemOID="IT.ADRS.SUBJID" Mandatory="Yes" OrderNumber="3"/>
       <ItemRef ItemOID="IT.ADRS.TRT01P" Mandatory="Yes" OrderNumber="4"/>
       <ItemRef ItemOID="IT.ADRS.TRTSDT" Mandatory="Yes" OrderNumber="5"/>
-      <ItemRef ItemOID="IT.ADRS.PARAMCD" Mandatory="Yes" OrderNumber="6"/>
+      <ItemRef ItemOID="IT.ADRS.PARAMCD" Mandatory="Yes" OrderNumber="6" KeySequence="3"/>
       <ItemRef ItemOID="IT.ADRS.PARAM" Mandatory="Yes" OrderNumber="7"/>
       <ItemRef ItemOID="IT.ADRS.AVALC" Mandatory="No" OrderNumber="8" MethodOID="MT.ADRS_AVALC"/>
-      <ItemRef ItemOID="IT.ADRS.ADT" Mandatory="Yes" OrderNumber="9"/>
+      <ItemRef ItemOID="IT.ADRS.ADT" Mandatory="Yes" OrderNumber="9" KeySequence="4"/>
       <ItemRef ItemOID="IT.ADRS.ADY" Mandatory="No" OrderNumber="10"/>
-      <ItemRef ItemOID="IT.ADRS.VISIT" Mandatory="Yes" OrderNumber="11"/>
+      <ItemRef ItemOID="IT.ADRS.AVISIT" Mandatory="Yes" OrderNumber="11" KeySequence="5"/>
       <ItemRef ItemOID="IT.ADRS.ANL01FL" Mandatory="No" OrderNumber="12"/>
       <ItemRef ItemOID="IT.ADRS.AVAL" Mandatory="No" OrderNumber="13" MethodOID="MT.ADRS_AVAL"/>
       <def:Class Name="BASIC DATA STRUCTURE"/>
@@ -285,23 +324,23 @@
       <Description>
         <TranslatedText xml:lang="en">Time-to-event endpoints including Overall Survival (OS), Progression-Free Survival (PFS), time to PSA progression (TTPSA), time to tumor progression (TTUMOR), time to pain progression (TTPAIN), and time to first serious adverse event (TTSAE).</TranslatedText>
       </Description>
-      <ItemRef ItemOID="IT.ADTTE.STUDYID" Mandatory="Yes" OrderNumber="1"/>
-      <ItemRef ItemOID="IT.ADTTE.USUBJID" Mandatory="Yes" OrderNumber="2"/>
+      <ItemRef ItemOID="IT.ADTTE.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
+      <ItemRef ItemOID="IT.ADTTE.USUBJID" Mandatory="Yes" OrderNumber="2" KeySequence="2"/>
       <ItemRef ItemOID="IT.ADTTE.SUBJID" Mandatory="Yes" OrderNumber="3"/>
       <ItemRef ItemOID="IT.ADTTE.SITEID" Mandatory="Yes" OrderNumber="4"/>
       <ItemRef ItemOID="IT.ADTTE.TRT01P" Mandatory="Yes" OrderNumber="5"/>
       <ItemRef ItemOID="IT.ADTTE.TRT01PN" Mandatory="Yes" OrderNumber="6"/>
       <ItemRef ItemOID="IT.ADTTE.ITTFL" Mandatory="Yes" OrderNumber="7" MethodOID="MT.ADTTE_ITTFL"/>
       <ItemRef ItemOID="IT.ADTTE.SAFFL" Mandatory="Yes" OrderNumber="8" MethodOID="MT.ADTTE_SAFFL"/>
-      <ItemRef ItemOID="IT.ADTTE.PARAMCD" Mandatory="Yes" OrderNumber="9"/>
+      <ItemRef ItemOID="IT.ADTTE.PARAMCD" Mandatory="Yes" OrderNumber="9" KeySequence="3"/>
       <ItemRef ItemOID="IT.ADTTE.PARAM" Mandatory="Yes" OrderNumber="10"/>
       <ItemRef ItemOID="IT.ADTTE.PARAMN" Mandatory="No" OrderNumber="11" MethodOID="MT.ADTTE_PARAMN"/>
       <ItemRef ItemOID="IT.ADTTE.PARCAT1" Mandatory="No" OrderNumber="12" MethodOID="MT.ADTTE_PARCAT1"/>
-      <ItemRef ItemOID="IT.ADTTE.STARTDT" Mandatory="Yes" OrderNumber="13"/>
-      <ItemRef ItemOID="IT.ADTTE.ADT" Mandatory="Yes" OrderNumber="14"/>
+      <ItemRef ItemOID="IT.ADTTE.STARTDT" Mandatory="Yes" OrderNumber="13" MethodOID="MT.ADTTE_ADT"/>
+      <ItemRef ItemOID="IT.ADTTE.ADT" Mandatory="Yes" OrderNumber="14" MethodOID="MT.ADTTE_ADT"/>
       <ItemRef ItemOID="IT.ADTTE.CNSR" Mandatory="Yes" MethodOID="MT.CNSR_TTE" OrderNumber="15"/>
-      <ItemRef ItemOID="IT.ADTTE.EVNTDESC" Mandatory="No" OrderNumber="16"/>
-      <ItemRef ItemOID="IT.ADTTE.CNSDTDSC" Mandatory="No" OrderNumber="17"/>
+      <ItemRef ItemOID="IT.ADTTE.EVNTDESC" Mandatory="No" OrderNumber="16" MethodOID="MT.ADTTE_ADT"/>
+      <ItemRef ItemOID="IT.ADTTE.CNSDTDSC" Mandatory="No" OrderNumber="17" MethodOID="MT.ADTTE_ADT"/>
       <ItemRef ItemOID="IT.ADTTE.AVAL" Mandatory="Yes" MethodOID="MT.AVAL_TTE" OrderNumber="18"/>
       <ItemRef ItemOID="IT.ADTTE.AVALU" Mandatory="No" OrderNumber="19" MethodOID="MT.ADTTE_AVALU"/>
       <def:Class Name="BASIC DATA STRUCTURE"/>
@@ -351,11 +390,11 @@
     </ItemDef>
     <ItemDef OID="IT.ADSL.TRT01A" Name="TRT01A" DataType="text" Length="40">
       <Description><TranslatedText xml:lang="en">Actual Treatment for Period 01</TranslatedText></Description><CodeListRef CodeListOID="CL.TRT"/>
-      <def:Origin Type="Assigned" Source="Sponsor"/>
+      <def:Origin Type="Derived" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADSL.TRT01AN" Name="TRT01AN" DataType="float" Length="8">
       <Description><TranslatedText xml:lang="en">Actual Treatment for Period 01 (N)</TranslatedText></Description><CodeListRef CodeListOID="CL.TRT01PN"/>
-      <def:Origin Type="Assigned" Source="Sponsor"/>
+      <def:Origin Type="Derived" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADSL.RANDDT" Name="RANDDT" DataType="date" Length="10">
       <Description><TranslatedText xml:lang="en">Randomization Date</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
@@ -440,39 +479,39 @@
       <def:Origin Type="Collected" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADSL.ECOGBLIF" Name="ECOGBLIF" DataType="text" Length="1">
-      <Description><TranslatedText xml:lang="en">Baseline ECOG Imputed Flag</TranslatedText></Description><CodeListRef CodeListOID="CL.NY"/>
+      <Description><TranslatedText xml:lang="en">Baseline ECOG Imputation Flag</TranslatedText></Description><CodeListRef CodeListOID="CL.NY"/>
       <def:Origin Type="Derived" Source="Sponsor">
         <Description>
-          <TranslatedText xml:lang="en">'Y' if ECOGBL was imputed to the protocol default (no baseline ECOG on file), else 'N'.</TranslatedText>
+          <TranslatedText xml:lang="en">Set to 'N' because no ECOGBL imputation is performed; a missing source baseline remains missing.</TranslatedText>
         </Description>
       </def:Origin>
     </ItemDef>
     <ItemDef OID="IT.ADSL.PSABLIF" Name="PSABLIF" DataType="text" Length="1">
-      <Description><TranslatedText xml:lang="en">Baseline PSA Imputed Flag</TranslatedText></Description><CodeListRef CodeListOID="CL.NY"/>
+      <Description><TranslatedText xml:lang="en">Baseline PSA Imputation Flag</TranslatedText></Description><CodeListRef CodeListOID="CL.NY"/>
       <def:Origin Type="Derived" Source="Sponsor">
         <Description>
-          <TranslatedText xml:lang="en">'Y' if PSABL was imputed to the population-median fallback (no baseline PSA on file), else 'N'.</TranslatedText>
+          <TranslatedText xml:lang="en">Set to 'N' because no PSABL imputation is performed; a missing source baseline remains missing.</TranslatedText>
         </Description>
       </def:Origin>
     </ItemDef>
     <ItemDef OID="IT.ADSL.ALPBLIF" Name="ALPBLIF" DataType="text" Length="1">
-      <Description><TranslatedText xml:lang="en">Baseline ALP Imputed Flag</TranslatedText></Description><CodeListRef CodeListOID="CL.NY"/>
+      <Description><TranslatedText xml:lang="en">Baseline ALP Imputation Flag</TranslatedText></Description><CodeListRef CodeListOID="CL.NY"/>
       <def:Origin Type="Derived" Source="Sponsor">
         <Description>
-          <TranslatedText xml:lang="en">'Y' if ALPBL was imputed to the population-median fallback (no baseline ALP on file), else 'N'.</TranslatedText>
+          <TranslatedText xml:lang="en">Set to 'N' because no ALPBL imputation is performed; a missing source baseline remains missing.</TranslatedText>
         </Description>
       </def:Origin>
     </ItemDef>
     <ItemDef OID="IT.ADSL.HGBBLIF" Name="HGBBLIF" DataType="text" Length="1">
-      <Description><TranslatedText xml:lang="en">Baseline Hemoglobin Imputed Flag</TranslatedText></Description><CodeListRef CodeListOID="CL.NY"/>
+      <Description><TranslatedText xml:lang="en">Baseline Hemoglobin Imputation Flag</TranslatedText></Description><CodeListRef CodeListOID="CL.NY"/>
       <def:Origin Type="Derived" Source="Sponsor">
         <Description>
-          <TranslatedText xml:lang="en">'Y' if HGBBL was imputed to the population-median fallback (no baseline hemoglobin on file), else 'N'.</TranslatedText>
+          <TranslatedText xml:lang="en">Set to 'N' because no HGBBL imputation is performed; a missing source baseline remains missing.</TranslatedText>
         </Description>
       </def:Origin>
     </ItemDef>
     <ItemDef OID="IT.ADSL.ALBBLIF" Name="ALBBLIF" DataType="text" Length="1">
-      <Description><TranslatedText xml:lang="en">Baseline Albumin Imputed Flag</TranslatedText></Description><CodeListRef CodeListOID="CL.NY"/>
+      <Description><TranslatedText xml:lang="en">Baseline Albumin Imputation Flag</TranslatedText></Description><CodeListRef CodeListOID="CL.NY"/>
       <def:Origin Type="Derived" Source="Sponsor">
         <Description>
           <TranslatedText xml:lang="en">Blank — ALBBL is not collected and is left missing (no imputation).</TranslatedText>
@@ -480,7 +519,7 @@
       </def:Origin>
     </ItemDef>
     <ItemDef OID="IT.ADSL.LDHBLIF" Name="LDHBLIF" DataType="text" Length="1">
-      <Description><TranslatedText xml:lang="en">Baseline LDH Imputed Flag</TranslatedText></Description><CodeListRef CodeListOID="CL.NY"/>
+      <Description><TranslatedText xml:lang="en">Baseline LDH Imputation Flag</TranslatedText></Description><CodeListRef CodeListOID="CL.NY"/>
       <def:Origin Type="Derived" Source="Sponsor">
         <Description>
           <TranslatedText xml:lang="en">Blank — LDHBL is not collected and is left missing (no imputation).</TranslatedText>
@@ -583,6 +622,9 @@
       <Description><TranslatedText xml:lang="en">Treatment Emergent Med Flag</TranslatedText></Description><CodeListRef CodeListOID="CL.NY"/>
       <def:Origin Type="Assigned" Source="Sponsor"/>
     </ItemDef>
+    <ItemDef OID="IT.ADCM.CMSEQ" Name="CMSEQ" DataType="integer" Length="8">
+      <Description><TranslatedText xml:lang="en">Concomitant Medication Sequence Number</TranslatedText></Description><def:Origin Type="Predecessor" Source="Sponsor"/>
+    </ItemDef>
     <ItemDef OID="IT.ADAE.TRTA" Name="TRTA" DataType="text" Length="20">
       <Description><TranslatedText xml:lang="en">Actual Treatment</TranslatedText></Description><CodeListRef CodeListOID="CL.TRT"/>
       <def:Origin Type="Assigned" Source="Sponsor"/>
@@ -612,7 +654,7 @@
     <ItemDef OID="IT.ADAE.ATOXGR" Name="ATOXGR" DataType="float" Length="8">
       <Description><TranslatedText xml:lang="en">Analysis Toxicity Grade</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
     </ItemDef>
-    <ItemDef OID="IT.ADAE.AESSER" Name="AESER" DataType="text" Length="1">
+    <ItemDef OID="IT.ADAE.AESER" Name="AESER" DataType="text" Length="1">
       <Description><TranslatedText xml:lang="en">Serious Event</TranslatedText></Description><CodeListRef CodeListOID="CL.NY"/>
       <def:Origin Type="Collected" Source="Sponsor"/>
     </ItemDef>
@@ -702,7 +744,7 @@
       <Description><TranslatedText xml:lang="en">Parameter (N)</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADLB.PARCAT1" Name="PARCAT1" DataType="text" Length="20">
-      <Description><TranslatedText xml:lang="en">Parameter Category 1</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
+      <Description><TranslatedText xml:lang="en">Parameter Category 1</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADLB.ADT" Name="ADT" DataType="date" Length="10">
       <Description><TranslatedText xml:lang="en">Analysis Date</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
@@ -733,7 +775,7 @@
       <Description><TranslatedText xml:lang="en">Analysis Window Distance</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADLB.ATOXGR" Name="ATOXGR" DataType="float" Length="8">
-      <Description><TranslatedText xml:lang="en">Analysis Toxicity Grade</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
+      <Description><TranslatedText xml:lang="en">Analysis Toxicity Grade</TranslatedText></Description><def:Origin Type="Predecessor" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADLB.BASE" Name="BASE" DataType="float" Length="8">
       <Description><TranslatedText xml:lang="en">Baseline Value</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
@@ -760,6 +802,9 @@
     </ItemDef>
     <ItemDef OID="IT.ADLB.LBDY" Name="LBDY" DataType="float" Length="8">
       <Description><TranslatedText xml:lang="en">Analysis Day</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
+    </ItemDef>
+    <ItemDef OID="IT.ADLB.LBSEQ" Name="LBSEQ" DataType="integer" Length="8">
+      <Description><TranslatedText xml:lang="en">Laboratory Test Sequence Number</TranslatedText></Description><def:Origin Type="Predecessor" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADRS.STUDYID" Name="STUDYID" DataType="text" Length="40">
       <Description><TranslatedText xml:lang="en">Study Identifier</TranslatedText></Description><def:Origin Type="Protocol" Source="Sponsor"/>
@@ -793,7 +838,7 @@
     <ItemDef OID="IT.ADRS.ADY" Name="ADY" DataType="float" Length="8">
       <Description><TranslatedText xml:lang="en">Analysis Day</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
     </ItemDef>
-    <ItemDef OID="IT.ADRS.VISIT" Name="AVISIT" DataType="text" Length="40">
+    <ItemDef OID="IT.ADRS.AVISIT" Name="AVISIT" DataType="text" Length="40">
       <Description><TranslatedText xml:lang="en">Analysis Visit</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADRS.ANL01FL" Name="ANL01FL" DataType="text" Length="1">
@@ -831,20 +876,20 @@
       <Description><TranslatedText xml:lang="en">Parameter</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADTTE.STARTDT" Name="STARTDT" DataType="date" Length="10">
-      <Description><TranslatedText xml:lang="en">Time-to-Event Start Date</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
+      <Description><TranslatedText xml:lang="en">Time-to-Event Start Date</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADTTE.ADT" Name="ADT" DataType="date" Length="10">
-      <Description><TranslatedText xml:lang="en">Analysis Date</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
+      <Description><TranslatedText xml:lang="en">Analysis Date</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADTTE.CNSR" Name="CNSR" DataType="float" Length="8">
       <Description><TranslatedText xml:lang="en">Censor Flag</TranslatedText></Description><CodeListRef CodeListOID="CL.CNSR"/>
       <def:Origin Type="Derived" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADTTE.EVNTDESC" Name="EVNTDESC" DataType="text" Length="100">
-      <Description><TranslatedText xml:lang="en">Event Description</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
+      <Description><TranslatedText xml:lang="en">Event Description</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADTTE.CNSDTDSC" Name="CNSDTDSC" DataType="text" Length="100">
-      <Description><TranslatedText xml:lang="en">Censoring Description</TranslatedText></Description><def:Origin Type="Collected" Source="Sponsor"/>
+      <Description><TranslatedText xml:lang="en">Censoring Description</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADTTE.AVAL" Name="AVAL" DataType="float" Length="8">
       <Description><TranslatedText xml:lang="en">Analysis Value (Days)</TranslatedText></Description><def:ValueListRef ValueListOID="VL.ADTTE.AVAL"/>
@@ -877,7 +922,7 @@
       <Description><TranslatedText xml:lang="en">Prostate Specific Antigen (ug/L)</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADEX.AVAL.RDI" Name="AVAL" DataType="float" Length="8">
-      <Description><TranslatedText xml:lang="en">Relative Dose Intensity (%)</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
+      <Description><TranslatedText xml:lang="en">Source Relative Dose Intensity (%)</TranslatedText></Description><def:Origin Type="Predecessor" Source="Sponsor"/>
     </ItemDef>
     <ItemDef OID="IT.ADEX.AVAL.NCYCLE" Name="AVAL" DataType="integer" Length="8">
       <Description><TranslatedText xml:lang="en">Number of Cycles Received</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
@@ -887,6 +932,18 @@
     </ItemDef>
     <ItemDef OID="IT.ADTTE.AVAL.PFS" Name="AVAL" DataType="float" Length="8">
       <Description><TranslatedText xml:lang="en">Progression-Free Survival (Days)</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
+    </ItemDef>
+    <ItemDef OID="IT.ADTTE.AVAL.TTPSA" Name="AVAL" DataType="float" Length="8">
+      <Description><TranslatedText xml:lang="en">Time to PSA Progression (Days)</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
+    </ItemDef>
+    <ItemDef OID="IT.ADTTE.AVAL.TTUMOR" Name="AVAL" DataType="float" Length="8">
+      <Description><TranslatedText xml:lang="en">Time to RECIST Tumor Progression (Days)</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
+    </ItemDef>
+    <ItemDef OID="IT.ADTTE.AVAL.TTPAIN" Name="AVAL" DataType="float" Length="8">
+      <Description><TranslatedText xml:lang="en">Time to Pain Progression (Days)</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
+    </ItemDef>
+    <ItemDef OID="IT.ADTTE.AVAL.TTSAE" Name="AVAL" DataType="float" Length="8">
+      <Description><TranslatedText xml:lang="en">Time to First TE Serious AE (Days)</TranslatedText></Description><def:Origin Type="Derived" Source="Sponsor"/>
     </ItemDef>
   <CodeList OID="CL.NY" Name="Yes/No Codelist" DataType="text" def:StandardOID="STD.ADaMCT.2026-03-27">
       <CodeListItem CodedValue="Y">
@@ -974,7 +1031,7 @@
       </CodeListItem>
       <CodeListItem CodedValue="RDI">
         <Decode>
-          <TranslatedText xml:lang="en">Relative Dose Intensity (%)</TranslatedText>
+          <TranslatedText xml:lang="en">Source Relative Dose Intensity (%)</TranslatedText>
         </Decode>
       </CodeListItem>
       <CodeListItem CodedValue="RDIDL">
@@ -984,7 +1041,7 @@
       </CodeListItem>
       <CodeListItem CodedValue="PERFDOSE">
         <Decode>
-          <TranslatedText xml:lang="en">Actual Dose Administered (mg/m2)</TranslatedText>
+          <TranslatedText xml:lang="en">IV Actual Dose Administered (mg/m2)</TranslatedText>
         </Decode>
       </CodeListItem>
       <CodeListItem CodedValue="ADJ">
@@ -1089,7 +1146,7 @@
       </CodeListItem>
       <CodeListItem CodedValue="CUMDOSE">
         <Decode>
-          <TranslatedText xml:lang="en">Cumulative Actual Dose (mg/m2)</TranslatedText>
+          <TranslatedText xml:lang="en">Cumulative IV Actual Dose (mg/m2)</TranslatedText>
         </Decode>
       </CodeListItem>
       <CodeListItem CodedValue="EOS">
@@ -1154,7 +1211,7 @@
       </CodeListItem>
       <CodeListItem CodedValue="PLDOSE">
         <Decode>
-          <TranslatedText xml:lang="en">Planned Dose (mg/m2)</TranslatedText>
+          <TranslatedText xml:lang="en">Initial Planned IV Dose (mg/m2)</TranslatedText>
         </Decode>
       </CodeListItem>
       <CodeListItem CodedValue="PSA">
@@ -1169,12 +1226,17 @@
       </CodeListItem>
       <CodeListItem CodedValue="PSPROG">
         <Decode>
-          <TranslatedText xml:lang="en">PSA Progression (PCWG3)</TranslatedText>
+          <TranslatedText xml:lang="en">PSA Progression (reconstructed rule)</TranslatedText>
         </Decode>
       </CodeListItem>
       <CodeListItem CodedValue="BSGRESP">
         <Decode>
-          <TranslatedText xml:lang="en">Bone Scan Progression (PCWG3)</TranslatedText>
+          <TranslatedText xml:lang="en">Exploratory Bone Progression (2+2)</TranslatedText>
+        </Decode>
+      </CodeListItem>
+      <CodeListItem CodedValue="CLINPROG">
+        <Decode>
+          <TranslatedText xml:lang="en">Disposition Clinical Progression</TranslatedText>
         </Decode>
       </CodeListItem>
       <CodeListItem CodedValue="RBC">
@@ -1245,17 +1307,17 @@
     </MethodDef>
     <MethodDef OID="MT.PAINBL" Name="Method for PAINBL" Type="Computation">
       <Description>
-        <TranslatedText xml:lang="en">Baseline pain assessment flag, set to Y if baseline pain intensity is &gt;= 2 or baseline analgesic score is &gt;= 10.</TranslatedText>
+        <TranslatedText xml:lang="en">Baseline pain flag from the 7 days ending on treatment start. Within each component and day, discordant duplicates are excluded. A component requires at least 5 valid days; PAINBL=Y for median pain intensity &gt;=2 or mean analgesic score &gt;=10, otherwise N.</TranslatedText>
       </Description>
     </MethodDef>
     <MethodDef OID="MT.RDI" Name="Method for RDI" Type="Computation">
       <Description>
-        <TranslatedText xml:lang="en">Relative Dose Intensity, calculated as (Actual cumulative dose administered / Planned cumulative dose) * 100.</TranslatedText>
+        <TranslatedText xml:lang="en">Source relative dose intensity carried from SDTM.EX.EXTRINT for the qualifying primary IV antineoplastic when repeated subject values are internally consistent; no dose-intensity formula is reconstructed.</TranslatedText>
       </Description>
     </MethodDef>
     <MethodDef OID="MT.NCYCLE" Name="Method for NCYCLE" Type="Computation">
       <Description>
-        <TranslatedText xml:lang="en">Number of treatment cycles received, derived as the max of visit number from EX.</TranslatedText>
+        <TranslatedText xml:lang="en">Count of distinct SDTM.EX.VISITNUM cycles with a positive administered IV dose (EXDOSE2&gt;0) for the qualifying randomized antineoplastic.</TranslatedText>
       </Description>
     </MethodDef>
     <MethodDef OID="MT.ANCNADIR" Name="Method for ANCNADIR" Type="Computation">
@@ -1265,15 +1327,15 @@
     </MethodDef>
     <MethodDef OID="MT.AVAL_TTE" Name="Method for AVAL_TTE" Type="Computation">
       <Description>
-        <TranslatedText xml:lang="en">Time-to-event duration in days, calculated as: ADT - STARTDT + 1.</TranslatedText>
+        <TranslatedText xml:lang="en">Inclusive duration in days: ADT - STARTDT + 1. Missing or pre-origin dates are hard validation failures; durations are never floored to one day.</TranslatedText>
       </Description>
     </MethodDef>
     <MethodDef OID="MT.CNSR_TTE" Name="Method for CNSR_TTE" Type="Computation">
       <Description>
-        <TranslatedText xml:lang="en">Censoring indicator, set to 0 if the event occurred, or 1 if censored.</TranslatedText>
+        <TranslatedText xml:lang="en">CNSR=0 for an eligible event under the parameter-specific rule and CNSR=1 otherwise. New anti-cancer therapy censors PFS only when it precedes the earliest eligible event.</TranslatedText>
       </Description>
     </MethodDef>
-    <MethodDef OID="MT.DTHDT" Name="Method for DTHDT" Type="Computation"><Description><TranslatedText xml:lang="en">Death date derived from SDTM.DM.DTHDTC or disposition/death records.</TranslatedText></Description></MethodDef><MethodDef OID="MT.LSTALVDT" Name="Method for LSTALVDT" Type="Computation"><Description><TranslatedText xml:lang="en">Last known alive date derived as the maximum non-death contact or assessment date across source domains.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ECOGBLIF" Name="Method for ECOGBLIF" Type="Computation"><Description><TranslatedText xml:lang="en">Baseline ECOG imputation flag derived from ECOGBL source availability and baseline window rules.</TranslatedText></Description></MethodDef><MethodDef OID="MT.PSABLIF" Name="Method for PSABLIF" Type="Computation"><Description><TranslatedText xml:lang="en">Baseline PSA imputation flag derived from PSABL source availability and baseline window rules.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ALPBLIF" Name="Method for ALPBLIF" Type="Computation"><Description><TranslatedText xml:lang="en">Baseline alkaline phosphatase imputation flag derived from ALPBL source availability and baseline window rules.</TranslatedText></Description></MethodDef><MethodDef OID="MT.HGBBLIF" Name="Method for HGBBLIF" Type="Computation"><Description><TranslatedText xml:lang="en">Baseline hemoglobin imputation flag derived from HGBBL source availability and baseline window rules.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ALBBLIF" Name="Method for ALBBLIF" Type="Computation"><Description><TranslatedText xml:lang="en">Baseline albumin imputation flag derived from ALBBL source availability and baseline window rules.</TranslatedText></Description></MethodDef><MethodDef OID="MT.LDHBLIF" Name="Method for LDHBLIF" Type="Computation"><Description><TranslatedText xml:lang="en">Baseline lactate dehydrogenase imputation flag derived from LDHBL source availability and baseline window rules.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADEX_AVAL" Name="Method for ADEX_AVAL" Type="Computation"><Description><TranslatedText xml:lang="en">Numeric exposure analysis value derived from SDTM.EX dose, duration, or cycle records according to ADEX.PARAMCD.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADEX_AVALC" Name="Method for ADEX_AVALC" Type="Computation"><Description><TranslatedText xml:lang="en">Character exposure analysis value derived from SDTM.EX dose, duration, or cycle records according to ADEX.PARAMCD.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADEX_PARAMN" Name="Method for ADEX_PARAMN" Type="Computation"><Description><TranslatedText xml:lang="en">Numeric ADEX parameter ordering derived from ADEX.PARAMCD.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADEX_AVISITN" Name="Method for ADEX_AVISITN" Type="Computation"><Description><TranslatedText xml:lang="en">Numeric ADEX analysis visit derived from ADEX.AVISIT and SDTM.EX date or sequence ordering.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADAE_ATOXGR" Name="Method for ADAE_ATOXGR" Type="Computation"><Description><TranslatedText xml:lang="en">Numeric adverse-event toxicity grade derived from SDTM.AE toxicity grade or severity source fields.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_AVAL" Name="Method for ADLB_AVAL" Type="Computation"><Description><TranslatedText xml:lang="en">Numeric laboratory analysis value derived from SDTM.LB.LBSTRESN after parameter-specific unit standardization.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_AVALC" Name="Method for ADLB_AVALC" Type="Computation"><Description><TranslatedText xml:lang="en">Character laboratory analysis value derived from SDTM.LB.LBSTRESC.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_ATOXGR" Name="Method for ADLB_ATOXGR" Type="Computation"><Description><TranslatedText xml:lang="en">Analysis toxicity grade derived from laboratory result, normal range, and grading rules.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_BASE" Name="Method for ADLB_BASE" Type="Computation"><Description><TranslatedText xml:lang="en">Baseline numeric value selected from the latest eligible pre-treatment ADLB.AVAL record.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_BASEC" Name="Method for ADLB_BASEC" Type="Computation"><Description><TranslatedText xml:lang="en">Baseline character value selected from the latest eligible pre-treatment ADLB.AVALC record.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_CHG" Name="Method for ADLB_CHG" Type="Computation"><Description><TranslatedText xml:lang="en">Change from baseline calculated as ADLB.AVAL minus ADLB.BASE.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_PCHG" Name="Method for ADLB_PCHG" Type="Computation"><Description><TranslatedText xml:lang="en">Percent change from baseline calculated as 100 times ADLB.CHG divided by ADLB.BASE.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_BASEFL" Name="Method for ADLB_BASEFL" Type="Computation"><Description><TranslatedText xml:lang="en">Baseline flag set on the selected eligible pre-treatment laboratory record.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_ADT" Name="Method for ADLB_ADT" Type="Computation"><Description><TranslatedText xml:lang="en">Analysis date derived from SDTM.LB.LBDTC.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADRS_AVALC" Name="Method for ADRS_AVALC" Type="Computation"><Description><TranslatedText xml:lang="en">Character response result derived from response source assessments and response derivation rules.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADRS_AVAL" Name="Method for ADRS_AVAL" Type="Computation"><Description><TranslatedText xml:lang="en">Numeric response category derived from ADRS.AVALC response ordering.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADTTE_ITTFL" Name="Method for ADTTE_ITTFL" Type="Computation"><Description><TranslatedText xml:lang="en">Intent-to-treat flag inherited from ADSL.ITTFL.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADTTE_SAFFL" Name="Method for ADTTE_SAFFL" Type="Computation"><Description><TranslatedText xml:lang="en">Safety population flag inherited from ADSL.SAFFL.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADTTE_PARAMN" Name="Method for ADTTE_PARAMN" Type="Computation"><Description><TranslatedText xml:lang="en">Numeric ADTTE parameter ordering derived from ADTTE.PARAMCD.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADTTE_PARCAT1" Name="Method for ADTTE_PARCAT1" Type="Computation"><Description><TranslatedText xml:lang="en">Time-to-event parameter category derived from ADTTE.PARAMCD.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADTTE_AVALU" Name="Method for ADTTE_AVALU" Type="Computation"><Description><TranslatedText xml:lang="en">Time-to-event unit assigned by ADTTE parameter derivation.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADCM_ASTDT" Name="Method for ADCM_ASTDT" Type="Computation"><Description><TranslatedText xml:lang="en">Analysis medication start date derived from SDTM.CM.CMSTDTC.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADCM_AENDT" Name="Method for ADCM_AENDT" Type="Computation"><Description><TranslatedText xml:lang="en">Analysis medication end date derived from SDTM.CM.CMENDTC.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADCM_ASTDY" Name="Method for ADCM_ASTDY" Type="Computation"><Description><TranslatedText xml:lang="en">Analysis medication start relative day derived from ADCM.ASTDT and ADSL.TRTSDT.</TranslatedText></Description></MethodDef><def:CommentDef OID="COM.CIAESEQ">
+    <MethodDef OID="MT.DTHDT" Name="Method for DTHDT" Type="Computation"><Description><TranslatedText xml:lang="en">Earliest complete SDTM.AE.AEDTHDTC is preferred; otherwise the earliest DS death week is anchored to ADSL.RANDDT.</TranslatedText></Description></MethodDef><MethodDef OID="MT.LSTALVDT" Name="Method for LSTALVDT" Type="Computation"><Description><TranslatedText xml:lang="en">Maximum dated observed contact or assessment across DS, EX, VS, LB, LS, PN, and SV, capped at DTHDT for deceased subjects.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ECOGBLIF" Name="Method for ECOGBLIF" Type="Computation"><Description><TranslatedText xml:lang="en">Set to N because observed baseline ECOG is not imputed.</TranslatedText></Description></MethodDef><MethodDef OID="MT.PSABLIF" Name="Method for PSABLIF" Type="Computation"><Description><TranslatedText xml:lang="en">Set to N because observed baseline PSA is not imputed.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ALPBLIF" Name="Method for ALPBLIF" Type="Computation"><Description><TranslatedText xml:lang="en">Set to N because observed baseline alkaline phosphatase is not imputed.</TranslatedText></Description></MethodDef><MethodDef OID="MT.HGBBLIF" Name="Method for HGBBLIF" Type="Computation"><Description><TranslatedText xml:lang="en">Set to N because observed baseline hemoglobin is not imputed.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ALBBLIF" Name="Method for ALBBLIF" Type="Computation"><Description><TranslatedText xml:lang="en">Blank because baseline albumin is unavailable in the source release and is not imputed.</TranslatedText></Description></MethodDef><MethodDef OID="MT.LDHBLIF" Name="Method for LDHBLIF" Type="Computation"><Description><TranslatedText xml:lang="en">Blank because baseline lactate dehydrogenase is unavailable in the source release and is not imputed.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADEX_AVAL" Name="Method for ADEX_AVAL" Type="Computation"><Description><TranslatedText xml:lang="en">Parameter-specific numeric value from qualifying primary IV SDTM.EX records: initial EXPDOSE, cumulative EXCUMD2, positive administered-cycle count, delay/reduction counts, consistent source EXTRINT, cycle EXDOSE2, or adjustment flag.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADEX_AVALC" Name="Method for ADEX_AVALC" Type="Computation"><Description><TranslatedText xml:lang="en">Character representation or category corresponding to ADEX.AVAL and PARAMCD.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADEX_PARAMN" Name="Method for ADEX_PARAMN" Type="Computation"><Description><TranslatedText xml:lang="en">Numeric ADEX parameter ordering derived from ADEX.PARAMCD.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADEX_AVISITN" Name="Method for ADEX_AVISITN" Type="Computation"><Description><TranslatedText xml:lang="en">Cycle number from SDTM.EX.VISITNUM; summary records labelled ALL CYCLES are assigned AVISITN=0.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADAE_ATOXGR" Name="Method for ADAE_ATOXGR" Type="Computation"><Description><TranslatedText xml:lang="en">Numeric adverse-event toxicity grade derived from SDTM.AE toxicity grade or severity source fields.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_AVAL" Name="Method for ADLB_AVAL" Type="Computation"><Description><TranslatedText xml:lang="en">Numeric laboratory analysis value derived from SDTM.LB.LBSTRESN after parameter-specific unit standardization.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_AVALC" Name="Method for ADLB_AVALC" Type="Computation"><Description><TranslatedText xml:lang="en">Character laboratory analysis value derived from SDTM.LB.LBSTRESC.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_ATOXGR" Name="Method for ADLB_ATOXGR" Type="Computation"><Description><TranslatedText xml:lang="en">Numeric carry-forward of SDTM.LB.LBTOXGR. No independent CTCAE grading algorithm is applied.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_BASE" Name="Method for ADLB_BASE" Type="Computation"><Description><TranslatedText xml:lang="en">Numeric value from the deterministic SDTM.LB.LBBLFL=Y record selected by date and LBSEQ within subject and parameter.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_BASEC" Name="Method for ADLB_BASEC" Type="Computation"><Description><TranslatedText xml:lang="en">Character value from the same deterministic SDTM.LB.LBBLFL=Y record used for BASE.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_CHG" Name="Method for ADLB_CHG" Type="Computation"><Description><TranslatedText xml:lang="en">Change from baseline calculated as ADLB.AVAL minus ADLB.BASE.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_PCHG" Name="Method for ADLB_PCHG" Type="Computation"><Description><TranslatedText xml:lang="en">Percent change from baseline calculated as 100 times ADLB.CHG divided by ADLB.BASE.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_BASEFL" Name="Method for ADLB_BASEFL" Type="Computation"><Description><TranslatedText xml:lang="en">Y only on the SDTM.LB record selected as baseline from LBBLFL=Y; N otherwise.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_ADT" Name="Method for ADLB_ADT" Type="Computation"><Description><TranslatedText xml:lang="en">Analysis date derived from SDTM.LB.LBDTC.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADRS_AVALC" Name="Method for ADRS_AVALC" Type="Computation"><Description><TranslatedText xml:lang="en">Parameter-specific response result. OVRLRESP is lesion-derived RECIST v1.0; BESTRESP/OBJRESP use confirmed objective-response rules without an intervening PD; PSPROG is reconstructed with prior nadir; BSGRESP is exploratory; CLINPROG remains separately typed.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADRS_AVAL" Name="Method for ADRS_AVAL" Type="Computation"><Description><TranslatedText xml:lang="en">Numeric category mapped from the parameter-specific ADRS.AVALC value.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADTTE_ITTFL" Name="Method for ADTTE_ITTFL" Type="Computation"><Description><TranslatedText xml:lang="en">Intent-to-treat flag inherited from ADSL.ITTFL.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADTTE_SAFFL" Name="Method for ADTTE_SAFFL" Type="Computation"><Description><TranslatedText xml:lang="en">Safety population flag inherited from ADSL.SAFFL.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADTTE_PARAMN" Name="Method for ADTTE_PARAMN" Type="Computation"><Description><TranslatedText xml:lang="en">Numeric ADTTE parameter ordering derived from ADTTE.PARAMCD.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADTTE_PARCAT1" Name="Method for ADTTE_PARCAT1" Type="Computation"><Description><TranslatedText xml:lang="en">Time-to-event parameter category derived from ADTTE.PARAMCD.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADTTE_AVALU" Name="Method for ADTTE_AVALU" Type="Computation"><Description><TranslatedText xml:lang="en">Time-to-event unit assigned by ADTTE parameter derivation.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADCM_ASTDT" Name="Method for ADCM_ASTDT" Type="Computation"><Description><TranslatedText xml:lang="en">Analysis medication start date derived from SDTM.CM.CMSTDTC.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADCM_AENDT" Name="Method for ADCM_AENDT" Type="Computation"><Description><TranslatedText xml:lang="en">Analysis medication end date derived from SDTM.CM.CMENDTC.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADCM_ASTDY" Name="Method for ADCM_ASTDY" Type="Computation"><Description><TranslatedText xml:lang="en">Analysis medication start relative day derived from ADCM.ASTDT and ADSL.TRTSDT.</TranslatedText></Description></MethodDef><MethodDef OID="MT.TRT01A" Name="Method for TRT01A" Type="Computation"><Description><TranslatedText xml:lang="en">Actual treatment is derived from administered qualifying primary IV antineoplastic in SDTM.EX (cabazitaxel/XRP6258 or mitoxantrone). If no qualifying IV record exists, planned treatment is retained; TRT01AN maps CbzP=1 and MP=2.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADLB_PARCAT1" Name="Method for ADLB_PARCAT1" Type="Computation"><Description><TranslatedText xml:lang="en">PARCAT1 is assigned TUMOR MARKER for PARAMCD=PSA; otherwise it is carried from SDTM.LB.LBCAT.</TranslatedText></Description></MethodDef><MethodDef OID="MT.ADTTE_ADT" Name="Method for ADTTE_ADT" Type="Computation"><Description><TranslatedText xml:lang="en">OS, PFS, TTPSA, TTUMOR, and TTPAIN start at randomization; TTSAE starts at first dose. All are bounded by the analysis cutoff. OS uses eligible death; PFS uses the earliest eligible lesion-derived RECIST, reconstructed PSA, governed F-042 pain, or death component unless earlier NACT censors; TTPSA, TTUMOR, and TTPAIN use their typed components; TTSAE uses the first treatment-emergent serious AE through the earliest of last known alive, 30 days after last dose, and the cutoff. Censor dates are parameter-specific and may not precede STARTDT.</TranslatedText></Description></MethodDef><def:CommentDef OID="COM.CIAESEQ">
       <Description>
         <TranslatedText xml:lang="en">Sequence index increments when chronological gap between myeloid AEs is &gt; 3 days, representing separate clinical episodes.</TranslatedText>
       </Description>
@@ -1293,6 +1355,6 @@
 <arm:ResultDisplay OID="RD.EFFICACY.PSA.RESPONSE" Name="PSA Best Percentage Change — Waterfall (figure F-13-1)"><Description><TranslatedText xml:lang="en">Per-subject best (minimum) percentage change in PSA from baseline, CbzP vs MP, against the 50% PSA-response threshold; rendered as figure F-13-1. Path A limitation: CbzP is synthetic/reconstructed and TFL-only; comparative results are non-confirmatory and are not submission evidence.</TranslatedText></Description><arm:AnalysisResult OID="AR.PSA.BESTPCHG" ParameterOID="IT.ADLB.PARAMCD" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="SECONDARY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">Best percentage change from baseline in PSA per subject (minimum PCHG over post-baseline records), by treatment.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADLB"><def:WhereClauseRef WhereClauseOID="WC.ADLB.PARAMCD.EQ.PSA"/><arm:AnalysisVariable ItemOID="IT.ADLB.PCHG"/><arm:AnalysisVariable ItemOID="IT.ADLB.TRT01P"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (dplyr)"><arm:Code>adlb[PARAMCD=='PSA'] grouped by USUBJID, best_pchg = min(PCHG); classified against 50% response threshold</arm:Code></arm:ProgrammingCode></arm:AnalysisResult></arm:ResultDisplay>
 <arm:ResultDisplay OID="RD.SAFETY.EXPOSURE" Name="Treatment Exposure Duration — Swimmer (figure F-14-1)"><Description><TranslatedText xml:lang="en">Per-subject treatment exposure duration (months) with death events and cycles received, by arm; rendered as figure F-14-1. Path A limitation: CbzP is synthetic/reconstructed and TFL-only; comparative results are non-confirmatory and are not submission evidence.</TranslatedText></Description><arm:AnalysisResult OID="AR.TRTDUR.EXPOSURE" ParameterOID="IT.ADEX.PARAMCD" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="SAFETY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">Treatment duration (ADSL.TRTDURD) and cycles received (ADEX NCYCLE) per subject, with death-event marker, by treatment.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADSL"><arm:AnalysisVariable ItemOID="IT.ADSL.TRTDURD"/><arm:AnalysisVariable ItemOID="IT.ADSL.DTHFL"/><arm:AnalysisVariable ItemOID="IT.ADSL.TRT01P"/></arm:AnalysisDataset><arm:AnalysisDataset ItemGroupOID="IG.ADEX"><def:WhereClauseRef WhereClauseOID="WC.ADEX.PARAMCD.EQ.NCYCLE"/><arm:AnalysisVariable ItemOID="IT.ADEX.AVAL"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (ggplot2)"><arm:Code>duration_months = ADSL.TRTDURD / 30.4375; cycles from ADEX[PARAMCD=='NCYCLE']; death marker = (DTHFL == 'Y')</arm:Code></arm:ProgrammingCode></arm:AnalysisResult></arm:ResultDisplay>
 <arm:ResultDisplay OID="RD.OPTIMUS.ER" Name="Project Optimus Exposure-Response Scatter (figure F-17-1)"><Description><TranslatedText xml:lang="en">Project Optimus exposure-response: Cycle-1 ANC nadir versus relative dose intensity (RDI) by arm, with LOWESS smoothing and the Grade-4 neutropenia threshold; rendered as figure F-17-1, per SAP v3.0 §10 (Project Optimus) and ADRG §3. Path A limitation: CbzP is synthetic/reconstructed and TFL-only; comparative results are non-confirmatory and are not submission evidence.</TranslatedText></Description><arm:AnalysisResult OID="AR.OPTIMUS.RDI.ANC" ParameterOID="IT.ADEX.PARAMCD" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="EXPLORATORY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">ANC nadir (ADLB ANCNADIR, Cycle 1) modelled against relative dose intensity (ADEX RDI, all cycles) by treatment, LOWESS local regression.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADEX"><def:WhereClauseRef WhereClauseOID="WC.ADEX.PARAMCD.EQ.RDI"/><arm:AnalysisVariable ItemOID="IT.ADEX.AVAL"/><arm:AnalysisVariable ItemOID="IT.ADEX.TRT01P"/></arm:AnalysisDataset><arm:AnalysisDataset ItemGroupOID="IG.ADLB"><def:WhereClauseRef WhereClauseOID="WC.ADLB.PARAMCD.EQ.ANCNADIR"/><arm:AnalysisVariable ItemOID="IT.ADLB.AVAL"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (ggplot2::geom_smooth loess)"><arm:Code>loess(ANC ~ RDI) by TRT01P; RDI = ADEX[PARAMCD=='RDI', AVISIT=='ALL CYCLES'].AVAL; ANC = ADLB[PARAMCD=='ANCNADIR', AVISIT=='CYCLE 1'].AVAL</arm:Code></arm:ProgrammingCode></arm:AnalysisResult></arm:ResultDisplay>
-<arm:ResultDisplay OID="RD.SAFETY.LABSHIFT" Name="T-21-1/T-21-2 Laboratory Toxicity-Grade Shift"><Description><TranslatedText xml:lang="en">Shift in CTCAE analysis toxicity grade (ATOXGR) from baseline to worst post-baseline analysis record, by laboratory parameter (ANC, PSA); rendered as table T-21-1, per SAP v3.0 §7.5. Path A limitation: CbzP is synthetic/reconstructed and TFL-only; comparative results are non-confirmatory and are not submission evidence.</TranslatedText></Description><arm:AnalysisResult OID="AR.LAB.SHIFT" ParameterOID="IT.ADLB.PARAMCD" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="SAFETY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">Cross-tabulation of baseline (BASEFL='Y') versus worst post-baseline (BASEFL='N', ANL01FL='Y') ATOXGR per subject and parameter.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADLB"><arm:AnalysisVariable ItemOID="IT.ADLB.PARAMCD"/><arm:AnalysisVariable ItemOID="IT.ADLB.ATOXGR"/><arm:AnalysisVariable ItemOID="IT.ADLB.BASEFL"/><arm:AnalysisVariable ItemOID="IT.ADLB.ANL01FL"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (dplyr)"><arm:Code>baseline ATOXGR (BASEFL=='Y') joined to worst post-baseline ATOXGR (BASEFL=='N', ANL01FL=='Y') per USUBJID and PARAMCD (NEUT, PSA)</arm:Code></arm:ProgrammingCode></arm:AnalysisResult></arm:ResultDisplay><arm:ResultDisplay OID="RD.EFFICACY.RESPONSE" Name="T-11-3/T-11-4/T-11-5/T-11-8b Response Analyses"><Description><TranslatedText xml:lang="en">PSA response, objective response, pain response, and the response-evaluable ORR sensitivity under SAP v4.0 sections 10.2-10.4. Pain response uses staged PN/SV plus ADSL and is subject-level reconciled by the F042_PAIN_RESPONSE gate. Path A limitation: CbzP is synthetic/reconstructed and TFL-only; comparative results are non-confirmatory and are not submission evidence.</TranslatedText></Description><arm:AnalysisResult OID="AR.PSA.RESPONSE" ParameterOID="IT.ADRS.PARAMCD" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="SECONDARY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">T-11-3 PSA response rate using observed baseline PSA eligibility.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADRS"><def:WhereClauseRef WhereClauseOID="WC.ADRS.PARAMCD.EQ.PSARESP"/><arm:AnalysisVariable ItemOID="IT.ADRS.AVALC"/><arm:AnalysisVariable ItemOID="IT.ADRS.TRT01P"/></arm:AnalysisDataset><arm:AnalysisDataset ItemGroupOID="IG.ADSL"><arm:AnalysisVariable ItemOID="IT.ADSL.PSABL"/><arm:AnalysisVariable ItemOID="IT.ADSL.PSABLIF"/><arm:AnalysisVariable ItemOID="IT.ADSL.TRT01P"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (Path A reporting program)"><arm:Code>tfl_generation.R filters ADRS PSARESP to observed baseline PSA &gt;=20 and reports responders by treatment.</arm:Code></arm:ProgrammingCode></arm:AnalysisResult><arm:AnalysisResult OID="AR.OBJECTIVE.RESPONSE" ParameterOID="IT.ADRS.PARAMCD" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="SECONDARY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">T-11-4 confirmed objective response rate using the baseline measurable-disease denominator.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADRS"><def:WhereClauseRef WhereClauseOID="WC.ADRS.PARAMCD.EQ.OBJRESP"/><arm:AnalysisVariable ItemOID="IT.ADRS.AVALC"/><arm:AnalysisVariable ItemOID="IT.ADRS.TRT01P"/></arm:AnalysisDataset><arm:AnalysisDataset ItemGroupOID="IG.ADSL"><arm:AnalysisVariable ItemOID="IT.ADSL.MEASDISF"/><arm:AnalysisVariable ItemOID="IT.ADSL.TRT01P"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (Path A reporting program)"><arm:Code>tfl_generation.R left-joins confirmed ADRS OBJRESP to the ADSL baseline measurable-disease population and reports responders.</arm:Code></arm:ProgrammingCode></arm:AnalysisResult><arm:AnalysisResult OID="AR.PAIN.RESPONSE" ParameterOID="IT.ADSL.PAINBL" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="SECONDARY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">T-11-5 pain response rate. The analysis uses response-evaluable subjects from staged PN/SV; ADSL supplies subject and treatment attributes. Exact SAS/R subject-level parity is required.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADSL"><arm:AnalysisVariable ItemOID="IT.ADSL.USUBJID"/><arm:AnalysisVariable ItemOID="IT.ADSL.TRT01P"/><arm:AnalysisVariable ItemOID="IT.ADSL.ITTFL"/><arm:AnalysisVariable ItemOID="IT.ADSL.PAINBL"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (Path A reporting program)"><arm:Code>f042_provisional_pain_derivation.R evaluates initial and confirming PN/SV visits; cross_lang_audit.R requires F042_PAIN_RESPONSE exact SAS/R subject, event, confirmation, component, and source-date parity.</arm:Code></arm:ProgrammingCode></arm:AnalysisResult><arm:AnalysisResult OID="AR.OBJECTIVE.RESPONSE.EVALUABLE" ParameterOID="IT.ADRS.PARAMCD" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="EXPLORATORY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">T-11-8b response-evaluable objective response sensitivity.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADRS"><def:WhereClauseRef WhereClauseOID="WC.ADRS.PARAMCD.EQ.OBJRESP"/><arm:AnalysisVariable ItemOID="IT.ADRS.AVALC"/><arm:AnalysisVariable ItemOID="IT.ADRS.TRT01P"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (Path A reporting program)"><arm:Code>tfl_generation.R reports confirmed ADRS OBJRESP among subjects with an evaluable OBJRESP record.</arm:Code></arm:ProgrammingCode></arm:AnalysisResult></arm:ResultDisplay><arm:ResultDisplay OID="RD.OPTIMUS.TABLES" Name="T-17-1/T-17-2/T-17-4 Project Optimus Tables"><Description><TranslatedText xml:lang="en">Controlled RDI distribution, ANC nadir by G-CSF usage, and descriptive benefit-risk summaries for T-17-1, T-17-2, and T-17-4. Path A limitation: CbzP is synthetic/reconstructed and TFL-only; comparative results are non-confirmatory and are not submission evidence.</TranslatedText></Description><arm:AnalysisResult OID="AR.RDI.DISTRIBUTION" ParameterOID="IT.ADEX.PARAMCD" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="EXPLORATORY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">T-17-1 relative dose intensity category distribution.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADEX"><def:WhereClauseRef WhereClauseOID="WC.ADEX.PARAMCD.EQ.RDIDL"/><arm:AnalysisVariable ItemOID="IT.ADEX.AVALC"/><arm:AnalysisVariable ItemOID="IT.ADEX.TRT01P"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (Path A reporting program)"><arm:Code>tfl_generation.R tabulates ADEX RDIDL by treatment.</arm:Code></arm:ProgrammingCode></arm:AnalysisResult><arm:AnalysisResult OID="AR.ANC.GCSF" ParameterOID="IT.ADLB.PARAMCD" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="EXPLORATORY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">T-17-2 worst Cycle 1 ANC nadir grade by G-CSF usage.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADLB"><def:WhereClauseRef WhereClauseOID="WC.ADLB.PARAMCD.EQ.ANCNADIR"/><arm:AnalysisVariable ItemOID="IT.ADLB.AVAL"/><arm:AnalysisVariable ItemOID="IT.ADLB.ATOXGR"/><arm:AnalysisVariable ItemOID="IT.ADLB.TRT01P"/></arm:AnalysisDataset><arm:AnalysisDataset ItemGroupOID="IG.ADCM"><arm:AnalysisVariable ItemOID="IT.ADCM.GCSFFL"/></arm:AnalysisDataset><arm:AnalysisDataset ItemGroupOID="IG.ADSL"><arm:AnalysisVariable ItemOID="IT.ADSL.TRT01P"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (Path A reporting program)"><arm:Code>tfl_generation.R combines ADLB ANCNADIR with ADCM GCSFFL and summarizes grade by treatment and prophylaxis status.</arm:Code></arm:ProgrammingCode></arm:AnalysisResult><arm:AnalysisResult OID="AR.BENEFIT.RISK.RDI" ParameterOID="IT.ADEX.PARAMCD" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="EXPLORATORY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">T-17-4 descriptive benefit-risk summary by RDI tertile.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADEX"><def:WhereClauseRef WhereClauseOID="WC.ADEX.PARAMCD.EQ.RDI"/><arm:AnalysisVariable ItemOID="IT.ADEX.AVAL"/><arm:AnalysisVariable ItemOID="IT.ADEX.TRT01P"/></arm:AnalysisDataset><arm:AnalysisDataset ItemGroupOID="IG.ADLB"><def:WhereClauseRef WhereClauseOID="WC.ADLB.PARAMCD.EQ.ANCNADIR"/><arm:AnalysisVariable ItemOID="IT.ADLB.AVAL"/><arm:AnalysisVariable ItemOID="IT.ADLB.ATOXGR"/></arm:AnalysisDataset><arm:AnalysisDataset ItemGroupOID="IG.ADTTE"><def:WhereClauseRef WhereClauseOID="WC.ADTTE.PARAMCD.EQ.OS"/><arm:AnalysisVariable ItemOID="IT.ADTTE.AVAL"/><arm:AnalysisVariable ItemOID="IT.ADTTE.CNSR"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (Path A reporting program)"><arm:Code>tfl_generation.R assigns RDI tertiles and reports descriptive exposure, ANC, and OS summaries without confirmatory inference.</arm:Code></arm:ProgrammingCode></arm:AnalysisResult></arm:ResultDisplay></arm:AnalysisResultDisplays></MetaDataVersion>
+<arm:ResultDisplay OID="RD.SAFETY.LABSHIFT" Name="T-21-1/T-21-2 Laboratory Toxicity-Grade Shift"><Description><TranslatedText xml:lang="en">Shift in source-carried laboratory toxicity grade (ATOXGR, carried from SDTM.LB.LBTOXGR for real MP data) from baseline to worst post-baseline analysis record; no independent CTCAE re-grading algorithm is applied. Rendered as T-21-1/T-21-2. Path A limitation: CbzP is synthetic/reconstructed and TFL-only; comparative results are non-confirmatory and are not submission evidence.</TranslatedText></Description><arm:AnalysisResult OID="AR.LAB.SHIFT" ParameterOID="IT.ADLB.PARAMCD" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="SAFETY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">Cross-tabulation of baseline (BASEFL='Y') versus worst post-baseline (BASEFL='N', ANL01FL='Y') ATOXGR per subject and parameter.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADLB"><arm:AnalysisVariable ItemOID="IT.ADLB.PARAMCD"/><arm:AnalysisVariable ItemOID="IT.ADLB.ATOXGR"/><arm:AnalysisVariable ItemOID="IT.ADLB.BASEFL"/><arm:AnalysisVariable ItemOID="IT.ADLB.ANL01FL"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (dplyr)"><arm:Code>baseline ATOXGR (BASEFL=='Y') joined to worst post-baseline ATOXGR (BASEFL=='N', ANL01FL=='Y') per USUBJID and PARAMCD (NEUT, PSA)</arm:Code></arm:ProgrammingCode></arm:AnalysisResult></arm:ResultDisplay><arm:ResultDisplay OID="RD.EFFICACY.RESPONSE" Name="T-11-3/T-11-4/T-11-5/T-11-8b Response Analyses"><Description><TranslatedText xml:lang="en">PSA response, objective response, pain response, and the response-evaluable ORR sensitivity under SAP v4.0 sections 10.2-10.4. Pain response uses staged PN/SV plus ADSL and is subject-level reconciled by the F042_PAIN_RESPONSE gate. Path A limitation: CbzP is synthetic/reconstructed and TFL-only; comparative results are non-confirmatory and are not submission evidence.</TranslatedText></Description><arm:AnalysisResult OID="AR.PSA.RESPONSE" ParameterOID="IT.ADRS.PARAMCD" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="SECONDARY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">T-11-3 PSA response rate using observed baseline PSA eligibility.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADRS"><def:WhereClauseRef WhereClauseOID="WC.ADRS.PARAMCD.EQ.PSARESP"/><arm:AnalysisVariable ItemOID="IT.ADRS.AVALC"/><arm:AnalysisVariable ItemOID="IT.ADRS.TRT01P"/></arm:AnalysisDataset><arm:AnalysisDataset ItemGroupOID="IG.ADSL"><arm:AnalysisVariable ItemOID="IT.ADSL.PSABL"/><arm:AnalysisVariable ItemOID="IT.ADSL.PSABLIF"/><arm:AnalysisVariable ItemOID="IT.ADSL.TRT01P"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (Path A reporting program)"><arm:Code>tfl_generation.R filters ADRS PSARESP to observed baseline PSA &gt;=20 and reports responders by treatment.</arm:Code></arm:ProgrammingCode></arm:AnalysisResult><arm:AnalysisResult OID="AR.OBJECTIVE.RESPONSE" ParameterOID="IT.ADRS.PARAMCD" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="SECONDARY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">T-11-4 confirmed objective response rate using the baseline measurable-disease denominator.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADRS"><def:WhereClauseRef WhereClauseOID="WC.ADRS.PARAMCD.EQ.OBJRESP"/><arm:AnalysisVariable ItemOID="IT.ADRS.AVALC"/><arm:AnalysisVariable ItemOID="IT.ADRS.TRT01P"/></arm:AnalysisDataset><arm:AnalysisDataset ItemGroupOID="IG.ADSL"><arm:AnalysisVariable ItemOID="IT.ADSL.MEASDISF"/><arm:AnalysisVariable ItemOID="IT.ADSL.TRT01P"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (Path A reporting program)"><arm:Code>tfl_generation.R left-joins confirmed ADRS OBJRESP to the ADSL baseline measurable-disease population and reports responders.</arm:Code></arm:ProgrammingCode></arm:AnalysisResult><arm:AnalysisResult OID="AR.PAIN.RESPONSE" ParameterOID="IT.ADSL.PAINBL" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="SECONDARY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">T-11-5 pain response rate. The analysis uses response-evaluable subjects from staged PN/SV; ADSL supplies subject and treatment attributes. Exact SAS/R subject-level parity is required.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADSL"><arm:AnalysisVariable ItemOID="IT.ADSL.USUBJID"/><arm:AnalysisVariable ItemOID="IT.ADSL.TRT01P"/><arm:AnalysisVariable ItemOID="IT.ADSL.ITTFL"/><arm:AnalysisVariable ItemOID="IT.ADSL.PAINBL"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (Path A reporting program)"><arm:Code>f042_provisional_pain_derivation.R evaluates initial and confirming PN/SV visits; cross_lang_audit.R requires F042_PAIN_RESPONSE exact SAS/R subject, event, confirmation, component, and source-date parity.</arm:Code></arm:ProgrammingCode></arm:AnalysisResult><arm:AnalysisResult OID="AR.OBJECTIVE.RESPONSE.EVALUABLE" ParameterOID="IT.ADRS.PARAMCD" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="EXPLORATORY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">T-11-8b response-evaluable objective response sensitivity.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADRS"><def:WhereClauseRef WhereClauseOID="WC.ADRS.PARAMCD.EQ.OBJRESP"/><arm:AnalysisVariable ItemOID="IT.ADRS.AVALC"/><arm:AnalysisVariable ItemOID="IT.ADRS.TRT01P"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (Path A reporting program)"><arm:Code>tfl_generation.R reports confirmed ADRS OBJRESP among subjects with an evaluable OBJRESP record.</arm:Code></arm:ProgrammingCode></arm:AnalysisResult></arm:ResultDisplay><arm:ResultDisplay OID="RD.OPTIMUS.TABLES" Name="T-17-1/T-17-2/T-17-4 Project Optimus Tables"><Description><TranslatedText xml:lang="en">Controlled RDI distribution, ANC nadir by G-CSF usage, and descriptive benefit-risk summaries for T-17-1, T-17-2, and T-17-4. Path A limitation: CbzP is synthetic/reconstructed and TFL-only; comparative results are non-confirmatory and are not submission evidence.</TranslatedText></Description><arm:AnalysisResult OID="AR.RDI.DISTRIBUTION" ParameterOID="IT.ADEX.PARAMCD" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="EXPLORATORY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">T-17-1 relative dose intensity category distribution.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADEX"><def:WhereClauseRef WhereClauseOID="WC.ADEX.PARAMCD.EQ.RDIDL"/><arm:AnalysisVariable ItemOID="IT.ADEX.AVALC"/><arm:AnalysisVariable ItemOID="IT.ADEX.TRT01P"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (Path A reporting program)"><arm:Code>tfl_generation.R tabulates ADEX RDIDL by treatment.</arm:Code></arm:ProgrammingCode></arm:AnalysisResult><arm:AnalysisResult OID="AR.ANC.GCSF" ParameterOID="IT.ADLB.PARAMCD" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="EXPLORATORY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">T-17-2 worst Cycle 1 ANC nadir grade by G-CSF usage.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADLB"><def:WhereClauseRef WhereClauseOID="WC.ADLB.PARAMCD.EQ.ANCNADIR"/><arm:AnalysisVariable ItemOID="IT.ADLB.AVAL"/><arm:AnalysisVariable ItemOID="IT.ADLB.ATOXGR"/><arm:AnalysisVariable ItemOID="IT.ADLB.TRT01P"/></arm:AnalysisDataset><arm:AnalysisDataset ItemGroupOID="IG.ADCM"><arm:AnalysisVariable ItemOID="IT.ADCM.GCSFFL"/></arm:AnalysisDataset><arm:AnalysisDataset ItemGroupOID="IG.ADSL"><arm:AnalysisVariable ItemOID="IT.ADSL.TRT01P"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (Path A reporting program)"><arm:Code>tfl_generation.R combines ADLB ANCNADIR with ADCM GCSFFL and summarizes grade by treatment and prophylaxis status.</arm:Code></arm:ProgrammingCode></arm:AnalysisResult><arm:AnalysisResult OID="AR.BENEFIT.RISK.RDI" ParameterOID="IT.ADEX.PARAMCD" AnalysisReason="PRE-SPECIFIED IN SAP" AnalysisPurpose="EXPLORATORY OUTCOME MEASURE"><Description><TranslatedText xml:lang="en">T-17-4 descriptive benefit-risk summary by RDI tertile.</TranslatedText></Description><arm:AnalysisDatasets><arm:AnalysisDataset ItemGroupOID="IG.ADEX"><def:WhereClauseRef WhereClauseOID="WC.ADEX.PARAMCD.EQ.RDI"/><arm:AnalysisVariable ItemOID="IT.ADEX.AVAL"/><arm:AnalysisVariable ItemOID="IT.ADEX.TRT01P"/></arm:AnalysisDataset><arm:AnalysisDataset ItemGroupOID="IG.ADLB"><def:WhereClauseRef WhereClauseOID="WC.ADLB.PARAMCD.EQ.ANCNADIR"/><arm:AnalysisVariable ItemOID="IT.ADLB.AVAL"/><arm:AnalysisVariable ItemOID="IT.ADLB.ATOXGR"/></arm:AnalysisDataset><arm:AnalysisDataset ItemGroupOID="IG.ADTTE"><def:WhereClauseRef WhereClauseOID="WC.ADTTE.PARAMCD.EQ.OS"/><arm:AnalysisVariable ItemOID="IT.ADTTE.AVAL"/><arm:AnalysisVariable ItemOID="IT.ADTTE.CNSR"/></arm:AnalysisDataset></arm:AnalysisDatasets><arm:ProgrammingCode Context="R 4.6.0 (Path A reporting program)"><arm:Code>tfl_generation.R assigns RDI tertiles and reports descriptive exposure, ANC, and OS summaries without confirmatory inference.</arm:Code></arm:ProgrammingCode></arm:AnalysisResult></arm:ResultDisplay></arm:AnalysisResultDisplays></MetaDataVersion>
 </Study>
   </ODM>

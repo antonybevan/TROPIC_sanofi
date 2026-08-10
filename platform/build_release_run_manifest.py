@@ -214,6 +214,9 @@ def _expected_stage_names(manifest: dict) -> list[str]:
         if not dataset.get("name"):
             continue
         names.append(str(dataset.get("val_stage") or f"R {str(dataset['name']).upper()} Validation"))
+    for stage in infra.get("pre_sas", []) or []:
+        if stage.get("name"):
+            names.append(str(stage["name"]))
     names.append("SAS Production (ODA/Real/Simulated)")
     for stage in infra.get("post", []) or []:
         if stage.get("name"):
@@ -683,20 +686,12 @@ def build_release_run_manifest(out_dir: Path = OUT_DIR) -> dict:
         "05_outputs/tfl/output/figures/sas/*",
         "05_outputs/tfl/output/listings/*",
     ])
+    # Seal the complete package/sequence surfaces, including programs, workbooks,
+    # Define stylesheets, and official eCTD UTIL support files. Extension allowlists
+    # previously omitted exactly the support/program files G08 is meant to control.
     package_hashes = _hash_globs([
-        "08_submission_package/ectd/0000/index.xml",
-        "08_submission_package/ectd/0000/index-md5.txt",
-        "08_submission_package/ectd/0000/m1/us/us-regional.xml",
-        "08_submission_package/ectd/0000/m5/**/*.xml",
-        "08_submission_package/ectd/0000/m5/**/*.pdf",
-        "08_submission_package/ectd/0000/m5/**/*.txt",
-        "08_submission_package/ectd/0000/m5/**/*.png",
-        "08_submission_package/ectd/0000/m5/**/*.xpt",
-        "08_submission_package/m5/**/*.xml",
-        "08_submission_package/m5/**/*.pdf",
-        "08_submission_package/m5/**/*.txt",
-        "08_submission_package/m5/**/*.png",
-        "08_submission_package/m5/**/*.xpt",
+        "08_submission_package/ectd/0000/**/*",
+        "08_submission_package/m5/**/*",
     ])
     logs = _hash_globs([
         "04_analysis_datasets/programs/sas/oda_master_driver.log",

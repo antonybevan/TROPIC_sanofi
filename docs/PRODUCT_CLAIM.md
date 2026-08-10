@@ -1,15 +1,15 @@
 # TROPIC Product Claim Decision
 
 **Document ID:** PRODUCT_CLAIM
-**Version:** 1.2
-**Effective:** 2026-08-05
-**Status:** FROZEN for tag train `v0.2.1-portfolio` and successors until amended
+**Version:** 1.3
+**Effective:** 2026-08-10
+**Status:** ACTIVE Path A source-tree claim; next release seal pending
 **Owner workstream:** WS-0 Governance & Scope Control (G00)
 **Binding companions:** `06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md` · `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md` · `docs/RELEASE_NOTE_v0.2.2-portfolio.md` · `docs/WORKSTREAM_EXECUTION_BOARD.md`
 **Presentation entry:** root `README.md` · `docs/INTERVIEWER_GUIDE.md` · `08_submission_package/README.md` · `docs/INDEX.md`
 **Git surface:** `docs/REPO_SURFACE_POLICY.md` (only review face + spine + seals in git — not factory noise)
 
-**Factual amendment:** The manifest-driven pipeline currently records **34 stages** (previously described as 30). This corrects the stage count only; it does not expand the controlled output scope or change the Path A product boundary.
+**Factual amendment:** The manifest-driven pipeline currently records **37 stages**. The prior 34-stage release remains historical evidence; three explicit pre-SAS stages now regenerate, validate, and export the synthetic comparator so a new run cannot consume stale ignored files. This does not expand the controlled output scope or change the Path A product boundary.
 
 ---
 
@@ -34,7 +34,7 @@ If a sentence contradicts this file, the sentence is wrong—not this file.
 1. Implements an end-to-end **SDTM → ADaM → TFL → Define → eCTD-style** control system.
 2. Enforces **dual-language (SAS 9.4 / R) reconciliation** on real MP-arm analysis datasets under a genuine SAS engine (`oda` / `local`).
 3. Applies **risk-tiered third-engine admiral** re-derivation for ADSL and primary TTE (OS, PFS).
-4. Runs a **manifest-driven 34-stage DAG** with machine gates (recon, TFL catalog, logs, seals).
+4. Runs a **manifest-driven 37-stage DAG** with machine gates (reconstruction, recon, TFL catalog, logs, seals).
 5. Publishes a **hash-sealed release-run record** and **release-candidate checklist PASS** under the honesty boundary below.
 6. Organizes work as **workstreams** (source, standards, programming, QC, writing, release)—not as a single script pile.
 
@@ -140,7 +140,7 @@ At tag `v0.2.1-portfolio` (and successive Path A seals):
 
 | Seal | Meaning |
 |---|---|
-| `pipeline_health` GREEN + `full_dag` + `oda` | Full 34-stage DAG ran under real SAS |
+| `pipeline_health` GREEN + `full_dag` + `oda` | Full 37-stage DAG ran under real SAS |
 | `release_run_manifest` PASS | Hash-bound inputs/programs/outputs/QC under clean material tree |
 | `release_candidate` PASS | G01–G09 checklist items for **Path A** satisfied |
 | `validation_strategy` PASS | Risk-tier checks against current evidence |

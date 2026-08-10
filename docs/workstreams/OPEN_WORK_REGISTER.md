@@ -1,7 +1,7 @@
 # Open Work Register — Path A (post D-012)
 
 **Purpose:** What a principal programmer still treats as **real work**, not “green JSON theater.”  
-**As of:** 2026-08-05
+**As of:** 2026-08-10
 **Seals:** Path A demo RC can remain green while these are open if dispositioned.
 
 ---
@@ -12,7 +12,7 @@ The next controlled work item is specification closure, not an unapproved ADTTE 
 
 | ID | Pri | Owner | Work | Why it matters | Exit |
 |---|---|---|---|---|---|
-| **W-ENDPOINT-01** | **P0** | WS-2 / WS-4 + accountable author | **Closed for Path A implementation.** ED-01–ED-07 are adopted and implemented: corrected pain algorithm, cancer-related evidence, CM+PR union, RT sensitivities, SAP-native `T-11-3`–`T-11-8` mappings, TTUMOR ITT population and TTE origins. | Numerical parity does not replace independent clinical review; the pre-rerun pain/TTUMOR records remain historical baseline evidence. | [`EDR-F042-T11-8-2026-08-03.md`](decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md) records Antony Bevan's adoption; full 34-stage real-SAS DAG and delayed second-pass review pass. External statistical/medical review remains required before regulated reuse. |
+| **W-ENDPOINT-01** | **P0** | WS-2 / WS-4 + accountable author | **Closed for Path A implementation.** ED-01–ED-07 are adopted and implemented: corrected pain algorithm, cancer-related evidence, CM+PR union, RT sensitivities, SAP-native `T-11-3`–`T-11-8` mappings, TTUMOR ITT population and TTE origins. | Numerical parity does not replace independent clinical review; the pre-rerun pain/TTUMOR records remain historical baseline evidence. | [`EDR-F042-T11-8-2026-08-03.md`](decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md) records Antony Bevan's adoption; the expanded 37-stage real-SAS DAG and delayed second-pass review pass. External statistical/medical review remains required before regulated reuse. |
 | **W-ENDPOINT-02** | **P0** | WS-2 / WS-4 / WS-5 | **Conditional closure.** The statistical-governance assessment found `GOV-STAT-01` (SAS T-11-5 initial-visit-only response check), corrected it, and added an exact subject-level endpoint reconciliation gate. | The prior TFL value was correct, but its claimed independent SAS challenge was not. | Current-head real-SAS DAG, `F042_PAIN_RESPONSE=PASS`, reseal and CI; then retain external human review as the regulated-use boundary. |
 
 The author-adopted record, executable specification and impact appendix are now implemented and reconciled. The historical backlog below remains useful evidence, but this handoff supersedes its older “next session” ordering for endpoint work.

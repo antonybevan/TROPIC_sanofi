@@ -119,6 +119,24 @@ def validate(path):
         if leaf is None or leaf.get("ID") != alid:
             problems.append(f"ItemGroupDef {ig.get('OID')}: leaf/ArchiveLocationID mismatch")
 
+        refs = list(ig.findall(o("ItemRef")))
+        orders = [ref.get("OrderNumber") for ref in refs]
+        checks += 1
+        if any(value is None for value in orders) or len(orders) != len(set(orders)):
+            problems.append(f"ItemGroupDef {ig.get('OID')}: missing or duplicate OrderNumber")
+
+        key_values = [ref.get("KeySequence") for ref in refs if ref.get("KeySequence")]
+        checks += 1
+        try:
+            key_numbers = sorted(int(value) for value in key_values)
+        except (TypeError, ValueError):
+            key_numbers = []
+            problems.append(f"ItemGroupDef {ig.get('OID')}: non-integer KeySequence")
+        if not key_values:
+            problems.append(f"ItemGroupDef {ig.get('OID')}: no key variables declared")
+        elif key_numbers != list(range(1, len(key_numbers) + 1)):
+            problems.append(f"ItemGroupDef {ig.get('OID')}: KeySequence is not contiguous from 1")
+
     # ---- Description must hold TranslatedText ----
     for desc in root.iter(o("Description")):
         if (desc.text and desc.text.strip()) and desc.find(o("TranslatedText")) is None:
@@ -138,7 +156,7 @@ def main():
         for p in problems[:40]:
             print("  -", p)
         sys.exit(1)
-    print("PASS: structure + referential integrity conform (full XSD/Pinnacle 21 = offline step).")
+    print("PASS: structure + keys + referential integrity conform (full XSD/Pinnacle 21 = offline step).")
     sys.exit(0)
 
 

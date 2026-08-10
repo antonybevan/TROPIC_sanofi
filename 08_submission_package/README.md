@@ -27,8 +27,8 @@ An **eCTD Module 5–style** clinical study data package assembled for portfolio
 | Part 11 validated system | Hash seals ≠ validated e-signature system |
 | Commercial Pinnacle 21 full clearance | Not asserted under Path A |
 
-**Current sealed portfolio release:** [`docs/RELEASE_NOTE_v0.2.1-portfolio.md`](../docs/RELEASE_NOTE_v0.2.1-portfolio.md) · tag `v0.2.1-portfolio`
-The earlier `v0.1.0-demo-rc.1` and `v0.2.0-portfolio` notes remain immutable historical release records.
+**Current sealed portfolio release:** [`docs/RELEASE_NOTE_v0.2.2-portfolio.md`](../docs/RELEASE_NOTE_v0.2.2-portfolio.md) · tag `v0.2.2-portfolio`
+The earlier `v0.1.0-demo-rc.1`, `v0.2.0-portfolio`, and `v0.2.1-portfolio` notes remain immutable historical release records.
 
 ---
 
@@ -90,14 +90,16 @@ m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/
 Controlled TFL universe (in-scope vs deferred):  
 [`config/tfl_output_catalog.yaml`](../config/tfl_output_catalog.yaml)
 
-### 6. eCTD sequence shell (structure only)
+### 6. Materialized eCTD sequence
 
 ```text
 ectd/0000/
 ├── index.xml          # backbone
 ├── m1/us/             # US regional (EXAMPLE placeholders)
 ├── m5/                # mirrored study content
-└── util/dtd/          # DTD references
+└── util/
+    ├── dtd/           # checksum-pinned official DTDs
+    └── style/         # checksum-pinned official ICH/FDA stylesheets
 ```
 
 Run record: [`ectd/RUN_RECORD.md`](ectd/RUN_RECORD.md)
@@ -140,6 +142,8 @@ Do **not** hand-edit package trees as source of truth.
 |---|---|
 | Full DAG | `python3 platform/cibuild.py` (optionally `--real-sas`) |
 | Package only | `python3 platform/package_ectd.py` |
+| Backbone + sequence | `python3 platform/build_ectd_backbone.py` then `python3 platform/materialize_ectd.py` |
+| Complete G08 validation | `python3 platform/validate_ectd_sequence.py` (also runs inside materialization) |
 | Preview (data-light) | `python3 platform/package_ectd.py --preview` |
 | Verify seals | `python3 scripts/verify_release.py` |
 | Orchestrator | `platform/cibuild.py` · manifest `config/study_manifest.yaml` |

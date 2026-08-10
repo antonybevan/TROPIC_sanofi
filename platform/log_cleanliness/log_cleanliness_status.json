@@ -1,6 +1,6 @@
 {
   "status": "PASS",
-  "generated_at": "2026-08-05 08:11:47 UTC",
+  "generated_at": "2026-08-09 20:00:38 UTC",
   "config": "config/log_cleanliness.yaml",
   "coverage": "configured_persisted_logs_only",
   "coverage_note": "Scans only logs listed in config/log_cleanliness.yaml (required/optional). rscript/python stage stdout/stderr is not persisted by cibuild.py and is outside this gate; PASS means configured persisted logs are clean, not full pipeline stdout/stderr clean. not_available = no required logs on disk (typical data-free CI checkout); seal re-check uses committed PASS evidence.",
@@ -20,17 +20,17 @@
     "06_qc_evidence/reconciliation/cross_lang_audit.log",
     "06_qc_evidence/reconciliation/results_reconcile.log"
   ],
-  "findings": 22,
+  "findings": 1,
   "unapproved_findings": 0,
-  "reviewed_exceptions": 22,
+  "reviewed_exceptions": 1,
   "missing_required_logs": 0,
   "reviewed_exception_caps": [
     {
-      "id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "count": 22,
-      "max_count": 39,
+      "id": "ADAE_SOURCE_TEAE_PRETRT",
+      "count": 1,
+      "max_count": 1,
       "status": "PASS",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017."
+      "rationale": "The public source AETRTEM classification is retained for 44 records whose recorded start date precedes first dose because such records can represent pre-existing events that worsened after treatment. The exact message and count are capped at one occurrence; any source or derivation drift remains an unapproved blocking finding.\n"
     }
   ],
   "excluded_logs": [
@@ -43,222 +43,12 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5106,
-      "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "severity": "reviewed_exception",
-      "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-038-002-701",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
-      "owner": "statistical_programming"
-    },
-    {
-      "status": "REVIEWED_EXCEPTION",
-      "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5107,
-      "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "severity": "reviewed_exception",
-      "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-238-005-601",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
-      "owner": "statistical_programming"
-    },
-    {
-      "status": "REVIEWED_EXCEPTION",
-      "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5108,
-      "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "severity": "reviewed_exception",
-      "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-400-108-601",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
-      "owner": "statistical_programming"
-    },
-    {
-      "status": "REVIEWED_EXCEPTION",
-      "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5109,
-      "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "severity": "reviewed_exception",
-      "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-430-108-401",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
-      "owner": "statistical_programming"
-    },
-    {
-      "status": "REVIEWED_EXCEPTION",
-      "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5110,
-      "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "severity": "reviewed_exception",
-      "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-430-708-801",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
-      "owner": "statistical_programming"
-    },
-    {
-      "status": "REVIEWED_EXCEPTION",
-      "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5111,
-      "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "severity": "reviewed_exception",
-      "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-480-508-401",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
-      "owner": "statistical_programming"
-    },
-    {
-      "status": "REVIEWED_EXCEPTION",
-      "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5112,
-      "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "severity": "reviewed_exception",
-      "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-490-308-601",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
-      "owner": "statistical_programming"
-    },
-    {
-      "status": "REVIEWED_EXCEPTION",
-      "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5113,
-      "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "severity": "reviewed_exception",
-      "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-490-508-701",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
-      "owner": "statistical_programming"
-    },
-    {
-      "status": "REVIEWED_EXCEPTION",
-      "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5114,
-      "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "severity": "reviewed_exception",
-      "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-490-508-801",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
-      "owner": "statistical_programming"
-    },
-    {
-      "status": "REVIEWED_EXCEPTION",
-      "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5115,
-      "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "severity": "reviewed_exception",
-      "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-530-002-103",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
-      "owner": "statistical_programming"
-    },
-    {
-      "status": "REVIEWED_EXCEPTION",
-      "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5116,
-      "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "severity": "reviewed_exception",
-      "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-530-002-504",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
-      "owner": "statistical_programming"
-    },
-    {
-      "status": "REVIEWED_EXCEPTION",
-      "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5117,
-      "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "severity": "reviewed_exception",
-      "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-530-002-604",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
-      "owner": "statistical_programming"
-    },
-    {
-      "status": "REVIEWED_EXCEPTION",
-      "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5118,
-      "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "severity": "reviewed_exception",
-      "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-530-002-802",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
-      "owner": "statistical_programming"
-    },
-    {
-      "status": "REVIEWED_EXCEPTION",
-      "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5119,
-      "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "severity": "reviewed_exception",
-      "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-536-003-202",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
-      "owner": "statistical_programming"
-    },
-    {
-      "status": "REVIEWED_EXCEPTION",
-      "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5120,
-      "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "severity": "reviewed_exception",
-      "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-536-003-501",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
-      "owner": "statistical_programming"
-    },
-    {
-      "status": "REVIEWED_EXCEPTION",
-      "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5121,
-      "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "severity": "reviewed_exception",
-      "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-536-003-801",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
-      "owner": "statistical_programming"
-    },
-    {
-      "status": "REVIEWED_EXCEPTION",
-      "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5122,
-      "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "severity": "reviewed_exception",
-      "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-546-000-102",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
-      "owner": "statistical_programming"
-    },
-    {
-      "status": "REVIEWED_EXCEPTION",
-      "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5123,
-      "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "severity": "reviewed_exception",
-      "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-550-002-202",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
-      "owner": "statistical_programming"
-    },
-    {
-      "status": "REVIEWED_EXCEPTION",
-      "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5124,
-      "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "severity": "reviewed_exception",
-      "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-550-002-901",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
-      "owner": "statistical_programming"
-    },
-    {
-      "status": "REVIEWED_EXCEPTION",
-      "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5125,
-      "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "severity": "reviewed_exception",
-      "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=PFS USUBJID=006193-560-002-402",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
-      "owner": "statistical_programming"
-    },
-    {
-      "status": "REVIEWED_EXCEPTION",
-      "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5246,
-      "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "severity": "reviewed_exception",
-      "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=TTPSA USUBJID=006193-038-002-202",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
-      "owner": "statistical_programming"
-    },
-    {
-      "status": "REVIEWED_EXCEPTION",
-      "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 5247,
-      "rule_id": "ADTTE_TIME_ORIGIN_FLOORING",
-      "severity": "reviewed_exception",
-      "message": "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. PARAMCD=TTPSA USUBJID=006193-264-007-801",
-      "rationale": "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017.",
-      "owner": "statistical_programming"
+      "line": 2861,
+      "rule_id": "ADAE_SOURCE_TEAE_PRETRT",
+      "severity": "major",
+      "message": "WARNING: [ADAE-QC] 44 source-classified TEAE rows precede treatment.",
+      "rationale": "The public source AETRTEM classification is retained for 44 records whose recorded start date precedes first dose because such records can represent pre-existing events that worsened after treatment. The exact message and count are capped at one occurrence; any source or derivation drift remains an unapproved blocking finding.\n",
+      "owner": "clinical_programming"
     }
   ]
 }

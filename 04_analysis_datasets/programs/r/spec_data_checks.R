@@ -80,14 +80,42 @@ for (ds in domains) {
 
   # Semantic checks supplement the structural metacore checks.  These are
   # deliberately limited to Path-A contracts that are otherwise invisible to
-  # variable/length conformance: DM is the arm authority (F-028), ETHNIC is an
-  # assigned NOT REPORTED placeholder because the public DM has no ETHNIC field,
-  # and ALBBL/LDHBL are genuinely unavailable and therefore remain missing.
+  # variable/length conformance: DM is the planned-arm authority (F-028), actual
+  # treatment is independently derived from administered EX, ETHNIC is an assigned
+  # NOT REPORTED placeholder because the public DM has no ETHNIC field, and
+  # ALBBL/LDHBL are genuinely unavailable and therefore remain missing.
   semantic_w <- character()
+  semantic_observations <- character()
   if (identical(toupper(ds), "ADSL")) {
-    if (!all(as.character(df$TRT01A) == as.character(df$TRT01P), na.rm = TRUE)) {
-      semantic_w <- c(semantic_w, "TRT01A is not equal to the DM-authoritative TRT01P arm")
+    planned_n <- case_when(
+      as.character(df$TRT01P) == "CbzP" ~ 1,
+      as.character(df$TRT01P) == "MP" ~ 2,
+      TRUE ~ NA_real_
+    )
+    actual_n <- case_when(
+      as.character(df$TRT01A) == "CbzP" ~ 1,
+      as.character(df$TRT01A) == "MP" ~ 2,
+      TRUE ~ NA_real_
+    )
+    if (any(is.na(planned_n)) ||
+        any(as.numeric(df$TRT01PN) != planned_n, na.rm = TRUE)) {
+      semantic_w <- c(semantic_w, "TRT01P/TRT01PN planned-treatment mapping is inconsistent")
     }
+    if (any(is.na(actual_n)) ||
+        any(as.numeric(df$TRT01AN) != actual_n, na.rm = TRUE)) {
+      semantic_w <- c(semantic_w, "TRT01A/TRT01AN actual-treatment mapping is inconsistent")
+    }
+    n_trt_diff <- sum(
+      as.character(df$TRT01A) != as.character(df$TRT01P),
+      na.rm = TRUE
+    )
+    semantic_observations <- c(
+      semantic_observations,
+      sprintf(
+        "%d planned/actual treatment discrepancy(ies) retained for source traceability",
+        n_trt_diff
+      )
+    )
     if (!all(as.character(df$ETHNIC) == "NOT REPORTED", na.rm = TRUE)) {
       semantic_w <- c(semantic_w, "ETHNIC is not the documented NOT REPORTED assignment")
     }
@@ -110,6 +138,7 @@ for (ds in domains) {
     type_mismatches = length(type_w), type_detail = utils::head(type_w, 5),
     length_mismatches = length(len_w), length_detail = utils::head(len_w, 5),
     semantic_violations = length(semantic_w), semantic_detail = utils::head(semantic_w, 5),
+    semantic_observations = semantic_observations,
     status = status
   )
 }
@@ -150,6 +179,13 @@ for (r in records) {
     cat(
       "         semantic:       ",
       paste(r$semantic_detail, collapse = " | "),
+      "\n"
+    )
+  }
+  if (!is.null(r$semantic_observations) && length(r$semantic_observations)) {
+    cat(
+      "         observation:    ",
+      paste(r$semantic_observations, collapse = " | "),
       "\n"
     )
   }

@@ -4,14 +4,22 @@
 library(haven)
 library(dplyr)
 library(tidyr)
+source("04_analysis_datasets/programs/r/config_study.R")
 
 cat("NOTE: [INGEST] Starting Real SDTM Ingestion & Transposition...\n")
 
-dir.create("01_source_data/real_sdtm/staging", showWarnings = FALSE, recursive = TRUE)
+dir.create(STAGING_PATH, showWarnings = FALSE, recursive = TRUE)
+
+source_real <- normalizePath(SOURCE_SDTM_PATH, mustWork = TRUE)
+staging_real <- normalizePath(STAGING_PATH, mustWork = TRUE)
+source_prefix <- paste0(source_real, .Platform$file.sep)
+if (identical(source_real, staging_real) || startsWith(staging_real, source_prefix)) {
+  stop("ERROR: [SOURCE-ISOLATION] STAGING_PATH must not equal or descend from SOURCE_SDTM_PATH")
+}
 
 transpose_supp <- function(domain_name) {
-  main_path <- paste0("01_source_data/real_sdtm/", domain_name, ".sas7bdat")
-  supp_path <- paste0("01_source_data/real_sdtm/supp", domain_name, ".sas7bdat")
+  main_path <- file.path(SOURCE_SDTM_PATH, paste0(domain_name, ".sas7bdat"))
+  supp_path <- file.path(SOURCE_SDTM_PATH, paste0("supp", domain_name, ".sas7bdat"))
 
   if (!file.exists(main_path)) {
     cat(sprintf("  [WARNING] Main domain file %s does not exist. Skipping.\n", main_path))
@@ -65,7 +73,7 @@ transpose_supp <- function(domain_name) {
   # Ensure all column names of output are uppercase
   colnames(main_df) <- toupper(colnames(main_df))
 
-  save_path <- paste0("01_source_data/real_sdtm/staging/", tolower(domain_name), ".rds")
+  save_path <- stage_file(domain_name)
   saveRDS(main_df, save_path)
   cat(sprintf("  [SUCCESS] Ingested and staging-saved: %s -> %s (Rows: %d, Cols: %d)\n",
               toupper(domain_name), save_path, nrow(main_df), ncol(main_df)))

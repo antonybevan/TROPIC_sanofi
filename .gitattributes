@@ -1,2 +1,9 @@
-# Auto detect text files and perform LF normalization
+# Auto detect text files and perform LF normalization.
 * text=auto
+
+# Preserve vendor-distributed eCTD stylesheet bytes. Their exact bytes are
+# checksum-bound in the submitted sequence and are not project-authored text.
+08_submission_package/ectd/0000/util/style/*.xsl -text -whitespace
+
+# Keep generated ARS exchange CSVs portable and hash-stable across platforms.
+05_outputs/ars/*.csv text eol=lf

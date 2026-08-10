@@ -5,6 +5,12 @@
 **Execution status:** **PROVISIONAL PRE-ADOPTION ARTIFACT — ED-01–ED-07 ADOPTED 2026-08-04**
 **Production status:** **NO PRODUCTION CONSUMPTION; SEALED PATH A OUTPUTS UNCHANGED**
 
+> **Historical artifact — superseded 2026-08-09.** The counts and comparisons below describe
+> the isolated pre-production implementation. The current governed production summary is 37
+> primary subjects (36 diary-only and 1 direct-RT-only), 15 complete-date RT inventory records
+> plus 1 missing/partial-date record, and 43 pain responses among 156 evaluable real-MP subjects.
+> Current production evidence, not this provisional note, governs the pipeline.
+
 ## Purpose and boundary
 
 The project author directed exploratory implementation to continue and indicated

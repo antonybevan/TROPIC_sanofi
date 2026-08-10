@@ -31,6 +31,7 @@ proc sql;
         adsl.usubjid,
         adsl.trt01p,
         adsl.trtsdt,
+        cm.cmseq,
         cm.cmtrt,
         cm.cmdecod,
         cm.cmcat length=60,
@@ -64,7 +65,8 @@ proc sort data=work.nact_dates;
 run;
 
 /* Derive CM flags and merge NACTDT */
-data adam.adcm(keep=STUDYID USUBJID CMDECOD CMCAT CMINDC CMSTDT CMENDT CMTRT CMSTDY GCSFFL GCSFPRFL NACTFL NACTDT PREDNFL TRTEMFL
+data adam.adcm(keep=STUDYID USUBJID CMDECOD CMCAT CMINDC CMSTDT CMENDT CMTRT CMSTDY
+                    GCSFFL GCSFPRFL NACTFL NACTDT PREDNFL TRTEMFL CMSEQ
                     rename=(CMSTDT=ASTDT CMENDT=AENDT CMSTDY=ASTDY));  /* audit F-10: OCCDS analysis-date naming */
     merge work.cm_base work.nact_dates;
     by usubjid;
@@ -101,7 +103,16 @@ data adam.adcm(keep=STUDYID USUBJID CMDECOD CMCAT CMINDC CMSTDT CMENDT CMTRT CMS
 run;
 
 proc sort data=adam.adcm;
-    by usubjid ASTDT cmdecod;
+    by usubjid CMSEQ;
+run;
+
+data _null_;
+    set adam.adcm;
+    by usubjid CMSEQ;
+    if missing(CMSEQ) or (not first.CMSEQ) then do;
+        putlog "ERROR: [ADCM-QC] Source CMSEQ is missing or duplicated for " usubjid= CMSEQ=;
+        abort cancel;
+    end;
 run;
 
 /* Clean up work library */

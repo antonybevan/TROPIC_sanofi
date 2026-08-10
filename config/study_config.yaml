@@ -3,17 +3,12 @@ TRT01P_CODE: "MP"
 TRT01PN_CODE: 2
 
 STUDY_CUTOFF_DT: "2009-09-25"
+FINAL_ALPHA: 0.0452
+SAFETY_FOLLOWUP_DAYS: 30
 
 PLANNED_DOSE: 12.0
+DOSE_REDUCTION_TOLERANCE: 0.05
 AGE_STRAT_CUT: 65
-
-# Missing data imputation defaults (no formal SAP imputation section; method per ADRG §5.1)
-ECOGBL_DEFAULT: 1.0
-PSABL_DEFAULT: 110.0
-ALPBL_DEFAULT: 140.0
-HGBBL_DEFAULT: 11.5
-ALBBL_DEFAULT: 38.0
-LDHBL_DEFAULT: 220.0
 
 # RECIST v1.0 response thresholds (SAP v4.0 §10.3)
 RECIST_PD_PCT: 20.0
@@ -23,7 +18,7 @@ RECIST_PR_PCT: -30.0
 # this many days afterwards (RECIST v1.0 "no less than 4 weeks"), SAP v4.0 §10.3.
 RECIST_CONFIRM_DAYS: 28
 
-# PCWG3 bone-scan 2+2 progression (Scher 2016) — methodological demonstration, not
+# Exploratory bone-scan 2+2 progression (Scher 2016) — methodological demonstration, not
 # in the trial-era SAP; see ADRG §4A. Drives the BSGRESP parameter in ADRS.
 BONE_PROG_MIN_NEW: 2      # new bone lesions on first post-baseline scan => PDu
 BONE_PROG_CONFIRM_NEW: 2  # additional new bone lesions on a later scan to confirm
@@ -58,5 +53,7 @@ W_C2D8_HI: 34
 W_C3D1_LO: 39
 W_C3D1_HI: 45
 
-# Staging data path (relative to project root)
-STAGING_PATH: "01_source_data/real_sdtm/staging"
+# Governed storage zones (relative to project root). SOURCE_SDTM_PATH is immutable;
+# STAGING_PATH is regenerable and must never equal or descend from the source path.
+SOURCE_SDTM_PATH: "01_source_data/real_sdtm"
+STAGING_PATH: "04_analysis_datasets/staging"

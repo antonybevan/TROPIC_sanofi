@@ -814,7 +814,7 @@ adrs_psprog <- data.frame(
   TRT01P   = "CbzP",
   TRTSDT   = adsl_cbzp$TRTSDT,
   PARAMCD  = "PSPROG",
-  PARAM    = "PSA Progression (PCWG3)",
+  PARAM    = "PSA Progression (reconstructed rule)",
   AVALC    = psa_prog_val,
   AVAL     = psa_prog_num,
   ADT      = psa_prog_adt,
@@ -823,10 +823,10 @@ adrs_psprog <- data.frame(
   stringsAsFactors = FALSE
 )
 
-# PCWG3 bone-scan progression (BSGRESP) — synthetic/illustrative three-level result
-# matching the real-arm derivation (A_adrs_generation.sas). Confirmed PROGRESSION feeds
-# TTUMOR; PROGRESSION UNCONFIRMED (PDu) is informational. CbzP TTE is independently
-# reconstructed, so this exists only for CT/define/TFL coherence with the merged arm.
+# Exploratory bone 2+2 status (BSGRESP) — synthetic/illustrative three-level result
+# matching the real-arm informational parameter. It does not feed BOR, ORR, TTUMOR,
+# or PFS. CbzP TTE is independently reconstructed, so this exists only for
+# controlled-terminology/Define/TFL coherence with the merged arm.
 set.seed(20100104)
 bsg_pool <- c(rep("PROGRESSION", 11), rep("PROGRESSION UNCONFIRMED", 8),
               rep("NO PROGRESSION", N_cbzp - 19))
@@ -842,7 +842,7 @@ adrs_bsgresp <- data.frame(
   TRT01P   = "CbzP",
   TRTSDT   = adsl_cbzp$TRTSDT,
   PARAMCD  = "BSGRESP",
-  PARAM    = "Bone Scan Progression (PCWG3)",
+  PARAM    = "Exploratory Bone Progression (2+2)",
   AVALC    = bsg_val,
   AVAL     = bsg_num,
   ADT      = bsg_adt,

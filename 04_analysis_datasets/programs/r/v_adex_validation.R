@@ -1,11 +1,10 @@
-# Program: v_adex_validation.R | Version: 2.1.0
-# Author: Antony Bevan, Clinical Programming | Date: 2026-05-23
-# (ADaM dens contract 2026-07-09)
+# Program: v_adex_validation.R | Version: 3.0.0
+# Author: Antony Bevan, Clinical Programming | Date: 2026-08-09
 # Standard: ADaMIG v1.3 BDS | renv.lock hash: locked
 # Description: R Independent Validation double-programming for TROPIC ADEX.
 #
-# Dens: subject-level BDS spine = ADSL SAFFL=="Y"; TRT01P from ADSL (DM arm).
-# EX used for dose metrics only — never for treatment arm (F-028).
+# Dens: subject-level BDS spine = ADSL SAFFL=="Y". Oral prednisone/
+# prednisolone records are excluded from antineoplastic cycle metrics.
 
 library(dplyr)
 library(haven)
@@ -26,57 +25,70 @@ cat("NOTE: [VALIDATION] Starting ADEX Validation script...\n")
 
 # Load real validation ADSL and staging EX
 adsl <- read_xpt("04_analysis_datasets/adam/adsl_v.xpt")
-ex <- readRDS("01_source_data/real_sdtm/staging/ex.rds")
+ex <- readRDS(stage_file("ex"))
 
-# Ensure columns are numeric and exclude staging STUDYID
+# Restrict exposure metrics to the primary randomized IV antineoplastic. EXSEQ
+# counts oral and IV records; VISITNUM is the treatment-cycle index.
 ex_clean <- ex %>%
   select(-any_of("STUDYID")) %>%
+  filter(grepl("MITOX|XRP|CABAZ", coalesce(EXTRT, ""), ignore.case = TRUE)) %>%
   mutate(
     EXSEQ = as.numeric(EXSEQ),
+    VISITNUM = as.numeric(VISITNUM),
     EXDOSE2 = as.numeric(EXDOSE2),
     EXCUMD2 = as.numeric(EXCUMD2),
     EXPDOSE = as.numeric(EXPDOSE),
-    EXTRINT = as.numeric(EXTRINT)
+    EXTRINT = as.numeric(EXTRINT),
+    delay_flag = !is.na(EXDELAY) & trimws(as.character(EXDELAY)) != "",
+    reduction_flag = !is.na(EXDOSE2) & EXDOSE2 > 0 & !is.na(EXPDOSE) &
+      EXDOSE2 < EXPDOSE * (1 - DOSE_REDUCTION_TOLERANCE)
   )
 
-# Summarize Modifications per USUBJID
+# EXTRINT is a source-derived subject RDI repeated on each IV cycle. Carry it
+# only when those repetitions are internally consistent.
 ex_summary <- ex_clean %>%
   group_by(USUBJID) %>%
   summarise(
-    ncycle = max(EXSEQ, na.rm = TRUE),
+    ncycle = n_distinct(VISITNUM[!is.na(EXDOSE2) & EXDOSE2 > 0]),
+    planned_dose = {
+      z <- EXPDOSE[VISITNUM == 1 & !is.na(EXPDOSE)]
+      if (length(z)) max(z) else NA_real_
+    },
     cumdose = max(EXCUMD2, na.rm = TRUE),
-    ndeldose = sum(!is.na(EXDELAY) & EXDELAY != "", na.rm = TRUE),
-    nreddose = sum(!is.na(EXDSRCM) & EXDSRCM != "", na.rm = TRUE),
-    rdi = max(EXTRINT, na.rm = TRUE),
+    ndeldose = sum(delay_flag),
+    nreddose = sum(reduction_flag),
+    n_rdi_values = n_distinct(EXTRINT, na.rm = TRUE),
+    rdi = if_else(n_rdi_values <= 1L, max(EXTRINT, na.rm = TRUE), NA_real_),
     .groups = "drop"
   ) %>%
   mutate(
     # Handle infinities/NAs from max() on missing values
     ncycle = if_else(is.infinite(ncycle) | is.na(ncycle), 0.0, ncycle),
     cumdose = if_else(is.infinite(cumdose) | is.na(cumdose), 0.0, cumdose),
-    rdi = if_else(is.infinite(rdi) | is.na(rdi), 0.0, rdi)
+    rdi = if_else(is.infinite(rdi), NA_real_, rdi)
   )
+
+if (any(ex_summary$n_rdi_values > 1L)) {
+  stop("ERROR: [ADEX-QC] conflicting source EXTRINT values within subject")
+}
 
 # Fetch header details from ADSL
 header <- adsl %>%
   select(STUDYID, USUBJID, SUBJID, TRT01P, TRT01PN, TRTSDT)
 
 summary_records <- header %>%
-  inner_join(ex_summary, by = "USUBJID") %>%
-  mutate(
-    planned_dose = PLANNED_DOSE # Mitoxantrone planned dose mg/m2 — see config_study.R
-  )
+  inner_join(ex_summary, by = "USUBJID")
 
 # Build BDS Structure (Summary records)
 summary_bds <- bind_rows(
   summary_records %>% transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRT01PN, TRTSDT,
-    PARAMCD = "PLDOSE", PARAM = "Planned Dose (mg/m2)", PARCAT1 = "INDIVIDUAL",
+    PARAMCD = "PLDOSE", PARAM = "Initial Planned IV Dose (mg/m2)", PARCAT1 = "INDIVIDUAL",
     AVAL = planned_dose, AVALC = sprintf("%.2f", planned_dose), AVISIT = "ALL CYCLES"
   ),
   summary_records %>% transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRT01PN, TRTSDT,
-    PARAMCD = "CUMDOSE", PARAM = "Cumulative Actual Dose (mg/m2)", PARCAT1 = "SUMMARY",
+    PARAMCD = "CUMDOSE", PARAM = "Cumulative IV Actual Dose (mg/m2)", PARCAT1 = "SUMMARY",
     AVAL = cumdose, AVALC = sprintf("%.2f", cumdose), AVISIT = "ALL CYCLES"
   ),
   summary_records %>% transmute(
@@ -96,14 +108,19 @@ summary_bds <- bind_rows(
   ),
   summary_records %>% transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRT01PN, TRTSDT,
-    PARAMCD = "RDI", PARAM = "Relative Dose Intensity (%)", PARCAT1 = "SUMMARY",
+    PARAMCD = "RDI", PARAM = "Source RDI (%)", PARCAT1 = "SUMMARY",
     AVAL = rdi, AVALC = sprintf("%.1f", round_half_up(rdi, 1)), AVISIT = "ALL CYCLES"
   ),
   summary_records %>% transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRT01PN, TRTSDT,
     PARAMCD = "RDIDL", PARAM = "Relative Dose Intensity Category", PARCAT1 = "SUMMARY",
     AVAL = rdi,
-    AVALC = if_else(rdi >= 85, ">=85%", if_else(rdi >= 65, "65-<85%", "<65%")),
+    AVALC = case_when(
+      is.na(rdi) ~ NA_character_,
+      rdi >= 85 ~ ">=85%",
+      rdi >= 65 ~ "65-<85%",
+      TRUE ~ "<65%"
+    ),
     AVISIT = "ALL CYCLES"
   )
 )
@@ -113,10 +130,10 @@ cycle_bds <- ex_clean %>%
   inner_join(header, by = c("USUBJID", "SUBJID")) %>%
   transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRT01PN, TRTSDT,
-    PARAMCD = "PERFDOSE", PARAM = "Actual Dose Administered (mg/m2)", PARCAT1 = "INDIVIDUAL",
+    PARAMCD = "PERFDOSE", PARAM = "IV Actual Dose Administered (mg/m2)", PARCAT1 = "INDIVIDUAL",
     AVAL = EXDOSE2,
     AVALC = if_else(is.na(EXDOSE2), NA_character_, sprintf("%.2f", EXDOSE2)),
-    AVISIT = paste("CYCLE", EXSEQ)
+    AVISIT = paste("CYCLE", as.integer(VISITNUM))
   )
 
 cycle_adj <- ex_clean %>%
@@ -124,9 +141,9 @@ cycle_adj <- ex_clean %>%
   transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRT01PN, TRTSDT,
     PARAMCD = "ADJ", PARAM = "Dose Adjusted Flag", PARCAT1 = "INDIVIDUAL",
-    AVAL = if_else(!is.na(EXDSRCM) & EXDSRCM != "", 1.0, 0.0),
-    AVALC = if_else(!is.na(EXDSRCM) & EXDSRCM != "", "Y", "N"),
-    AVISIT = paste("CYCLE", EXSEQ)
+    AVAL = if_else(delay_flag | reduction_flag | !is.na(EXDSREA), 1.0, 0.0),
+    AVALC = if_else(delay_flag | reduction_flag | !is.na(EXDSREA), "Y", "N"),
+    AVISIT = paste("CYCLE", as.integer(VISITNUM))
   )
 
 cycle_adj_ae <- ex_clean %>%
@@ -134,9 +151,9 @@ cycle_adj_ae <- ex_clean %>%
   transmute(
     STUDYID, USUBJID, SUBJID, TRT01P, TRT01PN, TRTSDT,
     PARAMCD = "ADJAE", PARAM = "Dose Adjusted due to AE Flag", PARCAT1 = "INDIVIDUAL",
-    AVAL = if_else(!is.na(EXDSRCM) & EXDSRCM == "ADVERSE EVENT", 1.0, 0.0),
-    AVALC = if_else(!is.na(EXDSRCM) & EXDSRCM == "ADVERSE EVENT", "Y", "N"),
-    AVISIT = paste("CYCLE", EXSEQ)
+    AVAL = if_else(toupper(trimws(coalesce(EXDSREA, ""))) == "ADVERSE EVENT", 1.0, 0.0),
+    AVALC = if_else(toupper(trimws(coalesce(EXDSREA, ""))) == "ADVERSE EVENT", "Y", "N"),
+    AVISIT = paste("CYCLE", as.integer(VISITNUM))
   )
 
 # Combine and Sort

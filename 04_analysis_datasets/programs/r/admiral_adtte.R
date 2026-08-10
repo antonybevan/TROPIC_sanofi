@@ -8,7 +8,7 @@
 #
 # SCOPE: the two ITT EFFICACY parameters admiral models idiomatically:
 #   OS  -- Overall Survival: death event, last-known-alive censor (admiral-clean).
-#   PFS -- Progression-Free Survival: composite progression (tumour/PSA/bone + the
+#   PFS -- Progression-Free Survival: composite progression (typed tumour/PSA + the
 #          author-adopted F-042 pain event pool) and death, with the study's NACT
 #          censoring hierarchy.
 #   The SAFETY parameters (TTSAE/TTPAIN/TTPSA/TTUMOR) stay with the SAS+R tracks.
@@ -29,7 +29,7 @@ names(adsl) <- toupper(names(adsl))
 adsl <- adsl |>
   mutate(across(c(RANDDT, TRTSDT, TRTEDT, DTHDT, LSTALVDT), as.Date))
 
-# Event dates: ADRS composite PD + the author-adopted F-042 Phase 2 pain pool
+# Event dates: typed ADRS progression + the author-adopted F-042 Phase 2 pain pool
 # + ADCM NACT for censoring.  The F-042 module is a governed component shared by
 # the controlled R validation track; admiral independently derives the TTE
 # event/censor assembly below.
@@ -39,21 +39,37 @@ adlb <- read_xpt("04_analysis_datasets/adam/adlb_v.xpt")
 names(adlb) <- toupper(names(adlb))
 adcm <- read_xpt("04_analysis_datasets/adam/adcm_v.xpt")
 names(adcm) <- toupper(names(adcm))
-sv <- readRDS("01_source_data/real_sdtm/staging/sv.rds")
-pn <- readRDS("01_source_data/real_sdtm/staging/pn.rds")
-cm <- readRDS("01_source_data/real_sdtm/staging/cm.rds")
-pr <- readRDS("01_source_data/real_sdtm/staging/pr.rds")
-ds <- readRDS("01_source_data/real_sdtm/staging/ds.rds")
+sv <- readRDS(stage_file("sv"))
+pn <- readRDS(stage_file("pn"))
+cm <- readRDS(stage_file("cm"))
+pr <- readRDS(stage_file("pr"))
+ds <- readRDS(stage_file("ds"))
 
-first_pd <- adrs |>
-  filter((PARAMCD == "OVRLRESP" & AVALC == "PD") |
-           (PARAMCD == "BSGRESP" & AVALC == "PROGRESSION") |
-           (PARAMCD == "PSPROG"  & AVALC == "Y")) |>
-  transmute(USUBJID, PDDT = as.Date(ADT, origin = "1960-01-01")) |>
+first_nonpain <- bind_rows(
+  adrs |>
+    filter(PARAMCD == "OVRLRESP", AVALC == "PD") |>
+    transmute(
+      USUBJID,
+      PDDT = as.Date(ADT, origin = "1960-01-01"),
+      NONPAIN_EVENT = "TUMOR PROGRESSION",
+      event_rank = 1L
+    ),
+  adrs |>
+    filter(PARAMCD == "PSPROG", AVALC == "Y") |>
+    transmute(
+      USUBJID,
+      PDDT = as.Date(ADT, origin = "1960-01-01"),
+      NONPAIN_EVENT = "PSA PROGRESSION",
+      event_rank = 2L
+    )
+) |>
   inner_join(adsl |> select(USUBJID, RANDDT), by = "USUBJID") |>
-  filter(!is.na(PDDT) & PDDT > RANDDT) |>
+  filter(!is.na(PDDT), PDDT > RANDDT, PDDT <= STUDY_CUTOFF_DT) |>
+  arrange(USUBJID, PDDT, event_rank) |>
   group_by(USUBJID) |>
-  summarise(PDDT = min(PDDT), .groups = "drop")
+  slice_head(n = 1) |>
+  ungroup() |>
+  select(USUBJID, PDDT, NONPAIN_EVENT)
 
 # F-042 is evaluated from the same governed staged domains as the R validation
 # track.  It supplies the primary pain event pool and evaluable-visit lineage;
@@ -68,7 +84,10 @@ pain_prog_pfs <- f042_phase2$primary_events |>
     pain_event_source = event_source,
     pain_event_component = event_component,
     pain_source_keys = source_keys
-  )
+  ) |>
+  inner_join(adsl |> select(USUBJID, RANDDT), by = "USUBJID") |>
+  filter(PAIN_PROG_DT > RANDDT, PAIN_PROG_DT <= STUDY_CUTOFF_DT) |>
+  select(-RANDDT)
 
 # PFS last-evaluable censor date: valid post-randomisation RECIST, PSA, or
 # evaluable pain visit.  Death milestones are not tumour assessments.
@@ -76,7 +95,8 @@ pfs_tumor_lastassess <- adrs |>
   filter(PARAMCD == "OVRLRESP", AVALC %in% c("CR", "PR", "SD", "PD")) |>
   transmute(USUBJID, last_eval_dt = as.Date(ADT, origin = "1960-01-01")) |>
   inner_join(adsl |> select(USUBJID, RANDDT), by = "USUBJID") |>
-  filter(!is.na(last_eval_dt) & last_eval_dt > RANDDT) |>
+  filter(!is.na(last_eval_dt), last_eval_dt > RANDDT,
+         last_eval_dt <= STUDY_CUTOFF_DT) |>
   group_by(USUBJID) |>
   summarise(last_eval_dt = max(last_eval_dt), .groups = "drop")
 
@@ -84,7 +104,7 @@ pfs_psa_lastassess <- adlb |>
   filter(PARAMCD == "PSA", !is.na(AVAL), !is.na(ADT)) |>
   transmute(USUBJID, last_eval_dt = as.Date(ADT, origin = "1960-01-01")) |>
   inner_join(adsl |> select(USUBJID, RANDDT), by = "USUBJID") |>
-  filter(last_eval_dt > RANDDT) |>
+  filter(last_eval_dt > RANDDT, last_eval_dt <= STUDY_CUTOFF_DT) |>
   group_by(USUBJID) |>
   summarise(last_eval_dt = max(last_eval_dt), .groups = "drop")
 
@@ -92,6 +112,7 @@ pfs_pain_lastassess <- f042_phase2$visits |>
   inner_join(adsl |> select(USUBJID, RANDDT), by = "USUBJID") |>
   filter(
     !is.na(visit_date), visit_date > RANDDT,
+    visit_date <= STUDY_CUTOFF_DT,
     ppi_evaluable | as_evaluable
   ) |>
   transmute(USUBJID, last_eval_dt = visit_date) |>
@@ -106,8 +127,8 @@ pfs_lastassess <- bind_rows(
   group_by(USUBJID) |>
   summarise(last_eval_dt = max(last_eval_dt), .groups = "drop")
 
-# Composite progression date = earliest of tumour/PSA/bone PD and pain progression.
-first_prog <- first_pd |>
+# Composite progression date = earliest of typed tumour/PSA PD and pain progression.
+first_prog <- first_nonpain |>
   rename(NONPAIN_PROG_DT = PDDT) |>
   full_join(pain_prog_pfs, by = "USUBJID") |>
   mutate(
@@ -118,12 +139,15 @@ first_prog <- first_pd |>
       TRUE                                ~ PAIN_PROG_DT
     )
   ) |>
-  select(USUBJID, PDDT, NONPAIN_PROG_DT, PAIN_PROG_DT)
+  select(USUBJID, PDDT, NONPAIN_PROG_DT, NONPAIN_EVENT, PAIN_PROG_DT)
 
 first_nact <- adcm |>
   filter(!is.na(NACTDT)) |>
+  transmute(USUBJID, NACTDT = as.Date(NACTDT, origin = "1960-01-01")) |>
+  inner_join(adsl |> select(USUBJID, RANDDT), by = "USUBJID") |>
+  filter(NACTDT > RANDDT, NACTDT <= STUDY_CUTOFF_DT) |>
   group_by(USUBJID) |>
-  summarise(NACTDT = min(as.Date(NACTDT, origin = "1960-01-01")), .groups = "drop")
+  summarise(NACTDT = min(NACTDT), .groups = "drop")
 
 # Augment ADSL with the per-subject event/censor anchor dates + precomputed
 # censoring dates, so the source objects below can reference plain ADSL columns.
@@ -132,7 +156,10 @@ adsl_tte <- adsl |>
   left_join(first_nact, by = "USUBJID") |>
   left_join(pfs_lastassess, by = "USUBJID") |>
   mutate(
-    LSTALV_CAP = pmin(LSTALVDT, STUDY_CUTOFF_DT),          # admin cutoff applied
+    LSTALV_CAP = case_when(
+      is.na(LSTALVDT) | LSTALVDT < RANDDT ~ RANDDT,
+      TRUE ~ pmin(LSTALVDT, STUDY_CUTOFF_DT)
+    ),
     # PFS censoring hierarchy (SAP): a new anti-cancer therapy censors at the day
     # before NACT and OUTRANKS last-evaluable. admiral's derive_param_tte selects
     # the LATEST date among competing censor_sources, which does not honour this
@@ -152,7 +179,10 @@ adsl_tte <- adsl |>
 
 # ---- OS: Overall Survival (ITT) --------------------------------------------
 os_death <- event_source(
-  dataset_name = "adsl", filter = DTHFL == "Y", date = DTHDT,
+  dataset_name = "adsl",
+  filter = DTHFL == "Y" & !is.na(DTHDT) &
+    DTHDT >= RANDDT & DTHDT <= STUDY_CUTOFF_DT,
+  date = DTHDT,
   set_values_to = exprs(EVNTDESC = "DEATH")
 )
 os_censor <- censor_source(
@@ -182,7 +212,7 @@ pfs_pd <- event_source(
     (is.na(PAIN_PROG_DT) | PDDT <= PAIN_PROG_DT) &
     (is.na(NACTDT) | NACTDT >= NONPAIN_PROG_DT),
   date = NONPAIN_PROG_DT,
-  set_values_to = exprs(EVNTDESC = "DISEASE PROGRESSION")
+  set_values_to = exprs(EVNTDESC = NONPAIN_EVENT)
 )
 pfs_pain <- event_source(
   dataset_name = "adsl",
@@ -193,7 +223,9 @@ pfs_pain <- event_source(
 )
 pfs_death <- event_source(
   dataset_name = "adsl",
-  filter = DTHFL == "Y" & (is.na(NACTDT) | NACTDT >= DTHDT),
+  filter = DTHFL == "Y" & !is.na(DTHDT) &
+    DTHDT >= RANDDT & DTHDT <= STUDY_CUTOFF_DT &
+    (is.na(NACTDT) | NACTDT >= DTHDT),
   date = DTHDT, set_values_to = exprs(EVNTDESC = "DEATH")
 )
 pfs_censor <- censor_source(
@@ -219,6 +251,15 @@ adtte <- bind_rows(os, pfs) |>
   ) |>
   mutate(AVALU = "DAYS") |>
   arrange(USUBJID, PARAMCD)
+
+invalid <- adtte |>
+  filter(is.na(STARTDT) | is.na(ADT) | ADT < STARTDT | AVAL < 1)
+if (nrow(invalid) > 0) {
+  stop(sprintf(
+    "ERROR: [ADMIRAL] ADTTE has %d missing/pre-origin duration records",
+    nrow(invalid)
+  ))
+}
 
 for (.dv in names(adtte)) {
   if (inherits(adtte[[.dv]], "Date")) attr(adtte[[.dv]], "format.sas") <- "DATE9."

@@ -1,6 +1,6 @@
 # TROPIC Findings Disposition Board
 
-**Date:** 2026-08-05
+**Date:** 2026-08-10
 **Product claim:** Controlled **non-submission demonstration** programming pipeline  
 **Authority:** SAP v4.0 locked for remediation (`06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md`); not sponsor-approved for filing  
 
@@ -9,6 +9,13 @@
 > **2026-08-03 remediation update:** The corrected full real-SAS DAG completed 34/34 stages GREEN. F-011 now excludes the one ADSL fallback baseline PSA (MP 61/329; CbzP 145/361). Section 3 corrected TTUMOR death-milestone censoring, PFS last-evaluable/no-post-baseline censoring, and ADTTE composite event labels. The PFS pain/supporting-disease and palliative-RT decision remains an explicitly accepted Path A residual. F-012 remains an explicit non-submission demonstration limit: combined N=749 is not protocol ITT N=755.
 
 > **2026-08-05 control update:** F-042’s register row is synchronized with the implemented/sealed Path A state and the GOV-STAT-01 closure. F-043 records and remediates the abort-path telemetry defect that could label a truncated RED run as `full_dag`; the historical run record remains unchanged as evidence.
+
+> **2026-08-10 forensic closure update:** The expanded live-ODA pipeline completed
+> 37/37 stages GREEN after source/staging isolation, endpoint, date, source-sequence,
+> metadata-key, reconciliation, narrative-consistency, and log-cleanliness repairs.
+> Technical Path A implementation is ready for review; the working tree remains
+> intentionally uncommitted, and full IPD/sponsor/independent-QC/Part-11/Pinnacle-21
+> dependencies continue to block any regulated-submission claim.
 
 ## Disposition classes
 

@@ -1,4 +1,4 @@
-# GREEN ODA Run — Committed Evidence Badge
+# Historical GREEN ODA Run — Committed Evidence Badge
 
 These files are an **immutable snapshot** of a genuine SAS↔R double-programming run executed
 against a **real SAS 9.4 engine on SAS OnDemand for Academics (ODA)**. They are committed here
@@ -7,11 +7,12 @@ against a **real SAS 9.4 engine on SAS OnDemand for Academics (ODA)**. They are 
 (audit finding C‑1).
 
 > **Snapshot provenance:** refreshed **2026-06-18** (endpoint `odaws01-apse1-2.oda.sas.com`,
-> SDTM manifest `329430f6…`). This run certifies the **current** ADRS derivation — i.e. the
-> PCWG3-correct integrated RECIST overall response + bone-scan 2+2 (`BSGRESP`) of Finding B,
-> and the `AVALC $100` length fix that the real-SAS reconciliation itself surfaced (the SET
+> SDTM manifest `329430f6…`). This is immutable **historical evidence**, not certification of
+> the current working tree. It records the then-current integrated RECIST response and exploratory
+> bone 2+2 (`BSGRESP`) implementation, plus the `AVALC $100` length fix that the real-SAS
+> reconciliation itself surfaced (the SET
 > concatenation was truncating `'PROGRESSION UNCONFIRMED'` to `'PROGRESSION UNCONFIR'`; 5
-> `BSGRESP` cells). All 8 domains + 6 results parameters reconcile against this code.
+> `BSGRESP` cells). All 8 domains + 6 results parameters reconciled against that snapshot revision.
 
 | File | What it proves |
 |---|---|
@@ -33,6 +34,8 @@ produced **independently** and **agree** — at both the dataset layer and the a
 python3 platform/cibuild.py --real-sas    # requires JRE + saspy + ODA credentials
 ```
 
-The run that produced this snapshot also surfaced (did not hide) 39 `ADTTE` week-precision
-time-origin anomalies as SAS `WARNING`s (21 PFS / 15 TTPAIN / 2 TTPSA / 1 TTUMOR), inherent to the
-source data's week-offset date precision (see ADRG/SDRG).
+The run that produced this historical snapshot surfaced 39 `ADTTE` week-precision time-origin
+anomalies and retained them by flooring durations to one day. That behavior is **superseded** in
+the current implementation: missing or pre-origin dates are release-blocking and are never silently
+floored. Current-run evidence is the live `platform/pipeline_health.json` plus reconciliation and
+release-manifest artifacts, not this frozen badge.

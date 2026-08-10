@@ -29,6 +29,9 @@ STAGE_GATE_RULES = [
     ("R ADRS Validation", ["G04", "G06"], "ADaM validation track"),
     ("R ADTTE Validation", ["G04", "G06"], "ADaM validation track"),
     ("R BIMO Validation", ["G04", "G06"], "BIMO validation track"),
+    ("Synthetic Comparator Reconstruction", ["G05"], "deterministic literature-derived comparator build"),
+    ("Guyot Reconstruction Validation", ["G05", "G06"], "intrinsic reconstruction and live-comparator compatibility checks"),
+    ("Synthetic Comparator XPT Export", ["G05", "G06"], "current RDS-to-XPT bridge materialization before SAS"),
     ("SAS Production (ODA/Real/Simulated)", ["G04"], "production analysis dataset build"),
     ("Cross-Language Audit Reconcile", ["G04", "G06"], "dataset-level reconciliation gate"),
     ("Admiral ADSL Re-derivation", ["G04", "G06"], "third-engine T1 ADSL re-derivation (admiral)"),
@@ -83,6 +86,15 @@ def _stage_rows(manifest):
             "parallel": "parallel_group" in d,
             "manifest_gated": False,
             "source": f"manifest.datasets.{d['name']}",
+        })
+    for s in (manifest.get("infrastructure_stages") or {}).get("pre_sas", []):
+        stages.append({
+            "name": s["name"],
+            "script": s.get("script", ""),
+            "runner": s.get("runner", "logrx"),
+            "parallel": False,
+            "manifest_gated": bool(s.get("gated")),
+            "source": "manifest.infrastructure_stages.pre_sas",
         })
     stages.append({
         "name": "SAS Production (ODA/Real/Simulated)",

@@ -15,29 +15,20 @@
 %global STUDY_CUTOFF_DT;
 %let STUDY_CUTOFF_DT = '25SEP2009'd;
 
+%global FINAL_ALPHA;
+%let FINAL_ALPHA = 0.0452;
+
+%global SAFETY_FOLLOWUP_DAYS;
+%let SAFETY_FOLLOWUP_DAYS = 30;
+
 %global PLANNED_DOSE;
 %let PLANNED_DOSE = 12.0;
 
+%global DOSE_REDUCTION_TOLERANCE;
+%let DOSE_REDUCTION_TOLERANCE = 0.05;
+
 %global AGE_STRAT_CUT;
 %let AGE_STRAT_CUT = 65;
-
-%global ECOGBL_DEFAULT;
-%let ECOGBL_DEFAULT = 1.0;
-
-%global PSABL_DEFAULT;
-%let PSABL_DEFAULT = 110.0;
-
-%global ALPBL_DEFAULT;
-%let ALPBL_DEFAULT = 140.0;
-
-%global HGBBL_DEFAULT;
-%let HGBBL_DEFAULT = 11.5;
-
-%global ALBBL_DEFAULT;
-%let ALBBL_DEFAULT = 38.0;
-
-%global LDHBL_DEFAULT;
-%let LDHBL_DEFAULT = 220.0;
 
 %global RECIST_PD_PCT;
 %let RECIST_PD_PCT = 20.0;
@@ -120,5 +111,8 @@
 %global W_C3D1_HI;
 %let W_C3D1_HI = 45;
 
+%global SOURCE_SDTM_PATH;
+%let SOURCE_SDTM_PATH = %nrstr(01_source_data/real_sdtm);
+
 %global STAGING_PATH;
-%let STAGING_PATH = %nrstr(01_source_data/real_sdtm/staging);
+%let STAGING_PATH = %nrstr(04_analysis_datasets/staging);

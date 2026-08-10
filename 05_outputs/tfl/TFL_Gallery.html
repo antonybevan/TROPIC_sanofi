@@ -285,10 +285,10 @@
       de Bono et al., <em>Lancet</em> 2010 · Sanofi · Real SDTM Source Data (MP arm, N=371)
     </p>
     <div class="badges">
-      <span class="badge badge-green">✓ 12/12 Pipeline Stages Passing</span>
+      <span class="badge badge-green">✓ Manifest-controlled pipeline</span>
       <span class="badge badge-blue">CDISC ADaMIG v1.3 · SDTMIG v3.1.1</span>
-      <span class="badge badge-red">FDA Project Optimus 2026</span>
-      <span class="badge badge-green">100% diffdf Reconciliation</span>
+      <span class="badge badge-red">Project Optimus-style exploratory display</span>
+      <span class="badge badge-green">SAS/R parity gated by execution mode</span>
       <span class="badge badge-amber">⚠ CbzP arm: synthesized comparator</span>
     </div>
   </div>
@@ -298,12 +298,12 @@
 <div class="stats-row">
   <div class="stat-card">
     <div class="stat-label">OS Hazard Ratio</div>
-    <div class="stat-value blue-val">0.70</div>
-    <div class="stat-sub">95% CI: 0.59–0.83 · p=0.0004</div>
+    <div class="stat-value blue-val">0.71</div>
+    <div class="stat-sub">95% CI: 0.60–0.85 · stratified log-rank p=0.000216</div>
   </div>
   <div class="stat-card">
     <div class="stat-label">Median OS — CbzP</div>
-    <div class="stat-value blue-val">15.1 mo</div>
+    <div class="stat-value blue-val">15.2 mo</div>
     <div class="stat-sub">vs 12.7 mo (MP)</div>
   </div>
   <div class="stat-card">
@@ -357,7 +357,7 @@
       <div class="fig-meta">
         <div class="fig-id">F-11-1</div>
         <div class="fig-name">Kaplan–Meier: Overall Survival</div>
-        <div class="fig-desc">Primary endpoint. HR = 0.70 (0.59–0.83), log-rank p = 0.0004. Includes aligned risk table.</div>
+        <div class="fig-desc">Primary endpoint. Stratified Cox HR = 0.71 (0.60–0.85), stratified log-rank p = 0.000216. Includes aligned risk table.</div>
       </div>
     </div>
 
@@ -367,7 +367,7 @@
       <div class="fig-meta">
         <div class="fig-id">F-11-2</div>
         <div class="fig-name">Kaplan–Meier: Progression-Free Survival</div>
-        <div class="fig-desc">Secondary endpoint. HR = 0.74 (0.64–0.86), log-rank p = 0.0012.</div>
+        <div class="fig-desc">Gatekept endpoint. Stratified Cox HR = 0.87 (0.75–1.02), stratified log-rank p = 0.089234; the hierarchical gate closes at PFS.</div>
       </div>
     </div>
 
@@ -407,7 +407,7 @@
       <div class="fig-meta">
         <div class="fig-id">F-17-1</div>
         <div class="fig-name">FDA Project Optimus — Exposure–Response Scatter</div>
-        <div class="fig-desc">Cycle 1 RDI vs OS (days). Loess regression overlay. Supports FDA 2026 dose optimisation guidance alignment.</div>
+        <div class="fig-desc">Subject-level all-cycles source RDI versus Cycle 1 ANC nadir, with LOESS overlay. Exploratory, synthetic-comparator, non-confirmatory demonstration.</div>
       </div>
     </div>
 
@@ -437,10 +437,11 @@
             <tr><th>Endpoint</th><th>CbzP (N=378)</th><th>MP (N=371)</th><th>HR (95% CI)</th><th>p-value</th></tr>
           </thead>
           <tbody>
-            <tr><td><strong>Overall Survival</strong> <em>(primary)</em></td><td class="val-info">15.1 mo</td><td>12.7 mo</td><td class="val-sig">0.70 (0.59–0.83)</td><td class="val-sig">0.0004</td></tr>
-            <tr><td>Progression-Free Survival</td><td class="val-info">—</td><td>—</td><td class="val-sig">0.74 (0.64–0.86)</td><td class="val-sig">0.0012</td></tr>
-            <tr><td>Time to PSA Progression</td><td class="val-info">6.4 mo</td><td>2.1 mo</td><td class="val-sig">0.75 (0.63–0.90)</td><td class="val-sig">0.0001</td></tr>
-            <tr><td>Time to Tumour Progression</td><td class="val-info">8.8 mo</td><td>2.8 mo</td><td class="val-sig">0.61 (0.49–0.76)</td><td class="val-sig">0.0001</td></tr>
+            <tr><td><strong>Overall Survival</strong> <em>(primary)</em></td><td class="val-info">15.2 mo</td><td>12.7 mo</td><td class="val-sig">0.71 (0.60–0.85)</td><td class="val-sig">0.000216</td></tr>
+            <tr><td>Progression-Free Survival</td><td class="val-info">2.7 mo</td><td>1.4 mo</td><td>0.87 (0.75–1.02)</td><td>0.089234</td></tr>
+            <tr><td>Time to PSA Progression</td><td class="val-info">2.7 mo</td><td>2.2 mo</td><td class="val-sig">0.84 (0.70–0.99)</td><td>0.0319</td></tr>
+            <tr><td>Time to Tumour Progression</td><td class="val-info">9.1 mo</td><td>5.0 mo</td><td class="val-sig">0.60 (0.44–0.82)</td><td>0.0007</td></tr>
+            <tr><td>Time to Pain Progression</td><td class="val-info">7.9 mo</td><td>NE</td><td>2.84 (1.97–4.11)</td><td>&lt;0.0001</td></tr>
           </tbody>
         </table>
       </div>
@@ -463,6 +464,7 @@
             <tr><td><strong>Any TEAE</strong></td><td>328</td><td class="val-warn">88%</td></tr>
             <tr><td><strong>Any Grade ≥3 TEAE</strong></td><td>147</td><td class="val-warn">40%</td></tr>
             <tr><td><strong>Any Serious TEAE (SAE)</strong></td><td>78</td><td class="val-warn">21%</td></tr>
+            <tr><td><strong>Any TEAE leading to discontinuation</strong></td><td>32</td><td class="val-warn">9%</td></tr>
           </tbody>
         </table>
         <table style="margin-top:12px">

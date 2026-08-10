@@ -128,6 +128,31 @@ def _method_description(method_node):
     return _clean(text[0]) if text else ""
 
 
+def _apply_define_text_replacements(root, replacements: list[dict], check_only: bool):
+    """Enforce small governed prose corrections not represented by workbook columns."""
+    translated = root.xpath('//*[local-name()="TranslatedText"]')
+    mismatches = []
+    applied = 0
+    for entry in replacements:
+        old = _clean(entry.get("from"))
+        new = _clean(entry.get("to"))
+        if not old or not new:
+            raise SystemExit("define_text_replacements entries require non-empty from/to values")
+        old_nodes = [node for node in translated if _clean(node.text) == old]
+        new_nodes = [node for node in translated if _clean(node.text) == new]
+        if old_nodes:
+            mismatches.append(old)
+            if not check_only:
+                for node in old_nodes:
+                    node.text = new
+                    applied += 1
+        elif not new_nodes:
+            raise SystemExit(
+                "Define-XML text-control anchor is missing for governed replacement: " + old
+            )
+    return mismatches, applied
+
+
 def _append_method_def(root, method_id, description):
     method = etree.Element(f"{{{ODM_NS}}}MethodDef")
     method.set("OID", method_id)
@@ -183,6 +208,11 @@ def apply_or_check(check_only: bool) -> dict:
         )
     method_rows, method_index = _method_rows(method_ws)
     define_tree, define_root, define_refs, define_methods = _define_method_state()
+    define_text_mismatches, define_text_updates = _apply_define_text_replacements(
+        define_root,
+        lineage.get("define_text_replacements") or [],
+        check_only,
+    )
 
     rows = []
     missing_rules = []
@@ -194,7 +224,7 @@ def apply_or_check(check_only: bool) -> dict:
     missing_define_refs = []
     applied = 0
     method_updates_applied = 0
-    define_updates_applied = 0
+    define_updates_applied = define_text_updates
 
     for row_num, predecessor_col, method_col, origin_col, dataset, variable, current, current_method, current_origin in _variable_rows(ws):
         expected = _resolve_predecessor(dataset, variable, rules)
@@ -319,6 +349,7 @@ def apply_or_check(check_only: bool) -> dict:
         + len(method_definition_mismatches)
         + len(define_method_mismatches)
         + len(origin_mismatches)
+        + len(define_text_mismatches)
     )
 
     if check_only and total_mismatches:
@@ -365,6 +396,7 @@ def apply_or_check(check_only: bool) -> dict:
         "method_definition_mismatches": len(method_definition_mismatches),
         "define_method_mismatches": len(define_method_mismatches),
         "origin_mismatches": len(origin_mismatches),
+        "define_text_mismatches": len(define_text_mismatches),
         "updates_applied": applied,
         "method_updates_applied": method_updates_applied,
         "define_updates_applied": define_updates_applied,
@@ -386,6 +418,7 @@ def apply_or_check(check_only: bool) -> dict:
         f"method_definition_mismatches={len(method_definition_mismatches)}; "
         f"define_method_mismatches={len(define_method_mismatches)}; "
         f"origin_mismatches={len(origin_mismatches)}; "
+        f"define_text_mismatches={len(define_text_mismatches)}; "
         f"updates_applied={applied}; method_updates_applied={method_updates_applied}; "
         f"define_updates_applied={define_updates_applied}"
     )

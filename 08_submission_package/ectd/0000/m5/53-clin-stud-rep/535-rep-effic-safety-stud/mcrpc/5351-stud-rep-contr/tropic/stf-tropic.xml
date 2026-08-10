@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="../../../../../../util/style/us-stf-stylesheet.xsl"?>
+<?xml-stylesheet type="text/xsl" href="../../../../../../util/style/ich-stf-stylesheet-2-3.xsl"?>
 <!DOCTYPE ectd:study SYSTEM "../../../../../../util/dtd/ich-stf-v2-2.dtd">
 <ectd:study xmlns:ectd="http://www.ich.org/ectd" xml:lang="en"
             dtd-version="2.2" xmlns:xlink="http://www.w3.org/1999/xlink">

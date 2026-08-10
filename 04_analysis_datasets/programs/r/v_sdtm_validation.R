@@ -3,10 +3,11 @@
 # Validates presence, row counts, and structural completeness of core SDTM staging data.
 
 library(dplyr)
+source("04_analysis_datasets/programs/r/config_study.R")
 
 cat("NOTE: [VALIDATION] Starting SDTM Structure Validation...\n")
 
-staging_dir <- "01_source_data/real_sdtm/staging"
+staging_dir <- STAGING_PATH
 domains <- c("dm", "ae", "ex", "cm", "lb", "ds", "vs", "ls", "pn")
 
 validation_failed <- FALSE

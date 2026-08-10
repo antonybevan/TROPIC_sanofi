@@ -38,6 +38,7 @@ Read **CORE** only, then SUPPORT when you need ODA/seals.
 | `package_ectd.py` | Assemble Module 5 style tree → `08_submission_package/m5/` |
 | `build_ectd_backbone.py` | eCTD index / STF |
 | `materialize_ectd.py` | Materialize sequence `ectd/0000/` |
+| `validate_ectd_sequence.py` | Reject extras and validate leaves, UTIL assets, XML/DTD references, and run-record counts |
 | `check_log_cleanliness.py` | Log gate |
 | `build_release_run_manifest.py` | Hash seal binding |
 
@@ -123,8 +124,10 @@ Sealed snapshot of a genuine ODA run: `platform/evidence/`
 python3 platform/cibuild.py              # sim if no SAS
 python3 platform/cibuild.py --real-sas   # genuine ODA/local when available
 
-# Package only (after data exist)
+# Package/sequence only (after data exist)
 python3 platform/package_ectd.py
+python3 platform/build_ectd_backbone.py
+python3 platform/materialize_ectd.py
 
 # Seals re-check
 python3 scripts/verify_release.py

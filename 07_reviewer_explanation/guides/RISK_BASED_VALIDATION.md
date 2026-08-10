@@ -43,8 +43,8 @@ human re-derivation.
 | ADSL | T1 | `cross_lang_audit` (SAS↔R, 0-diff) · `admiral_reconcile` ADSL 0-diff (`platform/admiral_reconciliation_status.json`) |
 | ADTTE · OS, PFS | T1 | `cross_lang_audit` · `results_reconcile` (KM median/events/N, `results_reconciliation_status.json`) · `admiral_reconcile` OS+PFS 0-diff |
 | ADTTE · TTPAIN/TTPSA/TTUMOR/TTSAE | T2 | `cross_lang_audit` · `results_reconcile` (per-parameter) |
-| ADRS | T2 | `cross_lang_audit` (PCWG3-integrated response, keyed multiset) |
-| ADAE / ADCM / ADEX / ADLB | T3 | `cross_lang_audit` (ADAE on `USUBJID`+`AESEQ`; keyless domains by record-content multiset) · `spec_data_checks` |
+| ADRS | T2 | `cross_lang_audit` (lesion-derived RECIST, reconstructed PSA, exploratory bone 2+2, and separately typed clinical progression; unique governed key `USUBJID`+`PARAMCD`+`ADT`+`AVISIT`) |
+| ADAE / ADCM / ADEX / ADLB | T3 | `cross_lang_audit` using unique governed keys (including source `AESEQ`/`CMSEQ`/`LBSEQ` where applicable) · `spec_data_checks` |
 | define.xml (SDTM + ADaM) | T4 | XSD 2.1 + ARM valid (`validate_xsd.sh`) · referential integrity (`validate_define.py`) · CORE parse |
 | SDTM conformance | T4 | CDISC CORE run (`CORE_SDTM34_RUN_RECORD.md`) |
 | ADaM conformance | T4 | Authored CORE ADaM rules via `--local-rules` (`CORE_RUN_RECORD.md`); Pinnacle 21 = authoritative for a full submission run |

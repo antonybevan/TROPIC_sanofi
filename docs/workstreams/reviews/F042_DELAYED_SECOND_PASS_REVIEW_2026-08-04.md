@@ -6,6 +6,12 @@
 **Review date:** 2026-08-04
 **Status:** **HISTORICAL PASS; NOT SUFFICIENT AS SOLE APPROVAL EVIDENCE — see statistical governance assessment**
 
+> **2026-08-09 supersession note.** This frozen pass predates the no-floor ADTTE contract and
+> the current F-042 counts. Its accepted time-origin warning exception is no longer active:
+> missing/pre-origin dates now fail the build. Current F-042 evidence is 37 primary subjects
+> (36 diary-only, 1 direct-RT-only) and 43/156 pain responses. A new full-DAG run is required
+> for the changed source tree; this record cannot supply it.
+
 ## Purpose and independence boundary
 
 This is a deliberately delayed, checklist-based second pass after implementation of

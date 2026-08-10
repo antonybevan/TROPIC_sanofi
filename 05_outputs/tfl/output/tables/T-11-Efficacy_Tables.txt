@@ -19,14 +19,14 @@ Fisher's exact p-value                    5.2378e-10
 T-11-4: Objective Response Rate (ORR) per RECIST v1.0 (measurable disease)
 ----------------------------------------------------------------------------
 Statistic                                 CbzP (N=179)        MP (N=203)
-Responders / N (%)                        30/179 (16.8%)      13/203 (6.4%)
-Fisher's exact p-value                    0.0018
+Responders / N (%)                        30/179 (16.8%)      12/203 (5.9%)
+Fisher's exact p-value                    0.0009
 Footnote: denominator is all ADSL MEASDISF='Y' subjects; missing OBJRESP is non-response.
 
 T-11-5: Pain Response Rate (PAINBL='Y' subset; maintained >=3 weeks)
 --------------------------------------------------------------------
 Statistic                                 CbzP (synthetic)      MP (real)
-Responders / N (%)                        N/A (PN unavailable)   43/153 (28.1%)
+Responders / N (%)                        N/A (PN unavailable)   43/156 (27.6%)
 Footnote: MP uses staged PN/SV, component-specific 5-of-7 evaluability,
 PPI/analgesic response criteria and >=21-day confirmation. No CbzP PN
 source exists in this demonstration; no synthetic pain-response count is imputed.
@@ -34,11 +34,11 @@ source exists in this demonstration; no synthetic pain-response count is imputed
 T-11-6: Time to Tumour Progression (TTUMOR; ITT primary)
 ---------------------------------------------------------
 Statistic                                 CbzP (N=378)        MP (N=371)
-Number of Events / Total N                166/378               328/371
-Median Survival Time (Months)             9.1                2.4
-95% Confidence Interval                   7.2-10.2                2.1-2.8
-Unstratified Hazard Ratio (CbzP vs MP)     0.32 (95% CI: 0.26-0.38)
-Wald p-value                               <0.0001
+Number of Events / Total N                166/378               96/371
+Median Survival Time (Months)             4.9                5.0
+95% Confidence Interval                   4.6-6.8                4.2-8.0
+Stratified Cox HR (CbzP vs MP)             0.89 (95% CI: 0.66-1.22)
+Stratified log-rank p-value                0.4406
 
 T-11-7: Time to PSA Progression (TTPSA; ITT)
 ----------------------------------------------
@@ -46,24 +46,24 @@ Statistic                                 CbzP (N=378)        MP (N=371)
 Number of Events / Total N                286/378               265/371
 Median Survival Time (Months)             2.7                2.2
 95% Confidence Interval                   1.9-3.2                1.7-3.3
-Unstratified Hazard Ratio (CbzP vs MP)     0.85 (95% CI: 0.72-1.00)
-Wald p-value                               0.0514
+Stratified Cox HR (CbzP vs MP)             0.84 (95% CI: 0.70-0.99)
+Stratified log-rank p-value                0.0319
 
 T-11-8: Time to Pain Progression (TTPAIN; ITT)
 -----------------------------------------------
 Statistic                                 CbzP (N=378)        MP (N=371)
-Number of Events / Total N                130/378               45/371
-Median Survival Time (Months)             7.9                NE
-95% Confidence Interval                   6.9-9.9                NE
-Unstratified Hazard Ratio (CbzP vs MP)     2.36 (95% CI: 1.68-3.32)
-Wald p-value                               <0.0001
+Number of Events / Total N                130/378               37/371
+Median Survival Time (Months)             8.1                NE
+95% Confidence Interval                   7.2-9.2                NE
+Stratified Cox HR (CbzP vs MP)             2.85 (95% CI: 1.98-4.12)
+Stratified log-rank p-value                <0.0001
 Footnote: primary MP events use the adopted diary-or-direct-intent-RT
 F-042 rule; diary-only and RT-only source sensitivities are in QC evidence.
 
 T-11-8b: Objective Response Rate — Response-Evaluable Denominator (review-board SR-1)
 --------------------------------------------------------------------------------------
 Denominator basis        CbzP (evaluable)          MP (evaluable)
-Responders / N (%)       54/378 (14.3%)             13/351 (3.7%)
+Responders / N (%)       54/378 (14.3%)             12/185 (6.5%)
 Note: T-11-4 uses the SAP-specified baseline measurable-disease denominator on the
 combined demonstration cohort; T-11-8b uses only subjects with an OBJRESP record.
 

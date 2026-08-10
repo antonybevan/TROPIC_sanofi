@@ -19,6 +19,7 @@ AllProvidedFiles_79.zip
 !01_source_data/guyot_digitised/**
 
 # ADaM / native build outputs (regenerable; may contain patient-level data)
+04_analysis_datasets/staging/
 04_analysis_datasets/adam/*.xpt
 04_analysis_datasets/adam/*.sas7bdat
 04_analysis_datasets/adam/*.csv

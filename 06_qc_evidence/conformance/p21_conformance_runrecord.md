@@ -2,9 +2,9 @@
 
 > **Superseded (2026-06-23).** This is the 2026-06-14 record of the first ADaM attempt against
 > CORE's *published* rule set, which is empty (see below). It has been superseded by
-> [`conformance/CORE_RUN_RECORD.md`](conformance/CORE_RUN_RECORD.md), the authoritative ADaM CORE
-> run that executes the project's custom rules via `--local-rules` (7 rules, 0 issues; report
-> [`conformance/core_adam_report.json`](conformance/core_adam_report.json)). The raw output
+> [`platform/conformance/CORE_RUN_RECORD.md`](../../platform/conformance/CORE_RUN_RECORD.md), the authoritative ADaM CORE
+> run that executes the project's custom rules via `--local-rules` (7 rules, 0 issues; local report
+> `platform/conformance/core_adam_report.json`, regenerated on demand). The raw output
 > referenced below (`p21_report.json`) has since been removed. Retained as a dated provenance
 > record; the finding that CORE ships no published ADaM rules remains accurate.
 

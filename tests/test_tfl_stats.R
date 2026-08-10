@@ -80,10 +80,34 @@ ref <- pool_fix
 ref$TRT01P <- factor(ref$TRT01P, levels = c("MP", "CbzP"))  # same coding as compute_tte_stats
 ref$ECOGBLGRP <- ifelse(ref$ECOGBL <= 1, "0-1", "2")
 fit_ref <- survival::coxph(survival::Surv(AVAL, 1 - CNSR) ~ TRT01P +
-                             survival::strata(ECOGBLGRP, MEASDISF), data = ref)
+                             survival::strata(ECOGBLGRP, MEASDISF), data = ref,
+                           ties = "efron", na.action = stats::na.fail,
+                           singular.ok = FALSE)
 hr_ref <- summary(fit_ref)$conf.int[1]
 if (near(s_pool$hr, hr_ref, 1e-9)) pass(sprintf("ECOG pooling matches locked 4-strata HR (%.6f)", s_pool$hr)) else
   fail(sprintf("ECOG pooling drifted from locked 4-strata HR (got %.6f vs ref %.6f)", s_pool$hr, hr_ref))
+
+lr_ref <- survival::survdiff(
+  survival::Surv(AVAL, 1 - CNSR) ~ TRT01P +
+    survival::strata(ECOGBLGRP, MEASDISF),
+  data = ref, rho = 0, na.action = stats::na.fail
+)
+p_ref <- stats::pchisq(lr_ref$chisq, df = 1, lower.tail = FALSE)
+if (near(s_pool$pval, p_ref, 1e-12)) pass(sprintf("stratified log-rank p matches independent reference (%.8f)", p_ref)) else
+  fail(sprintf("stratified log-rank p drifted (got %.12f vs ref %.12f)", s_pool$pval, p_ref))
+
+# ---- Case 4: fail-fast input contracts prevent silent denominator drift -------
+bad_missing <- pool_fix
+bad_missing$MEASDISF[1] <- NA_character_
+missing_failed <- inherits(try(compute_tte_stats(bad_missing), silent = TRUE), "try-error")
+if (missing_failed) pass("missing stratification value fails fast") else
+  fail("missing stratification value was silently dropped")
+
+bad_cnsr <- pool_fix
+bad_cnsr$CNSR[1] <- 2
+cnsr_failed <- inherits(try(compute_tte_stats(bad_cnsr), silent = TRUE), "try-error")
+if (cnsr_failed) pass("invalid CNSR value fails fast") else
+  fail("invalid CNSR value entered the survival model")
 
 cat("===========================================================\n")
 if (ok) {

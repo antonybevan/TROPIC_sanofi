@@ -1,9 +1,9 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: A_adtte_generation.sas
-   Version: 3.0.0
+   Version: 4.0.0
    Author: Antony Bevan, Clinical Programming
-   Date: 2026-06-13 (ADaM dens contract 2026-07-09)
+   Date: 2026-08-09
    Standard: ADaMIG v1.3 / CDISC BDS TTE v1.0
    Input: adam.adsl, adam.adrs, adam.adcm, adam.adae, adam.adlb, staging.pn
    Output: adam.adtte
@@ -43,21 +43,27 @@
 %set_pgmdir;
 %include "&PGMDIR./00_config.sas";
 
-/* 1. Retrieve first post-randomisation PD date per subject across all source
-   domains.  Baseline milestones are not PFS/TTE events under SAP v4.0. */
+/* 1. Retrieve typed, post-randomisation PFS component dates. Exploratory bone
+   and generic DS clinical-progression records are intentionally excluded. */
 proc sql;
-    create table work.pd_dates as
-    select
-        r.usubjid,
-        min(r.ADT) as pd_dt format=yymmdd10.
+    create table work.pfs_tumor_event_dates as
+    select r.usubjid, min(r.ADT) as tumor_prog_dt format=yymmdd10.
     from adam.adrs as r
     inner join adam.adsl(keep=usubjid randdt) as a
         on r.usubjid = a.usubjid
-    where ((r.PARAMCD = 'OVRLRESP' and r.AVALC = 'PD') or
-           (r.PARAMCD = 'BSGRESP' and r.AVALC = 'PROGRESSION') or
-           (r.PARAMCD = 'PSPROG' and r.AVALC = 'Y'))
-      and not missing(r.ADT)
-      and r.ADT > a.RANDDT
+    where r.PARAMCD = 'OVRLRESP' and r.AVALC = 'PD'
+      and not missing(r.ADT) and r.ADT > a.RANDDT
+      and r.ADT <= &STUDY_CUTOFF_DT.
+    group by r.usubjid;
+
+    create table work.pfs_psa_event_dates as
+    select r.usubjid, min(r.ADT) as psa_prog_dt format=yymmdd10.
+    from adam.adrs as r
+    inner join adam.adsl(keep=usubjid randdt) as a
+        on r.usubjid = a.usubjid
+    where r.PARAMCD = 'PSPROG' and r.AVALC = 'Y'
+      and not missing(r.ADT) and r.ADT > a.RANDDT
+      and r.ADT <= &STUDY_CUTOFF_DT.
     group by r.usubjid;
 quit;
 
@@ -65,11 +71,16 @@ quit;
 proc sql;
     create table work.sae_dates as
     select
-        usubjid,
-        min(astdt) as sae_dt format=yymmdd10.
-    from adam.adae
-    where aeser = 'Y' and trtemfl = 'Y'
-    group by usubjid;
+        e.usubjid,
+        min(e.astdt) as sae_dt format=yymmdd10.
+    from adam.adae as e
+    inner join adam.adsl(keep=usubjid trtsdt trtedt) as a
+      on e.usubjid = a.usubjid
+    where e.aeser = 'Y' and e.trtemfl = 'Y'
+      and not missing(e.astdt) and e.astdt >= a.trtsdt
+      and e.astdt <= &STUDY_CUTOFF_DT.
+      and (missing(a.trtedt) or e.astdt <= a.trtedt + &SAFETY_FOLLOWUP_DAYS.)
+    group by e.usubjid;
 quit;
 
 /* Assemble OS and TTSAE Parameters.
@@ -102,22 +113,22 @@ data work.tte_base;
         PARCAT1 = 'EFFICACY';
         STARTDT = RANDDT;
 
-        if dthfl = 'Y' then do;
+        _os_event = (dthfl = 'Y' and not missing(dthdt) and
+                     dthdt >= RANDDT and dthdt <= &STUDY_CUTOFF_DT.);
+        if _os_event then do;
             ADT = dthdt;
             CNSR = 0;
             EVNTDESC = 'DEATH';
             CNSDTDSC = '';
         end;
         else do;
-            ADT = min(lstalvdt, &STUDY_CUTOFF_DT.);
+            if missing(lstalvdt) then ADT = RANDDT;
+            else ADT = min(lstalvdt, &STUDY_CUTOFF_DT.);
             CNSR = 1;
             EVNTDESC = '';
             CNSDTDSC = 'LAST KNOWN ALIVE DATE';
         end;
 
-        if not missing(ADT) and not missing(STARTDT) and ADT < STARTDT then
-            putlog "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. " PARAMCD= USUBJID=;
-        if ADT < STARTDT then ADT = STARTDT;
         AVAL = ADT - STARTDT + 1;
         output;
     end;
@@ -132,22 +143,22 @@ data work.tte_base;
         PARCAT1 = 'SAFETY';
         STARTDT = TRTSDT;
 
-        if not missing(sae_dt) then do;
+        _safety_end = min(lstalvdt, &STUDY_CUTOFF_DT.);
+        if not missing(trtedt) then
+            _safety_end = min(_safety_end, trtedt + &SAFETY_FOLLOWUP_DAYS.);
+        if not missing(sae_dt) and sae_dt <= _safety_end then do;
             ADT = sae_dt;
             CNSR = 0;
             EVNTDESC = 'SERIOUS ADVERSE EVENT';
             CNSDTDSC = '';
         end;
         else do;
-            ADT = min(lstalvdt, &STUDY_CUTOFF_DT.);
+            ADT = _safety_end;
             CNSR = 1;
             EVNTDESC = '';
-            CNSDTDSC = 'LAST KNOWN ALIVE DATE';
+            CNSDTDSC = 'END OF SAFETY FOLLOW-UP';
         end;
 
-        if not missing(ADT) and not missing(STARTDT) and ADT < STARTDT then
-            putlog "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. " PARAMCD= USUBJID=;
-        if ADT < STARTDT then ADT = STARTDT;
         AVAL = ADT - STARTDT + 1;
         output;
     end;
@@ -173,6 +184,7 @@ proc sql;
       and r.AVALC in ('CR', 'PR', 'SD', 'PD')
       and not missing(r.ADT)
       and r.ADT > a.RANDDT
+      and r.ADT <= &STUDY_CUTOFF_DT.
     group by r.usubjid;
 
     create table work.pfs_psa_eval_dates as
@@ -184,6 +196,7 @@ proc sql;
       and not missing(l.AVAL)
       and not missing(l.ADT)
       and l.ADT > a.RANDDT
+      and l.ADT <= &STUDY_CUTOFF_DT.
     group by l.usubjid;
 
     create table work.pfs_eval_candidates as
@@ -198,7 +211,8 @@ proc sql;
     inner join adam.adsl(keep=usubjid randdt) as a
       on p.usubjid = a.usubjid
     where not missing(p.last_pain_eval_dt)
-      and p.last_pain_eval_dt > a.RANDDT;
+      and p.last_pain_eval_dt > a.RANDDT
+      and p.last_pain_eval_dt <= &STUDY_CUTOFF_DT.;
 
     create table work.pfs_last_eval_dates as
     select usubjid, max(last_eval_dt) as last_eval_dt format=yymmdd10.
@@ -209,23 +223,28 @@ quit;
 /* Add PFS parameter which has a more complex censoring hierarchy (ITT) */
 proc sql;
     create table work.nact_mapping as
-    select usubjid, min(nactdt) as nactdt format=yymmdd10.
-    from adam.adcm
-    where not missing(nactdt)
-    group by usubjid;
+    select c.usubjid, min(c.nactdt) as nactdt format=yymmdd10.
+    from adam.adcm as c
+    inner join adam.adsl(keep=usubjid randdt) as a
+      on c.usubjid = a.usubjid
+    where not missing(c.nactdt) and c.nactdt > a.randdt
+      and c.nactdt <= &STUDY_CUTOFF_DT.
+    group by c.usubjid;
 quit;
 
 proc sql;
     create table work.pfs_raw as
     select
         adsl.*,
-        pd.pd_dt,
+        tum.tumor_prog_dt,
+        psa.psa_prog_dt,
         pain.pain_prog_dt,
         nact.nactdt,
         eval.last_eval_dt
     from adam.adsl(keep=studyid usubjid subjid siteid trt01p trt01pn ittfl saffl
                         randdt dthfl dthdt lstalvdt) as adsl
-    left join work.pd_dates as pd on adsl.usubjid = pd.usubjid
+    left join work.pfs_tumor_event_dates as tum on adsl.usubjid = tum.usubjid
+    left join work.pfs_psa_event_dates as psa on adsl.usubjid = psa.usubjid
     left join work.pain_pfs_prog_dates as pain on adsl.usubjid = pain.usubjid
     left join work.nact_mapping as nact on adsl.usubjid = nact.usubjid
     left join work.pfs_last_eval_dates as eval on adsl.usubjid = eval.usubjid
@@ -245,52 +264,37 @@ data work.pfs_derived;
     PARCAT1 = 'EFFICACY';
     STARTDT = randdt;
 
-    if not missing(pd_dt) and not missing(pain_prog_dt) then _prog_dt = min(pd_dt, pain_prog_dt);
-    else if not missing(pd_dt) then _prog_dt = pd_dt;
-    else if not missing(pain_prog_dt) then _prog_dt = pain_prog_dt;
-    else _prog_dt = .;
-    _pd_found = not missing(_prog_dt);
+    _pain_dt = .;
+    if not missing(pain_prog_dt) and pain_prog_dt > randdt and
+       pain_prog_dt <= &STUDY_CUTOFF_DT. then _pain_dt = pain_prog_dt;
+    _death_dt = .;
+    if dthfl = 'Y' and not missing(dthdt) and dthdt >= randdt and
+       dthdt <= &STUDY_CUTOFF_DT. then _death_dt = dthdt;
+    /* Avoid an all-missing MIN() invocation, which is semantically valid but
+       emits a misleading SAS missing-operation NOTE. */
+    if nmiss(tumor_prog_dt, psa_prog_dt, _pain_dt, _death_dt) < 4 then
+        _event_dt = min(tumor_prog_dt, psa_prog_dt, _pain_dt, _death_dt);
+    else _event_dt = .;
+    _event_found = not missing(_event_dt);
     _nact_found = not missing(nactdt);
 
-    /* Hierarchy rule checking */
-    if _pd_found then do;
-        /* PD event occurred */
-        if _nact_found and nactdt < _prog_dt then do;
-            /* Censor: New therapy started BEFORE progression */
+    /* Chronological composite: tumor, PSA, pain, or death. NACT censors only
+       when it starts after randomisation and before the earliest event. */
+    if _event_found then do;
+        if _nact_found and nactdt < _event_dt then do;
             ADT = nactdt - 1;
             CNSR = 1;
             EVNTDESC = '';
             CNSDTDSC = 'NEW ANTI-CANCER THERAPY START';
         end;
         else do;
-            /* Event: Progression */
-            ADT = _prog_dt;
+            ADT = _event_dt;
             CNSR = 0;
-            /* Preserve the earliest composite component in the existing
-               ADTTE traceability field.  A non-pain component wins a same-day
-               tie deterministically; the SAP supporting-disease decision for
-               pain remains an explicit Section 3 residual. */
-            if not missing(pain_prog_dt) and
-               (missing(pd_dt) or pain_prog_dt < pd_dt) then
-                EVNTDESC = 'PAIN PROGRESSION';
-            else EVNTDESC = 'DISEASE PROGRESSION';
-            CNSDTDSC = '';
-        end;
-    end;
-    else if dthfl = 'Y' then do;
-        /* PD did not occur but subject died */
-        if _nact_found and nactdt < dthdt then do;
-            /* Censor: New therapy before death */
-            ADT = nactdt - 1;
-            CNSR = 1;
-            EVNTDESC = '';
-            CNSDTDSC = 'NEW ANTI-CANCER THERAPY START';
-        end;
-        else do;
-            /* Event: Death */
-            ADT = dthdt;
-            CNSR = 0;
-            EVNTDESC = 'DEATH';
+            /* Deterministic label precedence for same-day composite events. */
+            if _event_dt = tumor_prog_dt then EVNTDESC = 'TUMOR PROGRESSION';
+            else if _event_dt = psa_prog_dt then EVNTDESC = 'PSA PROGRESSION';
+            else if _event_dt = _pain_dt then EVNTDESC = 'PAIN PROGRESSION';
+            else EVNTDESC = 'DEATH';
             CNSDTDSC = '';
         end;
     end;
@@ -318,9 +322,6 @@ data work.pfs_derived;
         end;
     end;
 
-    if not missing(ADT) and not missing(STARTDT) and ADT < STARTDT then
-            putlog "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. " PARAMCD= USUBJID=;
-        if ADT < STARTDT then ADT = STARTDT;
     AVAL = ADT - STARTDT + 1;
     output;
 run;
@@ -359,16 +360,16 @@ proc sql;
              when not missing(c.last_pn_dt) then 'LAST EVALUABLE PAIN ASSESSMENT'
              else 'NO EVALUABLE PAIN ASSESSMENT' end as CNSDTDSC length=100
     from adam.adsl as adsl
-    left join work.prog_dates as p on adsl.usubjid = p.usubjid
+    left join work.prog_dates as p
+      on adsl.usubjid = p.usubjid
+     and p.prog_date > adsl.randdt
+     and p.prog_date <= &STUDY_CUTOFF_DT.
     left join work.censor_dates as c on adsl.usubjid = c.usubjid
     where adsl.ittfl = 'Y';
 quit;
 
 data work.ttpain_final;
     set work.ttpain_derived;
-    if not missing(ADT) and not missing(STARTDT) and ADT < STARTDT then
-        putlog "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. " PARAMCD= USUBJID=;
-    if ADT < STARTDT then ADT = STARTDT;
     AVAL = ADT - STARTDT + 1;
 run;
 
@@ -384,15 +385,19 @@ proc sql;
     inner join adam.adsl(keep=usubjid randdt) as a
         on r.usubjid = a.usubjid
     where r.PARAMCD = 'PSPROG' and r.AVALC = 'Y'
-      and not missing(r.ADT) and r.ADT > a.RANDDT;
+      and not missing(r.ADT) and r.ADT > a.RANDDT
+      and r.ADT <= &STUDY_CUTOFF_DT.;
 quit;
 
 proc sql;
     create table work.psa_censor_dates as
-    select usubjid, max(ADT) as last_psa_dt format=yymmdd10.
-    from adam.adlb
-    where PARAMCD = 'PSA' and not missing(AVAL) and not missing(ADT)
-    group by usubjid;
+    select l.usubjid, max(l.ADT) as last_psa_dt format=yymmdd10.
+    from adam.adlb as l
+    inner join adam.adsl(keep=usubjid randdt) as a
+      on l.usubjid = a.usubjid
+    where l.PARAMCD = 'PSA' and not missing(l.AVAL) and not missing(l.ADT)
+      and l.ADT > a.randdt and l.ADT <= &STUDY_CUTOFF_DT.
+    group by l.usubjid;
 quit;
 
 proc sql;
@@ -416,7 +421,7 @@ proc sql;
         case
             when not missing(p.psa_prog_dt) then p.psa_prog_dt
             when not missing(c.last_psa_dt) then min(c.last_psa_dt, &STUDY_CUTOFF_DT.)
-            else min(adsl.lstalvdt, &STUDY_CUTOFF_DT.)
+            else adsl.randdt
         end as ADT format=yymmdd10.,
 
         case
@@ -432,7 +437,7 @@ proc sql;
         case
             when not missing(p.psa_prog_dt) then ''
             when not missing(c.last_psa_dt) then 'LAST PSA ASSESSMENT'
-            else 'LAST KNOWN ALIVE DATE'
+            else 'NO POST-BASELINE PSA ASSESSMENT'
         end as CNSDTDSC length=100
     from adam.adsl as adsl
     left join work.psa_prog_dates as p on adsl.usubjid = p.usubjid
@@ -442,9 +447,6 @@ quit;
 
 data work.ttpsa_final;
     set work.ttpsa_derived;
-    if not missing(ADT) and not missing(STARTDT) and ADT < STARTDT then
-            putlog "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. " PARAMCD= USUBJID=;
-        if ADT < STARTDT then ADT = STARTDT;
     AVAL = ADT - STARTDT + 1;
 run;
 
@@ -459,6 +461,7 @@ proc sql;
         on r.usubjid = a.usubjid
     where r.PARAMCD = 'OVRLRESP' and r.AVALC = 'PD'
       and not missing(r.ADT) and r.ADT > a.RANDDT
+      and r.ADT <= &STUDY_CUTOFF_DT.
     group by r.usubjid;
 quit;
 
@@ -472,6 +475,7 @@ proc sql;
       and r.AVALC in ('CR', 'PR', 'SD', 'PD')
       and not missing(r.ADT)
       and r.ADT > a.RANDDT
+      and r.ADT <= &STUDY_CUTOFF_DT.
     group by r.usubjid;
 quit;
 
@@ -522,9 +526,6 @@ quit;
 
 data work.ttum_final;
     set work.ttum_derived;
-    if not missing(ADT) and not missing(STARTDT) and ADT < STARTDT then
-            putlog "WARNING: [ADTTE] event/censor date precedes time origin; floored to 1 day. " PARAMCD= USUBJID=;
-        if ADT < STARTDT then ADT = STARTDT;
     AVAL = ADT - STARTDT + 1;
 run;
 
@@ -535,12 +536,22 @@ data adam.adtte(keep=STUDYID USUBJID SUBJID SITEID TRT01P TRT01PN ITTFL SAFFL
     set work.tte_base work.pfs_derived work.ttpain_final work.ttpsa_final work.ttum_final;
 run;
 
+proc sql noprint;
+    select count(*) into :_n_tte_bad_origin trimmed
+    from adam.adtte
+    where missing(STARTDT) or missing(ADT) or ADT < STARTDT or AVAL < 1;
+quit;
+%if &_n_tte_bad_origin. > 0 %then %do;
+    %put ERROR: [ADTTE-QC] &_n_tte_bad_origin. records have missing or pre-origin dates.;
+%end;
+
 proc sort data=adam.adtte;
     by usubjid PARAMCD;
 run;
 
 /* Clean up work library */
-proc delete data=work.pd_dates work.sae_dates work.os_ttsae_raw work.nact_mapping work.pfs_raw
+proc delete data=work.pfs_tumor_event_dates work.pfs_psa_event_dates work.sae_dates
+            work.os_ttsae_raw work.nact_mapping work.pfs_raw
             work.prog_dates
             work.pain_pfs_prog_dates work.pfs_tumor_eval_dates work.pfs_psa_eval_dates
             work.pfs_pain_eval_dates work.pfs_eval_candidates work.pfs_last_eval_dates

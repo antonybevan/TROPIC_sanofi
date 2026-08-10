@@ -19,17 +19,12 @@ TRT01P_CODE       <- as.character(cfg$TRT01P_CODE)
 TRT01PN_CODE      <- as.integer(cfg$TRT01PN_CODE)
 
 STUDY_CUTOFF_DT   <- as.Date(cfg$STUDY_CUTOFF_DT)
+FINAL_ALPHA       <- as.numeric(cfg$FINAL_ALPHA)
+SAFETY_FOLLOWUP_DAYS <- as.integer(cfg$SAFETY_FOLLOWUP_DAYS)
 
 PLANNED_DOSE      <- as.numeric(cfg$PLANNED_DOSE)
+DOSE_REDUCTION_TOLERANCE <- as.numeric(cfg$DOSE_REDUCTION_TOLERANCE)
 AGE_STRAT_CUT     <- as.integer(cfg$AGE_STRAT_CUT)
-
-# Missing data imputation defaults (no formal SAP imputation section; method per ADRG §5.1)
-ECOGBL_DEFAULT    <- as.numeric(cfg$ECOGBL_DEFAULT)
-PSABL_DEFAULT     <- as.numeric(cfg$PSABL_DEFAULT)
-ALPBL_DEFAULT     <- as.numeric(cfg$ALPBL_DEFAULT)
-HGBBL_DEFAULT     <- as.numeric(cfg$HGBBL_DEFAULT)
-ALBBL_DEFAULT     <- as.numeric(cfg$ALBBL_DEFAULT)
-LDHBL_DEFAULT     <- as.numeric(cfg$LDHBL_DEFAULT)
 
 # RECIST v1.0 response thresholds (SAP v4.0 §10.3)
 RECIST_PD_PCT     <- as.numeric(cfg$RECIST_PD_PCT)
@@ -37,7 +32,7 @@ RECIST_PD_ABS     <- as.numeric(cfg$RECIST_PD_ABS)
 RECIST_PR_PCT     <- as.numeric(cfg$RECIST_PR_PCT)
 RECIST_CONFIRM_DAYS <- as.integer(cfg$RECIST_CONFIRM_DAYS)
 
-# PCWG3 bone-scan 2+2 progression (Scher 2016 — methodological demonstration; see ADRG §4A)
+# Exploratory bone-scan 2+2 progression (Scher 2016; see ADRG §4A)
 BONE_PROG_MIN_NEW     <- as.integer(cfg$BONE_PROG_MIN_NEW)
 BONE_PROG_CONFIRM_NEW <- as.integer(cfg$BONE_PROG_CONFIRM_NEW)
 
@@ -70,8 +65,10 @@ W_C2D8_HI  <- as.integer(cfg$W_C2D8_HI)
 W_C3D1_LO  <- as.integer(cfg$W_C3D1_LO)
 W_C3D1_HI  <- as.integer(cfg$W_C3D1_HI)
 
-# Staging data path (relative to project root)
+# Governed source/staging paths (relative to project root)
+SOURCE_SDTM_PATH <- do.call(file.path, as.list(strsplit(cfg$SOURCE_SDTM_PATH, "/")[[1]]))
 STAGING_PATH <- do.call(file.path, as.list(strsplit(cfg$STAGING_PATH, "/")[[1]]))
+stage_file <- function(domain) file.path(STAGING_PATH, paste0(tolower(domain), ".rds"))
 
 # --------------------------------------------------------------------------- #
 # write_xpt_v(): xportr_write wrapper for the R validation track.

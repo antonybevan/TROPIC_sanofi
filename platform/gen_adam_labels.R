@@ -34,7 +34,9 @@ ds_order <- spec$ds_spec$dataset
 
 # variable-level (dataset, variable, label) in spec order
 vars <- bind_rows(lapply(ds_order, function(ds) {
-  s <- suppressMessages(select_dataset(spec, ds))
+  # metacore warns when optional specification columns are entirely blank for a
+  # dataset; those columns are not consumed by this label/order generator.
+  s <- suppressWarnings(suppressMessages(select_dataset(spec, ds)))
   s$ds_vars %>%
     left_join(s$var_spec, by = "variable") %>%
     arrange(order) %>%
@@ -65,17 +67,28 @@ lines <- c(
   "                Do not edit by hand. */",
   ""
 )
+wrap_sas_tokens <- function(tokens, initial = "", exdent = 0) {
+  strwrap(
+    paste(tokens, collapse = " "),
+    width = 118,
+    initial = initial,
+    exdent = exdent
+  )
+}
 for (ds in ds_order) {
   v <- vars %>% filter(dataset == ds)
   d <- labs %>% filter(dataset == ds)
+  vars_lines <- wrap_sas_tokens(v$variable)
+  retain_lines <- wrap_sas_tokens(v$variable, initial = "  retain ", exdent = 4)
+  retain_lines[length(retain_lines)] <- paste(retain_lines[length(retain_lines)], ";")
   lines <- c(
     lines,
     sprintf("%%macro vars_%s;", tolower(ds)),
-    paste(v$variable, collapse = " "),
+    vars_lines,
     sprintf("%%mend vars_%s;", tolower(ds)),
     "",
     sprintf("%%macro ord_%s;", tolower(ds)),
-    paste("  retain", paste(v$variable, collapse = " "), ";"),
+    retain_lines,
     sprintf("%%mend ord_%s;", tolower(ds)),
     ""
   )
