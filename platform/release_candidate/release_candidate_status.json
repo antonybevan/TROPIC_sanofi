@@ -1,6 +1,6 @@
 {
   "status": "PASS",
-  "generated_at": "2026-08-05 13:52:02 UTC",
+  "generated_at": "2026-08-10 05:17:02 UTC",
   "checks": 18,
   "pass": 18,
   "warning": 0,
@@ -34,7 +34,7 @@
       "gate": "G06 qc_signoff",
       "check": "Execution logs have no unapproved warnings, errors, invalid-input notes, or uninitialized-variable findings",
       "status": "PASS",
-      "evidence": "platform/log_cleanliness/log_cleanliness_status.json status=PASS; unapproved=0; reviewed_exceptions=22",
+      "evidence": "platform/log_cleanliness/log_cleanliness_status.json status=PASS; unapproved=0; reviewed_exceptions=1",
       "required_action": ""
     },
     {
@@ -111,14 +111,14 @@
       "gate": "G09 release_candidate_lock",
       "check": "Current release-run manifest is release-candidate grade (full DAG, clean tree)",
       "status": "PASS",
-      "evidence": "platform/release_run_manifest/release_run_manifest.json status=PASS; evidence_grade=release_candidate; run_scope=full_dag; seal=3f811d9d0dbefa1a8ba8ac302cd7260fa20ca09691be90876ef2e687d64c1bb7",
+      "evidence": "platform/release_run_manifest/release_run_manifest.json status=PASS; evidence_grade=release_candidate; run_scope=full_dag; seal=48c4ca2183a8f555557332a0a632bf7d56311d61295d0f17c81e4c443b9039dd",
       "required_action": ""
     },
     {
       "gate": "G09 release_candidate_lock",
       "check": "Pipeline health records a full current DAG run",
       "status": "PASS",
-      "evidence": "platform/pipeline_health.json run_scope=full_dag; stages_recorded=34; stages_expected=34; stages_not_run=0",
+      "evidence": "platform/pipeline_health.json run_scope=full_dag; stages_recorded=37; stages_expected=37; stages_not_run=0",
       "required_action": ""
     },
     {
@@ -130,10 +130,10 @@
     },
     {
       "gate": "G08 submission_package_materialization",
-      "check": "eCTD backbone/run record present",
+      "check": "Complete eCTD sequence inventory, checksums, support files, XML references, and run record validate",
       "status": "PASS",
-      "evidence": "08_submission_package/ectd/0000/index.xml present=True; 08_submission_package/ectd/RUN_RECORD.md present=True",
-      "required_action": "Rebuild/materialize eCTD sequence after upstream release candidate is clean."
+      "evidence": "platform/validate_ectd_sequence.py status=PASS; leaves=92/92; unexpected=0; problems=[]",
+      "required_action": ""
     }
   ]
 }
