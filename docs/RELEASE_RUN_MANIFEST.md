@@ -1,19 +1,19 @@
 # TROPIC Release-Run Manifest
 
-Generated: 2026-08-10 05:16:55 UTC
+Generated: 2026-08-10 05:30:04 UTC
 
 > Hash-sealed run manifest for current artifacts. This is not an electronic signature or Part 11 attestation.
 
 ## Verdict
 
-- Status: `PASS`
-- Evidence grade: `release_candidate`
-- Manifest SHA-256 seal: `48c4ca2183a8f555557332a0a632bf7d56311d61295d0f17c81e4c443b9039dd`
+- Status: `REMEDIATION`
+- Evidence grade: `remediation_partial_or_dirty`
+- Manifest SHA-256 seal: `9743a5d3610dcba638d454941227363d58011ec2fff46eb9c7bb8f5ad623f095`
 - SAS execution mode: `oda`
 - Pipeline health: `GREEN`
 - Run scope: `full_dag` (37 recorded / 36 release-required upstream stages)
-- Git HEAD: `caf5fc1e9ca2bbc16ea8ebdbaad61ecdb8a63a43`
-- Worktree dirty: `False`
+- Git HEAD: `48f4a356967144afe07a33ae38b30d1c6b5d4374`
+- Worktree dirty: `True`
 - SAS companion figures: `in_dag_real_sas_companion`; current with health=`True`
 
 ## Status meanings
@@ -26,18 +26,22 @@ Generated: 2026-08-10 05:16:55 UTC
 
 No release-run binding problems detected.
 
+## Remediation reasons (block release-candidate PASS)
+
+- git worktree is dirty (13 porcelain entries); release-candidate lock requires a clean committed state
+
 ## Dataset Binding
 
 | Dataset | Prod MD5 | Validation MD5 | Distinct | Package match | Sequence match |
 | --- | --- | --- | --- | --- | --- |
-| ADSL | 6a8b121877fcc2eadcbd7a791c94914c | 0d6a5c8b5d3961c493689cec204a932b | yes | yes | yes |
-| ADEX | 8d4464035b8a405add3f4763da8c015c | a17ea8f28e17bd5bef20c71518ca3742 | yes | yes | yes |
-| ADCM | 34fc070d50545c3c28d15d37cae50a71 | aa6ed5a26ef7c301f0ba60d906a75d33 | yes | yes | yes |
-| ADAE | 12de6360fd860d576e70c2e4e17858e8 | 8c6ce6e3853ee6641518bf92a486b330 | yes | yes | yes |
-| ADLB | d4bcced6222bdba679cb4378a8363d07 | f77d08c3017e6b7cc9b32f5c2224f955 | yes | yes | yes |
-| ADRS | 18ed3eee4e0f6f017391bc24a4acade8 | 0f91f891b3a0515b6a9c5b30294c1d05 | yes | yes | yes |
-| ADTTE | 9af8c16a4c03be482064370439f5b2c4 | 3d4621381c7b33db880ccc7239cc33a7 | yes | yes | yes |
-| CLINSITE | 81e4812e1f3cd49c54bbfea957e90c79 | b97c89d8dcf1f8d1f9e7736fd9dd7c26 | yes | yes | yes |
+| ADSL | 9bdeb452b5a69e848703b2b72d65cc2e | af449fbf7aae6bfd3d138027c643ce31 | yes | yes | yes |
+| ADEX | 428834593b14d73b0ac60e60f29c31c4 | 13911c79ed1325df40f638381bbd592e | yes | yes | yes |
+| ADCM | e0e9354f7a8a9c9fbd719a6e3816283d | f6a3b5c8d012a8ae016b94f47761b4a1 | yes | yes | yes |
+| ADAE | 2fe5407c1d46b93da91a36279a1b2cf3 | 5df69444b278dfd800f4a62599b57e08 | yes | yes | yes |
+| ADLB | 2b9c3e3990caad9c4792b78a09731652 | aa5851a6401778b66ba7987e8c42e8a2 | yes | yes | yes |
+| ADRS | 5a474e7669dad1e67edf7f84db5322a1 | 32eaf12c32738c23d2ae65b5972594f9 | yes | yes | yes |
+| ADTTE | 3c6b3a6f84fb52f690e8da12565d17a4 | 4bd67f905701a21d073b62a72024f937 | yes | yes | yes |
+| CLINSITE | ce6fb6da51061d32f9fec531cd614800 | c8e3ba6f0b1e5b80a5a3076c9807bde1 | yes | yes | yes |
 
 ## QC Verdicts
 

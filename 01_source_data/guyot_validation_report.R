@@ -97,7 +97,7 @@ gates <- rbind(
 
 cat("\n  [VALIDATION] ============ ACCEPTANCE GATES ============\n")
 for (i in seq_len(nrow(gates))) {
-    cat(sprintf("    %-13s %-34s %-18s (target %-10s) %s\n",
+  cat(sprintf("    %-13s %-34s %-18s (target %-10s) %s\n",
               gates$Classification[i], gates$Gate[i], gates$Value[i],
               gates$Target[i], gates$Result[i]))
 }

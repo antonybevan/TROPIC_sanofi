@@ -1,6 +1,6 @@
 # Guyot Reconstruction — Validation Report
 
-_Generated: 2026-08-10 01:26_
+_Generated: 2026-08-10 10:55_
 _Coordinate provenance: **DIGITISED**_
 
 Method: genuine Guyot (2012) IPD reconstruction via `IPDfromKM` from digitised

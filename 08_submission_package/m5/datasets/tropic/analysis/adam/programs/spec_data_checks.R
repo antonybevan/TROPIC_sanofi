@@ -98,11 +98,11 @@ for (ds in domains) {
       TRUE ~ NA_real_
     )
     if (any(is.na(planned_n)) ||
-        any(as.numeric(df$TRT01PN) != planned_n, na.rm = TRUE)) {
+          any(as.numeric(df$TRT01PN) != planned_n, na.rm = TRUE)) {
       semantic_w <- c(semantic_w, "TRT01P/TRT01PN planned-treatment mapping is inconsistent")
     }
     if (any(is.na(actual_n)) ||
-        any(as.numeric(df$TRT01AN) != actual_n, na.rm = TRUE)) {
+          any(as.numeric(df$TRT01AN) != actual_n, na.rm = TRUE)) {
       semantic_w <- c(semantic_w, "TRT01A/TRT01AN actual-treatment mapping is inconsistent")
     }
     n_trt_diff <- sum(
