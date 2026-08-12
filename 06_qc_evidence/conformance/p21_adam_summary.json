@@ -1,6 +1,6 @@
 {
-  "schema_version": "1.0",
-  "record_id": "TROPIC-P21-ADAM-2026-08-12-03",
+  "schema_version": "1.1",
+  "record_id": "TROPIC-P21-ADAM-2026-08-12-04",
   "status": "EXECUTED_WITH_OPEN_FINDINGS_AND_COMPATIBILITY_CAVEAT",
   "use": "INFORMATIVE_ONLY",
   "licensed_enterprise_execution": false,
@@ -13,7 +13,7 @@
     "distribution": "Apple-notarized Developer ID Application: Pinnacle 21 LLC (56C9Z22DN3)"
   },
   "validation": {
-    "generated_at": "2026-08-12T15:01:16+05:30",
+    "generated_at": "2026-08-12T16:57:55+05:30",
     "engine": "FDA 2508.1",
     "standard": "ADaM-IG 1.3 (FDA)",
     "define_standard": "Define-XML 2.1",
@@ -21,13 +21,16 @@
     "sdtm_ct": "2024-03-29",
     "configuration_sha256": "7076c498f841346dac1fe48afb6ef480ce22e8a42a02aeb07453f751a8b9f014",
     "define_sha256": "74256966d9247f117ffba4a52712733bd42abc11f5aca5061aa73e210e7db204",
-    "raw_report_filename": "pinnacle21-report-2026-08-12T15-02-final-green.xlsx",
-    "raw_report_sha256": "2cb4cc952939d5ca4681197a09ff256abc5e9a87c9839296cca82195deba4f9f",
+    "raw_report_filename": "pinnacle21-report-2026-08-12T16-58-controlled-exact-byte-final.xlsx",
+    "raw_report_sha256": "8184a5ccedca45ccd25c444cc3aca350798085a26d03153dfbb122da9c217024",
     "raw_report_committed": false,
-    "raw_report_withheld_reason": "Details include record-level identifiers",
+    "raw_report_withheld_reason": "Vendor-licensed runtime workbook with embedded local execution paths; retained outside Git under the controlled-artifact policy. The Details sheet in this aggregate-only run is header-only.",
     "compatibility_caveat": "Incompatible CLI used",
     "process_completed": true,
-    "shell_exit_code": 5
+    "shell_exit_code": 5,
+    "input_filename_contract": "Byte-identical *_prod.xpt artifacts staged under standard submission filenames without the engineering suffix",
+    "input_content_transformations": 0,
+    "aggregate_reconciliation": "Independent artifact-tool and openpyxl parsers agreed; workbook ZIP integrity passed"
   },
   "totals": {
     "datasets_processed": 7,
@@ -55,13 +58,13 @@
     {"family": "define_physical_type_messages", "occurrences": 19, "disposition": "requires_qualified_standards_review"}
   ],
   "datasets": [
-    {"dataset": "ADAE", "records": 5428, "sha256": "0ed941880c91ce8ce94a751e6acb91306a241bf6ce864e7f97b09488c421c4dc"},
-    {"dataset": "ADCM", "records": 24534, "sha256": "42efe96796572e0044450ea1f838efbc7884d8f453dd5b09694a40b5041618c9"},
-    {"dataset": "ADEX", "records": 7820, "sha256": "1cac2fcf52782f01adefb8df890064017b96fb64171ad00ff23e6361e02bd377"},
-    {"dataset": "ADLB", "records": 78619, "sha256": "71f0d7f016b81209372a38529355e129736dbed2c31781b12dc9b5335f95edc5"},
-    {"dataset": "ADRS", "records": 2322, "sha256": "2bb24d70cff299b755a70c94c2d46874679b5ca73045d6f3fbef2591a3a3640e"},
-    {"dataset": "ADSL", "records": 371, "sha256": "ff0232e2d7358ac4a9cf2d607802a9a3d9c342d48928e28d2fbe1d7941b62c91"},
-    {"dataset": "ADTTE", "records": 2226, "sha256": "e53d06e57d74ea148a93ae5425a7ac551e9732db12b41539e4ff5385f9a5e8b1"}
+    {"dataset": "ADAE", "validator_filename": "adae.xpt", "records": 5428, "sha256": "fcad58d6706ecfc8cd4508f874fcdd343a1f42588686edc4932ca8edaaab2a93"},
+    {"dataset": "ADCM", "validator_filename": "adcm.xpt", "records": 24534, "sha256": "87a5c0c51f139c9fc18eeb01612bf413d159c9d71b638233155944d06637a6d0"},
+    {"dataset": "ADEX", "validator_filename": "adex.xpt", "records": 7820, "sha256": "88f48e9a46775ef5b9e8d40395c277badde3ebdc83fee153fea6e7793c28240d"},
+    {"dataset": "ADLB", "validator_filename": "adlb.xpt", "records": 78619, "sha256": "e2e11cfc900be0129ef5e6d6dfeeabbd36b04bec57be5353eaa1165fb7bf10cd"},
+    {"dataset": "ADRS", "validator_filename": "adrs.xpt", "records": 2322, "sha256": "2355507061b1c37743cd0d543ff2bb129ddbbc33d48e74f755dad711bbd4ab4f"},
+    {"dataset": "ADSL", "validator_filename": "adsl.xpt", "records": 371, "sha256": "b4f465cc39e4a90706c72bde69cc21b56f5aab11506f25af1190d0e9b96459ad"},
+    {"dataset": "ADTTE", "validator_filename": "adtte.xpt", "records": 2226, "sha256": "377e13bf3b34524692b48ed77f56df1beec8b5b972c7015cf09220c530173840"}
   ],
   "issues": [
     {"domain": "GLOBAL", "id": "AD1024", "found": 1, "message": "Traceability rules not executed due to missing DM dataset"},
@@ -96,13 +99,13 @@
     {"domain": "ADTTE", "id": "SD0059", "found": 2, "message": "Define.xml/dataset variable type mismatch"}
   ],
   "pipeline_binding": {
-    "health_timestamp": "2026-08-12T09:29:59.539074+00:00",
+    "health_timestamp": "2026-08-12T10:28:13.216075+00:00",
     "pipeline_health_status": "GREEN",
     "sas_execution_mode": "oda",
     "run_scope": "full_dag",
     "stages_expected": 37,
     "stages_recorded": 37,
-    "source_tree_sha256": "81dadd3c02bf521bf11fce32f67f30ec4c70913059675cc576c895b8182a605d"
+    "source_tree_sha256": "25eea11519389347cf943ecdb2c57c55733c32f781241f158d91acca35eb6fa5"
   },
   "qualification": {
     "community_informative_only": true,
@@ -110,14 +113,14 @@
     "submission_clearance_claimed": false,
     "independent_qc_approved": false
   },
-  "subsequent_rebuild_assessment": {
+  "exact_byte_rerun": {
     "health_timestamp": "2026-08-12T10:28:13.216075+00:00",
-    "comparison_method": "exhaustive_byte_comparison",
-    "datasets_compared": 7,
-    "payload_differences_after_byte_495": 0,
-    "header_timestamp_differences_per_dataset": 2,
-    "comparison": "XPT payload byte-identical after byte 495 for all seven datasets; differences are confined to two SAS XPORT header timestamps per file",
-    "exact_byte_vendor_rerun": false,
-    "vendor_rerun_blocker": "Acceptance of vendor application Terms and Conditions requires authorized human confirmation"
+    "completed": true,
+    "datasets_validated": 7,
+    "input_hashes_match_current_production_xpts": true,
+    "standard_filenames_used": true,
+    "content_transformations": 0,
+    "process_completed": true,
+    "report_sha256": "8184a5ccedca45ccd25c444cc3aca350798085a26d03153dfbb122da9c217024"
   }
 }

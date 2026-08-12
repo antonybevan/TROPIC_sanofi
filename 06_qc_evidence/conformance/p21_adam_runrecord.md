@@ -1,6 +1,6 @@
 # Pinnacle 21 Community ADaM Validation Run Record
 
-**Record ID:** TROPIC-P21-ADAM-2026-08-12-03
+**Record ID:** TROPIC-P21-ADAM-2026-08-12-04
 **Execution date:** 2026-08-12
 **Status:** `EXECUTED_WITH_OPEN_FINDINGS_AND_COMPATIBILITY_CAVEAT`
 **Use:** `INFORMATIVE_ONLY`
@@ -18,29 +18,33 @@
 | Configuration | ADaM-IG 1.3 (FDA); SHA-256 `7076c498f841346dac1fe48afb6ef480ce22e8a42a02aeb07453f751a8b9f014` |
 | Controlled terminology | ADaM CT 2024-03-29 (`4ea8d18df997f0ed4c7bc41e3aeba8379fbe388ef3026c9d03122256036bf8ab`); SDTM CT 2024-03-29 (`973f55002840116158fa79fb89361a174998908404e8e6ef7b7de3e59543d1ce`) |
 | Define-XML | Define-XML 2.1 explicitly declared; `03_metadata/define/define.xml`; SHA-256 `74256966d9247f117ffba4a52712733bd42abc11f5aca5061aa73e210e7db204` |
-| Inputs | Seven final MP-arm production XPTs: ADAE, ADCM, ADEX, ADLB, ADRS, ADSL, ADTTE |
+| Inputs | Seven exact current MP-arm production XPT payloads: ADAE, ADCM, ADEX, ADLB, ADRS, ADSL, ADTTE |
+| Filename staging | Byte-identical copies were presented as the submission filenames `adae.xpt` through `adtte.xpt`; local `_prod` engineering suffixes were removed without content transformation |
 | Scope | 121,320 records; 7 of 7 datasets processed; 0 rejected datasets |
 | Rule catalog | 388 distinct rules listed in the workbook |
 | Result | 30 issue-summary groups; 2,373 aggregate occurrences |
 | Process result | Report generated and client logged `Validation: Process completed`; shell exit code `5` retained with the installation-compatibility condition |
-| Raw report | `pinnacle21-report-2026-08-12T15-02-final-green.xlsx`; SHA-256 `2cb4cc952939d5ca4681197a09ff256abc5e9a87c9839296cca82195deba4f9f` |
-| Pipeline binding | GREEN full DAG; 37/37 stages PASS; SAS execution mode `oda`; health timestamp `2026-08-12T09:29:59.539074+00:00`; source-tree SHA-256 `81dadd3c02bf521bf11fce32f67f30ec4c70913059675cc576c895b8182a605d` |
+| Raw report | `pinnacle21-report-2026-08-12T16-58-controlled-exact-byte-final.xlsx`; SHA-256 `8184a5ccedca45ccd25c444cc3aca350798085a26d03153dfbb122da9c217024` |
+| Aggregate QC | Workbook ZIP integrity passed; independent artifact-tool and openpyxl reads reconciled 7 datasets, 121,320 records, 0 rejects, 388 rules, 30 issue groups, and 2,373 occurrences |
+| Pipeline binding | GREEN full DAG; 37/37 stages PASS; SAS execution mode `oda`; health timestamp `2026-08-12T10:28:13.216075+00:00`; source-tree SHA-256 `25eea11519389347cf943ecdb2c57c55733c32f781241f158d91acca35eb6fa5` |
 
-The raw workbook is retained outside Git because its details sheet includes record-level identifiers. This record and `p21_adam_summary.json` retain only run identity, hashes, aggregate counts, and dispositions.
+The raw workbook is retained outside Git as vendor-licensed runtime output under the repository's controlled-artifact policy; it also embeds local execution paths. The `Details` sheet in this aggregate-only run is header-only. This record and `p21_adam_summary.json` retain the run identity, cryptographic bindings, aggregate counts, and dispositions needed for repository review.
 
-The later GREEN run at `2026-08-12T10:28:13.216075+00:00` re-executed the same clinical programs and changed only the two SAS XPORT header timestamps in each of the seven production files; exhaustive byte comparison found no differences after byte 495. The clinical payload validated by this workbook is therefore unchanged, but the later XPT byte hashes are not represented as independently rerun Community evidence. A fresh exact-byte rerun remains pending acceptance of the vendor application's Terms and Conditions.
+This superseding run validates the exact seven XPT byte sequences produced by the bound GREEN run at `2026-08-12T10:28:13.216075+00:00`. No header-only equivalence inference is used. The standard-named validator inputs were byte-identical staging copies of the current `_prod.xpt` artifacts, and their SHA-256 values were checked before and after staging.
+
+An exploratory invocation supplied the local engineering filenames (`*_prod.xpt`) directly and caused Community to classify the sources as nonstandard domains such as `ADAE_PROD`, producing a misleading global reject and missing-dataset messages. It is not the controlled result. The final invocation used standard submission filenames, matching the Module 5 delivery contract. `platform/stage_p21_adam_inputs.py` now makes that filename-only staging step explicit, byte-verifies it, checks each internal XPT member name, and fails closed on a reused destination.
 
 ## Input hash binding
 
 | Dataset | Records | SHA-256 |
 |---|---:|---|
-| ADAE | 5,428 | `0ed941880c91ce8ce94a751e6acb91306a241bf6ce864e7f97b09488c421c4dc` |
-| ADCM | 24,534 | `42efe96796572e0044450ea1f838efbc7884d8f453dd5b09694a40b5041618c9` |
-| ADEX | 7,820 | `1cac2fcf52782f01adefb8df890064017b96fb64171ad00ff23e6361e02bd377` |
-| ADLB | 78,619 | `71f0d7f016b81209372a38529355e129736dbed2c31781b12dc9b5335f95edc5` |
-| ADRS | 2,322 | `2bb24d70cff299b755a70c94c2d46874679b5ca73045d6f3fbef2591a3a3640e` |
-| ADSL | 371 | `ff0232e2d7358ac4a9cf2d607802a9a3d9c342d48928e28d2fbe1d7941b62c91` |
-| ADTTE | 2,226 | `e53d06e57d74ea148a93ae5425a7ac551e9732db12b41539e4ff5385f9a5e8b1` |
+| ADAE | 5,428 | `fcad58d6706ecfc8cd4508f874fcdd343a1f42588686edc4932ca8edaaab2a93` |
+| ADCM | 24,534 | `87a5c0c51f139c9fc18eeb01612bf413d159c9d71b638233155944d06637a6d0` |
+| ADEX | 7,820 | `88f48e9a46775ef5b9e8d40395c277badde3ebdc83fee153fea6e7793c28240d` |
+| ADLB | 78,619 | `e2e11cfc900be0129ef5e6d6dfeeabbd36b04bec57be5353eaa1165fb7bf10cd` |
+| ADRS | 2,322 | `2355507061b1c37743cd0d543ff2bb129ddbbc33d48e74f755dad711bbd4ab4f` |
+| ADSL | 371 | `b4f465cc39e4a90706c72bde69cc21b56f5aab11506f25af1190d0e9b96459ad` |
+| ADTTE | 2,226 | `377e13bf3b34524692b48ed77f56df1beec8b5b972c7015cf09220c530173840` |
 
 ## Before/after remediation
 

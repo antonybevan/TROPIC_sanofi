@@ -8,6 +8,7 @@ if the legacy SDRG filename returns, or if qualification non-claims disappear.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from datetime import datetime, timezone
@@ -28,6 +29,14 @@ REQUIRED_ASSERTIONS = {
     "REGULATORY_GATEWAY_ACCEPTANCE=NOT_EXECUTED",
     "ANNOTATED_CRF=NOT_AVAILABLE",
 }
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def _valid_reseal_chain(pipeline_health: dict) -> tuple[bool, list[str], str]:
@@ -199,6 +208,7 @@ def evaluate(root: Path = ROOT) -> dict:
         add(f"p21.summary.{key}", actual == expected, f"actual={actual}; expected={expected}")
 
     validation = p21_summary.get("validation") or {}
+    add("p21.summary.schema_version", p21_summary.get("schema_version") == "1.1", str(p21_summary.get("schema_version")))
     add("p21.summary.process_completed", validation.get("process_completed") is True, str(validation.get("process_completed")))
     add(
         "p21.summary.compatibility_caveat",
@@ -225,6 +235,55 @@ def evaluate(root: Path = ROOT) -> dict:
         totals.get("datasets_processed") == len(datasets),
         f"declared={totals.get('datasets_processed')}; listed={len(datasets)}",
     )
+    expected_validator_filenames = {
+        f"{str(row.get('dataset', '')).lower()}.xpt" for row in datasets
+    }
+    actual_validator_filenames = {
+        str(row.get("validator_filename", "")) for row in datasets
+    }
+    add(
+        "p21.summary.standard_validator_filenames",
+        bool(datasets)
+        and actual_validator_filenames == expected_validator_filenames
+        and not any("_prod" in name for name in actual_validator_filenames),
+        f"filenames={sorted(actual_validator_filenames)}",
+    )
+    expected_dataset_names = {str(row.get("dataset", "")).lower() for row in datasets}
+    local_xpts = {
+        name: root / f"04_analysis_datasets/adam/{name}_prod.xpt"
+        for name in expected_dataset_names
+    }
+    locally_present = {name for name, path in local_xpts.items() if path.is_file()}
+    if locally_present:
+        add(
+            "p21.summary.local_xpt_scope_complete",
+            locally_present == expected_dataset_names,
+            f"present={sorted(locally_present)}; expected={sorted(expected_dataset_names)}",
+        )
+        recorded_hashes = {
+            str(row.get("dataset", "")).lower(): str(row.get("sha256", ""))
+            for row in datasets
+        }
+        local_hashes = {
+            name: _sha256_file(path)
+            for name, path in local_xpts.items()
+            if path.is_file()
+        }
+        mismatches = sorted(
+            name for name in expected_dataset_names
+            if local_hashes.get(name) != recorded_hashes.get(name)
+        )
+        add(
+            "p21.summary.local_xpt_hashes_match",
+            not mismatches and locally_present == expected_dataset_names,
+            f"mismatches={mismatches}",
+        )
+    else:
+        add(
+            "p21.summary.local_xpt_hashes_match",
+            True,
+            "not evaluated in data-free checkout; controlled hashes remain recorded",
+        )
     add(
         "p21.summary.record_count_reconciled",
         totals.get("records") == sum(int(row.get("records", 0)) for row in datasets),
@@ -280,27 +339,14 @@ def evaluate(root: Path = ROOT) -> dict:
             actual == expected,
             f"actual={actual}; expected={expected}",
         )
-    assessment = p21_summary.get("subsequent_rebuild_assessment") or {}
+    exact_byte_rerun = p21_summary.get("exact_byte_rerun") or {}
     current_health_timestamp = pipeline_health.get("timestamp")
     binding_timestamp = pipeline_binding.get("health_timestamp")
     timestamp_is_current = binding_timestamp == current_health_timestamp
-    timestamp_is_assessed = (
-        assessment.get("health_timestamp") == current_health_timestamp
-        and assessment.get("exact_byte_vendor_rerun") is False
-        and assessment.get("comparison_method") == "exhaustive_byte_comparison"
-        and assessment.get("datasets_compared") == 7
-        and assessment.get("payload_differences_after_byte_495") == 0
-        and assessment.get("header_timestamp_differences_per_dataset") == 2
-        and assessment.get("vendor_rerun_blocker")
-        == "Acceptance of vendor application Terms and Conditions requires authorized human confirmation"
-    )
     add(
         "p21.pipeline_binding.health_timestamp",
-        timestamp_is_current or timestamp_is_assessed,
-        (
-            f"bound={binding_timestamp}; current={current_health_timestamp}; "
-            f"later_rebuild_assessed={timestamp_is_assessed}"
-        ),
+        timestamp_is_current,
+        f"bound={binding_timestamp}; current={current_health_timestamp}",
     )
     bound_source = pipeline_binding.get("source_tree_sha256")
     health_source = pipeline_health.get("source_tree_sha256")
@@ -308,13 +354,10 @@ def evaluate(root: Path = ROOT) -> dict:
     add("p21.pipeline_binding.reseal_chain", chain_ok, chain_detail)
     add(
         "p21.pipeline_binding.source_tree",
-        chain_ok and bool(bound_source) and (
-            bound_source in set(accepted_sources) or timestamp_is_assessed
-        ),
+        chain_ok and bool(bound_source) and bound_source in set(accepted_sources),
         (
             f"bound={bound_source}; current_health={health_source}; "
-            f"accepted_chain={accepted_sources}; "
-            f"later_rebuild_assessed={timestamp_is_assessed}"
+            f"accepted_chain={accepted_sources}"
         ),
     )
 
@@ -335,16 +378,15 @@ def evaluate(root: Path = ROOT) -> dict:
     add("p21.summary.no_independent_qc_claim", qualification.get("independent_qc_approved") is False, str(qualification.get("independent_qc_approved")))
     add(
         "p21.summary.exact_byte_rerun_boundary",
-        assessment.get("exact_byte_vendor_rerun") is not False
-        or (
-            assessment.get("comparison_method") == "exhaustive_byte_comparison"
-            and assessment.get("datasets_compared") == 7
-            and assessment.get("payload_differences_after_byte_495") == 0
-            and assessment.get("header_timestamp_differences_per_dataset") == 2
-            and assessment.get("vendor_rerun_blocker")
-            == "Acceptance of vendor application Terms and Conditions requires authorized human confirmation"
-        ),
-        "later exact-byte rerun is either complete or explicitly bounded",
+        exact_byte_rerun.get("completed") is True
+        and exact_byte_rerun.get("health_timestamp") == current_health_timestamp
+        and exact_byte_rerun.get("datasets_validated") == 7
+        and exact_byte_rerun.get("input_hashes_match_current_production_xpts") is True
+        and exact_byte_rerun.get("standard_filenames_used") is True
+        and exact_byte_rerun.get("content_transformations") == 0
+        and exact_byte_rerun.get("process_completed") is True
+        and exact_byte_rerun.get("report_sha256") == validation.get("raw_report_sha256"),
+        "exact current production bytes validated under standard submission filenames",
     )
 
     claim_path = root / "docs/PRODUCT_CLAIM.md"

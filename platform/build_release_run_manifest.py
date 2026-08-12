@@ -78,6 +78,7 @@ CONTROL_FILES = [
     "platform/cibuild.py",
     "platform/check_log_cleanliness.py",
     "platform/package_ectd.py",
+    "platform/stage_p21_adam_inputs.py",
     "platform/build_ectd_backbone.py",
     "platform/materialize_ectd.py",
     "05_outputs/tfl/tfl_generation.R",
