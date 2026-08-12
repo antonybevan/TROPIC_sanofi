@@ -91,7 +91,7 @@ data adam.adcm(keep=STUDYID USUBJID CMDECOD CMCAT CMINDC CMSTDT CMENDT CMTRT CMS
     
     /* Treatment Emergent flag */
     if not missing(cmstdt) and cmstdt >= trtsdt then TRTEMFL = 'Y';
-    else TRTEMFL = 'N';
+    else call missing(TRTEMFL);
     
     label 
         GCSFFL = 'G-CSF Concomitant Med Flag'

@@ -15,6 +15,11 @@ def _text(relative: str) -> str:
     return (ROOT / relative).read_text(encoding="utf-8")
 
 
+def test_ars_csv_writer_is_cross_platform_lf_deterministic() -> None:
+    program = _text("platform/build_ars.py")
+    assert 'lineterminator="\\n"' in program
+
+
 def test_adtte_uses_typed_components_and_rejects_pre_origin_dates() -> None:
     r_program = _text("04_analysis_datasets/programs/r/v_adtte_validation.R")
     sas_program = _text("04_analysis_datasets/programs/sas/A_adtte_generation.sas")

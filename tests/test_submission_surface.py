@@ -31,7 +31,7 @@ def test_current_release_identity_is_bound_across_reviewer_sources():
         lines = [
             line
             for line in (ROOT / rel).read_text(encoding="utf-8").splitlines()
-            if "Current portfolio release" in line or "Current sealed portfolio release" in line
+            if "Current controlled release" in line or "Current sealed controlled release" in line
         ]
         assert len(lines) == 1, (rel, lines)
         assert CURRENT_RELEASE in lines[0]
@@ -45,6 +45,16 @@ def test_committed_ectd_surface_has_no_extras_or_broken_support_references():
     result = validate_sequence(require_all_leaves=False)
     assert result["status"] == "PASS", result["problems"]
     assert result["unexpected_files"] == []
+
+
+def test_packaged_tfl_driver_includes_its_runtime_helper():
+    source_dir = ROOT / "05_outputs/tfl"
+    package_dir = (
+        ROOT
+        / "08_submission_package/m5/datasets/tropic/analysis/adam/programs"
+    )
+    for name in ("tfl_generation.R", "tfl_stats.R", "lab_shift_table.R"):
+        assert (package_dir / name).read_bytes() == (source_dir / name).read_bytes()
 
 
 def test_analysis_report_secondary_tte_rows_match_generated_table():

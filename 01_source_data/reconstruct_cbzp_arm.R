@@ -552,7 +552,7 @@ neut_base <- data.frame(
   AVAL    = runif(N_safety_cbzp, 2.0, 5.0),
   AVISIT  = "Baseline",
   AVISITN = 0.0,
-  BASEFL  = "Y",
+  ABLFL   = "Y",
   ANL01FL = "Y",
   ATOXGR  = neut_base_grade
 )
@@ -572,7 +572,7 @@ neut_worst <- data.frame(
                             runif(N_safety_cbzp, 1.0, 3.0))),
   AVISIT  = "Cycle 1 Day 15",
   AVISITN = 3.0,
-  BASEFL  = "N",
+  ABLFL   = NA_character_,
   ANL01FL = "Y",
   ATOXGR  = neut_worst_grade
 )
@@ -591,7 +591,7 @@ hgb_base <- data.frame(
   AVAL    = runif(N_safety_cbzp, 10.0, 14.0),
   AVISIT  = "Baseline",
   AVISITN = 0.0,
-  BASEFL  = "Y",
+  ABLFL   = "Y",
   ANL01FL = "Y",
   ATOXGR  = hgb_base_grade
 )
@@ -609,7 +609,7 @@ hgb_worst <- data.frame(
   AVAL    = if_else(hgb_worst_grade >= 3, runif(N_safety_cbzp, 6.5, 7.9), runif(N_safety_cbzp, 8.0, 12.0)),
   AVISIT  = "Cycle 1 Day 15",
   AVISITN = 3.0,
-  BASEFL  = "N",
+  ABLFL   = NA_character_,
   ANL01FL = "Y",
   ATOXGR  = hgb_worst_grade
 )
@@ -628,7 +628,7 @@ plat_base <- data.frame(
   AVAL    = runif(N_safety_cbzp, 150, 450),
   AVISIT  = "Baseline",
   AVISITN = 0.0,
-  BASEFL  = "Y",
+  ABLFL   = "Y",
   ANL01FL = "Y",
   ATOXGR  = plat_base_grade
 )
@@ -646,7 +646,7 @@ plat_worst <- data.frame(
   AVAL    = if_else(plat_worst_grade >= 3, runif(N_safety_cbzp, 10, 49), runif(N_safety_cbzp, 50, 149)),
   AVISIT  = "Cycle 1 Day 15",
   AVISITN = 3.0,
-  BASEFL  = "N",
+  ABLFL   = NA_character_,
   ANL01FL = "Y",
   ATOXGR  = plat_worst_grade
 )
@@ -679,7 +679,7 @@ adlb_optimus_nadir <- data.frame(
   AVAL    = anc_nadir_vals,
   AVISIT  = "CYCLE 1",
   AVISITN = 1.0,
-  BASEFL  = "N",
+  ABLFL   = NA_character_,
   ANL01FL = "Y",
   ATOXGR  = neut_grades
 )
@@ -711,7 +711,7 @@ adlb_psa_waterfall <- data.frame(
   AVAL    = runif(N_cbzp, 50, 500),
   AVISIT  = "Best Response",
   AVISITN = 99.0,
-  BASEFL  = "N",
+  ABLFL   = NA_character_,
   ANL01FL = "Y",
   PCHG    = psa_pchg_vals,
   ATOXGR  = 0

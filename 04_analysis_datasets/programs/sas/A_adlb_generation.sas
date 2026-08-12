@@ -149,25 +149,25 @@ proc sort data=work.lb_base_merged;
     by usubjid PARAMCD AVISITN AWDIST descending ATOXGR ADT lbseq;
 run;
 
-/* Derive ANL01FL and BASEFL */
+/* Derive ANL01FL and the ADaM baseline record flag ABLFL */
 data work.lb_anl01;
     set work.lb_base_merged;
     by usubjid PARAMCD AVISITN;
     
-    length ANL01FL BASEFL $1;
+    length ANL01FL ABLFL $1;
     
     /* Set ANL01FL Worst Flag */
     if not missing(AVISITN) and AVISITN ne 99 then do;
         if first.AVISITN then ANL01FL = 'Y';
-        else ANL01FL = 'N';
+        else call missing(ANL01FL);
     end;
     else do;
-        ANL01FL = 'N';
+        call missing(ANL01FL);
     end;
     
-    /* Set BASEFL Baseline Flag */
-    if not missing(BASESEQ) and lbseq = BASESEQ then BASEFL = 'Y';
-    else BASEFL = 'N';
+    /* ABLFL is a one-sided ADaM flag: Y on the selected baseline record, null otherwise. */
+    if not missing(BASESEQ) and lbseq = BASESEQ then ABLFL = 'Y';
+    else call missing(ABLFL);
 run;
 
 /* Add Project Optimus continuous parameters: ANCNADIR, ANCRECDY */
@@ -232,7 +232,7 @@ proc sql;
         n.nadir_val as AVAL,
         strip(put(n.nadir_val, 8.2)) as AVALC length=20,
         'Y' as ANL01FL length=1,
-        'N' as BASEFL length=1,
+        '' as ABLFL length=1,
         n.nadir_dy as lbdy
     from work.anc_nadir_summary as n
     left join adam.adsl as adsl on n.usubjid = adsl.usubjid;
@@ -252,7 +252,7 @@ proc sql;
         (r.rec_dy - n.nadir_dy) as AVAL,
         strip(put((r.rec_dy - n.nadir_dy), 8.0)) as AVALC length=20,
         'Y' as ANL01FL length=1,
-        'N' as BASEFL length=1,
+        '' as ABLFL length=1,
         r.rec_dy as lbdy
     from work.anc_recovery as r
     inner join work.anc_nadir_summary as n on r.usubjid = n.usubjid and r.cycle = n.cycle
@@ -266,7 +266,7 @@ quit;
    no single assessment date and carry ADT missing. */
 data work.adlb_all(keep=STUDYID USUBJID SUBJID TRT01P TRTSDT PARAMCD PARAM PARCAT1 ADT
                         AVAL AVALC LBNRLO LBNRHI LBNRIND AVISIT AVISITN AWDIST ATOXGR BASE BASEC
-                        BTOXGR CHG PCHG ANL01FL BASEFL LBDY LBSEQ);
+                        BTOXGR CHG PCHG ANL01FL ABLFL LBDY LBSEQ);
     set work.lb_anl01(rename=(ADY=LBDY)) work.optimus_nadir work.optimus_rec;
     format ADT yymmdd10.;
 run;
@@ -288,7 +288,7 @@ proc sql;
     select a.STUDYID, a.USUBJID, a.SUBJID, a.TRT01P, a.TRTSDT, a.PARAMCD, a.PARAM,
            m.PARAMN, a.PARCAT1, a.ADT, a.AVAL, a.AVALC, a.LBNRLO, a.LBNRHI, a.LBNRIND,
            a.AVISIT, a.AVISITN, a.AWDIST, a.ATOXGR, a.BASE, a.BASEC, a.BTOXGR, a.CHG, a.PCHG,
-           a.ANL01FL, a.BASEFL, a.LBDY, a.LBSEQ
+           a.ANL01FL, a.ABLFL, a.LBDY, a.LBSEQ
     from work.adlb_all as a
     left join work._pnmap as m on a.PARAMCD = m.PARAMCD;
 quit;

@@ -1,0 +1,17 @@
+title = "TROPIC secret-scanning policy"
+
+[extend]
+useDefault = true
+
+# The Community validation record stores cryptographic digests as provenance.
+# Restrict this exception to the generic detector, the exact evidence file, and
+# a full SHA-256 JSON field. Other values and all other files remain scanned.
+[[rules]]
+id = "generic-api-key"
+
+  [rules.allowlist]
+  description = "Pinnacle 21 binary/report SHA-256 provenance is not a credential"
+  condition = "AND"
+  regexTarget = "line"
+  paths = ['''^06_qc_evidence/conformance/p21_adam_summary\.json$''']
+  regexes = ['''"(?:client|configuration|define|raw_report)_sha256"\s*:\s*"[0-9a-f]{64}"''']

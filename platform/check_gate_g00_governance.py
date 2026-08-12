@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """G00 Governance Scope Lock — executable gate.
 
-Fails the DAG if Path A product claim, authority docs, or findings disposition
+Fails the DAG if the controlled product claim, authority docs, or findings disposition
 are missing or contradicted. Writes 06_qc_evidence/gates/g00_governance_status.json.
 """
 from __future__ import annotations
@@ -18,6 +18,8 @@ OUT = ROOT / "06_qc_evidence/gates/g00_governance_status.json"
 
 REQUIRED = [
     "docs/PRODUCT_CLAIM.md",
+    "docs/QUALITY_SYSTEM_BOUNDARY.md",
+    "docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md",
     "docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md",
     "docs/WORKSTREAM_EXECUTION_BOARD.md",
     "00_governance/REPRODUCIBILITY.md",
@@ -26,13 +28,14 @@ REQUIRED = [
     "06_qc_evidence/audit/findings_register.csv",
     "06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md",
     "config/workstream_execution_board.yaml",
+    "config/regulatory_baseline.yaml",
 ]
 
 # Must appear in PRODUCT_CLAIM (case-insensitive).
 CLAIM_MUST = [
     r"controlled",
     r"non[- ]submission",
-    r"Path A|demo",
+    r"controlled clinical-submission simulation",
     r"not.*Part 11|non-Part 11|not a Part 11",
 ]
 
@@ -63,10 +66,10 @@ def main() -> int:
     text = claim_path.read_text(encoding="utf-8") if claim_path.is_file() else ""
     lower = text.lower()
     add(
-        "product_claim.path_a",
-        ("path a" in lower or "controlled non-submission" in lower or "demo" in lower)
-        and ("non-submission" in lower or "non submission" in lower or "demonstration" in lower),
-        "PRODUCT_CLAIM must freeze Path A / controlled demo language",
+        "product_claim.controlled_simulation",
+        "controlled clinical-submission simulation" in lower
+        and "not a regulatory submission" in lower,
+        "PRODUCT_CLAIM must freeze the controlled simulation and non-submission boundary",
     )
     add(
         "product_claim.forbids_part11",

@@ -200,10 +200,10 @@ data adam.adae(keep=STUDYID USUBJID TRTA TRTAN AEDECOD AEBODSYS AEHLT AESEV ATOX
     length TRTEMFL $1;
     if not missing(aetrtem) and strip(aetrtem) ne '' then do;
         if aetrtem = 'T' then TRTEMFL = 'Y';
-        else TRTEMFL = 'N';
+        else call missing(TRTEMFL);
     end;
     else if not missing(astdt) and astdt >= trtsdt then TRTEMFL = 'Y';
-    else TRTEMFL = 'N';
+    else call missing(TRTEMFL);
     
     /* Non-grouped OCCDS compliance override */
     if missing(cq02nam) or cq02nam = '' then do;
@@ -247,7 +247,7 @@ data _null_;
     set adam.adae end=eof;
     retain n_teae_blank_aeser 0 n_nte_blank_aeser 0;
     if TRTEMFL = 'Y' and missing(AESER) then n_teae_blank_aeser + 1;
-    if TRTEMFL = 'N' and missing(AESER) then n_nte_blank_aeser + 1;
+    if missing(TRTEMFL) and missing(AESER) then n_nte_blank_aeser + 1;
     if eof then do;
         putlog "NOTE: [ADAE-QC] Non-TE blank AESER rows (expected baseline skeleton) = " n_nte_blank_aeser;
         putlog "NOTE: [ADAE-QC] TEAE blank AESER rows (expect 0 or near-0) = " n_teae_blank_aeser;

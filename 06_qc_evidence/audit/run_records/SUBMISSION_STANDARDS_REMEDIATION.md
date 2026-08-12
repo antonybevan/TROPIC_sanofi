@@ -6,6 +6,13 @@ package, or an external validator. Companion to `FDA_AUDIT_2026-06-18.md`, which
 audits structural conformance to the standards *as declared*; this document
 challenges whether the *declared* standards are still current.
 
+> **Supersession note — 2026-08-12.** The June statement that Community was
+> engine-expired and never executed is historical. The current controlled evidence is
+> `06_qc_evidence/conformance/p21_adam_runrecord.md` plus
+> `p21_adam_summary.json`: Community 4.1.0 / FDA 2508.1 processed seven final ADaM
+> datasets and 121,320 records with zero rejects, leaving 30 open issue groups / 2,373
+> occurrences and an incompatible-CLI caveat. Licensed Enterprise remains not executed.
+
 Legend: **DONE** = engineered and verified in this repo · **PLAN** = requires
 SAS/CT/validator/owner decision, steps given.
 
@@ -16,7 +23,7 @@ SAS/CT/validator/owner decision, steps given.
 | # | Area | Current standard | Declared / present | Verdict | Status |
 |---|------|------------------|--------------------|---------|--------|
 | 1 | SDTM IG version | SDTMIG ≥3.3/3.4 (FDA Data Standards Catalog support window) | **3.4** (uplifted from 3.1.1; see §1) | Now in support window | **DONE (2026-06-20)** |
-| 2 | Conformance validation | Completed P21/Certara or CORE report | **CORE 0.16.0 @ SDTMIG 3.4 run** (`CORE_SDTM34_RUN_RECORD.md`) | All structural-fixable findings cleared; residual classified | **DONE (SDTM) / PLAN (ADaM pack)** |
+| 2 | Conformance validation | Completed P21/Certara or CORE report | **CORE 0.16.0 @ SDTMIG 3.4** plus **P21 Community 4.1.0 / FDA 2508.1 ADaM** | Community is informative-only with open findings; Enterprise closure remains external | **RUN (Community) / PLAN (Enterprise)** |
 | 3 | Dataset transport | Dataset-JSON v1.1 (XPT v5 legacy) | XPT v5 + Dataset-JSON v1.1 | Gap closed (additive) | **DONE** |
 | 4 | Controlled Terminology | latest published CT package | **2026-03-27** (both defines) | Current | **DONE (2026-06-20)** |
 | 5 | eCTD packaging | eCTD backbone + Study Tagging Files (v4.0/RPS emerging) | Backbone + STF + content materialized (89/89 MD5-verified) + **all 3 XML files DTD-VALID** (ICH 3.2 / STF 2.2 / FDA Regional v3.3) | Sequence self-contained & DTD-valid | **DONE (2026-06-20); PLAN: real FDA app metadata** |
@@ -78,18 +85,17 @@ support window and cannot be validated by current engines.
 
 ---
 
-## 2 — No regulator-grade conformance pass — **PLAN**
+## 2 — No regulator-grade conformance clearance — **PLAN**
 
-**Evidence:** `06_qc_evidence/conformance/p21_adam_runrecord.md` — P21 Community 4.1.0 blocked by
-hard-coded engine expiry (2025-03-31); never executed. `CORE_RUN_RECORD.md` — CORE
-0.16.0 ships **zero** executable ADaM rules; ADaM rests on the in-repo custom rules
-(`conformance_rules/adam/`) and the interim `adam_conf_check.R`
-("NOT the full FDA Validator pack"). SDTM CORE run is explicitly "not a clean pass".
+**Current evidence (superseding the original June observation):**
+`06_qc_evidence/conformance/p21_adam_runrecord.md` records a completed Community
+4.1.0 / FDA 2508.1 ADaM run with open findings and an incompatible-CLI caveat.
+`CORE_RUN_RECORD.md` records the open-engine coverage boundary. Neither constitutes
+licensed Enterprise clearance or regulator acceptance.
 
 **Plan:**
-1. ADaM: keep custom CORE rules as the interim gate; re-run CORE when its ADaMIG
-   pack ships (CORE 1.0 roadmap), or run P21/Certara Enterprise with a current
-   licence for the authoritative report.
+1. ADaM: retain the Community run for issue discovery and reproduce the final locked
+   package in licensed, qualified Enterprise for regulated use.
 2. SDTM: after item 1's IG upgrade, re-run and attach the clean report under
    `platform/conformance/` and cite it in the SDRG/ADRG.
 3. Record the validator name + rule-pack version + CT version in the reviewer guides.

@@ -1,0 +1,64 @@
+schema_version: "1.0"
+baseline_id: "TROPIC-FDA-2026-08-12"
+effective_as_of: "2026-08-12"
+product_class: "controlled_clinical_submission_simulation"
+filing_status: "not_for_regulatory_submission"
+
+authorities:
+  fda_study_data_technical_conformance_guide:
+    version: "June 2026"
+    url: "https://www.fda.gov/media/153632/download"
+  fda_study_data_standards_resources:
+    version: "current as checked 2026-08-12"
+    url: "https://www.fda.gov/industry/fda-data-standards-advisory-board/study-data-standards-resources"
+  fda_ectd:
+    version: "current as checked 2026-08-12"
+    url: "https://www.fda.gov/drugs/electronic-regulatory-submission-and-review/electronic-common-technical-document-ectd"
+  fda_21_cfr_part_11:
+    version: "current eCFR as checked 2026-08-12"
+    url: "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11"
+  fda_electronic_systems_clinical_investigations:
+    version: "October 2024"
+    url: "https://www.fda.gov/media/166215/download"
+  ich_e6_r3:
+    version: "Step 4, 2025-01-06"
+    url: "https://database.ich.org/sites/default/files/ICH_E6%28R3%29_Step4_FinalGuideline_2025_0106.pdf"
+  cdisc_sdtmig:
+    version: "3.4"
+    url: "https://www.cdisc.org/standards/foundational/sdtmig/sdtmig-v3-4"
+  cdisc_adamig:
+    version: "1.3"
+    url: "https://www.cdisc.org/standards/foundational/adam/adamig-v1-3"
+  cdisc_define_xml:
+    version: "2.1"
+    url: "https://www.cdisc.org/standards/foundational/define-xml/define-xml-v2-1-0"
+
+package_contract:
+  analysis_data_reviewers_guide: "08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf"
+  clinical_study_data_reviewers_guide: "08_submission_package/m5/datasets/tropic/tabulations/sdtm/csdrg.pdf"
+  legacy_sdrg_filename_forbidden: "08_submission_package/m5/datasets/tropic/tabulations/sdtm/sdrg.pdf"
+  analysis_define: "08_submission_package/m5/datasets/tropic/analysis/adam/datasets/define.xml"
+  tabulation_define: "08_submission_package/m5/datasets/tropic/tabulations/sdtm/datasets/define.xml"
+  local_stylesheet: "define2-1.xsl"
+  analysis_program_directory: "08_submission_package/m5/datasets/tropic/analysis/adam/programs"
+  source_blank_crf: "08_submission_package/m5/datasets/tropic/tabulations/sdtm/blankcrf.pdf"
+  annotated_crf_forbidden_alias: "08_submission_package/m5/datasets/tropic/tabulations/sdtm/acrf.pdf"
+
+validation_evidence:
+  pinnacle_21_community_summary:
+    path: "06_qc_evidence/conformance/p21_adam_summary.json"
+    record_id: "TROPIC-P21-ADAM-2026-08-12-03"
+    status: "EXECUTED_WITH_OPEN_FINDINGS_AND_COMPATIBILITY_CAVEAT"
+    use: "INFORMATIVE_ONLY"
+    expected_datasets: 7
+    expected_records: 121320
+    expected_rule_catalog_entries: 388
+    expected_issue_groups: 30
+    expected_issue_occurrences: 2373
+
+qualification_claims:
+  organizationally_independent_qc: false
+  part_11_validated_system: false
+  licensed_pinnacle_21_enterprise: false
+  pinnacle_21_community_informative_run: true
+  regulatory_gateway_acceptance: false

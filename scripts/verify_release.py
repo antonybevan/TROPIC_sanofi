@@ -303,6 +303,9 @@ def main() -> int:
     lg = load("platform/log_cleanliness/log_cleanliness_status.json") or {}
     add("log_cleanliness.PASS", lg.get("status") == "PASS", str(lg.get("status")))
 
+    rb = load("06_qc_evidence/gates/regulatory_baseline_status.json") or {}
+    add("regulatory_baseline.PASS", rb.get("status") == "PASS", str(rb.get("status")))
+
     rm = load("platform/release_run_manifest/release_run_manifest.json") or {}
     expected_manifest_sha = rm.get("manifest_sha256", "")
     actual_manifest_sha = manifest_sha256(rm) if rm else ""

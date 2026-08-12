@@ -1,16 +1,16 @@
-# Study Data Reviewer's Guide (SDRG)
+# Clinical Study Data Reviewer's Guide (cSDRG)
 
 | Field | Value |
 |---|---|
-| **Document** | Study Data Reviewer's Guide (SDRG) |
+| **Document** | Clinical Study Data Reviewer's Guide (cSDRG) |
 | **Study** | TROPIC / EFC6193 / NCT00417079 |
 | **Compound** | Cabazitaxel (CbzP) vs Mitoxantrone (MP) |
 | **Standard (package layer)** | CDISC SDTMIG **v3.4** + CDISC/NCI CT 2026-03-27 (uplifted; §5) |
 | **Standard (pristine source)** | CDISC SDTMIG **v3.1.1** (PDS 2013; local `01_source_data/real_sdtm/`) |
-| **Document version** | 1.3 (audit closure / portfolio release) |
-| **Effective** | 2026-08-05 |
-| **Supersedes** | SDRG v1.2 from the `v0.2.0-portfolio` release (which superseded the `v0.1.0-demo-rc.1` baseline) |
-| **Product claim** | **Path A only** — controlled non-submission demonstration |
+| **Document version** | 2.0 |
+| **Effective** | 2026-08-12 |
+| **Supersedes** | SDRG v1.3 from the `v0.2.2-portfolio` release |
+| **Product claim** | Controlled clinical-submission simulation; not a regulatory submission |
 
 ---
 
@@ -23,18 +23,18 @@
 | Uplifted SDTMIG 3.4 **package layer** + define co-located under `m5/.../tabulations/sdtm/` | Proof that commercial P21 cleared every residual |
 | CORE SDTM 3.4 run with **classified residuals** (F-015) | “Full CORE clean” / zero-finding claim |
 | Week-offset / partial-date source honesty (F-017) | Day-level AE timing precision that the source never had |
-| Path A demo with patient XPT **not redistributed** | Part 11 validated system |
+| Controlled simulation with patient XPT **not redistributed** | Part 11 validated system |
 
 **Binding claim:** [`docs/PRODUCT_CLAIM.md`](../../docs/PRODUCT_CLAIM.md)
 **Source intake pack (WS-1):** [`docs/workstreams/WS1_SOURCE_INTAKE_PACK.md`](../../docs/workstreams/WS1_SOURCE_INTAKE_PACK.md)
 **Residual risks:** [`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)
 **External validation slots:** [`docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md`](../../docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md)
-**Current portfolio release:** tag `v0.2.2-portfolio` · [`docs/RELEASE_NOTE_v0.2.2-portfolio.md`](../../docs/RELEASE_NOTE_v0.2.2-portfolio.md) · `python3 scripts/verify_release.py`
+**Current controlled release:** tag `v0.3.0-clinical-simulation` · [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) · `python3 scripts/verify_release.py`
 **Review package face:** [`08_submission_package/m5/datasets/tropic/tabulations/sdtm/`](../../08_submission_package/m5/datasets/tropic/tabulations/sdtm/)
 **Analysis narrative:** [`ADRG.md`](ADRG.md)
 **Findings disposition:** `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md`
 
-> **Redistribution:** Real `*.sas7bdat` and package `*.xpt` are **not** in git (data rights + portfolio surface policy). Structure, define, SDRG/ADRG, and programs are.
+> **Redistribution:** Real `*.sas7bdat` and package `*.xpt` are **not** in Git (data rights and repository surface policy). Structure, Define-XML, cSDRG/ADRG, and programs are retained.
 
 ---
 
@@ -70,7 +70,7 @@
 | **Pristine PDS (local)** | 34 `*.sas7bdat` domains (incl. EG, MH, PE, SV, IE, CD, CX, trial design fragments, etc.) |
 | **Package / `define_sdtm.xml`** | **18** datasets: DM, EX, AE, LB, CM, DS, VS, LS, PN + SUPPAE/CM/DM/DS/EX/LB/LS + **TA, TS** |
 
-Domains present in PDS but **not** packaged (by design for this Path A analysis package):
+Domains present in PDS but **not** packaged (by design for this controlled analysis scope):
 `CD, CX, EG, IE, MH, PE, PR, SC, SV, TE, TI, TV` (+ related SUPP*).
 Do **not** claim the Module 5 SDTM folder is a full copy of every PDS domain.
 
@@ -93,7 +93,7 @@ Source data are the official **Sanofi de-identified SDTM** for NCT00417079 (2013
 Staging: [`L_staging_ingest.sas`](../../04_analysis_datasets/programs/sas/L_staging_ingest.sas) (and R twin `v_staging_ingest.R`) ingests `realsdtm.<domain>`, transpose-merges SUPP--, and coerces character continuous indicators to numeric where required.
 
 > [!IMPORTANT]
-> **Single-arm source limitation (Path A critical):** PDS public data here is **MP only (N=371)**. Cabazitaxel is **not** present as source SDTM. Dual-language ADaM recon is MP-only. Synthetic/reconstructed CbzP is merged only at TFL reporting ([`tfl_generation.R`](../../05_outputs/tfl/tfl_generation.R)) — non-confirmatory (F-003). Do not describe this as a clean two-arm double-programming of trial IPD.
+> **Critical single-arm source limitation:** PDS public data here is **MP only (N=371)**. Cabazitaxel is **not** present as source SDTM. Dual-language ADaM reconciliation is MP-only. Synthetic/reconstructed CbzP is merged only at TFL reporting ([`tfl_generation.R`](../../05_outputs/tfl/tfl_generation.R)) — non-confirmatory (F-003). Do not describe this as a two-arm double-programming of trial IPD.
 
 ### Database write-protection architecture
 
@@ -162,7 +162,7 @@ The pristine source SDTM (`01_source_data/real_sdtm/`, PDS 2013) was authored to
 **Engine:** cdisc-rules-engine (CORE) v0.16.0 · standard SDTMIG 3.4 · CT 2026-03-27
 **Headline:** targeted **structural uplift rules cleared**; overall issue count is **not zero** and must not be marketed as “CORE clean.”
 
-| Class | Examples | Disposition (Path A) |
+| Class | Examples | Disposition (controlled scope) |
 |---|---|---|
 | **Structural targets fixed** | AESOC, AGE, EPOCH, EXENDY, non-standard→SUPP, labels/order/type | Accept as uplift success |
 | **Inherent de-identification** | SITEID / COUNTRY / MedDRA hierarchy codes / exact AE dates removed by PDS | **Accept** — cannot invent PII or lost codes |
@@ -177,4 +177,4 @@ The pristine source SDTM (`01_source_data/real_sdtm/`, PDS 2013) was authored to
 
 **Related residual:** week-offset / partial ISO dates — **F-017** (§2 AE note, §4.5). Never invent day precision.
 
-**Pinnacle 21 commercial ADaM/SDTM:** **NOT_AVAILABLE** under Path A (see WS-3 external validation index). Local CORE + dual-language ADaM recon are substitutes only.
+**Pinnacle 21:** Community 4.1.0 executed against the ADaM package using FDA engine 2508.1 and ADaMIG 1.3 (FDA). The run is **informative only** because Community is not Enterprise and the output reports `Incompatible CLI used`. Licensed final-package validation remains **NOT_EXECUTED**. See `06_qc_evidence/conformance/p21_adam_runrecord.md`.

@@ -9,7 +9,7 @@
 | **Document version** | 1.3 (audit closure / portfolio release) |
 | **Effective** | 2026-08-05 |
 | **Supersedes** | ADRG v1.2 from the `v0.2.0-portfolio` release (which superseded the `v0.1.0-demo-rc.1` baseline) |
-| **Product claim** | **Path A only** — controlled non-submission demonstration |
+| **Product claim** | Controlled clinical-submission simulation; not a regulatory submission |
 
 ---
 
@@ -21,12 +21,12 @@
 | Dual-language (SAS 9.4 / R) recon on **real MP** ADaM under a genuine SAS engine when seals say `oda`/`local` | Organizational GxP two-programmer double programming |
 | Risk-tiered **admiral** third engine for ADSL + OS/PFS | Full ADaM re-derived in admiral |
 | Controlled TFL catalog (21 in-scope IDs; 18 SAP IDs deferred) | Full SAP Appendix D TFL inventory |
-| Hash-sealed Path A demo RC | 21 CFR Part 11 validated system |
+| Hash-sealed controlled release | 21 CFR Part 11 validated system |
 | Comparative TFLs that may include **synthetic/reconstructed CbzP** | Independent clinical confirmation of CbzP efficacy |
 
 **Binding claim:** [`docs/PRODUCT_CLAIM.md`](../../docs/PRODUCT_CLAIM.md)
 **Residual risks (ACCEPTED findings):** [`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)
-**Current portfolio release:** tag `v0.2.2-portfolio` · [`docs/RELEASE_NOTE_v0.2.2-portfolio.md`](../../docs/RELEASE_NOTE_v0.2.2-portfolio.md) · `python3 scripts/verify_release.py`
+**Current controlled release:** tag `v0.3.0-clinical-simulation` · [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) · `python3 scripts/verify_release.py`
 **Review package face:** [`08_submission_package/m5/`](../../08_submission_package/m5/) · [`08_submission_package/README.md`](../../08_submission_package/README.md)
 
 > **SAP v4.0 lock:** `02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx` is the **programming** authority for this demonstration (lock memo: `06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md`). It is **not** a sponsor-approved filing SAP. This ADRG explains implementation; it does not invent new analysis decisions.
@@ -37,7 +37,7 @@
 
 The **TROPIC Phase III Trial (NCT00417079)** evaluated cabazitaxel (25 mg/m² IV q3w) + prednisone vs mitoxantrone (12 mg/m² IV q3w) + prednisone in mCRPC after docetaxel (de Bono et al., *Lancet* 2010).
 
-This repository is a **Path A programming demonstration** built on:
+This repository is a **controlled programming simulation** built on:
 
 - **Real MP arm (N=371)** de-identified SDTM (Sanofi 2013 / Project Data Sphere) → dual-language ADaM + recon
 - **Synthetic / reconstructed CbzP (N=378)** merged **only at TFL** for comparative displays (non-confirmatory; F-003)
@@ -71,7 +71,7 @@ For Progression-Free Survival (PFS), progression is the earliest eligible, cutof
   1. If a patient starts a new systemic anti-cancer therapy (`NACTDT`) prior to a documented PFS event, the time-to-event is censored at **`NACTDT - 1 day`** (`CNSDTDSC = 'NEW ANTI-CANCER THERAPY START'`).
   2. If no event or NACT occurs, the time-to-event is censored at the latest valid post-baseline RECIST, PSA, or evaluable pain assessment (capped at the administrative cutoff). If no post-baseline assessment exists, it is censored at randomization (`CNSDTDSC = 'NO POST-BASELINE ASSESSMENT'`).
 
-  ADTTE `EVNTDESC` records the typed earliest composite component: `TUMOR PROGRESSION`, `PSA PROGRESSION`, `PAIN PROGRESSION`, or `DEATH`. Same-day ties use the deterministic order tumour, PSA, pain, then death; an event on the NACT date remains an event, while strictly earlier NACT censors at `NACTDT - 1`. The F-042 implementation is the adopted Path A programming rule, but it remains non-sponsor-approved and requires qualified external clinical/statistical review before regulated reuse.
+  ADTTE `EVNTDESC` records the typed earliest composite component: `TUMOR PROGRESSION`, `PSA PROGRESSION`, `PAIN PROGRESSION`, or `DEATH`. Same-day ties use the deterministic order tumour, PSA, pain, then death; an event on the NACT date remains an event, while strictly earlier NACT censors at `NACTDT - 1`. The F-042 implementation is the adopted simulation programming rule, but it remains non-sponsor-approved and requires qualified external clinical/statistical review before regulated reuse.
 
 * **Other Time-to-Event Parameters Censoring Rules (VAL-06):**
   * **Overall Survival (OS) (PARAMCD: OS):** Start date is `RANDDT`. Event is death (`DTHFL = 'Y'`). Censored at last known alive date (`LSTALVDT`).
@@ -148,7 +148,7 @@ All subjects are assigned `SEX = 'M'` in `A_adsl_generation.sas`. This demograph
 
 ## 6. Quality Control & SAS/R Parity (VAL-01)
 
-### 6.0 Path A validation talk track (interview / reviewer)
+### 6.0 Validation evidence boundary
 
 | Layer | What we do | What we do **not** claim |
 |---|---|---|
@@ -157,7 +157,7 @@ All subjects are assigned `SEX = 'M'` in `A_adsl_generation.sas`. This demograph
 | Results / figures | SAS vs R numerical recon for MP stats; forest + figure-driving gates when SAS exports exist | Pixel-identical graphics; two-arm HR as dual-programmed (CbzP synthetic) |
 | TFL scope | Catalog-controlled in-scope set (`config/tfl_output_catalog.yaml`) | Full SAP Appendix D (18 IDs deferred with reasons) |
 | Metadata | Spec→define / spec→data gates; Define XSD; local CORE ADaM rules | Commercial full Pinnacle 21 clearance |
-| Seals | Hash-sealed Path A demo RC; `scripts/verify_release.py` | Part 11 e-signature / validated CSV system |
+| Seals | Hash-sealed controlled release; `scripts/verify_release.py` | Part 11 e-signature / validated computerized system |
 
 **Always read residuals here:** [`WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md) (F-003, F-005, F-011, F-012, F-014, F-025, …).
 **Machine re-check (no SAS required):** `python3 scripts/verify_release.py`

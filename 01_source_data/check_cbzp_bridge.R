@@ -54,17 +54,32 @@ strip_attrs <- function(df) {
   df
 }
 
-# Count mismatching cells between two equal-length vectors (NA-aware).
+# Count mismatching cells between two equal-length vectors. SAS XPORT represents a
+# missing character value as blanks, while the source RDS uses NA_character_. Treat
+# both encodings as the same missing value before applying the parity comparison.
 count_mismatch <- function(a, b) {
+  if (!is.numeric(a) || !is.numeric(b)) {
+    a <- trimws(as.character(a))
+    b <- trimws(as.character(b))
+    a[a == ""] <- NA_character_
+    b[b == ""] <- NA_character_
+  }
   na_mis <- xor(is.na(a), is.na(b))
   both   <- !is.na(a) & !is.na(b)
   if (is.numeric(a) && is.numeric(b)) {
     val_mis <- both & (abs(a - b) > TOL * pmax(1, abs(b)))
   } else {
-    val_mis <- both & (trimws(as.character(a)) != trimws(as.character(b)))
+    val_mis <- both & (a != b)
   }
   sum(na_mis) + sum(val_mis)
 }
+
+# Control-function teeth: prove that SAS blank and R NA are equivalent while a
+# populated non-Y value still fails. These checks execute on every bridge run.
+stopifnot(
+  count_mismatch(c("Y", NA_character_), c("Y", "")) == 0,
+  count_mismatch(c("Y", NA_character_), c("Y", "N")) == 1
+)
 
 domains <- list()
 overall <- "PASS"

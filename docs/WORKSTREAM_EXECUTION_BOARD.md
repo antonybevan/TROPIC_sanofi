@@ -74,7 +74,7 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | Field | Content |
 |---|---|
 | **Owned artifacts** | `01_source_data/` (governed, not redistributed) · staging ingest · SDTM validation · source profile report · SDTM CORE run records · SDRG source sections · F-017 timing residuals |
-| **Current status** | **GREEN for Path A; AMBER for broader industry depth** — Section 1 source recheck passed; CORE residual matrix and F-015/F-017 dispositions are filed; still not “CORE clean” / commercial P21 |
+| **Current status** | **GREEN for Path A; AMBER for broader industry depth** — Section 1 source recheck passed; CORE residual matrix and F-015/F-017 dispositions are filed; still not “CORE clean” or licensed P21 Enterprise-cleared |
 | **Open risks** | F-017 remains source-inherent · F-015 open classes remain accepted · real SDTM not in git (correct) |
 | **Required evidence pack** | (1) Source profile · (2) SDTM val · (3) CORE run record + **`WS1_CORE_RESIDUAL_MATRIX.csv`** · (4) SDRG §5.1 · (5) REPRODUCIBILITY data-access |
 | **Release gate** | G01 before any “source locked” language |
@@ -103,10 +103,10 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 |---|---|
 | **Owned artifacts** | ADaM_spec.xlsx · define.xml · define_sdtm.xml · XSD validation · metadata lineage · metadata control report · ARM · Dataset-JSON / USDM / ARS (scope) · F-014/F-020/F-021/F-022 residuals |
 | **Current status** | **GREEN for Path A; AMBER for broader commercial-validator depth** — metadata control, lineage, XSD, spec→Define and spec→data pass; ARM covers every controlled analysis output except the non-analysis F-01-1 flow diagram (10 ResultDisplays / 18 AnalysisResults); Dataset-JSON/USDM/ARS remain explicitly exploratory or partial |
-| **Open risks** | Reviewer asks for full ARM/VLM/CT story; exploratory layers over-claimed; commercial P21 not run (F-016) |
-| **Required evidence pack** | (1) Spec→define + spec→data status · (2) XSD validate run record · (3) Lineage check PASS · (4) Explicit “in package / exploratory” inventory for Dataset-JSON, USDM, ARS · (5) P21 slot: RUN or NOT_AVAILABLE with reason |
+| **Open risks** | Reviewer asks for full ARM/VLM/CT story; exploratory layers over-claimed; Community has 30 open issue groups / 2,373 occurrences and a compatibility caveat; licensed Enterprise not run (F-016) |
+| **Required evidence pack** | (1) Spec→define + spec→data status · (2) XSD validate run record · (3) Lineage check PASS · (4) Explicit “in package / exploratory” inventory for Dataset-JSON, USDM, ARS · (5) Community run record + self-reconciling aggregate inventory · (6) Enterprise slot explicitly NOT_AVAILABLE/NOT_EXECUTED |
 | **Release gate** | G03 before metadata promotion language |
-| **Next action** | Maintain the filed external-validation index and CORE residual matrix; keep commercial P21/FDA validator slots `NOT_AVAILABLE` until genuine tool access; require the G02 ARM semantic contract on every release |
+| **Next action** | Maintain the filed external-validation index and CORE residual matrix; retain Community as informative-only; require licensed, qualified Enterprise plus independent disposition approval for any regulated-use claim; require the G02 ARM semantic contract on every release |
 
 ---
 
@@ -130,8 +130,8 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | Field | Content |
 |---|---|
 | **Owned artifacts** | Risk-based validation plan · config/validation_strategy.yaml · recon (dataset/results/forest/admiral) · log cleanliness · findings register · disposition board · CORE local rules |
-| **Current status** | **GREEN for Path A residual communication** — known-differences memo filed; machine gates PASS; still AMBER-leaning for industry if P21/CORE residual matrix missing (owned with WS-3) |
-| **Open risks** | Single-author tracks; log coverage = persisted logs only; commercial P21 external |
+| **Current status** | **GREEN for Path A residual communication** — known-differences memo filed; machine gates PASS; Community aggregate evidence is reconciled; still AMBER for licensed validator and full CORE depth (owned with WS-3) |
+| **Open risks** | Single-author tracks; log coverage = persisted logs only; Community findings open; licensed Enterprise and qualified disposition approval external |
 | **Required evidence pack** | (1) Validation strategy control report · (2) Recon/admiral status · (3) Log cleanliness · (4) Findings + disposition · (5) **`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`** |
 | **Release gate** | G06 |
 | **Next action** | Hold residual memo current when any ACCEPTED finding changes; co-own CORE residual matrix with WS-1 |

@@ -9,7 +9,7 @@
 | **Document version** | 1.3 (audit closure / portfolio release) |
 | **Effective** | 2026-08-05 |
 | **Supersedes** | BDRG v1.2 from the `v0.2.0-portfolio` release (which superseded the `v0.1.0-demo-rc.1` baseline) |
-| **Product claim** | **Path A only** — controlled non-submission demonstration |
+| **Product claim** | Controlled clinical-submission simulation; not a regulatory submission |
 
 ---
 
@@ -20,11 +20,11 @@
 | Site-level roll-up (`clinsite`) for **BIMO-style** review practice | Full BIMO TCG Appendix-3 ~39-variable production clinsite |
 | Dual-language (SAS/R) recon of the delivered clinsite subset under genuine SAS when seals say `oda`/`local` | Organizational GxP double programming |
 | Honest omissions where PDS has no PI/CTMS/DV data | Real investigator identity / financial disclosure / full DV counts |
-| Path A demo deliverable under `m5/.../bimo/` | FDA filing BIMO package |
+| Controlled simulation deliverable under `m5/.../bimo/` | FDA filing BIMO package |
 
 **Binding claim:** [`docs/PRODUCT_CLAIM.md`](../../docs/PRODUCT_CLAIM.md)
 **Residuals:** [`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)
-**Current portfolio release:** tag `v0.2.2-portfolio` · [`docs/RELEASE_NOTE_v0.2.2-portfolio.md`](../../docs/RELEASE_NOTE_v0.2.2-portfolio.md) · `python3 scripts/verify_release.py`
+**Current controlled release:** tag `v0.3.0-clinical-simulation` · [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) · `python3 scripts/verify_release.py`
 **Package path:** [`08_submission_package/m5/datasets/tropic/bimo/`](../../08_submission_package/m5/datasets/tropic/bimo/)
 **Related guides:** [`ADRG.md`](ADRG.md) · [`SDRG.md`](SDRG.md) · [`TRACEABILITY_MATRIX.md`](TRACEABILITY_MATRIX.md)
 
@@ -85,7 +85,7 @@ dual-language recon.
 | `N_SAE` | Subjects with a Serious AE | distinct `USUBJID` with ADAE `AESER='Y'`, via ADSL site |
 | `N_TEAE` | Subjects with a TEAE | distinct `USUBJID` with ADAE `TRTEMFL='Y'`, via ADSL site |
 
-### 3.1 Population note (ICH E9 + Path A source)
+### 3.1 Population note (ICH E9 + controlled source)
 
 Randomized, Safety, ITT, and Per-Protocol are **distinct analysis-set concepts**. ITT is
 reported as `N_ITT` and is **never** relabelled “Efficacy Population.”
@@ -105,7 +105,7 @@ lives in the safety roll-ups (`N_DEATH`, `N_SAE`, `N_TEAE`), which vary by site.
 
 ---
 
-## 4. Dual-language reconciliation (Path A talk track)
+## 4. Dual-language reconciliation evidence
 
 `clinsite` is produced on both tracks and reconciled on keys `(STUDYID, SITEID)` by
 `06_qc_evidence/reconciliation/cross_lang_audit.R` (one of eight recon domains).
@@ -139,4 +139,4 @@ Markdown source of truth for narrative: this file.
 - PHUSE, *BIMO Data Reviewer's Guide (BDRG) Completion Guidelines*.
 - PHUSE SA01, *Development of a standard BIMO process to create the clinsite dataset*.
 - ICH E9, *Statistical Principles for Clinical Trials* (analysis-set definitions).
-- Path A claim: `docs/PRODUCT_CLAIM.md`
+- Binding claim: `docs/PRODUCT_CLAIM.md`

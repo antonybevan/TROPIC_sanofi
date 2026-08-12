@@ -4,7 +4,7 @@
 **Audience:** Reviewer, hiring manager, audit challenge
 **Product claim:** Path A — controlled non-submission demo (`docs/PRODUCT_CLAIM.md`)
 **Source of truth for IDs:** `06_qc_evidence/audit/findings_register.csv` · `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md`
-**As of:** 2026-08-04
+**As of:** 2026-08-12
 **Machine QC grade at seal:** validation_strategy PASS · recon PASS (non-sim) · admiral PASS · log cleanliness PASS · RC PASS
 
 ---
@@ -132,15 +132,15 @@ Machine gates can be green while **residual risks** remain. This memo is the hum
 | **Why Path A holds** | Run record + SDRG §5.1 + residual matrix; no zero-finding claim |
 | **Close condition (harder claim)** | Commercial validator program + residual closure beyond Path A accept/waive classes; matrix already filed for Path A honesty |
 
-#### F-016 — Commercial P21 ADaM (Major) · **ACCEPTED**
+#### F-016 — Licensed/qualified P21 ADaM clearance (Major) · **ACCEPTED**
 **Class:** `external_dependency` · **Owner:** WS-3 + WS-5
 
 | | |
 |---|---|
-| **Difference** | No commercial Pinnacle 21 ADaM pack run in-repo. Substitutes: local CORE ADaM rules, spec→define, spec→data, dual-lang. |
+| **Difference** | Pinnacle 21 Community 4.1.0 / FDA 2508.1 was executed on the final seven ADaM datasets for informative issue discovery: 121,320 records, 0 rejects, 30 open issue groups / 2,373 occurrences. The report retains an incompatible-CLI caveat. Licensed, qualified Enterprise was not executed. |
 | **Impact if ignored** | False “P21 clean” claim |
-| **Why Path A holds** | Explicitly not claimed |
-| **Close condition** | Tool access + full report + disposition |
+| **Why Path A holds** | The exact run, input/report hashes, open findings, and non-clearance boundary are recorded and machine checked. No clean, licensed, qualified, or accepted claim is made. |
+| **Close condition** | Final locked SDTM/ADaM/Define package run in licensed, qualified Enterprise; all messages independently reviewed, corrected or approved; report retained in the qualified system and bound to the delivery hashes |
 
 #### F-017 — Partial ISO dates / week-offset AE timing (Major) · **ACCEPTED**
 **Class:** `scope_out_with_disclosure` · **Owner:** WS-1

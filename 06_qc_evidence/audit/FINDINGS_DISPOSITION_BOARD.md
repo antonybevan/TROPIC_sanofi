@@ -17,6 +17,12 @@
 > intentionally uncommitted, and full IPD/sponsor/independent-QC/Part-11/Pinnacle-21
 > dependencies continue to block any regulated-submission claim.
 
+> **2026-08-12 P21 update:** Community 4.1.0 / FDA 2508.1 executed on the final
+> seven ADaM datasets (121,320 records; zero rejects). The machine-reconciled record
+> retains 30 open issue groups / 2,373 occurrences and an incompatible-CLI caveat.
+> F-016 remains ACCEPTED because licensed, qualified Enterprise execution and
+> independent disposition approval were not performed.
+
 ## Disposition classes
 
 | Class | Meaning | Register status |
@@ -40,7 +46,7 @@
 | **F-012** | Major | `non_submission_demo_limit` | **ACCEPTED** | N=749 = real MP 371 + synthetic CbzP 378; protocol ITT 755 needs full two-arm IPD. Figures must not be read as original-trial ITT. |
 | **F-014** | Major | `resolve_now` | **RESOLVED 2026-08-04** | ARM now has 10 ResultDisplays / 18 AnalysisResults covering every controlled analysis output except the non-analysis F-01-1 flow diagram. OS/PFS declare ADSL covariates, display names bind to controlled TFL IDs, TTUMOR is ITT-primary, and TTPAIN/response/Optimus results are represented. `platform/define_arm_contract.py` makes these claims executable. Deferred SAP outputs remain outside the controlled catalog and are not an F-014 defect. |
 | **F-015** | Major | `external_dependency` + `scope_out_with_disclosure` | **ACCEPTED** | Full CORE breadth on every SDTM domain + residual issue disposition is a conformance program beyond current targeted SDTMIG 3.4 run. Known residuals stay in CORE run records/SDRG. |
-| **F-016** | Major | `external_dependency` | **ACCEPTED** (was UNVERIFIED) | Official P21/ADaM commercial rule pack not available in-repo. Local CORE ADaM rules + spec→data gates are the controlled substitute; not claimed as full P21. |
+| **F-016** | Major | `external_dependency` | **ACCEPTED** (Community executed; Enterprise not executed) | Community 4.1.0 / FDA 2508.1 processed 7 final ADaM datasets / 121,320 records with 0 rejects and 30 open groups / 2,373 occurrences. This is informative-only and retains an incompatible-CLI caveat. Licensed, qualified Enterprise and independent disposition approval remain external; no clearance claim is made. |
 | **F-017** | Major | `scope_out_with_disclosure` | **ACCEPTED** | Partial ISO dates and TSSEQ are **source PDS precision** limitations (SDRG §2/§5), not silent programming bugs. Carried as known data limitation. |
 | **F-019** | Major | `resolve_now` + residual demo | **RESOLVED** (docs) / SAP signatures **ACCEPTED** | Guyot vs PH language reconciled in REPRODUCIBILITY/ADRG; OCCDS is v1.0 + custom extension (no OCCDS v1.1). Blank SAP signature blocks = non-submission demo limit. |
 | **F-020** | Major | `resolve_now` + `scope_out_with_disclosure` | **RESOLVED** (hardening) / residual **ACCEPTED** | Dataset-JSON hardened for zero-input fail + key/MDV fixes where applicable; layer remains **exploratory exchange**, not eCTD consumer. |
@@ -73,7 +79,7 @@ After this board:
 2. eCTD uses EXAMPLE identifiers and is not a real FDA sequence.  
 3. No Part 11 validated system claim.  
 4. Controlled TFL catalog is the release output universe (`config/tfl_output_catalog.yaml`).  
-5. P21 commercial ADaM pack and full SDTM CORE residual disposition are external/backlog.  
+5. P21 Community findings remain open; licensed Enterprise validation and full SDTM CORE residual disposition are external/backlog.
 
 ## Next after board
 

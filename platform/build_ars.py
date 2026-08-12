@@ -223,7 +223,7 @@ def main():
                            "sourceRecordCount", "analyzedRecordCount",
                            "excludedMissingAVALOrCNSR",
                            "excludedNotMatchingDeclaredConditions",
-                           "rawValue", "formattedValue"])
+                           "rawValue", "formattedValue"], lineterminator="\n")
         w.writeheader()
         w.writerows(ard)
 

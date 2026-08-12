@@ -58,7 +58,7 @@ adcm <- df_cm %>%
 
     NACTFL = if_else(CMCAT == "POST TREATMENT ANTI-CANCER DRUG THERAPY", "Y", "N"),
     PREDNFL = if_else(CMDECOD %in% c("PREDNISONE", "PREDNISOLONE"), "Y", "N"),
-    TRTEMFL = if_else(!is.na(cmstdt) & cmstdt >= TRTSDT, "Y", "N")
+    TRTEMFL = if_else(!is.na(cmstdt) & cmstdt >= TRTSDT, "Y", NA_character_)
   ) %>%
   select(
     STUDYID, USUBJID, CMDECOD, CMCAT, CMINDC, ASTDT = cmstdt, AENDT = cmendt,

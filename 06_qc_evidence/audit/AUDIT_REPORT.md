@@ -6,6 +6,15 @@
 **Evidence commit at audit start:** `90d7403` (`style(ci): satisfy zero-warning R lint gate`)
 **Scope:** FDA-oriented eCTD sequence plus SDTM, ADaM, Define-XML, ARM, CT, Dataset-JSON, ARS, USDM, SAS/R production and QC, TLFs, documentation, logs, CI, and runtime/vendor material.
 
+> **Historical-audit supersession note — 2026-08-12.** This report records the frozen
+> 25 June evidence state; it is not the current release verdict. Subsequent remediation
+> completed a 37-stage real-SAS DAG and a definitive Pinnacle 21 Community 4.1.0 /
+> FDA 2508.1 ADaM run (7 datasets, 121,320 records, zero rejects, 30 open groups /
+> 2,373 occurrences). The Community report retains an incompatible-CLI caveat and is
+> informative only. The current binding claim is `docs/PRODUCT_CLAIM.md`; regulated
+> submission, Part 11, independent organizational QC, licensed Enterprise clearance,
+> and gateway acceptance remain explicitly outside the demonstrated scope.
+
 ## 1. Executive summary
 
 **Verdict: NOT SUBMISSION-READY.** The repository is a technically ambitious demonstration, but it is not a defensible regulatory submission pipeline in its present state. Five Critical and nineteen Major findings remain. The blockers are not cosmetic: the current eCTD sequence mixes a data-free preview index with 44 stale, unindexed patient-level XPT payloads; the packaged SDTM files are source-era SDTM 3.1.1 structures while the Define-XML and SDRG claim SDTMIG 3.4; and the real analysis data contain only the 371-subject mitoxantrone arm while the comparative TFLs add a reconstructed/simulated 378-subject cabazitaxel arm. Those outputs cannot support a regulatory treatment comparison for the original randomized trial.

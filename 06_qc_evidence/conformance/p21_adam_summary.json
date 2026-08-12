@@ -1,0 +1,123 @@
+{
+  "schema_version": "1.0",
+  "record_id": "TROPIC-P21-ADAM-2026-08-12-03",
+  "status": "EXECUTED_WITH_OPEN_FINDINGS_AND_COMPATIBILITY_CAVEAT",
+  "use": "INFORMATIVE_ONLY",
+  "licensed_enterprise_execution": false,
+  "application": {
+    "name": "Pinnacle 21 Community",
+    "version": "4.1.0",
+    "build": "4.1.0.4652",
+    "client": "p21-client-1.0.8.jar",
+    "client_sha256": "1d6cb1c03c16bb7dec2c2e04933fc1dcd01bcad8781c456000434cee0173e8b7",
+    "distribution": "Apple-notarized Developer ID Application: Pinnacle 21 LLC (56C9Z22DN3)"
+  },
+  "validation": {
+    "generated_at": "2026-08-12T15:01:16+05:30",
+    "engine": "FDA 2508.1",
+    "standard": "ADaM-IG 1.3 (FDA)",
+    "define_standard": "Define-XML 2.1",
+    "adam_ct": "2024-03-29",
+    "sdtm_ct": "2024-03-29",
+    "configuration_sha256": "7076c498f841346dac1fe48afb6ef480ce22e8a42a02aeb07453f751a8b9f014",
+    "define_sha256": "74256966d9247f117ffba4a52712733bd42abc11f5aca5061aa73e210e7db204",
+    "raw_report_filename": "pinnacle21-report-2026-08-12T15-02-final-green.xlsx",
+    "raw_report_sha256": "2cb4cc952939d5ca4681197a09ff256abc5e9a87c9839296cca82195deba4f9f",
+    "raw_report_committed": false,
+    "raw_report_withheld_reason": "Details include record-level identifiers",
+    "compatibility_caveat": "Incompatible CLI used",
+    "process_completed": true,
+    "shell_exit_code": 5
+  },
+  "totals": {
+    "datasets_processed": 7,
+    "datasets_rejected": 0,
+    "records": 121320,
+    "rule_catalog_entries": 388,
+    "issue_groups": 30,
+    "issue_occurrences": 2373
+  },
+  "remediation_comparison": {
+    "initial_issue_groups": 37,
+    "initial_issue_occurrences": 86611,
+    "final_issue_groups": 30,
+    "final_issue_occurrences": 2373,
+    "occurrences_eliminated": 84238,
+    "percent_reduction": 97.3,
+    "eliminated_finding_family": "One-sided ADaM flags represented as N instead of null"
+  },
+  "residual_families": [
+    {"family": "adam_only_traceability_context", "occurrences": 3, "disposition": "expected_scoped_run_limitation"},
+    {"family": "source_timing", "occurrences": 1604, "disposition": "requires_approved_source_or_derivation_decision"},
+    {"family": "controlled_terminology", "occurrences": 124, "disposition": "requires_governed_mapping"},
+    {"family": "paired_numeric_character_representation", "occurrences": 587, "disposition": "requires_parameter_level_model_review"},
+    {"family": "standard_labels_types_required_variables", "occurrences": 36, "disposition": "open_standards_backlog"},
+    {"family": "define_physical_type_messages", "occurrences": 19, "disposition": "requires_qualified_standards_review"}
+  ],
+  "datasets": [
+    {"dataset": "ADAE", "records": 5428, "sha256": "0ed941880c91ce8ce94a751e6acb91306a241bf6ce864e7f97b09488c421c4dc"},
+    {"dataset": "ADCM", "records": 24534, "sha256": "42efe96796572e0044450ea1f838efbc7884d8f453dd5b09694a40b5041618c9"},
+    {"dataset": "ADEX", "records": 7820, "sha256": "1cac2fcf52782f01adefb8df890064017b96fb64171ad00ff23e6361e02bd377"},
+    {"dataset": "ADLB", "records": 78619, "sha256": "71f0d7f016b81209372a38529355e129736dbed2c31781b12dc9b5335f95edc5"},
+    {"dataset": "ADRS", "records": 2322, "sha256": "2bb24d70cff299b755a70c94c2d46874679b5ca73045d6f3fbef2591a3a3640e"},
+    {"dataset": "ADSL", "records": 371, "sha256": "ff0232e2d7358ac4a9cf2d607802a9a3d9c342d48928e28d2fbe1d7941b62c91"},
+    {"dataset": "ADTTE", "records": 2226, "sha256": "e53d06e57d74ea148a93ae5425a7ac551e9732db12b41539e4ff5385f9a5e8b1"}
+  ],
+  "issues": [
+    {"domain": "GLOBAL", "id": "AD1024", "found": 1, "message": "Traceability rules not executed due to missing DM dataset"},
+    {"domain": "GLOBAL", "id": "AD1025", "found": 1, "message": "Traceability rules not executed due to missing AE dataset"},
+    {"domain": "GLOBAL", "id": "AD1026", "found": 1, "message": "Traceability rules not executed due to missing EX dataset"},
+    {"domain": "ADAE", "id": "AD0018", "found": 6, "message": "Variable label mismatch between dataset and ADaM standard"},
+    {"domain": "ADAE", "id": "AD0047", "found": 12, "message": "Required variable is not present"},
+    {"domain": "ADAE", "id": "AD0099", "found": 6, "message": "ASTDY is greater than AENDY"},
+    {"domain": "ADAE", "id": "AD0200", "found": 1, "message": "ADaM/dataset variable type mismatch"},
+    {"domain": "ADAE", "id": "AD0361", "found": 6, "message": "Value of ASTDT is greater than value of AENDT"},
+    {"domain": "ADAE", "id": "CT2001", "found": 124, "message": "AEACN value not found in Action Taken with Study Treatment non-extensible codelist"},
+    {"domain": "ADAE", "id": "SD0059", "found": 4, "message": "Define.xml/dataset variable type mismatch"},
+    {"domain": "ADCM", "id": "AD0018", "found": 2, "message": "Variable label mismatch between dataset and ADaM standard"},
+    {"domain": "ADCM", "id": "AD0046", "found": 24, "message": "ASTDY = 0"},
+    {"domain": "ADCM", "id": "SD0059", "found": 3, "message": "Define.xml/dataset variable type mismatch"},
+    {"domain": "ADEX", "id": "AD0150", "found": 360, "message": "Inconsistent value for AVAL"},
+    {"domain": "ADEX", "id": "SD0059", "found": 1, "message": "Define.xml/dataset variable type mismatch"},
+    {"domain": "ADLB", "id": "AD0018", "found": 2, "message": "Variable label mismatch between dataset and ADaM standard"},
+    {"domain": "ADLB", "id": "AD0046", "found": 1567, "message": "LBDY = 0"},
+    {"domain": "ADLB", "id": "AD0150", "found": 222, "message": "Inconsistent value for AVAL"},
+    {"domain": "ADLB", "id": "AD0200", "found": 2, "message": "ADaM/dataset variable type mismatch"},
+    {"domain": "ADLB", "id": "SD0059", "found": 2, "message": "Define.xml/dataset variable type mismatch"},
+    {"domain": "ADRS", "id": "AD0018", "found": 2, "message": "Variable label mismatch between dataset and ADaM standard"},
+    {"domain": "ADRS", "id": "AD0046", "found": 1, "message": "ADY = 0"},
+    {"domain": "ADRS", "id": "AD0149B", "found": 5, "message": "Inconsistent value for AVALC"},
+    {"domain": "ADRS", "id": "SD0059", "found": 2, "message": "Define.xml/dataset variable type mismatch"},
+    {"domain": "ADSL", "id": "AD0018", "found": 3, "message": "Variable label mismatch between dataset and ADaM standard"},
+    {"domain": "ADSL", "id": "AD0047", "found": 2, "message": "Required variable is not present"},
+    {"domain": "ADSL", "id": "AD0320", "found": 1, "message": "Non-standard dataset label"},
+    {"domain": "ADSL", "id": "SD0059", "found": 5, "message": "Define.xml/dataset variable type mismatch"},
+    {"domain": "ADTTE", "id": "AD0018", "found": 3, "message": "Variable label mismatch between dataset and ADaM standard"},
+    {"domain": "ADTTE", "id": "SD0059", "found": 2, "message": "Define.xml/dataset variable type mismatch"}
+  ],
+  "pipeline_binding": {
+    "health_timestamp": "2026-08-12T09:29:59.539074+00:00",
+    "pipeline_health_status": "GREEN",
+    "sas_execution_mode": "oda",
+    "run_scope": "full_dag",
+    "stages_expected": 37,
+    "stages_recorded": 37,
+    "source_tree_sha256": "81dadd3c02bf521bf11fce32f67f30ec4c70913059675cc576c895b8182a605d"
+  },
+  "qualification": {
+    "community_informative_only": true,
+    "enterprise_executed": false,
+    "submission_clearance_claimed": false,
+    "independent_qc_approved": false
+  },
+  "subsequent_rebuild_assessment": {
+    "health_timestamp": "2026-08-12T10:28:13.216075+00:00",
+    "comparison_method": "exhaustive_byte_comparison",
+    "datasets_compared": 7,
+    "payload_differences_after_byte_495": 0,
+    "header_timestamp_differences_per_dataset": 2,
+    "comparison": "XPT payload byte-identical after byte 495 for all seven datasets; differences are confined to two SAS XPORT header timestamps per file",
+    "exact_byte_vendor_rerun": false,
+    "vendor_rerun_blocker": "Acceptance of vendor application Terms and Conditions requires authorized human confirmation"
+  }
+}

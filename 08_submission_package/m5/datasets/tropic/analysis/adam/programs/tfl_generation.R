@@ -641,7 +641,8 @@ cbzp_os <- adtte |>
   left_join(cbzp_rdi, by = "USUBJID")
 
 cbzp_neut <- adlb |>
-  filter(TRT01P == "CbzP" & PARAMCD == "NEUT" & BASEFL == "N" & ANL01FL == "Y") |> # nolint
+  filter(TRT01P == "CbzP" & PARAMCD == "NEUT" &
+    coalesce(as.character(ABLFL), "") != "Y" & ANL01FL == "Y") |> # nolint
   group_by(USUBJID) |>
   summarise(worst_grade = max(ATOXGR, na.rm = TRUE), .groups = "drop") |>
   left_join(cbzp_rdi, by = "USUBJID")

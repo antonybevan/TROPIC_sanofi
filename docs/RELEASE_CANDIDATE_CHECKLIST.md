@@ -1,6 +1,6 @@
 # TROPIC Release-Candidate Checklist
 
-Generated: 2026-08-12 05:54:37 UTC
+Generated: 2026-08-12 10:06:42 UTC
 
 > Strict go/no-go checklist for the current working evidence set. This report is intentionally conservative and does not convert historical evidence into current release readiness.
 
@@ -42,10 +42,10 @@ No release-candidate warnings.
 | G06 qc_signoff | Forest HR reconciliation passes | PASS | platform/forest_reconciliation_status.json overall=PASS |  |
 | G06 qc_signoff | Figure-driving data reconciliation passes | PASS | platform/figure_data_reconciliation_status.json overall=PASS |  |
 | G06 qc_signoff | Synthetic comparator bridge parity passes | PASS | platform/cbzp_bridge_status.json overall=PASS | Still disclose CbzP as synthetic/reconstructed demonstration content. |
-| G09 release_candidate_lock | Current release-run manifest is release-candidate grade (full DAG, clean tree) | PASS | platform/release_run_manifest/release_run_manifest.json status=PASS; evidence_grade=release_candidate; run_scope=full_dag; seal=719c58421ff921402d92b1a5b7fd0e071b9cad55d022598693d3d69f38697ead |  |
+| G09 release_candidate_lock | Current release-run manifest is release-candidate grade (full DAG, clean tree) | PASS | platform/release_run_manifest/release_run_manifest.json status=PASS; evidence_grade=release_candidate; run_scope=full_dag; seal=766bd117909d6215d6d287dd5b5f84fcb4142e1485b1667dbaebe6eeb5531642 |  |
 | G09 release_candidate_lock | Pipeline health records a full current DAG run | PASS | platform/pipeline_health.json run_scope=full_dag; stages_recorded=37; stages_expected=37; stages_not_run=0 |  |
 | G06 qc_signoff | Audit findings register has no active confirmed Critical/Major blockers | PASS | 06_qc_evidence/audit/findings_register.csv active=0; confirmed Critical/Major=0; severity_counts={} | Close, resolve, or formally disposition confirmed Critical/Major findings before any release-ready claim. |
-| G08 submission_package_materialization | Complete eCTD sequence inventory, checksums, support files, XML references, and run record validate | PASS | platform/validate_ectd_sequence.py status=PASS; leaves=92/92; unexpected=0; problems=[] |  |
+| G08 submission_package_materialization | Complete eCTD sequence inventory, checksums, support files, XML references, and run record validate | PASS | platform/validate_ectd_sequence.py status=PASS; leaves=93/93; unexpected=0; problems=[] |  |
 
 ## Interpretation
 

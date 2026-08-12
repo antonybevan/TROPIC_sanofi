@@ -45,6 +45,7 @@ QC_FILES = {
     "log_cleanliness": "platform/log_cleanliness/log_cleanliness_status.json",
     "tfl_output_index": "platform/tfl_output_index_status.json",
     "validation_strategy": "platform/validation_strategy/validation_strategy_status.json",
+    "regulatory_baseline": "06_qc_evidence/gates/regulatory_baseline_status.json",
 }
 
 CONTROL_FILES = [
@@ -57,6 +58,11 @@ CONTROL_FILES = [
     "config/evidence_layers.yaml",
     "config/metadata_lineage.yaml",
     "config/log_cleanliness.yaml",
+    "config/regulatory_baseline.yaml",
+    "docs/PRODUCT_CLAIM.md",
+    "docs/QUALITY_SYSTEM_BOUNDARY.md",
+    "06_qc_evidence/conformance/p21_adam_runrecord.md",
+    "06_qc_evidence/conformance/p21_adam_summary.json",
     "03_metadata/adam/ADaM_spec.xlsx",
     "03_metadata/define/define.xml",
     "03_metadata/define/define_sdtm.xml",
@@ -85,6 +91,7 @@ CONTROL_FILES = [
 PIPELINE_CONTROL_FILES = [
     ".github/CODEOWNERS",
     ".github/workflows/ci.yml",
+    ".gitleaks.toml",
     ".pre-commit-config.yaml",
     "requirements-ci.txt",
     "requirements-ci.lock",
@@ -471,6 +478,7 @@ def _binding_problems(payload: dict) -> list[str]:
     spec_define = _load_json(QC_FILES["spec_define"])
     spec_data = _load_json(QC_FILES["spec_data"])
     log_cleanliness = _load_json(QC_FILES["log_cleanliness"])
+    regulatory_baseline = _load_json(QC_FILES["regulatory_baseline"])
 
     if health.get("pipeline_health_status") != "GREEN":
         problems.append("pipeline_health.json is not GREEN")
@@ -494,6 +502,8 @@ def _binding_problems(payload: dict) -> list[str]:
         problems.append("spec-to-data conformance is not PASS")
     if log_cleanliness.get("status") != "PASS":
         problems.append("log cleanliness gate is not PASS")
+    if regulatory_baseline.get("status") != "PASS":
+        problems.append("regulatory baseline and validator-evidence gate is not PASS")
 
     governance_reseal = health.get("governance_only_reseal") or {}
     if governance_reseal:

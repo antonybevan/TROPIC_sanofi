@@ -137,7 +137,7 @@ def md_to_pdf(md_path, pdf_path):
             self.set_y(10)
             self.set_font(font_family, "B", 9)
             self.cell(
-                0, 5, "TROPIC Clinical Analysis & FDA eCTD Module 5 Package",
+                0, 5, "TROPIC | Controlled Clinical Submission Simulation",
                 border=0, align="R",
             )
             # Automatic page breaks invoke header() before positioning the next
@@ -163,8 +163,8 @@ def md_to_pdf(md_path, pdf_path):
     pdf.pdf_version = "1.7"
     pdf.alias_nb_pages()
     pdf.set_compression(True)
-    pdf.set_subject("TROPIC controlled non-submission demonstration reviewer document")
-    pdf.set_author("TROPIC clinical biometrics portfolio")
+    pdf.set_subject("TROPIC controlled clinical-submission simulation reviewer document")
+    pdf.set_author("TROPIC Clinical Biometrics")
     pdf.set_creator("TROPIC platform/package_ectd.py")
     pdf.set_lang("en-US")
     pdf.page_mode = "USE_OUTLINES"
@@ -613,16 +613,16 @@ def main(data_free=False):
 
     # 6. Generate PDFs for Reviewer's Guides and CSR
     print("Generating Reviewer's Guides and CSR PDFs...")
-    # SDRG
-    _require_exists(os.path.join(guides_src_dir, "SDRG.md"), "SDRG (Study Data Reviewer's Guide)")
-    md_to_pdf(os.path.join(guides_src_dir, "SDRG.md"), os.path.join(m5_sdtm_dir, "sdrg.pdf"))
+    # cSDRG
+    _require_exists(os.path.join(guides_src_dir, "SDRG.md"), "cSDRG (Clinical Study Data Reviewer's Guide)")
+    md_to_pdf(os.path.join(guides_src_dir, "SDRG.md"), os.path.join(m5_sdtm_dir, "csdrg.pdf"))
     # ADRG
     _require_exists(os.path.join(guides_src_dir, "ADRG.md"), "ADRG (Analysis Data Reviewer's Guide)")
     md_to_pdf(os.path.join(guides_src_dir, "ADRG.md"), os.path.join(m5_adam_dir, "adrg.pdf"))
     # CSR
     _require_exists(csr_src_file, "Clinical Study Report source")
     md_to_pdf(csr_src_file, os.path.join(m5_csr_dir, "csr.pdf"))
-    print("  Successfully generated SDRG, ADRG, and CSR PDFs.")
+    print("  Successfully generated cSDRG, ADRG, and CSR PDFs.")
     
     # 7. Copy the available source CRF. Do not fabricate a placeholder CRF.
     copy_source_crf(os.path.join(m5_sdtm_dir, "blankcrf.pdf"))
@@ -638,8 +638,14 @@ def main(data_free=False):
     for f in r_files:
         shutil.copy(f, m5_adam_programs_dir)
     # TFL programs
-    shutil.copy("05_outputs/tfl/tfl_generation.R", m5_adam_programs_dir)
-    shutil.copy("05_outputs/tfl/tfl_stats.R", m5_adam_programs_dir)
+    tfl_programs = [
+        "05_outputs/tfl/tfl_generation.R",
+        "05_outputs/tfl/tfl_stats.R",
+        "05_outputs/tfl/lab_shift_table.R",
+    ]
+    for f in tfl_programs:
+        _require_exists(f, f"TFL program {f}")
+        shutil.copy(f, m5_adam_programs_dir)
     # spec -> define conformance program. Its report is QC evidence under platform/conformance/,
     # not a Module 5 package leaf.
     extra_programs = ["03_metadata/define/check_define_conformance.R"]
@@ -649,7 +655,7 @@ def main(data_free=False):
             shutil.copy(f, m5_adam_programs_dir)
             n_extra += 1
     print(f"  Successfully copied {len(sas_files)} SAS files, {len(r_files)} R files, "
-          f"2 TFL R scripts, and {n_extra} conformance program(s).")
+          f"{len(tfl_programs)} TFL R scripts, and {n_extra} conformance program(s).")
     
     # 9. Copy output TFLs into CSR Appendices
     print("Copying output TFLs (tables, listings, figures) to CSR appendices...")

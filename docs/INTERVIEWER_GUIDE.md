@@ -1,6 +1,6 @@
 # Interviewer Guide — 10 minutes
 
-**What this repo is:** Path A controlled **clinical biometrics programming demonstration**
+**What this repo is:** a controlled **clinical-submission simulation** with executable evidence boundaries
 (not an FDA filing, not Part 11, not a re-analysis of trial efficacy).
 
 **Binding claim:** [`PRODUCT_CLAIM.md`](PRODUCT_CLAIM.md)
@@ -77,7 +77,8 @@ Expected: **VERIFY_RELEASE: PASS** on the committed seal set (no ODA required).
 
 Also open:
 
-- [`RELEASE_NOTE_v0.2.2-portfolio.md`](RELEASE_NOTE_v0.2.2-portfolio.md)
+- [`RELEASE_NOTE_v0.3.0-clinical-simulation.md`](RELEASE_NOTE_v0.3.0-clinical-simulation.md)
+- [`QUALITY_SYSTEM_BOUNDARY.md`](QUALITY_SYSTEM_BOUNDARY.md)
 - [`workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)
 - Frozen ODA snapshot: `platform/evidence/`
 

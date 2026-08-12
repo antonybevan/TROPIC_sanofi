@@ -27,6 +27,13 @@ Pinnacle 21 certification, signed analysis-plan approval, or medical/statistical
 adjudication. The CbzP arm remains reconstructed/synthetic and is not confirmatory
 clinical evidence.
 
+> **External-validation addendum — 2026-08-12.** Pinnacle 21 Community 4.1.0 /
+> FDA 2508.1 subsequently processed the final seven ADaM datasets (121,320 records;
+> zero rejects). Thirty issue groups / 2,373 occurrences remain open and the report
+> retains an incompatible-CLI caveat. This improves issue-discovery evidence but is
+> not certification, licensed Enterprise clearance, or independent approval; the
+> regulated-use NO-GO is unchanged.
+
 ### Git/release-governance decision
 
 **REMEDIATION until review, commit, and tag.** The repository was already materially
@@ -255,7 +262,7 @@ are explicitly classified and justified as sponsor-defined in
 | Blocking | No sponsor-approved/signed SAP, protocol deviations, adjudication, or accountable approvals | Sponsor-controlled document and approval workflow required |
 | Blocking | No independent organizational programmer/statistician/medical QC signoff | Qualified independent review and documented issue closure required |
 | Blocking | No validated Part 11 environment/e-signatures/access-control evidence | Execute under a validated regulated platform and SOP/QMS controls |
-| Blocking | No current external Pinnacle 21 certification | Run the final package in a licensed/current engine and disposition every finding |
+| Blocking | No licensed, qualified Pinnacle 21 Enterprise clearance; Community findings remain open | Run the final package in licensed, qualified Enterprise and independently approve every finding disposition |
 | Governance | Working tree is uncommitted and release verifier remains REMEDIATION | Peer review, intentional commit, clean checkout rerun/readback, tag, and archive |
 | Accepted | 44 source-classified TEAE rows predate first dose | Exact capped reviewed exception; count or wording drift fails the log gate |
 | Accepted | Source week/partial-date precision limitations | Preserve precision; never fabricate day values; sensitivity review where material |
@@ -282,7 +289,7 @@ are explicitly classified and justified as sponsor-defined in
 3. Resolve or formally accept every remaining finding under a real QMS.
 4. Commit intentionally on a clean branch; rerun the 37-stage live-SAS DAG from the
    clean commit; verify `scripts/verify_release.py` reaches full PASS.
-5. Run a current licensed Pinnacle 21 package review and archive the unaltered report.
+5. Reproduce the final package in licensed, qualified Pinnacle 21 Enterprise, independently approve every finding disposition, and archive the unaltered report in the qualified system.
 6. Tag and archive only after release authority signs the final package.
 
 ## CONTEXT FOR NEXT MODEL
