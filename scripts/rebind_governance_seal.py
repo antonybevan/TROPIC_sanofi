@@ -70,6 +70,35 @@ def _is_allowed(path: str) -> bool:
     return any(path == prefix or path.startswith(prefix) for prefix in ALLOWED_PATHS)
 
 
+def _chain_from_base_revision(reseal: dict) -> list[dict]:
+    """Recover an older append-only/legacy chain from the reseal's recorded base."""
+    base = str(reseal.get("base_revision") or "")
+    prior = str(reseal.get("prior_source_tree_sha256") or "")
+    if not base or not prior:
+        return []
+    try:
+        raw = subprocess.check_output(
+            ["git", "show", f"{base}:platform/pipeline_health.json"],
+            cwd=ROOT,
+            text=True,
+            stderr=subprocess.DEVNULL,
+        )
+        base_health = json.loads(raw)
+    except (subprocess.CalledProcessError, json.JSONDecodeError, OSError):
+        return []
+    if base_health.get("source_tree_sha256") != prior:
+        return []
+    chain = base_health.get("governance_reseal_chain")
+    if chain is None:
+        legacy = base_health.get("governance_only_reseal")
+        chain = [legacy] if isinstance(legacy, dict) else []
+    if not isinstance(chain, list) or not all(isinstance(row, dict) for row in chain):
+        return []
+    if chain and chain[-1].get("rebound_source_tree_sha256") != prior:
+        return []
+    return chain
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("base_revision", help="last release/run revision before governance-only changes")
@@ -100,7 +129,9 @@ def main(argv=None) -> int:
     prior_reseal = health.get("governance_only_reseal")
     chain = health.get("governance_reseal_chain")
     if chain is None:
-        chain = [prior_reseal] if isinstance(prior_reseal, dict) else []
+        chain = _chain_from_base_revision(prior_reseal) if isinstance(prior_reseal, dict) else []
+        if isinstance(prior_reseal, dict):
+            chain.append(prior_reseal)
     elif not isinstance(chain, list) or not all(isinstance(row, dict) for row in chain):
         raise SystemExit("refusing malformed governance_reseal_chain")
     if chain and chain[-1].get("rebound_source_tree_sha256") != previous:
