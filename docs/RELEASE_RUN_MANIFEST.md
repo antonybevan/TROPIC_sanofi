@@ -1,6 +1,6 @@
 # TROPIC Release-Run Manifest
 
-Generated: 2026-08-12 11:31:24 UTC
+Generated: 2026-08-12 12:18:51 UTC
 
 > Hash-sealed run manifest for current artifacts. This is not an electronic signature or Part 11 attestation.
 
@@ -8,11 +8,11 @@ Generated: 2026-08-12 11:31:24 UTC
 
 - Status: `PASS`
 - Evidence grade: `release_candidate`
-- Manifest SHA-256 seal: `cbe10eefaf862be343c2f9ac5fd3581fc9d72a33ece2fb19d7216e8072cda453`
+- Manifest SHA-256 seal: `6810b9f6506f8605eb35675f048776afc6c1be6db26ef477cddf2f060bc9f5fd`
 - SAS execution mode: `oda`
 - Pipeline health: `GREEN`
 - Run scope: `full_dag` (37 recorded / 36 release-required upstream stages)
-- Git HEAD: `424e51c8a7f331ddaecbebdd24fd02c306175cf2`
+- Git HEAD: `6e8c4b56a1ba5607d837731885373e8fbf9d4ed3`
 - Worktree dirty: `False`
 - SAS companion figures: `in_dag_real_sas_companion`; current with health=`True`
 

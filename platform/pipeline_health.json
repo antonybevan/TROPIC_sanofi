@@ -49,7 +49,7 @@
   },
   "r_version": "R version 4.6.0 (2026-04-24)",
   "renv_lock_sha256": "a9ba2082ce1f227add5d2cb400fb70688ea5031fef238dcf1bf1928de2700630",
-  "source_tree_sha256": "e535b7c3fed330d1fa65f98986baa089cf0e19f928995d9c571ccaffb8766de6",
+  "source_tree_sha256": "31e2df88517d231624a5c56fbdb5c74398b240a452e5863f5ca618248fd3f29c",
   "oda_endpoint": "odaws01-apse1-2.oda.sas.com",
   "oda_attempts": 1,
   "oda_total_wait_s": 6.6,
@@ -106,25 +106,21 @@
   },
   "governance_only_reseal": {
     "status": "PASS",
-    "rebound_at": "2026-08-12T11:31:05.048134+00:00",
-    "base_revision": "1a6b189b0b59e9784faf93f0eece3f8b8a1c56c1",
+    "rebound_at": "2026-08-12T12:18:25.297856+00:00",
+    "base_revision": "43097f1",
     "clinical_run_timestamp": "2026-08-12T10:28:13.216075+00:00",
-    "prior_source_tree_sha256": "25eea11519389347cf943ecdb2c57c55733c32f781241f158d91acca35eb6fa5",
-    "rebound_source_tree_sha256": "e535b7c3fed330d1fa65f98986baa089cf0e19f928995d9c571ccaffb8766de6",
+    "prior_source_tree_sha256": "e535b7c3fed330d1fa65f98986baa089cf0e19f928995d9c571ccaffb8766de6",
+    "rebound_source_tree_sha256": "31e2df88517d231624a5c56fbdb5c74398b240a452e5863f5ca618248fd3f29c",
     "changed_paths": [
       ".github/workflows/ci.yml",
-      "06_qc_evidence/conformance/p21_adam_runrecord.md",
-      "06_qc_evidence/conformance/p21_adam_summary.json",
-      "config/regulatory_baseline.yaml",
+      "07_reviewer_explanation/tools/shiny/app.R",
       "platform/build_release_run_manifest.py",
-      "platform/check_regulatory_baseline.py",
-      "platform/stage_p21_adam_inputs.py",
       "scripts/rebind_governance_seal.py",
-      "tests/test_p21_staging.py",
-      "tests/test_regulatory_baseline.py"
+      "tests/test_shiny_dashboard.R",
+      "tests/test_shiny_dashboard_local.R"
     ],
     "clinical_run_was_not_reexecuted": true,
-    "reason": "Pipeline integrity, dependency, executor-validation, regulatory-claim, external-validator-evidence, and test controls changed; clinical derivation programs, study parameters, datasets, and statistical results did not."
+    "reason": "Pipeline integrity, dependency, executor-validation, regulatory-claim, external-validator-evidence, reviewer-presentation, and test controls changed; clinical derivation programs, study parameters, datasets, and statistical results did not."
   },
   "governance_reseal_chain": [
     {
@@ -181,6 +177,24 @@
       ],
       "clinical_run_was_not_reexecuted": true,
       "reason": "Pipeline integrity, dependency, executor-validation, regulatory-claim, external-validator-evidence, and test controls changed; clinical derivation programs, study parameters, datasets, and statistical results did not."
+    },
+    {
+      "status": "PASS",
+      "rebound_at": "2026-08-12T12:18:25.297856+00:00",
+      "base_revision": "43097f1",
+      "clinical_run_timestamp": "2026-08-12T10:28:13.216075+00:00",
+      "prior_source_tree_sha256": "e535b7c3fed330d1fa65f98986baa089cf0e19f928995d9c571ccaffb8766de6",
+      "rebound_source_tree_sha256": "31e2df88517d231624a5c56fbdb5c74398b240a452e5863f5ca618248fd3f29c",
+      "changed_paths": [
+        ".github/workflows/ci.yml",
+        "07_reviewer_explanation/tools/shiny/app.R",
+        "platform/build_release_run_manifest.py",
+        "scripts/rebind_governance_seal.py",
+        "tests/test_shiny_dashboard.R",
+        "tests/test_shiny_dashboard_local.R"
+      ],
+      "clinical_run_was_not_reexecuted": true,
+      "reason": "Pipeline integrity, dependency, executor-validation, regulatory-claim, external-validator-evidence, reviewer-presentation, and test controls changed; clinical derivation programs, study parameters, datasets, and statistical results did not."
     }
   ]
 }

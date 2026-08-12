@@ -2,7 +2,7 @@
 # TROPIC Sponsor Overview Dashboard
 # ------------------------------------------------------------------------------
 # Purpose : Executive-level review of the TROPIC study, driven exclusively by
-#           the p21-conformed, double-programmed production outputs. This
+#           pipeline-controlled production outputs. This
 #           application is a read-only presentation layer. It does not
 #           regenerate, transform, or persist any analysis result and therefore
 #           does not affect the validated pipeline or its audit trail.
@@ -25,7 +25,39 @@ library(DT)
 # ------------------------------------------------------------------------------
 # Configuration
 # ------------------------------------------------------------------------------
-ADAM_DIR <- normalizePath(file.path("..", "04_analysis_datasets/adam"), mustWork = FALSE)
+find_project_root <- function(start = getwd()) {
+  path <- normalizePath(start, mustWork = TRUE)
+  repeat {
+    if (file.exists(file.path(path, "renv.lock")) &&
+          dir.exists(file.path(path, "07_reviewer_explanation"))) {
+      return(path)
+    }
+    parent <- dirname(path)
+    if (identical(parent, path)) {
+      stop("Unable to locate the TROPIC project root from: ", start)
+    }
+    path <- parent
+  }
+}
+
+project_root_from <- function(start = getwd()) {
+  configured <- Sys.getenv("TROPIC_PROJECT_ROOT", unset = "")
+  if (nzchar(configured)) {
+    root <- normalizePath(configured, mustWork = TRUE)
+    if (!file.exists(file.path(root, "renv.lock")) ||
+          !dir.exists(file.path(root, "07_reviewer_explanation"))) {
+      stop("TROPIC_PROJECT_ROOT is not a TROPIC repository root: ", root)
+    }
+    return(root)
+  }
+  find_project_root(start)
+}
+
+# runApp() does not guarantee that the working directory is changed to the app
+# directory. Resolve all inputs from the repository root so the documented
+# root-level launch command and app-directory launches behave identically.
+PROJECT_ROOT <- project_root_from()
+ADAM_DIR <- file.path(PROJECT_ROOT, "04_analysis_datasets", "adam")
 
 # Consistent treatment-arm colours used across every figure.
 ARM_COLOURS <- c(CbzP = "#1f4e79", MP = "#c55a11")
@@ -35,37 +67,75 @@ ARM_COLOURS <- c(CbzP = "#1f4e79", MP = "#c55a11")
 # ------------------------------------------------------------------------------
 adam_path <- function(file) file.path(ADAM_DIR, file)
 
-read_figure_csv <- function(file) {
-  path <- adam_path(file)
-  if (!file.exists(path)) {
-    return(NULL)
-  }
-  suppressMessages(readr::read_csv(path, show_col_types = FALSE))
+load_issues <- character(0)
+
+record_load_issue <- function(file, detail) {
+  load_issues <<- c(load_issues, paste0(file, ": ", detail))
+  NULL
 }
 
-read_adam_xpt <- function(file) {
+validate_source_data <- function(data, file, required) {
+  missing_columns <- setdiff(required, names(data))
+  if (length(missing_columns) > 0) {
+    return(record_load_issue(
+      file,
+      paste("missing required column(s)", paste(missing_columns, collapse = ", "))
+    ))
+  }
+  if (nrow(data) == 0) {
+    return(record_load_issue(file, "contains no records"))
+  }
+  data
+}
+
+read_figure_csv <- function(file, required) {
   path <- adam_path(file)
   if (!file.exists(path)) {
-    return(NULL)
+    return(record_load_issue(file, "not found"))
   }
-  haven::read_xpt(path)
+  data <- tryCatch(
+    suppressMessages(readr::read_csv(path, show_col_types = FALSE)),
+    error = function(error) record_load_issue(file, conditionMessage(error))
+  )
+  if (is.null(data)) return(NULL)
+  validate_source_data(data, file, required)
+}
+
+read_adam_xpt <- function(file, required) {
+  path <- adam_path(file)
+  if (!file.exists(path)) {
+    return(record_load_issue(file, "not found"))
+  }
+  data <- tryCatch(
+    haven::read_xpt(path),
+    error = function(error) record_load_issue(file, conditionMessage(error))
+  )
+  if (is.null(data)) return(NULL)
+  validate_source_data(data, file, required)
 }
 
 # Parse the SAS-versus-R analysis-results reconciliation log into a table.
 # Each production endpoint is emitted as a single, machine-readable NOTE line.
 read_reconciliation <- function() {
-  path <- normalizePath(file.path("..", "06_qc_evidence/reconciliation",
-                                  "results_reconcile.log"), mustWork = FALSE)
-  if (!file.exists(path)) return(NULL)
-  lines <- readLines(path, warn = FALSE)
+  path <- file.path(PROJECT_ROOT, "06_qc_evidence", "reconciliation",
+                    "results_reconcile.log")
+  file <- "results_reconcile.log"
+  if (!file.exists(path)) return(record_load_issue(file, "not found"))
+  lines <- tryCatch(
+    readLines(path, warn = FALSE),
+    error = function(error) record_load_issue(file, conditionMessage(error))
+  )
+  if (is.null(lines)) return(NULL)
   pattern <- paste0(
-    "\\[RESULTS-RECON\\]\\s+(\\S+)\\s+",
-    "N\\(R=(\\S+)/SAS=(\\S+)\\)\\s+",
-    "EVENTS\\(R=(\\S+)/SAS=(\\S+)\\)\\s+",
-    "MEDIAN_d\\(R=(\\S+)/SAS=(\\S+)\\)\\s+->\\s+(\\w+)")
+                    "\\[RESULTS-RECON\\]\\s+(\\S+)\\s+",
+                    "N\\(R=(\\S+)/SAS=(\\S+)\\)\\s+",
+                    "EVENTS\\(R=(\\S+)/SAS=(\\S+)\\)\\s+",
+                    "MEDIAN_d\\(R=(\\S+)/SAS=(\\S+)\\)\\s+->\\s+(\\w+)")
   m <- regmatches(lines, regexec(pattern, lines))
   m <- m[vapply(m, length, integer(1)) == 9]
-  if (length(m) == 0) return(NULL)
+  if (length(m) == 0) {
+    return(record_load_issue(file, "contains no parseable reconciliation records"))
+  }
   d <- as.data.frame(do.call(rbind, m), stringsAsFactors = FALSE)[, -1]
   names(d) <- c("Endpoint", "N (R)", "N (SAS)", "Events (R)", "Events (SAS)",
                 "Median days (R)", "Median days (SAS)", "Status")
@@ -73,13 +143,34 @@ read_reconciliation <- function() {
 }
 
 # Load once at start-up. The dashboard is a static view of a completed run.
-km_stats  <- read_figure_csv("figure_km_stats_prod.csv")
-km_risk   <- read_figure_csv("figure_km_risk_prod.csv")
-waterfall <- read_figure_csv("figure_waterfall_prod.csv")
-swimmer   <- read_figure_csv("figure_swimmer_prod.csv")
-forest_hr <- read_figure_csv("forest_hr_prod.csv")
-adtte     <- read_adam_xpt("adtte_prod.xpt")
-adae      <- read_adam_xpt("adae_prod.xpt")
+km_stats <- read_figure_csv(
+  "figure_km_stats_prod.csv",
+  c("PARAMCD", "HAZARDRATIO", "WALDLOWER", "WALDUPPER")
+)
+km_risk <- read_figure_csv(
+  "figure_km_risk_prod.csv",
+  c("PARAMCD", "AVALM", "TRT01P", "NRISK")
+)
+waterfall <- read_figure_csv(
+  "figure_waterfall_prod.csv",
+  c("TRT01P", "BEST", "RESPCAT")
+)
+swimmer <- read_figure_csv(
+  "figure_swimmer_prod.csv",
+  c("TRT01P", "DURM", "DEATH")
+)
+forest_hr <- read_figure_csv(
+  "forest_hr_prod.csv",
+  c("SUBGROUP", "HAZARDRATIO", "WALDLOWER", "WALDUPPER")
+)
+adtte <- read_adam_xpt(
+  "adtte_prod.xpt",
+  c("PARAMCD", "AVAL", "AVALU", "CNSR", "TRT01P")
+)
+adae <- read_adam_xpt(
+  "adae_prod.xpt",
+  c("AEDECOD", "AEBODSYS", "TRTEMFL")
+)
 recon     <- read_reconciliation()
 
 # ------------------------------------------------------------------------------
@@ -88,10 +179,9 @@ recon     <- read_reconciliation()
 # Randomised subjects per arm are taken from the number-at-risk at time zero,
 # which is the only production source that contains both treatment arms.
 n_randomised <- if (!is.null(km_risk)) {
-  km_risk %>%
-    filter(PARAMCD == "OS", AVALM == 0) %>%
-    summarise(n = sum(NRISK, na.rm = TRUE)) %>%
-    pull(n)
+  baseline_risk <- km_risk %>%
+    filter(PARAMCD == "OS", AVALM == 0, is.finite(NRISK), NRISK >= 0)
+  if (nrow(baseline_risk) > 0) sum(baseline_risk$NRISK) else NA_integer_
 } else {
   NA_integer_
 }
@@ -103,6 +193,8 @@ hr_for <- function(paramcd) {
 os_hr  <- hr_for("OS")
 pfs_hr <- hr_for("PFS")
 
+# This is the pooled responder fraction in the plotted waterfall records. It is
+# descriptive only and is not the arm-specific SAP efficacy estimand.
 psa_response_rate <- if (!is.null(waterfall)) {
   responders <- sum(grepl("PSA Response", waterfall$RESPCAT, ignore.case = TRUE))
   round(100 * responders / nrow(waterfall), 1)
@@ -112,11 +204,19 @@ psa_response_rate <- if (!is.null(waterfall)) {
 
 fmt_hr <- function(row) {
   if (is.null(row) || nrow(row) == 0) return("n/a")
+  values <- unlist(row[1, c("HAZARDRATIO", "WALDLOWER", "WALDUPPER")],
+                   use.names = FALSE)
+  if (!all(is.finite(values)) || any(values <= 0)) return("n/a")
   sprintf("%.2f (%.2f–%.2f)", row$HAZARDRATIO, row$WALDLOWER, row$WALDUPPER)
 }
 
 # Endpoints available for the Kaplan-Meier panel (survival curve computed live).
-km_endpoints <- if (!is.null(adtte)) sort(unique(adtte$PARAMCD)) else character(0)
+km_endpoints <- if (!is.null(adtte)) {
+  values <- unique(as.character(adtte$PARAMCD))
+  sort(values[!is.na(values) & nzchar(trimws(values))])
+} else {
+  character(0)
+}
 
 # ------------------------------------------------------------------------------
 # User interface
@@ -139,14 +239,31 @@ ui <- page_navbar(
 
   nav_panel(
     "Overview",
+    if (length(load_issues) > 0) {
+      div(
+        class = "alert alert-warning mt-3",
+        role = "alert",
+        tags$h4(class = "alert-heading", "Local review data are incomplete"),
+        p("The dashboard is still available, but affected panels are disabled. ",
+          "Generate the local production outputs before using this review aid."),
+        tags$details(
+          tags$summary(paste(length(load_issues), "input issue(s)")),
+          tags$ul(lapply(load_issues, tags$li))
+        )
+      )
+    },
     layout_columns(
       col_widths = c(3, 3, 3, 3),
-      kpi_card("Randomised", ifelse(is.na(n_randomised), "n/a", format(n_randomised, big.mark = ",")),
-               "ITT population"),
+      kpi_card("Study Display N",
+               ifelse(is.na(n_randomised), "n/a",
+                      format(n_randomised, big.mark = ",")),
+               "real MP + reconstructed CbzP"),
       kpi_card("Overall Survival HR", fmt_hr(os_hr), "CbzP vs MP (95% CI)"),
       kpi_card("Progression-Free HR", fmt_hr(pfs_hr), "CbzP vs MP (95% CI)"),
-      kpi_card("PSA Response", ifelse(is.na(psa_response_rate), "n/a", paste0(psa_response_rate, "%")),
-               "≥50% decline")
+      kpi_card("Plotted PSA Responders",
+               ifelse(is.na(psa_response_rate), "n/a",
+                      paste0(psa_response_rate, "%")),
+               "pooled descriptive figure data")
     ),
     layout_columns(
       col_widths = c(7, 5),
@@ -155,12 +272,21 @@ ui <- page_navbar(
            card_body(
              p(strong("Source: "), "production ADaM and reconciled figure data in ",
                tags$code("04_analysis_datasets/adam/")),
-             p(strong("Nature: "), "read-only presentation of double-programmed, ",
-               "p21-conformed outputs."),
-             p(strong("Treatment arms: "), "CbzP (cabazitaxel + prednisone) versus ",
-               "MP (mitoxantrone + prednisone)."),
+             p(strong("Evidence boundary: "),
+               "MP ADaM and analysis results have single-author SAS/R ",
+               "implementation reconciliation; this is not organisationally ",
+               "independent double programming."),
+             p(strong("Treatment arms: "),
+               "MP is de-identified clinical data. CbzP is reconstructed or ",
+               "synthetic, depending on the display; mixed-source comparisons ",
+               "are portfolio demonstrations, not clinical findings."),
+             p(strong("External validation: "),
+               "Pinnacle 21 Community issue-discovery was informative and ",
+               "retains open findings plus a CLI compatibility caveat; no ",
+               "licensed Enterprise clearance is claimed."),
              p(class = "text-muted small",
-               "This dashboard is an internal review aid and is not a submission artefact.")
+               "Read-only internal review aid; not a submission artefact. ",
+               "Binding scope: docs/PRODUCT_CLAIM.md.")
            ))
     )
   ),
@@ -171,7 +297,13 @@ ui <- page_navbar(
       sidebar = sidebar(
         selectInput("km_param", "Endpoint",
                     choices = km_endpoints,
-                    selected = if ("OS" %in% km_endpoints) "OS" else km_endpoints[1]),
+                    selected = if ("OS" %in% km_endpoints) {
+                      "OS"
+                    } else if (length(km_endpoints) > 0) {
+                      km_endpoints[[1]]
+                    } else {
+                      NULL
+                    }),
         helpText("Survival curve computed live from adtte_prod.xpt via",
                  tags$code("survival::survfit"), ".")
       ),
@@ -214,8 +346,9 @@ ui <- page_navbar(
     card(
       card_header("SAS versus R Analysis-Results Reconciliation (MP arm)"),
       card_body(
-        p("Independent double programming: each production endpoint is ",
-          "recomputed in R and compared against SAS. Source: ",
+        p("Single-author implementation reconciliation: each MP production ",
+          "endpoint is independently implemented in R and compared against ",
+          "SAS. This is methodological, not organisational, independence. Source: ",
           tags$code("06_qc_evidence/reconciliation/results_reconcile.log"), "."),
         DT::DTOutput("recon_table")
       )
@@ -236,12 +369,16 @@ server <- function(input, output, session) {
       transmute(SUBGROUP = paste0(PARAMCD, " (overall)"),
                 HAZARDRATIO, WALDLOWER, WALDUPPER)
     dat <- bind_rows(primary, forest_hr) %>%
+      filter(is.finite(HAZARDRATIO), is.finite(WALDLOWER),
+             is.finite(WALDUPPER), HAZARDRATIO > 0,
+             WALDLOWER > 0, WALDUPPER > 0) %>%
       mutate(SUBGROUP = factor(SUBGROUP, levels = rev(SUBGROUP)))
+    validate(need(nrow(dat) > 0, "No valid hazard-ratio records are available."))
 
     ggplot(dat, aes(x = HAZARDRATIO, y = SUBGROUP)) +
       geom_vline(xintercept = 1, linetype = "dashed", colour = "grey50") +
-      geom_errorbarh(aes(xmin = WALDLOWER, xmax = WALDUPPER), height = 0.25,
-                     colour = "#1f4e79") +
+      geom_errorbar(aes(xmin = WALDLOWER, xmax = WALDUPPER),
+                    orientation = "y", width = 0.25, colour = "#1f4e79") +
       geom_point(size = 3, colour = "#1f4e79") +
       scale_x_log10() +
       labs(x = "Hazard ratio (log scale) — favours CbzP < 1 < favours MP",
@@ -260,8 +397,12 @@ server <- function(input, output, session) {
 
     dat <- adtte %>%
       filter(PARAMCD == input$km_param) %>%
+      filter(is.finite(AVAL), AVAL >= 0, is.finite(CNSR),
+             CNSR %in% c(0, 1), !is.na(TRT01P), nzchar(trimws(TRT01P))) %>%
       mutate(event = as.integer(round(CNSR)) == 0)
     validate(need(nrow(dat) > 0, "No records for the selected endpoint."))
+    validate(need(all(unique(dat$TRT01P) %in% names(ARM_COLOURS)),
+                  "Treatment-arm values are not recognised."))
 
     fit <- survfit(Surv(AVAL, event) ~ TRT01P, data = dat)
     # A single treatment arm yields no strata; fall back to that arm's label.
@@ -273,18 +414,28 @@ server <- function(input, output, session) {
     }
     sdat <- data.frame(time = fit$time, surv = fit$surv, arm = arm_seq)
 
+    units <- unique(as.character(dat$AVALU))
+    units <- units[!is.na(units) & nzchar(trimws(units))]
+    unit <- if (length(units) == 1) units else "units"
+
     ggplot(sdat, aes(time, surv, colour = arm)) +
       geom_step(linewidth = 0.9) +
       scale_colour_manual(values = ARM_COLOURS, name = "Arm") +
       scale_y_continuous(limits = c(0, 1), labels = scales::percent) +
-      labs(x = paste0("Time (", unique(dat$AVALU), ")"),
+      labs(x = paste0("Time (", unit, ")"),
            y = "Survival probability") +
       theme_minimal(base_size = 13)
   })
 
   output$waterfall_plot <- renderPlot({
     validate(need(!is.null(waterfall), "Waterfall data are unavailable."))
-    dat <- waterfall %>% arrange(desc(BEST)) %>% mutate(idx = row_number())
+    dat <- waterfall %>%
+      filter(is.finite(BEST), !is.na(TRT01P), nzchar(trimws(TRT01P))) %>%
+      arrange(desc(BEST)) %>%
+      mutate(idx = row_number())
+    validate(need(nrow(dat) > 0, "No valid waterfall records are available."))
+    validate(need(all(unique(dat$TRT01P) %in% names(ARM_COLOURS)),
+                  "Treatment-arm values are not recognised."))
 
     ggplot(dat, aes(idx, BEST, fill = TRT01P)) +
       geom_col() +
@@ -298,7 +449,14 @@ server <- function(input, output, session) {
 
   output$swimmer_plot <- renderPlot({
     validate(need(!is.null(swimmer), "Swimmer data are unavailable."))
-    dat <- swimmer %>% arrange(TRT01P, DURM) %>% mutate(row = row_number())
+    dat <- swimmer %>%
+      filter(is.finite(DURM), DURM >= 0, !is.na(TRT01P),
+             nzchar(trimws(TRT01P)), DEATH %in% c(0, 1)) %>%
+      arrange(TRT01P, DURM) %>%
+      mutate(row = row_number())
+    validate(need(nrow(dat) > 0, "No valid swimmer records are available."))
+    validate(need(all(unique(dat$TRT01P) %in% names(ARM_COLOURS)),
+                  "Treatment-arm values are not recognised."))
 
     ggplot(dat, aes(y = row)) +
       geom_segment(aes(x = 0, xend = DURM, yend = row, colour = TRT01P),
@@ -321,6 +479,7 @@ server <- function(input, output, session) {
 
   output$ae_pt_plot <- renderPlot({
     dat <- ae_filtered() %>%
+      filter(!is.na(AEDECOD), nzchar(trimws(AEDECOD))) %>%
       count(AEDECOD, name = "n") %>%
       arrange(desc(n)) %>%
       slice_head(n = 15) %>%
@@ -335,9 +494,12 @@ server <- function(input, output, session) {
 
   output$ae_soc_table <- DT::renderDT({
     dat <- ae_filtered() %>%
+      filter(!is.na(AEBODSYS), nzchar(trimws(AEBODSYS))) %>%
       count(`System Organ Class` = AEBODSYS, name = "Events") %>%
       arrange(desc(Events)) %>%
       slice_head(n = input$soc_n)
+    validate(need(nrow(dat) > 0,
+                  "No system-organ-class records match the current filter."))
     DT::datatable(dat, rownames = FALSE, options = list(dom = "t", pageLength = 20))
   })
 
@@ -346,7 +508,9 @@ server <- function(input, output, session) {
     DT::datatable(recon, rownames = FALSE,
                   options = list(dom = "t", pageLength = 20)) %>%
       DT::formatStyle("Status",
-                      backgroundColor = DT::styleEqual("PASS", "#d4edda"),
+                      backgroundColor = DT::styleEqual(
+                        c("PASS", "FAIL"), c("#d4edda", "#f8d7da")
+                      ),
                       fontWeight = "bold")
   })
 }

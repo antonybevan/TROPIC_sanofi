@@ -2350,11 +2350,11 @@
         "size_bytes": 106
       },
       {
-        "md5": "bf0fe9bd3b4cab06c6942fe4a606dec9",
+        "md5": "68fac80c5027e4a3793527ca01751895",
         "path": ".github/workflows/ci.yml",
         "present": true,
-        "sha256": "0dbc1493bb8d8a4e03db0d01c33899e97c1f64ff5bc4676947c93f332fde0eb5",
-        "size_bytes": 13465
+        "sha256": "ece2126123a86c7cb6d59df536aaefbbccc7bda080f24612b3cb40975d18287d",
+        "size_bytes": 13613
       },
       {
         "md5": "52a9438e917fcb1b550c79515f9b269d",
@@ -2392,11 +2392,11 @@
         "size_bytes": 252146
       },
       {
-        "md5": "10998b9e61e55c34194318ad40065eb6",
+        "md5": "f026d1bbb824b3f6f19b1a54b6536b96",
         "path": "scripts/rebind_governance_seal.py",
         "present": true,
-        "sha256": "8badb1add8b8eb17358e008dc69f4b562904bdb3a0cbd5ce83332eadd8096913",
-        "size_bytes": 9165
+        "sha256": "000b6038db8d3434dd9b1ea3038033c97c148deb5d8cc2f8199cb318f2d3d876",
+        "size_bytes": 9247
       },
       {
         "md5": "8df7caedb96d81ea7017354f7c62eb0e",
@@ -2751,11 +2751,11 @@
         "size_bytes": 21478
       },
       {
-        "md5": "788cd9cace631bc1160c20c4fa286c63",
+        "md5": "89303529da6233f49ac063562a3a5071",
         "path": "platform/build_release_run_manifest.py",
         "present": true,
-        "sha256": "34d3e9d0ab6a63487877bb5d593f1b46691996e6a059747d1ce4fe88adb20912",
-        "size_bytes": 35125
+        "sha256": "bacf7c46b665dfc2d2e1ad38d4afe2548e2963775c54ea66c23d99a7ec67eeb5",
+        "size_bytes": 35175
       },
       {
         "md5": "f5e1d699602ab38b23bc834f6ed430f1",
@@ -3036,15 +3036,22 @@
         "present": true,
         "sha256": "2bcd8fd31253e5cb6c7f91431df8fd7f8ca5329332ed982debc80aa9885cdf1e",
         "size_bytes": 2916
+      },
+      {
+        "md5": "c5f591c01f10e469cdb3f243474cd388",
+        "path": "07_reviewer_explanation/tools/shiny/app.R",
+        "present": true,
+        "sha256": "7860136a192e4f321f160cf98432e097ccafa23e25eb9cb11d9b5720976eaeea",
+        "size_bytes": 19810
       }
     ],
     "qc_files": [
       {
-        "md5": "f503ea2a170e4e237c98cdb6a6a864ac",
+        "md5": "f5e9a228ee38ce1cea9e5e569251ec03",
         "path": "platform/pipeline_health.json",
         "present": true,
-        "sha256": "92f0dc34ce0c602b1f25a0130d244e23b20e3e74730d71e06390acca4f9609fe",
-        "size_bytes": 8011
+        "sha256": "37966df84324b3a0f60ef75db6d8bf6e970a6621ff27a6e32d5b84a69eb9a166",
+        "size_bytes": 8819
       },
       {
         "md5": "06989db82566475af4ebd3685eb8d8a8",
@@ -3546,8 +3553,8 @@
     "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007"
   },
   "evidence_grade": "release_candidate",
-  "generated_at": "2026-08-12 11:31:24 UTC",
-  "manifest_sha256": "cbe10eefaf862be343c2f9ac5fd3581fc9d72a33ece2fb19d7216e8072cda453",
+  "generated_at": "2026-08-12 12:18:51 UTC",
+  "manifest_sha256": "6810b9f6506f8605eb35675f048776afc6c1be6db26ef477cddf2f060bc9f5fd",
   "problems": [],
   "qc_statuses": {
     "cbzp_bridge": {
@@ -3759,15 +3766,18 @@
     "stale_paths": []
   },
   "source_control": {
-    "branch": "codex/p21-exact-byte-evidence",
+    "branch": "codex/shiny-ui-edge-case-hardening",
     "dirty": false,
-    "dirty_including_seal_outputs": false,
-    "head": "424e51c8a7f331ddaecbebdd24fd02c306175cf2",
-    "pipeline_control_sha256": "8539bec18519407348b664e806490df52f1b1abba2849994e778f6131fe4d5dd",
-    "source_tree_sha256": "e535b7c3fed330d1fa65f98986baa089cf0e19f928995d9c571ccaffb8766de6",
+    "dirty_including_seal_outputs": true,
+    "head": "6e8c4b56a1ba5607d837731885373e8fbf9d4ed3",
+    "pipeline_control_sha256": "a502f686a8ad479f230bf7401fafde7ad42d789c72485f8ef742e34708d93335",
+    "source_tree_sha256": "31e2df88517d231624a5c56fbdb5c74398b240a452e5863f5ca618248fd3f29c",
     "staged_diff_paths": [],
     "status_porcelain": [],
-    "status_porcelain_all": [],
+    "status_porcelain_all": [
+      " M docs/RELEASE_RUN_MANIFEST.md",
+      " M platform/release_run_manifest/release_run_manifest.json"
+    ],
     "status_porcelain_sha256": "",
     "tracked_diff_paths": []
   },

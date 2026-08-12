@@ -114,6 +114,7 @@ PROGRAM_GLOBS = [
     "03_metadata/define/*.py",
     "03_metadata/define/*.R",
     "05_outputs/tfl/**/*.R",
+    "07_reviewer_explanation/tools/shiny/**/*.R",
 ]
 
 # Generated configuration is consumed by the local/ODA run but is intentionally
