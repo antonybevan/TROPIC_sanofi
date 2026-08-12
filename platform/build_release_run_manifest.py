@@ -91,6 +91,7 @@ CONTROL_FILES = [
 PIPELINE_CONTROL_FILES = [
     ".github/CODEOWNERS",
     ".github/workflows/ci.yml",
+    ".gitleaks.toml",
     ".pre-commit-config.yaml",
     "requirements-ci.txt",
     "requirements-ci.lock",

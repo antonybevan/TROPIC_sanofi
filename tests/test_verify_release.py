@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -16,6 +17,9 @@ SPEC = importlib.util.spec_from_file_location(
 verify_release = importlib.util.module_from_spec(SPEC)
 assert SPEC and SPEC.loader
 SPEC.loader.exec_module(verify_release)
+
+sys.path.insert(0, str(ROOT / "platform"))
+import build_release_run_manifest
 
 
 class TestReleaseSealHelpers(unittest.TestCase):
@@ -144,6 +148,9 @@ class TestReleaseSealHelpers(unittest.TestCase):
             self.assertTrue(verify_release.git_material_worktree_clean())
         with patch.object(verify_release.subprocess, "check_output", return_value=" M source.py\n"):
             self.assertFalse(verify_release.git_material_worktree_clean())
+
+    def test_secret_scanner_policy_is_bound_as_pipeline_control(self):
+        self.assertIn(".gitleaks.toml", build_release_run_manifest.PIPELINE_CONTROL_FILES)
 
 
 if __name__ == "__main__":

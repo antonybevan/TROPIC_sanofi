@@ -20,6 +20,7 @@ HEALTH = ROOT / "platform/pipeline_health.json"
 
 ALLOWED_PATHS = (
     ".github/",
+    ".gitleaks.toml",
     ".hermes.md",
     ".pre-commit-config.yaml",
     "08_submission_package/README.md",
