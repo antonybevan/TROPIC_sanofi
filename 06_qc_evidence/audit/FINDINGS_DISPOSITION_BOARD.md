@@ -79,7 +79,7 @@ After this board:
 2. eCTD uses EXAMPLE identifiers and is not a real FDA sequence.  
 3. No Part 11 validated system claim.  
 4. Controlled TFL catalog is the release output universe (`config/tfl_output_catalog.yaml`).  
-5. P21 Community findings remain open; licensed Enterprise validation and full SDTM CORE residual disposition are external/backlog.  
+5. P21 Community findings remain open; licensed Enterprise validation and full SDTM CORE residual disposition are external/backlog.
 
 ## Next after board
 
