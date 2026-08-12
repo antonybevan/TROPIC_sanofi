@@ -2385,11 +2385,11 @@
         "size_bytes": 252146
       },
       {
-        "md5": "75c2f7b5140477d8c2c00650e564edd1",
+        "md5": "1daf424c2774c2f3099d2d28e6bfd576",
         "path": "scripts/rebind_governance_seal.py",
         "present": true,
-        "sha256": "32d9db0c06a4398ffe92addfbcdff72773c89c47f540986e4be3060077449994",
-        "size_bytes": 8888
+        "sha256": "8350674f5dc0b1a9cd894ef89deb8cd59ed404da0b716f4a9b84bdc980929919",
+        "size_bytes": 9124
       },
       {
         "md5": "8df7caedb96d81ea7017354f7c62eb0e",
@@ -3532,8 +3532,8 @@
     "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007"
   },
   "evidence_grade": "release_candidate",
-  "generated_at": "2026-08-12 10:43:48 UTC",
-  "manifest_sha256": "d02a7f0f869fa61a0aa3a4e79e22c3d09cf75fd00f27bbbffd73588c9346ba03",
+  "generated_at": "2026-08-12 10:49:19 UTC",
+  "manifest_sha256": "46750698ddd4a298d37fdb5b0bcf7d767426595712ae0213e52591d03916e9f2",
   "problems": [],
   "qc_statuses": {
     "cbzp_bridge": {
@@ -3747,16 +3747,13 @@
   "source_control": {
     "branch": "codex/fda-aligned-clinical-portfolio",
     "dirty": false,
-    "dirty_including_seal_outputs": true,
-    "head": "cbf6a14a581facb974c2496fcd09267b64c3de23",
-    "pipeline_control_sha256": "6aaf46900559a6db6afc4b664763e39133a359b6fd426992d4c38e24b66afd50",
+    "dirty_including_seal_outputs": false,
+    "head": "f84e1d988059a1494eb6c3adfcce30fa7d2a537c",
+    "pipeline_control_sha256": "b2fde03b42ed6df297c6b25585c7cfb01339fc9a62211902415f23323d0f3d1b",
     "source_tree_sha256": "25eea11519389347cf943ecdb2c57c55733c32f781241f158d91acca35eb6fa5",
     "staged_diff_paths": [],
     "status_porcelain": [],
-    "status_porcelain_all": [
-      " M docs/RELEASE_RUN_MANIFEST.md",
-      " M platform/release_run_manifest/release_run_manifest.json"
-    ],
+    "status_porcelain_all": [],
     "status_porcelain_sha256": "",
     "tracked_diff_paths": []
   },
