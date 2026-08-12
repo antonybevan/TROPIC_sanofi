@@ -124,7 +124,7 @@ ADLB,BTOXGR,Baseline Toxicity Grade
 ADLB,CHG,Change from Baseline
 ADLB,PCHG,Percent Change from Baseline
 ADLB,ANL01FL,Analysis Record Flag 01
-ADLB,BASEFL,Baseline Record Flag
+ADLB,ABLFL,Baseline Record Flag
 ADLB,LBDY,Analysis Day
 ADLB,ADT,Analysis Date
 ADLB,LBSEQ,Laboratory Test Sequence Number

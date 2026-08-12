@@ -1,59 +1,58 @@
-# Conformance Run Record — Pinnacle 21 Community (ADaM)
+# Pinnacle 21 Community ADaM Validation Run Record
 
-**Date:** 2026-06-14 · **Engine:** Pinnacle 21 Community **4.1.0** (FDA rule-pack **2304.3**, ADaMIG 1.3).
+**Record ID:** TROPIC-P21-ADAM-2026-08-12-01
 
-## Status: SET UP IN FULL — BLOCKED at execution by vendor build-expiry
+**Execution date:** 2026-08-12
 
-The complete P21 toolchain was provisioned end-to-end and the validation was launched with the exact
-intended parameters. The run is blocked **only** by Pinnacle 21 Community's hard-coded engine
-expiration, not by anything in the data, metadata, or configuration.
+**Status:** `EXECUTED_WITH_COMPATIBILITY_CAVEAT`
 
-### What was provisioned (reusable)
-| Item | Detail |
+**Use:** `INFORMATIVE_ONLY`
+
+**Licensed Enterprise execution:** `NOT_EXECUTED`
+
+## Controlled execution
+
+| Item | Recorded value |
 |---|---|
-| Installer | P21 Community 4.1.0 `.dmg`, public CloudFront CDN (no registration) |
-| Java | bundled JRE is **x86_64** (`bad CPU type`, no Rosetta) → provisioned **arm64 Java 8** (Azul Zulu `1.8.0_492`) to run the platform-independent `p21-client-1.0.8.jar` |
-| CLI jar | `…/components/lib/p21-client-1.0.8.jar` |
-| Engine / config | FDA rule-pack **2304.3** → `ADaM-IG 1.3 (FDA).xml` |
-| Controlled Terminology | bundled CDISC ADaM CT, latest **2024-03-29** |
-| Inputs | 7 real-MP ADaM `*_prod.xpt` (zero-diff ODA run, CHANGELOG 3.6.1) + `define.xml` |
+| Application | Pinnacle 21 Community 4.1.0, build 4.1.0.4652 |
+| Distribution verification | Apple notarized Developer ID, Pinnacle 21 LLC, Team ID `56C9Z22DN3` |
+| Client component | `p21-client-1.0.8.jar`; SHA-256 `1d6cb1c03c16bb7dec2c2e04933fc1dcd01bcad8781c456000434cee0173e8b7` |
+| Validation engine | FDA 2508.1 |
+| Standard | ADaMIG 1.3 (FDA) |
+| Controlled terminology | ADaM and SDTM CT 2024-03-29 |
+| Define-XML | `03_metadata/define/define.xml`; SHA-256 `e95ec20c86556c442f6e0381dc5bbc0a5f74eff66688629f454d6224b270783a` |
+| Inputs | Seven real MP-arm production XPTs: ADAE, ADCM, ADEX, ADLB, ADRS, ADSL, ADTTE |
+| Scope | 121,320 records; 7 of 7 datasets processed |
+| Checks | 5,546 checks executed |
+| Result | 37 issue-summary messages |
+| Raw report | `pinnacle21-report-2026-08-12T12-24-20-781.xlsx`; SHA-256 `0beb2835708061db3f58bb5ddeda45ce46f5008f25fea58e2c1601225ed8c823` |
 
-### The blocker (verified)
-```
-ERROR CLI.3.17 :: Pinnacle 21 Community has expired due to an extended period with no internet connection.
-Caused by: IqException: Installation qualification check Expiration date check failed for GLOBAL
-```
-Root cause — `…/components/lib/engines/engines_v4.json`:
-```
-"expirationDate": "2025-03-31"
-```
-…vs. this environment's system clock **2026-06-14**. P21 Community engines **self-expire annually**
-(forcing updates); 4.1.0 (built 2024-05-31) expired **2025-03-31**, ~14 months before the
-environment date, so the CLI's `ExpirationHeaderHandler` refuses to run. **No newer Community build
-exists** — every later version on the CDN (4.1.1 / 4.2.0 / 4.3.0 / 5.0.0) returns HTTP 404.
+The raw workbook is retained outside Git because its issue tabs include record-level subject identifiers. The repository records the run identity, hashes, aggregate result, and disposition without redistributing patient-level rows.
 
-### Not done (deliberately)
-- **Did not** alter the system clock or patch/bypass the `ExpirationHeaderHandler` — that is
-  circumventing the vendor's license enforcement, out of bounds for a compliance deliverable.
+## Compatibility caveat
 
-## The exact command (ready to run where the engine is valid)
-```bash
-JAVA8=<arm64 Java 8>/bin/java   # e.g. Azul Zulu 8
-JAR="…/Pinnacle 21 Community.app/Contents/Resources/app.asar.unpacked/components/lib/p21-client-1.0.8.jar"
-COMP="…/app.asar.unpacked/components"
-"$JAVA8" -jar "$JAR" \
-  --engine.version=2304.3 --engine.folder="$COMP/lib" \
-  --standard=adam --standard.version=1.3 --filter=FDA \
-  --source.adam=platform/_p21_datasets \
-  --source.define=03_metadata/define/define.xml \
-  --cdisc.ct.adam.version=2024-03-29 \
-  --report=06_qc_evidence/conformance/p21_out/p21_adam_report.xlsx \
-  --output=06_qc_evidence/conformance/p21_out
-```
+The official Community GUI completed the validation using the current downloaded 2508.1 engine. The generated Validation Summary nevertheless reports **`Incompatible CLI used`**. Accordingly:
 
-## Legitimate paths to actually complete the ADaM conformance run
-1. **Run on a host whose real clock is within the engine validity window** (≤ 2025-03-31 for 4.1.0),
-   or once Certara ships a newer non-expired Community build — using the command above verbatim.
-2. **Pinnacle 21 Enterprise** (licensed, server-based, no self-expiry) — the authoritative engine FDA
-   itself uses; pair with the FDA Validator Rules matched to the Data Standards Catalog.
-3. Triage the resulting `p21_adam_report.xlsx` (Reject → must-fix, Error → fix/justify, Warning → disposition in ADRG).
+- this run is real execution evidence, not a placeholder;
+- it is not represented as licensed Pinnacle 21 Enterprise validation;
+- it is not submission-clearance evidence;
+- numeric severity rendering and issue classification must not be treated as authoritative until reproduced in a compatible, qualified environment.
+
+## Aggregate disposition
+
+| Group | Observation | Disposition |
+|---|---|---|
+| Traceability | GLOBAL messages note that DM/AE/EX source domains were not supplied with this ADaM-only run. | Expected for this scoped run; a licensed final run must include the complete locked source/metadata context. |
+| Yes-only flags | `TRTEMFL='N'` in ADAE/ADCM and `ANL01FL='N'` in ADLB generated the dominant record counts. | Corrected in paired SAS/R source to use `Y`/null; rerun required after the controlled rebuild. |
+| Date chronology | Six ADAE rows have start dates after end dates; additional day-zero observations were reported in ADCM/ADLB/ADRS. | Source/derivation review required. No silent clinical-data correction is permitted without an approved rule. |
+| Metadata and labels | Dataset/variable labels, predecessor variables, and Define datatype differences were reported across the seven datasets. | Open for standards triage against ADaMIG, source traceability, and the authoritative specification. |
+| Value representation | ADEX/ADLB/ADRS inconsistencies between numeric and character analysis values were reported. | Open modeling issue; correct only through an approved specification change and paired implementation. |
+| Controlled terminology | ADAE action-taken terminology and related metadata messages were reported. | Open for source-to-CT review and ADRG disposition. |
+
+## Qualification decision
+
+- `PINNACLE21_COMMUNITY=INFORMATIVE_ONLY`
+- `LICENSED_PINNACLE21_ENTERPRISE=NOT_EXECUTED`
+- `SUBMISSION_CLEARANCE=NOT_CLAIMED`
+
+The final regulated-use closure path is defined in `docs/QUALITY_SYSTEM_BOUNDARY.md`.

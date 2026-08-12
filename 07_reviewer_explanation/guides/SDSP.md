@@ -59,7 +59,7 @@ two Define-XML files, and the traceability matrix.
    (N=371) only; the Cabazitaxel arm is reconstructed (Guyot IPD / PH-scaling) for TFL
    demonstration and is **not** part of the conformed deliverables. The package is a
    **controlled non-submission programming demonstration** — not a filing and not a
-   confirmatory re-analysis of trial efficacy (see `docs/PRODUCT_CLAIM.md` §2, Path A).
+   confirmatory re-analysis of trial efficacy (see `docs/PRODUCT_CLAIM.md`).
 4. **Source date precision.** AE/disposition timing is week-offset (±3.5 days); a
    sensitivity analysis (`date_precision_sensitivity.py`) shows the KM medians are robust
    to this precision.

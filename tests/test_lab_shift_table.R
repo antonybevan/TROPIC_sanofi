@@ -14,13 +14,13 @@ fail <- function(msg) { cat(sprintf("  [FAIL] %s\n", msg)); ok <<- FALSE }
 pass <- function(msg) cat(sprintf("  [PASS] %s\n", msg))
 
 fixture <- tibble::tribble(
-  ~USUBJID, ~PARAMCD, ~BASEFL, ~ANL01FL, ~ATOXGR, ~ADT, ~LBDY,
+  ~USUBJID, ~PARAMCD, ~ABLFL, ~ANL01FL, ~ATOXGR, ~ADT, ~LBDY,
   "S01",   "NEUT",   "Y",     "N",      0,       as.Date("2020-01-01"), -10,
   "S01",   "NEUT",   "Y",     "Y",      1,       as.Date("2020-01-05"),  -6,
-  "S01",   "NEUT",   "N",     "Y",      2,       as.Date("2020-01-20"),   9,
-  "S01",   "NEUT",   "N",     "Y",      4,       as.Date("2020-02-01"),  21,
+  "S01",   "NEUT",   NA_character_, "Y", 2,       as.Date("2020-01-20"),   9,
+  "S01",   "NEUT",   NA_character_, "Y", 4,       as.Date("2020-02-01"),  21,
   "S02",   "NEUT",   "Y",     "N",      0,       as.Date("2020-01-02"),  -9,
-  "S02",   "NEUT",   "N",     "Y",      3,       as.Date("2020-01-21"),  10,
+  "S02",   "NEUT",   NA_character_, "Y", 3,       as.Date("2020-01-21"),  10,
   "S03",   "NEUT",   "Y",     "Y",      2,       as.Date("2020-01-03"),  -8
 )
 

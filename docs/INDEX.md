@@ -1,7 +1,7 @@
 # TROPIC Documentation Index
 
 **Purpose:** Stop dump-scrolling. Three tours — open only what your role needs.  
-**Binding claim:** [`PRODUCT_CLAIM.md`](PRODUCT_CLAIM.md) (Path A · controlled non-submission demo)  
+**Binding claim:** [`PRODUCT_CLAIM.md`](PRODUCT_CLAIM.md) (controlled clinical-submission simulation)
 **Presentation model:** [`SUBMISSION_REPO_PRESENTATION_RESEARCH.md`](SUBMISSION_REPO_PRESENTATION_RESEARCH.md)
 
 ---
@@ -14,7 +14,7 @@
 | 2 | [`PRODUCT_CLAIM.md`](PRODUCT_CLAIM.md) | What we may assert |
 | 3 | [`REPO_SURFACE_POLICY.md`](REPO_SURFACE_POLICY.md) | What is / isn’t in git |
 | 4 | [`../08_submission_package/README.md`](../08_submission_package/README.md) | Review package tour |
-| 5 | [`RELEASE_NOTE_v0.2.2-portfolio.md`](RELEASE_NOTE_v0.2.2-portfolio.md) | Current portfolio seal narrative |
+| 5 | [`RELEASE_NOTE_v0.3.0-clinical-simulation.md`](RELEASE_NOTE_v0.3.0-clinical-simulation.md) | Current controlled release narrative |
 | 6 | [`SCRIPT_MAP.md`](SCRIPT_MAP.md) | What runs vs ignore |
 | 7 | `python3 scripts/verify_release.py` | Machine re-check |
 
@@ -27,13 +27,13 @@
 
 | Step | Open | What you get |
 |---:|---|---|
-| 1 | [`PRODUCT_CLAIM.md`](PRODUCT_CLAIM.md) | Path A boundary |
+| 1 | [`PRODUCT_CLAIM.md`](PRODUCT_CLAIM.md) | Product and evidence boundary |
 | 2 | [`../08_submission_package/m5/datasets/tropic/`](../08_submission_package/m5/datasets/tropic/) | SDTM / ADaM / BIMO co-location |
 | 3 | [`../07_reviewer_explanation/guides/ADRG.md`](../07_reviewer_explanation/guides/ADRG.md) | Analysis data narrative |
 | 4 | [`../07_reviewer_explanation/guides/SDRG.md`](../07_reviewer_explanation/guides/SDRG.md) | Tabulation narrative |
 | 5 | [`../07_reviewer_explanation/guides/BDRG.md`](../07_reviewer_explanation/guides/BDRG.md) | BIMO narrative |
 | 6 | TFL appendices under `08_submission_package/m5/53-clin-stud-rep/…/tropic/` | Figures + tables |
-| 7 | [`RELEASE_NOTE_v0.2.2-portfolio.md`](RELEASE_NOTE_v0.2.2-portfolio.md) | What “PASS” means under Path A |
+| 7 | [`RELEASE_NOTE_v0.3.0-clinical-simulation.md`](RELEASE_NOTE_v0.3.0-clinical-simulation.md) | What release PASS means |
 | 8 | [`workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md) | Residual honesty |
 
 **Do not start with:** `platform/` JSON dumps, regenerated `*_REPORT.md` files, or `config/` YAML.

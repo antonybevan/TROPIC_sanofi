@@ -51,7 +51,7 @@ def test_ttumor_population_negative_control(tmp_path):
 def test_result_display_disclosure_negative_control(tmp_path):
     text = DEFINE.read_text(encoding="utf-8")
     broken = text.replace(
-        "Path A limitation: CbzP is synthetic/reconstructed and TFL-only; "
+        "Simulation boundary: CbzP is synthetic/reconstructed and TFL-only; "
         "comparative results are non-confirmatory and are not submission evidence.",
         "Comparator limitation omitted.",
         1,

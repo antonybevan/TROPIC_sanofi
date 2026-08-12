@@ -1,0 +1,214 @@
+{
+  "gate": "REGULATORY_BASELINE",
+  "baseline_id": "TROPIC-FDA-2026-08-12",
+  "status": "PASS",
+  "generated_at": "2026-08-12T07:28:18Z",
+  "checks": [
+    {
+      "name": "baseline.readable",
+      "ok": true,
+      "detail": "config/regulatory_baseline.yaml"
+    },
+    {
+      "name": "baseline.product_class",
+      "ok": true,
+      "detail": "controlled_clinical_submission_simulation"
+    },
+    {
+      "name": "baseline.not_for_submission",
+      "ok": true,
+      "detail": "not_for_regulatory_submission"
+    },
+    {
+      "name": "authorities.count",
+      "ok": true,
+      "detail": "count=9"
+    },
+    {
+      "name": "authority.https:fda_study_data_technical_conformance_guide",
+      "ok": true,
+      "detail": "https://www.fda.gov/media/153632/download"
+    },
+    {
+      "name": "authority.https:fda_study_data_standards_resources",
+      "ok": true,
+      "detail": "https://www.fda.gov/industry/fda-data-standards-advisory-board/study-data-standards-resources"
+    },
+    {
+      "name": "authority.https:fda_ectd",
+      "ok": true,
+      "detail": "https://www.fda.gov/drugs/electronic-regulatory-submission-and-review/electronic-common-technical-document-ectd"
+    },
+    {
+      "name": "authority.https:fda_21_cfr_part_11",
+      "ok": true,
+      "detail": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11"
+    },
+    {
+      "name": "authority.https:fda_electronic_systems_clinical_investigations",
+      "ok": true,
+      "detail": "https://www.fda.gov/media/166215/download"
+    },
+    {
+      "name": "authority.https:ich_e6_r3",
+      "ok": true,
+      "detail": "https://database.ich.org/sites/default/files/ICH_E6%28R3%29_Step4_FinalGuideline_2025_0106.pdf"
+    },
+    {
+      "name": "authority.https:cdisc_sdtmig",
+      "ok": true,
+      "detail": "https://www.cdisc.org/standards/foundational/sdtmig/sdtmig-v3-4"
+    },
+    {
+      "name": "authority.https:cdisc_adamig",
+      "ok": true,
+      "detail": "https://www.cdisc.org/standards/foundational/adam/adamig-v1-3"
+    },
+    {
+      "name": "authority.https:cdisc_define_xml",
+      "ok": true,
+      "detail": "https://www.cdisc.org/standards/foundational/define-xml/define-xml-v2-1-0"
+    },
+    {
+      "name": "package.exists:analysis_data_reviewers_guide",
+      "ok": true,
+      "detail": "08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf"
+    },
+    {
+      "name": "package.exists:clinical_study_data_reviewers_guide",
+      "ok": true,
+      "detail": "08_submission_package/m5/datasets/tropic/tabulations/sdtm/csdrg.pdf"
+    },
+    {
+      "name": "package.exists:analysis_define",
+      "ok": true,
+      "detail": "08_submission_package/m5/datasets/tropic/analysis/adam/datasets/define.xml"
+    },
+    {
+      "name": "package.exists:tabulation_define",
+      "ok": true,
+      "detail": "08_submission_package/m5/datasets/tropic/tabulations/sdtm/datasets/define.xml"
+    },
+    {
+      "name": "package.exists:source_blank_crf",
+      "ok": true,
+      "detail": "08_submission_package/m5/datasets/tropic/tabulations/sdtm/blankcrf.pdf"
+    },
+    {
+      "name": "package.no_legacy_sdrg",
+      "ok": true,
+      "detail": "08_submission_package/m5/datasets/tropic/tabulations/sdtm/sdrg.pdf"
+    },
+    {
+      "name": "package.no_false_acrf",
+      "ok": true,
+      "detail": "08_submission_package/m5/datasets/tropic/tabulations/sdtm/acrf.pdf"
+    },
+    {
+      "name": "package.local_stylesheet:analysis_define",
+      "ok": true,
+      "detail": "08_submission_package/m5/datasets/tropic/analysis/adam/datasets/define2-1.xsl"
+    },
+    {
+      "name": "package.local_stylesheet:tabulation_define",
+      "ok": true,
+      "detail": "08_submission_package/m5/datasets/tropic/tabulations/sdtm/datasets/define2-1.xsl"
+    },
+    {
+      "name": "package.analysis_programs.sas",
+      "ok": true,
+      "detail": "count=17"
+    },
+    {
+      "name": "package.analysis_programs.r",
+      "ok": true,
+      "detail": "count=20"
+    },
+    {
+      "name": "qualification:organizationally_independent_qc",
+      "ok": true,
+      "detail": "False"
+    },
+    {
+      "name": "qualification:part_11_validated_system",
+      "ok": true,
+      "detail": "False"
+    },
+    {
+      "name": "qualification:licensed_pinnacle_21_enterprise",
+      "ok": true,
+      "detail": "False"
+    },
+    {
+      "name": "qualification:pinnacle_21_community_informative_run",
+      "ok": true,
+      "detail": "True"
+    },
+    {
+      "name": "qualification:regulatory_gateway_acceptance",
+      "ok": true,
+      "detail": "False"
+    },
+    {
+      "name": "boundary.assertion:ANNOTATED_CRF=NOT_AVAILABLE",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "boundary.assertion:LICENSED_PINNACLE21_ENTERPRISE=NOT_EXECUTED",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "boundary.assertion:ORGANIZATIONAL_INDEPENDENT_QC=NOT_ESTABLISHED",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "boundary.assertion:PART11_VALIDATED_SYSTEM=NOT_ESTABLISHED",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "boundary.assertion:PINNACLE21_COMMUNITY=INFORMATIVE_ONLY",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "boundary.assertion:REGULATORY_GATEWAY_ACCEPTANCE=NOT_EXECUTED",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "p21.boundary:INFORMATIVE_ONLY",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "p21.boundary:LICENSED_PINNACLE21_ENTERPRISE=NOT_EXECUTED",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "p21.boundary:Incompatible CLI used",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "p21.boundary:FDA 2508.1",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "product_claim.controlled_simulation",
+      "ok": true,
+      "detail": "required controlled-simulation statement missing"
+    },
+    {
+      "name": "product_claim.not_submission",
+      "ok": true,
+      "detail": "required non-submission statement missing"
+    }
+  ],
+  "problems": []
+}

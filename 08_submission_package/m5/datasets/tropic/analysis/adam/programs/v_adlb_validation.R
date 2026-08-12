@@ -113,13 +113,13 @@ df_base_merged <- df_windows %>%
     PCHG = (CHG / BASE) * 100
   )
 
-# Determine ANL01FL and BASEFL - include LBSEQ as final tiebreaker
+# Determine ANL01FL and the ADaM baseline flag ABLFL; include LBSEQ as final tiebreaker
 df_anl01 <- df_base_merged %>%
   arrange(USUBJID, PARAMCD, AVISITN, desc(is.na(AWDIST)), AWDIST, desc(ATOXGR), desc(is.na(lbdt)), lbdt, LBSEQ) %>%
   group_by(USUBJID, PARAMCD, AVISITN) %>%
   mutate(
-    ANL01FL = if_else(AVISITN != 99.0 & row_number() == 1, "Y", "N"),
-    BASEFL = if_else(!is.na(BASESEQ) & LBSEQ == BASESEQ, "Y", "N")
+    ANL01FL = if_else(AVISITN != 99.0 & row_number() == 1, "Y", NA_character_),
+    ABLFL = if_else(!is.na(BASESEQ) & LBSEQ == BASESEQ, "Y", NA_character_)
   ) %>%
   ungroup()
 
@@ -161,7 +161,7 @@ df_optimus_nadir <- df_anc_nadir %>%
     PARAMCD = "ANCNADIR", PARAM = "ANC Nadir Value (x10^3/uL)", PARCAT1 = "OPTIMUS KINETICS",
     ADT = as.Date(NA),
     AVAL = nadir_val, AVALC = sprintf("%.2f", sas_round(nadir_val, 2)), AVISIT = paste("CYCLE", cycle), AVISITN = cycle,
-    ANL01FL = "Y", BASEFL = "N", lbdy = nadir_dy, LBSEQ = as.numeric(NA)
+    ANL01FL = "Y", ABLFL = NA_character_, lbdy = nadir_dy, LBSEQ = as.numeric(NA)
   )
 
 df_optimus_rec <- df_anc_rec %>%
@@ -172,7 +172,7 @@ df_optimus_rec <- df_anc_rec %>%
     PARAMCD = "ANCRECDY", PARAM = "Days from ANC Nadir to Recovery", PARCAT1 = "OPTIMUS KINETICS",
     ADT = as.Date(NA),
     AVAL = rec_dy - nadir_dy, AVALC = as.character(rec_dy - nadir_dy), AVISIT = paste("CYCLE", cycle), AVISITN = cycle,
-    ANL01FL = "Y", BASEFL = "N", lbdy = rec_dy, LBSEQ = as.numeric(NA)
+    ANL01FL = "Y", ABLFL = NA_character_, lbdy = rec_dy, LBSEQ = as.numeric(NA)
   )
 
 # Combine and Sort
@@ -180,7 +180,7 @@ adlb_final <- bind_rows(
   df_anl01 %>% select(
     STUDYID, USUBJID, SUBJID, TRT01P, TRTSDT, PARAMCD, PARAM, PARCAT1,
     ADT = lbdt, AVAL, AVALC, LBNRLO = LBORNRLO, LBNRHI = LBORNRHI, LBNRIND, AVISIT, AVISITN, AWDIST, ATOXGR,
-    BASE, BASEC, BTOXGR, CHG, PCHG, ANL01FL, BASEFL, lbdy, LBSEQ
+    BASE, BASEC, BTOXGR, CHG, PCHG, ANL01FL, ABLFL, lbdy, LBSEQ
   ),
   df_optimus_nadir,
   df_optimus_rec

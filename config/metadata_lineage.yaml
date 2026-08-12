@@ -13,8 +13,8 @@ define_text_replacements:
     to: "Set to 'N' because no ALPBL imputation is performed; a missing source baseline remains missing."
   - from: "'Y' if HGBBL was imputed to the population-median fallback (no baseline hemoglobin on file), else 'N'."
     to: "Set to 'N' because no HGBBL imputation is performed; a missing source baseline remains missing."
-  - from: "Shift in CTCAE analysis toxicity grade (ATOXGR) from baseline to worst post-baseline analysis record, by laboratory parameter (ANC, PSA); rendered as table T-21-1, per SAP v3.0 §7.5. Path A limitation: CbzP is synthetic/reconstructed and TFL-only; comparative results are non-confirmatory and are not submission evidence."
-    to: "Shift in source-carried laboratory toxicity grade (ATOXGR, carried from SDTM.LB.LBTOXGR for real MP data) from baseline to worst post-baseline analysis record; no independent CTCAE re-grading algorithm is applied. Rendered as T-21-1/T-21-2. Path A limitation: CbzP is synthetic/reconstructed and TFL-only; comparative results are non-confirmatory and are not submission evidence."
+  - from: "Shift in CTCAE analysis toxicity grade (ATOXGR) from baseline to worst post-baseline analysis record, by laboratory parameter (ANC, PSA); rendered as table T-21-1, per SAP v4.0 Section 7.5. Simulation boundary: CbzP is synthetic/reconstructed and TFL-only; comparative results are non-confirmatory and are not submission evidence."
+    to: "Shift in source-carried laboratory toxicity grade (ATOXGR, carried from SDTM.LB.LBTOXGR for real MP data) from baseline to worst post-baseline analysis record; no independent CTCAE re-grading algorithm is applied. Rendered as T-21-1/T-21-2. Simulation boundary: CbzP is synthetic/reconstructed and TFL-only; comparative results are non-confirmatory and are not submission evidence."
 
 controlled_terminology_dispositions:
   CL.TRT01PN:
@@ -144,7 +144,7 @@ predecessor_rules:
       BTOXGR: Baseline toxicity grade selected from pre-treatment records.
       CHG: Change from baseline derived as ADLB.AVAL minus ADLB.BASE.
       PCHG: Percent change from baseline derived as ADLB.CHG divided by ADLB.BASE.
-      BASEFL: "Y only on the SDTM.LB record selected as baseline from LBBLFL=Y; N otherwise."
+      ABLFL: "Y only on the deterministic SDTM.LB record selected as baseline from LBBLFL=Y; null otherwise."
       ADT: Analysis date from SDTM.LB.LBDTC.
       LBSEQ: SDTM.LB.LBSEQ; blank on derived Optimus parameter rows.
     ADRS:
@@ -192,7 +192,7 @@ method_expansion:
     ADLB.BASEC: MT.ADLB_BASEC
     ADLB.CHG: MT.ADLB_CHG
     ADLB.PCHG: MT.ADLB_PCHG
-    ADLB.BASEFL: MT.ADLB_BASEFL
+    ADLB.ABLFL: MT.ADLB_ABLFL
     ADLB.ADT: MT.ADLB_ADT
     ADRS.AVALC: MT.ADRS_AVALC
     ADRS.AVAL: MT.ADRS_AVAL
@@ -251,7 +251,7 @@ method_expansion:
     MT.ADLB_BASEC: Character value from the same deterministic SDTM.LB.LBBLFL=Y record used for BASE.
     MT.ADLB_CHG: Change from baseline calculated as ADLB.AVAL minus ADLB.BASE.
     MT.ADLB_PCHG: Percent change from baseline calculated as 100 times ADLB.CHG divided by ADLB.BASE.
-    MT.ADLB_BASEFL: "Y only on the SDTM.LB record selected as baseline from LBBLFL=Y; N otherwise."
+    MT.ADLB_ABLFL: "Y only on the deterministic SDTM.LB record selected as baseline from LBBLFL=Y; null otherwise."
     MT.ADLB_ADT: Analysis date derived from SDTM.LB.LBDTC.
     MT.ADRS_AVALC: >
       Parameter-specific response result. OVRLRESP is lesion-derived RECIST v1.0; BESTRESP/OBJRESP use

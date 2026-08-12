@@ -1,291 +1,116 @@
-<div align="center">
+# TROPIC
 
-# TROPIC — Controlled Clinical Biometrics Demonstration
+## Controlled clinical-submission simulation
 
-### Study EFC6193 / XRP6258 · NCT00417079
-**Cabazitaxel vs Mitoxantrone in mCRPC — Phase III RCT**
-*Sanofi · de Bono et al., Lancet 2010*
+TROPIC is an end-to-end clinical biometrics implementation for Study EFC6193 / NCT00417079. It takes de-identified SDTM through ADaM, statistical outputs, Define-XML, reviewer documentation, and a deterministic FDA Module 5-style package.
 
-[![Claim](https://img.shields.io/badge/Product-Path%20A%20controlled%20demo-important?style=flat-square)](docs/PRODUCT_CLAIM.md)
-[![CDISC](https://img.shields.io/badge/CDISC-ADaMIG%20v1.3%20%7C%20SDTMIG%20v3.4-005A9C?style=flat-square)](https://www.cdisc.org/)
-[![Define-XML](https://img.shields.io/badge/Define--XML-2.1%20%2B%20ARM-005A9C?style=flat-square)](03_metadata/define/)
-[![eCTD](https://img.shields.io/badge/eCTD-Module%205%20style-005A9C?style=flat-square)](08_submission_package/m5/)
-[![Release](https://img.shields.io/badge/Seal-v0.2.2--portfolio-success?style=flat-square)](docs/RELEASE_NOTE_v0.2.2-portfolio.md)
+The work is designed to be reviewed as a controlled delivery system, not as a themed portfolio. Its evidence includes real SAS execution, an independent R implementation, selected admiral re-derivation, machine reconciliation, schema and metadata checks, a real Pinnacle 21 Community run, package validation, and hash-bound release records.
 
-</div>
+> TROPIC is a controlled clinical-submission simulation. It is not a regulatory submission, a sponsor-approved reanalysis, a Part 11 validated system, licensed Pinnacle 21 clearance, or independent organizational QC.
 
----
+The binding claim is [Product and Evidence Claim](docs/PRODUCT_CLAIM.md). The qualification gap is [Quality System Boundary](docs/QUALITY_SYSTEM_BOUNDARY.md).
 
-## What this is (read before anything else)
+## Review the package
 
-**TROPIC is a controlled, non-submission clinical biometrics programming demonstration** — not an FDA filing, not Part 11, not a re-analysis of trial efficacy.
-
-| Allowed | Forbidden |
+| Review path | Purpose |
 |---|---|
-| SDTM → ADaM → TFL → Define → eCTD-style package | “Submission-ready / NDA complete” |
-| Dual-language SAS 9.4 / R recon on **real MP arm** | “GxP org double programming complete” |
-| Risk-tiered admiral third engine (ADSL, OS, PFS) | “Independent clinical confirmation of CbzP benefit” |
-| Hash-sealed demo release-candidate under Path A | “Part 11 compliant” |
+| [Module 5 package](08_submission_package/README.md) | Reviewer-facing datasets, metadata, programs, guides, CSR, and BIMO surface |
+| [Analysis Data Reviewer's Guide](07_reviewer_explanation/guides/ADRG.md) | ADaM derivations, traceability, conformance, and known differences |
+| [Clinical Study Data Reviewer's Guide](07_reviewer_explanation/guides/SDRG.md) | SDTM source boundary, standards decisions, and data limitations |
+| [Traceability matrix](07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md) | Source-to-analysis-to-output lineage |
+| [Current release note](docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) | Release evidence and residual limitations |
+| [Reviewer guide](docs/INTERVIEWER_GUIDE.md) | A short, evidence-led walkthrough |
 
-**Binding claim:** [`docs/PRODUCT_CLAIM.md`](docs/PRODUCT_CLAIM.md)
-**Current release narrative:** [`docs/RELEASE_NOTE_v0.2.2-portfolio.md`](docs/RELEASE_NOTE_v0.2.2-portfolio.md)
-**What GitHub is allowed to contain:** [`docs/REPO_SURFACE_POLICY.md`](docs/REPO_SURFACE_POLICY.md)
-**10-minute interviewer walk:** [`docs/INTERVIEWER_GUIDE.md`](docs/INTERVIEWER_GUIDE.md)
+**Current controlled release:** tag `v0.3.0-clinical-simulation` · [release note](docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md)
 
-> `v0.1.0-demo-rc.1` remains an immutable historical Path A tag record. The
-> current portfolio release is `v0.2.2-portfolio`, with its connected-evidence
-> disposition recorded in [`SECTION_05_PORTFOLIO_FINALIZATION_AUDIT_2026-08-04.md`](06_qc_evidence/audit/section_reviews/SECTION_05_PORTFOLIO_FINALIZATION_AUDIT_2026-08-04.md).
+## Evidence at a glance
 
-> **Portfolio surface:** this repo tracks the **review package face**, **spine programs**, **config**, and a **minimal seal pack** — not patient data, not secrets, not regenerable factory status piles. That is standard practice, not incompleteness.
-
----
-
-## Open first (30 seconds)
-
-There are **two surfaces**. Industry does not present a Git monorepo as “the submission.” A reviewer opens the package; an engineer opens the factory.
-
-| # | Open this | Why |
-|---:|---|---|
-| 1 | [`docs/INTERVIEWER_GUIDE.md`](docs/INTERVIEWER_GUIDE.md) | What we want interviewers to see |
-| 2 | [`docs/PRODUCT_CLAIM.md`](docs/PRODUCT_CLAIM.md) | What you may assert — Path A only |
-| 3 | [`08_submission_package/README.md`](08_submission_package/README.md) → [`m5/`](08_submission_package/m5/) | **Review surface** (Module 5 style) |
-| 4 | [`07_reviewer_explanation/guides/`](07_reviewer_explanation/guides/) | ADRG · SDRG · BDRG · SDSP |
-| 5 | [`docs/RELEASE_NOTE_v0.2.2-portfolio.md`](docs/RELEASE_NOTE_v0.2.2-portfolio.md) | Current portfolio seal and review anchors |
-| 6 | `python3 scripts/verify_release.py` | Re-check machine grades (no SAS needed) |
-| 7 | `python3 platform/cibuild.py --demo` | Bare-clone smoke (no patient data) |
-
-**Navigation index:** [`docs/INDEX.md`](docs/INDEX.md) — Reviewer · Engineer · QC
-**Repo surface policy:** [`docs/REPO_SURFACE_POLICY.md`](docs/REPO_SURFACE_POLICY.md) — what is / isn’t in git
-**Script map:** [`docs/SCRIPT_MAP.md`](docs/SCRIPT_MAP.md) · **Factory triage:** [`platform/README.md`](platform/README.md)
-
-### Interview line (use this)
-
-> There are two views. The **submission-style package** is under `08_submission_package/m5/` — that is what a reviewer would navigate. The rest of the repo is the **controlled factory**: dual-language ADaM, admiral, gates, and seals. Patient data are not in git. Comparative CbzP is synthetic and disclosed. This is Path A — a controlled demonstration, not a filing.
-
----
-
-## Dual surface map
-
-```text
-┌─────────────────────────────────────────────────────────────────┐
-│  SURFACE A — REVIEW PACKAGE (demo this first)                   │
-│  08_submission_package/m5/                                      │
-│    datasets/tropic/tabulations/sdtm/   XPT + define + SDRG      │
-│    datasets/tropic/analysis/adam/      XPT + define + ADRG + pgms│
-│    datasets/tropic/bimo/               clinsite + BDRG          │
-│    53-clin-stud-rep/.../               CSR / figures / tables   │
-└─────────────────────────────────────────────────────────────────┘
-                              ▲ produced & sealed by
-┌─────────────────────────────────────────────────────────────────┐
-│  SURFACE B — CONTROLLED FACTORY (engineers / QC)                │
-│  00…07 evidence chain · config/ · platform/ · scripts/ · tests/ │
-│  programs live under 04_analysis_datasets/programs/{sas,r}/     │
-│  QC warehouse under 06_qc_evidence/                             │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-| If you are… | Start here | Do not start here |
+| Control | Current evidence | Boundary |
 |---|---|---|
-| **Mock FDA / portfolio reviewer** | `08_submission_package/m5/` + guides | `platform/` status JSON |
-| **Statistical programmer** | `04_analysis_datasets/programs/` + SAP v4.0 | Random regenerated `docs/*_REPORT.md` |
-| **Platform / pipeline engineer** | `config/study_manifest.yaml` + `platform/cibuild.py` | Treating root as eCTD |
-| **QC / validation** | `06_qc_evidence/` + findings board | Claiming green JSON = filing |
+| Production programming | SAS 9.4 on SAS OnDemand for Academics | A recorded `oda`/`local` provenance guard is required; simulation mode has no double-programming value |
+| Validation programming | Independent R implementations for seven MP-arm ADaM datasets | Methodological independence, not organizational independence |
+| Third implementation | admiral for ADSL, OS, and PFS | Risk-based corroboration, not full-dataset triple programming |
+| Reconciliation | Record and value comparisons plus result-level controls | Applies to the documented populations and tolerances only |
+| Standards | ADaMIG 1.3, SDTMIG 3.4, Define-XML 2.1, local stylesheet, CDISC CORE | Alignment and local conformance, not agency acceptance |
+| Pinnacle 21 | Community 4.1.0, FDA engine 2508.1, ADaMIG 1.3 (FDA), 5,546 checks | Informative only; report carries an incompatible-CLI caveat; Enterprise not executed |
+| Submission package | Deterministic Module 5-style tree, cSDRG/ADRG, programs, Define, eCTD v3.2.2 example backbone | Structural simulation; no gateway submission |
+| Release control | CI, findings, logs, SHA-256 manifests, clean-checkout verification | Integrity controls, not Part 11 electronic signatures |
 
----
+## Data provenance
 
-## Repository structure (evidence chain + factory)
+| Data | N | Use |
+|---|---:|---|
+| Real de-identified MP SDTM | 371 | SAS/R ADaM production and validation; not redistributed in Git |
+| Reconstructed/synthetic CbzP | 378 | Reporting comparison only; not included in reconciled ADaM |
 
-The numbered folders are an **internal evidence-chain model** (source → package).
-The **FDA-shaped tree** lives *inside* `08_submission_package/` only.
+OS and PFS use published Kaplan-Meier reconstruction methods for the CbzP comparator. Secondary CbzP endpoints are synthetic. Comparative outputs are therefore descriptive demonstrations and must not be described as confirmatory trial results.
+
+## Controlled pipeline
+
+The study manifest drives a 37-stage evidence chain:
 
 ```text
-TROPIC/
-│
-│  ── LAYER 0  Claim & entry ──────────────────────────────────
-├── README.md                         ← you are here
-├── docs/PRODUCT_CLAIM.md             ← binding Path A claim
-├── docs/INDEX.md                     ← Reviewer / Engineer / QC tours
-├── docs/RELEASE_NOTE_v0.2.2-portfolio.md
-│
-│  ── LAYER 1  Review surface ─────────────────────────────────
-├── 08_submission_package/            ← THE deliverable face
-│   ├── README.md                     ← package tour
-│   ├── m5/                           ← Module 5 style tree
-│   └── ectd/0000/                    ← sequence + backbone demo
-├── 07_reviewer_explanation/guides/   ← ADRG · SDRG · BDRG · SDSP
-│
-│  ── LAYER 2  Analysis truth ─────────────────────────────────
-├── 00_governance/                    # reproducibility boundary
-├── 01_source_data/                   # intake (real SDTM not redistributed)
-├── 02_specifications/sap/            # SAP v4.0 programming authority
-├── 03_metadata/                      # ADaM spec · Define-XML · USDM
-├── 04_analysis_datasets/             # programs + ADaM XPT + Dataset-JSON
-├── 05_outputs/                       # TFLs · ARS
-│
-│  ── LAYER 3  Factory ────────────────────────────────────────
-├── config/                           # manifest · catalog · controls
-├── platform/                         # orchestrator · packagers · seals
-├── scripts/verify_release.py         # release re-check
-├── tests/                            # R smoke / figure gates
-├── studies/                          # multi-study engine proof (DEMO02)
-│
-│  ── LAYER 4  QC warehouse ───────────────────────────────────
-├── 06_qc_evidence/                   # recon · gates · findings · run records
-└── docs/                             # operating model + generated control reports
+authorized SDTM
+  -> controlled staging and source checks
+  -> paired SAS/R ADaM plus selected admiral derivation
+  -> record, value, and result reconciliation
+  -> catalog-controlled tables, figures, and listings
+  -> Define-XML, ARM, and specification conformance
+  -> reviewer guides and CSR
+  -> Module 5/eCTD-style materialization
+  -> log, finding, manifest, and release seals
 ```
 
-**Authority stack (conflicts):** PRODUCT_CLAIM → SAP v4.0 → lock memo → TFL catalog → study config/manifest → machine seals → ADRG/SDRG (must not exceed claim).
+The package and factory are intentionally separate:
 
----
+```text
+08_submission_package/     reviewer-facing deliverable surface
+00_governance/             reproducibility and data-rights controls
+01_source_data/            source intake; patient data excluded from Git
+02_specifications/         analysis authority and specifications
+03_metadata/               ADaM spec, Define-XML, ARM, USDM
+04_analysis_datasets/      SAS/R programs and local XPT products
+05_outputs/                controlled TFL outputs and ARS
+06_qc_evidence/            reconciliation, findings, gates, run records
+07_reviewer_explanation/   ADRG, cSDRG source, BDRG, traceability
+config/                    study, output, evidence, and regulatory contracts
+platform/                  orchestration, validation, packaging, release controls
+tests/                     data-free and data-bearing regression checks
+```
 
-## Scope & data provenance (non-negotiable)
+## Run and verify
 
-| Arm | N | Nature | Where used |
-|---|---:|---|---|
-| **MP (control)** | 371 | Real de-identified SDTM (Sanofi 2013 / Project Data Sphere) | Reconciled ADaM (`*_prod.xpt` / `*_v.xpt`); **not committed to git** |
-| **CbzP (comparator)** | 378 | **Synthetic / reconstructed** (Guyot OS/PFS; PH secondary) | TFL merge only — never in reconciled package ADaM |
-
-- **Programming authority:** `02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx` (lock memo: package is **not** submission-passed).
-- **Bare clone:** real MP SDTM and ODA credentials are not in git — see [`00_governance/REPRODUCIBILITY.md`](00_governance/REPRODUCIBILITY.md). Use `--demo` for a data-free smoke path.
-- **SAS mode honesty:** check `sas_execution_mode` in `platform/pipeline_health.json`. Default (no engine) is `sim` — zero-diff recon is **tautological**. Genuine dual-language evidence requires `oda` / `local` with provenance guard PASS.
-
-Full Guyot validation notes: [`01_source_data/guyot_validation_report.md`](01_source_data/guyot_validation_report.md).
-
----
-
-## Quickstart
-
-### Prerequisites
-- **R 4.6.0+** · **Python 3.10+**
-- **SAS 9.4** or **SAS OnDemand for Academics** *(optional — default is simulation mode)*
-  ODA setup: [`docs/runbooks/ODA_GUIDE.md`](docs/runbooks/ODA_GUIDE.md)
-
-### Run / verify
+Requirements: Python 3.10+, R 4.6.0+, and either SAS 9.4 or configured SAS OnDemand access for a genuine production run.
 
 ```bash
-git clone https://github.com/antonybevan/TROPIC_sanofi.git TROPIC && cd TROPIC
+# Recheck the committed release without patient data or SAS
+python3 scripts/verify_release.py
 
-# What interviewers can do immediately (no patient data, no SAS)
-python3 scripts/verify_release.py          # re-check committed Path A seals
-python3 platform/cibuild.py --demo         # smoke: syntax + recon methodology
+# Run the data-free smoke path
+python3 platform/cibuild.py --demo
 
-# Full governed DAG (requires local SDTM; default = sim SAS unless --real-sas)
-python3 platform/cibuild.py
-python3 platform/cibuild.py --real-sas     # genuine ODA/local when configured
+# Run the full controlled DAG with genuine SAS execution
+python3 platform/cibuild.py --real-sas
 
-# Assemble and validate the complete eCTD-style sequence (after a local build)
-python3 platform/package_ectd.py
-python3 platform/build_ectd_backbone.py
-python3 platform/materialize_ectd.py       # includes complete G08 surface validation
+# Recheck the current regulatory and qualification boundary
+python3 platform/check_regulatory_baseline.py --check-only
 ```
 
-See [`00_governance/REPRODUCIBILITY.md`](00_governance/REPRODUCIBILITY.md) and [`docs/REPO_SURFACE_POLICY.md`](docs/REPO_SURFACE_POLICY.md).
+The full run requires the authorized local SDTM source and credentials; see [Reproducibility](00_governance/REPRODUCIBILITY.md) and the [ODA runbook](docs/runbooks/ODA_GUIDE.md). A clean clone intentionally does not contain patient-level source or derived XPTs.
 
-Multi-study proof: `python3 platform/cibuild.py --study DEMO02` — see [`studies/README.md`](studies/README.md).
+## Regulatory baseline
 
----
+The executable baseline is [config/regulatory_baseline.yaml](config/regulatory_baseline.yaml). It is anchored to the FDA Study Data Technical Conformance Guide (June 2026), FDA electronic-systems guidance (October 2024), 21 CFR Part 11, ICH E6(R3), ADaMIG 1.3, SDTMIG 3.4, and Define-XML 2.1.
 
-## Pipeline (factory summary)
+Current package controls include:
 
-Manifest-driven **37-stage DAG** (`config/study_manifest.yaml` · `platform/cibuild.py`):
+- `csdrg.pdf` and `adrg.pdf` with FDA STF classification;
+- separate ADaM and SDTM Define-XML files and co-located local stylesheets;
+- analysis source programs for primary/secondary outputs;
+- a source blank CRF that is never presented as `acrf.pdf`;
+- explicit non-claims for Part 11, independent QC, Enterprise validation, and gateway acceptance; and
+- a CI gate that fails if those boundaries or filenames regress.
 
-```text
-01 real SDTM (local, not in git)
-  → staging + R validation
-  → synthetic comparator reconstruction + intrinsic/compatibility validation + XPT export
-  → independent SAS production + R validation ADaM
-  → cell-level recon (diffdf) + results recon
-  → admiral third engine (ADSL, OS, PFS)
-  → TFLs (catalog-controlled) + figure data recon
-  → Define / spec conformance
-  → Dataset-JSON · ARS · USDM (additive layers)
-  → Module 5 package + eCTD backbone
-  → log cleanliness + release-run hash seal
-```
+## License and source rights
 
-**Dual-language model:** SAS `*_prod.xpt` ↔ R `*_v.xpt` on real MP only.
-**Third track (risk-based):** admiral for ADSL + OS/PFS — see [`06_qc_evidence/reconciliation/ADMIRAL_RECONCILIATION.md`](06_qc_evidence/reconciliation/ADMIRAL_RECONCILIATION.md).
-**Single-author tracks** = implementation independence, **not** organizational GxP double programming.
-
-Architecture redesign map: [`docs/PIPELINE_ARCHITECTURE_REDESIGN.md`](docs/PIPELINE_ARCHITECTURE_REDESIGN.md)
-Operating model: [`docs/BIOMETRICS_DELIVERY_OPERATING_MODEL.md`](docs/BIOMETRICS_DELIVERY_OPERATING_MODEL.md)
-
----
-
-## What the package contains
-
-### ADaM (reconciled MP arm only)
-
-| Dataset | Role |
-|---|---|
-| ADSL | Subject-level analysis population |
-| ADEX / ADCM | Exposure · concomitant meds |
-| ADAE / ADLB | Safety programming (TEAE, labs/shifts) |
-| ADRS / ADTTE | Response · TTE (OS, PFS, secondaries) |
-
-Paths: development `04_analysis_datasets/adam/` · package `08_submission_package/m5/datasets/tropic/analysis/adam/datasets/`.
-
-### TFL (catalog-controlled)
-
-In-scope IDs live in [`config/tfl_output_catalog.yaml`](config/tfl_output_catalog.yaml).
-Gallery / outputs: [`05_outputs/tfl/`](05_outputs/tfl/) · package CSR appendices under `m5/53-clin-stud-rep/…`.
-
-Representative figures: KM OS/PFS · forest · waterfall · swimmer · Optimus ER.
-Tables: T-11 efficacy · T-17 Optimus · T-20 AE summary · T-21 lab shifts.
-
-### Reviewer guides
-
-| Guide | Location |
-|---|---|
-| ADRG | `07_reviewer_explanation/guides/ADRG.md` (+ PDF in package) |
-| SDRG | `…/SDRG.md` (+ `sdrg.pdf` co-located with SDTM) |
-| BDRG | `…/BDRG.md` (+ `bdrg.pdf` with BIMO) |
-| SDSP / Traceability | same guides folder |
-
-### Standards alignment (demonstration scope)
-
-CDISC ADaMIG 1.3 · SDTMIG 3.4 uplift · Define-XML 2.1 + ARM · FDA sdTCG Module 5 layout · BIMO clinsite pattern · Dataset-JSON / ARS / USDM additive layers.
-**Pattern demonstrated ≠ certified commercial validator clearance.** Details: historical section content retained in package README and ADRG.
-
----
-
-## SAS execution modes (honesty table)
-
-| Invocation | Mode | Evidence value |
-|---|---|---|
-| `--real-sas` + local SAS | `local` | Genuine dual-language |
-| `--real-sas` + ODA | `oda` | Genuine dual-language (if provenance guard PASS) |
-| `--use-cached-sas` | `cached` | Prior prod XPT only — not a new SAS run |
-| default / no engine | `sim` | **Not** double programming |
-
-Recorded in `platform/pipeline_health.json`. Frozen GREEN ODA snapshot: [`platform/evidence/`](platform/evidence/).
-Operator runbook: [`docs/runbooks/ODA_GUIDE.md`](docs/runbooks/ODA_GUIDE.md).
-
----
-
-## Workstreams (how the work is organized)
-
-Not a single script pile. Delivery is operated as departments:
-
-| WS | Focus |
-|---|---|
-| WS-0 | Governance & product claim (G00) |
-| WS-1 / WS-2 | Source intake · standards / metadata |
-| WS-3 | Analysis programming (SAS / R / admiral) |
-| WS-5 | QC, recon, findings disposition |
-| WS-6 | Reviewer writing (ADRG/SDRG/BDRG) |
-| Release | Seals, RC checklist, tag train |
-
-Board: [`docs/WORKSTREAM_EXECUTION_BOARD.md`](docs/WORKSTREAM_EXECUTION_BOARD.md) · packs: [`docs/workstreams/`](docs/workstreams/).
-
----
-
-## Reference
-
-de Bono JS, et al. **Prednisone plus cabazitaxel or mitoxantrone for metastatic castration-resistant prostate cancer…** *Lancet.* 2010;376(9747):1147–1154. [doi:10.1016/S0140-6736(10)61389-X](https://doi.org/10.1016/S0140-6736(10)61389-X)
-
-### Audit & seal records
-- Findings disposition: [`06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md`](06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md)
-- SAP lock memo: [`06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md`](06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md)
-- Historical run records: `06_qc_evidence/audit/run_records/`
-- Presentation research (why dual surface): [`docs/SUBMISSION_REPO_PRESENTATION_RESEARCH.md`](docs/SUBMISSION_REPO_PRESENTATION_RESEARCH.md)
+Code and repository-authored documentation follow the repository license. Source clinical data, published materials, standards content, SAS, and Pinnacle 21 remain subject to their respective access terms and licenses. Nothing in this repository grants redistribution or regulatory-use rights to those materials.

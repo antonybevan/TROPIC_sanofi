@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate Path A endpoint semantics and evidence boundaries in ADaM ARM."""
+"""Validate endpoint semantics and evidence boundaries in the controlled ADaM ARM."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ def _translated(node: ET.Element | None) -> str:
 
 
 def evaluate(path: Path) -> list[dict[str, object]]:
-    """Return named pass/fail checks for the governed Path A ARM contract."""
+    """Return named pass/fail checks for the governed ARM contract."""
     root = ET.parse(path).getroot()
     checks: list[dict[str, object]] = []
 
@@ -201,7 +201,7 @@ def evaluate(path: Path) -> list[dict[str, object]]:
     undisclosed = [
         display.get("OID", "")
         for display in displays
-        if "Path A limitation:" not in _translated(display)
+        if "Simulation boundary:" not in _translated(display)
     ]
     add(
         "define.arm_CbzP_disclosure",

@@ -1,0 +1,188 @@
+#!/usr/bin/env python3
+"""Validate the current FDA-facing package and qualification boundary.
+
+This gate checks objective repository facts. It does not infer regulatory
+approval and deliberately fails if a source blank CRF is presented as an aCRF,
+if the legacy SDRG filename returns, or if qualification non-claims disappear.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+import yaml
+
+
+ROOT = Path(__file__).resolve().parents[1]
+BASELINE = ROOT / "config/regulatory_baseline.yaml"
+OUT = ROOT / "06_qc_evidence/gates/regulatory_baseline_status.json"
+
+REQUIRED_ASSERTIONS = {
+    "ORGANIZATIONAL_INDEPENDENT_QC=NOT_ESTABLISHED",
+    "PART11_VALIDATED_SYSTEM=NOT_ESTABLISHED",
+    "LICENSED_PINNACLE21_ENTERPRISE=NOT_EXECUTED",
+    "PINNACLE21_COMMUNITY=INFORMATIVE_ONLY",
+    "REGULATORY_GATEWAY_ACCEPTANCE=NOT_EXECUTED",
+    "ANNOTATED_CRF=NOT_AVAILABLE",
+}
+
+
+def evaluate(root: Path = ROOT) -> dict:
+    checks: list[dict] = []
+    problems: list[str] = []
+
+    def add(name: str, ok: bool, detail: str = "") -> None:
+        checks.append({"name": name, "ok": bool(ok), "detail": detail})
+        if not ok:
+            problems.append(f"{name}: {detail}" if detail else name)
+
+    baseline_path = root / "config/regulatory_baseline.yaml"
+    try:
+        baseline = yaml.safe_load(baseline_path.read_text(encoding="utf-8")) or {}
+    except (OSError, yaml.YAMLError) as exc:
+        baseline = {}
+        add("baseline.readable", False, str(exc))
+    else:
+        add("baseline.readable", True, str(baseline_path.relative_to(root)))
+
+    add(
+        "baseline.product_class",
+        baseline.get("product_class") == "controlled_clinical_submission_simulation",
+        str(baseline.get("product_class")),
+    )
+    add(
+        "baseline.not_for_submission",
+        baseline.get("filing_status") == "not_for_regulatory_submission",
+        str(baseline.get("filing_status")),
+    )
+
+    authorities = baseline.get("authorities") or {}
+    add("authorities.count", len(authorities) >= 8, f"count={len(authorities)}")
+    for name, authority in authorities.items():
+        url = str((authority or {}).get("url", ""))
+        add(f"authority.https:{name}", url.startswith("https://"), url)
+
+    contract = baseline.get("package_contract") or {}
+    expected_file_keys = (
+        "analysis_data_reviewers_guide",
+        "clinical_study_data_reviewers_guide",
+        "analysis_define",
+        "tabulation_define",
+        "source_blank_crf",
+    )
+    for key in expected_file_keys:
+        rel = str(contract.get(key, ""))
+        path = root / rel
+        add(f"package.exists:{key}", bool(rel) and path.is_file(), rel or "not configured")
+
+    legacy_rel = str(contract.get("legacy_sdrg_filename_forbidden", ""))
+    add(
+        "package.no_legacy_sdrg",
+        bool(legacy_rel) and not (root / legacy_rel).exists(),
+        legacy_rel or "not configured",
+    )
+    acrf_rel = str(contract.get("annotated_crf_forbidden_alias", ""))
+    add(
+        "package.no_false_acrf",
+        bool(acrf_rel) and not (root / acrf_rel).exists(),
+        acrf_rel or "not configured",
+    )
+
+    stylesheet = str(contract.get("local_stylesheet", ""))
+    for define_key in ("analysis_define", "tabulation_define"):
+        define_rel = str(contract.get(define_key, ""))
+        style_path = (root / define_rel).parent / stylesheet
+        add(
+            f"package.local_stylesheet:{define_key}",
+            bool(stylesheet) and style_path.is_file(),
+            str(style_path.relative_to(root)) if stylesheet else "not configured",
+        )
+
+    program_rel = str(contract.get("analysis_program_directory", ""))
+    program_dir = root / program_rel
+    sas_programs = list(program_dir.glob("*.sas")) if program_dir.is_dir() else []
+    r_programs = list(program_dir.glob("*.R")) if program_dir.is_dir() else []
+    add("package.analysis_programs.sas", bool(sas_programs), f"count={len(sas_programs)}")
+    add("package.analysis_programs.r", bool(r_programs), f"count={len(r_programs)}")
+
+    claims = baseline.get("qualification_claims") or {}
+    expected_claims = {
+        "organizationally_independent_qc": False,
+        "part_11_validated_system": False,
+        "licensed_pinnacle_21_enterprise": False,
+        "pinnacle_21_community_informative_run": True,
+        "regulatory_gateway_acceptance": False,
+    }
+    for key, expected in expected_claims.items():
+        add(f"qualification:{key}", claims.get(key) is expected, str(claims.get(key)))
+
+    boundary_path = root / "docs/QUALITY_SYSTEM_BOUNDARY.md"
+    boundary = boundary_path.read_text(encoding="utf-8") if boundary_path.is_file() else ""
+    for assertion in sorted(REQUIRED_ASSERTIONS):
+        add(
+            f"boundary.assertion:{assertion}",
+            assertion in boundary,
+            "present" if assertion in boundary else "missing",
+        )
+
+    p21_path = root / "06_qc_evidence/conformance/p21_adam_runrecord.md"
+    p21 = p21_path.read_text(encoding="utf-8") if p21_path.is_file() else ""
+    for marker in (
+        "INFORMATIVE_ONLY",
+        "LICENSED_PINNACLE21_ENTERPRISE=NOT_EXECUTED",
+        "Incompatible CLI used",
+        "FDA 2508.1",
+    ):
+        add(
+            f"p21.boundary:{marker}",
+            marker in p21,
+            "present" if marker in p21 else "missing",
+        )
+
+    claim_path = root / "docs/PRODUCT_CLAIM.md"
+    claim = claim_path.read_text(encoding="utf-8") if claim_path.is_file() else ""
+    add(
+        "product_claim.controlled_simulation",
+        "controlled clinical-submission simulation" in claim.lower(),
+        "required controlled-simulation statement missing",
+    )
+    add(
+        "product_claim.not_submission",
+        "not a regulatory submission" in claim.lower(),
+        "required non-submission statement missing",
+    )
+
+    status = "PASS" if not problems else "FAIL"
+    return {
+        "gate": "REGULATORY_BASELINE",
+        "baseline_id": baseline.get("baseline_id"),
+        "status": status,
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "checks": checks,
+        "problems": problems,
+    }
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check-only", action="store_true", help="do not rewrite status JSON")
+    args = parser.parse_args(argv)
+    payload = evaluate()
+    if not args.check_only:
+        OUT.parent.mkdir(parents=True, exist_ok=True)
+        OUT.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    print(f"Regulatory baseline: {payload['status']}")
+    for problem in payload["problems"]:
+        print(f"  - {problem}")
+    if args.check_only:
+        print("Check-only mode: status JSON not rewritten")
+    else:
+        print(f"Wrote {OUT.relative_to(ROOT)}")
+    return 0 if payload["status"] == "PASS" else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

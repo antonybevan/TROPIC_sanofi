@@ -8,7 +8,7 @@ select_lab_baseline <- function(lb_data, paramcd_val) {
   lb_data |>
     filter(
       .data$PARAMCD == paramcd_val,
-      .data$BASEFL == "Y",
+      .data$ABLFL == "Y",
       !is.na(.data$ATOXGR)
     ) |>
     mutate(
@@ -32,7 +32,7 @@ select_lab_worst <- function(lb_data, paramcd_val) {
   lb_data |>
     filter(
       .data$PARAMCD == paramcd_val,
-      .data$BASEFL == "N",
+      is.na(.data$ABLFL),
       .data$ANL01FL == "Y",
       !is.na(.data$ATOXGR)
     ) |>

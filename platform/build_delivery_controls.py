@@ -28,7 +28,7 @@ REPORT_COMMANDS = [
     ["platform/build_delivery_dashboard.py"],
 ]
 
-# These rewrite Path A seal allowlist JSONs (or other committed machine grades
+# These rewrite controlled-release allowlist JSONs (or other committed machine grades
 # that scripts/verify_release.py re-checks). Safe locally after a real run;
 # unsafe in data-free CI because they clobber committed seals before the
 # end-of-suite verify_release step.
@@ -107,7 +107,7 @@ def main(argv=None):
         "--ci",
         action="store_true",
         help=(
-            "CI mode: skip seal-mutating report builders so committed Path A "
+            "CI mode: skip seal-mutating report builders so committed release "
             "seal JSONs stay intact for scripts/verify_release.py"
         ),
     )

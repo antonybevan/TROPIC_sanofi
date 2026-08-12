@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """G07 Reviewer Package Lock — executable gate.
 
-Ensures ADRG/SDRG/BDRG and supporting reviewer packs exist and carry Path A
+Ensures ADRG/cSDRG/BDRG and supporting reviewer packs exist and carry controlled
 non-claim / residual-risk pointers before packaging language is trusted.
 """
 from __future__ import annotations
@@ -16,8 +16,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "06_qc_evidence/gates/g07_reviewer_package_status.json"
-CURRENT_RELEASE = "v0.2.2-portfolio"
-CURRENT_RELEASE_NOTE = "docs/RELEASE_NOTE_v0.2.2-portfolio.md"
+CURRENT_RELEASE = "v0.3.0-clinical-simulation"
+CURRENT_RELEASE_NOTE = "docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md"
 
 REQUIRED = [
     "07_reviewer_explanation/guides/ADRG.md",
@@ -38,14 +38,14 @@ RELEASE_ID_SOURCES = [
     "08_submission_package/README.md",
 ]
 
-# Each guide must mention product claim or non-submission / demo boundary.
+# Each guide must mention the controlled non-submission boundary.
 GUIDE_MARKERS = {
     "07_reviewer_explanation/guides/ADRG.md": [
-        r"PRODUCT_CLAIM|non-submission|demonstration|v0\.1\.0-demo-rc",
+        r"PRODUCT_CLAIM|non-submission|controlled|v0\.1\.0-demo-rc",
         r"KNOWN_DIFFERENCES|synthetic|CbzP|Guyot|Part 11",
     ],
     "07_reviewer_explanation/guides/SDRG.md": [
-        r"PRODUCT_CLAIM|non-submission|demonstration|v0\.1\.0-demo-rc",
+        r"PRODUCT_CLAIM|non-submission|controlled|v0\.1\.0-demo-rc",
         r"source|PDS|week|precision|CORE",
     ],
     "07_reviewer_explanation/guides/BDRG.md": [
@@ -60,7 +60,7 @@ OVERCLAIM = re.compile(
 
 REVIEWER_PDFS = [
     "08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
-    "08_submission_package/m5/datasets/tropic/tabulations/sdtm/sdrg.pdf",
+    "08_submission_package/m5/datasets/tropic/tabulations/sdtm/csdrg.pdf",
     "08_submission_package/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
     "08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
 ]
@@ -216,7 +216,7 @@ def main() -> int:
             continue
         current_lines = [
             line for line in p.read_text(encoding="utf-8", errors="replace").splitlines()
-            if re.search(r"(?i)current (sealed )?portfolio release", line)
+            if re.search(r"(?i)current (sealed )?(portfolio|controlled) release", line)
         ]
         add(
             f"release_identity:{rel}",

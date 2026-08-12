@@ -235,8 +235,8 @@ adae_final <- adae_pre |>
     # Assign TRTEMFL in the same row context as SAS (by usubjid aedecod sort)
     TRTEMFL = if_else(
       !is.na(aetrtem_clean),
-      if_else(aetrtem_clean == "T", "Y", "N"),
-      if_else(!is.na(astdt) & astdt >= TRTSDT, "Y", "N")
+      if_else(aetrtem_clean == "T", "Y", NA_character_),
+      if_else(!is.na(astdt) & astdt >= TRTSDT, "Y", NA_character_)
     ),
     ADURN = as.numeric(aendt - astdt + 1),
     ADURU = "DAYS"
@@ -262,7 +262,7 @@ if (nrow(adae) == 0) {
 
 # D-012 follow-on: TEAE must carry AESER; baseline skeleton AEs often blank AESER
 n_teae_blank <- sum(adae$TRTEMFL == "Y" & (is.na(adae$AESER) | adae$AESER == ""), na.rm = TRUE)
-n_nte_blank <- sum(adae$TRTEMFL == "N" & (is.na(adae$AESER) | adae$AESER == ""), na.rm = TRUE)
+n_nte_blank <- sum(is.na(adae$TRTEMFL) & (is.na(adae$AESER) | adae$AESER == ""), na.rm = TRUE)
 cat(sprintf("NOTE: [ADAE-QC] Non-TE blank AESER (baseline skeleton expected) = %d\n", n_nte_blank))
 cat(sprintf("NOTE: [ADAE-QC] TEAE blank AESER (expect 0 or near-0) = %d\n", n_teae_blank))
 if (n_teae_blank > 5) {

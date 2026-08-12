@@ -1,7 +1,8 @@
 # Repository Surface Policy
 
-**Purpose:** Only **standard portfolio / clinical-programming practice** is tracked in git.  
-**Product claim:** Path A controlled non-submission demo (`docs/PRODUCT_CLAIM.md`).  
+**Purpose:** Track the controlled review surface, source spine, and minimum durable evidence.
+
+**Product claim:** controlled clinical-submission simulation (`docs/PRODUCT_CLAIM.md`).
 **Audience:** Interviewers, reviewers, future self.
 
 This is **not** “put every run artifact on GitHub.”  
@@ -16,13 +17,13 @@ This is **reproducible factory + honest sealed evidence + clean review face.**
 | 1 | Root `README.md` | Claim + dual surface |
 | 2 | `docs/PRODUCT_CLAIM.md` | What we may assert |
 | 3 | `08_submission_package/m5/` | Module 5–style **review package** (data-free preview) |
-| 4 | `07_reviewer_explanation/guides/` | ADRG · SDRG · BDRG |
-| 5 | `docs/RELEASE_NOTE_v0.2.2-portfolio.md` | Current portfolio seal narrative |
+| 4 | `07_reviewer_explanation/guides/` | ADRG · cSDRG source · BDRG |
+| 5 | `docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md` | Current controlled release narrative |
 | 6 | `python3 scripts/verify_release.py` | Re-check seals without SAS |
 | 7 | `docs/SCRIPT_MAP.md` · `platform/README.md` | If they want the factory |
 
 **Interview line:**  
-Package under `m5/`. Factory is programs + orchestrator + seals. Patient data not in git. CbzP synthetic. Path A demo — not a filing.
+Package under `m5/`. Factory is programs, orchestration, and evidence. Patient data are not in Git. CbzP is synthetic/reconstructed and TFL-only. This is not a filing.
 
 Full walk: [`INTERVIEWER_GUIDE.md`](INTERVIEWER_GUIDE.md).
 
@@ -57,9 +58,9 @@ Full walk: [`INTERVIEWER_GUIDE.md`](INTERVIEWER_GUIDE.md).
 - `07_reviewer_explanation/guides/`  
 - Findings disposition board + findings register  
 
-### D. Sealed run evidence (honest Path A proof)
+### D. Sealed run evidence
 
-Minimal machine grades so a **bare clone** can re-check the current sealed Path A release **without** patient data or ODA:
+Minimal machine evidence so a **bare clone** can recheck the controlled release **without** patient data or ODA:
 
 | Artifact | Role |
 |---|---|
@@ -91,7 +92,7 @@ Everything else regenerable is **local only**.
 | Tool installs | `.core_engine/`, `.p21/`, `renv/library/` | Re-downloadable |
 | Runtime caches | `stage_cache.json`, ODA locks, logs | Ephemeral |
 
-**Standard practice:** version **code + controlled docs + sealed evidence**, not the entire QC warehouse every night.
+Version **code, controlled documents, and sealed evidence**, not transient runtime output.
 
 ---
 
@@ -100,7 +101,7 @@ Everything else regenerable is **local only**.
 | Who | What they can do |
 |---|---|
 | **Any interviewer (bare clone)** | Read `m5/` + guides; run `scripts/verify_release.py`; run `python3 platform/cibuild.py --demo` |
-| **GitHub Actions** | Job `path-a-seal-verify` re-runs `scripts/verify_release.py` on push/PR (no SAS/data) |
+| **GitHub Actions** | Job `Controlled release seal verify` reruns `scripts/verify_release.py` on push/PR (no SAS/data) |
 | **You with SDTM + ODA/local SAS** | Full dual-language DAG; re-seal; refresh package |
 | **Nobody from public git alone** | Re-derive real MP patient-level ADaM without licensed source |
 

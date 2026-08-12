@@ -5,9 +5,9 @@
 | **Document** | Analysis Traceability Matrix |
 | **Study** | TROPIC (EFC6193 / XRP6258) · NCT00417079 |
 | **Standards** | SDTMIG v3.1.1 source → v3.4 uplift · ADaMIG v1.3 / OCCDS v1.0 + custom episode-merge |
-| **Document version** | 1.2 (audit closure / Path A catalog-aligned) |
+| **Document version** | 2.0 (controlled release / catalog-aligned) |
 | **Effective** | 2026-08-05 |
-| **Product claim** | **Path A only** (`docs/PRODUCT_CLAIM.md`) |
+| **Product claim** | Controlled clinical-submission simulation (`docs/PRODUCT_CLAIM.md`) |
 | **TFL control authority** | `config/tfl_output_catalog.yaml` |
 
 **Purpose:** Walk any controlled display number back to code, ADaM, define, and recon evidence.
@@ -75,7 +75,7 @@ variable-label artifacts for both tracks (`platform/gen_adam_labels.R`).
 
 ---
 
-## 3. TFL outputs — controlled catalog alignment (Path A)
+## 3. TFL outputs — controlled catalog alignment
 
 **Authority:** `config/tfl_output_catalog.yaml` only.  
 **Generator:** `05_outputs/tfl/tfl_generation.R` (reporting deliverable).  
@@ -110,7 +110,7 @@ variable-label artifacts for both tracks (`platform/gen_adam_labels.R`).
 
 ### 3.2 Explicitly deferred (18 IDs) — sample of policy
 
-Not listed above = **not** Path A controlled delivery. Examples: standalone T-11-1/T-11-2 OS/PFS table shells (evidence via F-11-1/F-11-2 + results recon instead), F-12-2, T-12-*, many T-20 detail shells. Full list and reasons: `config/tfl_output_catalog.yaml` → `deferred_not_in_scope`.
+Not listed above = **not** controlled delivery scope. Examples: standalone T-11-1/T-11-2 OS/PFS table shells (evidence via F-11-1/F-11-2 + results reconciliation instead), F-12-2, T-12-*, and many T-20 detail shells. Full list and reasons: `config/tfl_output_catalog.yaml` → `deferred_not_in_scope`.
 
 ### 3.3 SAS companion figures (out of DAG)
 
@@ -145,7 +145,7 @@ that link key results to their ADaM data + method — the define-level complemen
 > Every controlled analysis output is mapped to a ResultDisplay except the analysis-population
 > flow diagram `F-01-1`, which is not a statistical analysis result. The response display
 > records the staged PN/SV dependency for T-11-5 and its exact subject-level
-> `F042_PAIN_RESPONSE` SAS/R control; all ResultDisplays carry the Path A synthetic-comparator
+> `F042_PAIN_RESPONSE` SAS/R control; all ResultDisplays carry the controlled synthetic-comparator
 > disclosure. Referential integrity and endpoint semantics are gated by
 > `validate_define.py`, `define_arm_contract.py`, and G02. The analysis-population overview (`F-01`, legacy
 > `CONSORT` filename) and the

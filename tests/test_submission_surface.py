@@ -31,7 +31,7 @@ def test_current_release_identity_is_bound_across_reviewer_sources():
         lines = [
             line
             for line in (ROOT / rel).read_text(encoding="utf-8").splitlines()
-            if "Current portfolio release" in line or "Current sealed portfolio release" in line
+            if "Current controlled release" in line or "Current sealed controlled release" in line
         ]
         assert len(lines) == 1, (rel, lines)
         assert CURRENT_RELEASE in lines[0]

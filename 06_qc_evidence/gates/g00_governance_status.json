@@ -2,10 +2,20 @@
   "gate": "G00",
   "name": "governance_scope_lock",
   "status": "PASS",
-  "generated_at": "2026-08-10T05:38:08Z",
+  "generated_at": "2026-08-12T07:28:19Z",
   "checks": [
     {
       "name": "exists:docs/PRODUCT_CLAIM.md",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:docs/QUALITY_SYSTEM_BOUNDARY.md",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md",
       "ok": true,
       "detail": "present"
     },
@@ -50,9 +60,14 @@
       "detail": "present"
     },
     {
-      "name": "product_claim.path_a",
+      "name": "exists:config/regulatory_baseline.yaml",
       "ok": true,
-      "detail": "PRODUCT_CLAIM must freeze Path A / controlled demo language"
+      "detail": "present"
+    },
+    {
+      "name": "product_claim.controlled_simulation",
+      "ok": true,
+      "detail": "PRODUCT_CLAIM must freeze the controlled simulation and non-submission boundary"
     },
     {
       "name": "product_claim.forbids_part11",

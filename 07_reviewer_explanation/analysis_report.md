@@ -1,7 +1,7 @@
-# TROPIC Clinical Analysis Report
+# TROPIC Controlled Clinical Analysis Report
 ## Study EFC6193 / XRP6258 — Abbreviated Clinical Study Summary
 
-**Current portfolio release:** tag `v0.2.2-portfolio` · [`docs/RELEASE_NOTE_v0.2.2-portfolio.md`](../docs/RELEASE_NOTE_v0.2.2-portfolio.md) · controlled non-submission demonstration
+**Current controlled release:** tag `v0.3.0-clinical-simulation` · [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) · controlled clinical-submission simulation
 
 > **SAP v4.0 lock note (2026-06-25):** This report is a generated demonstration output under
 > remediation control. It is not a clinical study report for submission and it is not a source
@@ -94,7 +94,7 @@ Treatment-emergent adverse events (TEAEs) were defined as events occurring on or
 
 ## 5. Laboratory Toxicity — CTCAE Grade Shift
 
-Baseline to worst post-baseline toxicity-grade shifts use `BASEFL`, `ANL01FL`, and `ATOXGR` in ADLB. For the real MP arm, `ATOXGR` carries the source `LBTOXGR`; the analysis pipeline does not independently re-grade laboratory values against CTCAE thresholds. The CbzP laboratory arm remains synthetic and illustrative.
+Baseline to worst post-baseline toxicity-grade shifts use the one-sided ADaM baseline flag `ABLFL`, the analysis record flag `ANL01FL`, and `ATOXGR` in ADLB. For the real MP arm, `ATOXGR` carries the source `LBTOXGR`; the analysis pipeline does not independently re-grade laboratory values against CTCAE thresholds. The CbzP laboratory arm remains synthetic and illustrative.
 
 ### 5.1 ANC / Neutrophils — Key Finding
 
