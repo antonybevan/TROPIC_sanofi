@@ -50,6 +50,7 @@ ALLOWED_PATHS = (
     "platform/check_regulatory_baseline.py",
     "platform/cibuild.py",
     "platform/pipeline_health.json",
+    "platform/stage_p21_adam_inputs.py",
     "requirements-ci.txt",
     "requirements-ci.lock",
     "scripts/rebind_governance_seal.py",

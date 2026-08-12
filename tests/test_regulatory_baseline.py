@@ -72,7 +72,7 @@ def test_governance_reseal_chain_rejects_discontinuous_history():
     assert not ok
 
 
-def test_current_baseline_accepts_disclosed_later_header_only_rebuild():
+def test_current_baseline_requires_completed_exact_byte_rerun():
     result = evaluate(ROOT)
     timestamp_check = next(
         row for row in result["checks"]
@@ -83,8 +83,11 @@ def test_current_baseline_accepts_disclosed_later_header_only_rebuild():
         if row["name"] == "p21.summary.exact_byte_rerun_boundary"
     )
     assert timestamp_check["ok"], timestamp_check
-    assert "later_rebuild_assessed=True" in timestamp_check["detail"]
+    assert "bound=2026-08-12T10:28:13.216075+00:00" in timestamp_check["detail"]
     assert boundary_check["ok"], boundary_check
+    assert boundary_check["detail"] == (
+        "exact current production bytes validated under standard submission filenames"
+    )
 
 
 def test_prior_governance_reseal_validation_is_history_independent():
@@ -152,10 +155,16 @@ def test_definitive_p21_summary_is_self_reconciling_and_non_qualifying():
         (ROOT / "06_qc_evidence/conformance/p21_adam_summary.json").read_text()
     )
     totals = summary["totals"]
+    assert summary["schema_version"] == "1.1"
     assert summary["status"] == "EXECUTED_WITH_OPEN_FINDINGS_AND_COMPATIBILITY_CAVEAT"
     assert summary["use"] == "INFORMATIVE_ONLY"
     assert summary["validation"]["process_completed"] is True
     assert summary["validation"]["compatibility_caveat"] == "Incompatible CLI used"
+    assert summary["validation"]["raw_report_sha256"] == (
+        "8184a5ccedca45ccd25c444cc3aca350798085a26d03153dfbb122da9c217024"
+    )
+    assert summary["validation"]["input_content_transformations"] == 0
+    assert "standard submission filenames" in summary["validation"]["input_filename_contract"]
     assert totals == {
         "datasets_processed": 7,
         "datasets_rejected": 0,
@@ -165,19 +174,37 @@ def test_definitive_p21_summary_is_self_reconciling_and_non_qualifying():
         "issue_occurrences": 2373,
     }
     assert totals["records"] == sum(row["records"] for row in summary["datasets"])
+    assert {row["validator_filename"] for row in summary["datasets"]} == {
+        "adae.xpt",
+        "adcm.xpt",
+        "adex.xpt",
+        "adlb.xpt",
+        "adrs.xpt",
+        "adsl.xpt",
+        "adtte.xpt",
+    }
+    assert {row["dataset"]: row["sha256"] for row in summary["datasets"]} == {
+        "ADAE": "fcad58d6706ecfc8cd4508f874fcdd343a1f42588686edc4932ca8edaaab2a93",
+        "ADCM": "87a5c0c51f139c9fc18eeb01612bf413d159c9d71b638233155944d06637a6d0",
+        "ADEX": "88f48e9a46775ef5b9e8d40395c277badde3ebdc83fee153fea6e7793c28240d",
+        "ADLB": "e2e11cfc900be0129ef5e6d6dfeeabbd36b04bec57be5353eaa1165fb7bf10cd",
+        "ADRS": "2355507061b1c37743cd0d543ff2bb129ddbbc33d48e74f755dad711bbd4ab4f",
+        "ADSL": "b4f465cc39e4a90706c72bde69cc21b56f5aab11506f25af1190d0e9b96459ad",
+        "ADTTE": "377e13bf3b34524692b48ed77f56df1beec8b5b972c7015cf09220c530173840",
+    }
     assert totals["issue_groups"] == len(summary["issues"])
     assert totals["issue_occurrences"] == sum(row["found"] for row in summary["issues"])
     assert totals["issue_occurrences"] == sum(
         row["occurrences"] for row in summary["residual_families"]
     )
     assert summary["pipeline_binding"] == {
-        "health_timestamp": "2026-08-12T09:29:59.539074+00:00",
+        "health_timestamp": "2026-08-12T10:28:13.216075+00:00",
         "pipeline_health_status": "GREEN",
         "sas_execution_mode": "oda",
         "run_scope": "full_dag",
         "stages_expected": 37,
         "stages_recorded": 37,
-        "source_tree_sha256": "81dadd3c02bf521bf11fce32f67f30ec4c70913059675cc576c895b8182a605d",
+        "source_tree_sha256": "25eea11519389347cf943ecdb2c57c55733c32f781241f158d91acca35eb6fa5",
     }
     assert summary["remediation_comparison"]["occurrences_eliminated"] == 84238
     assert summary["remediation_comparison"]["percent_reduction"] == 97.3
@@ -190,19 +217,15 @@ def test_definitive_p21_summary_is_self_reconciling_and_non_qualifying():
         "submission_clearance_claimed": False,
         "independent_qc_approved": False,
     }
-    assert summary["subsequent_rebuild_assessment"] == {
+    assert summary["exact_byte_rerun"] == {
         "health_timestamp": "2026-08-12T10:28:13.216075+00:00",
-        "comparison_method": "exhaustive_byte_comparison",
-        "datasets_compared": 7,
-        "payload_differences_after_byte_495": 0,
-        "header_timestamp_differences_per_dataset": 2,
-        "comparison": (
-            "XPT payload byte-identical after byte 495 for all seven datasets; "
-            "differences are confined to two SAS XPORT header timestamps per file"
-        ),
-        "exact_byte_vendor_rerun": False,
-        "vendor_rerun_blocker": (
-            "Acceptance of vendor application Terms and Conditions requires authorized "
-            "human confirmation"
+        "completed": True,
+        "datasets_validated": 7,
+        "input_hashes_match_current_production_xpts": True,
+        "standard_filenames_used": True,
+        "content_transformations": 0,
+        "process_completed": True,
+        "report_sha256": (
+            "8184a5ccedca45ccd25c444cc3aca350798085a26d03153dfbb122da9c217024"
         ),
     }
