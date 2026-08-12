@@ -249,11 +249,11 @@
         "size_bytes": 8260
       },
       {
-        "md5": "aaf9b1cc7f205987256446f84c23c189",
+        "md5": "b90a31a03a1fd33fa658603796a53552",
         "path": "config/evidence_layers.yaml",
         "present": true,
-        "sha256": "c7b78ef98639f1bfff357d4da986df019a01a29eafa3910a626db86a68c8f55c",
-        "size_bytes": 18791
+        "sha256": "6d948550b1b1079833074103f9aa8a7d33f0b6e283bc37e42734a9f8ef3c5919",
+        "size_bytes": 18982
       },
       {
         "md5": "9c120fc9eac089a8da12124586186703",
@@ -270,11 +270,11 @@
         "size_bytes": 3388
       },
       {
-        "md5": "c5b6f4c57f333077984396c5b4eab72f",
+        "md5": "8723aa68f49c7469e0391ecd3e45739a",
         "path": "config/regulatory_baseline.yaml",
         "present": true,
-        "sha256": "cb8859bde9eec91c4be83ec01fd6be0f3b30bd8a1c105f178db1bc4d3e9e82b8",
-        "size_bytes": 2936
+        "sha256": "e01e80e2d1ebc4cfe55c0d3c317dfee29c7f53751504ee64c6900dbe03415c3f",
+        "size_bytes": 2975
       },
       {
         "md5": "f251090e6b831de74799d4e53a8c7c10",
@@ -291,18 +291,18 @@
         "size_bytes": 5728
       },
       {
-        "md5": "9320c5499c8e4ba0b4b9918eab5ca945",
+        "md5": "9ac775e7ccf1163a1073ec9a479c1ab5",
         "path": "06_qc_evidence/conformance/p21_adam_runrecord.md",
         "present": true,
-        "sha256": "e3445d6ad2195bfd97ac09f7cc1cf3917cb7aadd667db44c5e1af3c565c7c39c",
-        "size_bytes": 6009
+        "sha256": "5721a34f75f364ad69453a4f0fcc6bfac4b3740272164968df23f10a9d385f41",
+        "size_bytes": 6199
       },
       {
-        "md5": "120cb8dd1747d85f38d7b0eea8127bbe",
+        "md5": "8336ef9c5fd3ecd4d72da907dc47ee4a",
         "path": "06_qc_evidence/conformance/p21_adam_summary.json",
         "present": true,
-        "sha256": "61851aeaaced101436a3d2d49b96bdad0eb5056a4bf719fd48ceef8e66304d99",
-        "size_bytes": 6971
+        "sha256": "412f721e8b678c7befae0622dedf31a6a812da964e4d2b9fd2491958895f0362",
+        "size_bytes": 7280
       },
       {
         "md5": "df49adc0bbf6f1c550e3a5cb4e71400a",
@@ -2814,11 +2814,11 @@
         "size_bytes": 12792
       },
       {
-        "md5": "52356b1e7e11bf70d7c08edc4c6e79a4",
+        "md5": "46a79aca1ebef5a1e95fc2a66f9b815f",
         "path": "platform/check_regulatory_baseline.py",
         "present": true,
-        "sha256": "2d07daac3dae450de274dd7049d775d017e31c8d5ce96e3eb41df66e07bc2023",
-        "size_bytes": 11447
+        "sha256": "af95e325994bd8418e5f73c572c22e49038b3342068fb9b7933e9080e924a7b0",
+        "size_bytes": 13109
       },
       {
         "md5": "764ba737f74cb525b6b6b21e79ce92ec",
@@ -3019,11 +3019,11 @@
     ],
     "qc_files": [
       {
-        "md5": "3b48f0dbf7ce8880b5d4b80523f82bb2",
+        "md5": "cac02e068c8fdcf4c129d8a5fd46eece",
         "path": "platform/pipeline_health.json",
         "present": true,
-        "sha256": "fb1a3cf7446672cf60dafca05f1bb1de6bbec8396e4ece93682fbf371d7234ff",
-        "size_bytes": 3650
+        "sha256": "3d9c1b24b0edaf2e0f2ba83acf55680fa6969bffb24bb627f29cec2978ccb02b",
+        "size_bytes": 4716
       },
       {
         "md5": "06989db82566475af4ebd3685eb8d8a8",
@@ -3103,11 +3103,11 @@
         "size_bytes": 22052
       },
       {
-        "md5": "91582c98e8428d51ec07ea01bd24fd15",
+        "md5": "b0a53ecee6eeb80012b3ffd7e7c146af",
         "path": "06_qc_evidence/gates/regulatory_baseline_status.json",
         "present": true,
-        "sha256": "1fffdbd9d07222c33e7d2fa1c29b14e842cee1bf614aeba031c754c9159c9712",
-        "size_bytes": 8907
+        "sha256": "5eb3de49d07b58f812779594ad2c47601468c01341f396d2bbb27fcf5c7ea63c",
+        "size_bytes": 10290
       }
     ],
     "tfl_outputs": [
@@ -3524,9 +3524,9 @@
     "sas_version": "9.04.01M8P022223",
     "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007"
   },
-  "evidence_grade": "remediation_partial_or_dirty",
-  "generated_at": "2026-08-12 09:30:02 UTC",
-  "manifest_sha256": "67a5e044baeb63b8b8c19726cd2706cfcd552767a29ab53968102a52fefeab1b",
+  "evidence_grade": "release_candidate",
+  "generated_at": "2026-08-12 09:37:44 UTC",
+  "manifest_sha256": "42b199d8c6aed9136726447813b27d8d368ae81d52aa06357ed5e7a47a9fbd36",
   "problems": [],
   "qc_statuses": {
     "cbzp_bridge": {
@@ -3647,9 +3647,7 @@
       "status": "PASS"
     }
   },
-  "remediation_reasons": [
-    "git worktree is dirty (49 porcelain entries); release-candidate lock requires a clean committed state"
-  ],
+  "remediation_reasons": [],
   "run_completeness": {
     "expected_stage_names": [
       "Governance Scope Lock (G00)",
@@ -3741,165 +3739,16 @@
   },
   "source_control": {
     "branch": "codex/fda-aligned-clinical-portfolio",
-    "dirty": true,
-    "dirty_including_seal_outputs": true,
-    "head": "6ea76682778d23e8c8ff907300b5870df0ec4034",
+    "dirty": false,
+    "dirty_including_seal_outputs": false,
+    "head": "ee8b06fa1f4e7656f70bdbe947a06085bb6a5a83",
     "pipeline_control_sha256": "94a2f7d6176b7a31e95b349edf55520fb54ba400bd65e0794668c8a98144ec26",
-    "source_tree_sha256": "81dadd3c02bf521bf11fce32f67f30ec4c70913059675cc576c895b8182a605d",
+    "source_tree_sha256": "85e79bae07334e80311266c03267228d6e230f6905b2bea6d4f771ed602be780",
     "staged_diff_paths": [],
-    "status_porcelain": [
-      " M 01_source_data/guyot_validation_report.md",
-      " M 03_metadata/define/define.xml",
-      " M 05_outputs/ars/tropic_ard.csv",
-      " M 05_outputs/tfl/lab_shift_table.R",
-      " M 05_outputs/tfl/tfl_generation.R",
-      " M 06_qc_evidence/audit/AUDIT_REPORT.md",
-      " M 06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md",
-      " M 06_qc_evidence/audit/findings_register.csv",
-      " M 06_qc_evidence/audit/run_records/FDA_REVIEWER_AUDIT_2026-06-20.md",
-      " M 06_qc_evidence/audit/run_records/SUBMISSION_STANDARDS_REMEDIATION.md",
-      " M 06_qc_evidence/audit/section_reviews/SECTION_05_PORTFOLIO_FINALIZATION_AUDIT_2026-08-04.md",
-      " M 06_qc_evidence/conformance/p21_adam_runrecord.md",
-      " M 06_qc_evidence/gates/g00_governance_status.json",
-      " M 06_qc_evidence/gates/g02_specification_status.json",
-      " M 06_qc_evidence/gates/g07_reviewer_package_status.json",
-      " M 06_qc_evidence/gates/regulatory_baseline_status.json",
-      " M 08_submission_package/README.md",
-      " M 08_submission_package/ectd/0000/index-md5.txt",
-      " M 08_submission_package/ectd/0000/index.xml",
-      " M 08_submission_package/ectd/0000/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/stf-tropic.xml",
-      " M 08_submission_package/ectd/RUN_RECORD.md",
-      " M 08_submission_package/m5/datasets/tropic/analysis/adam/datasets/define.xml",
-      " M 08_submission_package/m5/datasets/tropic/analysis/adam/programs/tfl_generation.R",
-      " M CHANGELOG.md",
-      " M README.md",
-      " M TROPIC_PIPELINE_AUDIT_CLOSURE_2026-08-10.md",
-      " M config/evidence_layers.yaml",
-      " M config/regulatory_baseline.yaml",
-      " M docs/PRODUCT_CLAIM.md",
-      " M docs/QUALITY_SYSTEM_BOUNDARY.md",
-      " M docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md",
-      " M docs/WORKSTREAM_EXECUTION_BOARD.md",
-      " M docs/workstreams/WS1_SOURCE_INTAKE_PACK.md",
-      " M docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md",
-      " M docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md",
-      " M docs/workstreams/reviews/PATH_A_STATISTICAL_GOVERNANCE_ASSESSMENT_2026-08-04.md",
-      " M platform/admiral_reconciliation_status.json",
-      " M platform/build_release_run_manifest.py",
-      " M platform/check_regulatory_baseline.py",
-      " M platform/log_cleanliness/log_cleanliness_status.json",
-      " M platform/package_ectd.py",
-      " M platform/pipeline_health.json",
-      " M scripts/rebind_governance_seal.py",
-      " M scripts/verify_release.py",
-      " M tests/test_lab_shift_table.R",
-      " M tests/test_regulatory_baseline.py",
-      " M tests/test_submission_surface.py",
-      "?? 06_qc_evidence/conformance/p21_adam_summary.json",
-      "?? 08_submission_package/m5/datasets/tropic/analysis/adam/programs/lab_shift_table.R"
-    ],
-    "status_porcelain_all": [
-      " M 01_source_data/guyot_validation_report.md",
-      " M 03_metadata/define/define.xml",
-      " M 05_outputs/ars/tropic_ard.csv",
-      " M 05_outputs/tfl/lab_shift_table.R",
-      " M 05_outputs/tfl/tfl_generation.R",
-      " M 06_qc_evidence/audit/AUDIT_REPORT.md",
-      " M 06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md",
-      " M 06_qc_evidence/audit/findings_register.csv",
-      " M 06_qc_evidence/audit/run_records/FDA_REVIEWER_AUDIT_2026-06-20.md",
-      " M 06_qc_evidence/audit/run_records/SUBMISSION_STANDARDS_REMEDIATION.md",
-      " M 06_qc_evidence/audit/section_reviews/SECTION_05_PORTFOLIO_FINALIZATION_AUDIT_2026-08-04.md",
-      " M 06_qc_evidence/conformance/p21_adam_runrecord.md",
-      " M 06_qc_evidence/gates/g00_governance_status.json",
-      " M 06_qc_evidence/gates/g02_specification_status.json",
-      " M 06_qc_evidence/gates/g07_reviewer_package_status.json",
-      " M 06_qc_evidence/gates/regulatory_baseline_status.json",
-      " M 08_submission_package/README.md",
-      " M 08_submission_package/ectd/0000/index-md5.txt",
-      " M 08_submission_package/ectd/0000/index.xml",
-      " M 08_submission_package/ectd/0000/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/stf-tropic.xml",
-      " M 08_submission_package/ectd/RUN_RECORD.md",
-      " M 08_submission_package/m5/datasets/tropic/analysis/adam/datasets/define.xml",
-      " M 08_submission_package/m5/datasets/tropic/analysis/adam/programs/tfl_generation.R",
-      " M CHANGELOG.md",
-      " M README.md",
-      " M TROPIC_PIPELINE_AUDIT_CLOSURE_2026-08-10.md",
-      " M config/evidence_layers.yaml",
-      " M config/regulatory_baseline.yaml",
-      " M docs/PRODUCT_CLAIM.md",
-      " M docs/QUALITY_SYSTEM_BOUNDARY.md",
-      " M docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md",
-      " M docs/RELEASE_RUN_MANIFEST.md",
-      " M docs/WORKSTREAM_EXECUTION_BOARD.md",
-      " M docs/workstreams/WS1_SOURCE_INTAKE_PACK.md",
-      " M docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md",
-      " M docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md",
-      " M docs/workstreams/reviews/PATH_A_STATISTICAL_GOVERNANCE_ASSESSMENT_2026-08-04.md",
-      " M platform/admiral_reconciliation_status.json",
-      " M platform/build_release_run_manifest.py",
-      " M platform/check_regulatory_baseline.py",
-      " M platform/log_cleanliness/log_cleanliness_status.json",
-      " M platform/package_ectd.py",
-      " M platform/pipeline_health.json",
-      " M platform/release_run_manifest/release_run_manifest.json",
-      " M scripts/rebind_governance_seal.py",
-      " M scripts/verify_release.py",
-      " M tests/test_lab_shift_table.R",
-      " M tests/test_regulatory_baseline.py",
-      " M tests/test_submission_surface.py",
-      "?? 06_qc_evidence/conformance/p21_adam_summary.json",
-      "?? 08_submission_package/m5/datasets/tropic/analysis/adam/programs/lab_shift_table.R"
-    ],
-    "status_porcelain_sha256": "eda852359f78b36a40019981deffeee7d5b3644623792df55705dc06f33e2717",
-    "tracked_diff_paths": [
-      "01_source_data/guyot_validation_report.md",
-      "03_metadata/define/define.xml",
-      "05_outputs/tfl/lab_shift_table.R",
-      "05_outputs/tfl/tfl_generation.R",
-      "06_qc_evidence/audit/AUDIT_REPORT.md",
-      "06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md",
-      "06_qc_evidence/audit/findings_register.csv",
-      "06_qc_evidence/audit/run_records/FDA_REVIEWER_AUDIT_2026-06-20.md",
-      "06_qc_evidence/audit/run_records/SUBMISSION_STANDARDS_REMEDIATION.md",
-      "06_qc_evidence/audit/section_reviews/SECTION_05_PORTFOLIO_FINALIZATION_AUDIT_2026-08-04.md",
-      "06_qc_evidence/conformance/p21_adam_runrecord.md",
-      "06_qc_evidence/gates/g00_governance_status.json",
-      "06_qc_evidence/gates/g02_specification_status.json",
-      "06_qc_evidence/gates/g07_reviewer_package_status.json",
-      "06_qc_evidence/gates/regulatory_baseline_status.json",
-      "08_submission_package/README.md",
-      "08_submission_package/ectd/0000/index-md5.txt",
-      "08_submission_package/ectd/0000/index.xml",
-      "08_submission_package/ectd/0000/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/stf-tropic.xml",
-      "08_submission_package/ectd/RUN_RECORD.md",
-      "08_submission_package/m5/datasets/tropic/analysis/adam/datasets/define.xml",
-      "08_submission_package/m5/datasets/tropic/analysis/adam/programs/tfl_generation.R",
-      "CHANGELOG.md",
-      "README.md",
-      "TROPIC_PIPELINE_AUDIT_CLOSURE_2026-08-10.md",
-      "config/evidence_layers.yaml",
-      "config/regulatory_baseline.yaml",
-      "docs/PRODUCT_CLAIM.md",
-      "docs/QUALITY_SYSTEM_BOUNDARY.md",
-      "docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md",
-      "docs/WORKSTREAM_EXECUTION_BOARD.md",
-      "docs/workstreams/WS1_SOURCE_INTAKE_PACK.md",
-      "docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md",
-      "docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md",
-      "docs/workstreams/reviews/PATH_A_STATISTICAL_GOVERNANCE_ASSESSMENT_2026-08-04.md",
-      "platform/admiral_reconciliation_status.json",
-      "platform/build_release_run_manifest.py",
-      "platform/check_regulatory_baseline.py",
-      "platform/log_cleanliness/log_cleanliness_status.json",
-      "platform/package_ectd.py",
-      "platform/pipeline_health.json",
-      "scripts/rebind_governance_seal.py",
-      "scripts/verify_release.py",
-      "tests/test_lab_shift_table.R",
-      "tests/test_regulatory_baseline.py",
-      "tests/test_submission_surface.py"
-    ]
+    "status_porcelain": [],
+    "status_porcelain_all": [],
+    "status_porcelain_sha256": "",
+    "tracked_diff_paths": []
   },
-  "status": "REMEDIATION"
+  "status": "PASS"
 }
