@@ -53,11 +53,16 @@ fail_patterns:
     rationale: "R errors invalidate the validation/reconciliation log."
 
 reviewed_exceptions:
-  - id: ADTTE_TIME_ORIGIN_FLOORING
+  - id: ADAE_SOURCE_TEAE_PRETRT
     files:
       - 04_analysis_datasets/programs/sas/oda_master_driver.log
-    regex: '^WARNING: \[ADTTE\] event/censor date precedes time origin; floored to 1 day\. PARAMCD=(PFS|TTPAIN|TTPSA|TTUMOR) USUBJID=[0-9-]+$'
-    severity: reviewed_exception
-    max_count: 39
-    owner: statistical_programming
-    rationale: "Known source-date/time-origin anomaly retained as an explicit, capped QC exception; source timing remediation remains tracked under F-017."
+    regex: '^WARNING: \[ADAE-QC\] 44 source-classified TEAE rows precede treatment\.$'
+    severity: major
+    max_count: 1
+    owner: clinical_programming
+    rationale: >
+      The public source AETRTEM classification is retained for 44 records whose
+      recorded start date precedes first dose because such records can represent
+      pre-existing events that worsened after treatment. The exact message and
+      count are capped at one occurrence; any source or derivation drift remains
+      an unapproved blocking finding.

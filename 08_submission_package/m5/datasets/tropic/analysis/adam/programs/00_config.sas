@@ -62,13 +62,26 @@
         %let PGMDIR = &PROJ_ROOT.&PATH_SEP.04_analysis_datasets/programs/sas;
     %end;
 
-    /* Define Libraries */
+    /* Load the governed scalar configuration before allocating libraries. */
+    %include "&PGMDIR.&PATH_SEP.00_config_generated.sas";
+
+    /* Define Libraries. The immutable source and regenerable staging zones are
+       deliberately separate; the equality guard is a hard pipeline failure. */
     options dlcreatedir;
     libname raw     "&PROJ_ROOT.&PATH_SEP.01_source_data" access=readonly;
-    libname realsdtm "&PROJ_ROOT.&PATH_SEP.01_source_data&PATH_SEP.real_sdtm" access=readonly;
-    libname staging "&PROJ_ROOT.&PATH_SEP.01_source_data&PATH_SEP.real_sdtm";
+    libname realsdtm "&PROJ_ROOT.&PATH_SEP.&SOURCE_SDTM_PATH." access=readonly;
+    libname staging "&PROJ_ROOT.&PATH_SEP.&STAGING_PATH.";
     libname sdtm    "&PROJ_ROOT.&PATH_SEP.04_analysis_datasets/adam&PATH_SEP.sdtm_mapped";
     libname adam    "&PROJ_ROOT.&PATH_SEP.04_analysis_datasets/adam";
+
+    %let _realsdtm_path = %sysfunc(pathname(realsdtm));
+    %let _staging_path = %sysfunc(pathname(staging));
+    /* COMPARE returns a numeric result, so path separators can never be parsed
+       as arithmetic by the macro processor's implicit %EVAL. */
+    %if %qsysfunc(compare(%superq(_realsdtm_path),%superq(_staging_path),i)) = 0 %then %do;
+        %put ERROR: [SOURCE-ISOLATION] REALSDTM and STAGING resolve to the same physical path.;
+        %abort cancel;
+    %end;
     
     /* Global SAS Options */
     options ls=120 ps=60 validvarname=upcase missing='' mergenoby=WARN;
@@ -78,10 +91,10 @@
        Reference: TROPIC SAP v4.0 controlled draft (EFC6193 / XRP6258)
        ============================================================ */
 
-    %include "&PGMDIR.&PATH_SEP.00_config_generated.sas";
-
     %put NOTE: [CONFIG] Environment configured successfully on &SYSSCP..;
     %put NOTE: [CONFIG] Auto-resolved Project Root path: &PROJ_ROOT.;
+    %put NOTE: [SOURCE-ISOLATION] Immutable source: &_realsdtm_path.;
+    %put NOTE: [SOURCE-ISOLATION] Writable staging: &_staging_path.;
 %mend load_config;
 
 %load_config;

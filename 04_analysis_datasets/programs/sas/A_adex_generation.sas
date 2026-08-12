@@ -1,17 +1,17 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: A_adex_generation.sas
-   Version: 2.3.0
+   Version: 3.0.0
    Author: Antony Bevan, Clinical Programming
-   Date: 2026-05-27 (ADaM dens 2026-07-09)
+   Date: 2026-08-09
    Standard: ADaMIG v1.3 BDS
    Input: sdtm.ex, adam.adsl
    Output: adam.adex
-   Description: Characterizes cycle-level and cumulative drug exposure, BSA resets,
-                dose adjustments, delays, and relative dose intensity (RDI).
+   Description: Characterizes primary IV antineoplastic exposure, dose
+                adjustments, delays, and source-derived relative dose intensity.
 
-   ADaM dens: one subject-level BDS spine per ADSL SAFFL='Y'; TRT01P from ADSL
-   (DM arm). EX used for dose metrics only — never for treatment arm (F-028).
+   ADaM dens: one subject-level BDS spine per ADSL SAFFL='Y'. Oral prednisone/
+   prednisolone records are excluded from antineoplastic cycle metrics.
    ============================================================================= */
 
 /* PGMDIR guard: define only when running standalone; master driver pre-defines this. */
@@ -24,19 +24,40 @@
 %set_pgmdir;
 %include "&PGMDIR./00_config.sas";
 
-/* Summarize modifications per subject from real SDTM EX */
+/* Restrict exposure metrics to the randomized IV antineoplastic. EXSEQ counts
+   oral and IV records, so VISITNUM is the governed treatment-cycle index. */
+data work.iv_ex;
+    set sdtm.ex;
+    where index(upcase(strip(extrt)), 'MITOX') > 0
+       or index(upcase(strip(extrt)), 'XRP') > 0
+       or index(upcase(strip(extrt)), 'CABAZ') > 0;
+    delay_flag = (not missing(exdelay));
+    reduction_flag = (not missing(exdose2) and exdose2 > 0 and not missing(expdose) and
+                      exdose2 < expdose * (1 - &DOSE_REDUCTION_TOLERANCE.));
+run;
+
+/* EXTRINT is a source-derived subject-level RDI repeated on each cycle. It may
+   be carried only when the repeated values are internally unique. */
 proc sql;
     create table work.subj_mods as
     select 
         usubjid,
-        max(exseq) as ncycle,
+        count(distinct case when exdose2 > 0 then visitnum else . end) as ncycle,
+        max(case when visitnum = 1 then expdose else . end) as planned_dose,
         max(excumd2) as cumdose,
-        sum(case when not missing(exdelay) and exdelay ne '' then 1 else 0 end) as ndeldose,
-        sum(case when not missing(exdsrcm) and exdsrcm ne '' then 1 else 0 end) as nreddose,
-        max(extrint) as rdi
-    from sdtm.ex
+        sum(delay_flag) as ndeldose,
+        sum(reduction_flag) as nreddose,
+        case when count(distinct extrint) <= 1 then max(extrint) else . end as rdi,
+        count(distinct extrint) as n_rdi_values
+    from work.iv_ex
     group by usubjid;
 quit;
+
+data _null_;
+    set work.subj_mods;
+    if n_rdi_values > 1 then
+        putlog "ERROR: [ADEX-QC] Conflicting source EXTRINT values for " usubjid= n_rdi_values=;
+run;
 
 /* Sort ADSL safety population by usubjid */
 proc sort data=adam.adsl(keep=studyid usubjid subjid siteid trt01p trt01pn saffl trtsdt trtedt trtdurd
@@ -64,16 +85,12 @@ data work.adex_bds;
     format AVAL 8.2;
     
     if missing(ncycle) then ncycle = 0;
-    if missing(cumdose) then cumdose = 0;
     if missing(ndeldose) then ndeldose = 0;
     if missing(nreddose) then nreddose = 0;
-    if missing(rdi) then rdi = 0;
-    
-    planned_dose = &PLANNED_DOSE.; /* Mitoxantrone planned dose mg/m2 — see config */
     
     /* 1. Planned Dose Parameter */
     PARAMCD = 'PLDOSE';
-    PARAM = 'Planned Dose (mg/m2)';
+    PARAM = 'Initial Planned IV Dose (mg/m2)';
     PARCAT1 = 'INDIVIDUAL';
     AVAL = planned_dose;
     AVALC = strip(put(AVAL, 8.2));
@@ -82,7 +99,7 @@ data work.adex_bds;
     
     /* 2. Cumulative Dose Parameter */
     PARAMCD = 'CUMDOSE';
-    PARAM = 'Cumulative Actual Dose (mg/m2)';
+    PARAM = 'Cumulative IV Actual Dose (mg/m2)';
     PARCAT1 = 'SUMMARY';
     AVAL = cumdose;
     AVALC = strip(put(AVAL, 8.2));
@@ -118,7 +135,7 @@ data work.adex_bds;
     
     /* 6. Relative Dose Intensity Parameter */
     PARAMCD = 'RDI';
-    PARAM = 'Relative Dose Intensity (%)';
+    PARAM = 'Source RDI (%)';
     PARCAT1 = 'SUMMARY';
     AVAL = rdi;
     AVALC = strip(put(AVAL, 8.1));
@@ -130,7 +147,8 @@ data work.adex_bds;
     PARAM = 'Relative Dose Intensity Category';
     PARCAT1 = 'SUMMARY';
     AVAL = rdi;
-    if rdi >= 85 then AVALC = '>=85%';
+    if missing(rdi) then AVALC = '';
+    else if rdi >= 85 then AVALC = '>=85%';
     else if rdi >= 65 then AVALC = '65-<85%';
     else AVALC = '<65%';
     AVISIT = 'ALL CYCLES';
@@ -138,7 +156,8 @@ data work.adex_bds;
 run;
 
 /* Sort cycle-level EX data by usubjid */
-proc sort data=sdtm.ex(keep=usubjid exdose2 exseq exdsrcm exdelay) out=work.ex_sorted;
+proc sort data=work.iv_ex(keep=usubjid exdose2 expdose visitnum exdsrea exdelay
+                              delay_flag reduction_flag) out=work.ex_sorted;
     by usubjid;
 run;
 
@@ -156,11 +175,11 @@ data work.adex_cycle;
     length PARAMCD $8 PARAM $40 AVALC $40 PARCAT1 $20 AVISIT $40;
     format AVAL 8.2;
     
-    AVISIT = catx(' ', 'CYCLE', put(exseq, 2.));
+    AVISIT = catx(' ', 'CYCLE', put(visitnum, best.));
     
     /* 8. Actual Performance Dose Parameter */
     PARAMCD = 'PERFDOSE';
-    PARAM = 'Actual Dose Administered (mg/m2)';
+    PARAM = 'IV Actual Dose Administered (mg/m2)';
     PARCAT1 = 'INDIVIDUAL';
     AVAL = exdose2;
     AVALC = strip(put(AVAL, 8.2));
@@ -170,7 +189,7 @@ data work.adex_cycle;
     PARAMCD = 'ADJ';
     PARAM = 'Dose Adjusted Flag';
     PARCAT1 = 'INDIVIDUAL';
-    if not missing(exdsrcm) and exdsrcm ne '' then do;
+    if delay_flag = 1 or reduction_flag = 1 or not missing(exdsrea) then do;
         AVALC = 'Y';
         AVAL = 1.0;
     end;
@@ -184,7 +203,7 @@ data work.adex_cycle;
     PARAMCD = 'ADJAE';
     PARAM = 'Dose Adjusted due to AE Flag';
     PARCAT1 = 'INDIVIDUAL';
-    if exdsrcm = 'ADVERSE EVENT' then do;
+    if upcase(strip(exdsrea)) = 'ADVERSE EVENT' then do;
         AVALC = 'Y';
         AVAL = 1.0;
     end;
@@ -226,7 +245,7 @@ proc sort data=adam.adex;
 run;
 
 /* Clean up work library */
-proc delete data=work.subj_mods work.adsl_sorted work.adex_bds_merged work.adex_bds
+proc delete data=work.iv_ex work.subj_mods work.adsl_sorted work.adex_bds_merged work.adex_bds
             work.ex_sorted work.adex_cycle_merged work.adex_cycle
             work.adex_all work._pc work._pnmap;
 run;

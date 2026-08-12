@@ -393,12 +393,12 @@ class TestGenerateConfig(unittest.TestCase):
     def test_yaml_quotes_preserve_hash_and_strings_are_macro_quoted(self):
         cfg = GC.parse_yaml(self._yaml(
             'STUDY_TITLE: "Trial #6193 Extension"\n'
-            'STAGING_PATH: "01_source_data/real_sdtm/staging"\n'
+            'STAGING_PATH: "04_analysis_datasets/staging"\n'
             'STUDY_CUTOFF_DT: "2009-09-25"\n'
         ))
         text = GC.render_sas_config(cfg)
         self.assertIn("%let STUDY_TITLE = %nrstr(Trial #6193 Extension);", text)
-        self.assertIn("%let STAGING_PATH = %nrstr(01_source_data/real_sdtm/staging);", text)
+        self.assertIn("%let STAGING_PATH = %nrstr(04_analysis_datasets/staging);", text)
         self.assertIn("%let STUDY_CUTOFF_DT = '25SEP2009'd;", text)
 
     def test_rejects_sas_statement_terminator_in_string_value(self):

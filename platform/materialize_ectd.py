@@ -16,6 +16,8 @@ Usage:  python3 platform/materialize_ectd.py
 """
 import os, re, sys, json, hashlib, shutil
 
+from build_ectd_backbone import SUPPORT_FILES
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, ".."))
 SEQ = os.path.join(ROOT, "08_submission_package/ectd", "0000")
@@ -35,7 +37,7 @@ def _require_contained(base, path, href):
     index.xml is self-generated today, not external input, so this is defense against a future
     bug/hand-edit/merge artifact rather than a live threat -- but os.path.join happily returns an
     absolute href as-is (ignoring `base` entirely) or leaves a '../' traversal unresolved in the
-    joined string, and both the copy step and purge_unindexed_m5_payloads's os.remove() loop
+    joined string, and both the copy step and purge_unindexed_sequence_files's os.remove() loop
     would otherwise trust that silently. os.path.commonpath does NOT resolve '..' components on
     its own -- on the raw os.path.join() result it compares path strings lexically, so
     '<base>/../../etc/hosts' lexically still starts with `base` and a naive commonpath check
@@ -75,23 +77,36 @@ def _verify_dest(dest, href, recorded, cache):
                     "recorded": recorded.lower(), "verified_md5": actual}
     return actual
 
-def purge_unindexed_m5_payloads(leaves):
-    """Remove stale materialized Module 5 payloads not referenced by index.xml."""
+def purge_unindexed_sequence_files(leaves):
+    """Remove every sequence file not indexed or explicitly required infrastructure.
+
+    Submission directories commonly acquire ignored Finder/desktop files that Git
+    status cannot see. Purging the complete sequence surface, rather than only m5,
+    prevents those files and stale UTIL notes from reaching handoff media.
+    """
     indexed = {
         os.path.normpath(os.path.join(SEQ, href))
         for href, _recorded in leaves
-        if href.startswith("m5/")
     }
-    m5_dir = os.path.join(SEQ, "m5")
-    if not os.path.isdir(m5_dir):
+    infrastructure = {
+        os.path.normpath(os.path.join(SEQ, rel))
+        for rel in ("index.xml", "index-md5.txt", *SUPPORT_FILES.keys())
+    }
+    allowed = indexed | infrastructure
+    if not os.path.isdir(SEQ):
         return []
     purged = []
-    for root, _dirs, files in os.walk(m5_dir):
+    for root, _dirs, files in os.walk(SEQ):
         for name in files:
             path = os.path.normpath(os.path.join(root, name))
-            if path not in indexed:
+            _require_contained(SEQ, path, os.path.relpath(path, SEQ))
+            if path not in allowed:
                 os.remove(path)
                 purged.append(os.path.relpath(path, SEQ))
+    parent_finder_file = os.path.join(os.path.dirname(SEQ), ".DS_Store")
+    if os.path.isfile(parent_finder_file):
+        os.remove(parent_finder_file)
+        purged.append("../.DS_Store")
     return sorted(purged)
 
 def indexed_leaves(index_xml):
@@ -118,9 +133,9 @@ def main():
     leaves = indexed_leaves(idx)
     if not leaves:
         sys.exit("No leaves with checksums found in index.xml")
-    purged = purge_unindexed_m5_payloads(leaves)
+    purged = purge_unindexed_sequence_files(leaves)
     if purged:
-        print("REMOVED UNINDEXED M5 PAYLOADS:", *purged, sep="\n  ")
+        print("REMOVED UNINDEXED SEQUENCE FILES:", *purged, sep="\n  ")
     cache = _load_cache()
     copied = verified = in_place = 0
     missing, mismatch = [], []
@@ -159,7 +174,17 @@ def main():
     if mismatch: print("MD5 MISMATCH:", *mismatch, sep="\n  ")
     if missing or mismatch:
         sys.exit(1)
+    # G08 is a complete sequence-surface gate, not only a copy/checksum gate.
+    # Import here to keep the materializer's leaf parser independently testable.
+    from validate_ectd_sequence import validate_sequence
+    sequence_result = validate_sequence(require_all_leaves=True)
+    if sequence_result.get("status") != "PASS":
+        print("eCTD COMPLETE-SURFACE VALIDATION FAILED:")
+        for problem in sequence_result.get("problems", []):
+            print(f"  - {problem}")
+        sys.exit(1)
     print("OK — all leaves materialized and checksum-verified in 08_submission_package/ectd/0000/")
+    print("OK — complete sequence inventory/support/XML/run-record validation passed (G08)")
 
 if __name__ == "__main__":
     main()

@@ -781,6 +781,22 @@ def run_single_stage(stage, from_stage, sas_mode, results, expected_stage_names=
                 rc = 1
                 stderr = f"{gate_name} status unreadable at {status_path}: {exc}"
 
+    # Stage 26 checks the committed reviewer surface before downstream packaging.
+    # Stage 30 then regenerates those PDFs, so immediately re-run G07 against the
+    # newly rendered files; otherwise a renderer regression is visible only on the
+    # next pipeline invocation.
+    if stage["name"] == "eCTD Final Package" and rc == 0:
+        rc_g07, out_g07, err_g07 = run_command(
+            [sys.executable, "platform/check_gate_g07_reviewer_package.py"],
+            timeout=STAGE_TIMEOUT_S,
+        )
+        if rc_g07 != 0:
+            rc = 1
+            stderr = (
+                "Post-package G07 reviewer PDF validation failed: "
+                + (err_g07 or out_g07).strip()[:1000]
+            )
+
     if stage["name"] == "Cross-Language Audit Reconcile" and rc == 0:
         status_path = "platform/reconciliation_status.json"
         try:
@@ -905,6 +921,12 @@ def build_stages(manifest, engine_root=None, relocate=False):
                        "cmd": _stage_cmd(script_path, "logrx"),
                        "parallel": "parallel_group" in d, "gated": False,
                        "script": script_path})  # roadmap Move 4: dry-run cache key input
+    for s in infra.get("pre_sas", []):
+        stages.append({"name": s["name"],
+                       "cmd": _stage_cmd(s["script"], s.get("runner", "logrx"),
+                                         engine_root, relocate, s.get("engine", False)),
+                       "script": s["script"],
+                       "parallel": False, "gated": bool(s.get("gated"))})
     stages.append({"name": "SAS Production (ODA/Real/Simulated)", "cmd": "SIMULATE",
                    "parallel": False, "gated": False})
     for s in infra.get("post", []):
@@ -950,6 +972,7 @@ def validate_pipeline_dag(manifest, engine_root=None, relocate=False):
         for d in manifest.get("datasets", []) or []
         if d.get("name")
     )
+    expected.extend(s["name"] for s in infra.get("pre_sas", []) or [])
     expected.append("SAS Production (ODA/Real/Simulated)")
     expected.extend(s["name"] for s in infra.get("post", []) or [])
 
@@ -1195,8 +1218,8 @@ def execute_pipeline(from_stage=0, real_sas=False, use_cached_sas=False, serial=
     # release-manifest stage itself. Partial --from-stage runs are therefore visible
     # rather than silently under-counted as a "15-stage green" pipeline.
     write_telemetry(results, sas_mode, expected_stage_names=expected_stage_names)
-    # Re-bind the release manifest against FINAL full_dag health. Stage 30 itself ran
-    # against pre-stage health; without this re-seal, a green full DAG still seals as
+    # Re-bind the release manifest against FINAL full_dag health. The release-manifest
+    # stage itself ran against pre-stage health; without this re-seal, a green full DAG still seals as
     # REMEDIATION(partial) from the intermediate write.
     if results.get("Release Run Manifest Binding") in {"PASS", "REMEDIATION"} or (
         any(s["name"] == "Release Run Manifest Binding" and s["id"] >= from_stage for s in stages)
@@ -1249,7 +1272,7 @@ def update_define_timestamp():
 
 
 _STAGE_CACHE_FILE = "platform/stage_cache.json"
-_STAGE_CACHE_STAGING_DIR = "01_source_data/real_sdtm/staging"
+_STAGE_CACHE_STAGING_DIR = "04_analysis_datasets/staging"
 _STAGE_CACHE_KEYS = {}   # this run's computed keys, merged into _STAGE_CACHE_FILE by write_telemetry
 _PRIOR_STAGE_CACHE = None  # lazily loaded once per process; see _get_prior_stage_cache()
 
@@ -1467,7 +1490,7 @@ def write_telemetry(results, sas_mode="sim", expected_stage_names=None):
         for k, v in _ODA_OUTCOME.items():
             if k != "fell_back_to_sim":
                 health[k] = v
-    # Attach the cross-language reconciliation verdict if Stage 11 wrote one.
+    # Attach the cross-language reconciliation verdict if Stage 15 wrote one.
     try:
         with open("platform/reconciliation_status.json") as _rf:
             health["reconciliation_status"] = json.load(_rf).get("overall")

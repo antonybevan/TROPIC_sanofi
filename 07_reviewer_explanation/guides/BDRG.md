@@ -24,7 +24,7 @@
 
 **Binding claim:** [`docs/PRODUCT_CLAIM.md`](../../docs/PRODUCT_CLAIM.md)
 **Residuals:** [`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)
-**Current portfolio release:** tag `v0.2.1-portfolio` · [`docs/RELEASE_NOTE_v0.2.1-portfolio.md`](../../docs/RELEASE_NOTE_v0.2.1-portfolio.md) · `python3 scripts/verify_release.py`
+**Current portfolio release:** tag `v0.2.2-portfolio` · [`docs/RELEASE_NOTE_v0.2.2-portfolio.md`](../../docs/RELEASE_NOTE_v0.2.2-portfolio.md) · `python3 scripts/verify_release.py`
 **Package path:** [`08_submission_package/m5/datasets/tropic/bimo/`](../../08_submission_package/m5/datasets/tropic/bimo/)
 **Related guides:** [`ADRG.md`](ADRG.md) · [`SDRG.md`](SDRG.md) · [`TRACEABILITY_MATRIX.md`](TRACEABILITY_MATRIX.md)
 

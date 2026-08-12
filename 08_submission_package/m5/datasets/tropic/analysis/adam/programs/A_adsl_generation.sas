@@ -3,7 +3,7 @@
    Program: A_adsl_generation.sas
    Version: 2.4.0
    Author: Antony Bevan, Clinical Programming
-   Date: 2026-06-12 (ADaM phase 2026-07-09: DM-arm authority)
+   Date: 2026-08-09 (forensic remediation: source hierarchy and actual treatment)
    Standard: ADaMIG v1.3
    Input: sdtm.dm, sdtm.ex, sdtm.ds, sdtm.vs; staging.ls, staging.pn, staging.lb, staging.cm
    Output: adam.adsl
@@ -11,8 +11,8 @@
                 demographics, population flags, baseline covariates, and survival.
 
    ADaM phase rules (WS1_SDTM_E2E + ADaM entry criteria):
-     - TRT01P/TRT01A from DM.ARM/ARMCD only (F-028: never EXTRT as arm).
-     - EX used only for TRTSDT/TRTEDT/TRTDURD (exposure timing).
+     - TRT01P from DM.ARM/ARMCD; TRT01A independently reflects administered IV drug.
+     - EX supplies TRTSDT/TRTEDT/TRTDURD and actual-treatment evidence.
      - Row count must equal DM N (Path A: 371 MP).
 
    CRF grounding (D-012): ECOG on CRF VS; DS reasons on EOT/EOS.
@@ -29,7 +29,8 @@
 %set_pgmdir;
 %include "&PGMDIR./00_config.sas";
 
-/* Exposure dates only — arm is NEVER taken from EXTRT (F-028). */
+/* Exposure dates. Planned treatment is never taken from EXTRT; actual treatment
+   is independently classified from qualifying administered IV exposure below. */
 proc sql;
     create table work.ex_dates as
     select 
@@ -39,6 +40,19 @@ proc sql;
         (max(exendt) - min(exstdt) + 1) as trtdurd
     from sdtm.ex
     where not missing(exstdt)
+    group by usubjid;
+quit;
+
+/* Actual treatment is distinct from planned/randomized treatment. The source
+   contains one DM-planned MP subject with XRP6258 infusions; retain that
+   discrepancy rather than silently copying TRT01P into TRT01A. */
+proc sql;
+    create table work.actual_trt as
+    select usubjid,
+           max(case when index(upcase(strip(extrt)), 'XRP') > 0 or
+                         index(upcase(strip(extrt)), 'CABAZ') > 0 then 1 else 0 end) as has_cbzp,
+           max(case when index(upcase(strip(extrt)), 'MITOX') > 0 then 1 else 0 end) as has_mp
+    from sdtm.ex
     group by usubjid;
 quit;
 
@@ -54,7 +68,7 @@ proc sort data=work.survival_ds;
     by usubjid dsseq;
 run;
 
-data work.survival;
+data work.survival_approx;
     set work.survival_ds;
     by usubjid;
     retain dthdt dthcaus;
@@ -69,14 +83,49 @@ data work.survival;
     format dthdt yymmdd10.;
 run;
 
-/* Retrieve last known alive date */
+/* Prefer complete source-reported death dates from SUPPAE over week-derived DS
+   point estimates. Multiple AE rows may repeat the same death date. */
 proc sql;
+    create table work.suppae_death as
+    select usubjid,
+           min(input(substr(aedthdtc, 1, 10), ? yymmdd10.)) as exact_dthdt format=yymmdd10.
+    from staging.ae
+    where not missing(aedthdtc)
+      and prxmatch('/^[0-9]{4}-[0-9]{2}-[0-9]{2}/', strip(aedthdtc))
+    group by usubjid;
+
+    create table work.survival as
+    select coalesce(a.usubjid, e.usubjid) as usubjid length=40,
+           'Y' as dthfl length=1,
+           coalesce(e.exact_dthdt, a.dthdt) as dthdt format=yymmdd10.,
+           a.dthcaus length=100
+    from work.survival_approx as a
+    full join work.suppae_death as e on a.usubjid = e.usubjid;
+quit;
+
+/* Retrieve the latest dated evidence of subject contact/assessment across
+   disposition, visits, exposure, vital signs, laboratories, lesions, and pain.
+   Medication end dates are deliberately excluded because they may be planned. */
+proc sql;
+    create table work.lstalv_candidates as
+    select usubjid, dsstdt as contact_dt from sdtm.ds where not missing(dsstdt)
+    union all select usubjid, exstdt from sdtm.ex where not missing(exstdt)
+    union all select usubjid, exendt from sdtm.ex where not missing(exendt)
+    union all select usubjid, vsdt from sdtm.vs where not missing(vsdt)
+    union all select usubjid, lbdt from sdtm.lb where not missing(lbdt)
+    union all select usubjid, input(substr(lsdtc, 1, 10), ? yymmdd10.)
+      from staging.ls where not missing(lsdtc)
+    union all select usubjid, input(substr(pndtc, 1, 10), ? yymmdd10.)
+      from staging.pn where not missing(pndtc)
+    union all select usubjid, input(substr(svstdtc, 1, 10), ? yymmdd10.)
+      from staging.sv where not missing(svstdtc)
+    union all select usubjid, input(substr(svendtc, 1, 10), ? yymmdd10.)
+      from staging.sv where not missing(svendtc);
+
     create table work.lstalv as
-    select 
-        usubjid,
-        max(dsstdt) as lstalvdt format=yymmdd10.
-    from sdtm.ds
-    where not missing(dsstdt)
+    select usubjid, max(contact_dt) as lstalvdt format=yymmdd10.
+    from work.lstalv_candidates
+    where not missing(contact_dt)
     group by usubjid;
 quit;
 
@@ -104,7 +153,8 @@ proc sql;
     where lsloc in ('LIVER', 'LUNGS', 'KIDNEYS', 'PANCREAS', 'ADRENAL', 'BRAIN / CNS') and visit = 'BASELINE';
 quit;
 
-/* 4. PAINBL */
+/* 4. PAINBL: protocol diary baseline (TRTSDT-6 through TRTSDT), with
+   component-specific aggregation and at least five non-discordant diary days. */
 proc sql;
     create table work.pn_trt as
     select pn.usubjid, pn.pntestcd, pn.pnstresn,
@@ -113,40 +163,38 @@ proc sql;
 quit;
 
 proc sql;
-    create table work.pn_base_daily as
-    select p.usubjid, p.pntestcd, p.pnstresn
+    create table work.pn_base_raw as
+    select p.usubjid, p.pntestcd, p.pndt, p.pnstresn
     from work.pn_trt as p
     inner join work.ex_dates as ex on p.usubjid = ex.usubjid
-    where not missing(p.pndt) and p.pndt <= ex.trtsdt;
+    where p.pntestcd in ('PAININT', 'ANSCORE')
+      and not missing(p.pndt) and not missing(p.pnstresn)
+      and ex.trtsdt - 6 <= p.pndt <= ex.trtsdt;
+
+    create table work.pn_base_daily as
+    select usubjid, pntestcd, pndt,
+           min(pnstresn) as day_value
+    from work.pn_base_raw
+    group by usubjid, pntestcd, pndt
+    having count(distinct pnstresn) = 1;
+
+    create table work.pn_base_component as
+    select usubjid, pntestcd,
+           count(*) as n_valid_days,
+           median(day_value) as median_value,
+           mean(day_value) as mean_value
+    from work.pn_base_daily
+    group by usubjid, pntestcd;
+
+    create table work.pain_base as
+    select usubjid, 'Y' as painbl length=1
+    from work.pn_base_component
+    group by usubjid
+    having max(case when pntestcd = 'PAININT' and n_valid_days >= 5 and median_value >= 2
+                    then 1 else 0 end) = 1
+        or max(case when pntestcd = 'ANSCORE' and n_valid_days >= 5 and mean_value >= 10
+                    then 1 else 0 end) = 1;
 quit;
-
-proc sort data=work.pn_base_daily;
-    by usubjid pntestcd;
-run;
-
-proc summary data=work.pn_base_daily median;
-    by usubjid pntestcd;
-    var pnstresn;
-    output out=work.pn_median(drop=_type_ _freq_) median=med_val;
-run;
-
-proc sql;
-    create table work.ppi_med as
-    select distinct usubjid
-    from work.pn_median
-    where pntestcd = 'PAININT' and med_val >= 2;
-    
-    create table work.an_med as
-    select distinct usubjid
-    from work.pn_median
-    where pntestcd = 'ANSCORE' and med_val >= 10;
-quit;
-
-data work.pain_base;
-    merge work.ppi_med(in=a) work.an_med(in=b);
-    by usubjid;
-    painbl = 'Y';
-run;
 
 /* 5. Baseline Labs */
 proc sql;
@@ -221,8 +269,7 @@ proc sql;
         'NOT REPORTED' as ETHNIC length=40,
         'M' as SEX length=1,
 
-        /* Planned/actual analysis arm from DM only (F-028 / ADaM entry criteria).
-           Map study ARM labels to analysis codes; config is fallback only. */
+        /* Planned arm from DM; actual arm from administered IV antineoplastic. */
         case
             when index(upcase(strip(dm.arm)), 'MITOX') > 0
                  or strip(dm.armcd) = 'A'
@@ -241,8 +288,12 @@ proc sql;
                 then 1
             else &TRT01PN_CODE.
         end as TRT01PN,
-        calculated TRT01P as TRT01A length=20,
-        calculated TRT01PN as TRT01AN,
+        case when act.has_cbzp = 1 then 'CbzP'
+             when act.has_mp = 1 then 'MP'
+             else calculated TRT01P end as TRT01A length=20,
+        case when act.has_cbzp = 1 then 1
+             when act.has_mp = 1 then 2
+             else calculated TRT01PN end as TRT01AN,
 
         dm.randdt as RANDDT format=yymmdd10.,
         ex.trtsdt as TRTSDT format=yymmdd10.,
@@ -256,31 +307,32 @@ proc sql;
         coalesce(srv.dthfl, 'N') as DTHFL length=1,
         srv.dthdt as DTHDT format=yymmdd10.,
         srv.dthcaus as DTHCAUS length=100,
-        lst.lstalvdt as LSTALVDT format=yymmdd10.,
+        case when srv.dthfl = 'Y' and not missing(srv.dthdt) and
+                       lst.lstalvdt > srv.dthdt then srv.dthdt
+             else lst.lstalvdt end as LSTALVDT format=yymmdd10.,
 
-        /* Baseline clinical covariates — defaults from config (imputation defaults block).
-           Each imputed covariate carries a companion *IF flag ('Y' = value was
-           imputed because none was on file; 'N' = observed). ALBBL/LDHBL are
-           not collected in this trial and are set to missing (imputation flags are blank). */
-        coalesce(ecog.ecogbl, &ECOGBL_DEFAULT.) as ECOGBL,
-        case when missing(ecog.ecogbl) then 'Y' else 'N' end as ECOGBLIF length=1,
+        /* No unapproved constant imputation: retain missing collected covariates.
+           *IF remains N because no value is imputed in the real-data track. */
+        ecog.ecogbl as ECOGBL,
+        'N' as ECOGBLIF length=1,
         coalesce(meas.measdisf, 'N') as MEASDISF length=1,
         coalesce(visc.viscfl, 'N') as VISCFL length=1,
         coalesce(pain.painbl, 'N') as PAINBL length=1,
-        coalesce(labs.PSABL, &PSABL_DEFAULT.) as PSABL,
-        case when missing(labs.PSABL) then 'Y' else 'N' end as PSABLIF length=1,
-        coalesce(labs.ALPBL, &ALPBL_DEFAULT.) as ALPBL,
-        case when missing(labs.ALPBL) then 'Y' else 'N' end as ALPBLIF length=1,
+        labs.PSABL as PSABL,
+        'N' as PSABLIF length=1,
+        labs.ALPBL as ALPBL,
+        'N' as ALPBLIF length=1,
         . as ALBBL,
         ' ' as ALBBLIF length=1,
         . as LDHBL,
         ' ' as LDHBLIF length=1,
-        coalesce(labs.HGBBL, &HGBBL_DEFAULT.) as HGBBL,
-        case when missing(labs.HGBBL) then 'Y' else 'N' end as HGBBLIF length=1,
+        labs.HGBBL as HGBBL,
+        'N' as HGBBLIF length=1,
         coalesce(doc.docprog, 'AFTER') as DOCPROG length=10,
         coalesce(doc.docresp, 'N') as DOCRESP length=1
     from sdtm.dm as dm
     left join work.ex_dates as ex on dm.usubjid = ex.usubjid
+    left join work.actual_trt as act on dm.usubjid = act.usubjid
     left join work.survival as srv on dm.usubjid = srv.usubjid
     left join work.lstalv as lst on dm.usubjid = lst.usubjid
     left join work.ecog as ecog on dm.usubjid = ecog.usubjid
@@ -300,17 +352,18 @@ data _null_;
         putlog "WARNING: [ADSL-QC] ADSL row count differs from DM — check joins.";
 run;
 proc freq data=adam.adsl noprint;
-    tables TRT01P / out=work.adsl_trt;
+    tables TRT01P*TRT01A / out=work.adsl_trt;
 run;
 data _null_;
     set work.adsl_trt;
-    putlog "NOTE: [ADSL-QC] TRT01P=" TRT01P " n=" COUNT;
+    putlog "NOTE: [ADSL-QC] TRT01P=" TRT01P " TRT01A=" TRT01A " n=" COUNT;
 run;
 
 /* Clean up work library */
-proc delete data=work.ex_dates work.survival_ds work.survival work.lstalv work.ecog
-            work.meas work.visc work.pn_trt work.pn_base_daily work.pn_median
-            work.ppi_med work.an_med work.pain_base work.labs_base work.labs_wide
+proc delete data=work.ex_dates work.actual_trt work.survival_ds work.survival_approx
+            work.suppae_death work.survival work.lstalv_candidates work.lstalv work.ecog
+            work.meas work.visc work.pn_trt work.pn_base_raw work.pn_base_daily
+            work.pn_base_component work.pain_base work.labs_base work.labs_wide
             work.labs_ready work.docetaxel_recs work.docetaxel_resp work.docetaxel_prog
             work.docetaxel_summary work.adsl_trt;
 run;

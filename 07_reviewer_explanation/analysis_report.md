@@ -1,6 +1,8 @@
 # TROPIC Clinical Analysis Report
 ## Study EFC6193 / XRP6258 — Abbreviated Clinical Study Summary
 
+**Current portfolio release:** tag `v0.2.2-portfolio` · [`docs/RELEASE_NOTE_v0.2.2-portfolio.md`](../docs/RELEASE_NOTE_v0.2.2-portfolio.md) · controlled non-submission demonstration
+
 > **SAP v4.0 lock note (2026-06-25):** This report is a generated demonstration output under
 > remediation control. It is not a clinical study report for submission and it is not a source
 > of analysis requirements. The governing analysis plan is `02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx`.
@@ -10,7 +12,7 @@
 **Publication:** de Bono JS et al., *Lancet* 2010;376(9747):1147–1154
 
 > [!WARNING]
-> **Mixed real + synthetic data.** All MP-arm statistics (N=371) are derived from the official Sanofi de-identified SDTM public data release (2013) — real patient-level data. The Cabazitaxel (CbzP, N=378) arm is a **synthetic, illustrative** cohort built by two methods depending on endpoint: **OS and PFS** are reconstructed via genuine **Guyot (2012) IPD reconstruction** from the published Lancet 2010 Kaplan–Meier curves (independent of the MP arm, so the reconstructed HRs are **non-circular** and reproduce the published effect); the **secondary** time-to-event endpoints (TTPSA/TTUMOR/TTPAIN) are **PH-scaled** from the MP arm and are **circular by construction**; the non-TTE domains are fixed-seed sampled from published Lancet 2010 Table 1/Table 2 marginals. It is **not real patient data** and is shown only to exercise the analysis pipeline — secondary CbzP-vs-MP comparisons are illustrative only, **not** clinical findings (see ADRG §7).
+> **Mixed real + synthetic data.** All MP-arm statistics (N=371) are derived from the official Sanofi de-identified SDTM public data release (2013) — real patient-level data. The Cabazitaxel (CbzP, N=378) arm is a **synthetic, illustrative** cohort built by two methods depending on endpoint: **OS and PFS** are reconstructed via genuine **Guyot (2012) IPD reconstruction** from the published Lancet 2010 Kaplan–Meier curves (independent of the MP arm, so the reconstruction is **non-circular**); the **secondary** time-to-event endpoints (TTPSA/TTUMOR/TTPAIN) are **PH-scaled** from the MP arm and are **circular by construction**; the non-TTE domains are fixed-seed sampled from published Lancet 2010 Table 1/Table 2 marginals. The live mixed-source OS comparison remains compatible with the publication, but the corrected real-MP PFS derivation yields HR 0.87 and does **not** reproduce the published PFS effect. The comparator is **not real patient data** and is shown only to exercise the analysis pipeline, not as a clinical finding (see ADRG §7).
 
 ---
 
@@ -37,11 +39,11 @@ The primary survival endpoints exercise the stratified Cox / log-rank machinery 
 |---|---|---|---|
 | Median OS | 15.2 months | 12.7 months | 15.1 mo vs 12.7 mo |
 | Median PFS | 2.7 months | 1.4 months | 2.8 mo vs 1.4 mo |
-| OS HR (CbzP vs MP) | 0.70 (95% CI 0.59–0.84) | Reference | 0.70 (0.59–0.83) |
-| PFS HR (CbzP vs MP) | 0.72 (95% CI 0.62–0.84) | Reference | 0.74 (0.64–0.86) |
+| OS HR (CbzP vs MP) | 0.71 (95% CI 0.60–0.85) | Reference | 0.70 (0.59–0.83) |
+| PFS HR (CbzP vs MP) | 0.87 (95% CI 0.75–1.02) | Reference | 0.74 (0.64–0.86) |
 
 > [!NOTE]
-> **OS/PFS are reconstructed, not PH-scaled.** Because the CbzP curve is inverted from the published figure rather than divided out of the MP arm, the reconstructed HRs are non-circular — the **OS HR matches the published 0.70 exactly** and the PFS HR (0.72) is within tolerance of the published 0.74 (acceptance gates in `01_source_data/guyot_validation_report.md`). The arm is still **synthetic and illustrative** — not real patient data — and is shown to exercise the pipeline, not as an independent clinical finding.
+> **OS/PFS are reconstructed, not PH-scaled.** The intrinsic curve-reconstruction gates pass. Using the live stratified TFL method, OS is compatible with the publication (HR 0.71), while PFS is outside the legacy compatibility range (HR 0.87; range 0.64–0.84). The current real-MP PFS derivation is intentionally restricted to typed RECIST/PSA/F-042 pain/death components and excludes exploratory bone/clinical-progression signals. This mixed-source PFS comparison is therefore a disclosed pipeline diagnostic, not evidence that the published effect was reproduced; see `01_source_data/guyot_validation_report.md`.
 
 †Synthetic, illustrative — not real patient data; reconstructed from the published KM curves (Guyot 2012).
 
@@ -53,12 +55,12 @@ The secondary time-to-event endpoints (TTPSA, TTUMOR, TTPAIN) use the synthetic 
 
 | Endpoint | Synthetic CbzP† | Real MP | Pipeline HR / test | Pipeline p | Published (de Bono 2010) |
 |---|---|---|---|---|---|
-| Time to PSA Progression‡ | 2.7 mo (286/378) | 2.2 mo (265/371) | HR 0.85 (0.72–1.00) | 0.0514 | median 6.4 mo, HR 0.75 |
-| Time to Tumour Progression‡ | 9.1 mo (166/378) | 2.4 mo (328/371) | descriptive KM | — | publication-era endpoint context |
-| Time to Pain Progression‡ | 7.9 mo (130/378) | NA (45/371) | HR 2.36 (1.68–3.32) | <0.0001 | SAP T-11-8 mapping restored |
+| Time to PSA Progression‡ | 2.7 mo (286/378) | 2.2 mo (265/371) | stratified Cox HR 0.84 (0.70–0.99) | 0.0319 | median 6.4 mo, HR 0.75 |
+| Time to Tumour Progression‡ | 4.9 mo (166/378) | 5.0 mo (96/371) | stratified Cox HR 0.89 (0.66–1.22) | 0.4406 | publication-era endpoint context |
+| Time to Pain Progression‡ | 8.1 mo (130/378) | NE (37/371) | stratified Cox HR 2.85 (1.98–4.12) | <0.0001 | SAP T-11-8 mapping restored |
 | PSA Response (≥50% decrease; baseline PSA ≥20 ug/L) | 40.2% (145/361) | 18.5% (61/329) | Fisher's exact | 5.2e-10 | 39% vs 24% (p = 0.0002) |
-| Overall Response Rate (ORR, confirmed)§ | 16.8% (30/179) | 6.4% (13/203) | Fisher's exact | 0.0018 | 14.4% vs 4.4% (p = 0.005) |
-| Pain Response (F-042) | N/A (PN unavailable) | 28.1% (43/153) | descriptive responder rate | — | source-qualified PN/SV implementation |
+| Overall Response Rate (ORR, confirmed)§ | 16.8% (30/179) | 5.9% (12/203) | Fisher's exact | 0.0009 | 14.4% vs 4.4% (p = 0.005) |
+| Pain Response (F-042) | N/A (PN unavailable) | 27.6% (43/156) | descriptive responder rate | — | source-qualified PN/SV implementation |
 
 †Synthetic, illustrative — not real patient data. ‡PH-scaled from the real MP arm where applicable; any HR is **circular by construction** (descriptive of synthetic data only, not a treatment-effect estimate). §ORR is restricted to the measurable-disease subpopulation (CbzP N=179, MP N=203). TTUMOR is ITT-primary (CbzP N=378, MP N=371), with measurable disease retained as supportive. Pain response is unavailable for CbzP because no PN domain is reconstructed. The OS/PFS primary endpoints — which **are** non-circular Guyot reconstructions — are in §2.
 
@@ -70,18 +72,18 @@ Treatment-emergent adverse events (TEAEs) were defined as events occurring on or
 
 ### 4.1 Overall TEAE Incidence
 
-| Category | CbzP (N=378) | % | MP (N=371) | % |
+| Category | Synthetic CbzP (N=371) | % | Real MP (N=371) | % |
 |---|---|---|---|---|
-| Any TEAE | 364 | **96%** | 328 | **88%** |
-| Any Grade ≥3 TEAE | 310 | **82%** | 147 | **40%** |
-| Any Serious TEAE (SAE) | 145 | **38%** | 78 | **21%** |
-| Any TEAE leading to discontinuation | 68 | **18%** | 0 | **0%** |
+| Any TEAE | 364 | **98%** | 328 | **88%** |
+| Any Grade ≥3 TEAE | 310 | **84%** | 147 | **40%** |
+| Any Serious TEAE (SAE) | 145 | **39%** | 78 | **21%** |
+| Any TEAE leading to discontinuation | 68 | **18%** | 32 | **9%** |
 
 ### 4.2 Grade ≥3 TEAEs by System Organ Class (Top 6)
 
 | System Organ Class | CbzP (n, %) | MP (n, %) |
 |---|---|---|
-| Blood & Lymphatic System Disorders | 293 (78%) | 39 (11%) |
+| Blood & Lymphatic System Disorders | 293 (79%) | 39 (11%) |
 | Gastrointestinal Disorders | 34 (9%) | 6 (2%) |
 | General Disorders & Admin Site Conditions | 35 (9%) | 36 (10%) |
 | Musculoskeletal & Connective Tissue Disorders | 18 (5%) | 35 (9%) |
@@ -92,19 +94,19 @@ Treatment-emergent adverse events (TEAEs) were defined as events occurring on or
 
 ## 5. Laboratory Toxicity — CTCAE Grade Shift
 
-Baseline to worst post-baseline CTCAE grade shifts were derived from the ADLB dataset using `BASEFL`, `ANL01FL`, and `ATOXGR` variables.
+Baseline to worst post-baseline toxicity-grade shifts use `BASEFL`, `ANL01FL`, and `ATOXGR` in ADLB. For the real MP arm, `ATOXGR` carries the source `LBTOXGR`; the analysis pipeline does not independently re-grade laboratory values against CTCAE thresholds. The CbzP laboratory arm remains synthetic and illustrative.
 
 ### 5.1 ANC / Neutrophils — Key Finding
 
-Of 378 patients in the CbzP arm, **321 (84.9%)** experienced Grade 3/4 neutropenia compared to **154 (41.5%)** of 371 in the MP arm, highlighting the hematological toxicity signature of Cabazitaxel.
+In the synthetic CbzP laboratory cohort, **321/371 (86.5%)** had a worst post-baseline Grade 3/4 neutrophil result, compared with **125/371 (33.7%)** in the real MP arm.
 
 ### 5.2 Haemoglobin
 
-Grade 3/4 anemia occurred in **34 (9.0%)** patients in the CbzP arm compared to **9 (2.4%)** in the MP arm.
+Worst post-baseline Grade 3/4 haemoglobin results occurred in **34/371 (9.2%)** synthetic CbzP subjects and **7/371 (1.9%)** real MP subjects.
 
 ### 5.3 Platelets
 
-Thrombocytopenia was rare, with Grade 3/4 thrombocytopenia occurring in **16 (4.2%)** CbzP patients vs **5 (1.3%)** MP patients.
+Worst post-baseline Grade 3/4 platelet results occurred in **16/371 (4.3%)** synthetic CbzP subjects and **3/371 (0.8%)** real MP subjects.
 
 ---
 
@@ -112,12 +114,12 @@ Thrombocytopenia was rare, with Grade 3/4 thrombocytopenia occurring in **16 (4.
 
 Cycle-by-cycle exposure was captured in ADEX across parameters including:
 
-- **RDI** (Relative Dose Intensity) — ratio of actual to planned cumulative dose
-- **NCYCLE** — number of treatment cycles completed per patient
-- **CUMDOSE** — cumulative dose received
-- **NDELDOSE / NREDDOSE** — cycles with delays or dose reductions
+- **RDI** (Relative Dose Intensity) — source `EXTRINT` carried at subject level only when repeated values are internally consistent; no dose-intensity formula is reconstructed
+- **NCYCLE** — count of distinct cycles with a positive administered qualifying IV dose
+- **CUMDOSE** — source cumulative administered IV dose (`EXCUMD2`)
+- **NDELDOSE / NREDDOSE** — counts of source-indicated delays and qualifying dose reductions
 
-FDA Project Optimus alignment: RDI in Cycle 1 was used as the E-R exposure proxy in the scatter plot analysis (F-17-1).
+FDA Project Optimus alignment: the subject-level all-cycles RDI is paired with the Cycle 1 ANC nadir in the exploratory E–R scatter plot (F-17-1). This is a non-confirmatory pipeline demonstration, not a dose-optimization conclusion.
 
 ---
 
@@ -130,7 +132,7 @@ FDA Project Optimus alignment: RDI in Cycle 1 was used as the E-R exposure proxy
 | Independent Validation | R 4.6.0 / Pharmaverse | ADaMIG v1.3 |
 | Reconciliation | `diffdf` package | 100% cell-by-cell match |
 | TFL Generation | ggplot2, survival, patchwork | ICH E3 / NEJM style |
-| Orchestration | Python 3.10 (cibuild.py) | Manifest-driven 34-stage CI pipeline |
+| Orchestration | Python 3.10 (cibuild.py) | Manifest-driven 37-stage CI pipeline |
 
 ---
 
@@ -141,7 +143,7 @@ FDA Project Optimus alignment: RDI in Cycle 1 was used as the E-R exposure proxy
 
 > [!WARNING]
 > **Synthetic comparator (CbzP arm):** The Cabazitaxel arm was not included in the Sanofi public data release. The CbzP arm used in figures and comparative tables is **synthetic and illustrative**, built by two methods depending on endpoint:
-> - **OS and PFS** are reconstructed via **genuine Guyot (2012) IPD reconstruction** (`IPDfromKM`) from the published de Bono 2010 KM curves (Fig 2A = OS, Fig 3 = PFS) + transcribed numbers-at-risk tables. The shape comes from the published curve **independently of the MP arm**, so the reconstructed OS/PFS HRs are **non-circular** and reproduce the published effect (OS HR 0.70 **exactly**; PFS 0.72 vs published 0.74). Validated against the published summary statistics in `01_source_data/guyot_validation_report.md`.
+> - **OS and PFS** are reconstructed via **genuine Guyot (2012) IPD reconstruction** (`IPDfromKM`) from the published de Bono 2010 KM curves (Fig 2A = OS, Fig 3 = PFS) + transcribed numbers-at-risk tables. The shape comes from the published curve **independently of the MP arm**, so the reconstruction is non-circular. Intrinsic curve gates pass; the live stratified OS diagnostic is compatible (HR 0.71), while the mixed-source PFS diagnostic is outside its legacy range (HR 0.87) and is explicitly a warning in `01_source_data/guyot_validation_report.md`.
 > - **Secondary TTE endpoints** (TTPSA, TTUMOR, TTPAIN) remain **PH-scaled from the real MP arm** (no published KM curves exist for them) and are **circular by construction**.
 > - **Non-TTE domains** (AE, laboratory, exposure, demographics) are **fixed-seed sampled** from published Lancet 2010 Table 1/Table 2 marginal distributions.
 >

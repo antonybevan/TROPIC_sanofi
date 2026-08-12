@@ -1,4 +1,4 @@
-# Program: v_adlb_validation.R | Version: 3.5.0 | Author: Antony Bevan, Clinical Programming | Date: 2026-06-12
+# Program: v_adlb_validation.R | Version: 4.0.0 | Author: Antony Bevan, Clinical Programming | Date: 2026-08-09
 # Standard: ADaMIG v1.3 BDS | renv.lock hash: locked
 # Description: R Independent Validation double-programming for TROPIC ADLB.
 
@@ -22,7 +22,7 @@ sas_round <- function(x, d) {
 
 # Load real validation ADSL and staging LB
 adsl <- read_xpt("04_analysis_datasets/adam/adsl_v.xpt")
-lb <- readRDS("01_source_data/real_sdtm/staging/lb.rds")
+lb <- readRDS(stage_file("lb"))
 
 # Standardize header variables
 header <- adsl %>%
@@ -32,6 +32,7 @@ df_lb <- lb %>%
   select(-any_of("STUDYID")) %>%
   inner_join(header, by = c("USUBJID", "SUBJID")) %>%
   mutate(
+    LBSEQ = as.numeric(LBSEQ),
     lbdtc_clean = trimws(LBDTC),
     lbdt = if_else(grepl("^\\d{4}-\\d{1,2}-\\d{1,2}", lbdtc_clean), ymd(lbdtc_clean, quiet = TRUE), as.Date(NA)),
     lbdy = as.numeric(lbdt - TRTSDT + 1),
@@ -46,12 +47,17 @@ df_windows <- df_lb %>%
     PARAM = LBTEST,
     # PARAMN assigned 1:1 over the full PARAMCD set after the Optimus rows are bound (audit F-02);
     # the old NEUT/PSA/HGB/else=4 scheme collided across analytes and left ANCNADIR/ANCRECDY unset.
-    PARCAT1 = if_else(LBTESTCD == "PSA", "TUMOR MARKER", "HEMATOLOGY"),
+    PARCAT1 = case_when(
+      LBTESTCD == "PSA" ~ "TUMOR MARKER",
+      !is.na(LBCAT) & trimws(LBCAT) != "" ~ toupper(trimws(LBCAT)),
+      TRUE ~ "UNCLASSIFIED"
+    ),
     AVAL = avals,
-    AVALC = LBORRES,
+    AVALC = LBSTRESC,
 
     AVISITN = case_when(
-      is.na(lbdy) | lbdy <= W_BL_HI ~ 0.0,
+      is.na(lbdy) ~ 99.0,
+      lbdy <= W_BL_HI ~ 0.0,
       lbdy >= W_C1D1_LO  & lbdy <= W_C1D1_HI  ~ 1.0,
       lbdy >= W_C1D8_LO  & lbdy <= W_C1D8_HI  ~ 2.0,
       lbdy >= W_C1D15_LO & lbdy <= W_C1D15_HI ~ 3.0,
@@ -86,15 +92,16 @@ df_windows <- df_lb %>%
     ATOXGR = as.numeric(LBTOXGR)
   )
 
-# Calculate Baselines - sort by LBSEQ to break date ties stably matching SAS
+# Calculate the single source-flagged baseline per subject/analyte.
 df_baselines <- df_windows %>%
-  filter(AVISITN == 0.0) %>%
+  filter(LBBLFL == "Y", !is.na(lbdt)) %>%
   arrange(USUBJID, PARAMCD, is.na(lbdt), desc(lbdt), LBSEQ) %>%
   group_by(USUBJID, PARAMCD) %>%
   summarise(
     BASE = first(AVAL),
     BASEC = first(AVALC),
     BTOXGR = first(ATOXGR),
+    BASESEQ = first(LBSEQ),
     .groups = "drop"
   )
 
@@ -112,7 +119,7 @@ df_anl01 <- df_base_merged %>%
   group_by(USUBJID, PARAMCD, AVISITN) %>%
   mutate(
     ANL01FL = if_else(AVISITN != 99.0 & row_number() == 1, "Y", "N"),
-    BASEFL = if_else(AVISITN == 0.0, "Y", "N")
+    BASEFL = if_else(!is.na(BASESEQ) & LBSEQ == BASESEQ, "Y", "N")
   ) %>%
   ungroup()
 
@@ -154,7 +161,7 @@ df_optimus_nadir <- df_anc_nadir %>%
     PARAMCD = "ANCNADIR", PARAM = "ANC Nadir Value (x10^3/uL)", PARCAT1 = "OPTIMUS KINETICS",
     ADT = as.Date(NA),
     AVAL = nadir_val, AVALC = sprintf("%.2f", sas_round(nadir_val, 2)), AVISIT = paste("CYCLE", cycle), AVISITN = cycle,
-    ANL01FL = "Y", BASEFL = "N", lbdy = nadir_dy
+    ANL01FL = "Y", BASEFL = "N", lbdy = nadir_dy, LBSEQ = as.numeric(NA)
   )
 
 df_optimus_rec <- df_anc_rec %>%
@@ -165,7 +172,7 @@ df_optimus_rec <- df_anc_rec %>%
     PARAMCD = "ANCRECDY", PARAM = "Days from ANC Nadir to Recovery", PARCAT1 = "OPTIMUS KINETICS",
     ADT = as.Date(NA),
     AVAL = rec_dy - nadir_dy, AVALC = as.character(rec_dy - nadir_dy), AVISIT = paste("CYCLE", cycle), AVISITN = cycle,
-    ANL01FL = "Y", BASEFL = "N", lbdy = rec_dy
+    ANL01FL = "Y", BASEFL = "N", lbdy = rec_dy, LBSEQ = as.numeric(NA)
   )
 
 # Combine and Sort
@@ -173,7 +180,7 @@ adlb_final <- bind_rows(
   df_anl01 %>% select(
     STUDYID, USUBJID, SUBJID, TRT01P, TRTSDT, PARAMCD, PARAM, PARCAT1,
     ADT = lbdt, AVAL, AVALC, LBNRLO = LBORNRLO, LBNRHI = LBORNRHI, LBNRIND, AVISIT, AVISITN, AWDIST, ATOXGR,
-    BASE, BASEC, BTOXGR, CHG, PCHG, ANL01FL, BASEFL, lbdy
+    BASE, BASEC, BTOXGR, CHG, PCHG, ANL01FL, BASEFL, lbdy, LBSEQ
   ),
   df_optimus_nadir,
   df_optimus_rec
@@ -188,7 +195,7 @@ adlb_final <- adlb_final %>% left_join(pn_map, by = "PARAMCD")
 
 # Sort and Save
 
-adlb_final <- adlb_final %>% arrange(USUBJID, PARAMCD, AVISITN, lbdy)
+adlb_final <- adlb_final %>% arrange(USUBJID, PARAMCD, AVISITN, lbdy, LBSEQ)
 
 # Assertions and Error Guards (QC-03)
 if (nrow(adlb_final) == 0) {
@@ -196,6 +203,12 @@ if (nrow(adlb_final) == 0) {
 }
 if (nrow(adlb_final %>% filter(PARAMCD == "ANCNADIR")) == 0) {
   stop("ERROR: [VALIDATION] ADLB Project Optimus nadir records are missing!")
+}
+if (anyDuplicated(adlb_final[c("USUBJID", "PARAMCD", "AVISITN", "lbdy", "LBSEQ")]) > 0L) {
+  stop("ERROR: [ADLB-QC] governed ADLB key is not unique after source LBSEQ preservation")
+}
+if (any(is.na(adlb_final$LBSEQ) & !adlb_final$PARAMCD %in% c("ANCNADIR", "ANCRECDY"))) {
+  stop("ERROR: [ADLB-QC] source laboratory records must retain a nonmissing LBSEQ")
 }
 
 # XPT v5 compliance (clean log): uppercase variable names + SAS date formats (lbdy -> LBDY)

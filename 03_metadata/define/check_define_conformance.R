@@ -46,7 +46,8 @@ read_spec_grid <- function(path) {
     ),
     ds = transmute(d,
       dataset = Dataset, class = Class,
-      structure = Structure, label = Description
+      structure = Structure, label = Description,
+      key_variables = `Key Variables`
     ),
     # Codelist/term NCI controlled-terminology codes (one row per term). Empty for
     # sponsor-defined codelists; populated for codelists derived from CDISC CT.
@@ -99,6 +100,14 @@ read_define_grid <- function(path) {
     label = vapply(igs, function(n) {
       t <- xml_find_first(n, "./d1:Description/d1:TranslatedText", ns)
       if (inherits(t, "xml_missing")) NA_character_ else xml_text(t)
+    }, character(1)),
+    key_variables = vapply(igs, function(n) {
+      refs <- xml_find_all(n, "./d1:ItemRef", ns)
+      seq <- suppressWarnings(as.integer(xml_attr(refs, "KeySequence")))
+      keep <- !is.na(seq)
+      if (!any(keep)) return(NA_character_)
+      names <- idmap$name[match(xml_attr(refs[keep], "ItemOID"), idmap$oid)]
+      paste(names[order(seq[keep])], collapse = ", ")
     }, character(1))
   )
   # Codelist/term NCI codes carried as <Alias Context="nci:ExtCodeID" Name="C..."/>.
@@ -148,7 +157,7 @@ compare <- function(spec, def) {
   }
   # dataset attributes
   dj <- inner_join(spec$ds, def$ds, by = "dataset", suffix = c(".s", ".d"))
-  for (a in c("class", "structure", "label")) {
+  for (a in c("class", "structure", "label", "key_variables")) {
     bad <- dj[ne(dj[[paste0(a, ".s")]], dj[[paste0(a, ".d")]]), ]
     if (nrow(bad)) {
       out[[length(out) + 1]] <- tibble(

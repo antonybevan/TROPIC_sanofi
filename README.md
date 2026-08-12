@@ -173,8 +173,10 @@ python3 platform/cibuild.py --demo         # smoke: syntax + recon methodology
 python3 platform/cibuild.py
 python3 platform/cibuild.py --real-sas     # genuine ODA/local when configured
 
-# Assemble / refresh Module 5 style tree (after a local build)
+# Assemble and validate the complete eCTD-style sequence (after a local build)
 python3 platform/package_ectd.py
+python3 platform/build_ectd_backbone.py
+python3 platform/materialize_ectd.py       # includes complete G08 surface validation
 ```
 
 See [`00_governance/REPRODUCIBILITY.md`](00_governance/REPRODUCIBILITY.md) and [`docs/REPO_SURFACE_POLICY.md`](docs/REPO_SURFACE_POLICY.md).
@@ -185,11 +187,12 @@ Multi-study proof: `python3 platform/cibuild.py --study DEMO02` — see [`studie
 
 ## Pipeline (factory summary)
 
-Manifest-driven **34-stage DAG** (`config/study_manifest.yaml` · `platform/cibuild.py`):
+Manifest-driven **37-stage DAG** (`config/study_manifest.yaml` · `platform/cibuild.py`):
 
 ```text
 01 real SDTM (local, not in git)
   → staging + R validation
+  → synthetic comparator reconstruction + intrinsic/compatibility validation + XPT export
   → independent SAS production + R validation ADaM
   → cell-level recon (diffdf) + results recon
   → admiral third engine (ADSL, OS, PFS)

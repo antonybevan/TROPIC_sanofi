@@ -38,7 +38,7 @@ git clone <repo-url> && cd TROPIC
 python3 platform/cibuild.py --demo
 ```
 
-`--demo` runs [`tests/smoke_test.R`](tests/smoke_test.R), which:
+`--demo` runs [`tests/smoke_test.R`](../tests/smoke_test.R), which:
 1. confirms the pinned R packages load (`haven`, `dplyr`, `diffdf`);
 2. **parses every pipeline R script** (proves the code is syntactically intact);
 3. runs the **actual cross-language reconciliation methodology** on synthetic
@@ -53,14 +53,17 @@ requires only R.
 ### Prerequisites
 - **R 4.6.0** with the locked library: `Rscript -e 'renv::restore()'` (uses `renv.lock`).
 - **Python 3.10+** (orchestrator only — no heavy deps).
+- **Submission PDF tooling:** locked `fpdf2`/`pypdf` dependencies plus Ghostscript,
+  Poppler, and an embeddable Arial or Liberation Sans family. CI installs the Linux
+  equivalents; macOS uses the system Arial family.
 - The **real MP SDTM** (`*.sas7bdat`) placed in `01_source_data/real_sdtm/`. This is the
   official Sanofi de-identified TROPIC (EFC6193) public release; see §5.
 - **For genuine double-programming:** a SAS 9.4 engine — either a local `sas` on `PATH`
   or SAS OnDemand for Academics (ODA) with a **Java runtime (JRE 8+)** + `saspy` +
   `sascfg_personal.py` + `~/.authinfo` (key `oda`, perm 600). For ODA the SDTM is seeded
-  once via Job A; see [`docs/runbooks/ODA_GUIDE.md`](docs/runbooks/ODA_GUIDE.md).
+  once via Job A; see [`docs/runbooks/ODA_GUIDE.md`](../docs/runbooks/ODA_GUIDE.md).
 
-### Run matrix (Stage 11 mode is resolved at runtime and saved to `pipeline_health.json`)
+### Run matrix (Stage 14 mode is resolved at runtime and saved to `pipeline_health.json`)
 | Command | SAS source | Reconciliation meaning |
 |---|---|---|
 | `seed_sdtm.py` then `cibuild.py --real-sas` (ODA) | SAS 9.4 on ODA, this run | **genuine** SAS↔R double programming (mode `oda`, earned via live probe + verified manifest) |
@@ -75,7 +78,7 @@ requires only R.
 > stale SDTM library (it tells you to run Job A) rather than silently dropping to sim.
 
 The synthetic comparator arm is regenerated (deterministically, fixed seeds) by
-[`01_source_data/reconstruct_cbzp_arm.R`](01_source_data/reconstruct_cbzp_arm.R).
+[`01_source_data/reconstruct_cbzp_arm.R`](../01_source_data/reconstruct_cbzp_arm.R).
 
 ## 4. Determinism & environment notes
 - **Cross-language convergence is deterministic.** Both tracks order tied records by
@@ -95,8 +98,8 @@ The synthetic comparator arm is regenerated (deterministically, fixed seeds) by
   curves and numbers-at-risk tables; secondary time-to-event endpoints remain proportional-
   hazards scaled from the real MP arm; non-TTE domains use fixed-seed sampling from
   published Table 1/Table 2 marginals. It is **not real patient data**, is non-confirmatory,
-  and is used only to exercise comparative TFLs. See [07_reviewer_explanation/analysis_report.md](07_reviewer_explanation/analysis_report.md)
-  §8 and [07_reviewer_explanation/guides/ADRG.md](07_reviewer_explanation/guides/ADRG.md) §7.
+  and is used only to exercise comparative TFLs. See [07_reviewer_explanation/analysis_report.md](../07_reviewer_explanation/analysis_report.md)
+  §8 and [07_reviewer_explanation/guides/ADRG.md](../07_reviewer_explanation/guides/ADRG.md) §7.
 
 ## 6. Known limitations & deferred items
 

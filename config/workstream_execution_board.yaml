@@ -4,14 +4,14 @@
 
 version: 1
 study: TROPIC-NCT00417079
-as_of: "2026-08-05"
+as_of: "2026-08-10"
 product_claim_in_force: controlled_non_submission_demo
 pipeline_seal_tag: v0.2.1-portfolio
 historical_tag_note: "v0.1.0-demo-rc.1 and v0.2.0-portfolio are immutable historical evidence; v0.2.1-portfolio is the current Path A portfolio release."
 audit_baseline_commit: "v0.2.1-portfolio^{commit}"
 latest_sealed_run_source_head: "v0.2.1-portfolio^{commit}"
-latest_pipeline_health: "oda/full_dag/GREEN, 34 of 34 stages"
-latest_release_verification: "31 of 31 checks"
+latest_pipeline_health: "oda/full_dag/GREEN, 37 of 37 stages"
+latest_release_verification: "31 of 35 checks; REMEDIATION until the audited worktree is reviewed, committed, and tagged"
 board_doc: docs/WORKSTREAM_EXECUTION_BOARD.md
 product_claim_doc: docs/PRODUCT_CLAIM.md
 disposition_board: 06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md

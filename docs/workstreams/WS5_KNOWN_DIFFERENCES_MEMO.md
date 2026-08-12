@@ -115,7 +115,7 @@ Machine gates can be green while **residual risks** remain. This memo is the hum
 | **Difference** | The pre-Phase-2 sealed pain derivation used median AS, `PPI >=2`, absolute `AS >=10`, combined-component/terminal confirmation, minimum diary date, no author-adopted cancer-related qualification and no CM+PR RT consumption. Those labels remain historical baseline evidence; the adopted replacement is implemented separately in SAS and R. |
 | **Impact if ignored** | TTPAIN/PFS event dates and event sets can be wrong in both directions; numerical SAS/R/admiral parity would only reproduce the same clinical-rule error. |
 | **Why Path A holds** | Antony Bevan adopted ED-01–ED-07 on 2026-08-04. The later statistical-governance review found and corrected `GOV-STAT-01`: SAS T-11-5 tested only the initial response visit; replaying that defective logic yields 65 instead of the correct 43. The current control now requires exact subject-level SAS/R pain-response parity in addition to the corrected CM+PR pain derivation, TTUMOR ITT, SAP-native T-11 remap and aggregate lineage evidence. No independent, sponsor, medical or regulated approval is claimed. |
-| **Close condition** | **Path A only:** the current source tree must pass the full 34-stage real-SAS DAG, `endpoint_controls.F042_PAIN_RESPONSE=PASS`, release reseal and CI verification. External qualified statistical/medical review and sponsor governance remain required before regulated reuse. |
+| **Close condition** | **Path A only:** the current source tree must pass the full 37-stage real-SAS DAG, `endpoint_controls.F042_PAIN_RESPONSE=PASS`, release reseal and CI verification. External qualified statistical/medical review and sponsor governance remain required before regulated reuse. |
 
 ---
 
@@ -229,7 +229,7 @@ This is structural to a portfolio demo—not a temporary bug.
 
 Log cleanliness **PASS** means: configured **persisted** logs are clean under `config/log_cleanliness.yaml`, with reviewed ADTTE time-origin exceptions capped.
 
-It does **not** mean every R/Python stdout line from all 34 stages is archived and scanned. Coverage is explicit: `configured_persisted_logs_only`.
+It does **not** mean every R/Python stdout line from all 37 stages is archived and scanned. Coverage is explicit: `configured_persisted_logs_only`.
 
 ---
 

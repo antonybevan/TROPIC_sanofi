@@ -14,6 +14,8 @@ import sys
 from collections import Counter
 from datetime import datetime, timedelta, timezone
 
+from validate_ectd_sequence import validate_sequence
+
 
 PATHS = {
     "source_profile": "platform/source_profile_status.json",
@@ -120,6 +122,10 @@ def build_release_checklist(out_dir, report_path):
     oda_results = _load_json(PATHS["oda_evidence_results"], {})
     findings_rows = _read_csv(PATHS["findings_register"])
     active_findings, findings_by_severity, confirmed_blockers = _audit_counts(findings_rows)
+    try:
+        ectd_validation = validate_sequence(require_all_leaves=True)
+    except Exception as exc:  # release gate must fail closed on validator faults
+        ectd_validation = {"status": "FAIL", "problems": [f"validator exception: {exc}"]}
 
     rows = []
 
@@ -296,10 +302,22 @@ def build_release_checklist(out_dir, report_path):
         "Close, resolve, or formally disposition confirmed Critical/Major findings before any release-ready claim.",
     )
     _add(
-        rows, "G08 submission_package_materialization", "eCTD backbone/run record present",
-        _status(os.path.exists(PATHS["ectd_index"]) and os.path.exists(PATHS["ectd_run_record"])),
-        f"{PATHS['ectd_index']} present={os.path.exists(PATHS['ectd_index'])}; {PATHS['ectd_run_record']} present={os.path.exists(PATHS['ectd_run_record'])}",
-        "Rebuild/materialize eCTD sequence after upstream release candidate is clean.",
+        rows, "G08 submission_package_materialization",
+        "Complete eCTD sequence inventory, checksums, support files, XML references, and run record validate",
+        _status(ectd_validation.get("status") == "PASS"),
+        (
+            f"platform/validate_ectd_sequence.py status={ectd_validation.get('status', 'FAIL')}; "
+            f"leaves={ectd_validation.get('present_leaves', 0)}/"
+            f"{ectd_validation.get('checksum_leaves', 0)}; "
+            f"unexpected={len(ectd_validation.get('unexpected_files', []))}; "
+            f"problems={ectd_validation.get('problems', [])[:3]}"
+        ),
+        (
+            "Rebuild/materialize the sequence, remove unexpected files, restore checksum-pinned "
+            "official UTIL support assets, and resolve every validator problem."
+            if ectd_validation.get("status") != "PASS"
+            else ""
+        ),
     )
 
     blocker_count = sum(1 for r in rows if r["status"] == "BLOCKER")

@@ -333,7 +333,7 @@ proc sql;
               and not missing(x.base_ppi) and not missing(x.base_an)
               and not missing(x.ppi_value) and not missing(x.as_value)
               and x.base_an > 0
-              and (x.base_an - x.as_value) / x.base_an > 0.5
+              and (x.base_an - x.as_value) / x.base_an >= 0.5
               and x.ppi_value <= x.base_ppi
              then 1 else 0
            end as as_response_initial,
@@ -352,7 +352,7 @@ proc sql;
               and not missing(x.base_ppi) and not missing(x.base_an)
               and not missing(y.ppi_value) and not missing(y.as_value)
               and x.base_an > 0
-              and (x.base_an - y.as_value) / x.base_an > 0.5
+              and (x.base_an - y.as_value) / x.base_an >= 0.5
               and y.ppi_value <= x.base_ppi
              then 1 else 0
            end as as_response_confirming,
@@ -645,6 +645,7 @@ proc sql;
     inner join adam.adsl as a on v.usubjid = a.usubjid
     where not missing(v.visit_date)
       and v.visit_date > a.randdt
+      and v.visit_date <= &STUDY_CUTOFF_DT.
       and (v.ppi_evaluable = 1 or v.as_evaluable = 1)
     group by v.usubjid;
 

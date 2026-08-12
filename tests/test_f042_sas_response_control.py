@@ -24,7 +24,7 @@ def test_sas_pain_response_requires_confirming_visit_response():
 
     assert "y.ppi_evaluable = 1 and y.as_evaluable = 1" in candidate
     assert "x.base_ppi - y.ppi_value >= 2" in candidate
-    assert "(x.base_an - y.as_value) / x.base_an > 0.5" in candidate
+    assert "(x.base_an - y.as_value) / x.base_an >= 0.5" in candidate
     assert "calculated ppi_response_confirming = 1" in candidate
     assert "calculated as_response_confirming = 1" in candidate
     assert "where ppi_confirmed = 1 or as_confirmed = 1" in events

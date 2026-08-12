@@ -12,11 +12,9 @@
 #            1. The pinned R environment loads (haven, dplyr, diffdf).
 #            2. Every pipeline R script parses (no syntax errors on a clean clone).
 #            3. The cross-language reconciliation METHODOLOGY works end-to-end on
-#               synthetic fixtures, on BOTH branches it uses in production:
-#               (a) the unique-key path (USUBJID+AESEQ), and (b) the keyless
-#               multiset path used for ADCM/ADLB/ADRS/ADEX (non-unique business
-#               key + within-key SEQ). Each PASSES on identical independent
-#               outputs and correctly DETECTS an injected cell difference.
+#               synthetic fixtures: direct governed-key parity passes identical
+#               independent outputs, detects an injected cell difference, and
+#               rejects duplicate keys before comparing values.
 #
 #          This is a fixture/unit demonstration of the reconciliation engine — the
 #          heart of the validation claim — not the full 7-domain clinical run
@@ -100,24 +98,15 @@ issues_b <- reconcile(file.path(tdir, "demo_prod.xpt"), file.path(tdir, "demo_v_
 if (length(issues_b) > 0) pass(sprintf("injected 1-cell difference correctly DETECTED (%s)", paste(issues_b, collapse = ", "))) else
   fail("injected difference was NOT detected — reconciliation engine is not sensitive!")
 
-# ---- Keyless multiset path (the branch used for ADCM/ADLB/ADRS/ADEX) ----------
-# The four BDS/OCCDS domains above carry NO unique within-subject record id, so
-# 06_qc_evidence/reconciliation/cross_lang_audit.R aligns them by business keys + within-key
-# row_number() over content-sorted rows. Cases A/B only exercised the unique-key
-# path; this helper mirrors the keyless methodology verbatim so the demo covers it.
-reconcile_multiset <- function(prod, val, sort_keys) {
+# ---- Governed unique-key path for BDS/OCCDS ----------------------------------
+reconcile_unique <- function(prod, val, keys) {
   names(prod) <- toupper(names(prod)); names(val) <- toupper(names(val))
-  common <- intersect(names(prod), names(val))
-  other  <- setdiff(common, sort_keys)
-  seqd <- function(df) df %>%
-    arrange(across(all_of(c(sort_keys, other)))) %>%
-    group_by(across(all_of(sort_keys))) %>% mutate(SEQ = row_number()) %>% ungroup()
-  d <- diffdf(seqd(prod), seqd(val), keys = c(sort_keys, "SEQ"), suppress_warnings = TRUE)
+  if (anyDuplicated(prod[keys]) || anyDuplicated(val[keys])) return("DuplicateKey")
+  d <- diffdf(prod, val, keys = keys, suppress_warnings = TRUE)
   setdiff(names(d), c("DataSummary", "AttribDiffs"))
 }
 
-# Build a BDS-style fixture whose business key (USUBJID + PARAMCD) is NON-unique
-# (multiple visit rows per key) — the exact shape the keyless branch must handle.
+# Build a BDS-style fixture with multiple visits and a unique governed key.
 set.seed(23)
 make_bds <- function() data.frame(
   STUDYID = "DEMO",
@@ -129,30 +118,26 @@ make_bds <- function() data.frame(
 )
 bds_prod <- make_bds(); bds_val <- bds_prod   # independent track, identical spec
 
-# Case C: identical multiset on a non-unique key -> expect PASS (zero differences)
-issues_c <- reconcile_multiset(bds_prod, bds_val, sort_keys = c("USUBJID", "PARAMCD"))
-if (length(issues_c) == 0) pass("keyless multiset path: identical non-unique-key tracks reconcile with ZERO differences") else
-  fail(sprintf("keyless path expected zero differences, got: %s", paste(issues_c, collapse = ", ")))
+# Case C: identical values on a unique BDS key -> expect PASS.
+bds_keys <- c("USUBJID", "PARAMCD", "AVISITN")
+issues_c <- reconcile_unique(bds_prod, bds_val, keys = bds_keys)
+if (length(issues_c) == 0) pass("governed BDS key: identical tracks reconcile with ZERO differences") else
+  fail(sprintf("governed-key path expected zero differences, got: %s", paste(issues_c, collapse = ", ")))
 
 # Case D: perturb ONE AVAL cell inside a multi-row key group -> MUST be detected
 bds_bad <- bds_val
 bds_bad$AVAL[3] <- bds_bad$AVAL[3] + 7.5
-issues_d <- reconcile_multiset(bds_prod, bds_bad, sort_keys = c("USUBJID", "PARAMCD"))
-if (length(issues_d) > 0) pass(sprintf("keyless multiset path: within-group 1-cell difference correctly DETECTED (%s)", paste(issues_d, collapse = ", "))) else
-  fail("keyless path: within-group difference was NOT detected — multiset reconciliation is not sensitive!")
+issues_d <- reconcile_unique(bds_prod, bds_bad, keys = bds_keys)
+if (length(issues_d) > 0) pass(sprintf("governed BDS key: 1-cell difference correctly DETECTED (%s)", paste(issues_d, collapse = ", "))) else
+  fail("governed-key path did not detect an injected cell difference")
 
-# Case E: robustness under TIES. The multiset path verifies record CONTENT, so it must still
-# catch a single changed cell even when a key group contains duplicate rows. (The one thing NO
-# double-programming method can catch is a *correlated* error — both independent tracks
-# producing the SAME wrong value; that residual limitation is inherent to double-programming,
-# not specific to the multiset test, and is documented in cross_lang_audit.R / ADRG.)
+# Case E: duplicate governed keys are a structural failure, even if record content matches.
 tie_prod <- data.frame(
   STUDYID = "DEMO", USUBJID = "DEMO-001", PARAMCD = "ANC",
-  AVISITN = c(1L, 1L, 2L), AVAL = c(5.0, 5.0, 9.0), stringsAsFactors = FALSE)  # duplicate baseline rows
-tie_val <- tie_prod; tie_val$AVAL[3] <- 9.5                                     # one post-baseline cell differs
-issues_e <- reconcile_multiset(tie_prod, tie_val, sort_keys = c("USUBJID", "PARAMCD"))
-if (length(issues_e) > 0) pass(sprintf("keyless multiset path: detects a changed cell amid DUPLICATE rows (%s)", paste(issues_e, collapse = ", "))) else
-  fail("keyless path: missed a changed cell in a tied key group — multiset test is unsound")
+  AVISITN = c(1L, 1L, 2L), AVAL = c(5.0, 5.0, 9.0), stringsAsFactors = FALSE)
+issues_e <- reconcile_unique(tie_prod, tie_prod, keys = bds_keys)
+if (identical(issues_e, "DuplicateKey")) pass("duplicate governed keys are rejected before value comparison") else
+  fail("duplicate governed keys were not rejected")
 
 unlink(tdir, recursive = TRUE)
 

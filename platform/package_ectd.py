@@ -9,18 +9,20 @@ import os
 import sys
 import shutil
 import glob
+import hashlib
 import re
 import argparse
+import subprocess
 from datetime import datetime, timezone
+from pathlib import Path
 
-# Fixed PDF creation/mod date so the rendered reviewer guides and CSR are byte-reproducible.
-# The tracked data-free Module 5 preview must only change when content changes, not on every rebuild.
-_PDF_DATE = datetime(2026, 6, 17, tzinfo=timezone.utc)
+# Fixed submission-surface remediation date keeps the rendered reviewer guides
+# and CSR byte-reproducible while accurately post-dating their 2026-08-05 content.
+_PDF_DATE = datetime(2026, 8, 9, tzinfo=timezone.utc)
 
-# The package renderer intentionally uses the standard Helvetica/Latin-1 PDF
-# font for deterministic, portable output.  Convert the symbols used by the
-# reviewer Markdown to readable ASCII before the font encoder sees them;
-# silently emitting '?' changes clinical thresholds and is not acceptable.
+# Convert typographic symbols used by the reviewer Markdown to readable ASCII.
+# The generated PDFs use an embedded TrueType font, but clinical thresholds and
+# derivation operators should remain searchable/copyable without glyph ambiguity.
 _ASCII_REPLACEMENTS = {
     "\u2013": "-", "\u2014": "--", "\u2011": "-", "\u2212": "-",
     "\u201c": '"', "\u201d": '"', "\u2018": "'", "\u2019": "'",
@@ -35,7 +37,7 @@ _ASCII_REPLACEMENTS = {
 }
 
 def clean_text(text, counter=None):
-    """Replaces Unicode characters not supported by standard latin-1/Helvetica in FPDF.
+    """Return submission-safe text and count unsupported glyph substitutions.
 
     `counter`, if given a single-element list, has [0] incremented once per character silently
     substituted with '?' -- a rendered reviewer's guide/CSR is meant to accurately represent its
@@ -64,156 +66,347 @@ def clean_markdown(text, counter=None):
     cleaned = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', cleaned)
     return cleaned.replace('**', '').replace('__', '').replace('*', '').replace('`', '')
 
+def split_markdown_table_row(line):
+    r"""Split a pipe table row while preserving escaped literal pipes.
+
+    A plain ``str.split('|')`` corrupts expressions such as ``"PI_" \|\| SITEID``
+    into extra PDF columns. This small state machine implements the relevant
+    Markdown escape rule and is intentionally exported for regression tests.
+    """
+    cells, current = [], []
+    escaped = False
+    for char in line.strip():
+        if escaped:
+            current.append(char)
+            escaped = False
+        elif char == "\\":
+            escaped = True
+        elif char == "|":
+            cells.append("".join(current))
+            current = []
+        else:
+            current.append(char)
+    if escaped:
+        current.append("\\")
+    cells.append("".join(current))
+    if line.strip().startswith("|"):
+        cells = cells[1:]
+    if line.strip().endswith("|"):
+        cells = cells[:-1]
+    return [cell.strip() for cell in cells]
+
+
+def _submission_font_files():
+    """Locate a complete sans-serif family suitable for embedded PDF output."""
+    configured = os.environ.get("TROPIC_PDF_FONT_DIR")
+    roots = [Path(configured)] if configured else []
+    roots.extend([
+        Path("/System/Library/Fonts/Supplemental"),
+        Path("/usr/share/fonts/truetype/liberation2"),
+        Path("/usr/share/fonts/truetype/liberation"),
+        Path("C:/Windows/Fonts"),
+    ])
+    families = [
+        ("Arial.ttf", "Arial Bold.ttf", "Arial Italic.ttf", "Arial Bold Italic.ttf"),
+        ("LiberationSans-Regular.ttf", "LiberationSans-Bold.ttf",
+         "LiberationSans-Italic.ttf", "LiberationSans-BoldItalic.ttf"),
+        ("arial.ttf", "arialbd.ttf", "ariali.ttf", "arialbi.ttf"),
+    ]
+    for root in roots:
+        for names in families:
+            paths = tuple(root / name for name in names)
+            if all(path.is_file() for path in paths):
+                return paths
+    raise SystemExit(
+        "No embeddable Arial/Liberation Sans family found. Install fonts-liberation "
+        "or point TROPIC_PDF_FONT_DIR at regular/bold/italic/bold-italic font files."
+    )
+
+
 def md_to_pdf(md_path, pdf_path):
-    """Converts a Markdown file to a styled PDF using fpdf2."""
+    """Convert Markdown to a navigable, submission-oriented PDF using fpdf2."""
     from fpdf import FPDF
-    from fpdf.fonts import FontFace
-    
+    from fpdf.enums import MethodReturnValue, XPos, YPos
+    from fpdf.fonts import FontFace, TextStyle
+    from fpdf.outline import TableOfContents
+
+    font_family = "submission"
+
     class PDF(FPDF):
         def header(self):
-            self.set_font('helvetica', 'B', 8)
-            self.cell(0, 10, 'TROPIC Clinical Analysis & FDA eCTD Module 5 Package', border=0, align='R')
-            self.ln(10)
+            self.set_y(10)
+            self.set_font(font_family, "B", 9)
+            self.cell(
+                0, 5, "TROPIC Clinical Analysis & FDA eCTD Module 5 Package",
+                border=0, align="R",
+            )
+            # Automatic page breaks invoke header() before positioning the next
+            # body fragment.  Restore the document top margin explicitly so a
+            # continued paragraph or table cannot collide with the header.
+            self.set_y(self.t_margin)
+
         def footer(self):
-            self.set_y(-15)
-            self.set_font('helvetica', 'I', 8)
-            self.cell(0, 10, f'Page {self.page_no()}/{{nb}}', border=0, align='C')
+            self.set_y(-13)
+            self.set_font(font_family, "I", 9)
+            self.cell(0, 5, f"Page {self.page_no()}/{{nb}}", border=0, align="C")
 
     print(f"Converting Markdown: {md_path} -> PDF: {pdf_path}")
-    pdf = PDF()
+    pdf = PDF(format="Letter", unit="mm")
+    regular, bold, italic, bold_italic = _submission_font_files()
+    pdf.add_font(font_family, "", str(regular))
+    pdf.add_font(font_family, "B", str(bold))
+    pdf.add_font(font_family, "I", str(italic))
+    pdf.add_font(font_family, "BI", str(bold_italic))
+    pdf.set_margins(left=19.05, top=20, right=12.7)
+    pdf.set_auto_page_break(auto=True, margin=17)
     pdf.creation_date = _PDF_DATE
+    pdf.pdf_version = "1.7"
     pdf.alias_nb_pages()
+    pdf.set_compression(True)
+    pdf.set_subject("TROPIC controlled non-submission demonstration reviewer document")
+    pdf.set_author("TROPIC clinical biometrics portfolio")
+    pdf.set_creator("TROPIC platform/package_ectd.py")
+    pdf.set_lang("en-US")
+    pdf.page_mode = "USE_OUTLINES"
+    pdf.set_display_mode("default", "single")
     pdf.add_page()
-    pdf.set_font("helvetica", size=10)
-    
+    pdf.set_font(font_family, size=10)
+
     with open(md_path, "r", encoding="utf-8") as f:
         lines = f.readlines()
-        
+    document_title = next(
+        (clean_markdown(line.strip()[2:]) for line in lines if line.strip().startswith("# ")),
+        Path(md_path).stem,
+    )
+    pdf.set_title(document_title)
+
     in_table = False
+    in_code = False
     table_data = []
-    bold_font = FontFace(emphasis="BOLD")
-    replaced = [0]  # count of non-latin-1 chars silently '?'-substituted by clean_text below
-    
+    heading_style = FontFace(emphasis="BOLD", fill_color=(232, 237, 242))
+    replaced = [0]
+    toc_inserted = False
+    toc = TableOfContents(
+        text_style=TextStyle(font_family=font_family, font_size_pt=9),
+        level_indent=5,
+        line_spacing=1.25,
+        ignore_pages_before_toc=True,
+    )
+
+    def render_text_block(text, line_height, **kwargs):
+        """Keep ordinary Markdown blocks out of FPDF's unsafe split-cell path."""
+        height = pdf.multi_cell(
+            0,
+            line_height,
+            text,
+            dry_run=True,
+            output=MethodReturnValue.HEIGHT,
+            **kwargs,
+        )
+        body_height = pdf.h - pdf.t_margin - pdf.b_margin
+        if height <= body_height and pdf.will_page_break(height):
+            pdf.add_page()
+        pdf.multi_cell(0, line_height, text, **kwargs)
+
+    def render_table():
+        nonlocal table_data, in_table
+        if not table_data:
+            in_table = False
+            return
+        widths = {len(row) for row in table_data}
+        if len(widths) != 1 or 0 in widths:
+            raise ValueError(
+                f"Malformed Markdown table in {md_path}: inconsistent column counts "
+                f"{[len(row) for row in table_data]}"
+            )
+        pdf.ln(1.5)
+        pdf.set_font(font_family, size=9)
+        with pdf.table(
+            width=pdf.epw,
+            text_align="LEFT",
+            line_height=5,
+            padding=1.2,
+            headings_style=heading_style,
+        ) as table:
+            for row in table_data:
+                table.row(row)
+        pdf.set_font(font_family, size=10)
+        pdf.ln(2)
+        table_data = []
+        in_table = False
+
     for line in lines:
-        line_str = line.strip()
-        
-        # Check if we are in a table
-        if line_str.startswith('|'):
-            is_sep = all(c in '|- :+*' for c in line_str) and len(line_str.replace('|', '').strip()) > 0
+        raw_line = line.rstrip("\r\n")
+        line_str = raw_line.strip()
+
+        if line_str.startswith("```"):
+            if in_table:
+                render_table()
+            in_code = not in_code
+            if not in_code:
+                pdf.ln(1)
+            continue
+        if in_code:
+            pdf.set_font(font_family, size=9)
+            pdf.set_fill_color(245, 247, 249)
+            render_text_block(
+                clean_text(raw_line, replaced) or " ", 4.8, fill=True,
+                new_x=XPos.LMARGIN, new_y=YPos.NEXT,
+            )
+            pdf.set_font(font_family, size=10)
+            continue
+
+        if line_str.startswith("|"):
+            is_sep = (
+                all(c in "|- :+*" for c in line_str)
+                and len(line_str.replace("|", "").strip()) > 0
+            )
             if is_sep:
                 continue
-            cells = [clean_markdown(c.strip(), replaced) for c in line_str.split('|')[1:-1]]
+            cells = [
+                clean_markdown(cell, replaced)
+                for cell in split_markdown_table_row(line_str)
+            ]
             table_data.append(cells)
             in_table = True
             continue
-        else:
-            if in_table and table_data:
-                # Render the parsed table
-                pdf.ln(2)
-                try:
-                    with pdf.table(text_align="LEFT") as table:
-                        for r_idx, row in enumerate(table_data):
-                            row_cells = table.row()
-                            for cell in row:
-                                if r_idx == 0:
-                                    row_cells.cell(cell, style=bold_font)
-                                else:
-                                    row_cells.cell(cell)
-                except Exception as e:
-                    print(f"Table render exception: {e}")
-                    pdf.set_font("helvetica", "B", 9)
-                    for r_idx, row in enumerate(table_data):
-                        row_str = " | ".join(row)
-                        pdf.multi_cell(0, 6, row_str)
-                        pdf.set_font("helvetica", "", 9)
-                    pdf.ln(2)
-                table_data = []
-                in_table = False
-                pdf.ln(2)
-            
+        if in_table:
+            render_table()
+
         if not line_str:
-            pdf.ln(3)
+            pdf.ln(2.5)
             continue
-            
-        # Handle markdown blocks and headers
-        if line_str.startswith('>'):
-            line_str = line_str.lstrip('>').strip()
-            # GFM alert marker (> [!WARNING]/[!NOTE]/etc). Every real source in this repo puts
-            # the marker on its own line with the body on the NEXT '>' line, so stripping just
-            # the marker leaves nothing here and the `continue` below is a no-op change from
-            # before -- but if a marker and body ever DO share one line, the body text now
-            # survives and renders instead of being silently discarded along with the marker.
-            admonition = re.match(r'^\[!\w+\]\s*(.*)$', line_str)
+
+        if line_str.startswith(">"):
+            line_str = line_str.lstrip(">").strip()
+            admonition = re.match(r"^\[!\w+\]\s*(.*)$", line_str)
             if admonition:
                 line_str = admonition.group(1)
                 if not line_str:
                     continue
-            pdf.set_font("helvetica", "I", size=9)
-            pdf.multi_cell(0, 5, clean_markdown(line_str, replaced))
-            pdf.set_font("helvetica", size=10)
-            pdf.ln(2)
+            pdf.set_font(font_family, "I", size=9.5)
+            pdf.set_text_color(55, 65, 75)
+            render_text_block(
+                clean_markdown(line_str, replaced), 5,
+                new_x=XPos.LMARGIN, new_y=YPos.NEXT,
+            )
+            pdf.set_text_color(0, 0, 0)
+            pdf.set_font(font_family, size=10)
+            pdf.ln(1.5)
             continue
 
-        if line_str.startswith('# '):
-            pdf.ln(4)
-            pdf.set_font("helvetica", "B", size=15)
-            pdf.multi_cell(0, 8, clean_markdown(line_str[2:], replaced))
-            pdf.set_font("helvetica", size=10)
-            pdf.ln(2)
-        elif line_str.startswith('## '):
-            pdf.ln(3)
-            pdf.set_font("helvetica", "B", size=12)
-            pdf.multi_cell(0, 7, clean_markdown(line_str[3:], replaced))
-            pdf.set_font("helvetica", size=10)
-            pdf.ln(2)
-        elif line_str.startswith('### '):
-            pdf.ln(2)
-            pdf.set_font("helvetica", "B", size=11)
-            pdf.multi_cell(0, 6, clean_markdown(line_str[4:], replaced))
-            pdf.set_font("helvetica", size=10)
-            pdf.ln(2)
-        elif line_str.startswith('#### '):
-            pdf.ln(2)
-            pdf.set_font("helvetica", "B", size=10)
-            pdf.multi_cell(0, 5, clean_markdown(line_str[5:], replaced))
-            pdf.set_font("helvetica", size=10)
-            pdf.ln(1)
-        elif line_str.startswith('---'):
-            # Draw line
-            x = pdf.get_x()
-            y = pdf.get_y()
-            pdf.line(x, y + 2, x + 190, y + 2)
-            pdf.ln(4)
-        elif line_str.startswith('* ') or line_str.startswith('- '):
-            pdf.multi_cell(0, 5, " * " + clean_markdown(line_str[2:], replaced))
-            pdf.ln(1)
-        else:
-            pdf.multi_cell(0, 5, clean_markdown(line_str, replaced))
+        heading = re.match(r"^(#{1,4})\s+(.+)$", line_str)
+        if heading:
+            level = len(heading.group(1)) - 1
+            title = clean_markdown(heading.group(2), replaced)
+            pdf.start_section(title, level=level, strict=False)
+            sizes = (15, 13, 11.5, 10.5)
+            heights = (8, 7, 6, 5.5)
+            pdf.ln(3 if level < 2 else 2)
+            pdf.set_font(font_family, "B", size=sizes[level])
+            render_text_block(
+                title, heights[level],
+                new_x=XPos.LMARGIN, new_y=YPos.NEXT,
+            )
+            pdf.set_font(font_family, size=10)
             pdf.ln(1.5)
-            
-    # Handle end of file table edge case
-    if in_table and table_data:
-        pdf.ln(2)
-        try:
-            with pdf.table(text_align="LEFT") as table:
-                for r_idx, row in enumerate(table_data):
-                    row_cells = table.row()
-                    for cell in row:
-                        if r_idx == 0:
-                            row_cells.cell(cell, style=bold_font)
-                        else:
-                            row_cells.cell(cell)
-        except Exception as e:
-            pdf.set_font("helvetica", "B", 9)
-            for r_idx, row in enumerate(table_data):
-                row_str = " | ".join(row)
-                pdf.multi_cell(0, 6, row_str)
-                pdf.set_font("helvetica", "", 9)
-            pdf.ln(2)
+            if level == 0 and not toc_inserted:
+                pdf.set_font(font_family, "B", 12)
+                pdf.cell(0, 8, "Table of Contents")
+                pdf.ln(10)
+                pdf.set_font(font_family, size=9)
+                pdf.insert_toc_placeholder(toc.render_toc, pages=1)
+                pdf.set_font(font_family, size=10)
+                toc_inserted = True
+            continue
 
+        if line_str.startswith("---"):
+            x, y = pdf.get_x(), pdf.get_y()
+            pdf.set_draw_color(120, 130, 140)
+            pdf.line(x, y + 1, x + pdf.epw, y + 1)
+            pdf.ln(4)
+        elif line_str.startswith("* ") or line_str.startswith("- "):
+            render_text_block(
+                " - " + clean_markdown(line_str[2:], replaced), 5,
+                new_x=XPos.LMARGIN, new_y=YPos.NEXT,
+            )
+            pdf.ln(0.8)
+        else:
+            render_text_block(
+                clean_markdown(line_str, replaced), 5.2,
+                new_x=XPos.LMARGIN, new_y=YPos.NEXT,
+            )
+            pdf.ln(1.2)
+
+    if in_table:
+        render_table()
+    if in_code:
+        raise ValueError(f"Unclosed fenced code block in {md_path}")
     if replaced[0]:
-        print(f"  {replaced[0]} character(s) replaced with '?' (non-latin-1) in {md_path}")
-    pdf.output(pdf_path)
+        raise ValueError(
+            f"Refusing PDF with {replaced[0]} unsupported character substitution(s): {md_path}"
+        )
+    pdf_target = Path(pdf_path).resolve()
+    pdf_target.parent.mkdir(parents=True, exist_ok=True)
+    ghostscript = shutil.which("gs")
+    if not ghostscript:
+        raise SystemExit(
+            "Ghostscript is required to linearize reviewer PDFs for Fast Web View."
+        )
+    raw_path = f"{pdf_target}.raw.pdf"
+    optimized_path = f"{pdf_target}.optimized.pdf"
+    pdf.output(raw_path)
+    raw_digest = hashlib.sha256(Path(raw_path).read_bytes()).hexdigest()
+    document_uuid = (
+        f"{raw_digest[:8]}-{raw_digest[8:12]}-{raw_digest[12:16]}-"
+        f"{raw_digest[16:20]}-{raw_digest[20:32]}"
+    )
+    environment = os.environ.copy()
+    environment["SOURCE_DATE_EPOCH"] = str(int(_PDF_DATE.timestamp()))
+    command = [
+        ghostscript,
+        "-q",
+        "-dBATCH",
+        "-dNOPAUSE",
+        "-dSAFER",
+        "-sDEVICE=pdfwrite",
+        "-dCompatibilityLevel=1.7",
+        "-dFastWebView=true",
+        "-dOmitID=true",
+        "-dEmbedAllFonts=true",
+        "-dSubsetFonts=false",
+        "-dPreserveAnnots=true",
+        "-dAutoRotatePages=/None",
+        f"-sDocumentUUID={document_uuid}",
+        f"-sInstanceUUID={document_uuid}",
+        f"-sOutputFile={optimized_path}",
+        "-c",
+        (
+            "[ /CreationDate "
+            f"({_PDF_DATE.astimezone(timezone.utc).strftime('D:%Y%m%d%H%M%SZ')}) "
+            "/ModDate "
+            f"({_PDF_DATE.astimezone(timezone.utc).strftime('D:%Y%m%d%H%M%SZ')}) "
+            "/DOCINFO pdfmark"
+        ),
+        "-f",
+        raw_path,
+    ]
+    try:
+        subprocess.run(
+            command,
+            check=True,
+            cwd=pdf_target.parent,
+            env=environment,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+        os.replace(optimized_path, pdf_target)
+    finally:
+        if os.path.exists(raw_path):
+            os.remove(raw_path)
+        if os.path.exists(optimized_path):
+            os.remove(optimized_path)
 
 def copy_source_crf(pdf_path):
     """Copy the available source CRF; never generate a fabricated CRF placeholder."""

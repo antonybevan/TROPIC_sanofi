@@ -1,4 +1,4 @@
-# Program: v_adcm_validation.R | Version: 2.0 | Author: Antony Bevan, Clinical Programming | Date: 2026-05-23
+# Program: v_adcm_validation.R | Version: 3.0.0 | Author: Antony Bevan, Clinical Programming | Date: 2026-08-10
 # Standard: ADaMIG v1.3 OCCDS v1.0 | renv.lock hash: locked
 # Description: R Independent Validation double-programming for TROPIC ADCM.
 
@@ -12,7 +12,7 @@ cat("NOTE: [VALIDATION] Starting ADCM Validation script...\n")
 
 # Load real validation ADSL and staging CM
 adsl <- read_xpt("04_analysis_datasets/adam/adsl_v.xpt")
-cm <- readRDS("01_source_data/real_sdtm/staging/cm.rds")
+cm <- readRDS(stage_file("cm"))
 
 # Standardize header variables
 header <- adsl %>%
@@ -23,6 +23,7 @@ df_cm <- cm %>%
   select(-any_of("STUDYID")) %>%
   inner_join(header, by = c("USUBJID", "SUBJID")) %>%
   mutate(
+    CMSEQ = as.numeric(CMSEQ),
     cmstdtc_clean = trimws(CMSTDTC),
     cmendtc_clean = trimws(CMENDTC),
     is_full_stdt = grepl("^\\d{4}-\\d{1,2}-\\d{1,2}", cmstdtc_clean),
@@ -61,17 +62,19 @@ adcm <- df_cm %>%
   ) %>%
   select(
     STUDYID, USUBJID, CMDECOD, CMCAT, CMINDC, ASTDT = cmstdt, AENDT = cmendt,
-    CMTRT, ASTDY = cmstdy, GCSFFL, GCSFPRFL, NACTFL, NACTDT = nactdt, PREDNFL, TRTEMFL
+    CMTRT, ASTDY = cmstdy, GCSFFL, GCSFPRFL, NACTFL, NACTDT = nactdt, PREDNFL, TRTEMFL,
+    CMSEQ
   )
 
 # Sort and Save
-
-# Sort and Save
-adcm <- adcm %>% arrange(USUBJID, ASTDT, CMDECOD)
+adcm <- adcm %>% arrange(USUBJID, CMSEQ)
 
 # Assertions and Error Guards (QC-03)
 if (nrow(adcm) == 0) {
   stop("ERROR: [VALIDATION] ADCM output dataset is empty!")
+}
+if (anyDuplicated(adcm[c("USUBJID", "CMSEQ")]) > 0L || any(is.na(adcm$CMSEQ))) {
+  stop("ERROR: [ADCM-QC] source CMSEQ does not uniquely identify subject medication records")
 }
 
 # XPT v5 compliance (clean log): uppercase variable names + SAS date formats

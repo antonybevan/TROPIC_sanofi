@@ -362,6 +362,26 @@ def main() -> int:
     add("release_candidate.PASS", rc.get("status") == "PASS", str(rc.get("status")))
     add("release_candidate.blockers_0", rc.get("blocker", 1) == 0, str(rc.get("blocker")))
 
+    try:
+        sys.path.insert(0, str(ROOT / "platform"))
+        from validate_ectd_sequence import validate_sequence
+
+        # The lightweight Path-A seal job intentionally installs no Python
+        # dependencies. Full DTD validation runs in G08/validate CI; this check
+        # still rejects extras, missing support files, broken references, and
+        # checksum drift in every leaf that is present in a data-free checkout.
+        ectd = validate_sequence(require_all_leaves=False, validate_dtd=False)
+        ectd_ok = ectd.get("status") == "PASS"
+        ectd_detail = (
+            f"present_leaves={ectd.get('present_leaves', 0)}/"
+            f"{ectd.get('checksum_leaves', 0)}; "
+            + "; ".join(ectd.get("problems", [])[:5])
+        )
+    except Exception as exc:
+        ectd_ok = False
+        ectd_detail = f"validator exception: {exc}"
+    add("ectd.sequence_surface", ectd_ok, ectd_detail)
+
     add("product_claim.exists", (ROOT / "docs/PRODUCT_CLAIM.md").is_file(), "")
     add(
         "known_diff_memo.exists",

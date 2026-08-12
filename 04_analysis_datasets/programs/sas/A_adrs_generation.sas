@@ -1,21 +1,20 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: A_adrs_generation.sas
-   Version: 2.1.0
+   Version: 3.0.0
    Author: Antony Bevan, Clinical Programming
-   Date: 2026-05-23 (ADaM dens contract 2026-07-09)
+   Date: 2026-08-09
    Standard: CDISC ADaMIG v1.3 BDS
    Input: staging.ls, sdtm.rs, sdtm.lb, adam.adsl
    Output: adam.adrs
-   Description: Efficacy response ADaM (ADRS) combining progression and
-                death milestones with PSA progression metrics.
+   Description: Efficacy response ADaM (ADRS), with RECIST response kept
+                distinct from disposition-reported clinical progression.
 
    ADaM dens contract (TRT01P always from ADSL / DM arm — never EXTRT):
      PSARESP, PSPROG, BSGRESP  -> one row per ADSL SAFFL='Y' (Path A: 371)
-     OVRLRESP                  -> visit-level RECIST for lesion-evaluable spine
-                                   (Path A: 351 subj; multi-row)
-     BESTRESP, OBJRESP         -> one row per BOR spine subject (351), NOT the
-                                   SAP ORR dens. OBJRESP is confirmed CR/PR among
+     OVRLRESP                  -> visit-level lesion-derived RECIST assessments
+     BESTRESP, OBJRESP         -> one row per subject with evaluable RECIST, NOT
+                                   the SAP ORR dens. OBJRESP is confirmed CR/PR among
                                    subjects with evaluable RECIST timepoints.
      ORR TFL dens (MEASDISF='Y', N=203) is applied in tfl_generation.R via
      left-join of ADSL MEAS subjects to OBJRESP (missing AVALC -> non-responder).
@@ -75,8 +74,10 @@ data work.recist_calc;
     
     retain nadir_sod;
     
-    if first.usubjid then nadir_sod = post_sod;
-    else nadir_sod = min(nadir_sod, post_sod);
+    /* RECIST PD compares the current SoD with the smallest PRIOR on-study SoD,
+       including baseline. Updating the nadir before comparison suppresses PD. */
+    if first.usubjid then nadir_sod = base_sod;
+    if missing(nadir_sod) then nadir_sod = post_sod;
     
     if base_sod > 0 then pct_chg_base = (post_sod - base_sod) / base_sod * 100;
     else pct_chg_base = .;
@@ -90,6 +91,8 @@ data work.recist_calc;
     else if pct_chg_nadir >= &RECIST_PD_PCT. and abs_chg_nadir >= &RECIST_PD_ABS. then target_resp = 'PD';
     else if pct_chg_base <= &RECIST_PR_PCT. then target_resp = 'PR';
     else target_resp = 'SD';
+
+    nadir_sod = min(nadir_sod, post_sod);
 run;
 
 /* 1a. Non-target lesion response per visit (RECIST integration component).
@@ -168,7 +171,8 @@ proc sql;
     left join adam.adsl as adsl on r.usubjid = adsl.usubjid;
 quit;
 
-/* Map Efficacy Milestones from sdtm.rs */
+/* Preserve generic disposition-reported progression as a distinct typed
+   parameter. It is not RECIST and is not consumed by BOR, TTUMOR, or PFS. */
 proc sql;
     create table work.rs_disp as
     select 
@@ -176,20 +180,23 @@ proc sql;
         adsl.usubjid,
         adsl.trt01p,
         adsl.trtsdt,
-        'Overall Response per RECIST v1.0' as PARAM length=40,
-        'OVRLRESP' as PARAMCD length=8,
-        rs.rsorres as AVALC length=20,
-        rs.rsdt as ADT format=yymmdd10.,
-        rs.rsdy as ADY,
-        rs.visit as AVISIT length=40
+        'Disposition Clinical Progression' as PARAM length=40,
+        'CLINPROG' as PARAMCD length=8,
+        'Y' as AVALC length=20,
+        1.0 as AVAL,
+        min(rs.rsdt) as ADT format=yymmdd10.,
+        calculated ADT - adsl.trtsdt + 1 as ADY,
+        'ALL CYCLES' as AVISIT length=40,
+        99 as AVISITN
     from sdtm.rs as rs
     left join adam.adsl as adsl on rs.usubjid = adsl.usubjid
-    where adsl.saffl = 'Y';
+    where adsl.saffl = 'Y'
+    group by adsl.studyid, adsl.usubjid, adsl.trt01p, adsl.trtsdt;
 quit;
 
-/* Union visit-level records */
+/* RECIST visit-level records only. */
 data work.rs_base;
-    set work.recist_ovrl work.rs_disp;
+    set work.recist_ovrl;
 run;
 
 proc sort data=work.rs_base;
@@ -209,8 +216,7 @@ proc sql;
             when AVALC = 'PR' then 2.0
             when AVALC = 'SD' then 3.0
             when AVALC = 'PD' then 4.0
-            when AVALC = 'DEATH' then 5.0
-            else 6.0
+            else 5.0
         end as rank,
         AVALC
     from work.rs_base
@@ -252,7 +258,12 @@ proc sql;
         on a.usubjid = b.usubjid
        and b.ADT - a.ADT >= &RECIST_CONFIRM_DAYS.
     where a.AVALC in ('CR', 'PR') and b.AVALC in ('CR', 'PR')
-      and not (a.AVALC = 'CR' and b.AVALC = 'PR');
+      and not (a.AVALC = 'CR' and b.AVALC = 'PR')
+      and not exists (
+          select 1 from work.recist_ovrl as p
+          where p.usubjid = a.usubjid and p.AVALC = 'PD'
+            and p.ADT > a.ADT and p.ADT < b.ADT
+      );
 quit;
 
 proc sql;
@@ -269,7 +280,7 @@ proc sql;
     left join work.orr_confirmed as c on b.usubjid = c.usubjid;
 quit;
 
-/* Rigorous PCWG3 PSA Progression Logic */
+/* Reconstructed PSA progression rule with prior-nadir confirmation logic. */
 proc sql;
     create table work.psa_base as
     select usubjid, lbstresn as psabl, lbdt as base_dt
@@ -319,8 +330,14 @@ data work.psa_nadir;
     set work.psa_all;
     by usubjid;
     retain psanadir;
-    if first.usubjid then psanadir = lbstresn;
-    else psanadir = min(psanadir, lbstresn);
+    if first.usubjid then do;
+        psanadir = lbstresn;
+        prior_psanadir = lbstresn;
+    end;
+    else do;
+        prior_psanadir = psanadir;
+        psanadir = min(psanadir, lbstresn);
+    end;
 run;
 
 proc sql;
@@ -335,11 +352,12 @@ data work.psa_prog_eval;
     if not missing(visitnum) and visitnum > 0;
     length is_trigger 8;
     if psad50 = 'Y' then do;
-        if lbstresn >= &PSA_PROG_MULT_RESP. * psanadir then is_trigger = 1;
+        if lbstresn >= &PSA_PROG_MULT_RESP. * prior_psanadir then is_trigger = 1;
         else is_trigger = 0;
     end;
     else do;
-        if lbstresn >= &PSA_PROG_MULT_NORESP. * psanadir and (lbstresn - psanadir) >= &PSA_PROG_ABS. then is_trigger = 1;
+        if lbstresn >= &PSA_PROG_MULT_NORESP. * prior_psanadir and
+           (lbstresn - prior_psanadir) >= &PSA_PROG_ABS. then is_trigger = 1;
         else is_trigger = 0;
     end;
 run;
@@ -359,7 +377,7 @@ proc sql;
     select 
         adsl.usubjid,
         'PSPROG' as PARAMCD length=8,
-        'PSA Progression (PCWG3)' as PARAM length=40,
+        'PSA Progression (reconstructed rule)' as PARAM length=40,
         case when not missing(p.prog_date) then 'Y' else 'N' end as AVALC length=20,
         case when not missing(p.prog_date) then 1.0 else 0.0 end as AVAL,
         p.prog_date as ADT format=yymmdd10.,
@@ -387,11 +405,11 @@ proc sql;
     where adsl.saffl = 'Y';
 quit;
 
-/* PCWG3 Bone-Scan Progression (BSGRESP) -- 2+2 rule (Scher 2016). Methodological
-   demonstration (post-2010, not in the trial-era SAP; see ADRG SS4A), mirroring how
-   PSPROG already applies PCWG3 to this 2010 trial. Bone is the dominant mCRPC
+/* Exploratory Bone-Scan Progression (BSGRESP) -- later 2+2 rule (Scher 2016).
+   Methodological demonstration (post-2010, not in the trial-era SAP; see ADRG SS4A).
+   Bone is the dominant mCRPC
    progression site and is largely non-measurable by RECIST, so it is tracked
-   separately and feeds A_adtte_generation.sas (BSGRESP='PROGRESSION'). */
+   separately but does not feed the trial-era primary TTUMOR/PFS endpoints. */
 proc sql;
     /* New bone lesions per post-baseline scan date */
     create table work.bone_new as
@@ -429,13 +447,13 @@ proc sql;
 quit;
 
 proc sql;
-    /* Three-level PCWG3 result: confirmed PROGRESSION feeds TTUMOR (A_adtte);
-       PROGRESSION UNCONFIRMED (PDu) is informational and does NOT count as an event. */
+    /* Three-level exploratory result; it is informational and does not count as
+       a trial-era primary endpoint event. */
     create table work.bsgresp as
     select
         adsl.usubjid,
         'BSGRESP' as PARAMCD length=8,
-        'Bone Scan Progression (PCWG3)' as PARAM length=40,
+        'Exploratory Bone Progression (2+2)' as PARAM length=40,
         case when c.usubjid is not null then 'PROGRESSION'
              when p.usubjid is not null then 'PROGRESSION UNCONFIRMED'
              else 'NO PROGRESSION' end as AVALC length=24,
@@ -457,7 +475,7 @@ quit;
    truncation is what the SAS-vs-R cross-language audit caught (5 BSGRESP cells). */
 data work.adrs_union;
     length AVALC $100;
-    set work.rs_base work.bor_summary work.orr_summary work.psprog work.psaresp work.bsgresp;
+    set work.rs_base work.rs_disp work.bor_summary work.orr_summary work.psprog work.psaresp work.bsgresp;
 run;
 
 proc sort data=work.adrs_union;

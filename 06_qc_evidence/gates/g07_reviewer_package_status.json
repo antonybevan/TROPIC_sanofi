@@ -2,7 +2,7 @@
   "gate": "G07",
   "name": "reviewer_package_lock",
   "status": "PASS",
-  "generated_at": "2026-08-05T09:04:32Z",
+  "generated_at": "2026-08-10T05:43:14Z",
   "checks": [
     {
       "name": "exists:07_reviewer_explanation/guides/ADRG.md",
@@ -35,9 +35,39 @@
       "detail": "present"
     },
     {
-      "name": "exists:docs/RELEASE_NOTE_v0.1.0-demo-rc.1.md",
+      "name": "exists:docs/RELEASE_NOTE_v0.2.2-portfolio.md",
       "ok": true,
       "detail": "present"
+    },
+    {
+      "name": "exists:08_submission_package/README.md",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "release_identity:07_reviewer_explanation/analysis_report.md",
+      "ok": true,
+      "detail": "expected one current-release line binding v0.2.2-portfolio to docs/RELEASE_NOTE_v0.2.2-portfolio.md; found=['**Current portfolio release:** tag `v0.2.2-portfolio` \u00b7 [`docs/RELEASE_NOTE_v0.2.2-portfolio.md`](../docs/RELEASE_NOTE_v0.2.2-portfolio.md) \u00b7 controlled non-submission demonstration']"
+    },
+    {
+      "name": "release_identity:07_reviewer_explanation/guides/ADRG.md",
+      "ok": true,
+      "detail": "expected one current-release line binding v0.2.2-portfolio to docs/RELEASE_NOTE_v0.2.2-portfolio.md; found=['**Current portfolio release:** tag `v0.2.2-portfolio` \u00b7 [`docs/RELEASE_NOTE_v0.2.2-portfolio.md`](../../docs/RELEASE_NOTE_v0.2.2-portfolio.md) \u00b7 `python3 scripts/verify_release.py`']"
+    },
+    {
+      "name": "release_identity:07_reviewer_explanation/guides/SDRG.md",
+      "ok": true,
+      "detail": "expected one current-release line binding v0.2.2-portfolio to docs/RELEASE_NOTE_v0.2.2-portfolio.md; found=['**Current portfolio release:** tag `v0.2.2-portfolio` \u00b7 [`docs/RELEASE_NOTE_v0.2.2-portfolio.md`](../../docs/RELEASE_NOTE_v0.2.2-portfolio.md) \u00b7 `python3 scripts/verify_release.py`']"
+    },
+    {
+      "name": "release_identity:07_reviewer_explanation/guides/BDRG.md",
+      "ok": true,
+      "detail": "expected one current-release line binding v0.2.2-portfolio to docs/RELEASE_NOTE_v0.2.2-portfolio.md; found=['**Current portfolio release:** tag `v0.2.2-portfolio` \u00b7 [`docs/RELEASE_NOTE_v0.2.2-portfolio.md`](../../docs/RELEASE_NOTE_v0.2.2-portfolio.md) \u00b7 `python3 scripts/verify_release.py`']"
+    },
+    {
+      "name": "release_identity:08_submission_package/README.md",
+      "ok": true,
+      "detail": "expected one current-release line binding v0.2.2-portfolio to docs/RELEASE_NOTE_v0.2.2-portfolio.md; found=['**Current sealed portfolio release:** [`docs/RELEASE_NOTE_v0.2.2-portfolio.md`](../docs/RELEASE_NOTE_v0.2.2-portfolio.md) \u00b7 tag `v0.2.2-portfolio`']"
     },
     {
       "name": "marker:07_reviewer_explanation/guides/ADRG.md:PRODUCT_CLAIM|non-submission|demonstrati",
@@ -70,9 +100,39 @@
       "detail": "possible active L-01 claim"
     },
     {
+      "name": "analysis_report.matches:T-11-6",
+      "ok": true,
+      "detail": "report=('4.9', '5.0', '166/378', '96/371', '0.89', '0.66', '1.22', '0.4406'); generated_table=('4.9', '5.0', '166/378', '96/371', '0.89', '0.66', '1.22', '0.4406')"
+    },
+    {
+      "name": "analysis_report.matches:T-11-7",
+      "ok": true,
+      "detail": "report=('2.7', '2.2', '286/378', '265/371', '0.84', '0.70', '0.99', '0.0319'); generated_table=('2.7', '2.2', '286/378', '265/371', '0.84', '0.70', '0.99', '0.0319')"
+    },
+    {
+      "name": "analysis_report.matches:T-11-8",
+      "ok": true,
+      "detail": "report=('8.1', 'NE', '130/378', '37/371', '2.85', '1.98', '4.12', '<0.0001'); generated_table=('8.1', 'NE', '130/378', '37/371', '2.85', '1.98', '4.12', '<0.0001')"
+    },
+    {
       "name": "reviewer_pdf.pdftotext_available",
       "ok": true,
       "detail": "Poppler pdftotext not found"
+    },
+    {
+      "name": "reviewer_pdf.pdfinfo_available",
+      "ok": true,
+      "detail": "Poppler pdfinfo not found"
+    },
+    {
+      "name": "reviewer_pdf.pdffonts_available",
+      "ok": true,
+      "detail": "Poppler pdffonts not found"
+    },
+    {
+      "name": "reviewer_pdf.pypdf_available",
+      "ok": true,
+      "detail": "pypdf not installed"
     },
     {
       "name": "reviewer_pdf.no_symbol_substitution:08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
@@ -85,6 +145,61 @@
       "detail": ""
     },
     {
+      "name": "reviewer_pdf.release_identity:08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
+      "ok": true,
+      "detail": "rendered PDF does not identify current release v0.2.2-portfolio"
+    },
+    {
+      "name": "reviewer_pdf.letter_page_size:08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
+      "ok": true,
+      "detail": "612 x 792 pts (letter)"
+    },
+    {
+      "name": "reviewer_pdf.fast_web_view:08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
+      "ok": true,
+      "detail": "Optimized=yes"
+    },
+    {
+      "name": "reviewer_pdf.not_encrypted:08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
+      "ok": true,
+      "detail": "Encrypted=no"
+    },
+    {
+      "name": "reviewer_pdf.version_1_7:08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
+      "ok": true,
+      "detail": "PDF version=1.7"
+    },
+    {
+      "name": "reviewer_pdf.fonts_embedded:08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
+      "ok": true,
+      "detail": "fonts=3; unembedded=[]"
+    },
+    {
+      "name": "reviewer_pdf.all_pages_letter:08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
+      "ok": true,
+      "detail": "letter=14/14"
+    },
+    {
+      "name": "reviewer_pdf.bookmarks:08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
+      "ok": true,
+      "detail": "outlines=2; page_mode=/UseOutlines"
+    },
+    {
+      "name": "reviewer_pdf.hyperlinks:08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
+      "ok": true,
+      "detail": "link_annotations=81"
+    },
+    {
+      "name": "reviewer_pdf.minimum_font_size:08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
+      "ok": true,
+      "detail": "minimum rendered text size=9.0"
+    },
+    {
+      "name": "reviewer_pdf.metadata_title:08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
+      "ok": true,
+      "detail": "PDF title metadata is empty"
+    },
+    {
       "name": "reviewer_pdf.no_symbol_substitution:08_submission_package/m5/datasets/tropic/tabulations/sdtm/sdrg.pdf",
       "ok": true,
       "detail": "rendered threshold substitutions: []"
@@ -93,6 +208,61 @@
       "name": "reviewer_pdf.no_raw_markdown:08_submission_package/m5/datasets/tropic/tabulations/sdtm/sdrg.pdf",
       "ok": true,
       "detail": ""
+    },
+    {
+      "name": "reviewer_pdf.release_identity:08_submission_package/m5/datasets/tropic/tabulations/sdtm/sdrg.pdf",
+      "ok": true,
+      "detail": "rendered PDF does not identify current release v0.2.2-portfolio"
+    },
+    {
+      "name": "reviewer_pdf.letter_page_size:08_submission_package/m5/datasets/tropic/tabulations/sdtm/sdrg.pdf",
+      "ok": true,
+      "detail": "612 x 792 pts (letter)"
+    },
+    {
+      "name": "reviewer_pdf.fast_web_view:08_submission_package/m5/datasets/tropic/tabulations/sdtm/sdrg.pdf",
+      "ok": true,
+      "detail": "Optimized=yes"
+    },
+    {
+      "name": "reviewer_pdf.not_encrypted:08_submission_package/m5/datasets/tropic/tabulations/sdtm/sdrg.pdf",
+      "ok": true,
+      "detail": "Encrypted=no"
+    },
+    {
+      "name": "reviewer_pdf.version_1_7:08_submission_package/m5/datasets/tropic/tabulations/sdtm/sdrg.pdf",
+      "ok": true,
+      "detail": "PDF version=1.7"
+    },
+    {
+      "name": "reviewer_pdf.fonts_embedded:08_submission_package/m5/datasets/tropic/tabulations/sdtm/sdrg.pdf",
+      "ok": true,
+      "detail": "fonts=3; unembedded=[]"
+    },
+    {
+      "name": "reviewer_pdf.all_pages_letter:08_submission_package/m5/datasets/tropic/tabulations/sdtm/sdrg.pdf",
+      "ok": true,
+      "detail": "letter=8/8"
+    },
+    {
+      "name": "reviewer_pdf.bookmarks:08_submission_package/m5/datasets/tropic/tabulations/sdtm/sdrg.pdf",
+      "ok": true,
+      "detail": "outlines=2; page_mode=/UseOutlines"
+    },
+    {
+      "name": "reviewer_pdf.hyperlinks:08_submission_package/m5/datasets/tropic/tabulations/sdtm/sdrg.pdf",
+      "ok": true,
+      "detail": "link_annotations=54"
+    },
+    {
+      "name": "reviewer_pdf.minimum_font_size:08_submission_package/m5/datasets/tropic/tabulations/sdtm/sdrg.pdf",
+      "ok": true,
+      "detail": "minimum rendered text size=9.0"
+    },
+    {
+      "name": "reviewer_pdf.metadata_title:08_submission_package/m5/datasets/tropic/tabulations/sdtm/sdrg.pdf",
+      "ok": true,
+      "detail": "PDF title metadata is empty"
     },
     {
       "name": "reviewer_pdf.no_symbol_substitution:08_submission_package/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
@@ -105,6 +275,66 @@
       "detail": ""
     },
     {
+      "name": "reviewer_pdf.release_identity:08_submission_package/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
+      "ok": true,
+      "detail": "rendered PDF does not identify current release v0.2.2-portfolio"
+    },
+    {
+      "name": "reviewer_pdf.bdrg_investigator_expression",
+      "ok": true,
+      "detail": "BDRG INVNAM expression is not rendered as one intact table cell"
+    },
+    {
+      "name": "reviewer_pdf.letter_page_size:08_submission_package/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
+      "ok": true,
+      "detail": "612 x 792 pts (letter)"
+    },
+    {
+      "name": "reviewer_pdf.fast_web_view:08_submission_package/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
+      "ok": true,
+      "detail": "Optimized=yes"
+    },
+    {
+      "name": "reviewer_pdf.not_encrypted:08_submission_package/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
+      "ok": true,
+      "detail": "Encrypted=no"
+    },
+    {
+      "name": "reviewer_pdf.version_1_7:08_submission_package/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
+      "ok": true,
+      "detail": "PDF version=1.7"
+    },
+    {
+      "name": "reviewer_pdf.fonts_embedded:08_submission_package/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
+      "ok": true,
+      "detail": "fonts=3; unembedded=[]"
+    },
+    {
+      "name": "reviewer_pdf.all_pages_letter:08_submission_package/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
+      "ok": true,
+      "detail": "letter=5/5"
+    },
+    {
+      "name": "reviewer_pdf.bookmarks:08_submission_package/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
+      "ok": true,
+      "detail": "outlines=2; page_mode=/UseOutlines"
+    },
+    {
+      "name": "reviewer_pdf.hyperlinks:08_submission_package/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
+      "ok": true,
+      "detail": "link_annotations=24"
+    },
+    {
+      "name": "reviewer_pdf.minimum_font_size:08_submission_package/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
+      "ok": true,
+      "detail": "minimum rendered text size=9.0"
+    },
+    {
+      "name": "reviewer_pdf.metadata_title:08_submission_package/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
+      "ok": true,
+      "detail": "PDF title metadata is empty"
+    },
+    {
       "name": "reviewer_pdf.no_symbol_substitution:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
       "ok": true,
       "detail": "rendered threshold substitutions: []"
@@ -113,6 +343,61 @@
       "name": "reviewer_pdf.no_raw_markdown:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
       "ok": true,
       "detail": ""
+    },
+    {
+      "name": "reviewer_pdf.release_identity:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
+      "ok": true,
+      "detail": "rendered PDF does not identify current release v0.2.2-portfolio"
+    },
+    {
+      "name": "reviewer_pdf.letter_page_size:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
+      "ok": true,
+      "detail": "612 x 792 pts (letter)"
+    },
+    {
+      "name": "reviewer_pdf.fast_web_view:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
+      "ok": true,
+      "detail": "Optimized=yes"
+    },
+    {
+      "name": "reviewer_pdf.not_encrypted:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
+      "ok": true,
+      "detail": "Encrypted=no"
+    },
+    {
+      "name": "reviewer_pdf.version_1_7:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
+      "ok": true,
+      "detail": "PDF version=1.7"
+    },
+    {
+      "name": "reviewer_pdf.fonts_embedded:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
+      "ok": true,
+      "detail": "fonts=3; unembedded=[]"
+    },
+    {
+      "name": "reviewer_pdf.all_pages_letter:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
+      "ok": true,
+      "detail": "letter=7/7"
+    },
+    {
+      "name": "reviewer_pdf.bookmarks:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
+      "ok": true,
+      "detail": "outlines=2; page_mode=/UseOutlines"
+    },
+    {
+      "name": "reviewer_pdf.hyperlinks:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
+      "ok": true,
+      "detail": "link_annotations=45"
+    },
+    {
+      "name": "reviewer_pdf.minimum_font_size:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
+      "ok": true,
+      "detail": "minimum rendered text size=9.0"
+    },
+    {
+      "name": "reviewer_pdf.metadata_title:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
+      "ok": true,
+      "detail": "PDF title metadata is empty"
     }
   ],
   "problems": []

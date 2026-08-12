@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:def="http://www.cdisc.org/ns/def/v2.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ODMVersion="1.3.2" FileType="Snapshot" FileOID="TROPIC_SDTM_Metadata_v2.1" CreationDateTime="2026-06-12T21:49:25" AsOfDateTime="2026-06-12T21:49:25" Originator="Antony Bevan, Clinical Programming" def:Context="Submission" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 http://schema.cdisc.org/define/v2.1/define2-1-0.xsd">
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:def="http://www.cdisc.org/ns/def/v2.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ODMVersion="1.3.2" FileType="Snapshot" FileOID="TROPIC_SDTM_Metadata_v2.1" CreationDateTime="2026-06-12T21:49:25" AsOfDateTime="2026-06-12T21:49:25" Originator="Antony Bevan, Clinical Programming" def:Context="Other" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 http://schema.cdisc.org/define/v2.1/define2-1-0.xsd">
   <Study OID="STDY.TROPIC">
     <GlobalVariables>
       <StudyName>TROPIC (EFC6193 / XRP6258)</StudyName>
@@ -15,9 +15,9 @@
         <Description>
           <TranslatedText xml:lang="en">DM (One record per subject)</TranslatedText>
         </Description>
-        <ItemRef ItemOID="IT.DM.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.DM.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
         <ItemRef ItemOID="IT.DM.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
-        <ItemRef ItemOID="IT.DM.USUBJID" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.DM.USUBJID" Mandatory="Yes" OrderNumber="3" KeySequence="2"/>
         <ItemRef ItemOID="IT.DM.SUBJID" Mandatory="No" OrderNumber="4"/>
         <ItemRef ItemOID="IT.DM.RFSTDTC" Mandatory="No" OrderNumber="5"/>
         <ItemRef ItemOID="IT.DM.RFENDTC" Mandatory="No" OrderNumber="6"/>
@@ -38,10 +38,10 @@
         <Description>
           <TranslatedText xml:lang="en">AE (One record per subject per adverse event)</TranslatedText>
         </Description>
-        <ItemRef ItemOID="IT.AE.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.AE.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
         <ItemRef ItemOID="IT.AE.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
-        <ItemRef ItemOID="IT.AE.USUBJID" Mandatory="Yes" OrderNumber="3"/>
-        <ItemRef ItemOID="IT.AE.AESEQ" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.AE.USUBJID" Mandatory="Yes" OrderNumber="3" KeySequence="2"/>
+        <ItemRef ItemOID="IT.AE.AESEQ" Mandatory="No" OrderNumber="4" KeySequence="3"/>
         <ItemRef ItemOID="IT.AE.AEREFID" Mandatory="No" OrderNumber="5"/>
         <ItemRef ItemOID="IT.AE.AESPID" Mandatory="No" OrderNumber="6"/>
         <ItemRef ItemOID="IT.AE.AETERM" Mandatory="No" OrderNumber="7"/>
@@ -73,10 +73,10 @@
         <Description>
           <TranslatedText xml:lang="en">EX (One record per subject per constant exposure cycle)</TranslatedText>
         </Description>
-        <ItemRef ItemOID="IT.EX.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.EX.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
         <ItemRef ItemOID="IT.EX.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
-        <ItemRef ItemOID="IT.EX.USUBJID" Mandatory="Yes" OrderNumber="3"/>
-        <ItemRef ItemOID="IT.EX.EXSEQ" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.EX.USUBJID" Mandatory="Yes" OrderNumber="3" KeySequence="2"/>
+        <ItemRef ItemOID="IT.EX.EXSEQ" Mandatory="No" OrderNumber="4" KeySequence="3"/>
         <ItemRef ItemOID="IT.EX.EXTRT" Mandatory="No" OrderNumber="5"/>
         <ItemRef ItemOID="IT.EX.EXDOSE" Mandatory="No" OrderNumber="6"/>
         <ItemRef ItemOID="IT.EX.EXDOSU" Mandatory="No" OrderNumber="7"/>
@@ -99,10 +99,10 @@
         <Description>
           <TranslatedText xml:lang="en">CM (One record per subject per medication)</TranslatedText>
         </Description>
-        <ItemRef ItemOID="IT.CM.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.CM.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
         <ItemRef ItemOID="IT.CM.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
-        <ItemRef ItemOID="IT.CM.USUBJID" Mandatory="Yes" OrderNumber="3"/>
-        <ItemRef ItemOID="IT.CM.CMSEQ" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.CM.USUBJID" Mandatory="Yes" OrderNumber="3" KeySequence="2"/>
+        <ItemRef ItemOID="IT.CM.CMSEQ" Mandatory="No" OrderNumber="4" KeySequence="3"/>
         <ItemRef ItemOID="IT.CM.CMTRT" Mandatory="No" OrderNumber="5"/>
         <ItemRef ItemOID="IT.CM.CMDECOD" Mandatory="No" OrderNumber="6"/>
         <ItemRef ItemOID="IT.CM.CMCAT" Mandatory="No" OrderNumber="7"/>
@@ -136,10 +136,10 @@
         <Description>
           <TranslatedText xml:lang="en">LB (One record per subject per laboratory test per visit)</TranslatedText>
         </Description>
-        <ItemRef ItemOID="IT.LB.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.LB.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
         <ItemRef ItemOID="IT.LB.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
-        <ItemRef ItemOID="IT.LB.USUBJID" Mandatory="Yes" OrderNumber="3"/>
-        <ItemRef ItemOID="IT.LB.LBSEQ" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.LB.USUBJID" Mandatory="Yes" OrderNumber="3" KeySequence="2"/>
+        <ItemRef ItemOID="IT.LB.LBSEQ" Mandatory="No" OrderNumber="4" KeySequence="3"/>
         <ItemRef ItemOID="IT.LB.LBTESTCD" Mandatory="No" OrderNumber="5"/>
         <ItemRef ItemOID="IT.LB.LBTEST" Mandatory="No" OrderNumber="6"/>
         <ItemRef ItemOID="IT.LB.LBCAT" Mandatory="No" OrderNumber="7"/>
@@ -173,10 +173,10 @@
         <Description>
           <TranslatedText xml:lang="en">DS (One record per subject per disposition event)</TranslatedText>
         </Description>
-        <ItemRef ItemOID="IT.DS.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.DS.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
         <ItemRef ItemOID="IT.DS.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
-        <ItemRef ItemOID="IT.DS.USUBJID" Mandatory="Yes" OrderNumber="3"/>
-        <ItemRef ItemOID="IT.DS.DSSEQ" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.DS.USUBJID" Mandatory="Yes" OrderNumber="3" KeySequence="2"/>
+        <ItemRef ItemOID="IT.DS.DSSEQ" Mandatory="No" OrderNumber="4" KeySequence="3"/>
         <ItemRef ItemOID="IT.DS.DSTERM" Mandatory="No" OrderNumber="5"/>
         <ItemRef ItemOID="IT.DS.DSDECOD" Mandatory="No" OrderNumber="6"/>
         <ItemRef ItemOID="IT.DS.DSCAT" Mandatory="No" OrderNumber="7"/>
@@ -193,10 +193,10 @@
         <Description>
           <TranslatedText xml:lang="en">VS (One record per subject per vital sign measurement per visit)</TranslatedText>
         </Description>
-        <ItemRef ItemOID="IT.VS.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.VS.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
         <ItemRef ItemOID="IT.VS.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
-        <ItemRef ItemOID="IT.VS.USUBJID" Mandatory="Yes" OrderNumber="3"/>
-        <ItemRef ItemOID="IT.VS.VSSEQ" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.VS.USUBJID" Mandatory="Yes" OrderNumber="3" KeySequence="2"/>
+        <ItemRef ItemOID="IT.VS.VSSEQ" Mandatory="No" OrderNumber="4" KeySequence="3"/>
         <ItemRef ItemOID="IT.VS.VSTESTCD" Mandatory="No" OrderNumber="5"/>
         <ItemRef ItemOID="IT.VS.VSTEST" Mandatory="No" OrderNumber="6"/>
         <ItemRef ItemOID="IT.VS.VSORRES" Mandatory="No" OrderNumber="7"/>
@@ -221,10 +221,10 @@
         <Description>
           <TranslatedText xml:lang="en">LS (One record per subject per lesion per assessment visit)</TranslatedText>
         </Description>
-        <ItemRef ItemOID="IT.LS.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.LS.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
         <ItemRef ItemOID="IT.LS.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
-        <ItemRef ItemOID="IT.LS.USUBJID" Mandatory="Yes" OrderNumber="3"/>
-        <ItemRef ItemOID="IT.LS.LSSEQ" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.LS.USUBJID" Mandatory="Yes" OrderNumber="3" KeySequence="2"/>
+        <ItemRef ItemOID="IT.LS.LSSEQ" Mandatory="No" OrderNumber="4" KeySequence="3"/>
         <ItemRef ItemOID="IT.LS.LSSPID" Mandatory="No" OrderNumber="5"/>
         <ItemRef ItemOID="IT.LS.LSTESTCD" Mandatory="No" OrderNumber="6"/>
         <ItemRef ItemOID="IT.LS.LSTEST" Mandatory="No" OrderNumber="7"/>
@@ -252,10 +252,10 @@
         <Description>
           <TranslatedText xml:lang="en">PN (One record per subject per pain assessment per visit)</TranslatedText>
         </Description>
-        <ItemRef ItemOID="IT.PN.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.PN.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
         <ItemRef ItemOID="IT.PN.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
-        <ItemRef ItemOID="IT.PN.USUBJID" Mandatory="Yes" OrderNumber="3"/>
-        <ItemRef ItemOID="IT.PN.PNSEQ" Mandatory="No" OrderNumber="4"/>
+        <ItemRef ItemOID="IT.PN.USUBJID" Mandatory="Yes" OrderNumber="3" KeySequence="2"/>
+        <ItemRef ItemOID="IT.PN.PNSEQ" Mandatory="No" OrderNumber="4" KeySequence="3"/>
         <ItemRef ItemOID="IT.PN.PNSPID" Mandatory="No" OrderNumber="5"/>
         <ItemRef ItemOID="IT.PN.PNTESTCD" Mandatory="No" OrderNumber="6"/>
         <ItemRef ItemOID="IT.PN.PNTEST" Mandatory="No" OrderNumber="7"/>
@@ -279,12 +279,12 @@
         <Description>
           <TranslatedText xml:lang="en">SUPPDM (One record per subject per supplemental qualifier)</TranslatedText>
         </Description>
-        <ItemRef ItemOID="IT.SUPPDM.STUDYID" Mandatory="Yes" OrderNumber="1"/>
-        <ItemRef ItemOID="IT.SUPPDM.RDOMAIN" Mandatory="Yes" OrderNumber="2"/>
-        <ItemRef ItemOID="IT.SUPPDM.USUBJID" Mandatory="Yes" OrderNumber="3"/>
-        <ItemRef ItemOID="IT.SUPPDM.IDVAR" Mandatory="No" OrderNumber="4"/>
-        <ItemRef ItemOID="IT.SUPPDM.IDVARVAL" Mandatory="No" OrderNumber="5"/>
-        <ItemRef ItemOID="IT.SUPPDM.QNAM" Mandatory="Yes" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.SUPPDM.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
+        <ItemRef ItemOID="IT.SUPPDM.RDOMAIN" Mandatory="Yes" OrderNumber="2" KeySequence="2"/>
+        <ItemRef ItemOID="IT.SUPPDM.USUBJID" Mandatory="Yes" OrderNumber="3" KeySequence="3"/>
+        <ItemRef ItemOID="IT.SUPPDM.IDVAR" Mandatory="No" OrderNumber="4" KeySequence="4"/>
+        <ItemRef ItemOID="IT.SUPPDM.IDVARVAL" Mandatory="No" OrderNumber="5" KeySequence="5"/>
+        <ItemRef ItemOID="IT.SUPPDM.QNAM" Mandatory="Yes" OrderNumber="6" KeySequence="6"/>
         <ItemRef ItemOID="IT.SUPPDM.QLABEL" Mandatory="No" OrderNumber="7"/>
         <ItemRef ItemOID="IT.SUPPDM.QVAL" Mandatory="Yes" OrderNumber="8"/>
         <ItemRef ItemOID="IT.SUPPDM.QORIG" Mandatory="No" OrderNumber="9"/>
@@ -298,12 +298,12 @@
         <Description>
           <TranslatedText xml:lang="en">SUPPAE (One record per subject per adverse event per supplemental qualifier)</TranslatedText>
         </Description>
-        <ItemRef ItemOID="IT.SUPPAE.STUDYID" Mandatory="Yes" OrderNumber="1"/>
-        <ItemRef ItemOID="IT.SUPPAE.RDOMAIN" Mandatory="Yes" OrderNumber="2"/>
-        <ItemRef ItemOID="IT.SUPPAE.USUBJID" Mandatory="Yes" OrderNumber="3"/>
-        <ItemRef ItemOID="IT.SUPPAE.IDVAR" Mandatory="No" OrderNumber="4"/>
-        <ItemRef ItemOID="IT.SUPPAE.IDVARVAL" Mandatory="No" OrderNumber="5"/>
-        <ItemRef ItemOID="IT.SUPPAE.QNAM" Mandatory="Yes" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.SUPPAE.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
+        <ItemRef ItemOID="IT.SUPPAE.RDOMAIN" Mandatory="Yes" OrderNumber="2" KeySequence="2"/>
+        <ItemRef ItemOID="IT.SUPPAE.USUBJID" Mandatory="Yes" OrderNumber="3" KeySequence="3"/>
+        <ItemRef ItemOID="IT.SUPPAE.IDVAR" Mandatory="No" OrderNumber="4" KeySequence="4"/>
+        <ItemRef ItemOID="IT.SUPPAE.IDVARVAL" Mandatory="No" OrderNumber="5" KeySequence="5"/>
+        <ItemRef ItemOID="IT.SUPPAE.QNAM" Mandatory="Yes" OrderNumber="6" KeySequence="6"/>
         <ItemRef ItemOID="IT.SUPPAE.QLABEL" Mandatory="No" OrderNumber="7"/>
         <ItemRef ItemOID="IT.SUPPAE.QVAL" Mandatory="Yes" OrderNumber="8"/>
         <ItemRef ItemOID="IT.SUPPAE.QORIG" Mandatory="No" OrderNumber="9"/>
@@ -317,12 +317,12 @@
         <Description>
           <TranslatedText xml:lang="en">SUPPEX (One record per subject per exposure cycle per supplemental qualifier)</TranslatedText>
         </Description>
-        <ItemRef ItemOID="IT.SUPPEX.STUDYID" Mandatory="Yes" OrderNumber="1"/>
-        <ItemRef ItemOID="IT.SUPPEX.RDOMAIN" Mandatory="No" OrderNumber="2"/>
-        <ItemRef ItemOID="IT.SUPPEX.USUBJID" Mandatory="Yes" OrderNumber="3"/>
-        <ItemRef ItemOID="IT.SUPPEX.IDVAR" Mandatory="No" OrderNumber="4"/>
-        <ItemRef ItemOID="IT.SUPPEX.IDVARVAL" Mandatory="No" OrderNumber="5"/>
-        <ItemRef ItemOID="IT.SUPPEX.QNAM" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.SUPPEX.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
+        <ItemRef ItemOID="IT.SUPPEX.RDOMAIN" Mandatory="No" OrderNumber="2" KeySequence="2"/>
+        <ItemRef ItemOID="IT.SUPPEX.USUBJID" Mandatory="Yes" OrderNumber="3" KeySequence="3"/>
+        <ItemRef ItemOID="IT.SUPPEX.IDVAR" Mandatory="No" OrderNumber="4" KeySequence="4"/>
+        <ItemRef ItemOID="IT.SUPPEX.IDVARVAL" Mandatory="No" OrderNumber="5" KeySequence="5"/>
+        <ItemRef ItemOID="IT.SUPPEX.QNAM" Mandatory="No" OrderNumber="6" KeySequence="6"/>
         <ItemRef ItemOID="IT.SUPPEX.QLABEL" Mandatory="No" OrderNumber="7"/>
         <ItemRef ItemOID="IT.SUPPEX.QVAL" Mandatory="No" OrderNumber="8"/>
         <ItemRef ItemOID="IT.SUPPEX.QORIG" Mandatory="No" OrderNumber="9"/>
@@ -337,12 +337,12 @@
         <Description>
           <TranslatedText xml:lang="en">SUPPCM (One record per subject per medication per supplemental qualifier)</TranslatedText>
         </Description>
-        <ItemRef ItemOID="IT.SUPPCM.STUDYID" Mandatory="Yes" OrderNumber="1"/>
-        <ItemRef ItemOID="IT.SUPPCM.RDOMAIN" Mandatory="No" OrderNumber="2"/>
-        <ItemRef ItemOID="IT.SUPPCM.USUBJID" Mandatory="Yes" OrderNumber="3"/>
-        <ItemRef ItemOID="IT.SUPPCM.IDVAR" Mandatory="No" OrderNumber="4"/>
-        <ItemRef ItemOID="IT.SUPPCM.IDVARVAL" Mandatory="No" OrderNumber="5"/>
-        <ItemRef ItemOID="IT.SUPPCM.QNAM" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.SUPPCM.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
+        <ItemRef ItemOID="IT.SUPPCM.RDOMAIN" Mandatory="No" OrderNumber="2" KeySequence="2"/>
+        <ItemRef ItemOID="IT.SUPPCM.USUBJID" Mandatory="Yes" OrderNumber="3" KeySequence="3"/>
+        <ItemRef ItemOID="IT.SUPPCM.IDVAR" Mandatory="No" OrderNumber="4" KeySequence="4"/>
+        <ItemRef ItemOID="IT.SUPPCM.IDVARVAL" Mandatory="No" OrderNumber="5" KeySequence="5"/>
+        <ItemRef ItemOID="IT.SUPPCM.QNAM" Mandatory="No" OrderNumber="6" KeySequence="6"/>
         <ItemRef ItemOID="IT.SUPPCM.QLABEL" Mandatory="No" OrderNumber="7"/>
         <ItemRef ItemOID="IT.SUPPCM.QVAL" Mandatory="No" OrderNumber="8"/>
         <ItemRef ItemOID="IT.SUPPCM.QORIG" Mandatory="No" OrderNumber="9"/>
@@ -357,12 +357,12 @@
         <Description>
           <TranslatedText xml:lang="en">SUPPLB (One record per subject per laboratory test per supplemental qualifier)</TranslatedText>
         </Description>
-        <ItemRef ItemOID="IT.SUPPLB.STUDYID" Mandatory="Yes" OrderNumber="1"/>
-        <ItemRef ItemOID="IT.SUPPLB.RDOMAIN" Mandatory="No" OrderNumber="2"/>
-        <ItemRef ItemOID="IT.SUPPLB.USUBJID" Mandatory="Yes" OrderNumber="3"/>
-        <ItemRef ItemOID="IT.SUPPLB.IDVAR" Mandatory="No" OrderNumber="4"/>
-        <ItemRef ItemOID="IT.SUPPLB.IDVARVAL" Mandatory="No" OrderNumber="5"/>
-        <ItemRef ItemOID="IT.SUPPLB.QNAM" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.SUPPLB.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
+        <ItemRef ItemOID="IT.SUPPLB.RDOMAIN" Mandatory="No" OrderNumber="2" KeySequence="2"/>
+        <ItemRef ItemOID="IT.SUPPLB.USUBJID" Mandatory="Yes" OrderNumber="3" KeySequence="3"/>
+        <ItemRef ItemOID="IT.SUPPLB.IDVAR" Mandatory="No" OrderNumber="4" KeySequence="4"/>
+        <ItemRef ItemOID="IT.SUPPLB.IDVARVAL" Mandatory="No" OrderNumber="5" KeySequence="5"/>
+        <ItemRef ItemOID="IT.SUPPLB.QNAM" Mandatory="No" OrderNumber="6" KeySequence="6"/>
         <ItemRef ItemOID="IT.SUPPLB.QLABEL" Mandatory="No" OrderNumber="7"/>
         <ItemRef ItemOID="IT.SUPPLB.QVAL" Mandatory="No" OrderNumber="8"/>
         <ItemRef ItemOID="IT.SUPPLB.QORIG" Mandatory="No" OrderNumber="9"/>
@@ -377,12 +377,12 @@
         <Description>
           <TranslatedText xml:lang="en">SUPPDS (One record per subject per disposition event per supplemental qualifier)</TranslatedText>
         </Description>
-        <ItemRef ItemOID="IT.SUPPDS.STUDYID" Mandatory="Yes" OrderNumber="1"/>
-        <ItemRef ItemOID="IT.SUPPDS.RDOMAIN" Mandatory="Yes" OrderNumber="2"/>
-        <ItemRef ItemOID="IT.SUPPDS.USUBJID" Mandatory="Yes" OrderNumber="3"/>
-        <ItemRef ItemOID="IT.SUPPDS.IDVAR" Mandatory="No" OrderNumber="4"/>
-        <ItemRef ItemOID="IT.SUPPDS.IDVARVAL" Mandatory="No" OrderNumber="5"/>
-        <ItemRef ItemOID="IT.SUPPDS.QNAM" Mandatory="Yes" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.SUPPDS.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
+        <ItemRef ItemOID="IT.SUPPDS.RDOMAIN" Mandatory="Yes" OrderNumber="2" KeySequence="2"/>
+        <ItemRef ItemOID="IT.SUPPDS.USUBJID" Mandatory="Yes" OrderNumber="3" KeySequence="3"/>
+        <ItemRef ItemOID="IT.SUPPDS.IDVAR" Mandatory="No" OrderNumber="4" KeySequence="4"/>
+        <ItemRef ItemOID="IT.SUPPDS.IDVARVAL" Mandatory="No" OrderNumber="5" KeySequence="5"/>
+        <ItemRef ItemOID="IT.SUPPDS.QNAM" Mandatory="Yes" OrderNumber="6" KeySequence="6"/>
         <ItemRef ItemOID="IT.SUPPDS.QLABEL" Mandatory="No" OrderNumber="7"/>
         <ItemRef ItemOID="IT.SUPPDS.QVAL" Mandatory="Yes" OrderNumber="8"/>
         <ItemRef ItemOID="IT.SUPPDS.QORIG" Mandatory="No" OrderNumber="9"/>
@@ -396,12 +396,12 @@
         <Description>
           <TranslatedText xml:lang="en">SUPPLS (One record per subject per lesion per supplemental qualifier)</TranslatedText>
         </Description>
-        <ItemRef ItemOID="IT.SUPPLS.STUDYID" Mandatory="Yes" OrderNumber="1"/>
-        <ItemRef ItemOID="IT.SUPPLS.RDOMAIN" Mandatory="No" OrderNumber="2"/>
-        <ItemRef ItemOID="IT.SUPPLS.USUBJID" Mandatory="Yes" OrderNumber="3"/>
-        <ItemRef ItemOID="IT.SUPPLS.IDVAR" Mandatory="No" OrderNumber="4"/>
-        <ItemRef ItemOID="IT.SUPPLS.IDVARVAL" Mandatory="No" OrderNumber="5"/>
-        <ItemRef ItemOID="IT.SUPPLS.QNAM" Mandatory="No" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.SUPPLS.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
+        <ItemRef ItemOID="IT.SUPPLS.RDOMAIN" Mandatory="No" OrderNumber="2" KeySequence="2"/>
+        <ItemRef ItemOID="IT.SUPPLS.USUBJID" Mandatory="Yes" OrderNumber="3" KeySequence="3"/>
+        <ItemRef ItemOID="IT.SUPPLS.IDVAR" Mandatory="No" OrderNumber="4" KeySequence="4"/>
+        <ItemRef ItemOID="IT.SUPPLS.IDVARVAL" Mandatory="No" OrderNumber="5" KeySequence="5"/>
+        <ItemRef ItemOID="IT.SUPPLS.QNAM" Mandatory="No" OrderNumber="6" KeySequence="6"/>
         <ItemRef ItemOID="IT.SUPPLS.QLABEL" Mandatory="No" OrderNumber="7"/>
         <ItemRef ItemOID="IT.SUPPLS.QVAL" Mandatory="No" OrderNumber="8"/>
         <ItemRef ItemOID="IT.SUPPLS.QORIG" Mandatory="No" OrderNumber="9"/>
@@ -416,9 +416,9 @@
         <Description>
           <TranslatedText xml:lang="en">TS (One record per trial summary parameter)</TranslatedText>
         </Description>
-        <ItemRef ItemOID="IT.TS.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.TS.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
         <ItemRef ItemOID="IT.TS.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
-        <ItemRef ItemOID="IT.TS.TSSEQ" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.TS.TSSEQ" Mandatory="Yes" OrderNumber="3" KeySequence="2"/>
         <ItemRef ItemOID="IT.TS.TSPARMCD" Mandatory="Yes" OrderNumber="4"/>
         <ItemRef ItemOID="IT.TS.TSPARM" Mandatory="No" OrderNumber="5"/>
         <ItemRef ItemOID="IT.TS.TSVAL" Mandatory="Yes" OrderNumber="6"/>
@@ -431,11 +431,11 @@
         <Description>
           <TranslatedText xml:lang="en">TA (One record per planned element per arm)</TranslatedText>
         </Description>
-        <ItemRef ItemOID="IT.TA.STUDYID" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.TA.STUDYID" Mandatory="Yes" OrderNumber="1" KeySequence="1"/>
         <ItemRef ItemOID="IT.TA.DOMAIN" Mandatory="Yes" OrderNumber="2"/>
-        <ItemRef ItemOID="IT.TA.ARMCD" Mandatory="Yes" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.TA.ARMCD" Mandatory="Yes" OrderNumber="3" KeySequence="2"/>
         <ItemRef ItemOID="IT.TA.ARM" Mandatory="Yes" OrderNumber="4"/>
-        <ItemRef ItemOID="IT.TA.TAETORD" Mandatory="Yes" OrderNumber="5"/>
+        <ItemRef ItemOID="IT.TA.TAETORD" Mandatory="Yes" OrderNumber="5" KeySequence="3"/>
         <ItemRef ItemOID="IT.TA.ETCD" Mandatory="Yes" OrderNumber="6"/>
         <ItemRef ItemOID="IT.TA.ELEMENT" Mandatory="Yes" OrderNumber="7"/>
         <ItemRef ItemOID="IT.TA.TABRANCH" Mandatory="No" OrderNumber="8"/>

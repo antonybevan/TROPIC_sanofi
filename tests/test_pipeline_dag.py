@@ -20,7 +20,7 @@ def test_manifest_dag_wiring_is_complete_and_gated():
         cibuild._RELOCATE_ENGINE,
     )
     assert not problems, problems
-    assert len(stages) == 34
+    assert len(stages) == 37
     assert stages[0]["name"] == "Governance Scope Lock (G00)"
     assert stages[-1]["name"] == "Release Run Manifest Binding"
 

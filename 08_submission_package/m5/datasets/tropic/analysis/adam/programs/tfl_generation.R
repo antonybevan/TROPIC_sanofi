@@ -1,5 +1,5 @@
-# Program: tfl_generation.R | Version: 3.6.0
-# Author: Antony Bevan, Clinical Programming | Date: 2026-06-12
+# Program: tfl_generation.R | Version: 4.0.0
+# Author: Antony Bevan, Clinical Programming | Date: 2026-08-09
 # Standard: ICH E3 TFL Catalogue / NEJM & Lancet Style Guides
 # renv.lock hash: locked
 # Description: Compiles all efficacy, safety, and Project Optimus clinical
@@ -12,6 +12,7 @@ library(ggplot2)
 library(survival)
 library(patchwork)
 library(scales)
+source("04_analysis_datasets/programs/r/config_study.R")
 
 # Avoid linter warnings for column names in ggplot/dplyr pipelines
 surv <- NULL
@@ -42,6 +43,7 @@ strip_png_metadata <- function(path) {
 }
 
 cat("NOTE: [TFL] Starting Efficacy & Safety TFL Suite compilation...\n")
+cat(sprintf("NOTE: [TFL] Controlled final two-sided alpha = %.4f\n", FINAL_ALPHA))
 
 dir.create("05_outputs/tfl/output/tables", showWarnings = FALSE, recursive = TRUE)
 dir.create("05_outputs/tfl/output/figures", showWarnings = FALSE, recursive = TRUE)
@@ -110,12 +112,12 @@ adrs <- bind_rows(adrs, adrs_cbzp)
 source("04_analysis_datasets/programs/r/f042_provisional_pain_derivation.R")
 f042_phase2 <- f042_derive(
   adsl_real,
-  readRDS("01_source_data/real_sdtm/staging/pn.rds"),
-  readRDS("01_source_data/real_sdtm/staging/sv.rds"),
-  readRDS("01_source_data/real_sdtm/staging/cm.rds"),
-  readRDS("01_source_data/real_sdtm/staging/pr.rds"),
+  readRDS(stage_file("pn")),
+  readRDS(stage_file("sv")),
+  readRDS(stage_file("cm")),
+  readRDS(stage_file("pr")),
   adrs_real,
-  readRDS("01_source_data/real_sdtm/staging/ds.rds")
+  readRDS(stage_file("ds"))
 )
 
 # Enforce presence of both treatment arms for comparative analysis
@@ -138,7 +140,7 @@ os_data <- adtte |>
   left_join(adsl |> select(USUBJID, ECOGBL, MEASDISF), by = "USUBJID")
 os_stats <- compute_tte_stats(os_data)
 os_pval <- os_stats$pval
-os_significant <- os_pval < 0.05
+os_significant <- os_pval < FINAL_ALPHA
 cat(sprintf("  Step 1: OS Significance check -> p = %f (Significant: %s)\n", os_pval, # nolint
     as.character(os_significant))) # nolint
 
@@ -148,7 +150,7 @@ pfs_data <- adtte |>
   left_join(adsl |> select(USUBJID, ECOGBL, MEASDISF), by = "USUBJID")
 pfs_stats <- compute_tte_stats(pfs_data)
 pfs_pval <- pfs_stats$pval
-pfs_significant <- os_significant && (pfs_pval < 0.05)
+pfs_significant <- os_significant && (pfs_pval < FINAL_ALPHA)
 cat(sprintf("  Step 2: PFS Significance check -> p = %f (Significant & Tested: %s)\n", pfs_pval, # nolint
     as.character(pfs_significant))) # nolint
 
@@ -159,9 +161,9 @@ cat(sprintf("  Step 2: PFS Significance check -> p = %f (Significant & Tested: %
 psa_resp_data <- adrs |>
   filter(PARAMCD == "PSARESP") |>
   inner_join(adsl |> select(USUBJID, PSABL, any_of("PSABLIF")), by = "USUBJID") |>
-  # ADSL's PSABL may be a controlled fallback for missing source baseline
-  # (PSABLIF='Y').  SAP eligibility is based on observed baseline PSA; retain
-  # synthetic comparator rows whose flag is absent by treating NA as observed.
+  # Real-arm missing baseline remains missing and is excluded; no fallback
+  # imputation is permitted. Synthetic comparator rows do not carry PSABLIF,
+  # so an absent flag is treated as observed for this demonstration output.
   filter(coalesce(PSABLIF, "N") != "Y", !is.na(PSABL), PSABL >= 20) |>
   mutate(
     TRT01P = factor(TRT01P, levels = c("MP", "CbzP")),
@@ -173,7 +175,7 @@ if (anyDuplicated(psa_resp_data$USUBJID) > 0) {
 psa_table <- table(psa_resp_data$TRT01P, psa_resp_data$AVALC)
 psa_test <- fisher.test(psa_table)
 psa_pval <- psa_test$p.value
-psa_significant <- pfs_significant && (psa_pval < 0.05)
+psa_significant <- pfs_significant && (psa_pval < FINAL_ALPHA)
 cat(sprintf("  Step 3: PSA Response Significance check -> p = %e (Significant & Tested: %s)\n", psa_pval, # nolint
     as.character(psa_significant))) # nolint
 
@@ -196,7 +198,7 @@ orr_resp_data <- orr_meas_den
 orr_table <- table(orr_resp_data$TRT01P, orr_resp_data$AVALC)
 orr_test <- fisher.test(orr_table)
 orr_pval <- orr_test$p.value
-orr_significant <- psa_significant && (orr_pval < 0.05)
+orr_significant <- psa_significant && (orr_pval < FINAL_ALPHA)
 cat(sprintf("  Step 4: ORR Significance check -> p = %f (Significant & Tested: %s)\n", orr_pval, # nolint
     as.character(orr_significant))) # nolint
 cat(sprintf("  [TFL-QC] ORR dens MEASDISF=%d (OBJRESP rows in dens=%d)\n",
@@ -707,13 +709,13 @@ writeLines(paste0(synth_banner, table_content),
 cat("  [TFL] Calculating dynamic KM and Cox PH statistics for TTPSA and TTUMOR...\n") # nolint
 
 # TTPSA Analysis
-psa_data <- adtte |> filter(PARAMCD == "TTPSA")
+psa_data <- adtte |>
+  filter(PARAMCD == "TTPSA") |>
+  left_join(adsl |> select(USUBJID, ECOGBL, MEASDISF), by = "USUBJID")
 fit_psa <- survfit(Surv(AVAL / 30.4375, 1 - CNSR) ~ TRT01P, data = psa_data)
-psa_data$TRT01P <- factor(psa_data$TRT01P, levels = c("MP", "CbzP"))
-cox_psa <- coxph(Surv(AVAL, 1 - CNSR) ~ TRT01P, data = psa_data)
+psa_stats <- compute_tte_stats(psa_data)
 
 sum_fit_psa <- summary(fit_psa)$table
-sum_cox_psa <- summary(cox_psa)
 
 fmt_tte_value <- function(x, digits = 1) {
   if (length(x) != 1L || !is.finite(x)) return("NE")
@@ -734,10 +736,10 @@ med_psa_mp <- sum_fit_psa["TRT01P=MP", "median"]
 ci_psa_cbzp <- fmt_tte_ci(sum_fit_psa["TRT01P=CbzP", "0.95LCL"], sum_fit_psa["TRT01P=CbzP", "0.95UCL"]) # nolint
 ci_psa_mp <- fmt_tte_ci(sum_fit_psa["TRT01P=MP", "0.95LCL"], sum_fit_psa["TRT01P=MP", "0.95UCL"]) # nolint
 
-hr_psa <- sum_cox_psa$conf.int[1]
-hr_psa_lcl <- sum_cox_psa$conf.int[3]
-hr_psa_ucl <- sum_cox_psa$conf.int[4]
-p_psa <- sum_cox_psa$coefficients[1, "Pr(>|z|)"]
+hr_psa <- psa_stats$hr
+hr_psa_lcl <- psa_stats$lcl
+hr_psa_ucl <- psa_stats$ucl
+p_psa <- psa_stats$pval
 
 events_psa_cbzp <- sum_fit_psa["TRT01P=CbzP", "events"]
 total_psa_cbzp <- sum_fit_psa["TRT01P=CbzP", "n.max"]
@@ -745,23 +747,23 @@ events_psa_mp <- sum_fit_psa["TRT01P=MP", "events"]
 total_psa_mp <- sum_fit_psa["TRT01P=MP", "n.max"]
 
 # TTUMOR Analysis
-tumor_data <- adtte |> filter(PARAMCD == "TTUMOR")
+tumor_data <- adtte |>
+  filter(PARAMCD == "TTUMOR") |>
+  left_join(adsl |> select(USUBJID, ECOGBL, MEASDISF), by = "USUBJID")
 fit_tumor <- survfit(Surv(AVAL / 30.4375, 1 - CNSR) ~ TRT01P, data = tumor_data)
-tumor_data$TRT01P <- factor(tumor_data$TRT01P, levels = c("MP", "CbzP"))
-cox_tumor <- coxph(Surv(AVAL, 1 - CNSR) ~ TRT01P, data = tumor_data)
+tumor_stats <- compute_tte_stats(tumor_data)
 
 sum_fit_tumor <- summary(fit_tumor)$table
-sum_cox_tumor <- summary(cox_tumor)
 
 med_tumor_cbzp <- sum_fit_tumor["TRT01P=CbzP", "median"]
 med_tumor_mp <- sum_fit_tumor["TRT01P=MP", "median"]
 ci_tumor_cbzp <- fmt_tte_ci(sum_fit_tumor["TRT01P=CbzP", "0.95LCL"], sum_fit_tumor["TRT01P=CbzP", "0.95UCL"]) # nolint
 ci_tumor_mp <- fmt_tte_ci(sum_fit_tumor["TRT01P=MP", "0.95LCL"], sum_fit_tumor["TRT01P=MP", "0.95UCL"]) # nolint
 
-hr_tumor <- sum_cox_tumor$conf.int[1]
-hr_tumor_lcl <- sum_cox_tumor$conf.int[3]
-hr_tumor_ucl <- sum_cox_tumor$conf.int[4]
-p_tumor <- sum_cox_tumor$coefficients[1, "Pr(>|z|)"]
+hr_tumor <- tumor_stats$hr
+hr_tumor_lcl <- tumor_stats$lcl
+hr_tumor_ucl <- tumor_stats$ucl
+p_tumor <- tumor_stats$pval
 
 events_tumor_cbzp <- sum_fit_tumor["TRT01P=CbzP", "events"]
 total_tumor_cbzp <- sum_fit_tumor["TRT01P=CbzP", "n.max"]
@@ -769,20 +771,20 @@ events_tumor_mp <- sum_fit_tumor["TRT01P=MP", "events"]
 total_tumor_mp <- sum_fit_tumor["TRT01P=MP", "n.max"]
 
 # TTPAIN Analysis (SAP-native T-11-8 mapping).
-ttpain_data <- adtte |> filter(PARAMCD == "TTPAIN")
+ttpain_data <- adtte |>
+  filter(PARAMCD == "TTPAIN") |>
+  left_join(adsl |> select(USUBJID, ECOGBL, MEASDISF), by = "USUBJID")
 fit_ttpain <- survfit(Surv(AVAL / 30.4375, 1 - CNSR) ~ TRT01P, data = ttpain_data)
-ttpain_data$TRT01P <- factor(ttpain_data$TRT01P, levels = c("MP", "CbzP"))
-cox_ttpain <- coxph(Surv(AVAL, 1 - CNSR) ~ TRT01P, data = ttpain_data)
+ttpain_stats <- compute_tte_stats(ttpain_data)
 sum_fit_ttpain <- summary(fit_ttpain)$table
-sum_cox_ttpain <- summary(cox_ttpain)
 med_ttpain_cbzp <- sum_fit_ttpain["TRT01P=CbzP", "median"]
 med_ttpain_mp <- sum_fit_ttpain["TRT01P=MP", "median"]
 ci_ttpain_cbzp <- fmt_tte_ci(sum_fit_ttpain["TRT01P=CbzP", "0.95LCL"], sum_fit_ttpain["TRT01P=CbzP", "0.95UCL"]) # nolint
 ci_ttpain_mp <- fmt_tte_ci(sum_fit_ttpain["TRT01P=MP", "0.95LCL"], sum_fit_ttpain["TRT01P=MP", "0.95UCL"]) # nolint
-hr_ttpain <- sum_cox_ttpain$conf.int[1]
-hr_ttpain_lcl <- sum_cox_ttpain$conf.int[3]
-hr_ttpain_ucl <- sum_cox_ttpain$conf.int[4]
-p_ttpain <- sum_cox_ttpain$coefficients[1, "Pr(>|z|)"]
+hr_ttpain <- ttpain_stats$hr
+hr_ttpain_lcl <- ttpain_stats$lcl
+hr_ttpain_ucl <- ttpain_stats$ucl
+p_ttpain <- ttpain_stats$pval
 events_ttpain_cbzp <- sum_fit_ttpain["TRT01P=CbzP", "events"]
 total_ttpain_cbzp <- sum_fit_ttpain["TRT01P=CbzP", "n.max"]
 events_ttpain_mp <- sum_fit_ttpain["TRT01P=MP", "events"]
@@ -884,8 +886,8 @@ efficacy_tables <- paste0(
       "Number of Events / Total N                %d/%d               %d/%d\n",
       "Median Survival Time (Months)             %s                %s\n",
       "95%% Confidence Interval                   %s                %s\n",
-      "Unstratified Hazard Ratio (CbzP vs MP)     %.2f (95%% CI: %.2f-%.2f)\n",
-      "Wald p-value                               %s\n\n"
+      "Stratified Cox HR (CbzP vs MP)             %.2f (95%% CI: %.2f-%.2f)\n",
+      "Stratified log-rank p-value                %s\n\n"
     ),
     as.integer(total_tumor_cbzp), as.integer(total_tumor_mp),
     as.integer(events_tumor_cbzp), as.integer(total_tumor_cbzp),
@@ -902,8 +904,8 @@ efficacy_tables <- paste0(
       "Number of Events / Total N                %d/%d               %d/%d\n",
       "Median Survival Time (Months)             %s                %s\n",
       "95%% Confidence Interval                   %s                %s\n",
-      "Unstratified Hazard Ratio (CbzP vs MP)     %.2f (95%% CI: %.2f-%.2f)\n",
-      "Wald p-value                               %s\n\n"
+      "Stratified Cox HR (CbzP vs MP)             %.2f (95%% CI: %.2f-%.2f)\n",
+      "Stratified log-rank p-value                %s\n\n"
     ),
     as.integer(total_psa_cbzp), as.integer(total_psa_mp),
     as.integer(events_psa_cbzp), as.integer(total_psa_cbzp),
@@ -920,8 +922,8 @@ efficacy_tables <- paste0(
       "Number of Events / Total N                %d/%d               %d/%d\n",
       "Median Survival Time (Months)             %s                %s\n",
       "95%% Confidence Interval                   %s                %s\n",
-      "Unstratified Hazard Ratio (CbzP vs MP)     %.2f (95%% CI: %.2f-%.2f)\n",
-      "Wald p-value                               %s\n",
+      "Stratified Cox HR (CbzP vs MP)             %.2f (95%% CI: %.2f-%.2f)\n",
+      "Stratified log-rank p-value                %s\n",
       "Footnote: primary MP events use the adopted diary-or-direct-intent-RT\n",
       "F-042 rule; diary-only and RT-only source sensitivities are in QC evidence.\n"
     ),

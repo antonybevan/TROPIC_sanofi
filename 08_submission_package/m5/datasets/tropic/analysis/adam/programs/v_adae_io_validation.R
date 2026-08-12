@@ -1,5 +1,5 @@
-# Program: v_adae_io_validation.R | Version: 3.5.1
-# Author: Antony Bevan, Clinical Programming | Date: 2026-06-12 (header 2026-07-09)
+# Program: v_adae_io_validation.R | Version: 4.0.0
+# Author: Antony Bevan, Clinical Programming | Date: 2026-08-09
 # Standard: ADaMIG v1.3 OCCDS v1.0 | renv.lock hash: locked
 # Description: R Independent Validation double-programming for TROPIC ADAE.
 #
@@ -20,7 +20,7 @@ cat("NOTE: [VALIDATION] Starting ADAE Validation script...\n")
 
 # Load real validation ADSL and staging AE
 adsl <- read_xpt("04_analysis_datasets/adam/adsl_v.xpt")
-ae <- readRDS("01_source_data/real_sdtm/staging/ae.rds")
+ae <- readRDS(stage_file("ae"))
 
 # VALIDATION INDEPENDENCE (audit F-1): This script derives ADAE SOLELY from the
 # independent R logic below. It deliberately does NOT read the SAS production
@@ -39,14 +39,18 @@ df_ae <- ae |>
   inner_join(header, by = c("USUBJID", "SUBJID")) |>
   mutate(
     # AE week conversion to days relative to randomization
+    # Positive weeks use week 1 = day 0; negative history weeks retain the
+    # source's signed seven-day offset (there is no week zero).
+    aestwk_offset = if_else(AESTWK > 0, AESTWK - 1, AESTWK),
+    aeenwk_offset = if_else(AEENWK > 0, AEENWK - 1, AEENWK),
     # Worst-case rule: if onset is week 1 (AESTWK = 1) and calculated date
     # is prior to TRTSDT, impute to TRTSDT
     astdt = if_else(
-      AESTWK == 1 & (RANDDT + AESTWK * 7) < TRTSDT & !is.na(TRTSDT),
+      AESTWK == 1 & (RANDDT + aestwk_offset * 7) < TRTSDT & !is.na(TRTSDT),
       TRTSDT,
-      RANDDT + AESTWK * 7
+      RANDDT + aestwk_offset * 7
     ),
-    aendt = if_else(!is.na(AEENWK), RANDDT + AEENWK * 7, as.Date(NA)),
+    aendt = if_else(!is.na(AEENWK), RANDDT + aeenwk_offset * 7, as.Date(NA)),
 
     astdy = as.numeric(astdt - TRTSDT + 1),
     aendy = as.numeric(aendt - TRTSDT + 1),
@@ -186,6 +190,24 @@ df_episodes <- df_sorted |>
   ) |>
   ungroup()
 
+# Propagate final episode bounds to every member record. The first-pass running
+# end is only provisional for early rows in an episode.
+df_episodes <- df_episodes |>
+  group_by(USUBJID, CQ02NAM, ciaeseq) |>
+  mutate(
+    episode_start = if (all(is.na(astdt))) as.Date(NA) else min(astdt, na.rm = TRUE),
+    episode_end = if (all(is.na(aendt))) as.Date(NA) else max(aendt, na.rm = TRUE),
+    ciaesdt = if_else(CQ02NAM != "", episode_start, as.Date(NA)),
+    ciaeedt = if_else(CQ02NAM != "", episode_end, as.Date(NA)),
+    ciaedur = if_else(
+      CQ02NAM != "" & !is.na(ciaesdt) & !is.na(ciaeedt),
+      as.numeric(ciaeedt - ciaesdt + 1) / 30.4375,
+      NA_real_
+    )
+  ) |>
+  ungroup() |>
+  select(-episode_start, -episode_end)
+
 # Apply AEOCCFL directly using is_new_seq without left_join
 adae_pre <- df_episodes |>
   mutate(
@@ -245,6 +267,16 @@ cat(sprintf("NOTE: [ADAE-QC] Non-TE blank AESER (baseline skeleton expected) = %
 cat(sprintf("NOTE: [ADAE-QC] TEAE blank AESER (expect 0 or near-0) = %d\n", n_teae_blank))
 if (n_teae_blank > 5) {
   warning("ADAE-QC: TEAE blank AESER exceeds soft cap 5 — review extract fidelity.")
+}
+n_te_pretrt <- sum(df_ae$aetrtem_clean == "T" & !is.na(df_ae$astdt) &
+                     !is.na(df_ae$TRTSDT) & df_ae$astdt < df_ae$TRTSDT,
+                   na.rm = TRUE)
+if (n_te_pretrt > 0L) {
+  warning(sprintf(
+    paste0("ADAE-QC: %d source-classified treatment-emergent records start before ",
+           "first dose; source AETRTEM is retained (possible pre-existing worsening)."),
+    n_te_pretrt
+  ))
 }
 
 # XPT v5 compliance (clean log): uppercase variable names + SAS date formats

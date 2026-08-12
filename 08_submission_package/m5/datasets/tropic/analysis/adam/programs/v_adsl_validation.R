@@ -1,10 +1,10 @@
-# Program: v_adsl_validation.R | Version: 3.6.0
-# Author: Antony Bevan, Clinical Programming | Date: 2026-06-12 (ADaM phase 2026-07-09)
+# Program: v_adsl_validation.R | Version: 4.0.0
+# Author: Antony Bevan, Clinical Programming | Date: 2026-08-09
 # Standard: ADaMIG v1.3 | renv.lock hash: locked
 # Description: R Independent Validation double-programming for TROPIC ADSL.
 #
-# ADaM entry criteria: TRT01P/TRT01A from DM.ARM/ARMCD only (F-028 — never EXTRT).
-# EX used only for TRTSDT/TRTEDT/TRTDURD. ADSL n must equal DM n.
+# ADaM entry criteria: TRT01P is planned treatment from DM; TRT01A is actual
+# administered IV antineoplastic from EX. ADSL n must equal DM n.
 
 library(dplyr)
 library(haven)
@@ -19,16 +19,31 @@ source("04_analysis_datasets/programs/r/config_study.R")
 cat("NOTE: [VALIDATION] Starting ADSL Validation script...\n")
 
 # Load real staging tables
-dm <- readRDS("01_source_data/real_sdtm/staging/dm.rds")
-ex <- readRDS("01_source_data/real_sdtm/staging/ex.rds")
-ds <- readRDS("01_source_data/real_sdtm/staging/ds.rds")
-vs <- readRDS("01_source_data/real_sdtm/staging/vs.rds")
-lb <- readRDS("01_source_data/real_sdtm/staging/lb.rds")
-ls <- readRDS("01_source_data/real_sdtm/staging/ls.rds")
-pn <- readRDS("01_source_data/real_sdtm/staging/pn.rds")
-cm <- readRDS("01_source_data/real_sdtm/staging/cm.rds")
+dm <- readRDS(stage_file("dm"))
+ex <- readRDS(stage_file("ex"))
+ds <- readRDS(stage_file("ds"))
+vs <- readRDS(stage_file("vs"))
+lb <- readRDS(stage_file("lb"))
+ls <- readRDS(stage_file("ls"))
+pn <- readRDS(stage_file("pn"))
+cm <- readRDS(stage_file("cm"))
+sv <- readRDS(stage_file("sv"))
+ae <- readRDS(stage_file("ae"))
 
-# Exposure dates only — arm is NEVER taken from EXTRT (F-028).
+date10 <- function(x) {
+  value <- substring(as.character(x), 1, 10)
+  ymd(
+    if_else(
+      grepl("^\\d{4}-\\d{2}-\\d{2}$", value),
+      value,
+      NA_character_
+    ),
+    quiet = TRUE
+  )
+}
+
+# Exposure dates. Planned treatment is never taken from EXTRT; actual treatment
+# is independently classified from qualifying administered IV exposure below.
 df_ex <- ex |>
   filter(!is.na(EXSTDTC)) |>
   mutate(
@@ -51,29 +66,67 @@ df_ex <- ex |>
     .groups = "drop"
   )
 
-# Calculate survival details from Disposition
-df_death <- ds |>
+# Derive actual treatment independently from administered IV drug. This keeps
+# the single observed planned/actual discrepancy visible in analysis data.
+df_actual_trt <- ex |>
+  group_by(USUBJID) |>
+  summarise(
+    has_cbzp = any(grepl("XRP|CABAZ", coalesce(EXTRT, ""),
+                         ignore.case = TRUE)),
+    has_mp = any(grepl("MITOX", coalesce(EXTRT, ""), ignore.case = TRUE)),
+    .groups = "drop"
+  )
+
+# Calculate approximate death dates from DS week precision.
+df_death_approx <- ds |>
   filter(DSDECOD %in% c("DEATH", "DEAD")) |>
   left_join(select(dm, USUBJID, RFSTDTC), by = "USUBJID") |>
   mutate(
-    dth_dt = ymd(substring(RFSTDTC, 1, 10), quiet = TRUE) + (DSSTWK - 1) * 7
+    dth_dt = date10(RFSTDTC) + (as.numeric(DSSTWK) - 1) * 7
   ) |>
+  filter(!is.na(dth_dt)) |>
+  arrange(USUBJID, dth_dt, DSSEQ) |>
   group_by(USUBJID) |>
   summarise(
-    DTHFL = "Y",
-    DTHDT = min(dth_dt, na.rm = TRUE),
+    approx_dthdt = first(dth_dt),
     DTHCAUS = first(DSTERM),
     .groups = "drop"
   )
 
-df_alive <- ds |>
+# Prefer complete source-reported dates from SUPPAE over DS point estimates.
+df_death_exact <- ae |>
+  filter(!is.na(AEDTHDTC), nchar(AEDTHDTC) >= 10) |>
+  transmute(USUBJID, exact_dthdt = date10(AEDTHDTC)) |>
+  filter(!is.na(exact_dthdt)) |>
+  group_by(USUBJID) |>
+  summarise(exact_dthdt = min(exact_dthdt), .groups = "drop")
+
+df_death <- full_join(df_death_approx, df_death_exact, by = "USUBJID") |>
+  mutate(DTHFL = "Y", DTHDT = coalesce(exact_dthdt, approx_dthdt)) |>
+  select(USUBJID, DTHFL, DTHDT, DTHCAUS)
+
+# Latest dated evidence of contact/assessment. Medication end dates are not
+# included because they may represent planned rather than observed exposure.
+ds_contact <- ds |>
   left_join(select(dm, USUBJID, RFSTDTC), by = "USUBJID") |>
-  mutate(
-    lstalv_dt = ymd(substring(RFSTDTC, 1, 10), quiet = TRUE) + (DSSTWK - 1) * 7
-  ) |>
+  transmute(USUBJID,
+            CONTACTDT = date10(RFSTDTC) + (as.numeric(DSSTWK) - 1) * 7)
+
+df_alive <- bind_rows(
+  ds_contact,
+  transmute(ex, USUBJID, CONTACTDT = date10(EXSTDTC)),
+  transmute(ex, USUBJID, CONTACTDT = date10(EXENDTC)),
+  transmute(vs, USUBJID, CONTACTDT = date10(VSDTC)),
+  transmute(lb, USUBJID, CONTACTDT = date10(LBDTC)),
+  transmute(ls, USUBJID, CONTACTDT = date10(LSDTC)),
+  transmute(pn, USUBJID, CONTACTDT = date10(PNDTC)),
+  transmute(sv, USUBJID, CONTACTDT = date10(SVSTDTC)),
+  transmute(sv, USUBJID, CONTACTDT = date10(SVENDTC))
+) |>
+  filter(!is.na(CONTACTDT)) |>
   group_by(USUBJID) |>
   summarise(
-    LSTALVDT = max(lstalv_dt, na.rm = TRUE),
+    LSTALVDT = max(CONTACTDT),
     .groups = "drop"
   )
 
@@ -99,20 +152,42 @@ df_visc <- ls |>
   group_by(USUBJID) |>
   summarise(VISCFL = "Y", .groups = "drop")
 
-# 4. PAINBL
+# 4. PAINBL: protocol diary baseline window TRTSDT-6 through TRTSDT.
 pn_trt <- pn |>
   left_join(df_ex, by = "USUBJID") |>
-  mutate(PNDT = ymd(substring(PNDTC, 1, 10), quiet = TRUE))
+  mutate(PNDT = date10(PNDTC)) |>
+  filter(
+    PNTESTCD %in% c("PAININT", "ANSCORE"),
+    !is.na(PNDT), !is.na(PNSTRESN),
+    PNDT >= TRTSDT - 6, PNDT <= TRTSDT
+  )
 
-baseline_pn <- pn_trt |> filter(PNDT <= TRTSDT)
+baseline_daily <- pn_trt |>
+  group_by(USUBJID, PNTESTCD, PNDT) |>
+  summarise(
+    n_values = n_distinct(PNSTRESN),
+    day_value = if_else(n_values == 1L, first(PNSTRESN), NA_real_),
+    .groups = "drop"
+  ) |>
+  filter(n_values == 1L, !is.na(day_value))
 
-baseline_summary <- baseline_pn |>
+baseline_summary <- baseline_daily |>
   group_by(USUBJID, PNTESTCD) |>
-  summarise(med_val = median(PNSTRESN, na.rm = TRUE), .groups = "drop")
+  summarise(
+    n_valid_days = n(),
+    median_value = median(day_value),
+    mean_value = mean(day_value),
+    .groups = "drop"
+  )
 
-ppi_meds <- baseline_summary |> filter(PNTESTCD == "PAININT", med_val >= 2)
-an_meds <- baseline_summary |> filter(PNTESTCD == "ANSCORE", med_val >= 10)
-pain_subjs <- union(ppi_meds$USUBJID, an_meds$USUBJID)
+pain_subjs <- baseline_summary |>
+  filter(
+    n_valid_days >= 5L,
+    (PNTESTCD == "PAININT" & median_value >= 2) |
+      (PNTESTCD == "ANSCORE" & mean_value >= 10)
+  ) |>
+  distinct(USUBJID) |>
+  pull(USUBJID)
 
 # 5. Baseline Labs
 df_labs <- lb |>
@@ -143,6 +218,7 @@ docetaxel <- cm |>
 # Combine into ADSL
 adsl <- dm |>
   left_join(df_ex, by = "USUBJID") |>
+  left_join(df_actual_trt, by = "USUBJID") |>
   left_join(df_death, by = "USUBJID") |>
   left_join(df_alive, by = "USUBJID") |>
   left_join(df_ecog, by = "USUBJID") |>
@@ -158,7 +234,7 @@ adsl <- dm |>
     AGEGR1N = if_else(AGE < .env$AGE_STRAT_CUT, 1.0, 2.0),
     ETHNIC = "NOT REPORTED",
     SEX = "M",
-    # Planned/actual analysis arm from DM only (F-028 / ADaM entry criteria)
+    # Planned treatment comes from DM; actual treatment comes from administered EX.
     TRT01P = dplyr::case_when(
       grepl("MITOX", ARM, ignore.case = TRUE) | ARMCD == "A" ~ "MP",
       grepl("CABAZ|XRP", ARM, ignore.case = TRUE) ~ "CbzP",
@@ -169,21 +245,28 @@ adsl <- dm |>
       grepl("CABAZ|XRP", ARM, ignore.case = TRUE) ~ 1L,
       TRUE ~ as.integer(.env$TRT01PN_CODE)
     ),
-    TRT01A = TRT01P,
-    TRT01AN = TRT01PN,
+    TRT01A = case_when(
+      has_cbzp ~ "CbzP",
+      has_mp ~ "MP",
+      TRUE ~ TRT01P
+    ),
+    TRT01AN = case_when(
+      has_cbzp ~ 1L,
+      has_mp ~ 2L,
+      TRUE ~ TRT01PN
+    ),
     RANDDT = ymd(substring(RFSTDTC, 1, 10), quiet = TRUE),
     ITTFL = coalesce(ITT, "N"),
     SAFFL = coalesce(SAFETY, "N"),
     PPROTFL = coalesce(PPROT, "N"),
     DTHFL = coalesce(DTHFL, "N"),
+    LSTALVDT = if_else(
+      DTHFL == "Y" & !is.na(DTHDT) & LSTALVDT > DTHDT,
+      DTHDT, LSTALVDT
+    ),
 
-    # Baseline clinical covariates — defaults from config_study.R (imputation defaults block).
-    # Each imputation flag (*IF) is computed BEFORE its coalesce so it captures
-    # whether the on-file value was missing — mirroring A_adsl_generation.sas
-    # `case when missing(...)`. ALBBL/LDHBL are not collected in this trial and
-    # are set to missing (imputation flags are blank).
-    ECOGBLIF = if_else(is.na(ECOGBL), "Y", "N"),
-    ECOGBL = coalesce(ECOGBL, .env$ECOGBL_DEFAULT),
+    # No unapproved constant imputation in the real-data track.
+    ECOGBLIF = "N",
     MEASDISF = coalesce(MEASDISF, "N"),
     VISCFL = coalesce(VISCFL, "N"),
     PAINBL = if_else(USUBJID %in% pain_subjs, "Y", "N"),
@@ -191,12 +274,9 @@ adsl <- dm |>
     ALBBL = as.numeric(NA),
     LDHBLIF = " ",
     LDHBL = as.numeric(NA),
-    PSABLIF = if_else(is.na(PSABL), "Y", "N"),
-    PSABL = coalesce(PSABL, .env$PSABL_DEFAULT),
-    ALPBLIF = if_else(is.na(ALPBL), "Y", "N"),
-    ALPBL = coalesce(ALPBL, .env$ALPBL_DEFAULT),
-    HGBBLIF = if_else(is.na(HGBBL), "Y", "N"),
-    HGBBL = coalesce(HGBBL, .env$HGBBL_DEFAULT),
+    PSABLIF = "N",
+    ALPBLIF = "N",
+    HGBBLIF = "N",
     DOCPROG = coalesce(DOCPROG, "AFTER"),
     DOCRESP = coalesce(DOCRESP, "N")
   ) |>
@@ -234,6 +314,6 @@ cat(sprintf("NOTE: [ADSL-QC] ADSL n=%d DM n=%d\n", nrow(adsl), nrow(dm)))
 if (nrow(adsl) != nrow(dm)) {
   warning("ADSL-QC: ADSL row count differs from DM")
 }
-trt_tab <- table(adsl$TRT01P, useNA = "ifany")
-cat("NOTE: [ADSL-QC] TRT01P distribution: ",
-    paste(names(trt_tab), trt_tab, sep = "=", collapse = ", "), "\n")
+trt_tab <- table(adsl$TRT01P, adsl$TRT01A, useNA = "ifany")
+cat("NOTE: [ADSL-QC] planned-by-actual treatment:\n")
+print(trt_tab)

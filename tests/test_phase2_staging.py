@@ -22,14 +22,14 @@ def main() -> None:
         "R staging domain list must include SV for governed visit dating"
     )
     assert "%transpose_supp(sv);" in sas_ingest, "SAS staging must materialize SV"
-    assert '01_source_data/real_sdtm/staging/pr.rds' in f042, (
-        "F-042 derivation must consume the governed staged PR dataset"
+    assert 'f042_staging_dir(root)' in f042 and 'file.path(staging, "pr.rds")' in f042, (
+        "F-042 derivation must resolve PR through the governed staging path"
     )
     assert 'read_sas(file.path(root, "01_source_data/real_sdtm/pr.sas7bdat"))' not in f042, (
         "F-042 derivation must not bypass the staging handoff"
     )
-    assert '01_source_data/real_sdtm/staging/sv.rds' in f042, (
-        "F-042 derivation must consume the governed staged SV dataset"
+    assert 'file.path(staging, "sv.rds")' in f042, (
+        "F-042 derivation must resolve SV through the governed staging path"
     )
     print("F-042 Phase 2 staging contract: PASS")
 

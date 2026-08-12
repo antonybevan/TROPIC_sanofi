@@ -8,6 +8,12 @@
 **Decision:** **CONDITIONAL GO — Path A controlled non-submission demonstration only**<br>
 **Regulated-use decision:** **NO-GO**
 
+> **Implementation revalidation addendum — 2026-08-09.** The authority boundary and
+> regulated-use NO-GO remain unchanged. Current governed F-042 evidence is 37 primary
+> pain-progression subjects (36 diary-only and 1 direct-RT-only), 15 complete-date RT inventory
+> records plus 1 missing/partial-date record, and 43 pain responders among 156 evaluable real-MP
+> subjects. Earlier 45-event and 43/153 counts below are historical assessment inputs.
+
 ## 1. Decision and authority boundary
 
 The controlled Path A implementation may be promoted only when the current source
@@ -40,7 +46,7 @@ judgment. Antony Bevan remains the accountable author. The human approval block 
 |---|---|---|
 | `ED-01` cancer-related support | The no-later-than-confirming-visit boundary, RECIST/clinical support, exclusion of PSA-only certification, and no later backdating are explicit and traceable. | Accept |
 | `ED-02` CM+PR radiotherapy union | Full PR is staged; direct-intent treatment text, prior/history exclusion, radiopharmaceutical exclusion, exact-date control, and CM/PR provenance are implemented. | Accept |
-| `ED-03` source sensitivities | Primary diary-or-RT, diary-only, RT-only, and missing/partial-date inventories are retained. Current aggregate evidence is 45 primary subjects, 45 diary-only, 1 RT-only, 15 complete-date RT inventory records, and 1 missing/partial-date record. | Accept for Path A; non-confirmatory |
+| `ED-03` source sensitivities | Primary diary-or-RT, diary-only, RT-only, and missing/partial-date inventories are retained. The assessment-time evidence was 45 primary/45 diary-only subjects; the 2026-08-09 revalidation is 37 primary, 36 diary-only, 1 RT-only, 15 complete-date RT records, and 1 missing/partial-date record. | Accept for Path A; non-confirmatory |
 | `ED-04` SAP output IDs | `T-11-3` PSA response, `T-11-4` ORR, `T-11-5` pain response, `T-11-6` TTUMOR, `T-11-7` TTPSA, and `T-11-8` TTPAIN agree across catalog, physical output, CTQ, and reviewer-facing traceability. `T-11-8b` is explicitly supportive. | Accept |
 | `ED-05` TTUMOR population | SAP Table 22 specifies ITT for `T-11-6`; the primary implementation carries 371 real MP and 378 reconstructed CbzP ITT records. Measurable disease remains supportive; ORR remains measurable-disease restricted. | Accept with synthetic-comparator disclosure |
 | `ED-06` time origins | Efficacy TTE parameters start at `RANDDT`; TTSAE starts at `TRTSDT`. Code and reviewer wording agree. | Accept |
@@ -59,8 +65,10 @@ component. A controlled replay of that exact defective logic on the current real
 data evaluates to 65 responder subjects instead of the correct 43, creating 22 false
 positives.
 
-The physical Path A table reported the correct R-derived result, 43/153 (28.1%), so
-the displayed count was not changed by this finding. The previous claim that T-11-5
+The physical Path A table at assessment time reported the then-current R-derived result,
+43/153 (28.1%); the 2026-08-09 eligibility reconstruction reports 43/156 (27.6%). The
+finding did not change the responder count; the later eligibility correction changed the
+denominator. The previous claim that T-11-5
 had an independent SAS/R challenge was invalid, however, because the controlled
 aggregate file was generated only from the R result and the SAS subject set was not
 compared.

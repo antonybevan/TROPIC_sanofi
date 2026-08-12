@@ -235,8 +235,8 @@
               "groupId": "G.MP"
             }
           ],
-          "rawValue": 322,
-          "formattedValue": "322"
+          "rawValue": 326,
+          "formattedValue": "326"
         },
         {
           "operationId": "OP.MEDD",
@@ -246,8 +246,8 @@
               "groupId": "G.MP"
             }
           ],
-          "rawValue": 43.0,
-          "formattedValue": "43.0"
+          "rawValue": 50.0,
+          "formattedValue": "50.0"
         },
         {
           "operationId": "OP.MEDM",
@@ -257,8 +257,8 @@
               "groupId": "G.MP"
             }
           ],
-          "rawValue": 1.41,
-          "formattedValue": "1.41"
+          "rawValue": 1.64,
+          "formattedValue": "1.64"
         }
       ]
     },
@@ -308,8 +308,8 @@
               "groupId": "G.MP"
             }
           ],
-          "rawValue": 45,
-          "formattedValue": "45"
+          "rawValue": 37,
+          "formattedValue": "37"
         },
         {
           "operationId": "OP.MEDD",
@@ -454,8 +454,8 @@
               "groupId": "G.MP"
             }
           ],
-          "rawValue": 328,
-          "formattedValue": "328"
+          "rawValue": 96,
+          "formattedValue": "96"
         },
         {
           "operationId": "OP.MEDD",
@@ -465,8 +465,8 @@
               "groupId": "G.MP"
             }
           ],
-          "rawValue": 72.0,
-          "formattedValue": "72.0"
+          "rawValue": 153.0,
+          "formattedValue": "153.0"
         },
         {
           "operationId": "OP.MEDM",
@@ -476,8 +476,8 @@
               "groupId": "G.MP"
             }
           ],
-          "rawValue": 2.37,
-          "formattedValue": "2.37"
+          "rawValue": 5.03,
+          "formattedValue": "5.03"
         }
       ]
     }

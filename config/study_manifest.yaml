@@ -2,7 +2,7 @@
 # config/study_manifest.yaml — pipeline STRUCTURE (governed control source).
 #
 # Companion to config/study_config.yaml: that file holds clinical PARAMETERS (thresholds,
-# windows, imputation defaults); this file holds STRUCTURE — which datasets exist,
+# windows, cutoff dates, and treatment mappings); this file holds STRUCTURE — which datasets exist,
 # which programs build/validate them, which keys reconcile them, and who the study
 # is. The orchestrator (platform/cibuild.py), the cross-language reconciler
 # (06_qc_evidence/reconciliation/cross_lang_audit.R) and the ODA TFL renderer
@@ -34,7 +34,7 @@ datasets:
     val: v_adex_validation.R
     parallel_group: 1
   - name: adcm
-    keys: [USUBJID, ASTDT, CMDECOD]
+    keys: [USUBJID, CMSEQ]
     sas: A_adcm_generation.sas
     val: v_adcm_validation.R
     parallel_group: 1
@@ -44,12 +44,12 @@ datasets:
     val: v_adae_io_validation.R    # exception: not v_adae_validation.R
     parallel_group: 1
   - name: adlb
-    keys: [USUBJID, PARAMCD, AVISITN, LBDY]
+    keys: [USUBJID, PARAMCD, AVISITN, LBDY, LBSEQ]
     sas: A_adlb_generation.sas
     val: v_adlb_validation.R
     parallel_group: 1
   - name: adrs
-    keys: [USUBJID, PARAMCD, AVISIT]
+    keys: [USUBJID, PARAMCD, ADT, AVISIT]
     sas: A_adrs_generation.sas
     val: v_adrs_validation.R
     parallel_group: 1
@@ -79,6 +79,13 @@ infrastructure_stages:
     - { name: "ADaM Spec Label/Order Artifacts", script: "platform/gen_adam_labels.R", runner: rscript }
     - { name: "Real SDTM Staging Ingest", script: "04_analysis_datasets/programs/r/v_staging_ingest.R", runner: logrx }
     - { name: "R SDTM Validation",        script: "04_analysis_datasets/programs/r/v_sdtm_validation.R", runner: logrx }
+  # These stages run after all real-arm R ADaM validation datasets exist and
+  # before SAS production uploads/consumes the comparator. This makes a clean
+  # end-to-end run independent of stale, ignored local RDS/XPT bridge files.
+  pre_sas:
+    - { name: "Synthetic Comparator Reconstruction",        script: "01_source_data/reconstruct_cbzp_arm.R",       runner: rscript }
+    - { name: "Guyot Reconstruction Validation",            script: "01_source_data/guyot_validation_report.R",    runner: rscript }
+    - { name: "Synthetic Comparator XPT Export",             script: "01_source_data/export_cbzp_xpt.R",             runner: rscript }
   post:
     - { name: "Cross-Language Audit Reconcile",              script: "06_qc_evidence/reconciliation/cross_lang_audit.R",     runner: logrx,   gated: true }
     # Third-engine (pharmaverse admiral) track for T1 critical core: ADSL + ADTTE OS/PFS.

@@ -29,7 +29,7 @@
 **Source intake pack (WS-1):** [`docs/workstreams/WS1_SOURCE_INTAKE_PACK.md`](../../docs/workstreams/WS1_SOURCE_INTAKE_PACK.md)
 **Residual risks:** [`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)
 **External validation slots:** [`docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md`](../../docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md)
-**Current portfolio release:** tag `v0.2.1-portfolio` · [`docs/RELEASE_NOTE_v0.2.1-portfolio.md`](../../docs/RELEASE_NOTE_v0.2.1-portfolio.md) · `python3 scripts/verify_release.py`
+**Current portfolio release:** tag `v0.2.2-portfolio` · [`docs/RELEASE_NOTE_v0.2.2-portfolio.md`](../../docs/RELEASE_NOTE_v0.2.2-portfolio.md) · `python3 scripts/verify_release.py`
 **Review package face:** [`08_submission_package/m5/datasets/tropic/tabulations/sdtm/`](../../08_submission_package/m5/datasets/tropic/tabulations/sdtm/)
 **Analysis narrative:** [`ADRG.md`](ADRG.md)
 **Findings disposition:** `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md`
@@ -98,8 +98,8 @@ Staging: [`L_staging_ingest.sas`](../../04_analysis_datasets/programs/sas/L_stag
 ### Database write-protection architecture
 
 - `realsdtm` libref → `01_source_data/real_sdtm/` with `access=readonly` in [`00_config.sas`](../../04_analysis_datasets/programs/sas/00_config.sas)
-- `staging` libref writable for SUPP-merged intermediates during ODA runs
-- Mapped intermediates redirect under `04_analysis_datasets/adam/` (local build outputs; not the git portfolio face)
+- `staging` libref → `04_analysis_datasets/staging/`, writable and fully regenerable for SUPP-merged intermediates during SAS/ODA runs; the R twin writes domain `*.rds` files to the same governed staging zone
+- Final ADaM products write under `04_analysis_datasets/adam/`; no program writes derived intermediates into the immutable source directory
 
 
 ---
@@ -108,30 +108,25 @@ Staging: [`L_staging_ingest.sas`](../../04_analysis_datasets/programs/sas/L_stag
 Standard SDTM mapping structures were built in `S_sdtm_mapping.sas` from trial-era **SDTM-IG 3.1.1** source data; SAP v4.0 treats this as source provenance and requires the release package to use the governed SDTMIG 3.4 uplift layer:
 * **DM (Demographics):** Unique subject identifier `USUBJID` constructed via `STUDYID || '-' || SITEID || '-' || SUBJID`. Randomization date `RANDDT` and treatment start date `TRTSDT` mapped to standard ISO 8601 date fields.
 * **EX (Exposure):** Normalised cycle-level actual administered doses (`EXDOSE` in mg).
-* **AE (Adverse Events):** Coded utilizing MedDRA dictionaries into `AEDECOD`, `AEBODSYS`, and CTCAE-style grades (`AETOXGR`). **CRF grounding (D-012):** the Adverse Event form collected seriousness, relationship to study treatment, action taken, outcome (incl. fatal), and seriousness criteria — and those concepts are **largely present** in the PDS extract (`AESER`, `AEREL`, `AEACN`, `AEOUT`, `AESxxx` flags). Do **not** narrate “trial never collected seriousness.” **Date Precision Note (Class B reduction):** CRF collected calendar day/month/year; the public extract carries week-offset integers (`AESTWK`, `AEENWK`). Dates are reconstructed as `RFSTDTC + (AESTWK - 1) * 7` (±3.5 days). That precision limit is an **extract design / de-identification property**, not a programming artefact. ADAE and TTSAE inherit it.
+* **AE (Adverse Events):** Coded utilizing MedDRA dictionaries into `AEDECOD`, `AEBODSYS`, and CTCAE-style grades (`AETOXGR`). **CRF grounding (D-012):** the Adverse Event form collected seriousness, relationship to study treatment, action taken, outcome (incl. fatal), and seriousness criteria — and those concepts are **largely present** in the PDS extract (`AESER`, `AEREL`, `AEACN`, `AEOUT`, `AESxxx` flags). Do **not** narrate “trial never collected seriousness.” **Date Precision Note (Class B reduction):** CRF collected calendar day/month/year; the public extract commonly carries week-offset integers (`AESTWK`, `AEENWK`). When a complete date is unavailable, analysis dates are reconstructed as `RFSTDTC + (week - 1) * 7` and retain the corresponding week-precision limitation. ADSL death dating preferentially uses a complete source `AEDTHDTC` when available and uses the DS week reconstruction only as fallback. This is an **extract design / de-identification property**, not a programming artefact.
 * **LB (Laboratory):** Mapped continuous Absolute Neutrophil Count (ANC) and Prostate Specific Antigen (PSA) measurements.
 * **DS (Disposition):** Captured study completion reasons, trial exits, and survival follow-up records.
-* **RS (Response / Efficacy Fallback):** Derived from `DS` domain where `DSDECOD` indicates progression or death. Death records are mapped to standard RS structures with `RSSTRESC = 'DEATH'` to capture survival outcomes cleanly as efficacy checkpoints.
+* **Disposition-derived clinical signal:** DS progression records may be retained as a separately typed `CLINPROG` analysis signal, and DS death records support survival follow-up. `CLINPROG` is not a RECIST assessment and does not feed BOR, ORR, TTUMOR, or PFS.
 
 ---
 
 ## 3. Reference Ranges & Baseline Criteria
-* Baseline lab and vitals measurements are defined as the last non-missing assessment completed prior to first exposure (`ADY <= 0`).
+* ADSL and ADLB laboratory baselines use deterministic source records flagged `LBBLFL='Y'`; they are not replaced by an arbitrary missing-day or population-constant baseline.
 * Normal reference ranges (`LBNRLO` and `LBNRHI`) were preserved from raw PDS metadata. Lab values outside these ranges are flagged accordingly in `LBNRIND`.
 
 ---
 
 ## 4. Known Data Limitations & Derivation Decisions
 
-### 4.1 Baseline Laboratory Imputation
-For subjects with missing baseline laboratory values (PSABL, ALPBL, HGBBL), population-median proxy values have been imputed in ADSL:
-- `PSABL` default: 110.0 ng/mL
-- `ALPBL` default: 140.0 U/L
-- `HGBBL` default: 11.5 g/dL
-- `ALBBL` **missing** (not collected; no imputation)
-- `LDHBL` **missing** (not collected; no imputation)
+### 4.1 Baseline Laboratory Missingness
+ADSL carries observed `PSABL`, `ALPBL`, and `HGBBL` values from source records flagged `LBBLFL='Y'`; a missing source baseline remains missing. No population-median proxy is inserted. `ALBBL` and `LDHBL` are unavailable in the public source release and remain missing with blank imputation flags. `ECOGBLIF`, `PSABLIF`, `ALPBLIF`, and `HGBBLIF` are `'N'` because the real-data track performs no imputation.
 
-This imputation strategy is retained as a documented implementation limitation under SAP v4.0 §14 / §18. **These imputed baseline laboratory constants are schema placeholders and are NOT used as covariates or stratification factors in any efficacy model**, consistent with [ADRG](ADRG.md) §5.1. The primary and secondary Cox / log-rank analyses stratify **only on the protocol randomization strata** (pooled `ECOGBL` 0–1 vs 2 and `MEASDISF`; see `05_outputs/tfl/tfl_generation.R`, `compute_tte_stats()` → `strata(ECOGBLGRP, MEASDISF)`). `ALBBL` and `LDHBL` in particular are **missing for all subjects** (no subject-level source available; both tracks leave them missing with blank flags), so they carry no subject-level information; they are retained purely to satisfy the ADaM schema and should be read as "not available," not as analysis inputs.
+These variables are not efficacy-model covariates. The primary and secondary Cox/log-rank analyses stratify only on pooled observed randomization factors (`ECOGBL` 0–1 vs 2 and `MEASDISF`; see `05_outputs/tfl/tfl_generation.R`, `compute_tte_stats()` → `strata(ECOGBLGRP, MEASDISF)`).
 
 ### 4.2 Supplemental Domain Ingestion
 Domains `LS` (Lesion) and `PN` (Pain/Numeric) do not have supplemental (`SUPPLS`, `SUPPPN`) datasets in the PDS source data. The `%transpose_supp()` macro gracefully handles this via the `supp_exists = 0` guard path, copying the primary domain directly without SUPP merge.
@@ -143,7 +138,7 @@ The DM domain in the source data does not contain country-of-study-site informat
 The demographics domain (`DM`) contains a hardcoded variable `SEX = 'M'` assigned to all subjects in `A_adsl_generation.sas`. This is a clinical decision consistent with the trial protocol for metastatic castration-resistant prostate cancer (mCRPC), which is an exclusively male patient population. To ensure metadata conformity, the Define-XML codelist references are maintained; however, no female subjects are present in the analysis dataset.
 
 ### 4.5 Partial/Imprecise Source Date Values (CM, LB, LS, PN)
-The independent R SDTM validation (`04_analysis_datasets/programs/r/v_sdtm_validation.log`) raises four `[WARNING]`s flagging partial or imprecise ISO-8601 date values in source date fields: `CMSTDTC` (CM), `LBDTC` (LB), `LSDTC` (LS), and `PNDTC` (PN) — e.g. `----07`, `--12-26`, `2009---04`. These are **expected manifestations of the source PDS public-release date precision** (the same root cause documented in §2 and §5.1), not programming defects: the values are carried through as-is rather than fabricating spurious precision. They surface as WARNINGs (not ERRORs); no analysis depends on day-level precision in these fields. No action required.
+The independent R SDTM validation (`04_analysis_datasets/programs/r/v_sdtm_validation.log`) raises four `[WARNING]`s flagging partial or imprecise ISO-8601 date values in source date fields: `CMSTDTC` (CM), `LBDTC` (LB), `LSDTC` (LS), and `PNDTC` (PN) — e.g. `----07`, `--12-26`, `2009---04`. These are expected manifestations of the public-release date precision. Values are preserved rather than assigned fabricated day precision; derivations requiring a complete calendar date accept only parseable complete dates or use a separately governed fallback (for example the SV hierarchy in F-042). The warnings therefore remain visible and their downstream exclusions/fallbacks are reviewable.
 
 ---
 
