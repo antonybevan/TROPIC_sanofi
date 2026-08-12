@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -43,3 +44,40 @@ def test_p21_yes_only_flags_are_derived_as_y_or_null():
     assert 'ANL01FL = if_else(AVISITN != 99.0 & row_number() == 1, "Y", "N")' not in r_adlb
     assert "BASEFL" not in r_adlb
     assert 'ABLFL = if_else(!is.na(BASESEQ) & LBSEQ == BASESEQ, "Y", NA_character_)' in r_adlb
+
+
+def test_definitive_p21_summary_is_self_reconciling_and_non_qualifying():
+    summary = json.loads(
+        (ROOT / "06_qc_evidence/conformance/p21_adam_summary.json").read_text()
+    )
+    totals = summary["totals"]
+    assert summary["status"] == "EXECUTED_WITH_OPEN_FINDINGS_AND_COMPATIBILITY_CAVEAT"
+    assert summary["use"] == "INFORMATIVE_ONLY"
+    assert summary["validation"]["process_completed"] is True
+    assert summary["validation"]["compatibility_caveat"] == "Incompatible CLI used"
+    assert totals == {
+        "datasets_processed": 7,
+        "datasets_rejected": 0,
+        "records": 121320,
+        "rule_catalog_entries": 387,
+        "checks_reported": 5546,
+        "issue_groups": 30,
+        "issue_occurrences": 2373,
+    }
+    assert totals["records"] == sum(row["records"] for row in summary["datasets"])
+    assert totals["issue_groups"] == len(summary["issues"])
+    assert totals["issue_occurrences"] == sum(row["found"] for row in summary["issues"])
+    assert totals["issue_occurrences"] == sum(
+        row["occurrences"] for row in summary["residual_families"]
+    )
+    assert summary["remediation_comparison"]["occurrences_eliminated"] == 84238
+    assert summary["remediation_comparison"]["percent_reduction"] == 97.3
+    assert not {"AD0269", "AD0127A", "AD0164", "AD0178"} & {
+        row["id"] for row in summary["issues"]
+    }
+    assert summary["qualification"] == {
+        "community_informative_only": True,
+        "enterprise_executed": False,
+        "submission_clearance_claimed": False,
+        "independent_qc_approved": False,
+    }

@@ -53,7 +53,7 @@ The packaged analysis datasets contain the real de-identified MP arm only. The r
 | Programming | Real SAS ODA plus independent R derivation; selected admiral corroboration | Technical implementation evidence |
 | Reconciliation | Key, value, population, and result-level gates | Controlled-scope agreement |
 | Metadata | XSD, Define checks, ARM contract, spec-to-Define and spec-to-data | Local standards conformance |
-| Pinnacle 21 | Community 4.1.0 / FDA 2508.1 run record | Informative only; compatibility caveat retained |
+| Pinnacle 21 | Community 4.1.0 / FDA 2508.1; 7 datasets, 121,320 records, 0 rejects, 30 open groups / 2,373 occurrences | Informative issue-discovery evidence only; compatibility caveat retained and Enterprise not executed |
 | Package | PDF structure, fonts, bookmarks, links, STF classification, checksums, backbone validation | Structural simulation |
 | Release | SHA-256 manifests, CI, clean-checkout verifier | Integrity and reproducibility, not Part 11 |
 

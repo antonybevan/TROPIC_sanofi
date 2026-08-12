@@ -6,7 +6,7 @@
 
 **Regulatory baseline:** `TROPIC-FDA-2026-08-12`
 
-**Status:** Release evidence pending final rebuild and CI promotion
+**Status:** `PROMOTE_ONLY_AFTER_ALL_RELEASE_GATES_PASS`
 
 ## Release intent
 
@@ -19,7 +19,7 @@ This release replaces portfolio-style presentation and ambiguous compliance lang
 3. Added a quality-system boundary for independent QC, Part 11, Enterprise validation, gateway acceptance, and aCRF status.
 4. Renamed the packaged Clinical Study Data Reviewer's Guide from `sdrg.pdf` to the current FDA convention `csdrg.pdf`.
 5. Preserved the source blank CRF as `blankcrf.pdf` and explicitly prohibited a false `acrf.pdf` alias.
-6. Recorded a real Pinnacle 21 Community 4.1.0 / FDA 2508.1 ADaM run, its hashes, aggregate findings, and its built-in incompatible-CLI caveat.
+6. Recorded a definitive Pinnacle 21 Community 4.1.0 / FDA 2508.1 ADaM run: 7 datasets, 121,320 records, 0 rejects, 30 open issue groups, and 2,373 aggregate occurrences. The raw workbook is retained outside Git because it contains record-level identifiers; its SHA-256 and a de-identified, self-reconciling aggregate inventory are retained in-repository.
 7. Corrected standard one-sided ADaM flags in paired SAS/R derivations: ADAE/ADCM `TRTEMFL`, ADLB `ANL01FL`, and ADLB `ABLFL` now use `Y`/null; the nonstandard ADLB `BASEFL` variable was removed across data, metadata, and reporting logic.
 8. Replaced promotional PDF header language with a neutral controlled-simulation identity.
 
@@ -36,13 +36,15 @@ The repository does not claim:
 
 Those gaps are explicit controls, not missing decoration. Their closure requirements are in `docs/QUALITY_SYSTEM_BOUNDARY.md`.
 
-## Evidence required before promotion
+## Promotion evidence contract
 
-- full 37-stage DAG with recorded real SAS execution;
-- zero-difference paired reconciliation at controlled tolerances;
-- metadata, TFL, PDF, cSDRG, eCTD, log, and finding gates passing;
-- post-correction Pinnacle 21 Community rerun and disposition update;
-- clean release manifest and release-candidate seal;
-- GitHub CI green from the published commit.
+The release tag may be created only after all of the following are true:
 
-Until those checks complete, this note remains a release candidate narrative and must not be represented as a completed tag.
+- the full 37-stage DAG completed with recorded real SAS execution;
+- paired reconciliation passed at controlled tolerances;
+- metadata, TFL, PDF, cSDRG, eCTD, log, and finding gates passed;
+- the post-correction Community run was executed and every residual family was recorded without a clearance claim;
+- the committed tree passed the clean-checkout release verifier and release-candidate seal; and
+- GitHub CI was green for the published commit and merged default branch.
+
+The existence of tag `v0.3.0-clinical-simulation` is the promotion record for this conditional note. The tag must not be created or retained if any item above is unmet.

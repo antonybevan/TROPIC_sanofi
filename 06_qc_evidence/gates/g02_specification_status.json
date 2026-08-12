@@ -2,7 +2,7 @@
   "gate": "G02",
   "name": "analysis_specification_lock",
   "status": "PASS",
-  "generated_at": "2026-08-12T07:30:44Z",
+  "generated_at": "2026-08-12T09:24:13Z",
   "checks": [
     {
       "name": "exists:docs/PRODUCT_CLAIM.md",

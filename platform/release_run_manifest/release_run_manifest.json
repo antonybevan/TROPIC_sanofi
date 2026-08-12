@@ -9,193 +9,193 @@
         "size_bytes": 26692
       },
       {
-        "md5": "e42af1a58860f08104da95f0bdf3a3f4",
+        "md5": "70a028e269163394b5cdc55805d24188",
         "path": "04_analysis_datasets/datasetjson/adam/adae.json",
         "present": true,
-        "sha256": "75beeaa7ed0d442f67eef4c5e4af0861c718de019c25b5a3cc3a385a9284c875",
-        "size_bytes": 1495999
+        "sha256": "9f8855c1693189dc6a4447d5339b17dbe63afafc12ab4db8d3706e09481d3bf2",
+        "size_bytes": 1494492
       },
       {
-        "md5": "15b0c8b9495097be16c6b423dc6ea777",
+        "md5": "a0702409a6e91a225acf27ecf1433ed7",
         "path": "04_analysis_datasets/datasetjson/adam/adcm.json",
         "present": true,
-        "sha256": "d8cc195a487f432237c4bf351669dc5bfa91dfcc6b6850d404ddf7f8b6c59b34",
-        "size_bytes": 3780638
+        "sha256": "c2d15ed88a5d2df68a1818de56099e371f57a57513747c8b1997e25de43e6f07",
+        "size_bytes": 3762603
       },
       {
-        "md5": "4c1ad9be21b97604baee2d1e3135208b",
+        "md5": "51f5ad0060b947f3b62f2a84ed6697e9",
         "path": "04_analysis_datasets/datasetjson/adam/adex.json",
         "present": true,
-        "sha256": "ea666b3901a6f55bd5a6e6af0b2d4a7e4e668cf4512d5e5adddd4bf53ccad649",
+        "sha256": "8b2cae27e5efd02c423d820328c3b448b59273f619bf2465f6edeea7c44fb2b5",
         "size_bytes": 1194988
       },
       {
-        "md5": "e3572a404c646e7ae4798808396e64f6",
+        "md5": "8c8f083819ced474fdfce17036bbbb15",
         "path": "04_analysis_datasets/datasetjson/adam/adlb.json",
         "present": true,
-        "sha256": "8a3771c1fe8be9325e1fc25c28734c55a538ac42fa60b3e6d43b399f718447ce",
-        "size_bytes": 18820560
+        "sha256": "7ccffbe230904adb93aa02a72c931943ec5da8a97828c80b2f2c26843881d1ae",
+        "size_bytes": 18704799
       },
       {
-        "md5": "306e869a9d4c6eba03115c6aa78617b1",
+        "md5": "6975c083570ac629218753375252d6a3",
         "path": "04_analysis_datasets/datasetjson/adam/adrs.json",
         "present": true,
-        "sha256": "1924a6d289a8d43844073a581c8f428c568d7dd6657a89c3f7e1a0f6aa22a5b0",
+        "sha256": "e064eb7aee2bcec948ed357512118637bc41becf3f46c0467ad475e793ad7ed0",
         "size_bytes": 358105
       },
       {
-        "md5": "685361cf749a46ef86e109026cc7a1e9",
+        "md5": "923ff4dc1c85971d6dccbb3725ef4c30",
         "path": "04_analysis_datasets/datasetjson/adam/adsl.json",
         "present": true,
-        "sha256": "da84f6f3ca0afa7e8fd15dc949705f30cf13a6933494587d6e3f248c09238b87",
+        "sha256": "fbf00131af4bd9dcf2137bb9a231e9de3773df439de0bfad80495ecc25c4e8c6",
         "size_bytes": 104665
       },
       {
-        "md5": "8185ad397ce2c6622bc05d7a1f9b1504",
+        "md5": "2b64084940f4867b9f49e781e6938f01",
         "path": "04_analysis_datasets/datasetjson/adam/adtte.json",
         "present": true,
-        "sha256": "6c1ecb8f2566732207c4d8cf36588a604043aee28cfdef15ae4a4f940aaca4b4",
+        "sha256": "e2422e919e2a18fbeb724ece2a29f06a2e7d25e44966e18d1b135eaf01762661",
         "size_bytes": 413370
       },
       {
-        "md5": "68edd4a1b10ea63f4db2e7b7f962e0c9",
+        "md5": "2e4ed1ef88929c1060bc3bea0fb41db3",
         "path": "04_analysis_datasets/datasetjson/adam/clinsite.json",
         "present": true,
-        "sha256": "d248a97f8d10833dae4254f6920e4bd397986c0af935a3011fb320d8030ee768",
+        "sha256": "f016066c167ac685408d13bdcaaba92524c173879233b0f348db1d0e658ef0a9",
         "size_bytes": 6210
       },
       {
-        "md5": "78a2ca7b1095f971bee0374d5b31835f",
+        "md5": "ec11c33a787303043e9df33533a83824",
         "path": "04_analysis_datasets/datasetjson/sdtm/ae.json",
         "present": true,
-        "sha256": "94b1784a433e965b4739c7669d84e8d41a59852befa7c3950979ba76d582169f",
+        "sha256": "ac0a3006b654cebb0230ac9975f5dd01f07572e9dc08c6e9fd8a186cb6fdc5f0",
         "size_bytes": 1507248
       },
       {
-        "md5": "e52a0810d0f3b71ff57c2d18077c44d4",
+        "md5": "9598cdd8e3835c4e002128b590b296aa",
         "path": "04_analysis_datasets/datasetjson/sdtm/cm.json",
         "present": true,
-        "sha256": "a2f52241a060d27a73c4f77854e6073432a1defefd017971bea7fc87b36b751d",
+        "sha256": "3126c022a5bbacf67e2d0c9cf41a4f3f8dbfe19bdb6932e8e7c7e56d2008d863",
         "size_bytes": 6537864
       },
       {
-        "md5": "b5561bacef6fb5cf19e94e7512a54dde",
+        "md5": "937c73cc8b9f2bcb1bef975e83b6c62a",
         "path": "04_analysis_datasets/datasetjson/sdtm/dm.json",
         "present": true,
-        "sha256": "5cf950f99692f5cd37c08004360d5ef067af5657a35cbbc86bbe9878343eb1c7",
+        "sha256": "595467c064af799741f8da10b0266de263f19aa4c56976c6d023d5137d145b25",
         "size_bytes": 65709
       },
       {
-        "md5": "08c51beef5b80219c12e5493b2a92da5",
+        "md5": "91578fc2fcad5db4f7ea38ebcc6a7af7",
         "path": "04_analysis_datasets/datasetjson/sdtm/ds.json",
         "present": true,
-        "sha256": "88bc8b4c6dd436820b66dab87fa81f9e1e9ca8f6523a4eff7e03453b608dc43d",
+        "sha256": "bfcd18d03017c5a65faf869aa857cc76d34a00918afbdf2b0b99decafe146706",
         "size_bytes": 391903
       },
       {
-        "md5": "e8053df94369732a8e6a3118e28b2bf3",
+        "md5": "d5c1ff39c4cc40d7c306e45ea3082f20",
         "path": "04_analysis_datasets/datasetjson/sdtm/ex.json",
         "present": true,
-        "sha256": "685c18fc86e08237372b0c4752c7ccdf832206332245b94a32c8d71ff262e0e1",
+        "sha256": "2d82f879b611979c13eaa13bf7020507b977416c6f938d57d61ff051214b0220",
         "size_bytes": 570538
       },
       {
-        "md5": "2c5e95b9f9d09b94e42672d97b5297d1",
+        "md5": "dd314986988bd7b3a52c70844f7ca4fc",
         "path": "04_analysis_datasets/datasetjson/sdtm/lb.json",
         "present": true,
-        "sha256": "e1a169bfa71a39393aacd2e6e9095289dd97a550c6c3014659904993b52030df",
+        "sha256": "6f89f7c14d211c0df488673de642a33601f834522db587a6bb0f12d2bbd63eb1",
         "size_bytes": 18794346
       },
       {
-        "md5": "95035551c280ce4ef5028f02bd259e1c",
+        "md5": "a21532d3dc3254f2b180646717bb17d4",
         "path": "04_analysis_datasets/datasetjson/sdtm/ls.json",
         "present": true,
-        "sha256": "d4b3c03822efc72348a46c3f979ec6708dfaa6e768fed07790c6a5b5a1da8bc5",
+        "sha256": "e39c285243168eb79089b7e0ce8d2d6972fb218d23fc6ca995dd407dcb6311c5",
         "size_bytes": 1371438
       },
       {
-        "md5": "abe088bd1c873783c1e244863b5adab4",
+        "md5": "f83e4ba6e81f7e67d7af0c07f1f32972",
         "path": "04_analysis_datasets/datasetjson/sdtm/pn.json",
         "present": true,
-        "sha256": "ab43aaf3d1e0c245338f4769f3c8f6c5b6e21fcda7b9c65e0b37e1deedf8b7f2",
+        "sha256": "3be3ccd5c622d3783e5c9a042ae8da805e78478dfdc9dcf6d95316a43e9cf676",
         "size_bytes": 5820735
       },
       {
-        "md5": "89725797c9114e4cf7a69ddfcad5acb0",
+        "md5": "fe073fcfe25fe776a2dec89707fd0566",
         "path": "04_analysis_datasets/datasetjson/sdtm/suppae.json",
         "present": true,
-        "sha256": "212536fc77c91c48bd83b8320f789b77184e397e6610b97cb812969b8fd9f52c",
+        "sha256": "f1da7d5f457028db1c7d690679002703933696177582c337e185b34b27a225ad",
         "size_bytes": 7121782
       },
       {
-        "md5": "6afd55383386ea6898bcb4638d878e50",
+        "md5": "07bae7e45e76a3332ebe230e91bf5df8",
         "path": "04_analysis_datasets/datasetjson/sdtm/suppcm.json",
         "present": true,
-        "sha256": "26971e26af1c28ac5899ad324b63faf4ee6fd5ee2b362eee4d1b7068f697c2e6",
+        "sha256": "7ff5f40863d81f7f2dda66f2b41f2e56fe7ee74dffff7c3d8b48286d866578e1",
         "size_bytes": 13802454
       },
       {
-        "md5": "b9bdfe29156aaedb4fb1b759d93c3f9a",
+        "md5": "1e7583dedaa77e9a8dd99fb28390e80e",
         "path": "04_analysis_datasets/datasetjson/sdtm/suppdm.json",
         "present": true,
-        "sha256": "bd45d0ea150c56bcbbcb7e767e5b74d62f375ff0a10512935c35814fc8ba2883",
+        "sha256": "7d83f8e44694b14a37f08f37f26629f890fedd92e4e0f4902428f899b55f7021",
         "size_bytes": 277320
       },
       {
-        "md5": "16731a0224fe3f12125a75c707212478",
+        "md5": "7a0c450d3896b7e79f13eb92e576fd82",
         "path": "04_analysis_datasets/datasetjson/sdtm/suppds.json",
         "present": true,
-        "sha256": "7888fa36d48b1baf586fe653cacf1686eb6f7670ac8f4fee285b73b6de48f2ba",
+        "sha256": "7791ce2e9e8ea7b3affb9f1529d4863d77434424365c68b4d49e90ede2508e58",
         "size_bytes": 462439
       },
       {
-        "md5": "826fddb34badf5163f9a8ecab33bd15e",
+        "md5": "7b0cad152c7f1de5244291f5af9dd62d",
         "path": "04_analysis_datasets/datasetjson/sdtm/suppex.json",
         "present": true,
-        "sha256": "6a2b569cf6aebc0394136a3762d26be57c346788b43fb07d522e820468a07ecd",
+        "sha256": "04b632be0cbdaf018f72989bbc82e8a8c6c392b78895b1dddbc397bf024803f8",
         "size_bytes": 2271249
       },
       {
-        "md5": "0acca2d0b3fdf8da6a06701e8e580fd1",
+        "md5": "0e97e304d450962924ca969d36badbc1",
         "path": "04_analysis_datasets/datasetjson/sdtm/supplb.json",
         "present": true,
-        "sha256": "ed9fd3427747f0deda5cc2654ef9ee892c425194bab6bf9d019d777a2ff66e87",
+        "sha256": "2075012f9a2d892015e47fb67308080319b67b398a1c5cdf6daad56c6ec08564",
         "size_bytes": 9742758
       },
       {
-        "md5": "344593adaffbf877df49c9763d33c2ef",
+        "md5": "060a20dbe9f2cbe57ec93e4a8eaa9176",
         "path": "04_analysis_datasets/datasetjson/sdtm/suppls.json",
         "present": true,
-        "sha256": "cdcf6324ed48d9e7d614d6f2876e55366e93eba4a4e9535728f8b87425db23a5",
+        "sha256": "91048e9c6a7bc8343cdf76def420593087cf76d010a2783a19ea047498d4d223",
         "size_bytes": 752398
       },
       {
-        "md5": "bb64b03b0d75bd9fbc2f1cd62e5df99e",
+        "md5": "cac7f7f21dd08fa81c8b381df91045e1",
         "path": "04_analysis_datasets/datasetjson/sdtm/ta.json",
         "present": true,
-        "sha256": "3a7e68993cc33c25f03beede3f0b618215a6ad62cf7b02f8cc242b6c93ae7487",
+        "sha256": "95c0fc23362cea5f0b99de43c3161270e69bb598e5a69789e169d47e63514434",
         "size_bytes": 1831
       },
       {
-        "md5": "009e0fe947f9710173bfff73bef575fd",
+        "md5": "97288175ea5b8011c5dbb8e89af7f04d",
         "path": "04_analysis_datasets/datasetjson/sdtm/ts.json",
         "present": true,
-        "sha256": "ab7a35b91fa261e54be6c5aadacf241a626f5d1c420c1ba52c3589c7c38ad7c0",
+        "sha256": "5e8013fc0dc7a8ab5a48e9b60e0dc015f166c0d76839fc76f35e226de2a5bb90",
         "size_bytes": 3152
       },
       {
-        "md5": "776ad428937ebb5371588ef1d602bf05",
+        "md5": "f0d54f466e7d7756434ed35e075e6826",
         "path": "04_analysis_datasets/datasetjson/sdtm/vs.json",
         "present": true,
-        "sha256": "581cc2997120cf6b29cf888a88f33af928921a53848ad8ec611d28b3101db59f",
+        "sha256": "5de0234f82d248dba31c86f808f1f1d0819ad469802cac162ff48c585e780b59",
         "size_bytes": 2905914
       },
       {
-        "md5": "c64056909089a74eb5f6399a1fda2d30",
+        "md5": "e78d4fc856233550cdc6991082b32f6e",
         "path": "05_outputs/ars/tropic_ard.csv",
         "present": true,
-        "sha256": "85667efdfc69a207efa2279bd7c2a7eb0a45bf14fa443db4cb9adab71702d99c",
-        "size_bytes": 2001
+        "sha256": "f2dda6cfe770a133763aea62f90e02c365afc62db259dd45aae238c846cc3beb",
+        "size_bytes": 2022
       },
       {
         "md5": "494e1729bda1d9298df7704ccc5ac69a",
@@ -249,18 +249,18 @@
         "size_bytes": 8260
       },
       {
-        "md5": "7a538432fc1724960c0ea6c32aa99e67",
+        "md5": "aaf9b1cc7f205987256446f84c23c189",
         "path": "config/evidence_layers.yaml",
         "present": true,
-        "sha256": "8130899f700f1b27593ec140737cabcc503dcea008ec7e12c7778fc2bed94342",
-        "size_bytes": 17494
+        "sha256": "c7b78ef98639f1bfff357d4da986df019a01a29eafa3910a626db86a68c8f55c",
+        "size_bytes": 18791
       },
       {
-        "md5": "44fb86bc008a1e50200cc17d19fff155",
+        "md5": "9c120fc9eac089a8da12124586186703",
         "path": "config/metadata_lineage.yaml",
         "present": true,
-        "sha256": "cea63f17da3474703ff4a945a2f728154561febf838418080dc39a7a83a12865",
-        "size_bytes": 19021
+        "sha256": "42982d4563cec68c283d81d9448129d4e1542d076ed1bd8778b5219f05504dbd",
+        "size_bytes": 19061
       },
       {
         "md5": "7ae4f7cdb9980e0e0ab155b5ffda043a",
@@ -270,18 +270,53 @@
         "size_bytes": 3388
       },
       {
-        "md5": "847b0d5414ab625c5fc95401f661f955",
-        "path": "03_metadata/adam/ADaM_spec.xlsx",
+        "md5": "c5b6f4c57f333077984396c5b4eab72f",
+        "path": "config/regulatory_baseline.yaml",
         "present": true,
-        "sha256": "e2b95312f1191849713c7596ccdfb4c2ede400e4ff5cd17dabb9776631eea9e7",
-        "size_bytes": 36520
+        "sha256": "cb8859bde9eec91c4be83ec01fd6be0f3b30bd8a1c105f178db1bc4d3e9e82b8",
+        "size_bytes": 2936
       },
       {
-        "md5": "fe1d378a04060c5ba5b83f673f46567b",
+        "md5": "f251090e6b831de74799d4e53a8c7c10",
+        "path": "docs/PRODUCT_CLAIM.md",
+        "present": true,
+        "sha256": "8b50cb7ed6e2b2ec2bf051b3e64d17c53436a3c70e1ac77d3ba6f4352753332e",
+        "size_bytes": 6087
+      },
+      {
+        "md5": "9d6eef455da0bac5ff444c987314a546",
+        "path": "docs/QUALITY_SYSTEM_BOUNDARY.md",
+        "present": true,
+        "sha256": "5f776b483a8ebcd61917462a428bc4c53e6e71f63ea5d2a953162efad887b67b",
+        "size_bytes": 5728
+      },
+      {
+        "md5": "9320c5499c8e4ba0b4b9918eab5ca945",
+        "path": "06_qc_evidence/conformance/p21_adam_runrecord.md",
+        "present": true,
+        "sha256": "e3445d6ad2195bfd97ac09f7cc1cf3917cb7aadd667db44c5e1af3c565c7c39c",
+        "size_bytes": 6009
+      },
+      {
+        "md5": "120cb8dd1747d85f38d7b0eea8127bbe",
+        "path": "06_qc_evidence/conformance/p21_adam_summary.json",
+        "present": true,
+        "sha256": "61851aeaaced101436a3d2d49b96bdad0eb5056a4bf719fd48ceef8e66304d99",
+        "size_bytes": 6971
+      },
+      {
+        "md5": "df49adc0bbf6f1c550e3a5cb4e71400a",
+        "path": "03_metadata/adam/ADaM_spec.xlsx",
+        "present": true,
+        "sha256": "2276b3df2d9277f8c2160d4dacdd07f34ae8e7c40f4b0c0d81071ca855c9bca7",
+        "size_bytes": 36524
+      },
+      {
+        "md5": "3ac03b8869bd17a4ddf39d4e2669de73",
         "path": "03_metadata/define/define.xml",
         "present": true,
-        "sha256": "e95ec20c86556c442f6e0381dc5bbc0a5f74eff66688629f454d6224b270783a",
-        "size_bytes": 120524
+        "sha256": "74256966d9247f117ffba4a52712733bd42abc11f5aca5061aa73e210e7db204",
+        "size_bytes": 120605
       },
       {
         "md5": "953eceab09bf0ece82d48ecae1f1855d",
@@ -298,11 +333,11 @@
         "size_bytes": 3056
       },
       {
-        "md5": "f56418c01fc8dd73d892e12d5398f3f8",
+        "md5": "e8422663fab120d2b4d1ce6ac80e43a1",
         "path": "04_analysis_datasets/programs/sas/_adam_labels.sas",
         "present": true,
-        "sha256": "42223a8952c220bdb28efb934456a36069818b013919a5e63ec61cad350242a2",
-        "size_bytes": 9653
+        "sha256": "dd5f0bd75cea4652edc06f8c6b669da38c1411cd91f4204036d1c6d91774edfc",
+        "size_bytes": 9650
       },
       {
         "md5": "4b762edf0b925a8ecd8769eb662f0f9d",
@@ -312,11 +347,11 @@
         "size_bytes": 5438
       },
       {
-        "md5": "cd51bfa9ed8cad4c93a5f0bce607e826",
+        "md5": "75ef839862e4a7bd8bdb85a959062d07",
         "path": "04_analysis_datasets/programs/r/adam_var_labels.csv",
         "present": true,
-        "sha256": "295397f0a60162118b060662cc05e719000188f9a982ca2bfbcd243d78af57dc",
-        "size_bytes": 5802
+        "sha256": "0a9e3900fee80a3bcafdecbbb5584b96e4d190ea5bb5baae5409aa12d7f10ae7",
+        "size_bytes": 5801
       },
       {
         "md5": "e9d67bbbfc5aec0671516a8cd907a3d5",
@@ -368,18 +403,18 @@
         "size_bytes": 12792
       },
       {
-        "md5": "3c4295722529b72fdd3249e2c7c2050f",
+        "md5": "44ab6902f8e6eb4adf89d72f765b84e0",
         "path": "platform/package_ectd.py",
         "present": true,
-        "sha256": "ec3ddb35c05755b3bdd5a1d8ea53a7ae0a23bcc09185d8feb3b8cce6572c34b1",
-        "size_bytes": 29028
+        "sha256": "1f32d2d9d08ed571eca0112068a11c09b04823f989831a9a5c0b876bc0f56e4c",
+        "size_bytes": 29179
       },
       {
-        "md5": "0d09d4e2d7f1abbaa02a9d2796ec1d5a",
+        "md5": "69039fdc4950fc35bf187303a9c02fe9",
         "path": "platform/build_ectd_backbone.py",
         "present": true,
-        "sha256": "88f20127cc7bedfb221aaacbc8a5c008c9466d28185f35daa4d5dc7917151bfa",
-        "size_bytes": 20469
+        "sha256": "11c8bb31ce84fc78455e795fafb5081153a946c316f148fb196db409f873523b",
+        "size_bytes": 20480
       },
       {
         "md5": "573a507f0dd54ae13adcb064a633ec34",
@@ -389,18 +424,18 @@
         "size_bytes": 9448
       },
       {
-        "md5": "e6fc0482f28114c95e54f1738c738e1c",
+        "md5": "abb37f653afe51b7949f03b14183e6a6",
         "path": "05_outputs/tfl/tfl_generation.R",
         "present": true,
-        "sha256": "2d18ce3725fafb40690dad883411c60374f86b22d8778b5f427fd876d794dc0a",
-        "size_bytes": 64358
+        "sha256": "4b84846ab154e396137bf85d11f958e53e2260cb881089fac0418e01e3abd0e9",
+        "size_bytes": 64389
       },
       {
-        "md5": "c1b955835ef7b48437e3a3cbc9fe451b",
+        "md5": "d27d3b79f8d65c532eca2bdfd24c249c",
         "path": "05_outputs/tfl/lab_shift_table.R",
         "present": true,
-        "sha256": "64db4050bb7d91a51a409f781815a51b9e7238e06adb8d20058c29ea1d1832a9",
-        "size_bytes": 3520
+        "sha256": "83c99348107320363ffbba484c10437f64c02c13897adce77d538a7800c387de",
+        "size_bytes": 3954
       },
       {
         "md5": "9f265bbc28c4ed9413f6404d7c5308bc",
@@ -664,11 +699,11 @@
         "size_bytes": 11187
       },
       {
-        "md5": "2f9df50b174064e70af813170db618ba",
+        "md5": "fc5296f88c5c95c615c3295fe7915dbc",
         "path": "01_source_data/cbzp_reconstructed/adlb_cbzp.rds",
         "present": true,
-        "sha256": "9bc0b67d9f12359d064692a28a29b4403e0e4e5a378d29225968b846637cb34d",
-        "size_bytes": 33511
+        "sha256": "7939a9c2946dc5b3f31d2b651ea16e809ad65f2902bab2c2790ab72c588d8d14",
+        "size_bytes": 33493
       },
       {
         "md5": "d5575e58a725ef27423f0bb5b3ac4bb6",
@@ -692,45 +727,45 @@
         "size_bytes": 17408
       },
       {
-        "md5": "50361f6677d2c417c214d9092fe5892a",
+        "md5": "eb72945f2c0c8dab88164d1d2e366d77",
         "path": "01_source_data/cbzp_reconstructed/adae_cbzp.xpt",
         "present": true,
-        "sha256": "116e2f5c609424b6ecad81aafe1c08f232e6de4208f3c1f1faa6366163486564",
+        "sha256": "a65b1d4ec0e5ba208d56ba9a6230437f6e1a4465049cec434c6947dd9c0cc243",
         "size_bytes": 291520
       },
       {
-        "md5": "21ecf7619c16234225aaf698138623ff",
+        "md5": "e583ceb94506364f0a9099efb4ec00b5",
         "path": "01_source_data/cbzp_reconstructed/adex_cbzp.xpt",
         "present": true,
-        "sha256": "3663eb4468163cb4b36c3f95170655799f59e6cf4e1632da0180e1e7b0826657",
+        "sha256": "740b1ae43c7944834a45c30d1b09a330d412954fb3b427642eda31154a2e0276",
         "size_bytes": 160080
       },
       {
-        "md5": "d4a94c3ad7e2d28f019838189130bfbd",
+        "md5": "3bdb21f2d5b39bfa90a4dec5c03e0fa0",
         "path": "01_source_data/cbzp_reconstructed/adlb_cbzp.xpt",
         "present": true,
-        "sha256": "51b7c04fe70cc8390f22ec74f592602e0af87f63e162156f53fdee8293a6c27f",
+        "sha256": "7e31c9f5814d0a0587190a911b6018ce633627f1b1ad07eaa4b0f52499fc0927",
         "size_bytes": 475920
       },
       {
-        "md5": "7c3a963c2b7d71a8e199f9850015ca3d",
+        "md5": "c09456d224f744066408b7929a0df669",
         "path": "01_source_data/cbzp_reconstructed/adrs_cbzp.xpt",
         "present": true,
-        "sha256": "4e3edf418580903260bc435b824fee8f4888c4fed8eb16313951de4fa3d2daa1",
+        "sha256": "405dc794b446f377359af0f4472555535e509c88e6b0ea918ae575c95fb3efd1",
         "size_bytes": 624960
       },
       {
-        "md5": "5d89bc24e6317735ac6f9d9e20d3f796",
+        "md5": "c7e0c07111418c228f852fd39ac83144",
         "path": "01_source_data/cbzp_reconstructed/adsl_cbzp.xpt",
         "present": true,
-        "sha256": "d663e3e6cec6507894ab9a4f324ed84bbc5fcec4f34b6f9f5631b74dbff82bff",
+        "sha256": "4a0fe2ca3be46b1990d12d521ec0f21d1f77408b1e84703cf291f62d9ceb5165",
         "size_bytes": 100480
       },
       {
-        "md5": "4922584c1d7b10b2a5201bbffef197a3",
+        "md5": "b21c4a4d672aadaea7df38e394559bfc",
         "path": "01_source_data/cbzp_reconstructed/adtte_cbzp.xpt",
         "present": true,
-        "sha256": "7c97c2136719b16191993d3aac70ea4d1d613fcbd5b99d4b33f8b5f65cbf4649",
+        "sha256": "e0c2f7b711e9afc88e439e5b6983a5b839ec977167ca398343e3dc03dd24a86a",
         "size_bytes": 282480
       },
       {
@@ -862,111 +897,111 @@
     ],
     "logs": [
       {
-        "md5": "3492306e0e9fcf12b45539c3bced1fce",
+        "md5": "874a889a49248fa474935ce659710d28",
         "path": "04_analysis_datasets/programs/sas/oda_master_driver.log",
         "present": true,
-        "sha256": "bf3784824ec91c6598120ad844df4e666f297958397873d169e63cff3b26d81c",
-        "size_bytes": 253383
+        "sha256": "80fb86cab84eda428ac9fa25c4a652f1eab06d26f5ae153e1bf86d56402bbab0",
+        "size_bytes": 253288
       },
       {
-        "md5": "6f800ddc2a9871fcd495694bac91089c",
+        "md5": "1df9e15dc3e0f896a9319b10325bfa15",
         "path": "04_analysis_datasets/programs/r/v_adae_io_validation.log",
         "present": true,
-        "sha256": "fae27ea270c74b029458d75c39952d7bc9779e29bd847311ad11ad20a1d1f1d4",
+        "sha256": "4141c183918e6e9d2586762a1861f6bab6522d6e6eceb937d68ed9ae5594eae2",
         "size_bytes": 8426
       },
       {
-        "md5": "a4d1e81c3bfe52e8a33cf0f274a6a808",
+        "md5": "6cb5a974ffa6c8a90833f8347b98de7c",
         "path": "04_analysis_datasets/programs/r/v_adcm_validation.log",
         "present": true,
-        "sha256": "ced4898998950ee22ba0581c518ada3b4e99cdf4300c169d075e7ff20cd60991",
+        "sha256": "510fea31e2eff44319a31e21dcd035c0d68611998bbcac4df67d858818746b6a",
         "size_bytes": 8095
       },
       {
-        "md5": "674938292048a5c6e04ae49a71e26df3",
+        "md5": "23d3fed86085049d54c4a56c84edd268",
         "path": "04_analysis_datasets/programs/r/v_adex_validation.log",
         "present": true,
-        "sha256": "57722fc7c41e08cba09e8bb4b54694e8fe9d7905bbc4879878177579a03e9818",
+        "sha256": "3a7ba8b4e577733b9d7a13e17c606e5f819dc08c4f9877a837ed46e1d09f79ab",
         "size_bytes": 8251
       },
       {
-        "md5": "4b633c0b86468ba4f0376e1bd82c85e1",
+        "md5": "882082f536e92f3be2483b11070a0864",
         "path": "04_analysis_datasets/programs/r/v_adlb_validation.log",
         "present": true,
-        "sha256": "8ff7a02e19577575ba109096b46ffaae3dac4958d6696e93dec52acc260d2f75",
+        "sha256": "f50eb87d9a74f2e9cc189545638c0582135b4bbfd267a973b6d8a14ab05f83a2",
         "size_bytes": 8258
       },
       {
-        "md5": "346b8cad1d6e714659316c557c223d80",
+        "md5": "dab0e58ed595870a6cf6f5e52ff0a6fe",
         "path": "04_analysis_datasets/programs/r/v_adrs_validation.log",
         "present": true,
-        "sha256": "2199f95c212a4ea113cca38c66071b704a35bb2e644d50dbd14c27e81ccab811",
+        "sha256": "408fb0e748779923cfb4c3aa84c7bd573429d7f4e2a556e97d5100a78d509c8f",
         "size_bytes": 8196
       },
       {
-        "md5": "e92e8ec520133ee55f1ae52ea5256549",
+        "md5": "07cc7d5868e7de643e8e9c712ee32fdd",
         "path": "04_analysis_datasets/programs/r/v_adsl_validation.log",
         "present": true,
-        "sha256": "f8528e323dc11a90bf83710465b70e6455e845331393be0419ca58239ec2412d",
+        "sha256": "d507203128205d63663c5d6506975931ec866a33d8c4a36f0beb485845631736",
         "size_bytes": 8457
       },
       {
-        "md5": "2d17e8bc1df9d20e38071968e93199e4",
+        "md5": "000714fbdbcec2fe5c48cf48c2408048",
         "path": "04_analysis_datasets/programs/r/v_adtte_validation.log",
         "present": true,
-        "sha256": "6cf826ce1ef43878d6a15563a09f114ac47966d4ca7e4f7d74a2ce7c1f43f05b",
+        "sha256": "f83f81b85d166c04828ba46456071bc3ecc015a4e13fb2a7eb5b5cbacc0b1acb",
         "size_bytes": 8341
       },
       {
-        "md5": "d20edd4f4d064c6280d17b3c835396a8",
+        "md5": "07703365428ba87c7bd75443502c11c5",
         "path": "04_analysis_datasets/programs/r/v_bimo_validation.log",
         "present": true,
-        "sha256": "75fdf525ef1a99a9fe3ae5316432727270917e7a5feb739148586fd7f8183a2f",
+        "sha256": "cb9a40ffb3948920ded7ba1e01a8f79ec81e31ab1bfb2a8a0cfd53d498a02372",
         "size_bytes": 7586
       },
       {
-        "md5": "91a984c4007ca2ff835369e4e0158edd",
+        "md5": "cdb7c686fe914b816b5907b9729419db",
         "path": "04_analysis_datasets/programs/r/v_sdtm_validation.log",
         "present": true,
-        "sha256": "609a4ef24fb6363acf7391f1790ec4652316c699074205d8a251f5d64af145ad",
+        "sha256": "6dd42bc29e9a1174062e4984643674d3f92b7e1dd9c49bde679932d7da2608a8",
         "size_bytes": 8114
       },
       {
-        "md5": "28a46b1559f8d1b68c03769e120b3961",
+        "md5": "16b27b7a6235b2d41afd1c9350d88bcb",
         "path": "04_analysis_datasets/programs/r/v_staging_ingest.log",
         "present": true,
-        "sha256": "e415707c515fe90afc69253f75a473fb3f9097f56ce4df6f187dde5fe21228d3",
+        "sha256": "f617950064d33ed258a42d5a757bffa6054bb20b4839c764b8f94d4d590841aa",
         "size_bytes": 8851
       },
       {
-        "md5": "6dca92590504d6cd40d0ada6f415932f",
+        "md5": "387635d58369730c0d8f77284e0facc4",
         "path": "06_qc_evidence/reconciliation/cross_lang_audit.log",
         "present": true,
-        "sha256": "eed464b65e969ab9343513e84b4980bdf07f49871afc69ab2e9b1c1de36ef75a",
+        "sha256": "d58aec4c06a8f6ff94fbccb20a8207e943ef9a4d0403bf2128986eeb51944401",
         "size_bytes": 9190
       },
       {
-        "md5": "c197efea97ea7ce3367a5cb75e5b42a6",
+        "md5": "883e8f045df931a30a7e021ef24f3548",
         "path": "06_qc_evidence/reconciliation/results_reconcile.log",
         "present": true,
-        "sha256": "287609bcada6383b26d13aeead3a7f53dcfc5f871cf99e75a6940543ac339e85",
+        "sha256": "2da14bbbdf53a8960361c3e54466144e4c0996110ffbbdbaae2e18b2c981c93e",
         "size_bytes": 8267
       }
     ],
     "package_files": [
       {
-        "md5": "7e2a8dd7b74e8207d1db7946f0051141",
+        "md5": "4f427b8ba4b207a759ed9573ac023d6a",
         "path": "08_submission_package/ectd/0000/index-md5.txt",
         "present": true,
-        "sha256": "badaca410f89d3f41f9b21e7149c354fc4753ee97ee75e1eb7962a9827fe64f0",
+        "sha256": "57ca6be13fbf1420dad94accdbae39abcdcab45f06340d0da2ccd54b857d5d0c",
         "size_bytes": 33
       },
       {
-        "md5": "9c3635f53d3e670ee6bb9eadcdcac3d8",
+        "md5": "f18add483b3d8baa57894f18a4333e54",
         "path": "08_submission_package/ectd/0000/index.xml",
         "present": true,
-        "sha256": "3ec803ead57087a64e99f88e086e293c4af61ec41d592f283dacaafb9311bb86",
-        "size_bytes": 27916
+        "sha256": "b19a7b451eaa0cc8ad71b28b9fade588a98737f1ca9b8f3f9bac7a08ff87a391",
+        "size_bytes": 28204
       },
       {
         "md5": "ced809a3748e23e3498aaea604076248",
@@ -976,11 +1011,11 @@
         "size_bytes": 1809
       },
       {
-        "md5": "55ff7d67d2ad5da276dae05928d1ce29",
+        "md5": "07fae7a2dcd96da496ea79dd686f87ee",
         "path": "08_submission_package/ectd/0000/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
         "present": true,
-        "sha256": "a38d1b8d2442889ad835e4d2f98e766fd38e5bf1df0c1a3949b978b537869c55",
-        "size_bytes": 100734
+        "sha256": "a619ded41f37411c132d752237c2a6773bc709e8c12a61ca2083a69323836f6b",
+        "size_bytes": 100574
       },
       {
         "md5": "503d6eb50baa2ea6e997d771e39d8ebb",
@@ -1074,11 +1109,11 @@
         "size_bytes": 306238
       },
       {
-        "md5": "7ab7f429c334d73cf70a256c1b66d187",
+        "md5": "7aba54f759eb78c5424b811924bb8741",
         "path": "08_submission_package/ectd/0000/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/stf-tropic.xml",
         "present": true,
-        "sha256": "47f2350437d0f6466a64c6b91c9da447119b375782f9b37001cfbda370fafda8",
-        "size_bytes": 13436
+        "sha256": "696bf71ac3dbfea518d3884d4dc83f331124f39c408da930c0f56911906577e1",
+        "size_bytes": 13577
       },
       {
         "md5": "56c42ad80fc173326853dc2d4b5be869",
@@ -1109,74 +1144,74 @@
         "size_bytes": 2665
       },
       {
-        "md5": "847b0d5414ab625c5fc95401f661f955",
+        "md5": "df49adc0bbf6f1c550e3a5cb4e71400a",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/ADaM_spec.xlsx",
         "present": true,
-        "sha256": "e2b95312f1191849713c7596ccdfb4c2ede400e4ff5cd17dabb9776631eea9e7",
-        "size_bytes": 36520
+        "sha256": "2276b3df2d9277f8c2160d4dacdd07f34ae8e7c40f4b0c0d81071ca855c9bca7",
+        "size_bytes": 36524
       },
       {
-        "md5": "712be3b96b127d5f2932d0f465b23b3b",
+        "md5": "fca0ee6fef381167ea022c10e05f4bc8",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/adrg.pdf",
         "present": true,
-        "sha256": "073e711885ac0dd3f8f7aeb9207b3519ffcce3feaa3bbc1e8704f7a4d401bdc3",
-        "size_bytes": 148293
+        "sha256": "a654ae97d4c00790f5821b4a2093864ef87307d1b2abc0396cf75a8f90ef3160",
+        "size_bytes": 148222
       },
       {
-        "md5": "ebc8aa81945cf36b14fd530772af4791",
+        "md5": "8379a5182d43fe766f5a824e55b386aa",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/datasets/adae.xpt",
         "present": true,
-        "sha256": "68930182d295284472467cb8328d148aff5dc4b4487b4e1ce017ec635e53ddef",
+        "sha256": "0ed941880c91ce8ce94a751e6acb91306a241bf6ce864e7f97b09488c421c4dc",
         "size_bytes": 3647040
       },
       {
-        "md5": "416de24b8944846d8eec3b68e3d7c33f",
+        "md5": "e298b072cb65b9b3be1184176d96795a",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/datasets/adcm.xpt",
         "present": true,
-        "sha256": "ce22a7bdc1e30613b307f66fcb9a5206026483e1105710741ff9aeaecd2bce51",
+        "sha256": "42efe96796572e0044450ea1f838efbc7884d8f453dd5b09694a40b5041618c9",
         "size_bytes": 14355360
       },
       {
-        "md5": "14b14ae4a4d9215403e913ef5d13a084",
+        "md5": "cc3048543a3d8070aae1b556e13bf621",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/datasets/adex.xpt",
         "present": true,
-        "sha256": "c5846e4ffbfc47fbaabd91dd55f6ff75db09f98df086a9e1ec91b58022873e28",
+        "sha256": "1cac2fcf52782f01adefb8df890064017b96fb64171ad00ff23e6361e02bd377",
         "size_bytes": 2333120
       },
       {
-        "md5": "a376c78f99d970c8831c9b757a6a1438",
+        "md5": "604b98ae3909ddcdf19d9c681f9e16d2",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/datasets/adlb.xpt",
         "present": true,
-        "sha256": "7077b052e9483323fcbc121571c18fb3b52f0309065979e181287603b3003224",
+        "sha256": "71f0d7f016b81209372a38529355e129736dbed2c31781b12dc9b5335f95edc5",
         "size_bytes": 45918160
       },
       {
-        "md5": "8ed69641d53fb72016568d374549e659",
+        "md5": "fb23ec7a911ee56dcde8e8f6c5bfb27e",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/datasets/adrs.xpt",
         "present": true,
-        "sha256": "f337dd46fdfa4befc59bfb764d454ca7d694330ef72648969d61f79737ceec98",
+        "sha256": "2bb24d70cff299b755a70c94c2d46874679b5ca73045d6f3fbef2591a3a3640e",
         "size_bytes": 724720
       },
       {
-        "md5": "f281078bdbe258bd25236439f7df8865",
+        "md5": "10b956d9b60193635c257369d86a39b1",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/datasets/adsl.xpt",
         "present": true,
-        "sha256": "de988b6c4be9f2d00134160947c74a891c00c84a5fb71ae76bb87660f9383490",
+        "sha256": "ff0232e2d7358ac4a9cf2d607802a9a3d9c342d48928e28d2fbe1d7941b62c91",
         "size_bytes": 185840
       },
       {
-        "md5": "1dc688418ec3d9d224879944344ac951",
+        "md5": "b1503f8ca82010573c20bf5897ebd9b5",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/datasets/adtte.xpt",
         "present": true,
-        "sha256": "a98651721fa8db4d3ed30b39dcfb18ac3635284a76cc4337fd1abe4f15d5c582",
+        "sha256": "e53d06e57d74ea148a93ae5425a7ac551e9732db12b41539e4ff5385f9a5e8b1",
         "size_bytes": 996240
       },
       {
-        "md5": "fe1d378a04060c5ba5b83f673f46567b",
+        "md5": "3ac03b8869bd17a4ddf39d4e2669de73",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/datasets/define.xml",
         "present": true,
-        "sha256": "e95ec20c86556c442f6e0381dc5bbc0a5f74eff66688629f454d6224b270783a",
-        "size_bytes": 120524
+        "sha256": "74256966d9247f117ffba4a52712733bd42abc11f5aca5061aa73e210e7db204",
+        "size_bytes": 120605
       },
       {
         "md5": "16521f8975f25c1c9f30c90025b72d83",
@@ -1207,18 +1242,18 @@
         "size_bytes": 2588
       },
       {
-        "md5": "0f1b06d2ee2410200bb1efaa56ae0983",
+        "md5": "8fed08140b543f1e70ad7569c2421307",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/programs/A_adae_io_respec.sas",
         "present": true,
-        "sha256": "170e8b1d5c82e4827f4f08c11a28c8cead688ad6980289026817486f0b6b0275",
-        "size_bytes": 10560
+        "sha256": "88e34689bcd831a3e1b2df5929b21b55ad73dfde8337859cf7f3714bcef1f970",
+        "size_bytes": 10579
       },
       {
-        "md5": "356496e92952cd55d1778f0b1676ce9d",
+        "md5": "6f24d0a9afc878408bb5e58a17e62ce4",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/programs/A_adcm_generation.sas",
         "present": true,
-        "sha256": "eed758fd6a5bfe332a3115cc7c1acdc43a344d346c13c9ff72a0ea6f7a527bef",
-        "size_bytes": 3849
+        "sha256": "9f043a861fc10fb1bde41cd26402290baf40e8482dcddc45bede7ba5cbfefab7",
+        "size_bytes": 3857
       },
       {
         "md5": "87b8d90e937a96e7d131082edbbb8479",
@@ -1228,11 +1263,11 @@
         "size_bytes": 7808
       },
       {
-        "md5": "0d273da8cf8152dc44b0b841f96a3b34",
+        "md5": "960703f14c1577ef9bb0f76db071d446",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/programs/A_adlb_generation.sas",
         "present": true,
-        "sha256": "bbc5fc7f83268be73271b6ecf6812d0b3abb2d9d1c5b9456c93d64bad24bcd1d",
-        "size_bytes": 10691
+        "sha256": "0a2adab36c458a94d9c5b548b305f5b4ac44de9d7bd1730bafb26862b49cdaf2",
+        "size_bytes": 10793
       },
       {
         "md5": "3026905bd3d2bdb8b0cea556b89cdb6d",
@@ -1298,11 +1333,11 @@
         "size_bytes": 3056
       },
       {
-        "md5": "f56418c01fc8dd73d892e12d5398f3f8",
+        "md5": "e8422663fab120d2b4d1ce6ac80e43a1",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/programs/_adam_labels.sas",
         "present": true,
-        "sha256": "42223a8952c220bdb28efb934456a36069818b013919a5e63ec61cad350242a2",
-        "size_bytes": 9653
+        "sha256": "dd5f0bd75cea4652edc06f8c6b669da38c1411cd91f4204036d1c6d91774edfc",
+        "size_bytes": 9650
       },
       {
         "md5": "bae4c53629876b70c43d5bb35d431267",
@@ -1347,6 +1382,13 @@
         "size_bytes": 29713
       },
       {
+        "md5": "d27d3b79f8d65c532eca2bdfd24c249c",
+        "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/programs/lab_shift_table.R",
+        "present": true,
+        "sha256": "83c99348107320363ffbba484c10437f64c02c13897adce77d538a7800c387de",
+        "size_bytes": 3954
+      },
+      {
         "md5": "6d5bca1cada09996fc752a065e3a52c7",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/programs/load_spec.R",
         "present": true,
@@ -1361,11 +1403,11 @@
         "size_bytes": 7691
       },
       {
-        "md5": "e6fc0482f28114c95e54f1738c738e1c",
+        "md5": "abb37f653afe51b7949f03b14183e6a6",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/programs/tfl_generation.R",
         "present": true,
-        "sha256": "2d18ce3725fafb40690dad883411c60374f86b22d8778b5f427fd876d794dc0a",
-        "size_bytes": 64358
+        "sha256": "4b84846ab154e396137bf85d11f958e53e2260cb881089fac0418e01e3abd0e9",
+        "size_bytes": 64389
       },
       {
         "md5": "9f265bbc28c4ed9413f6404d7c5308bc",
@@ -1375,18 +1417,18 @@
         "size_bytes": 2916
       },
       {
-        "md5": "6bbe1167962984972734ab0af0f2664a",
+        "md5": "a66092cc5706f0dfe7ef559e02243f82",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/programs/v_adae_io_validation.R",
         "present": true,
-        "sha256": "d33b751fa5efe96a5b6659eb15bc65adbae4337dbdafbe3d24f35fa5c332d585",
-        "size_bytes": 10483
+        "sha256": "2fcc95a151384090caf210cf0342300726ee03251b3a1497520a4af05143fa52",
+        "size_bytes": 10503
       },
       {
-        "md5": "e95a564c385f33d99444506ab4c234dd",
+        "md5": "d01f90e446414528e5eb6df9405428f5",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/programs/v_adcm_validation.R",
         "present": true,
-        "sha256": "ce098ee569f908e3cc74c6723435cc9619cb7daf83fd41f75ac5be680b862280",
-        "size_bytes": 3244
+        "sha256": "d7223e7bc304e83c08a08b40d2395c7c5dd5fd5a0040f020eb76a0c1bdc4daa0",
+        "size_bytes": 3254
       },
       {
         "md5": "e1101b8010792219c417de693442a35f",
@@ -1396,11 +1438,11 @@
         "size_bytes": 7502
       },
       {
-        "md5": "e279b305af930c1a016b910c38f1d248",
+        "md5": "a9ce1d13bca8f0f244c4bf66c55a8ab4",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/programs/v_adlb_validation.R",
         "present": true,
-        "sha256": "7610d979b3debf6b09472edefdfe7233a707ac2b2a1ae416753b1efcac7db385",
-        "size_bytes": 7734
+        "sha256": "1cee99237e9e837a83e4f5388772aca78aed22ec5f774c9934383a5504475ea0",
+        "size_bytes": 7791
       },
       {
         "md5": "c4a6ea86a087f36e21c3c5274ed64cbb",
@@ -1445,17 +1487,17 @@
         "size_bytes": 3152
       },
       {
-        "md5": "51b88c578ca78f68b856b63b3b06441e",
+        "md5": "b8e733acb46b5a33f89a2ec4d9ce24de",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
         "present": true,
-        "sha256": "4c1b8f0136baefadfec1ec312d6c9cc1a5fc5cd4946409025445e967992ececd",
-        "size_bytes": 81537
+        "sha256": "664c93083ee2033d0408d415161341cd4771d9c967a32d0e9f214bb512d2fec1",
+        "size_bytes": 81419
       },
       {
-        "md5": "0ef46d9143fc2154dbbf36089e55828e",
+        "md5": "10cd6ed9cfd2fbb8ee366b59dc784e96",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/bimo/datasets/clinsite.xpt",
         "present": true,
-        "sha256": "50115ca94ac4af11eead4c0e7b306217846c5e5a106cf56cb2f5f1c36583d79b",
+        "sha256": "3d16fd7ee3075f0c2913d6d49cb7056f35419db89c9a1bf4da5827fa45f9661b",
         "size_bytes": 10880
       },
       {
@@ -1464,6 +1506,13 @@
         "present": true,
         "sha256": "8fea63476ece57b0eec4dab395e2ad4e7f63ddb4bc137a72919060b439c6a4fc",
         "size_bytes": 3577369
+      },
+      {
+        "md5": "41fdc0ae7488cc50277964bc3e8bb7cc",
+        "path": "08_submission_package/ectd/0000/m5/datasets/tropic/tabulations/sdtm/csdrg.pdf",
+        "present": true,
+        "sha256": "8004b87552bfab9bfc29366f1655cb17eae8b75c4d138f1eb8b40de455c6639b",
+        "size_bytes": 106524
       },
       {
         "md5": "92338ade654983a9c9cf63a0a862f9dc",
@@ -1606,13 +1655,6 @@
         "size_bytes": 3074240
       },
       {
-        "md5": "df2f3141672605309a6210d87edb2245",
-        "path": "08_submission_package/ectd/0000/m5/datasets/tropic/tabulations/sdtm/sdrg.pdf",
-        "present": true,
-        "sha256": "77f449055f0070b7c9865d653c9b9216f184140ca83d1f48291f69ebb008663e",
-        "size_bytes": 106064
-      },
-      {
         "md5": "c72fbe552dde19bba528f49267ad2967",
         "path": "08_submission_package/ectd/0000/util/dtd/ich-ectd-3-2.dtd",
         "present": true,
@@ -1655,11 +1697,11 @@
         "size_bytes": 43493
       },
       {
-        "md5": "55ff7d67d2ad5da276dae05928d1ce29",
+        "md5": "07fae7a2dcd96da496ea79dd686f87ee",
         "path": "08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
         "present": true,
-        "sha256": "a38d1b8d2442889ad835e4d2f98e766fd38e5bf1df0c1a3949b978b537869c55",
-        "size_bytes": 100734
+        "sha256": "a619ded41f37411c132d752237c2a6773bc709e8c12a61ca2083a69323836f6b",
+        "size_bytes": 100574
       },
       {
         "md5": "503d6eb50baa2ea6e997d771e39d8ebb",
@@ -1781,74 +1823,74 @@
         "size_bytes": 2665
       },
       {
-        "md5": "847b0d5414ab625c5fc95401f661f955",
+        "md5": "df49adc0bbf6f1c550e3a5cb4e71400a",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/ADaM_spec.xlsx",
         "present": true,
-        "sha256": "e2b95312f1191849713c7596ccdfb4c2ede400e4ff5cd17dabb9776631eea9e7",
-        "size_bytes": 36520
+        "sha256": "2276b3df2d9277f8c2160d4dacdd07f34ae8e7c40f4b0c0d81071ca855c9bca7",
+        "size_bytes": 36524
       },
       {
-        "md5": "712be3b96b127d5f2932d0f465b23b3b",
+        "md5": "fca0ee6fef381167ea022c10e05f4bc8",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
         "present": true,
-        "sha256": "073e711885ac0dd3f8f7aeb9207b3519ffcce3feaa3bbc1e8704f7a4d401bdc3",
-        "size_bytes": 148293
+        "sha256": "a654ae97d4c00790f5821b4a2093864ef87307d1b2abc0396cf75a8f90ef3160",
+        "size_bytes": 148222
       },
       {
-        "md5": "ebc8aa81945cf36b14fd530772af4791",
+        "md5": "8379a5182d43fe766f5a824e55b386aa",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/datasets/adae.xpt",
         "present": true,
-        "sha256": "68930182d295284472467cb8328d148aff5dc4b4487b4e1ce017ec635e53ddef",
+        "sha256": "0ed941880c91ce8ce94a751e6acb91306a241bf6ce864e7f97b09488c421c4dc",
         "size_bytes": 3647040
       },
       {
-        "md5": "416de24b8944846d8eec3b68e3d7c33f",
+        "md5": "e298b072cb65b9b3be1184176d96795a",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/datasets/adcm.xpt",
         "present": true,
-        "sha256": "ce22a7bdc1e30613b307f66fcb9a5206026483e1105710741ff9aeaecd2bce51",
+        "sha256": "42efe96796572e0044450ea1f838efbc7884d8f453dd5b09694a40b5041618c9",
         "size_bytes": 14355360
       },
       {
-        "md5": "14b14ae4a4d9215403e913ef5d13a084",
+        "md5": "cc3048543a3d8070aae1b556e13bf621",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/datasets/adex.xpt",
         "present": true,
-        "sha256": "c5846e4ffbfc47fbaabd91dd55f6ff75db09f98df086a9e1ec91b58022873e28",
+        "sha256": "1cac2fcf52782f01adefb8df890064017b96fb64171ad00ff23e6361e02bd377",
         "size_bytes": 2333120
       },
       {
-        "md5": "a376c78f99d970c8831c9b757a6a1438",
+        "md5": "604b98ae3909ddcdf19d9c681f9e16d2",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/datasets/adlb.xpt",
         "present": true,
-        "sha256": "7077b052e9483323fcbc121571c18fb3b52f0309065979e181287603b3003224",
+        "sha256": "71f0d7f016b81209372a38529355e129736dbed2c31781b12dc9b5335f95edc5",
         "size_bytes": 45918160
       },
       {
-        "md5": "8ed69641d53fb72016568d374549e659",
+        "md5": "fb23ec7a911ee56dcde8e8f6c5bfb27e",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/datasets/adrs.xpt",
         "present": true,
-        "sha256": "f337dd46fdfa4befc59bfb764d454ca7d694330ef72648969d61f79737ceec98",
+        "sha256": "2bb24d70cff299b755a70c94c2d46874679b5ca73045d6f3fbef2591a3a3640e",
         "size_bytes": 724720
       },
       {
-        "md5": "f281078bdbe258bd25236439f7df8865",
+        "md5": "10b956d9b60193635c257369d86a39b1",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/datasets/adsl.xpt",
         "present": true,
-        "sha256": "de988b6c4be9f2d00134160947c74a891c00c84a5fb71ae76bb87660f9383490",
+        "sha256": "ff0232e2d7358ac4a9cf2d607802a9a3d9c342d48928e28d2fbe1d7941b62c91",
         "size_bytes": 185840
       },
       {
-        "md5": "1dc688418ec3d9d224879944344ac951",
+        "md5": "b1503f8ca82010573c20bf5897ebd9b5",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/datasets/adtte.xpt",
         "present": true,
-        "sha256": "a98651721fa8db4d3ed30b39dcfb18ac3635284a76cc4337fd1abe4f15d5c582",
+        "sha256": "e53d06e57d74ea148a93ae5425a7ac551e9732db12b41539e4ff5385f9a5e8b1",
         "size_bytes": 996240
       },
       {
-        "md5": "fe1d378a04060c5ba5b83f673f46567b",
+        "md5": "3ac03b8869bd17a4ddf39d4e2669de73",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/datasets/define.xml",
         "present": true,
-        "sha256": "e95ec20c86556c442f6e0381dc5bbc0a5f74eff66688629f454d6224b270783a",
-        "size_bytes": 120524
+        "sha256": "74256966d9247f117ffba4a52712733bd42abc11f5aca5061aa73e210e7db204",
+        "size_bytes": 120605
       },
       {
         "md5": "16521f8975f25c1c9f30c90025b72d83",
@@ -1879,18 +1921,18 @@
         "size_bytes": 2588
       },
       {
-        "md5": "0f1b06d2ee2410200bb1efaa56ae0983",
+        "md5": "8fed08140b543f1e70ad7569c2421307",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/programs/A_adae_io_respec.sas",
         "present": true,
-        "sha256": "170e8b1d5c82e4827f4f08c11a28c8cead688ad6980289026817486f0b6b0275",
-        "size_bytes": 10560
+        "sha256": "88e34689bcd831a3e1b2df5929b21b55ad73dfde8337859cf7f3714bcef1f970",
+        "size_bytes": 10579
       },
       {
-        "md5": "356496e92952cd55d1778f0b1676ce9d",
+        "md5": "6f24d0a9afc878408bb5e58a17e62ce4",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/programs/A_adcm_generation.sas",
         "present": true,
-        "sha256": "eed758fd6a5bfe332a3115cc7c1acdc43a344d346c13c9ff72a0ea6f7a527bef",
-        "size_bytes": 3849
+        "sha256": "9f043a861fc10fb1bde41cd26402290baf40e8482dcddc45bede7ba5cbfefab7",
+        "size_bytes": 3857
       },
       {
         "md5": "87b8d90e937a96e7d131082edbbb8479",
@@ -1900,11 +1942,11 @@
         "size_bytes": 7808
       },
       {
-        "md5": "0d273da8cf8152dc44b0b841f96a3b34",
+        "md5": "960703f14c1577ef9bb0f76db071d446",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/programs/A_adlb_generation.sas",
         "present": true,
-        "sha256": "bbc5fc7f83268be73271b6ecf6812d0b3abb2d9d1c5b9456c93d64bad24bcd1d",
-        "size_bytes": 10691
+        "sha256": "0a2adab36c458a94d9c5b548b305f5b4ac44de9d7bd1730bafb26862b49cdaf2",
+        "size_bytes": 10793
       },
       {
         "md5": "3026905bd3d2bdb8b0cea556b89cdb6d",
@@ -1970,11 +2012,11 @@
         "size_bytes": 3056
       },
       {
-        "md5": "f56418c01fc8dd73d892e12d5398f3f8",
+        "md5": "e8422663fab120d2b4d1ce6ac80e43a1",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/programs/_adam_labels.sas",
         "present": true,
-        "sha256": "42223a8952c220bdb28efb934456a36069818b013919a5e63ec61cad350242a2",
-        "size_bytes": 9653
+        "sha256": "dd5f0bd75cea4652edc06f8c6b669da38c1411cd91f4204036d1c6d91774edfc",
+        "size_bytes": 9650
       },
       {
         "md5": "bae4c53629876b70c43d5bb35d431267",
@@ -2019,6 +2061,13 @@
         "size_bytes": 29713
       },
       {
+        "md5": "d27d3b79f8d65c532eca2bdfd24c249c",
+        "path": "08_submission_package/m5/datasets/tropic/analysis/adam/programs/lab_shift_table.R",
+        "present": true,
+        "sha256": "83c99348107320363ffbba484c10437f64c02c13897adce77d538a7800c387de",
+        "size_bytes": 3954
+      },
+      {
         "md5": "6d5bca1cada09996fc752a065e3a52c7",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/programs/load_spec.R",
         "present": true,
@@ -2033,11 +2082,11 @@
         "size_bytes": 7691
       },
       {
-        "md5": "e6fc0482f28114c95e54f1738c738e1c",
+        "md5": "abb37f653afe51b7949f03b14183e6a6",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/programs/tfl_generation.R",
         "present": true,
-        "sha256": "2d18ce3725fafb40690dad883411c60374f86b22d8778b5f427fd876d794dc0a",
-        "size_bytes": 64358
+        "sha256": "4b84846ab154e396137bf85d11f958e53e2260cb881089fac0418e01e3abd0e9",
+        "size_bytes": 64389
       },
       {
         "md5": "9f265bbc28c4ed9413f6404d7c5308bc",
@@ -2047,18 +2096,18 @@
         "size_bytes": 2916
       },
       {
-        "md5": "6bbe1167962984972734ab0af0f2664a",
+        "md5": "a66092cc5706f0dfe7ef559e02243f82",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/programs/v_adae_io_validation.R",
         "present": true,
-        "sha256": "d33b751fa5efe96a5b6659eb15bc65adbae4337dbdafbe3d24f35fa5c332d585",
-        "size_bytes": 10483
+        "sha256": "2fcc95a151384090caf210cf0342300726ee03251b3a1497520a4af05143fa52",
+        "size_bytes": 10503
       },
       {
-        "md5": "e95a564c385f33d99444506ab4c234dd",
+        "md5": "d01f90e446414528e5eb6df9405428f5",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/programs/v_adcm_validation.R",
         "present": true,
-        "sha256": "ce098ee569f908e3cc74c6723435cc9619cb7daf83fd41f75ac5be680b862280",
-        "size_bytes": 3244
+        "sha256": "d7223e7bc304e83c08a08b40d2395c7c5dd5fd5a0040f020eb76a0c1bdc4daa0",
+        "size_bytes": 3254
       },
       {
         "md5": "e1101b8010792219c417de693442a35f",
@@ -2068,11 +2117,11 @@
         "size_bytes": 7502
       },
       {
-        "md5": "e279b305af930c1a016b910c38f1d248",
+        "md5": "a9ce1d13bca8f0f244c4bf66c55a8ab4",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/programs/v_adlb_validation.R",
         "present": true,
-        "sha256": "7610d979b3debf6b09472edefdfe7233a707ac2b2a1ae416753b1efcac7db385",
-        "size_bytes": 7734
+        "sha256": "1cee99237e9e837a83e4f5388772aca78aed22ec5f774c9934383a5504475ea0",
+        "size_bytes": 7791
       },
       {
         "md5": "c4a6ea86a087f36e21c3c5274ed64cbb",
@@ -2117,17 +2166,17 @@
         "size_bytes": 3152
       },
       {
-        "md5": "51b88c578ca78f68b856b63b3b06441e",
+        "md5": "b8e733acb46b5a33f89a2ec4d9ce24de",
         "path": "08_submission_package/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
         "present": true,
-        "sha256": "4c1b8f0136baefadfec1ec312d6c9cc1a5fc5cd4946409025445e967992ececd",
-        "size_bytes": 81537
+        "sha256": "664c93083ee2033d0408d415161341cd4771d9c967a32d0e9f214bb512d2fec1",
+        "size_bytes": 81419
       },
       {
-        "md5": "0ef46d9143fc2154dbbf36089e55828e",
+        "md5": "10cd6ed9cfd2fbb8ee366b59dc784e96",
         "path": "08_submission_package/m5/datasets/tropic/bimo/datasets/clinsite.xpt",
         "present": true,
-        "sha256": "50115ca94ac4af11eead4c0e7b306217846c5e5a106cf56cb2f5f1c36583d79b",
+        "sha256": "3d16fd7ee3075f0c2913d6d49cb7056f35419db89c9a1bf4da5827fa45f9661b",
         "size_bytes": 10880
       },
       {
@@ -2136,6 +2185,13 @@
         "present": true,
         "sha256": "8fea63476ece57b0eec4dab395e2ad4e7f63ddb4bc137a72919060b439c6a4fc",
         "size_bytes": 3577369
+      },
+      {
+        "md5": "41fdc0ae7488cc50277964bc3e8bb7cc",
+        "path": "08_submission_package/m5/datasets/tropic/tabulations/sdtm/csdrg.pdf",
+        "present": true,
+        "sha256": "8004b87552bfab9bfc29366f1655cb17eae8b75c4d138f1eb8b40de455c6639b",
+        "size_bytes": 106524
       },
       {
         "md5": "92338ade654983a9c9cf63a0a862f9dc",
@@ -2276,13 +2332,6 @@
         "present": true,
         "sha256": "2156b45b2b64ed30167e8a5422c01720f7af4280ac26a72bff3d75a7681105c1",
         "size_bytes": 3074240
-      },
-      {
-        "md5": "df2f3141672605309a6210d87edb2245",
-        "path": "08_submission_package/m5/datasets/tropic/tabulations/sdtm/sdrg.pdf",
-        "present": true,
-        "sha256": "77f449055f0070b7c9865d653c9b9216f184140ca83d1f48291f69ebb008663e",
-        "size_bytes": 106064
       }
     ],
     "pipeline_controls": [
@@ -2294,11 +2343,11 @@
         "size_bytes": 106
       },
       {
-        "md5": "1a33d40f2e108187cd764773dfe33979",
+        "md5": "391fd99cd9555a6d983395879b3c7584",
         "path": ".github/workflows/ci.yml",
         "present": true,
-        "sha256": "f5c2785810d9cd23e059cc74507b3049febc0e423b86ac9f6269839fb1a7c4c3",
-        "size_bytes": 13234
+        "sha256": "9361cc1b23b7392d7abcc4c5a3cfadac476060dfe95a62d41a3d6d766f017bc4",
+        "size_bytes": 13439
       },
       {
         "md5": "6751e3974d3e000a451141344a5b220e",
@@ -2329,18 +2378,18 @@
         "size_bytes": 252146
       },
       {
-        "md5": "7f5fcfe3ccaff6bdd5694cdb52f56439",
+        "md5": "b4193ed217756078cff4376c51a7529a",
         "path": "scripts/rebind_governance_seal.py",
         "present": true,
-        "sha256": "150f47358afee0806859c0980fac35b51bb829e1125bddce3a8ea805621e1835",
-        "size_bytes": 3652
+        "sha256": "6d33029adeada3080a2e65b48e7be055be987d4e5e96755b1a2726ec2e7c5e0c",
+        "size_bytes": 4993
       },
       {
-        "md5": "5dc986c69efa6ce8f8e7fe8150a65bb2",
+        "md5": "8df7caedb96d81ea7017354f7c62eb0e",
         "path": "scripts/verify_release.py",
         "present": true,
-        "sha256": "ff84d3bdd090038205c31e1255f8635d03ddcd0d8cf1ce5f883aaaf1918f00d7",
-        "size_bytes": 17687
+        "sha256": "a9b090decfb6571b7b1b90be8681c31b07572f0308d2cea4f503409794c29736",
+        "size_bytes": 17851
       }
     ],
     "programs": [
@@ -2359,18 +2408,18 @@
         "size_bytes": 2588
       },
       {
-        "md5": "0f1b06d2ee2410200bb1efaa56ae0983",
+        "md5": "8fed08140b543f1e70ad7569c2421307",
         "path": "04_analysis_datasets/programs/sas/A_adae_io_respec.sas",
         "present": true,
-        "sha256": "170e8b1d5c82e4827f4f08c11a28c8cead688ad6980289026817486f0b6b0275",
-        "size_bytes": 10560
+        "sha256": "88e34689bcd831a3e1b2df5929b21b55ad73dfde8337859cf7f3714bcef1f970",
+        "size_bytes": 10579
       },
       {
-        "md5": "356496e92952cd55d1778f0b1676ce9d",
+        "md5": "6f24d0a9afc878408bb5e58a17e62ce4",
         "path": "04_analysis_datasets/programs/sas/A_adcm_generation.sas",
         "present": true,
-        "sha256": "eed758fd6a5bfe332a3115cc7c1acdc43a344d346c13c9ff72a0ea6f7a527bef",
-        "size_bytes": 3849
+        "sha256": "9f043a861fc10fb1bde41cd26402290baf40e8482dcddc45bede7ba5cbfefab7",
+        "size_bytes": 3857
       },
       {
         "md5": "87b8d90e937a96e7d131082edbbb8479",
@@ -2380,11 +2429,11 @@
         "size_bytes": 7808
       },
       {
-        "md5": "0d273da8cf8152dc44b0b841f96a3b34",
+        "md5": "960703f14c1577ef9bb0f76db071d446",
         "path": "04_analysis_datasets/programs/sas/A_adlb_generation.sas",
         "present": true,
-        "sha256": "bbc5fc7f83268be73271b6ecf6812d0b3abb2d9d1c5b9456c93d64bad24bcd1d",
-        "size_bytes": 10691
+        "sha256": "0a2adab36c458a94d9c5b548b305f5b4ac44de9d7bd1730bafb26862b49cdaf2",
+        "size_bytes": 10793
       },
       {
         "md5": "3026905bd3d2bdb8b0cea556b89cdb6d",
@@ -2450,11 +2499,11 @@
         "size_bytes": 3056
       },
       {
-        "md5": "f56418c01fc8dd73d892e12d5398f3f8",
+        "md5": "e8422663fab120d2b4d1ce6ac80e43a1",
         "path": "04_analysis_datasets/programs/sas/_adam_labels.sas",
         "present": true,
-        "sha256": "42223a8952c220bdb28efb934456a36069818b013919a5e63ec61cad350242a2",
-        "size_bytes": 9653
+        "sha256": "dd5f0bd75cea4652edc06f8c6b669da38c1411cd91f4204036d1c6d91774edfc",
+        "size_bytes": 9650
       },
       {
         "md5": "bae4c53629876b70c43d5bb35d431267",
@@ -2506,18 +2555,18 @@
         "size_bytes": 7691
       },
       {
-        "md5": "6bbe1167962984972734ab0af0f2664a",
+        "md5": "a66092cc5706f0dfe7ef559e02243f82",
         "path": "04_analysis_datasets/programs/r/v_adae_io_validation.R",
         "present": true,
-        "sha256": "d33b751fa5efe96a5b6659eb15bc65adbae4337dbdafbe3d24f35fa5c332d585",
-        "size_bytes": 10483
+        "sha256": "2fcc95a151384090caf210cf0342300726ee03251b3a1497520a4af05143fa52",
+        "size_bytes": 10503
       },
       {
-        "md5": "e95a564c385f33d99444506ab4c234dd",
+        "md5": "d01f90e446414528e5eb6df9405428f5",
         "path": "04_analysis_datasets/programs/r/v_adcm_validation.R",
         "present": true,
-        "sha256": "ce098ee569f908e3cc74c6723435cc9619cb7daf83fd41f75ac5be680b862280",
-        "size_bytes": 3244
+        "sha256": "d7223e7bc304e83c08a08b40d2395c7c5dd5fd5a0040f020eb76a0c1bdc4daa0",
+        "size_bytes": 3254
       },
       {
         "md5": "e1101b8010792219c417de693442a35f",
@@ -2527,11 +2576,11 @@
         "size_bytes": 7502
       },
       {
-        "md5": "e279b305af930c1a016b910c38f1d248",
+        "md5": "a9ce1d13bca8f0f244c4bf66c55a8ab4",
         "path": "04_analysis_datasets/programs/r/v_adlb_validation.R",
         "present": true,
-        "sha256": "7610d979b3debf6b09472edefdfe7233a707ac2b2a1ae416753b1efcac7db385",
-        "size_bytes": 7734
+        "sha256": "1cee99237e9e837a83e4f5388772aca78aed22ec5f774c9934383a5504475ea0",
+        "size_bytes": 7791
       },
       {
         "md5": "c4a6ea86a087f36e21c3c5274ed64cbb",
@@ -2646,11 +2695,11 @@
         "size_bytes": 7772
       },
       {
-        "md5": "d6d74bad0f73dce32849bcda7ec32ae6",
+        "md5": "e2024c05016ec2734b5d988a4a237124",
         "path": "platform/build_delivery_controls.py",
         "present": true,
-        "sha256": "8a411bb27d3a718ad33e20bdc7fa7e46545ad381b8cfcf34baf33acf879c1766",
-        "size_bytes": 5493
+        "sha256": "ec03ee451cb189070b225cdddd2a0687b54f8ae02058e45cd7a2f320b574d2ca",
+        "size_bytes": 5501
       },
       {
         "md5": "83cfaaaac1985a3960e0515497cc921c",
@@ -2660,11 +2709,11 @@
         "size_bytes": 9507
       },
       {
-        "md5": "0d09d4e2d7f1abbaa02a9d2796ec1d5a",
+        "md5": "69039fdc4950fc35bf187303a9c02fe9",
         "path": "platform/build_ectd_backbone.py",
         "present": true,
-        "sha256": "88f20127cc7bedfb221aaacbc8a5c008c9466d28185f35daa4d5dc7917151bfa",
-        "size_bytes": 20469
+        "sha256": "11c8bb31ce84fc78455e795fafb5081153a946c316f148fb196db409f873523b",
+        "size_bytes": 20480
       },
       {
         "md5": "fc4023db73ac3bdcf6278234aefaf1e1",
@@ -2688,11 +2737,11 @@
         "size_bytes": 21478
       },
       {
-        "md5": "77d02ddb73e4e5363d6ff11853200b28",
+        "md5": "37513a89c01c4eae0f3669257075e5ed",
         "path": "platform/build_release_run_manifest.py",
         "present": true,
-        "sha256": "df2352a02044353ceebdaa475f30d9967ab189bea73ab07861c19cc4e2eb7709",
-        "size_bytes": 34551
+        "sha256": "7e43d186765772e94b2ea152617d15a5d031428c5872f707acad89c05cf682e5",
+        "size_bytes": 35062
       },
       {
         "md5": "f5e1d699602ab38b23bc834f6ed430f1",
@@ -2737,11 +2786,11 @@
         "size_bytes": 4596
       },
       {
-        "md5": "02c4c76cc2bf30e15648eaeff6aeaa45",
+        "md5": "62a8982d151ba82ae7595aa9ecc4c730",
         "path": "platform/check_gate_g00_governance.py",
         "present": true,
-        "sha256": "57f8913c54f998f9835b311aa1485d9ed13565400bed02e454a6ca8262a68f7d",
-        "size_bytes": 4013
+        "sha256": "8acae0114e7bfebef05ce8ebe188928c96220b0cc3fa13e0f577b6cc21d37e5d",
+        "size_bytes": 4147
       },
       {
         "md5": "014ac5c1cce6668e280f4c249af4e6ff",
@@ -2751,11 +2800,11 @@
         "size_bytes": 8166
       },
       {
-        "md5": "42f497ca61bb7d44bb062ae879e483f6",
+        "md5": "35457f2b085d9de4d082d80a0e76a1bc",
         "path": "platform/check_gate_g07_reviewer_package.py",
         "present": true,
-        "sha256": "274fd8f59c68536b9f9795e2e8d075faf8f91da990d8a07c374d507ae57961e1",
-        "size_bytes": 16208
+        "sha256": "ee2809bdb7eca7b400165e32ba063f990108c393a0caba7d9172b9a886482a43",
+        "size_bytes": 16232
       },
       {
         "md5": "0e3c954425abe1d45501fb0345bd4ec8",
@@ -2763,6 +2812,13 @@
         "present": true,
         "sha256": "f3d7c178bd0ae01f12de8c204213a85133c7da0747aaed84e94602267c8c7324",
         "size_bytes": 12792
+      },
+      {
+        "md5": "52356b1e7e11bf70d7c08edc4c6e79a4",
+        "path": "platform/check_regulatory_baseline.py",
+        "present": true,
+        "sha256": "2d07daac3dae450de274dd7049d775d017e31c8d5ce96e3eb41df66e07bc2023",
+        "size_bytes": 11447
       },
       {
         "md5": "764ba737f74cb525b6b6b21e79ce92ec",
@@ -2800,11 +2856,11 @@
         "size_bytes": 6544
       },
       {
-        "md5": "b65186296f0cbbddda55eb709664024b",
+        "md5": "ba44626de83564f93f41b938eeb9dd33",
         "path": "platform/define_arm_contract.py",
         "present": true,
-        "sha256": "6978bf5f0d7396393391112f0f2d7c0e8334ebf5a85f531808572be2e126a211",
-        "size_bytes": 7866
+        "sha256": "592e032f4784b4862b18a12ad52cb2667b1ff54713668813dd895bb14cb1579e",
+        "size_bytes": 7869
       },
       {
         "md5": "e7b7b73434cf7ab8c511eb089af004a7",
@@ -2849,11 +2905,11 @@
         "size_bytes": 27775
       },
       {
-        "md5": "3c4295722529b72fdd3249e2c7c2050f",
+        "md5": "44ab6902f8e6eb4adf89d72f765b84e0",
         "path": "platform/package_ectd.py",
         "present": true,
-        "sha256": "ec3ddb35c05755b3bdd5a1d8ea53a7ae0a23bcc09185d8feb3b8cce6572c34b1",
-        "size_bytes": 29028
+        "sha256": "1f32d2d9d08ed571eca0112068a11c09b04823f989831a9a5c0b876bc0f56e4c",
+        "size_bytes": 29179
       },
       {
         "md5": "fbd63fedb4cc478b6c6910e8afb7d2e6",
@@ -2940,18 +2996,18 @@
         "size_bytes": 12334
       },
       {
-        "md5": "c1b955835ef7b48437e3a3cbc9fe451b",
+        "md5": "d27d3b79f8d65c532eca2bdfd24c249c",
         "path": "05_outputs/tfl/lab_shift_table.R",
         "present": true,
-        "sha256": "64db4050bb7d91a51a409f781815a51b9e7238e06adb8d20058c29ea1d1832a9",
-        "size_bytes": 3520
+        "sha256": "83c99348107320363ffbba484c10437f64c02c13897adce77d538a7800c387de",
+        "size_bytes": 3954
       },
       {
-        "md5": "e6fc0482f28114c95e54f1738c738e1c",
+        "md5": "abb37f653afe51b7949f03b14183e6a6",
         "path": "05_outputs/tfl/tfl_generation.R",
         "present": true,
-        "sha256": "2d18ce3725fafb40690dad883411c60374f86b22d8778b5f427fd876d794dc0a",
-        "size_bytes": 64358
+        "sha256": "4b84846ab154e396137bf85d11f958e53e2260cb881089fac0418e01e3abd0e9",
+        "size_bytes": 64389
       },
       {
         "md5": "9f265bbc28c4ed9413f6404d7c5308bc",
@@ -2963,10 +3019,10 @@
     ],
     "qc_files": [
       {
-        "md5": "a24485dc12e63d8b81481ac538c646b7",
+        "md5": "3b48f0dbf7ce8880b5d4b80523f82bb2",
         "path": "platform/pipeline_health.json",
         "present": true,
-        "sha256": "b0dd3b34a63763c3fe5ba96ab856f067bf38bdba7a6d176f763ac920c094569f",
+        "sha256": "fb1a3cf7446672cf60dafca05f1bb1de6bbec8396e4ece93682fbf371d7234ff",
         "size_bytes": 3650
       },
       {
@@ -2991,10 +3047,10 @@
         "size_bytes": 554
       },
       {
-        "md5": "680719232f3883b63f40271fc64bc724",
+        "md5": "755a7e94d77d95ea993d34335574acba",
         "path": "platform/figure_data_reconciliation_status.json",
         "present": true,
-        "sha256": "a7956b6593548798c71ed887074fc401ed04afc03237ea1e9000e441b406b44d",
+        "sha256": "4c24b073c1e50137d4d1aa9da800f9432acffff0af3015305926782aa2d6425f",
         "size_bytes": 648
       },
       {
@@ -3005,17 +3061,17 @@
         "size_bytes": 265
       },
       {
-        "md5": "f9d4e186916aefdea8da1ab65dd9c0c2",
+        "md5": "bdfea6cc44b1b9ed30964a50f6ce3790",
         "path": "platform/conformance/spec_define_conformance.json",
         "present": true,
-        "sha256": "7f08f5b67b572eab1a405870e9704597a0ad2cd164ad2a0ae081679fd0cfbd90",
+        "sha256": "d6102941811342ea3469358fb4c7b8f75d4b8b9f8ea8a09514805ed94cac8b5c",
         "size_bytes": 258
       },
       {
-        "md5": "0fbdc5a6d92f96a3830b3f481764f697",
+        "md5": "06f2d0e291b0de1fa9ae6abf64a55589",
         "path": "platform/conformance/spec_data_conformance.json",
         "present": true,
-        "sha256": "e262db34117066832cb13ef68c935ce0010f00a0a120489e3a10322fbccc69c9",
+        "sha256": "06f4c1093ce120f70e01d505735bb3bf5c48d99f703ed432625294409d4e02d8",
         "size_bytes": 3257
       },
       {
@@ -3026,10 +3082,10 @@
         "size_bytes": 1101
       },
       {
-        "md5": "26dac66da3b0f321f3ce0abd80374e9e",
+        "md5": "d7348b6e6b85c0d93b157795630dce44",
         "path": "platform/log_cleanliness/log_cleanliness_status.json",
         "present": true,
-        "sha256": "d6c1310fc672d8a63a3a1c73d586423a4b91b1c62d690f7f73d26c953d075afe",
+        "sha256": "4fc9e9e7b6ba53262425f741552be43fe15bb64c1e1ce80e24e4d7984c6d132f",
         "size_bytes": 2979
       },
       {
@@ -3045,6 +3101,13 @@
         "present": true,
         "sha256": "2e203602d0ed6b1676c77e7c669d12645328b01079502cc9747dfac6eb584a64",
         "size_bytes": 22052
+      },
+      {
+        "md5": "91582c98e8428d51ec07ea01bd24fd15",
+        "path": "06_qc_evidence/gates/regulatory_baseline_status.json",
+        "present": true,
+        "sha256": "1fffdbd9d07222c33e7d2fa1c29b14e842cee1bf614aeba031c754c9159c9712",
+        "size_bytes": 8907
       }
     ],
     "tfl_outputs": [
@@ -3180,272 +3243,272 @@
     {
       "dataset": "ADSL",
       "package_copy": {
-        "md5": "f281078bdbe258bd25236439f7df8865",
+        "md5": "10b956d9b60193635c257369d86a39b1",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/datasets/adsl.xpt",
         "present": true,
-        "sha256": "de988b6c4be9f2d00134160947c74a891c00c84a5fb71ae76bb87660f9383490",
+        "sha256": "ff0232e2d7358ac4a9cf2d607802a9a3d9c342d48928e28d2fbe1d7941b62c91",
         "size_bytes": 185840
       },
       "package_matches_prod": true,
       "prod": {
-        "md5": "f281078bdbe258bd25236439f7df8865",
+        "md5": "10b956d9b60193635c257369d86a39b1",
         "path": "04_analysis_datasets/adam/adsl_prod.xpt",
         "present": true,
-        "sha256": "de988b6c4be9f2d00134160947c74a891c00c84a5fb71ae76bb87660f9383490",
+        "sha256": "ff0232e2d7358ac4a9cf2d607802a9a3d9c342d48928e28d2fbe1d7941b62c91",
         "size_bytes": 185840
       },
       "prod_vs_validation_distinct": true,
       "sequence_copy": {
-        "md5": "f281078bdbe258bd25236439f7df8865",
+        "md5": "10b956d9b60193635c257369d86a39b1",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/datasets/adsl.xpt",
         "present": true,
-        "sha256": "de988b6c4be9f2d00134160947c74a891c00c84a5fb71ae76bb87660f9383490",
+        "sha256": "ff0232e2d7358ac4a9cf2d607802a9a3d9c342d48928e28d2fbe1d7941b62c91",
         "size_bytes": 185840
       },
       "sequence_matches_prod": true,
       "validation": {
-        "md5": "ac133c48bb3fb7f9c1e34ac63cc0e95e",
+        "md5": "6cd5a2be3da475cf979503bc17ef6a1a",
         "path": "04_analysis_datasets/adam/adsl_v.xpt",
         "present": true,
-        "sha256": "aed0d9b28cb736596fb99403c71be063dd6ef544b942366262346f6c6f162a04",
+        "sha256": "2ef2cc41f811d099b13726e92141f09340bab3e61ecd3dea9dcbefbc0c9495bd",
         "size_bytes": 99040
       }
     },
     {
       "dataset": "ADEX",
       "package_copy": {
-        "md5": "14b14ae4a4d9215403e913ef5d13a084",
+        "md5": "cc3048543a3d8070aae1b556e13bf621",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/datasets/adex.xpt",
         "present": true,
-        "sha256": "c5846e4ffbfc47fbaabd91dd55f6ff75db09f98df086a9e1ec91b58022873e28",
+        "sha256": "1cac2fcf52782f01adefb8df890064017b96fb64171ad00ff23e6361e02bd377",
         "size_bytes": 2333120
       },
       "package_matches_prod": true,
       "prod": {
-        "md5": "14b14ae4a4d9215403e913ef5d13a084",
+        "md5": "cc3048543a3d8070aae1b556e13bf621",
         "path": "04_analysis_datasets/adam/adex_prod.xpt",
         "present": true,
-        "sha256": "c5846e4ffbfc47fbaabd91dd55f6ff75db09f98df086a9e1ec91b58022873e28",
+        "sha256": "1cac2fcf52782f01adefb8df890064017b96fb64171ad00ff23e6361e02bd377",
         "size_bytes": 2333120
       },
       "prod_vs_validation_distinct": true,
       "sequence_copy": {
-        "md5": "14b14ae4a4d9215403e913ef5d13a084",
+        "md5": "cc3048543a3d8070aae1b556e13bf621",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/datasets/adex.xpt",
         "present": true,
-        "sha256": "c5846e4ffbfc47fbaabd91dd55f6ff75db09f98df086a9e1ec91b58022873e28",
+        "sha256": "1cac2fcf52782f01adefb8df890064017b96fb64171ad00ff23e6361e02bd377",
         "size_bytes": 2333120
       },
       "sequence_matches_prod": true,
       "validation": {
-        "md5": "23ba5f19f871baf0d9e8ce9f3d2c44e5",
+        "md5": "607e6fbf48764f7b45408794584833fb",
         "path": "04_analysis_datasets/adam/adex_v.xpt",
         "present": true,
-        "sha256": "619b0c6e4d3c1bfc5e2639f1310f77f938762a5bd65649233e3df9d345ad306c",
+        "sha256": "fcc173e4799c28ec6a936d548fbeef52fdaa334ad1fc36f0348cffffa391a837",
         "size_bytes": 1230480
       }
     },
     {
       "dataset": "ADCM",
       "package_copy": {
-        "md5": "416de24b8944846d8eec3b68e3d7c33f",
+        "md5": "e298b072cb65b9b3be1184176d96795a",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/datasets/adcm.xpt",
         "present": true,
-        "sha256": "ce22a7bdc1e30613b307f66fcb9a5206026483e1105710741ff9aeaecd2bce51",
+        "sha256": "42efe96796572e0044450ea1f838efbc7884d8f453dd5b09694a40b5041618c9",
         "size_bytes": 14355360
       },
       "package_matches_prod": true,
       "prod": {
-        "md5": "416de24b8944846d8eec3b68e3d7c33f",
+        "md5": "e298b072cb65b9b3be1184176d96795a",
         "path": "04_analysis_datasets/adam/adcm_prod.xpt",
         "present": true,
-        "sha256": "ce22a7bdc1e30613b307f66fcb9a5206026483e1105710741ff9aeaecd2bce51",
+        "sha256": "42efe96796572e0044450ea1f838efbc7884d8f453dd5b09694a40b5041618c9",
         "size_bytes": 14355360
       },
       "prod_vs_validation_distinct": true,
       "sequence_copy": {
-        "md5": "416de24b8944846d8eec3b68e3d7c33f",
+        "md5": "e298b072cb65b9b3be1184176d96795a",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/datasets/adcm.xpt",
         "present": true,
-        "sha256": "ce22a7bdc1e30613b307f66fcb9a5206026483e1105710741ff9aeaecd2bce51",
+        "sha256": "42efe96796572e0044450ea1f838efbc7884d8f453dd5b09694a40b5041618c9",
         "size_bytes": 14355360
       },
       "sequence_matches_prod": true,
       "validation": {
-        "md5": "91e54074588d51587cc14b939e1abf4c",
+        "md5": "30b98dbe55d5bdbba26959f3a06d5423",
         "path": "04_analysis_datasets/adam/adcm_v.xpt",
         "present": true,
-        "sha256": "89feb95da52cd58b09a0d1112c17d1a7835dbef145fa05b0577c7fbd5f7b09ed",
+        "sha256": "689411e93357828b41530280fcb08f8287512edbc79139c8b89e06291e5bdac8",
         "size_bytes": 7338640
       }
     },
     {
       "dataset": "ADAE",
       "package_copy": {
-        "md5": "ebc8aa81945cf36b14fd530772af4791",
+        "md5": "8379a5182d43fe766f5a824e55b386aa",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/datasets/adae.xpt",
         "present": true,
-        "sha256": "68930182d295284472467cb8328d148aff5dc4b4487b4e1ce017ec635e53ddef",
+        "sha256": "0ed941880c91ce8ce94a751e6acb91306a241bf6ce864e7f97b09488c421c4dc",
         "size_bytes": 3647040
       },
       "package_matches_prod": true,
       "prod": {
-        "md5": "ebc8aa81945cf36b14fd530772af4791",
+        "md5": "8379a5182d43fe766f5a824e55b386aa",
         "path": "04_analysis_datasets/adam/adae_prod.xpt",
         "present": true,
-        "sha256": "68930182d295284472467cb8328d148aff5dc4b4487b4e1ce017ec635e53ddef",
+        "sha256": "0ed941880c91ce8ce94a751e6acb91306a241bf6ce864e7f97b09488c421c4dc",
         "size_bytes": 3647040
       },
       "prod_vs_validation_distinct": true,
       "sequence_copy": {
-        "md5": "ebc8aa81945cf36b14fd530772af4791",
+        "md5": "8379a5182d43fe766f5a824e55b386aa",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/datasets/adae.xpt",
         "present": true,
-        "sha256": "68930182d295284472467cb8328d148aff5dc4b4487b4e1ce017ec635e53ddef",
+        "sha256": "0ed941880c91ce8ce94a751e6acb91306a241bf6ce864e7f97b09488c421c4dc",
         "size_bytes": 3647040
       },
       "sequence_matches_prod": true,
       "validation": {
-        "md5": "997ab72f3557a1d8534439ba9e614bdd",
+        "md5": "255f223bab23db6230ff31a54c044506",
         "path": "04_analysis_datasets/adam/adae_v.xpt",
         "present": true,
-        "sha256": "bb3993356c9e2858ab08af7ac4b8226e01a81d11bb33548f303406854f53b176",
+        "sha256": "991991948dfc84c4c91b970dac3585d9d24f92963d3769fdc877f4e2d4b5b464",
         "size_bytes": 2235760
       }
     },
     {
       "dataset": "ADLB",
       "package_copy": {
-        "md5": "a376c78f99d970c8831c9b757a6a1438",
+        "md5": "604b98ae3909ddcdf19d9c681f9e16d2",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/datasets/adlb.xpt",
         "present": true,
-        "sha256": "7077b052e9483323fcbc121571c18fb3b52f0309065979e181287603b3003224",
+        "sha256": "71f0d7f016b81209372a38529355e129736dbed2c31781b12dc9b5335f95edc5",
         "size_bytes": 45918160
       },
       "package_matches_prod": true,
       "prod": {
-        "md5": "a376c78f99d970c8831c9b757a6a1438",
+        "md5": "604b98ae3909ddcdf19d9c681f9e16d2",
         "path": "04_analysis_datasets/adam/adlb_prod.xpt",
         "present": true,
-        "sha256": "7077b052e9483323fcbc121571c18fb3b52f0309065979e181287603b3003224",
+        "sha256": "71f0d7f016b81209372a38529355e129736dbed2c31781b12dc9b5335f95edc5",
         "size_bytes": 45918160
       },
       "prod_vs_validation_distinct": true,
       "sequence_copy": {
-        "md5": "a376c78f99d970c8831c9b757a6a1438",
+        "md5": "604b98ae3909ddcdf19d9c681f9e16d2",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/datasets/adlb.xpt",
         "present": true,
-        "sha256": "7077b052e9483323fcbc121571c18fb3b52f0309065979e181287603b3003224",
+        "sha256": "71f0d7f016b81209372a38529355e129736dbed2c31781b12dc9b5335f95edc5",
         "size_bytes": 45918160
       },
       "sequence_matches_prod": true,
       "validation": {
-        "md5": "6b5080705b476db3ee19fc8c09ce1f95",
+        "md5": "f8485247813e3f8ec21835da0b6f559d",
         "path": "04_analysis_datasets/adam/adlb_v.xpt",
         "present": true,
-        "sha256": "b77865b46094022de82f3362d74dbd8998702041b507b2576394e716c4c1f997",
+        "sha256": "df4a80188e3a6eea482c4e9044a229ddedd14d0fdc43d92df480821f0639948a",
         "size_bytes": 21231840
       }
     },
     {
       "dataset": "ADRS",
       "package_copy": {
-        "md5": "8ed69641d53fb72016568d374549e659",
+        "md5": "fb23ec7a911ee56dcde8e8f6c5bfb27e",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/datasets/adrs.xpt",
         "present": true,
-        "sha256": "f337dd46fdfa4befc59bfb764d454ca7d694330ef72648969d61f79737ceec98",
+        "sha256": "2bb24d70cff299b755a70c94c2d46874679b5ca73045d6f3fbef2591a3a3640e",
         "size_bytes": 724720
       },
       "package_matches_prod": true,
       "prod": {
-        "md5": "8ed69641d53fb72016568d374549e659",
+        "md5": "fb23ec7a911ee56dcde8e8f6c5bfb27e",
         "path": "04_analysis_datasets/adam/adrs_prod.xpt",
         "present": true,
-        "sha256": "f337dd46fdfa4befc59bfb764d454ca7d694330ef72648969d61f79737ceec98",
+        "sha256": "2bb24d70cff299b755a70c94c2d46874679b5ca73045d6f3fbef2591a3a3640e",
         "size_bytes": 724720
       },
       "prod_vs_validation_distinct": true,
       "sequence_copy": {
-        "md5": "8ed69641d53fb72016568d374549e659",
+        "md5": "fb23ec7a911ee56dcde8e8f6c5bfb27e",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/datasets/adrs.xpt",
         "present": true,
-        "sha256": "f337dd46fdfa4befc59bfb764d454ca7d694330ef72648969d61f79737ceec98",
+        "sha256": "2bb24d70cff299b755a70c94c2d46874679b5ca73045d6f3fbef2591a3a3640e",
         "size_bytes": 724720
       },
       "sequence_matches_prod": true,
       "validation": {
-        "md5": "f67a0dfb47a3a513d5b5fcfe767cf72f",
+        "md5": "1cf30301f36fffaf5c368fee9b8aa06b",
         "path": "04_analysis_datasets/adam/adrs_v.xpt",
         "present": true,
-        "sha256": "2528f86e4d07008d4773e84f72c132b3fff213f39abb7f009c1844e402c54a33",
+        "sha256": "1e1b9806425e1616c066b9a475d22fbc1c827de3a6bd454f8abec75b422a5ae9",
         "size_bytes": 381120
       }
     },
     {
       "dataset": "ADTTE",
       "package_copy": {
-        "md5": "1dc688418ec3d9d224879944344ac951",
+        "md5": "b1503f8ca82010573c20bf5897ebd9b5",
         "path": "08_submission_package/m5/datasets/tropic/analysis/adam/datasets/adtte.xpt",
         "present": true,
-        "sha256": "a98651721fa8db4d3ed30b39dcfb18ac3635284a76cc4337fd1abe4f15d5c582",
+        "sha256": "e53d06e57d74ea148a93ae5425a7ac551e9732db12b41539e4ff5385f9a5e8b1",
         "size_bytes": 996240
       },
       "package_matches_prod": true,
       "prod": {
-        "md5": "1dc688418ec3d9d224879944344ac951",
+        "md5": "b1503f8ca82010573c20bf5897ebd9b5",
         "path": "04_analysis_datasets/adam/adtte_prod.xpt",
         "present": true,
-        "sha256": "a98651721fa8db4d3ed30b39dcfb18ac3635284a76cc4337fd1abe4f15d5c582",
+        "sha256": "e53d06e57d74ea148a93ae5425a7ac551e9732db12b41539e4ff5385f9a5e8b1",
         "size_bytes": 996240
       },
       "prod_vs_validation_distinct": true,
       "sequence_copy": {
-        "md5": "1dc688418ec3d9d224879944344ac951",
+        "md5": "b1503f8ca82010573c20bf5897ebd9b5",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/analysis/adam/datasets/adtte.xpt",
         "present": true,
-        "sha256": "a98651721fa8db4d3ed30b39dcfb18ac3635284a76cc4337fd1abe4f15d5c582",
+        "sha256": "e53d06e57d74ea148a93ae5425a7ac551e9732db12b41539e4ff5385f9a5e8b1",
         "size_bytes": 996240
       },
       "sequence_matches_prod": true,
       "validation": {
-        "md5": "cb8b70b406dd1e8fbf1c16e5c03c8286",
+        "md5": "8db75c83191188514af410dcfee5cc5e",
         "path": "04_analysis_datasets/adam/adtte_v.xpt",
         "present": true,
-        "sha256": "c3e9e7bd681fb76e6511d11755ccd5fa28ff5d049a89613a6a78de388390ef6a",
+        "sha256": "4a3f4ea974cfa7b4c7e122aa4e9c3d1fe6a4fa2bd7ee91caf7ab315684f640e4",
         "size_bytes": 437520
       }
     },
     {
       "dataset": "CLINSITE",
       "package_copy": {
-        "md5": "0ef46d9143fc2154dbbf36089e55828e",
+        "md5": "10cd6ed9cfd2fbb8ee366b59dc784e96",
         "path": "08_submission_package/m5/datasets/tropic/bimo/datasets/clinsite.xpt",
         "present": true,
-        "sha256": "50115ca94ac4af11eead4c0e7b306217846c5e5a106cf56cb2f5f1c36583d79b",
+        "sha256": "3d16fd7ee3075f0c2913d6d49cb7056f35419db89c9a1bf4da5827fa45f9661b",
         "size_bytes": 10880
       },
       "package_matches_prod": true,
       "prod": {
-        "md5": "0ef46d9143fc2154dbbf36089e55828e",
+        "md5": "10cd6ed9cfd2fbb8ee366b59dc784e96",
         "path": "04_analysis_datasets/adam/clinsite_prod.xpt",
         "present": true,
-        "sha256": "50115ca94ac4af11eead4c0e7b306217846c5e5a106cf56cb2f5f1c36583d79b",
+        "sha256": "3d16fd7ee3075f0c2913d6d49cb7056f35419db89c9a1bf4da5827fa45f9661b",
         "size_bytes": 10880
       },
       "prod_vs_validation_distinct": true,
       "sequence_copy": {
-        "md5": "0ef46d9143fc2154dbbf36089e55828e",
+        "md5": "10cd6ed9cfd2fbb8ee366b59dc784e96",
         "path": "08_submission_package/ectd/0000/m5/datasets/tropic/bimo/datasets/clinsite.xpt",
         "present": true,
-        "sha256": "50115ca94ac4af11eead4c0e7b306217846c5e5a106cf56cb2f5f1c36583d79b",
+        "sha256": "3d16fd7ee3075f0c2913d6d49cb7056f35419db89c9a1bf4da5827fa45f9661b",
         "size_bytes": 10880
       },
       "sequence_matches_prod": true,
       "validation": {
-        "md5": "fe5a8cc1a1a43a5db4acf9b60512723e",
+        "md5": "5143d84c8889b2f68683b1dfa51adbb1",
         "path": "04_analysis_datasets/adam/clinsite_v.xpt",
         "present": true,
-        "sha256": "6d870a7f597cb90db291ed6e2e688b827810a1b3d0a2d1aa52daa88a9af7fbc2",
+        "sha256": "7038e5789d38d7651d555228e4c683afeb1b4ee3c0e38255a055149e217f1468",
         "size_bytes": 8240
       }
     }
@@ -3461,9 +3524,9 @@
     "sas_version": "9.04.01M8P022223",
     "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007"
   },
-  "evidence_grade": "release_candidate",
-  "generated_at": "2026-08-12 05:54:34 UTC",
-  "manifest_sha256": "719c58421ff921402d92b1a5b7fd0e071b9cad55d022598693d3d69f38697ead",
+  "evidence_grade": "remediation_partial_or_dirty",
+  "generated_at": "2026-08-12 09:30:02 UTC",
+  "manifest_sha256": "67a5e044baeb63b8b8c19726cd2706cfcd552767a29ab53968102a52fefeab1b",
   "problems": [],
   "qc_statuses": {
     "cbzp_bridge": {
@@ -3529,6 +3592,15 @@
       "path": "platform/reconciliation_status.json",
       "status": "PASS"
     },
+    "regulatory_baseline": {
+      "detail": {
+        "provenance_guard_passed": null,
+        "sas_execution_mode": null,
+        "simulated": null
+      },
+      "path": "06_qc_evidence/gates/regulatory_baseline_status.json",
+      "status": "PASS"
+    },
     "results_reconciliation": {
       "detail": {
         "provenance_guard_passed": null,
@@ -3575,7 +3647,9 @@
       "status": "PASS"
     }
   },
-  "remediation_reasons": [],
+  "remediation_reasons": [
+    "git worktree is dirty (49 porcelain entries); release-candidate lock requires a clean committed state"
+  ],
   "run_completeness": {
     "expected_stage_names": [
       "Governance Scope Lock (G00)",
@@ -3632,32 +3706,32 @@
     "files": [
       {
         "current_with_pipeline_health": true,
-        "mtime_utc": "2026-08-10T05:41:15.889502+00:00",
+        "mtime_utc": "2026-08-12T09:27:43.080795+00:00",
         "path": "05_outputs/tfl/output/figures/sas/F-11-1_KM_OS_SAS.png"
       },
       {
         "current_with_pipeline_health": true,
-        "mtime_utc": "2026-08-10T05:41:17.984193+00:00",
+        "mtime_utc": "2026-08-12T09:27:45.325471+00:00",
         "path": "05_outputs/tfl/output/figures/sas/F-11-2_KM_PFS_SAS.png"
       },
       {
         "current_with_pipeline_health": true,
-        "mtime_utc": "2026-08-10T05:41:20.077470+00:00",
+        "mtime_utc": "2026-08-12T09:27:47.697438+00:00",
         "path": "05_outputs/tfl/output/figures/sas/F-12-1_Subgroup_Forest_SAS.png"
       },
       {
         "current_with_pipeline_health": true,
-        "mtime_utc": "2026-08-10T05:41:22.167479+00:00",
+        "mtime_utc": "2026-08-12T09:27:49.939178+00:00",
         "path": "05_outputs/tfl/output/figures/sas/F-13-1_PSA_Waterfall_SAS.png"
       },
       {
         "current_with_pipeline_health": true,
-        "mtime_utc": "2026-08-10T05:41:24.260845+00:00",
+        "mtime_utc": "2026-08-12T09:27:52.310531+00:00",
         "path": "05_outputs/tfl/output/figures/sas/F-14-1_Swimmer_Plot_SAS.png"
       },
       {
         "current_with_pipeline_health": true,
-        "mtime_utc": "2026-08-10T05:41:26.460013+00:00",
+        "mtime_utc": "2026-08-12T09:27:54.672278+00:00",
         "path": "05_outputs/tfl/output/figures/sas/F-17-1_Optimus_Scatter_SAS.png"
       }
     ],
@@ -3666,17 +3740,166 @@
     "stale_paths": []
   },
   "source_control": {
-    "branch": "codex/pipeline-audit-final-2026-08-10",
-    "dirty": false,
-    "dirty_including_seal_outputs": false,
-    "head": "59905d33fa1dd19340808f7f7398869fbee92dcd",
-    "pipeline_control_sha256": "93db15a04e6175b0e99301327a5f5d698b541903702e22ca2ecc4b7eb50a6878",
-    "source_tree_sha256": "58fc27b10ef364c1fb277790860f23812daabc25df8357d075072ae9c03a9910",
+    "branch": "codex/fda-aligned-clinical-portfolio",
+    "dirty": true,
+    "dirty_including_seal_outputs": true,
+    "head": "6ea76682778d23e8c8ff907300b5870df0ec4034",
+    "pipeline_control_sha256": "94a2f7d6176b7a31e95b349edf55520fb54ba400bd65e0794668c8a98144ec26",
+    "source_tree_sha256": "81dadd3c02bf521bf11fce32f67f30ec4c70913059675cc576c895b8182a605d",
     "staged_diff_paths": [],
-    "status_porcelain": [],
-    "status_porcelain_all": [],
-    "status_porcelain_sha256": "",
-    "tracked_diff_paths": []
+    "status_porcelain": [
+      " M 01_source_data/guyot_validation_report.md",
+      " M 03_metadata/define/define.xml",
+      " M 05_outputs/ars/tropic_ard.csv",
+      " M 05_outputs/tfl/lab_shift_table.R",
+      " M 05_outputs/tfl/tfl_generation.R",
+      " M 06_qc_evidence/audit/AUDIT_REPORT.md",
+      " M 06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md",
+      " M 06_qc_evidence/audit/findings_register.csv",
+      " M 06_qc_evidence/audit/run_records/FDA_REVIEWER_AUDIT_2026-06-20.md",
+      " M 06_qc_evidence/audit/run_records/SUBMISSION_STANDARDS_REMEDIATION.md",
+      " M 06_qc_evidence/audit/section_reviews/SECTION_05_PORTFOLIO_FINALIZATION_AUDIT_2026-08-04.md",
+      " M 06_qc_evidence/conformance/p21_adam_runrecord.md",
+      " M 06_qc_evidence/gates/g00_governance_status.json",
+      " M 06_qc_evidence/gates/g02_specification_status.json",
+      " M 06_qc_evidence/gates/g07_reviewer_package_status.json",
+      " M 06_qc_evidence/gates/regulatory_baseline_status.json",
+      " M 08_submission_package/README.md",
+      " M 08_submission_package/ectd/0000/index-md5.txt",
+      " M 08_submission_package/ectd/0000/index.xml",
+      " M 08_submission_package/ectd/0000/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/stf-tropic.xml",
+      " M 08_submission_package/ectd/RUN_RECORD.md",
+      " M 08_submission_package/m5/datasets/tropic/analysis/adam/datasets/define.xml",
+      " M 08_submission_package/m5/datasets/tropic/analysis/adam/programs/tfl_generation.R",
+      " M CHANGELOG.md",
+      " M README.md",
+      " M TROPIC_PIPELINE_AUDIT_CLOSURE_2026-08-10.md",
+      " M config/evidence_layers.yaml",
+      " M config/regulatory_baseline.yaml",
+      " M docs/PRODUCT_CLAIM.md",
+      " M docs/QUALITY_SYSTEM_BOUNDARY.md",
+      " M docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md",
+      " M docs/WORKSTREAM_EXECUTION_BOARD.md",
+      " M docs/workstreams/WS1_SOURCE_INTAKE_PACK.md",
+      " M docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md",
+      " M docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md",
+      " M docs/workstreams/reviews/PATH_A_STATISTICAL_GOVERNANCE_ASSESSMENT_2026-08-04.md",
+      " M platform/admiral_reconciliation_status.json",
+      " M platform/build_release_run_manifest.py",
+      " M platform/check_regulatory_baseline.py",
+      " M platform/log_cleanliness/log_cleanliness_status.json",
+      " M platform/package_ectd.py",
+      " M platform/pipeline_health.json",
+      " M scripts/rebind_governance_seal.py",
+      " M scripts/verify_release.py",
+      " M tests/test_lab_shift_table.R",
+      " M tests/test_regulatory_baseline.py",
+      " M tests/test_submission_surface.py",
+      "?? 06_qc_evidence/conformance/p21_adam_summary.json",
+      "?? 08_submission_package/m5/datasets/tropic/analysis/adam/programs/lab_shift_table.R"
+    ],
+    "status_porcelain_all": [
+      " M 01_source_data/guyot_validation_report.md",
+      " M 03_metadata/define/define.xml",
+      " M 05_outputs/ars/tropic_ard.csv",
+      " M 05_outputs/tfl/lab_shift_table.R",
+      " M 05_outputs/tfl/tfl_generation.R",
+      " M 06_qc_evidence/audit/AUDIT_REPORT.md",
+      " M 06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md",
+      " M 06_qc_evidence/audit/findings_register.csv",
+      " M 06_qc_evidence/audit/run_records/FDA_REVIEWER_AUDIT_2026-06-20.md",
+      " M 06_qc_evidence/audit/run_records/SUBMISSION_STANDARDS_REMEDIATION.md",
+      " M 06_qc_evidence/audit/section_reviews/SECTION_05_PORTFOLIO_FINALIZATION_AUDIT_2026-08-04.md",
+      " M 06_qc_evidence/conformance/p21_adam_runrecord.md",
+      " M 06_qc_evidence/gates/g00_governance_status.json",
+      " M 06_qc_evidence/gates/g02_specification_status.json",
+      " M 06_qc_evidence/gates/g07_reviewer_package_status.json",
+      " M 06_qc_evidence/gates/regulatory_baseline_status.json",
+      " M 08_submission_package/README.md",
+      " M 08_submission_package/ectd/0000/index-md5.txt",
+      " M 08_submission_package/ectd/0000/index.xml",
+      " M 08_submission_package/ectd/0000/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/stf-tropic.xml",
+      " M 08_submission_package/ectd/RUN_RECORD.md",
+      " M 08_submission_package/m5/datasets/tropic/analysis/adam/datasets/define.xml",
+      " M 08_submission_package/m5/datasets/tropic/analysis/adam/programs/tfl_generation.R",
+      " M CHANGELOG.md",
+      " M README.md",
+      " M TROPIC_PIPELINE_AUDIT_CLOSURE_2026-08-10.md",
+      " M config/evidence_layers.yaml",
+      " M config/regulatory_baseline.yaml",
+      " M docs/PRODUCT_CLAIM.md",
+      " M docs/QUALITY_SYSTEM_BOUNDARY.md",
+      " M docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md",
+      " M docs/RELEASE_RUN_MANIFEST.md",
+      " M docs/WORKSTREAM_EXECUTION_BOARD.md",
+      " M docs/workstreams/WS1_SOURCE_INTAKE_PACK.md",
+      " M docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md",
+      " M docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md",
+      " M docs/workstreams/reviews/PATH_A_STATISTICAL_GOVERNANCE_ASSESSMENT_2026-08-04.md",
+      " M platform/admiral_reconciliation_status.json",
+      " M platform/build_release_run_manifest.py",
+      " M platform/check_regulatory_baseline.py",
+      " M platform/log_cleanliness/log_cleanliness_status.json",
+      " M platform/package_ectd.py",
+      " M platform/pipeline_health.json",
+      " M platform/release_run_manifest/release_run_manifest.json",
+      " M scripts/rebind_governance_seal.py",
+      " M scripts/verify_release.py",
+      " M tests/test_lab_shift_table.R",
+      " M tests/test_regulatory_baseline.py",
+      " M tests/test_submission_surface.py",
+      "?? 06_qc_evidence/conformance/p21_adam_summary.json",
+      "?? 08_submission_package/m5/datasets/tropic/analysis/adam/programs/lab_shift_table.R"
+    ],
+    "status_porcelain_sha256": "eda852359f78b36a40019981deffeee7d5b3644623792df55705dc06f33e2717",
+    "tracked_diff_paths": [
+      "01_source_data/guyot_validation_report.md",
+      "03_metadata/define/define.xml",
+      "05_outputs/tfl/lab_shift_table.R",
+      "05_outputs/tfl/tfl_generation.R",
+      "06_qc_evidence/audit/AUDIT_REPORT.md",
+      "06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md",
+      "06_qc_evidence/audit/findings_register.csv",
+      "06_qc_evidence/audit/run_records/FDA_REVIEWER_AUDIT_2026-06-20.md",
+      "06_qc_evidence/audit/run_records/SUBMISSION_STANDARDS_REMEDIATION.md",
+      "06_qc_evidence/audit/section_reviews/SECTION_05_PORTFOLIO_FINALIZATION_AUDIT_2026-08-04.md",
+      "06_qc_evidence/conformance/p21_adam_runrecord.md",
+      "06_qc_evidence/gates/g00_governance_status.json",
+      "06_qc_evidence/gates/g02_specification_status.json",
+      "06_qc_evidence/gates/g07_reviewer_package_status.json",
+      "06_qc_evidence/gates/regulatory_baseline_status.json",
+      "08_submission_package/README.md",
+      "08_submission_package/ectd/0000/index-md5.txt",
+      "08_submission_package/ectd/0000/index.xml",
+      "08_submission_package/ectd/0000/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/stf-tropic.xml",
+      "08_submission_package/ectd/RUN_RECORD.md",
+      "08_submission_package/m5/datasets/tropic/analysis/adam/datasets/define.xml",
+      "08_submission_package/m5/datasets/tropic/analysis/adam/programs/tfl_generation.R",
+      "CHANGELOG.md",
+      "README.md",
+      "TROPIC_PIPELINE_AUDIT_CLOSURE_2026-08-10.md",
+      "config/evidence_layers.yaml",
+      "config/regulatory_baseline.yaml",
+      "docs/PRODUCT_CLAIM.md",
+      "docs/QUALITY_SYSTEM_BOUNDARY.md",
+      "docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md",
+      "docs/WORKSTREAM_EXECUTION_BOARD.md",
+      "docs/workstreams/WS1_SOURCE_INTAKE_PACK.md",
+      "docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md",
+      "docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md",
+      "docs/workstreams/reviews/PATH_A_STATISTICAL_GOVERNANCE_ASSESSMENT_2026-08-04.md",
+      "platform/admiral_reconciliation_status.json",
+      "platform/build_release_run_manifest.py",
+      "platform/check_regulatory_baseline.py",
+      "platform/log_cleanliness/log_cleanliness_status.json",
+      "platform/package_ectd.py",
+      "platform/pipeline_health.json",
+      "scripts/rebind_governance_seal.py",
+      "scripts/verify_release.py",
+      "tests/test_lab_shift_table.R",
+      "tests/test_regulatory_baseline.py",
+      "tests/test_submission_surface.py"
+    ]
   },
-  "status": "PASS"
+  "status": "REMEDIATION"
 }

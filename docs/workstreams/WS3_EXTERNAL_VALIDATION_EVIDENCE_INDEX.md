@@ -3,7 +3,7 @@
 **Workstream:** Standards & Metadata (with WS-1/WS-5 inputs)
 **Gates:** G03 primary; feeds G06
 **Product claim:** Path A
-**As of:** 2026-08-04
+**As of:** 2026-08-12
 **Purpose:** Separate **what we have run** from **what industry still expects** so we never fake a P21/FDA story.
 
 ---
@@ -48,7 +48,8 @@ Every row is a **slot**:
 
 | Slot | Status | Evidence location | Notes |
 |---|---|---|---|
-| Pinnacle 21 Community/Enterprise ADaM | **NOT_AVAILABLE** | `06_qc_evidence/conformance/p21_*` historical notes only | Do not claim clean |
+| Pinnacle 21 Community ADaM | **RUN (INFORMATIVE)** | `06_qc_evidence/conformance/p21_adam_runrecord.md` · `p21_adam_summary.json` | FDA 2508.1; 7 datasets / 121,320 records / 0 rejects; 30 open groups / 2,373 occurrences; incompatible-CLI caveat retained |
+| Pinnacle 21 Enterprise ADaM | **NOT_AVAILABLE** | — | Licensed, qualified Enterprise execution not performed; do not claim clearance |
 | FDA DataFit / eCTD validator commercial | **NOT_AVAILABLE** | — | Structure demo only |
 | Local ADaM label/conformance scripts | **RUN** | `06_qc_evidence/conformance/adam_conformance_*` · `platform/run_adam_conformance.sh` | Sponsor-authored depth limited |
 
@@ -86,8 +87,8 @@ Every row is a **slot**:
 
 | Claim | Minimum external evidence |
 |---|---|
-| **Path A demo RC** (current) | Spec↔define↔data gates + dual-lang + XSD + eCTD structure + honest NOT_AVAILABLE for P21 |
-| **Path B submission simulation** | All Path A + P21 or equivalent ADaM report + CORE residual matrix + aCRF plan + real/placeholder app ID policy documented |
+| **Path A controlled simulation** (current) | Spec↔define↔data gates + dual-lang + XSD + eCTD structure + Community issue-discovery evidence with all findings and limitations visible |
+| **Path B submission simulation** | All Path A + qualified validator report with approved disposition + CORE residual matrix + aCRF plan + real/placeholder app ID policy documented |
 | **Path C real submission support** | Path B + sponsor data rights + org QC + Part 11 process evidence |
 
 ---
@@ -96,8 +97,9 @@ Every row is a **slot**:
 
 1. **DONE:** `WS1_CORE_RESIDUAL_MATRIX.csv` filed from the latest CORE evidence.
 2. **DONE:** SDRG links the XSD/CORE run records and states the residual boundary.
-3. If P21 becomes available: drop report under `platform/conformance/p21/` and flip slot to RUN.
-4. Keep Dataset-JSON/USDM/ARS labeled **exploratory** in ADRG until packaging decision.
+3. **DONE:** Community validation aggregate evidence is hash-bound and machine-reconciled; the record-level workbook remains outside Git.
+4. **EXTERNAL:** Reproduce the final locked package in licensed, qualified Enterprise and independently approve every disposition before any regulated-use claim.
+5. Keep Dataset-JSON/USDM/ARS labeled **exploratory** in ADRG until packaging decision.
 
 ---
 
@@ -115,11 +117,12 @@ Every row is a **slot**:
 - [x] Spec→define / spec→data PASS at seal
 - [x] XSD path documented
 - [x] Exploratory layers not in eCTD
-- [x] P21 explicitly NOT_AVAILABLE
+- [x] Community execution recorded as informative-only, with open findings and compatibility caveat
+- [x] Licensed Enterprise explicitly NOT_AVAILABLE / NOT_EXECUTED
 - [x] CORE residual matrix filed
 - [x] Standards pack reviewed once
 - [x] ARM endpoint semantics and synthetic-comparator disclosure executable under G02
 
-**Disposition:** **GREEN for Path A portfolio scope; AMBER for broader commercial-validator depth.**
-The missing commercial P21/FDA validator slot remains an honest capability boundary, not a
-Path A defect.
+**Disposition:** **GREEN for controlled Path A simulation scope; AMBER for broader commercial-validator depth.**
+The Community run strengthens issue-discovery evidence but does not close the missing licensed,
+qualified Enterprise/FDA-validator capability boundary.

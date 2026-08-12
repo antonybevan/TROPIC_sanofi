@@ -638,8 +638,14 @@ def main(data_free=False):
     for f in r_files:
         shutil.copy(f, m5_adam_programs_dir)
     # TFL programs
-    shutil.copy("05_outputs/tfl/tfl_generation.R", m5_adam_programs_dir)
-    shutil.copy("05_outputs/tfl/tfl_stats.R", m5_adam_programs_dir)
+    tfl_programs = [
+        "05_outputs/tfl/tfl_generation.R",
+        "05_outputs/tfl/tfl_stats.R",
+        "05_outputs/tfl/lab_shift_table.R",
+    ]
+    for f in tfl_programs:
+        _require_exists(f, f"TFL program {f}")
+        shutil.copy(f, m5_adam_programs_dir)
     # spec -> define conformance program. Its report is QC evidence under platform/conformance/,
     # not a Module 5 package leaf.
     extra_programs = ["03_metadata/define/check_define_conformance.R"]
@@ -649,7 +655,7 @@ def main(data_free=False):
             shutil.copy(f, m5_adam_programs_dir)
             n_extra += 1
     print(f"  Successfully copied {len(sas_files)} SAS files, {len(r_files)} R files, "
-          f"2 TFL R scripts, and {n_extra} conformance program(s).")
+          f"{len(tfl_programs)} TFL R scripts, and {n_extra} conformance program(s).")
     
     # 9. Copy output TFLs into CSR Appendices
     print("Copying output TFLs (tables, listings, figures) to CSR appendices...")

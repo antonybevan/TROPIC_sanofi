@@ -38,7 +38,7 @@ TROPIC may be described as demonstrating:
 | admiral re-derivation | Risk-based corroboration | Third-method evidence for ADSL and primary TTE only |
 | Reconciliation and conformance gates | Executable control | Evidence that specified machine checks passed for the recorded run |
 | Release hashes and Git/CI history | Integrity evidence | Reproducibility and change-detection controls |
-| Pinnacle 21 Community 4.1.0 / FDA 2508.1 | Informative only | Issue discovery; not licensed Enterprise clearance |
+| Pinnacle 21 Community 4.1.0 / FDA 2508.1 | Informative only | 7 datasets and 121,320 records processed with 0 rejects; 30 open issue groups / 2,373 occurrences and a compatibility caveat remain; not licensed Enterprise clearance |
 | eCTD-style backbone validation | Structural simulation | Package engineering evidence; not gateway acceptance |
 
 ## Prohibited claims
@@ -72,6 +72,7 @@ The authoritative gap and closure model is `docs/QUALITY_SYSTEM_BOUNDARY.md`.
 - Organizationally independent QC: **not established**.
 - Part 11 validated execution environment: **not established**.
 - Licensed Pinnacle 21 Enterprise validation: **not executed**.
+- Pinnacle 21 Community result: **executed for issue discovery; 30 groups / 2,373 occurrences remain open and dispositioned; incompatible-CLI caveat retained**.
 - Regulatory gateway acceptance: **not executed**.
 - Annotated CRF: **not available**.
 

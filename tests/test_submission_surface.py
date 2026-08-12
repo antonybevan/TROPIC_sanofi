@@ -47,6 +47,16 @@ def test_committed_ectd_surface_has_no_extras_or_broken_support_references():
     assert result["unexpected_files"] == []
 
 
+def test_packaged_tfl_driver_includes_its_runtime_helper():
+    source_dir = ROOT / "05_outputs/tfl"
+    package_dir = (
+        ROOT
+        / "08_submission_package/m5/datasets/tropic/analysis/adam/programs"
+    )
+    for name in ("tfl_generation.R", "tfl_stats.R", "lab_shift_table.R"):
+        assert (package_dir / name).read_bytes() == (source_dir / name).read_bytes()
+
+
 def test_analysis_report_secondary_tte_rows_match_generated_table():
     report = (ROOT / "07_reviewer_explanation/analysis_report.md").read_text(
         encoding="utf-8"

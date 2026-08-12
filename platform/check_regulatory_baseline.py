@@ -142,6 +142,93 @@ def evaluate(root: Path = ROOT) -> dict:
             "present" if marker in p21 else "missing",
         )
 
+    evidence = baseline.get("validation_evidence") or {}
+    p21_config = evidence.get("pinnacle_21_community_summary") or {}
+    p21_summary_rel = str(p21_config.get("path", ""))
+    p21_summary_path = root / p21_summary_rel
+    try:
+        p21_summary = json.loads(p21_summary_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        p21_summary = {}
+        add("p21.summary.readable", False, str(exc))
+    else:
+        add("p21.summary.readable", True, p21_summary_rel)
+
+    for key in ("record_id", "status", "use"):
+        actual = p21_summary.get(key)
+        expected = p21_config.get(key)
+        add(f"p21.summary.{key}", actual == expected, f"actual={actual}; expected={expected}")
+
+    validation = p21_summary.get("validation") or {}
+    add("p21.summary.process_completed", validation.get("process_completed") is True, str(validation.get("process_completed")))
+    add(
+        "p21.summary.compatibility_caveat",
+        validation.get("compatibility_caveat") == "Incompatible CLI used",
+        str(validation.get("compatibility_caveat")),
+    )
+
+    totals = p21_summary.get("totals") or {}
+    datasets = p21_summary.get("datasets") or []
+    issues = p21_summary.get("issues") or []
+    residual_families = p21_summary.get("residual_families") or []
+    expected_totals = {
+        "datasets_processed": p21_config.get("expected_datasets"),
+        "records": p21_config.get("expected_records"),
+        "issue_groups": p21_config.get("expected_issue_groups"),
+        "issue_occurrences": p21_config.get("expected_issue_occurrences"),
+    }
+    for key, expected in expected_totals.items():
+        add(f"p21.summary.total:{key}", totals.get(key) == expected, f"actual={totals.get(key)}; expected={expected}")
+    add("p21.summary.zero_rejects", totals.get("datasets_rejected") == 0, str(totals.get("datasets_rejected")))
+    add(
+        "p21.summary.dataset_count_reconciled",
+        totals.get("datasets_processed") == len(datasets),
+        f"declared={totals.get('datasets_processed')}; listed={len(datasets)}",
+    )
+    add(
+        "p21.summary.record_count_reconciled",
+        totals.get("records") == sum(int(row.get("records", 0)) for row in datasets),
+        f"declared={totals.get('records')}; summed={sum(int(row.get('records', 0)) for row in datasets)}",
+    )
+    add(
+        "p21.summary.issue_groups_reconciled",
+        totals.get("issue_groups") == len(issues),
+        f"declared={totals.get('issue_groups')}; listed={len(issues)}",
+    )
+    issue_occurrences = sum(int(row.get("found", 0)) for row in issues)
+    add(
+        "p21.summary.issue_occurrences_reconciled",
+        totals.get("issue_occurrences") == issue_occurrences,
+        f"declared={totals.get('issue_occurrences')}; summed={issue_occurrences}",
+    )
+    residual_occurrences = sum(int(row.get("occurrences", 0)) for row in residual_families)
+    add(
+        "p21.summary.residual_families_reconciled",
+        totals.get("issue_occurrences") == residual_occurrences,
+        f"declared={totals.get('issue_occurrences')}; summed={residual_occurrences}",
+    )
+    add(
+        "p21.summary.unique_issue_groups",
+        len({(row.get("domain"), row.get("id")) for row in issues}) == len(issues),
+        f"listed={len(issues)}",
+    )
+
+    remediation = p21_summary.get("remediation_comparison") or {}
+    initial = int(remediation.get("initial_issue_occurrences", 0))
+    final = int(remediation.get("final_issue_occurrences", 0))
+    eliminated = int(remediation.get("occurrences_eliminated", 0))
+    add(
+        "p21.summary.remediation_reconciled",
+        initial - final == eliminated and final == totals.get("issue_occurrences"),
+        f"initial={initial}; final={final}; eliminated={eliminated}",
+    )
+
+    qualification = p21_summary.get("qualification") or {}
+    add("p21.summary.community_informative_only", qualification.get("community_informative_only") is True, str(qualification.get("community_informative_only")))
+    add("p21.summary.enterprise_not_executed", qualification.get("enterprise_executed") is False, str(qualification.get("enterprise_executed")))
+    add("p21.summary.no_clearance_claim", qualification.get("submission_clearance_claimed") is False, str(qualification.get("submission_clearance_claimed")))
+    add("p21.summary.no_independent_qc_claim", qualification.get("independent_qc_approved") is False, str(qualification.get("independent_qc_approved")))
+
     claim_path = root / "docs/PRODUCT_CLAIM.md"
     claim = claim_path.read_text(encoding="utf-8") if claim_path.is_file() else ""
     add(

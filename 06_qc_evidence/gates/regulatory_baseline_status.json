@@ -2,7 +2,7 @@
   "gate": "REGULATORY_BASELINE",
   "baseline_id": "TROPIC-FDA-2026-08-12",
   "status": "PASS",
-  "generated_at": "2026-08-12T07:28:18Z",
+  "generated_at": "2026-08-12T08:56:48Z",
   "checks": [
     {
       "name": "baseline.readable",
@@ -198,6 +198,116 @@
       "name": "p21.boundary:FDA 2508.1",
       "ok": true,
       "detail": "present"
+    },
+    {
+      "name": "p21.summary.readable",
+      "ok": true,
+      "detail": "06_qc_evidence/conformance/p21_adam_summary.json"
+    },
+    {
+      "name": "p21.summary.record_id",
+      "ok": true,
+      "detail": "actual=TROPIC-P21-ADAM-2026-08-12-02; expected=TROPIC-P21-ADAM-2026-08-12-02"
+    },
+    {
+      "name": "p21.summary.status",
+      "ok": true,
+      "detail": "actual=EXECUTED_WITH_OPEN_FINDINGS_AND_COMPATIBILITY_CAVEAT; expected=EXECUTED_WITH_OPEN_FINDINGS_AND_COMPATIBILITY_CAVEAT"
+    },
+    {
+      "name": "p21.summary.use",
+      "ok": true,
+      "detail": "actual=INFORMATIVE_ONLY; expected=INFORMATIVE_ONLY"
+    },
+    {
+      "name": "p21.summary.process_completed",
+      "ok": true,
+      "detail": "True"
+    },
+    {
+      "name": "p21.summary.compatibility_caveat",
+      "ok": true,
+      "detail": "Incompatible CLI used"
+    },
+    {
+      "name": "p21.summary.total:datasets_processed",
+      "ok": true,
+      "detail": "actual=7; expected=7"
+    },
+    {
+      "name": "p21.summary.total:records",
+      "ok": true,
+      "detail": "actual=121320; expected=121320"
+    },
+    {
+      "name": "p21.summary.total:issue_groups",
+      "ok": true,
+      "detail": "actual=30; expected=30"
+    },
+    {
+      "name": "p21.summary.total:issue_occurrences",
+      "ok": true,
+      "detail": "actual=2373; expected=2373"
+    },
+    {
+      "name": "p21.summary.zero_rejects",
+      "ok": true,
+      "detail": "0"
+    },
+    {
+      "name": "p21.summary.dataset_count_reconciled",
+      "ok": true,
+      "detail": "declared=7; listed=7"
+    },
+    {
+      "name": "p21.summary.record_count_reconciled",
+      "ok": true,
+      "detail": "declared=121320; summed=121320"
+    },
+    {
+      "name": "p21.summary.issue_groups_reconciled",
+      "ok": true,
+      "detail": "declared=30; listed=30"
+    },
+    {
+      "name": "p21.summary.issue_occurrences_reconciled",
+      "ok": true,
+      "detail": "declared=2373; summed=2373"
+    },
+    {
+      "name": "p21.summary.residual_families_reconciled",
+      "ok": true,
+      "detail": "declared=2373; summed=2373"
+    },
+    {
+      "name": "p21.summary.unique_issue_groups",
+      "ok": true,
+      "detail": "listed=30"
+    },
+    {
+      "name": "p21.summary.remediation_reconciled",
+      "ok": true,
+      "detail": "initial=86611; final=2373; eliminated=84238"
+    },
+    {
+      "name": "p21.summary.community_informative_only",
+      "ok": true,
+      "detail": "True"
+    },
+    {
+      "name": "p21.summary.enterprise_not_executed",
+      "ok": true,
+      "detail": "False"
+    },
+    {
+      "name": "p21.summary.no_clearance_claim",
+      "ok": true,
+      "detail": "False"
+    },
+    {
+      "name": "p21.summary.no_independent_qc_claim",
+      "ok": true,
+      "detail": "False"
     },
     {
       "name": "product_claim.controlled_simulation",

@@ -123,4 +123,4 @@ python3 -c "import json; h=json.load(open('platform/pipeline_health.json')); pri
 - [x] CORE residual matrix file exists and is linked from SDRG
 - [x] WS-1 pack reviewed once with notes filed under `06_qc_evidence/audit/section_reviews/`
 
-The Path A source handoff is **GREEN with disclosed residuals**. The workstream remains **AMBER for broader industry depth** because the CORE residuals are classified rather than zero and commercial P21 evidence is unavailable.
+The Path A source handoff is **GREEN with disclosed residuals**. The workstream remains **AMBER for broader industry depth** because the CORE residuals are classified rather than zero, the Community ADaM run has open findings, and licensed Enterprise clearance is unavailable.

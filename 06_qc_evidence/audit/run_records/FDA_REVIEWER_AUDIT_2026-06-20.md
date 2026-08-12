@@ -8,6 +8,13 @@ then *independently verify* the data and metadata rather than accept the package
 application), **TRC** (Technical Rejection Criteria — gateway auto-reject),
 **MAJOR** (would generate an Information Request), **MINOR** (review comment).
 
+> **Supersession note — 2026-08-12.** This remains a dated June audit. Its statement
+> that Pinnacle 21 Community never executed was superseded by the definitive
+> Community 4.1.0 / FDA 2508.1 run in `06_qc_evidence/conformance/`: seven ADaM
+> datasets, 121,320 records, zero rejects, 30 open groups / 2,373 occurrences, and an
+> incompatible-CLI caveat. That later run is informative only; licensed Enterprise
+> and regulator-grade clearance remain absent, so the fileability conclusion stands.
+
 **One-line conclusion.** As a *methodological demonstration* this is exemplary and
 unusually honest engineering. As a *fileable efficacy submission* it is **not
 reviewable**, for two independent reasons that no amount of conformance tooling can
@@ -81,12 +88,13 @@ published control-arm value (~12.7 mo), validating the computation. See
 `DATE_PRECISION_SENSITIVITY_2026-06-20.md`. *Residual:* two-arm HR sensitivity still
 cannot be assessed (synthetic comparator, R-1).
 
-**M-2 — No completed authoritative conformance run.** Pinnacle 21 Community is
-engine-expired (never executed); CORE ships **zero** executable ADaM rules, so ADaM
-rests on the project's own custom CORE rules + interim `adam_conf_check.R`; the CORE
-SDTM run is explicitly "not a clean pass." There is no regulator-grade validation
-report for either standard. **IR: supply a current P21/Certara (or CORE-when-available)
-report with an explanation of every remaining finding in the guides.**
+**M-2 — No completed authoritative conformance clearance (current disposition in
+the 2026-08-12 supersession note above).** The June evidence available to this audit
+did not include a runnable current Community engine or comprehensive CORE ADaM rules.
+A later Community run provides genuine issue-discovery evidence, but open findings,
+its compatibility caveat, and absent licensed Enterprise execution mean there is
+still no regulator-grade clearance. **IR: supply a qualified final-package report
+with an approved explanation of every remaining finding in the guides.**
 
 **M-3 — Validation lacks producer/validator independence.** The SAS production and R
 validation tracks are both authored by one programmer (disclosed, ADRG §6). The

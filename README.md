@@ -32,7 +32,7 @@ The binding claim is [Product and Evidence Claim](docs/PRODUCT_CLAIM.md). The qu
 | Third implementation | admiral for ADSL, OS, and PFS | Risk-based corroboration, not full-dataset triple programming |
 | Reconciliation | Record and value comparisons plus result-level controls | Applies to the documented populations and tolerances only |
 | Standards | ADaMIG 1.3, SDTMIG 3.4, Define-XML 2.1, local stylesheet, CDISC CORE | Alignment and local conformance, not agency acceptance |
-| Pinnacle 21 | Community 4.1.0, FDA engine 2508.1, ADaMIG 1.3 (FDA), 5,546 checks | Informative only; report carries an incompatible-CLI caveat; Enterprise not executed |
+| Pinnacle 21 | Community 4.1.0, FDA engine 2508.1, ADaMIG 1.3 (FDA), 7 datasets / 121,320 records / 0 rejects | Informative only; 30 open issue groups (2,373 occurrences) and an incompatible-CLI caveat remain; Enterprise not executed |
 | Submission package | Deterministic Module 5-style tree, cSDRG/ADRG, programs, Define, eCTD v3.2.2 example backbone | Structural simulation; no gateway submission |
 | Release control | CI, findings, logs, SHA-256 manifests, clean-checkout verification | Integrity controls, not Part 11 electronic signatures |
 
@@ -109,7 +109,7 @@ Current package controls include:
 - analysis source programs for primary/secondary outputs;
 - a source blank CRF that is never presented as `acrf.pdf`;
 - explicit non-claims for Part 11, independent QC, Enterprise validation, and gateway acceptance; and
-- a CI gate that fails if those boundaries or filenames regress.
+- a CI gate that fails if those boundaries, filenames, or the reconciled Pinnacle 21 evidence regress.
 
 ## License and source rights
 

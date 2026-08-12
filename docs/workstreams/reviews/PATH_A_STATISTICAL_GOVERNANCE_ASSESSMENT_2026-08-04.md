@@ -14,6 +14,13 @@
 > records plus 1 missing/partial-date record, and 43 pain responders among 156 evaluable real-MP
 > subjects. Earlier 45-event and 43/153 counts below are historical assessment inputs.
 
+> **External-validation addendum — 2026-08-12.** Pinnacle 21 Community 4.1.0 / FDA
+> 2508.1 subsequently processed the final seven ADaM datasets (121,320 records; zero
+> rejects). Thirty issue groups / 2,373 occurrences remain dispositioned as open, and
+> the generated report carries an incompatible-CLI caveat. This informative run does
+> not change the regulated-use NO-GO: licensed Enterprise and qualified independent
+> disposition approval were not executed.
+
 ## 1. Decision and authority boundary
 
 The controlled Path A implementation may be promoted only when the current source
@@ -126,7 +133,7 @@ The following remain accepted only within Path A:
 - reconstructed/digitized Guyot CbzP and PH-scaled secondary endpoints;
 - N=749 rather than the protocol N=755;
 - incomplete aCRF/application identifiers and example eCTD metadata;
-- no commercial P21 ADaM validation and broader CORE residuals;
+- no licensed, qualified P21 Enterprise validation; Community issue-discovery findings and broader CORE residuals remain open;
 - partial-date/time-origin source limitations;
 - partial ARS and exploratory Dataset-JSON/USDM scope; ARM is complete for the
   controlled analysis-output catalog (10 ResultDisplays / 18 AnalysisResults)

@@ -7,6 +7,12 @@
 single-author portfolio model  
 **Regulated-use decision:** **NO-GO**
 
+> **External-validation addendum — 2026-08-12.** A later definitive Pinnacle 21
+> Community 4.1.0 / FDA 2508.1 run processed seven ADaM datasets and 121,320 records
+> with zero rejects. It retained 30 open issue groups / 2,373 occurrences and an
+> incompatible-CLI caveat. Licensed Enterprise and independent disposition approval
+> remain absent, so the regulated-use decision is unchanged.
+
 ## Decision
 
 **CONDITIONAL GO for portfolio release, effective only when the current commit
@@ -101,7 +107,7 @@ Green evidence proves coherence only within the declared Path A scope.
    non-confirmatory.
 2. N=749 is not protocol ITT N=755.
 3. The public source has precision and domain-breadth limitations.
-4. Commercial P21 ADaM validation and broader conformance closure are absent.
+4. Licensed, qualified P21 Enterprise validation is absent; Community and broader conformance findings remain open.
 5. ARS, Dataset-JSON, and USDM are partial/exploratory layers.
 6. EXAMPLE eCTD identifiers, incomplete aCRF depth, and non-Part-11 controls
    preclude a filing claim.

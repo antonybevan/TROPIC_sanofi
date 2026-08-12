@@ -20,8 +20,33 @@ HEALTH = ROOT / "platform/pipeline_health.json"
 
 ALLOWED_PATHS = (
     ".github/",
+    ".hermes.md",
     ".pre-commit-config.yaml",
+    "08_submission_package/README.md",
+    "CHANGELOG.md",
+    "README.md",
+    "TROPIC_PIPELINE_AUDIT_CLOSURE_2026-08-10.md",
+    "config/evidence_layers.yaml",
+    "config/regulatory_baseline.yaml",
+    "docs/PRODUCT_CLAIM.md",
+    "docs/QUALITY_SYSTEM_BOUNDARY.md",
+    "docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md",
+    "docs/WORKSTREAM_EXECUTION_BOARD.md",
+    "docs/workstreams/WS1_SOURCE_INTAKE_PACK.md",
+    "docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md",
+    "docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md",
+    "docs/workstreams/reviews/PATH_A_STATISTICAL_GOVERNANCE_ASSESSMENT_2026-08-04.md",
+    "06_qc_evidence/audit/AUDIT_REPORT.md",
+    "06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md",
+    "06_qc_evidence/audit/findings_register.csv",
+    "06_qc_evidence/audit/run_records/FDA_REVIEWER_AUDIT_2026-06-20.md",
+    "06_qc_evidence/audit/run_records/SUBMISSION_STANDARDS_REMEDIATION.md",
+    "06_qc_evidence/audit/section_reviews/SECTION_05_PORTFOLIO_FINALIZATION_AUDIT_2026-08-04.md",
+    "06_qc_evidence/conformance/p21_adam_runrecord.md",
+    "06_qc_evidence/conformance/p21_adam_summary.json",
+    "06_qc_evidence/gates/regulatory_baseline_status.json",
     "platform/build_release_run_manifest.py",
+    "platform/check_regulatory_baseline.py",
     "platform/cibuild.py",
     "requirements-ci.txt",
     "requirements-ci.lock",
@@ -82,8 +107,9 @@ def main(argv=None) -> int:
         "changed_paths": changed,
         "clinical_run_was_not_reexecuted": True,
         "reason": (
-            "Pipeline integrity, dependency, executor-validation, and test controls changed; "
-            "clinical programs, study controls, datasets, and QC outputs did not."
+            "Pipeline integrity, dependency, executor-validation, regulatory-claim, "
+            "external-validator-evidence, and test controls changed; clinical derivation "
+            "programs, study parameters, datasets, and statistical results did not."
         ),
     }
     HEALTH.write_text(json.dumps(health, indent=2) + "\n", encoding="utf-8")
