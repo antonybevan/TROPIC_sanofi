@@ -49,6 +49,7 @@ ALLOWED_PATHS = (
     "platform/build_release_run_manifest.py",
     "platform/check_regulatory_baseline.py",
     "platform/cibuild.py",
+    "platform/pipeline_health.json",
     "requirements-ci.txt",
     "requirements-ci.lock",
     "scripts/rebind_governance_seal.py",
@@ -68,6 +69,45 @@ def _changed_paths(base: str) -> list[str]:
 
 def _is_allowed(path: str) -> bool:
     return any(path == prefix or path.startswith(prefix) for prefix in ALLOWED_PATHS)
+
+
+def _health_change_is_prior_reseal_only(base: str) -> bool:
+    """Allow health.json only when HEAD carries a valid prior reseal hop.
+
+    A governance reseal necessarily updates pipeline_health.json. A second
+    governance commit can therefore compare against a base before that hop and
+    legitimately see the health file in the diff. Do not allow arbitrary health
+    edits: the clinical timestamp/mode/status must match the base revision, the
+    current chain must validate, and the last hop must end at the recorded source
+    digest.
+    """
+    try:
+        raw = subprocess.check_output(
+            ["git", "show", f"{base}:platform/pipeline_health.json"],
+            cwd=ROOT,
+            text=True,
+            stderr=subprocess.DEVNULL,
+        )
+        base_health = json.loads(raw)
+        current_health = json.loads(HEALTH.read_text(encoding="utf-8"))
+    except (subprocess.CalledProcessError, json.JSONDecodeError, OSError):
+        return False
+    for key in ("timestamp", "pipeline_health_status", "sas_execution_mode", "run_scope"):
+        if current_health.get(key) != base_health.get(key):
+            return False
+    chain = current_health.get("governance_reseal_chain")
+    if not isinstance(chain, list) or not chain or not all(isinstance(row, dict) for row in chain):
+        return False
+    expected = str(base_health.get("source_tree_sha256") or "")
+    for row in chain:
+        if (
+            row.get("status") != "PASS"
+            or row.get("clinical_run_was_not_reexecuted") is not True
+            or row.get("prior_source_tree_sha256") != expected
+        ):
+            return False
+        expected = str(row.get("rebound_source_tree_sha256") or "")
+    return bool(expected) and expected == current_health.get("source_tree_sha256")
 
 
 def _chain_from_base_revision(reseal: dict) -> list[dict]:
@@ -113,6 +153,8 @@ def main(argv=None) -> int:
         raise SystemExit("refusing to rebind a non-real-SAS health snapshot")
     changed = _changed_paths(args.base_revision)
     disallowed = [path for path in changed if not _is_allowed(path)]
+    if "platform/pipeline_health.json" in changed and not _health_change_is_prior_reseal_only(args.base_revision):
+        disallowed.append("platform/pipeline_health.json (not a valid prior governance reseal)")
     if disallowed:
         raise SystemExit("clinical/non-governance paths changed: " + ", ".join(disallowed))
 

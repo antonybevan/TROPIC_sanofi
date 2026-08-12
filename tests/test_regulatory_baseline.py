@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import importlib.util
 import sys
 from pathlib import Path
 
@@ -10,6 +11,15 @@ sys.path.insert(0, str(ROOT / "platform"))
 
 from build_ectd_backbone import classify  # noqa: E402
 from check_regulatory_baseline import _valid_reseal_chain, evaluate  # noqa: E402
+
+_RESEAL_SPEC = importlib.util.spec_from_file_location(
+    "rebind_governance_seal",
+    ROOT / "scripts/rebind_governance_seal.py",
+)
+assert _RESEAL_SPEC and _RESEAL_SPEC.loader
+_RESEAL_MODULE = importlib.util.module_from_spec(_RESEAL_SPEC)
+_RESEAL_SPEC.loader.exec_module(_RESEAL_MODULE)
+_health_change_is_prior_reseal_only = _RESEAL_MODULE._health_change_is_prior_reseal_only
 
 
 def test_current_regulatory_baseline_is_closed():
@@ -75,6 +85,10 @@ def test_current_baseline_accepts_disclosed_later_header_only_rebuild():
     assert timestamp_check["ok"], timestamp_check
     assert "later_rebuild_assessed=True" in timestamp_check["detail"]
     assert boundary_check["ok"], boundary_check
+
+
+def test_current_health_change_is_a_valid_prior_governance_reseal():
+    assert _health_change_is_prior_reseal_only("00f4f22")
 
 
 def test_current_csdrg_filename_receives_the_fda_stf_tag():
