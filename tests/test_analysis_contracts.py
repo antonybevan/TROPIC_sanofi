@@ -171,6 +171,44 @@ def test_define_keys_and_source_sequences_match_authoritative_spec() -> None:
     assert "IT.ADRS.VISIT" not in item_names
 
 
+def test_sdtm_define_declares_canonical_domain_keys() -> None:
+    ns = {"odm": "http://www.cdisc.org/ns/odm/v1.3"}
+    root = ET.parse(ROOT / "03_metadata/define/define_sdtm.xml").getroot()
+    expected = {
+        "DM": ["STUDYID", "USUBJID"],
+        "AE": ["STUDYID", "USUBJID", "AESEQ"],
+        "EX": ["STUDYID", "USUBJID", "EXSEQ"],
+        "CM": ["STUDYID", "USUBJID", "CMSEQ"],
+        "LB": ["STUDYID", "USUBJID", "LBSEQ"],
+        "DS": ["STUDYID", "USUBJID", "DSSEQ"],
+        "VS": ["STUDYID", "USUBJID", "VSSEQ"],
+        "LS": ["STUDYID", "USUBJID", "LSSEQ"],
+        "PN": ["STUDYID", "USUBJID", "PNSEQ"],
+        "SUPPDM": ["STUDYID", "RDOMAIN", "USUBJID", "IDVAR", "IDVARVAL", "QNAM"],
+        "SUPPAE": ["STUDYID", "RDOMAIN", "USUBJID", "IDVAR", "IDVARVAL", "QNAM"],
+        "SUPPEX": ["STUDYID", "RDOMAIN", "USUBJID", "IDVAR", "IDVARVAL", "QNAM"],
+        "SUPPCM": ["STUDYID", "RDOMAIN", "USUBJID", "IDVAR", "IDVARVAL", "QNAM"],
+        "SUPPLB": ["STUDYID", "RDOMAIN", "USUBJID", "IDVAR", "IDVARVAL", "QNAM"],
+        "SUPPDS": ["STUDYID", "RDOMAIN", "USUBJID", "IDVAR", "IDVARVAL", "QNAM"],
+        "SUPPLS": ["STUDYID", "RDOMAIN", "USUBJID", "IDVAR", "IDVARVAL", "QNAM"],
+        "TS": ["STUDYID", "TSSEQ"],
+        "TA": ["STUDYID", "ARMCD", "TAETORD"],
+    }
+    item_names = {
+        item.attrib["OID"]: item.attrib["Name"]
+        for item in root.findall(".//odm:ItemDef", ns)
+    }
+    groups = root.findall(".//odm:ItemGroupDef", ns)
+    assert {group.attrib["Name"] for group in groups} == set(expected)
+    for group in groups:
+        refs = [
+            (int(ref.attrib["KeySequence"]), item_names[ref.attrib["ItemOID"]])
+            for ref in group.findall("odm:ItemRef", ns)
+            if "KeySequence" in ref.attrib
+        ]
+        assert [name for _, name in sorted(refs)] == expected[group.attrib["Name"]]
+
+
 def test_workbook_matches_time_origin_and_no_imputation_contracts() -> None:
     workbook = load_workbook(
         ROOT / "03_metadata/adam/ADaM_spec.xlsx", read_only=True, data_only=False
