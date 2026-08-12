@@ -174,6 +174,7 @@ def evaluate(root: Path = ROOT) -> dict:
     expected_totals = {
         "datasets_processed": p21_config.get("expected_datasets"),
         "records": p21_config.get("expected_records"),
+        "rule_catalog_entries": p21_config.get("expected_rule_catalog_entries"),
         "issue_groups": p21_config.get("expected_issue_groups"),
         "issue_occurrences": p21_config.get("expected_issue_occurrences"),
     }
@@ -211,6 +212,48 @@ def evaluate(root: Path = ROOT) -> dict:
         "p21.summary.unique_issue_groups",
         len({(row.get("domain"), row.get("id")) for row in issues}) == len(issues),
         f"listed={len(issues)}",
+    )
+
+    pipeline_binding = p21_summary.get("pipeline_binding") or {}
+    pipeline_health_path = root / "platform/pipeline_health.json"
+    try:
+        pipeline_health = json.loads(pipeline_health_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        pipeline_health = {}
+        add("p21.pipeline_binding.health_readable", False, str(exc))
+    else:
+        add(
+            "p21.pipeline_binding.health_readable",
+            True,
+            str(pipeline_health_path.relative_to(root)),
+        )
+    binding_expectations = {
+        "health_timestamp": pipeline_health.get("timestamp"),
+        "pipeline_health_status": "GREEN",
+        "sas_execution_mode": "oda",
+        "run_scope": "full_dag",
+        "stages_expected": 37,
+        "stages_recorded": 37,
+    }
+    for key, expected in binding_expectations.items():
+        actual = pipeline_binding.get(key)
+        add(
+            f"p21.pipeline_binding.{key}",
+            actual == expected,
+            f"actual={actual}; expected={expected}",
+        )
+    bound_source = pipeline_binding.get("source_tree_sha256")
+    health_source = pipeline_health.get("source_tree_sha256")
+    prior_source = (pipeline_health.get("governance_only_reseal") or {}).get(
+        "prior_source_tree_sha256"
+    )
+    add(
+        "p21.pipeline_binding.source_tree",
+        bool(bound_source) and bound_source in {health_source, prior_source},
+        (
+            f"bound={bound_source}; current_health={health_source}; "
+            f"pre_governance_reseal={prior_source}"
+        ),
     )
 
     remediation = p21_summary.get("remediation_comparison") or {}

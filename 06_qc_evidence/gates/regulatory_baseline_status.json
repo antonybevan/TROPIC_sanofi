@@ -2,7 +2,7 @@
   "gate": "REGULATORY_BASELINE",
   "baseline_id": "TROPIC-FDA-2026-08-12",
   "status": "PASS",
-  "generated_at": "2026-08-12T08:56:48Z",
+  "generated_at": "2026-08-12T09:37:11Z",
   "checks": [
     {
       "name": "baseline.readable",
@@ -122,7 +122,7 @@
     {
       "name": "package.analysis_programs.r",
       "ok": true,
-      "detail": "count=20"
+      "detail": "count=21"
     },
     {
       "name": "qualification:organizationally_independent_qc",
@@ -207,7 +207,7 @@
     {
       "name": "p21.summary.record_id",
       "ok": true,
-      "detail": "actual=TROPIC-P21-ADAM-2026-08-12-02; expected=TROPIC-P21-ADAM-2026-08-12-02"
+      "detail": "actual=TROPIC-P21-ADAM-2026-08-12-03; expected=TROPIC-P21-ADAM-2026-08-12-03"
     },
     {
       "name": "p21.summary.status",
@@ -238,6 +238,11 @@
       "name": "p21.summary.total:records",
       "ok": true,
       "detail": "actual=121320; expected=121320"
+    },
+    {
+      "name": "p21.summary.total:rule_catalog_entries",
+      "ok": true,
+      "detail": "actual=388; expected=388"
     },
     {
       "name": "p21.summary.total:issue_groups",
@@ -283,6 +288,46 @@
       "name": "p21.summary.unique_issue_groups",
       "ok": true,
       "detail": "listed=30"
+    },
+    {
+      "name": "p21.pipeline_binding.health_readable",
+      "ok": true,
+      "detail": "platform/pipeline_health.json"
+    },
+    {
+      "name": "p21.pipeline_binding.health_timestamp",
+      "ok": true,
+      "detail": "actual=2026-08-12T09:29:59.539074+00:00; expected=2026-08-12T09:29:59.539074+00:00"
+    },
+    {
+      "name": "p21.pipeline_binding.pipeline_health_status",
+      "ok": true,
+      "detail": "actual=GREEN; expected=GREEN"
+    },
+    {
+      "name": "p21.pipeline_binding.sas_execution_mode",
+      "ok": true,
+      "detail": "actual=oda; expected=oda"
+    },
+    {
+      "name": "p21.pipeline_binding.run_scope",
+      "ok": true,
+      "detail": "actual=full_dag; expected=full_dag"
+    },
+    {
+      "name": "p21.pipeline_binding.stages_expected",
+      "ok": true,
+      "detail": "actual=37; expected=37"
+    },
+    {
+      "name": "p21.pipeline_binding.stages_recorded",
+      "ok": true,
+      "detail": "actual=37; expected=37"
+    },
+    {
+      "name": "p21.pipeline_binding.source_tree",
+      "ok": true,
+      "detail": "bound=81dadd3c02bf521bf11fce32f67f30ec4c70913059675cc576c895b8182a605d; current_health=81dadd3c02bf521bf11fce32f67f30ec4c70913059675cc576c895b8182a605d; pre_governance_reseal=None"
     },
     {
       "name": "p21.summary.remediation_reconciled",

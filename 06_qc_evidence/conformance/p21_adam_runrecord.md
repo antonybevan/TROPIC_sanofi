@@ -1,9 +1,9 @@
 # Pinnacle 21 Community ADaM Validation Run Record
 
-**Record ID:** TROPIC-P21-ADAM-2026-08-12-02  
-**Execution date:** 2026-08-12  
-**Status:** `EXECUTED_WITH_OPEN_FINDINGS_AND_COMPATIBILITY_CAVEAT`  
-**Use:** `INFORMATIVE_ONLY`  
+**Record ID:** TROPIC-P21-ADAM-2026-08-12-03
+**Execution date:** 2026-08-12
+**Status:** `EXECUTED_WITH_OPEN_FINDINGS_AND_COMPATIBILITY_CAVEAT`
+**Use:** `INFORMATIVE_ONLY`
 **Licensed Enterprise execution:** `NOT_EXECUTED`
 
 ## Controlled execution
@@ -20,10 +20,11 @@
 | Define-XML | Define-XML 2.1 explicitly declared; `03_metadata/define/define.xml`; SHA-256 `74256966d9247f117ffba4a52712733bd42abc11f5aca5061aa73e210e7db204` |
 | Inputs | Seven final MP-arm production XPTs: ADAE, ADCM, ADEX, ADLB, ADRS, ADSL, ADTTE |
 | Scope | 121,320 records; 7 of 7 datasets processed; 0 rejected datasets |
-| Rule catalog | 387 listed rules; 5,546 checks reported by the Community run summary |
+| Rule catalog | 388 distinct rules listed in the workbook |
 | Result | 30 issue-summary groups; 2,373 aggregate occurrences |
 | Process result | Report generated and client logged `Validation: Process completed`; shell exit code `5` retained with the installation-compatibility condition |
-| Raw report | `pinnacle21-report-2026-08-12T14-05-definitive.xlsx`; SHA-256 `94d29012c0b5cdfa90bab6f4b1a335a65de3674364ace14cc4b9a50be5f16629` |
+| Raw report | `pinnacle21-report-2026-08-12T15-02-final-green.xlsx`; SHA-256 `2cb4cc952939d5ca4681197a09ff256abc5e9a87c9839296cca82195deba4f9f` |
+| Pipeline binding | GREEN full DAG; 37/37 stages PASS; SAS execution mode `oda`; health timestamp `2026-08-12T09:29:59.539074+00:00`; source-tree SHA-256 `81dadd3c02bf521bf11fce32f67f30ec4c70913059675cc576c895b8182a605d` |
 
 The raw workbook is retained outside Git because its details sheet includes record-level identifiers. This record and `p21_adam_summary.json` retain only run identity, hashes, aggregate counts, and dispositions.
 
@@ -31,13 +32,13 @@ The raw workbook is retained outside Git because its details sheet includes reco
 
 | Dataset | Records | SHA-256 |
 |---|---:|---|
-| ADAE | 5,428 | `7d69bfd565d09305802058e8d5708642ae2872ff8939eac60924e8d742af6694` |
-| ADCM | 24,534 | `ee86a5e4ac69b22ed8d19aa5cf35b28f52caaf36f6242a5faf7a576e02c0f593` |
-| ADEX | 7,820 | `4492a011592c763429cdb84a87e80eb1c04ca2731c7eedfbbabd3175878c9e7e` |
-| ADLB | 78,619 | `e143726865d89ec58afea959311d0089afd340e12392be70250d23d45d6030be` |
-| ADRS | 2,322 | `36b1e6aaf868e2243fb3f97f68bf1982180124cc9cfe8a8d070568e024c73a87` |
-| ADSL | 371 | `41bd2a3fa78b6750d6059f40cfd6293cd158db7ec99915f3908d244ff39c92ac` |
-| ADTTE | 2,226 | `597ffd31e266f4fda44dfc6f82f37532cad00987838445c3b5deb9f92f86fec5` |
+| ADAE | 5,428 | `0ed941880c91ce8ce94a751e6acb91306a241bf6ce864e7f97b09488c421c4dc` |
+| ADCM | 24,534 | `42efe96796572e0044450ea1f838efbc7884d8f453dd5b09694a40b5041618c9` |
+| ADEX | 7,820 | `1cac2fcf52782f01adefb8df890064017b96fb64171ad00ff23e6361e02bd377` |
+| ADLB | 78,619 | `71f0d7f016b81209372a38529355e129736dbed2c31781b12dc9b5335f95edc5` |
+| ADRS | 2,322 | `2bb24d70cff299b755a70c94c2d46874679b5ca73045d6f3fbef2591a3a3640e` |
+| ADSL | 371 | `ff0232e2d7358ac4a9cf2d607802a9a3d9c342d48928e28d2fbe1d7941b62c91` |
+| ADTTE | 2,226 | `e53d06e57d74ea148a93ae5425a7ac551e9732db12b41539e4ff5385f9a5e8b1` |
 
 ## Before/after remediation
 

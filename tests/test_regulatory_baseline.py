@@ -59,8 +59,7 @@ def test_definitive_p21_summary_is_self_reconciling_and_non_qualifying():
         "datasets_processed": 7,
         "datasets_rejected": 0,
         "records": 121320,
-        "rule_catalog_entries": 387,
-        "checks_reported": 5546,
+        "rule_catalog_entries": 388,
         "issue_groups": 30,
         "issue_occurrences": 2373,
     }
@@ -70,6 +69,15 @@ def test_definitive_p21_summary_is_self_reconciling_and_non_qualifying():
     assert totals["issue_occurrences"] == sum(
         row["occurrences"] for row in summary["residual_families"]
     )
+    assert summary["pipeline_binding"] == {
+        "health_timestamp": "2026-08-12T09:29:59.539074+00:00",
+        "pipeline_health_status": "GREEN",
+        "sas_execution_mode": "oda",
+        "run_scope": "full_dag",
+        "stages_expected": 37,
+        "stages_recorded": 37,
+        "source_tree_sha256": "81dadd3c02bf521bf11fce32f67f30ec4c70913059675cc576c895b8182a605d",
+    }
     assert summary["remediation_comparison"]["occurrences_eliminated"] == 84238
     assert summary["remediation_comparison"]["percent_reduction"] == 97.3
     assert not {"AD0269", "AD0127A", "AD0164", "AD0178"} & {

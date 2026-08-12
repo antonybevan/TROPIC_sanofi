@@ -47,11 +47,12 @@ package_contract:
 validation_evidence:
   pinnacle_21_community_summary:
     path: "06_qc_evidence/conformance/p21_adam_summary.json"
-    record_id: "TROPIC-P21-ADAM-2026-08-12-02"
+    record_id: "TROPIC-P21-ADAM-2026-08-12-03"
     status: "EXECUTED_WITH_OPEN_FINDINGS_AND_COMPATIBILITY_CAVEAT"
     use: "INFORMATIVE_ONLY"
     expected_datasets: 7
     expected_records: 121320
+    expected_rule_catalog_entries: 388
     expected_issue_groups: 30
     expected_issue_occurrences: 2373
 

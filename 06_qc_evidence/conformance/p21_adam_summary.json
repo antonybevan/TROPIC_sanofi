@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "record_id": "TROPIC-P21-ADAM-2026-08-12-02",
+  "record_id": "TROPIC-P21-ADAM-2026-08-12-03",
   "status": "EXECUTED_WITH_OPEN_FINDINGS_AND_COMPATIBILITY_CAVEAT",
   "use": "INFORMATIVE_ONLY",
   "licensed_enterprise_execution": false,
@@ -13,7 +13,7 @@
     "distribution": "Apple-notarized Developer ID Application: Pinnacle 21 LLC (56C9Z22DN3)"
   },
   "validation": {
-    "generated_at": "2026-08-12T14:06:48+05:30",
+    "generated_at": "2026-08-12T15:01:16+05:30",
     "engine": "FDA 2508.1",
     "standard": "ADaM-IG 1.3 (FDA)",
     "define_standard": "Define-XML 2.1",
@@ -21,8 +21,8 @@
     "sdtm_ct": "2024-03-29",
     "configuration_sha256": "7076c498f841346dac1fe48afb6ef480ce22e8a42a02aeb07453f751a8b9f014",
     "define_sha256": "74256966d9247f117ffba4a52712733bd42abc11f5aca5061aa73e210e7db204",
-    "raw_report_filename": "pinnacle21-report-2026-08-12T14-05-definitive.xlsx",
-    "raw_report_sha256": "94d29012c0b5cdfa90bab6f4b1a335a65de3674364ace14cc4b9a50be5f16629",
+    "raw_report_filename": "pinnacle21-report-2026-08-12T15-02-final-green.xlsx",
+    "raw_report_sha256": "2cb4cc952939d5ca4681197a09ff256abc5e9a87c9839296cca82195deba4f9f",
     "raw_report_committed": false,
     "raw_report_withheld_reason": "Details include record-level identifiers",
     "compatibility_caveat": "Incompatible CLI used",
@@ -33,8 +33,7 @@
     "datasets_processed": 7,
     "datasets_rejected": 0,
     "records": 121320,
-    "rule_catalog_entries": 387,
-    "checks_reported": 5546,
+    "rule_catalog_entries": 388,
     "issue_groups": 30,
     "issue_occurrences": 2373
   },
@@ -56,13 +55,13 @@
     {"family": "define_physical_type_messages", "occurrences": 19, "disposition": "requires_qualified_standards_review"}
   ],
   "datasets": [
-    {"dataset": "ADAE", "records": 5428, "sha256": "7d69bfd565d09305802058e8d5708642ae2872ff8939eac60924e8d742af6694"},
-    {"dataset": "ADCM", "records": 24534, "sha256": "ee86a5e4ac69b22ed8d19aa5cf35b28f52caaf36f6242a5faf7a576e02c0f593"},
-    {"dataset": "ADEX", "records": 7820, "sha256": "4492a011592c763429cdb84a87e80eb1c04ca2731c7eedfbbabd3175878c9e7e"},
-    {"dataset": "ADLB", "records": 78619, "sha256": "e143726865d89ec58afea959311d0089afd340e12392be70250d23d45d6030be"},
-    {"dataset": "ADRS", "records": 2322, "sha256": "36b1e6aaf868e2243fb3f97f68bf1982180124cc9cfe8a8d070568e024c73a87"},
-    {"dataset": "ADSL", "records": 371, "sha256": "41bd2a3fa78b6750d6059f40cfd6293cd158db7ec99915f3908d244ff39c92ac"},
-    {"dataset": "ADTTE", "records": 2226, "sha256": "597ffd31e266f4fda44dfc6f82f37532cad00987838445c3b5deb9f92f86fec5"}
+    {"dataset": "ADAE", "records": 5428, "sha256": "0ed941880c91ce8ce94a751e6acb91306a241bf6ce864e7f97b09488c421c4dc"},
+    {"dataset": "ADCM", "records": 24534, "sha256": "42efe96796572e0044450ea1f838efbc7884d8f453dd5b09694a40b5041618c9"},
+    {"dataset": "ADEX", "records": 7820, "sha256": "1cac2fcf52782f01adefb8df890064017b96fb64171ad00ff23e6361e02bd377"},
+    {"dataset": "ADLB", "records": 78619, "sha256": "71f0d7f016b81209372a38529355e129736dbed2c31781b12dc9b5335f95edc5"},
+    {"dataset": "ADRS", "records": 2322, "sha256": "2bb24d70cff299b755a70c94c2d46874679b5ca73045d6f3fbef2591a3a3640e"},
+    {"dataset": "ADSL", "records": 371, "sha256": "ff0232e2d7358ac4a9cf2d607802a9a3d9c342d48928e28d2fbe1d7941b62c91"},
+    {"dataset": "ADTTE", "records": 2226, "sha256": "e53d06e57d74ea148a93ae5425a7ac551e9732db12b41539e4ff5385f9a5e8b1"}
   ],
   "issues": [
     {"domain": "GLOBAL", "id": "AD1024", "found": 1, "message": "Traceability rules not executed due to missing DM dataset"},
@@ -96,6 +95,15 @@
     {"domain": "ADTTE", "id": "AD0018", "found": 3, "message": "Variable label mismatch between dataset and ADaM standard"},
     {"domain": "ADTTE", "id": "SD0059", "found": 2, "message": "Define.xml/dataset variable type mismatch"}
   ],
+  "pipeline_binding": {
+    "health_timestamp": "2026-08-12T09:29:59.539074+00:00",
+    "pipeline_health_status": "GREEN",
+    "sas_execution_mode": "oda",
+    "run_scope": "full_dag",
+    "stages_expected": 37,
+    "stages_recorded": 37,
+    "source_tree_sha256": "81dadd3c02bf521bf11fce32f67f30ec4c70913059675cc576c895b8182a605d"
+  },
   "qualification": {
     "community_informative_only": true,
     "enterprise_executed": false,
