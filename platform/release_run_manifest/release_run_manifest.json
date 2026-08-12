@@ -191,11 +191,11 @@
         "size_bytes": 2905914
       },
       {
-        "md5": "e78d4fc856233550cdc6991082b32f6e",
+        "md5": "c64056909089a74eb5f6399a1fda2d30",
         "path": "05_outputs/ars/tropic_ard.csv",
         "present": true,
-        "sha256": "f2dda6cfe770a133763aea62f90e02c365afc62db259dd45aae238c846cc3beb",
-        "size_bytes": 2022
+        "sha256": "85667efdfc69a207efa2279bd7c2a7eb0a45bf14fa443db4cb9adab71702d99c",
+        "size_bytes": 2001
       },
       {
         "md5": "494e1729bda1d9298df7704ccc5ac69a",
@@ -3005,17 +3005,17 @@
         "size_bytes": 265
       },
       {
-        "md5": "54e12486d1c11043f1cb391d3b4e9199",
+        "md5": "f9d4e186916aefdea8da1ab65dd9c0c2",
         "path": "platform/conformance/spec_define_conformance.json",
         "present": true,
-        "sha256": "6eab438caf49059683b9da6568ddf7c4a62664927260cdf778302f991bad1fab",
+        "sha256": "7f08f5b67b572eab1a405870e9704597a0ad2cd164ad2a0ae081679fd0cfbd90",
         "size_bytes": 258
       },
       {
-        "md5": "da09d1e255fbe1eee694d31812f686ee",
+        "md5": "0fbdc5a6d92f96a3830b3f481764f697",
         "path": "platform/conformance/spec_data_conformance.json",
         "present": true,
-        "sha256": "04483258a937517b2ecccbdeb5cb4206009b070ea521d241d80e832bfe910455",
+        "sha256": "e262db34117066832cb13ef68c935ce0010f00a0a120489e3a10322fbccc69c9",
         "size_bytes": 3257
       },
       {
@@ -3461,9 +3461,9 @@
     "sas_version": "9.04.01M8P022223",
     "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007"
   },
-  "evidence_grade": "remediation_partial_or_dirty",
-  "generated_at": "2026-08-10 05:43:22 UTC",
-  "manifest_sha256": "de08a5825519424220096e3ab6bff0fdea9c9a6f4f7a24f546eadd07c4f65809",
+  "evidence_grade": "release_candidate",
+  "generated_at": "2026-08-12 05:54:34 UTC",
+  "manifest_sha256": "719c58421ff921402d92b1a5b7fd0e071b9cad55d022598693d3d69f38697ead",
   "problems": [],
   "qc_statuses": {
     "cbzp_bridge": {
@@ -3575,9 +3575,7 @@
       "status": "PASS"
     }
   },
-  "remediation_reasons": [
-    "git worktree is dirty (13 porcelain entries); release-candidate lock requires a clean committed state"
-  ],
+  "remediation_reasons": [],
   "run_completeness": {
     "expected_stage_names": [
       "Governance Scope Lock (G00)",
@@ -3669,59 +3667,16 @@
   },
   "source_control": {
     "branch": "codex/pipeline-audit-final-2026-08-10",
-    "dirty": true,
-    "dirty_including_seal_outputs": true,
-    "head": "fa381a61fb737f1d8200f56a78a3fde686daaf7c",
+    "dirty": false,
+    "dirty_including_seal_outputs": false,
+    "head": "59905d33fa1dd19340808f7f7398869fbee92dcd",
     "pipeline_control_sha256": "93db15a04e6175b0e99301327a5f5d698b541903702e22ca2ecc4b7eb50a6878",
     "source_tree_sha256": "58fc27b10ef364c1fb277790860f23812daabc25df8357d075072ae9c03a9910",
     "staged_diff_paths": [],
-    "status_porcelain": [
-      " M 01_source_data/guyot_validation_report.md",
-      " M 03_metadata/define/define_sdtm.xml",
-      " M 05_outputs/ars/tropic_ard.csv",
-      " M 06_qc_evidence/gates/g00_governance_status.json",
-      " M 06_qc_evidence/gates/g02_specification_status.json",
-      " M 06_qc_evidence/gates/g07_reviewer_package_status.json",
-      " M 08_submission_package/ectd/0000/index-md5.txt",
-      " M 08_submission_package/ectd/0000/index.xml",
-      " M 08_submission_package/m5/datasets/tropic/tabulations/sdtm/datasets/define.xml",
-      " M platform/admiral_reconciliation_status.json",
-      " M platform/log_cleanliness/log_cleanliness_status.json",
-      " M platform/pipeline_health.json",
-      " M tests/test_analysis_contracts.py"
-    ],
-    "status_porcelain_all": [
-      " M 01_source_data/guyot_validation_report.md",
-      " M 03_metadata/define/define_sdtm.xml",
-      " M 05_outputs/ars/tropic_ard.csv",
-      " M 06_qc_evidence/gates/g00_governance_status.json",
-      " M 06_qc_evidence/gates/g02_specification_status.json",
-      " M 06_qc_evidence/gates/g07_reviewer_package_status.json",
-      " M 08_submission_package/ectd/0000/index-md5.txt",
-      " M 08_submission_package/ectd/0000/index.xml",
-      " M 08_submission_package/m5/datasets/tropic/tabulations/sdtm/datasets/define.xml",
-      " M docs/RELEASE_RUN_MANIFEST.md",
-      " M platform/admiral_reconciliation_status.json",
-      " M platform/log_cleanliness/log_cleanliness_status.json",
-      " M platform/pipeline_health.json",
-      " M platform/release_run_manifest/release_run_manifest.json",
-      " M tests/test_analysis_contracts.py"
-    ],
-    "status_porcelain_sha256": "6b022ac5bce46e7be6896169fcd9fbd2f9a9461522110a7808bda6536439807b",
-    "tracked_diff_paths": [
-      "01_source_data/guyot_validation_report.md",
-      "03_metadata/define/define_sdtm.xml",
-      "06_qc_evidence/gates/g00_governance_status.json",
-      "06_qc_evidence/gates/g02_specification_status.json",
-      "06_qc_evidence/gates/g07_reviewer_package_status.json",
-      "08_submission_package/ectd/0000/index-md5.txt",
-      "08_submission_package/ectd/0000/index.xml",
-      "08_submission_package/m5/datasets/tropic/tabulations/sdtm/datasets/define.xml",
-      "platform/admiral_reconciliation_status.json",
-      "platform/log_cleanliness/log_cleanliness_status.json",
-      "platform/pipeline_health.json",
-      "tests/test_analysis_contracts.py"
-    ]
+    "status_porcelain": [],
+    "status_porcelain_all": [],
+    "status_porcelain_sha256": "",
+    "tracked_diff_paths": []
   },
-  "status": "REMEDIATION"
+  "status": "PASS"
 }
