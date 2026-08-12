@@ -2350,6 +2350,13 @@
         "size_bytes": 13439
       },
       {
+        "md5": "52a9438e917fcb1b550c79515f9b269d",
+        "path": ".gitleaks.toml",
+        "present": true,
+        "sha256": "29918bb172b5e853922afb17bf6596361e54e02adee487d2269b878f2f6b0715",
+        "size_bytes": 648
+      },
+      {
         "md5": "6751e3974d3e000a451141344a5b220e",
         "path": ".pre-commit-config.yaml",
         "present": true,
@@ -2378,11 +2385,11 @@
         "size_bytes": 252146
       },
       {
-        "md5": "b4193ed217756078cff4376c51a7529a",
+        "md5": "e168534adb7299782213262036c347dd",
         "path": "scripts/rebind_governance_seal.py",
         "present": true,
-        "sha256": "6d33029adeada3080a2e65b48e7be055be987d4e5e96755b1a2726ec2e7c5e0c",
-        "size_bytes": 4993
+        "sha256": "ddd84a47d8ad7049eb19fb7f66034e7386967430e75e296fe147b61c8caf2153",
+        "size_bytes": 5015
       },
       {
         "md5": "8df7caedb96d81ea7017354f7c62eb0e",
@@ -2737,11 +2744,11 @@
         "size_bytes": 21478
       },
       {
-        "md5": "37513a89c01c4eae0f3669257075e5ed",
+        "md5": "80225816ce691ef03de89481eb9f6ee9",
         "path": "platform/build_release_run_manifest.py",
         "present": true,
-        "sha256": "7e43d186765772e94b2ea152617d15a5d031428c5872f707acad89c05cf682e5",
-        "size_bytes": 35062
+        "sha256": "bd3a8a866d05ecda5064b4f7aea0355bf46080deef841ab215cc62d53a9fa0c7",
+        "size_bytes": 35084
       },
       {
         "md5": "f5e1d699602ab38b23bc834f6ed430f1",
@@ -3019,11 +3026,11 @@
     ],
     "qc_files": [
       {
-        "md5": "cac02e068c8fdcf4c129d8a5fd46eece",
+        "md5": "2855e254de2223e65a21322f7a475143",
         "path": "platform/pipeline_health.json",
         "present": true,
-        "sha256": "3d9c1b24b0edaf2e0f2ba83acf55680fa6969bffb24bb627f29cec2978ccb02b",
-        "size_bytes": 4716
+        "sha256": "253d7c65531d041c9a359c33309e613c6297576bfd100277df23f214b3b19246",
+        "size_bytes": 4616
       },
       {
         "md5": "06989db82566475af4ebd3685eb8d8a8",
@@ -3075,10 +3082,10 @@
         "size_bytes": 3257
       },
       {
-        "md5": "491d085b288c3b9d998b1a0c885594bf",
+        "md5": "b948d5f562e58ac2620664178ed87228",
         "path": "platform/metadata_control/metadata_control_status.json",
         "present": true,
-        "sha256": "a3c40ce95e27370cb9ff44515c53b7175530866e2b815d971a122481079cb82d",
+        "sha256": "e917ae56995348a94c3fdc4fd72800154c04bda50bce97bb1485fc56cdcf2981",
         "size_bytes": 1101
       },
       {
@@ -3525,8 +3532,8 @@
     "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007"
   },
   "evidence_grade": "release_candidate",
-  "generated_at": "2026-08-12 09:37:44 UTC",
-  "manifest_sha256": "42b199d8c6aed9136726447813b27d8d368ae81d52aa06357ed5e7a47a9fbd36",
+  "generated_at": "2026-08-12 10:03:34 UTC",
+  "manifest_sha256": "4f90aecd69cd4596e7e626c17b5f14746ffc41ea1cd94ce6d686a5177c4a9620",
   "problems": [],
   "qc_statuses": {
     "cbzp_bridge": {
@@ -3741,9 +3748,9 @@
     "branch": "codex/fda-aligned-clinical-portfolio",
     "dirty": false,
     "dirty_including_seal_outputs": false,
-    "head": "ee8b06fa1f4e7656f70bdbe947a06085bb6a5a83",
-    "pipeline_control_sha256": "94a2f7d6176b7a31e95b349edf55520fb54ba400bd65e0794668c8a98144ec26",
-    "source_tree_sha256": "85e79bae07334e80311266c03267228d6e230f6905b2bea6d4f771ed602be780",
+    "head": "a548c814d3969bee82bebdcf9e4f8faa12888d8a",
+    "pipeline_control_sha256": "f7dd816f5fa8296d49a1370c4e0c88b7f9a624f37e2a1c52db3d6fa43f2a83d6",
+    "source_tree_sha256": "c42e7ecd7059d137df8fa4a1ae83193b78ec4b94fd91b96df2d10e33907c3b5b",
     "staged_diff_paths": [],
     "status_porcelain": [],
     "status_porcelain_all": [],
