@@ -291,18 +291,18 @@
         "size_bytes": 5728
       },
       {
-        "md5": "9ac775e7ccf1163a1073ec9a479c1ab5",
+        "md5": "96b8005033239a012c0997464feaf76b",
         "path": "06_qc_evidence/conformance/p21_adam_runrecord.md",
         "present": true,
-        "sha256": "5721a34f75f364ad69453a4f0fcc6bfac4b3740272164968df23f10a9d385f41",
-        "size_bytes": 6199
+        "sha256": "371b5fc62e4681b209969fe0c1026b30f4c53e4aea39d69b709c1eda902861c0",
+        "size_bytes": 6720
       },
       {
-        "md5": "8336ef9c5fd3ecd4d72da907dc47ee4a",
+        "md5": "6c5931b7b173f64384892c957ef0a36a",
         "path": "06_qc_evidence/conformance/p21_adam_summary.json",
         "present": true,
-        "sha256": "412f721e8b678c7befae0622dedf31a6a812da964e4d2b9fd2491958895f0362",
-        "size_bytes": 7280
+        "sha256": "aa189df5f75b11610bc3a67273390c18d334718735b18b3dacd286e4ae00129c",
+        "size_bytes": 7878
       },
       {
         "md5": "df49adc0bbf6f1c550e3a5cb4e71400a",
@@ -2385,11 +2385,11 @@
         "size_bytes": 252146
       },
       {
-        "md5": "129dd6a29dc659cdfa55c7de1cf922f6",
+        "md5": "75c2f7b5140477d8c2c00650e564edd1",
         "path": "scripts/rebind_governance_seal.py",
         "present": true,
-        "sha256": "8e33b9cea6cf426d9f7bada45500815794497c6354416539130ece55c39081b5",
-        "size_bytes": 6854
+        "sha256": "32d9db0c06a4398ffe92addfbcdff72773c89c47f540986e4be3060077449994",
+        "size_bytes": 8888
       },
       {
         "md5": "8df7caedb96d81ea7017354f7c62eb0e",
@@ -2821,11 +2821,11 @@
         "size_bytes": 12792
       },
       {
-        "md5": "65d11c8a45cc8f2c7c36e630b3533f9c",
+        "md5": "683adb01bd1d252c10fecfdd901f044b",
         "path": "platform/check_regulatory_baseline.py",
         "present": true,
-        "sha256": "dcc00e1ef796daae3fc56323432f55419b0e58583fd17b12a93d7b0a5afc5676",
-        "size_bytes": 14916
+        "sha256": "0a4b36746d35f0588e1d9355d5483c283a7836d975873f09c276d77c235e4655",
+        "size_bytes": 16810
       },
       {
         "md5": "764ba737f74cb525b6b6b21e79ce92ec",
@@ -3026,11 +3026,11 @@
     ],
     "qc_files": [
       {
-        "md5": "61ef671c33fddc06734efc798fc3db40",
+        "md5": "8d1133f7626ce8f30ea5d0a1c9bba0ce",
         "path": "platform/pipeline_health.json",
         "present": true,
-        "sha256": "4794b0d72b95d9142bad6b512fe315d6b82e411bce283168640f860fcdf401b4",
-        "size_bytes": 3650
+        "sha256": "5bac43213af6582e02e35cf1317bd4b63de59657ddcbe5e21e7676db7dffa380",
+        "size_bytes": 6600
       },
       {
         "md5": "06989db82566475af4ebd3685eb8d8a8",
@@ -3110,11 +3110,11 @@
         "size_bytes": 22052
       },
       {
-        "md5": "b0a53ecee6eeb80012b3ffd7e7c146af",
+        "md5": "c17f7dedc507db57164e4b4d6bda875a",
         "path": "06_qc_evidence/gates/regulatory_baseline_status.json",
         "present": true,
-        "sha256": "5eb3de49d07b58f812779594ad2c47601468c01341f396d2bbb27fcf5c7ea63c",
-        "size_bytes": 10290
+        "sha256": "640cb4830f497a485610203db2c9eb70e9df89825476ba738033653e9488e326",
+        "size_bytes": 10824
       }
     ],
     "tfl_outputs": [
@@ -3532,8 +3532,8 @@
     "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007"
   },
   "evidence_grade": "release_candidate",
-  "generated_at": "2026-08-12 10:37:31 UTC",
-  "manifest_sha256": "8d472c56ecb54dae3bb9e80b6b2af04104f74f4968285060252e3b11bd27e503",
+  "generated_at": "2026-08-12 10:43:48 UTC",
+  "manifest_sha256": "d02a7f0f869fa61a0aa3a4e79e22c3d09cf75fd00f27bbbffd73588c9346ba03",
   "problems": [],
   "qc_statuses": {
     "cbzp_bridge": {
@@ -3748,9 +3748,9 @@
     "branch": "codex/fda-aligned-clinical-portfolio",
     "dirty": false,
     "dirty_including_seal_outputs": true,
-    "head": "d5fe5741033d98fd05e9fbcaab16ca80ffa61ee8",
-    "pipeline_control_sha256": "5f65b1cb7fcc06486c164529a3c6bd54432d4f8e426c406b06c63605f2c08eb6",
-    "source_tree_sha256": "21b5d67359c2ab8b733be9ea1d3d3a09131b43051b9d3c0a3017139d609af2a4",
+    "head": "cbf6a14a581facb974c2496fcd09267b64c3de23",
+    "pipeline_control_sha256": "6aaf46900559a6db6afc4b664763e39133a359b6fd426992d4c38e24b66afd50",
+    "source_tree_sha256": "25eea11519389347cf943ecdb2c57c55733c32f781241f158d91acca35eb6fa5",
     "staged_diff_paths": [],
     "status_porcelain": [],
     "status_porcelain_all": [
