@@ -92,6 +92,11 @@ def _health_change_is_prior_reseal_only(base: str) -> bool:
         current_health = json.loads(HEALTH.read_text(encoding="utf-8"))
     except (subprocess.CalledProcessError, json.JSONDecodeError, OSError):
         return False
+    return _health_is_valid_prior_reseal(base_health, current_health)
+
+
+def _health_is_valid_prior_reseal(base_health: dict, current_health: dict) -> bool:
+    """Validate a carried-forward health seal without requiring Git history."""
     for key in ("timestamp", "pipeline_health_status", "sas_execution_mode", "run_scope"):
         if current_health.get(key) != base_health.get(key):
             return False

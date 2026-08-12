@@ -19,7 +19,7 @@ _RESEAL_SPEC = importlib.util.spec_from_file_location(
 assert _RESEAL_SPEC and _RESEAL_SPEC.loader
 _RESEAL_MODULE = importlib.util.module_from_spec(_RESEAL_SPEC)
 _RESEAL_SPEC.loader.exec_module(_RESEAL_MODULE)
-_health_change_is_prior_reseal_only = _RESEAL_MODULE._health_change_is_prior_reseal_only
+_health_is_valid_prior_reseal = _RESEAL_MODULE._health_is_valid_prior_reseal
 
 
 def test_current_regulatory_baseline_is_closed():
@@ -87,8 +87,35 @@ def test_current_baseline_accepts_disclosed_later_header_only_rebuild():
     assert boundary_check["ok"], boundary_check
 
 
-def test_current_health_change_is_a_valid_prior_governance_reseal():
-    assert _health_change_is_prior_reseal_only("00f4f22")
+def test_prior_governance_reseal_validation_is_history_independent():
+    base = {
+        "timestamp": "2026-08-12T10:28:13+00:00",
+        "pipeline_health_status": "GREEN",
+        "sas_execution_mode": "oda",
+        "run_scope": "full_dag",
+        "source_tree_sha256": "a" * 64,
+    }
+    current = {
+        **base,
+        "source_tree_sha256": "c" * 64,
+        "governance_reseal_chain": [
+            {
+                "status": "PASS",
+                "clinical_run_was_not_reexecuted": True,
+                "prior_source_tree_sha256": "a" * 64,
+                "rebound_source_tree_sha256": "b" * 64,
+            },
+            {
+                "status": "PASS",
+                "clinical_run_was_not_reexecuted": True,
+                "prior_source_tree_sha256": "b" * 64,
+                "rebound_source_tree_sha256": "c" * 64,
+            },
+        ],
+    }
+    assert _health_is_valid_prior_reseal(base, current)
+    current["governance_reseal_chain"][1]["prior_source_tree_sha256"] = "x" * 64
+    assert not _health_is_valid_prior_reseal(base, current)
 
 
 def test_current_csdrg_filename_receives_the_fda_stf_tag():
