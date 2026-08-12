@@ -49,7 +49,7 @@
   },
   "r_version": "R version 4.6.0 (2026-04-24)",
   "renv_lock_sha256": "a9ba2082ce1f227add5d2cb400fb70688ea5031fef238dcf1bf1928de2700630",
-  "source_tree_sha256": "81dadd3c02bf521bf11fce32f67f30ec4c70913059675cc576c895b8182a605d",
+  "source_tree_sha256": "85e79bae07334e80311266c03267228d6e230f6905b2bea6d4f771ed602be780",
   "oda_endpoint": "odaws01-apse1-2.oda.sas.com",
   "oda_attempts": 1,
   "oda_total_wait_s": 5.7,
@@ -103,5 +103,24 @@
     ],
     "byte_distinct": true,
     "sdtm_manifest_sha": "matches current SDTM source (329430f6361e)"
+  },
+  "governance_only_reseal": {
+    "status": "PASS",
+    "rebound_at": "2026-08-12T09:37:26.980625+00:00",
+    "base_revision": "7413ace",
+    "clinical_run_timestamp": "2026-08-12T09:29:59.539074+00:00",
+    "prior_source_tree_sha256": "81dadd3c02bf521bf11fce32f67f30ec4c70913059675cc576c895b8182a605d",
+    "rebound_source_tree_sha256": "85e79bae07334e80311266c03267228d6e230f6905b2bea6d4f771ed602be780",
+    "changed_paths": [
+      "06_qc_evidence/conformance/p21_adam_runrecord.md",
+      "06_qc_evidence/conformance/p21_adam_summary.json",
+      "06_qc_evidence/gates/regulatory_baseline_status.json",
+      "config/evidence_layers.yaml",
+      "config/regulatory_baseline.yaml",
+      "platform/check_regulatory_baseline.py",
+      "tests/test_regulatory_baseline.py"
+    ],
+    "clinical_run_was_not_reexecuted": true,
+    "reason": "Pipeline integrity, dependency, executor-validation, regulatory-claim, external-validator-evidence, and test controls changed; clinical derivation programs, study parameters, datasets, and statistical results did not."
   }
 }
