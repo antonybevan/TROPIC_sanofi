@@ -9,12 +9,57 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "platform"))
 
 from build_ectd_backbone import classify  # noqa: E402
-from check_regulatory_baseline import evaluate  # noqa: E402
+from check_regulatory_baseline import _valid_reseal_chain, evaluate  # noqa: E402
 
 
 def test_current_regulatory_baseline_is_closed():
     result = evaluate(ROOT)
     assert result["status"] == "PASS", result["problems"]
+
+
+def test_governance_reseal_chain_accepts_valid_multi_hop_history():
+    health = {
+        "source_tree_sha256": "c" * 64,
+        "governance_reseal_chain": [
+            {
+                "status": "PASS",
+                "prior_source_tree_sha256": "a" * 64,
+                "rebound_source_tree_sha256": "b" * 64,
+                "clinical_run_was_not_reexecuted": True,
+            },
+            {
+                "status": "PASS",
+                "prior_source_tree_sha256": "b" * 64,
+                "rebound_source_tree_sha256": "c" * 64,
+                "clinical_run_was_not_reexecuted": True,
+            },
+        ],
+    }
+    ok, accepted, detail = _valid_reseal_chain(health)
+    assert ok, detail
+    assert accepted == ["a" * 64, "b" * 64, "c" * 64]
+
+
+def test_governance_reseal_chain_rejects_discontinuous_history():
+    health = {
+        "source_tree_sha256": "c" * 64,
+        "governance_reseal_chain": [
+            {
+                "status": "PASS",
+                "prior_source_tree_sha256": "a" * 64,
+                "rebound_source_tree_sha256": "b" * 64,
+                "clinical_run_was_not_reexecuted": True,
+            },
+            {
+                "status": "PASS",
+                "prior_source_tree_sha256": "x" * 64,
+                "rebound_source_tree_sha256": "c" * 64,
+                "clinical_run_was_not_reexecuted": True,
+            },
+        ],
+    }
+    ok, _, _ = _valid_reseal_chain(health)
+    assert not ok
 
 
 def test_current_csdrg_filename_receives_the_fda_stf_tag():

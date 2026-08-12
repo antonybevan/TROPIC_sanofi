@@ -30,6 +30,45 @@ REQUIRED_ASSERTIONS = {
 }
 
 
+def _valid_reseal_chain(pipeline_health: dict) -> tuple[bool, list[str], str]:
+    """Return whether a bound clinical digest can be traced to the current seal.
+
+    Older evidence has one ``governance_only_reseal`` object; current evidence
+    retains an append-only ``governance_reseal_chain``. Every hop must be PASS,
+    disclose that clinical execution was not repeated, and link prior -> rebound.
+    """
+    current = str(pipeline_health.get("source_tree_sha256") or "")
+    chain = pipeline_health.get("governance_reseal_chain")
+    if chain is None:
+        legacy = pipeline_health.get("governance_only_reseal")
+        chain = [legacy] if isinstance(legacy, dict) else []
+    if not isinstance(chain, list) or not all(isinstance(row, dict) for row in chain):
+        return False, [], "malformed governance reseal chain"
+
+    accepted: list[str] = []
+    expected_prior = ""
+    for index, row in enumerate(chain):
+        prior = str(row.get("prior_source_tree_sha256") or "")
+        rebound = str(row.get("rebound_source_tree_sha256") or "")
+        if (
+            row.get("status") != "PASS"
+            or row.get("clinical_run_was_not_reexecuted") is not True
+            or not prior
+            or not rebound
+            or (index and prior != expected_prior)
+        ):
+            return False, accepted, f"invalid governance reseal hop {index + 1}"
+        if not accepted:
+            accepted.append(prior)
+        accepted.append(rebound)
+        expected_prior = rebound
+    if chain and expected_prior != current:
+        return False, accepted, "governance reseal chain does not end at current health digest"
+    if not chain and current:
+        accepted.append(current)
+    return bool(current), accepted, f"validated_hops={len(chain)}"
+
+
 def evaluate(root: Path = ROOT) -> dict:
     checks: list[dict] = []
     problems: list[str] = []
@@ -244,15 +283,14 @@ def evaluate(root: Path = ROOT) -> dict:
         )
     bound_source = pipeline_binding.get("source_tree_sha256")
     health_source = pipeline_health.get("source_tree_sha256")
-    prior_source = (pipeline_health.get("governance_only_reseal") or {}).get(
-        "prior_source_tree_sha256"
-    )
+    chain_ok, accepted_sources, chain_detail = _valid_reseal_chain(pipeline_health)
+    add("p21.pipeline_binding.reseal_chain", chain_ok, chain_detail)
     add(
         "p21.pipeline_binding.source_tree",
-        bool(bound_source) and bound_source in {health_source, prior_source},
+        chain_ok and bool(bound_source) and bound_source in set(accepted_sources),
         (
             f"bound={bound_source}; current_health={health_source}; "
-            f"pre_governance_reseal={prior_source}"
+            f"accepted_chain={accepted_sources}"
         ),
     )
 

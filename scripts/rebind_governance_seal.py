@@ -97,8 +97,16 @@ def main(argv=None) -> int:
     if not previous or previous == rebound:
         raise SystemExit("source-tree rebind was unnecessary or had no prior digest")
 
-    health["source_tree_sha256"] = rebound
-    health["governance_only_reseal"] = {
+    prior_reseal = health.get("governance_only_reseal")
+    chain = health.get("governance_reseal_chain")
+    if chain is None:
+        chain = [prior_reseal] if isinstance(prior_reseal, dict) else []
+    elif not isinstance(chain, list) or not all(isinstance(row, dict) for row in chain):
+        raise SystemExit("refusing malformed governance_reseal_chain")
+    if chain and chain[-1].get("rebound_source_tree_sha256") != previous:
+        raise SystemExit("refusing discontinuous governance reseal chain")
+
+    reseal = {
         "status": "PASS",
         "rebound_at": datetime.now(timezone.utc).isoformat(),
         "base_revision": args.base_revision,
@@ -113,6 +121,10 @@ def main(argv=None) -> int:
             "programs, study parameters, datasets, and statistical results did not."
         ),
     }
+    chain.append(reseal)
+    health["source_tree_sha256"] = rebound
+    health["governance_only_reseal"] = reseal
+    health["governance_reseal_chain"] = chain
     HEALTH.write_text(json.dumps(health, indent=2) + "\n", encoding="utf-8")
     print(f"Rebound {HEALTH.relative_to(ROOT)} from {previous} to {rebound}")
     print("Disclosure: governance-only seal update; SAS/clinical stages were not re-executed.")
