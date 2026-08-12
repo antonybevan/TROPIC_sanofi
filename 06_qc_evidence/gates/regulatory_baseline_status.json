@@ -2,7 +2,7 @@
   "gate": "REGULATORY_BASELINE",
   "baseline_id": "TROPIC-FDA-2026-08-12",
   "status": "PASS",
-  "generated_at": "2026-08-12T10:41:49Z",
+  "generated_at": "2026-08-12T10:43:27Z",
   "checks": [
     {
       "name": "baseline.readable",
@@ -327,12 +327,12 @@
     {
       "name": "p21.pipeline_binding.reseal_chain",
       "ok": true,
-      "detail": "validated_hops=1"
+      "detail": "validated_hops=2"
     },
     {
       "name": "p21.pipeline_binding.source_tree",
       "ok": true,
-      "detail": "bound=81dadd3c02bf521bf11fce32f67f30ec4c70913059675cc576c895b8182a605d; current_health=7a06242b76a0953a54ec8f01e558869dca6f1d5ded130a4e0029a3ad431495fa; accepted_chain=['21b5d67359c2ab8b733be9ea1d3d3a09131b43051b9d3c0a3017139d609af2a4', '7a06242b76a0953a54ec8f01e558869dca6f1d5ded130a4e0029a3ad431495fa']; later_rebuild_assessed=True"
+      "detail": "bound=81dadd3c02bf521bf11fce32f67f30ec4c70913059675cc576c895b8182a605d; current_health=25eea11519389347cf943ecdb2c57c55733c32f781241f158d91acca35eb6fa5; accepted_chain=['21b5d67359c2ab8b733be9ea1d3d3a09131b43051b9d3c0a3017139d609af2a4', '7a06242b76a0953a54ec8f01e558869dca6f1d5ded130a4e0029a3ad431495fa', '25eea11519389347cf943ecdb2c57c55733c32f781241f158d91acca35eb6fa5']; later_rebuild_assessed=True"
     },
     {
       "name": "p21.summary.remediation_reconciled",
