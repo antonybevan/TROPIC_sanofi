@@ -46,6 +46,7 @@ ALLOWED_PATHS = (
     "06_qc_evidence/conformance/p21_adam_runrecord.md",
     "06_qc_evidence/conformance/p21_adam_summary.json",
     "06_qc_evidence/gates/regulatory_baseline_status.json",
+    "07_reviewer_explanation/tools/shiny/",
     "platform/build_release_run_manifest.py",
     "platform/check_regulatory_baseline.py",
     "platform/cibuild.py",
@@ -196,8 +197,9 @@ def main(argv=None) -> int:
         "clinical_run_was_not_reexecuted": True,
         "reason": (
             "Pipeline integrity, dependency, executor-validation, regulatory-claim, "
-            "external-validator-evidence, and test controls changed; clinical derivation "
-            "programs, study parameters, datasets, and statistical results did not."
+            "external-validator-evidence, reviewer-presentation, and test controls "
+            "changed; clinical derivation programs, study parameters, datasets, and "
+            "statistical results did not."
         ),
     }
     chain.append(reseal)

@@ -109,7 +109,7 @@ jobs:
         export LINTR_VERSION='3.3.0.1'
         export LINTR_ARCHIVE_VERSION='3.3.0-1'
         Rscript -e 'install.packages("lintr", repos="https://cloud.r-project.org", dependencies=TRUE); v <- Sys.getenv("LINTR_VERSION"); av <- Sys.getenv("LINTR_ARCHIVE_VERSION"); if (as.character(packageVersion("lintr")) != v) { url <- sprintf("https://cran.r-project.org/src/contrib/Archive/lintr/lintr_%s.tar.gz", av); dest <- file.path(tempdir(), basename(url)); download.file(url, dest, mode="wb", quiet=TRUE); install.packages(dest, repos=NULL, type="source") }; stopifnot(as.character(packageVersion("lintr")) == v)'
-        Rscript -e 'files <- list.files(c("03_metadata/adam", "01_source_data", "04_analysis_datasets/programs/r", "06_qc_evidence/reconciliation", "03_metadata/define", "05_outputs/tfl", "tests"), pattern = "[.]R$", full.names = TRUE); n <- sum(vapply(files, function(f) length(lintr::lint(f)), integer(1))); if (n > 0) { for (f in files) print(lintr::lint(f)); stop(sprintf("lintr gate failed: %d issue(s)", n)) }; cat(sprintf("lintr gate passed: 0 issues across %d files\n", length(files)))'
+        Rscript -e 'files <- list.files(c("03_metadata/adam", "01_source_data", "04_analysis_datasets/programs/r", "06_qc_evidence/reconciliation", "03_metadata/define", "05_outputs/tfl", "07_reviewer_explanation/tools/shiny", "tests"), pattern = "[.]R$", full.names = TRUE); n <- sum(vapply(files, function(f) length(lintr::lint(f)), integer(1))); if (n > 0) { for (f in files) print(lintr::lint(f)); stop(sprintf("lintr gate failed: %d issue(s)", n)) }; cat(sprintf("lintr gate passed: 0 issues across %d files\n", length(files)))'
 
     - name: Install Python dependencies
       run: |
@@ -161,6 +161,9 @@ jobs:
         # Re-check the committed G07 evidence without rewriting its timestamp;
         # the final release seal requires a clean material worktree.
         python3 platform/check_gate_g07_reviewer_package.py --check-only
+
+    - name: Run reviewer-dashboard data-free contract tests
+      run: Rscript tests/test_shiny_dashboard.R
 
     - name: Run ADaM conformance check gate
       run: |
