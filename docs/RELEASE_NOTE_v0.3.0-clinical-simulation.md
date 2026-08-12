@@ -22,6 +22,7 @@ This release replaces portfolio-style presentation and ambiguous compliance lang
 6. Recorded a definitive Pinnacle 21 Community 4.1.0 / FDA 2508.1 ADaM run: 7 datasets, 121,320 records, 0 rejects, 30 open issue groups, and 2,373 aggregate occurrences. The raw workbook is retained outside Git because it contains record-level identifiers; its SHA-256 and a de-identified, self-reconciling aggregate inventory are retained in-repository.
 7. Corrected standard one-sided ADaM flags in paired SAS/R derivations: ADAE/ADCM `TRTEMFL`, ADLB `ANL01FL`, and ADLB `ABLFL` now use `Y`/null; the nonstandard ADLB `BASEFL` variable was removed across data, metadata, and reporting logic.
 8. Replaced promotional PDF header language with a neutral controlled-simulation identity.
+9. Added a local dashboard visual-QC record and sanitized five-panel screenshots; retained the static TFL gallery as the portable public visual surface.
 
 ## Qualification decision
 

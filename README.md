@@ -18,6 +18,8 @@ The binding claim is [Product and Evidence Claim](docs/PRODUCT_CLAIM.md). The qu
 | [Analysis Data Reviewer's Guide](07_reviewer_explanation/guides/ADRG.md) | ADaM derivations, traceability, conformance, and known differences |
 | [Clinical Study Data Reviewer's Guide](07_reviewer_explanation/guides/SDRG.md) | SDTM source boundary, standards decisions, and data limitations |
 | [Traceability matrix](07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md) | Source-to-analysis-to-output lineage |
+| [TFL Gallery](05_outputs/tfl/TFL_Gallery.html) | Portable static figure review surface |
+| [Dashboard visual QC](06_qc_evidence/audit/DASHBOARD_VISUAL_QC.md) | Five-tab local dashboard acceptance evidence |
 | [Current release note](docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) | Release evidence and residual limitations |
 | [Reviewer guide](docs/INTERVIEWER_GUIDE.md) | A short, evidence-led walkthrough |
 
@@ -97,6 +99,8 @@ python3 platform/check_regulatory_baseline.py --check-only
 ```
 
 The full run requires the authorized local SDTM source and credentials; see [Reproducibility](00_governance/REPRODUCIBILITY.md) and the [ODA runbook](docs/runbooks/ODA_GUIDE.md). A clean clone intentionally does not contain patient-level source or derived XPTs.
+
+For reviewer-facing visuals, open the [TFL Gallery](05_outputs/tfl/TFL_Gallery.html). The [Shiny dashboard visual-QC record](06_qc_evidence/audit/DASHBOARD_VISUAL_QC.md) documents the data-bearing local acceptance capture; a bare clone safely opens the dashboard in disclosed data-free mode because patient-level inputs are not distributed.
 
 ## Regulatory baseline
 
