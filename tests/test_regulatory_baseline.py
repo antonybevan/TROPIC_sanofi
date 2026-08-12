@@ -62,6 +62,21 @@ def test_governance_reseal_chain_rejects_discontinuous_history():
     assert not ok
 
 
+def test_current_baseline_accepts_disclosed_later_header_only_rebuild():
+    result = evaluate(ROOT)
+    timestamp_check = next(
+        row for row in result["checks"]
+        if row["name"] == "p21.pipeline_binding.health_timestamp"
+    )
+    boundary_check = next(
+        row for row in result["checks"]
+        if row["name"] == "p21.summary.exact_byte_rerun_boundary"
+    )
+    assert timestamp_check["ok"], timestamp_check
+    assert "later_rebuild_assessed=True" in timestamp_check["detail"]
+    assert boundary_check["ok"], boundary_check
+
+
 def test_current_csdrg_filename_receives_the_fda_stf_tag():
     assert classify("m5/datasets/tropic/tabulations/sdtm/csdrg.pdf") == (
         "data-tabulation-data-reviewers-guide",
@@ -136,6 +151,10 @@ def test_definitive_p21_summary_is_self_reconciling_and_non_qualifying():
     }
     assert summary["subsequent_rebuild_assessment"] == {
         "health_timestamp": "2026-08-12T10:28:13.216075+00:00",
+        "comparison_method": "exhaustive_byte_comparison",
+        "datasets_compared": 7,
+        "payload_differences_after_byte_495": 0,
+        "header_timestamp_differences_per_dataset": 2,
         "comparison": (
             "XPT payload byte-identical after byte 495 for all seven datasets; "
             "differences are confined to two SAS XPORT header timestamps per file"

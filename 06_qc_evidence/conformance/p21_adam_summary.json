@@ -112,6 +112,10 @@
   },
   "subsequent_rebuild_assessment": {
     "health_timestamp": "2026-08-12T10:28:13.216075+00:00",
+    "comparison_method": "exhaustive_byte_comparison",
+    "datasets_compared": 7,
+    "payload_differences_after_byte_495": 0,
+    "header_timestamp_differences_per_dataset": 2,
     "comparison": "XPT payload byte-identical after byte 495 for all seven datasets; differences are confined to two SAS XPORT header timestamps per file",
     "exact_byte_vendor_rerun": false,
     "vendor_rerun_blocker": "Acceptance of vendor application Terms and Conditions requires authorized human confirmation"

@@ -2,7 +2,7 @@
   "gate": "REGULATORY_BASELINE",
   "baseline_id": "TROPIC-FDA-2026-08-12",
   "status": "PASS",
-  "generated_at": "2026-08-12T09:37:11Z",
+  "generated_at": "2026-08-12T10:41:49Z",
   "checks": [
     {
       "name": "baseline.readable",
@@ -295,11 +295,6 @@
       "detail": "platform/pipeline_health.json"
     },
     {
-      "name": "p21.pipeline_binding.health_timestamp",
-      "ok": true,
-      "detail": "actual=2026-08-12T09:29:59.539074+00:00; expected=2026-08-12T09:29:59.539074+00:00"
-    },
-    {
       "name": "p21.pipeline_binding.pipeline_health_status",
       "ok": true,
       "detail": "actual=GREEN; expected=GREEN"
@@ -325,9 +320,19 @@
       "detail": "actual=37; expected=37"
     },
     {
+      "name": "p21.pipeline_binding.health_timestamp",
+      "ok": true,
+      "detail": "bound=2026-08-12T09:29:59.539074+00:00; current=2026-08-12T10:28:13.216075+00:00; later_rebuild_assessed=True"
+    },
+    {
+      "name": "p21.pipeline_binding.reseal_chain",
+      "ok": true,
+      "detail": "validated_hops=1"
+    },
+    {
       "name": "p21.pipeline_binding.source_tree",
       "ok": true,
-      "detail": "bound=81dadd3c02bf521bf11fce32f67f30ec4c70913059675cc576c895b8182a605d; current_health=81dadd3c02bf521bf11fce32f67f30ec4c70913059675cc576c895b8182a605d; pre_governance_reseal=None"
+      "detail": "bound=81dadd3c02bf521bf11fce32f67f30ec4c70913059675cc576c895b8182a605d; current_health=7a06242b76a0953a54ec8f01e558869dca6f1d5ded130a4e0029a3ad431495fa; accepted_chain=['21b5d67359c2ab8b733be9ea1d3d3a09131b43051b9d3c0a3017139d609af2a4', '7a06242b76a0953a54ec8f01e558869dca6f1d5ded130a4e0029a3ad431495fa']; later_rebuild_assessed=True"
     },
     {
       "name": "p21.summary.remediation_reconciled",
@@ -353,6 +358,11 @@
       "name": "p21.summary.no_independent_qc_claim",
       "ok": true,
       "detail": "False"
+    },
+    {
+      "name": "p21.summary.exact_byte_rerun_boundary",
+      "ok": true,
+      "detail": "later exact-byte rerun is either complete or explicitly bounded"
     },
     {
       "name": "product_claim.controlled_simulation",

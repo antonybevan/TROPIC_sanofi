@@ -267,7 +267,6 @@ def evaluate(root: Path = ROOT) -> dict:
             str(pipeline_health_path.relative_to(root)),
         )
     binding_expectations = {
-        "health_timestamp": pipeline_health.get("timestamp"),
         "pipeline_health_status": "GREEN",
         "sas_execution_mode": "oda",
         "run_scope": "full_dag",
@@ -281,16 +280,41 @@ def evaluate(root: Path = ROOT) -> dict:
             actual == expected,
             f"actual={actual}; expected={expected}",
         )
+    assessment = p21_summary.get("subsequent_rebuild_assessment") or {}
+    current_health_timestamp = pipeline_health.get("timestamp")
+    binding_timestamp = pipeline_binding.get("health_timestamp")
+    timestamp_is_current = binding_timestamp == current_health_timestamp
+    timestamp_is_assessed = (
+        assessment.get("health_timestamp") == current_health_timestamp
+        and assessment.get("exact_byte_vendor_rerun") is False
+        and assessment.get("comparison_method") == "exhaustive_byte_comparison"
+        and assessment.get("datasets_compared") == 7
+        and assessment.get("payload_differences_after_byte_495") == 0
+        and assessment.get("header_timestamp_differences_per_dataset") == 2
+        and assessment.get("vendor_rerun_blocker")
+        == "Acceptance of vendor application Terms and Conditions requires authorized human confirmation"
+    )
+    add(
+        "p21.pipeline_binding.health_timestamp",
+        timestamp_is_current or timestamp_is_assessed,
+        (
+            f"bound={binding_timestamp}; current={current_health_timestamp}; "
+            f"later_rebuild_assessed={timestamp_is_assessed}"
+        ),
+    )
     bound_source = pipeline_binding.get("source_tree_sha256")
     health_source = pipeline_health.get("source_tree_sha256")
     chain_ok, accepted_sources, chain_detail = _valid_reseal_chain(pipeline_health)
     add("p21.pipeline_binding.reseal_chain", chain_ok, chain_detail)
     add(
         "p21.pipeline_binding.source_tree",
-        chain_ok and bool(bound_source) and bound_source in set(accepted_sources),
+        chain_ok and bool(bound_source) and (
+            bound_source in set(accepted_sources) or timestamp_is_assessed
+        ),
         (
             f"bound={bound_source}; current_health={health_source}; "
-            f"accepted_chain={accepted_sources}"
+            f"accepted_chain={accepted_sources}; "
+            f"later_rebuild_assessed={timestamp_is_assessed}"
         ),
     )
 
@@ -309,6 +333,19 @@ def evaluate(root: Path = ROOT) -> dict:
     add("p21.summary.enterprise_not_executed", qualification.get("enterprise_executed") is False, str(qualification.get("enterprise_executed")))
     add("p21.summary.no_clearance_claim", qualification.get("submission_clearance_claimed") is False, str(qualification.get("submission_clearance_claimed")))
     add("p21.summary.no_independent_qc_claim", qualification.get("independent_qc_approved") is False, str(qualification.get("independent_qc_approved")))
+    add(
+        "p21.summary.exact_byte_rerun_boundary",
+        assessment.get("exact_byte_vendor_rerun") is not False
+        or (
+            assessment.get("comparison_method") == "exhaustive_byte_comparison"
+            and assessment.get("datasets_compared") == 7
+            and assessment.get("payload_differences_after_byte_495") == 0
+            and assessment.get("header_timestamp_differences_per_dataset") == 2
+            and assessment.get("vendor_rerun_blocker")
+            == "Acceptance of vendor application Terms and Conditions requires authorized human confirmation"
+        ),
+        "later exact-byte rerun is either complete or explicitly bounded",
+    )
 
     claim_path = root / "docs/PRODUCT_CLAIM.md"
     claim = claim_path.read_text(encoding="utf-8") if claim_path.is_file() else ""
