@@ -28,6 +28,8 @@
 
 The raw workbook is retained outside Git because its details sheet includes record-level identifiers. This record and `p21_adam_summary.json` retain only run identity, hashes, aggregate counts, and dispositions.
 
+The later GREEN run at `2026-08-12T10:28:13.216075+00:00` re-executed the same clinical programs and changed only the two SAS XPORT header timestamps in each of the seven production files; exhaustive byte comparison found no differences after byte 495. The clinical payload validated by this workbook is therefore unchanged, but the later XPT byte hashes are not represented as independently rerun Community evidence. A fresh exact-byte rerun remains pending acceptance of the vendor application's Terms and Conditions.
+
 ## Input hash binding
 
 | Dataset | Records | SHA-256 |

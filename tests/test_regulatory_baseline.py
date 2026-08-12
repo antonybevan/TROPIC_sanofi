@@ -134,3 +134,15 @@ def test_definitive_p21_summary_is_self_reconciling_and_non_qualifying():
         "submission_clearance_claimed": False,
         "independent_qc_approved": False,
     }
+    assert summary["subsequent_rebuild_assessment"] == {
+        "health_timestamp": "2026-08-12T10:28:13.216075+00:00",
+        "comparison": (
+            "XPT payload byte-identical after byte 495 for all seven datasets; "
+            "differences are confined to two SAS XPORT header timestamps per file"
+        ),
+        "exact_byte_vendor_rerun": False,
+        "vendor_rerun_blocker": (
+            "Acceptance of vendor application Terms and Conditions requires authorized "
+            "human confirmation"
+        ),
+    }
