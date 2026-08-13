@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -68,3 +69,43 @@ def test_analysis_report_secondary_tte_rows_match_generated_table():
         assert _report_secondary_metrics(report, label) == _tfl_secondary_metrics(
             table, table_id
         )
+
+
+def test_tfl_gallery_matches_controlled_tables_and_is_keyboard_accessible():
+    """Keep the reviewer-facing static gallery tied to the controlled TFL text."""
+    gallery_path = ROOT / "05_outputs/tfl/TFL_Gallery.html"
+    gallery = gallery_path.read_text(encoding="utf-8")
+    t11 = (ROOT / "05_outputs/tfl/output/tables/T-11-Efficacy_Tables.txt").read_text(
+        encoding="utf-8"
+    )
+    t21 = (ROOT / "05_outputs/tfl/output/tables/T-21-Lab_Shift_Tables.txt").read_text(
+        encoding="utf-8"
+    )
+
+    # The gallery is a committed reviewer surface, so its endpoint and shift cells
+    # must remain synchronized with the generated, controlled text outputs.
+    assert "Median Survival Time (Months)             4.9" in t11
+    assert "0.89 (95% CI: 0.66-1.22)" in t11
+    assert "Median Survival Time (Months)             8.1" in t11
+    assert "2.85 (95% CI: 1.98-4.12)" in t11
+    assert "Time to Tumour Progression</td><td class=\"val-info\">4.9 mo" in gallery
+    assert "0.89 (0.66–1.22)</td><td>0.4406" in gallery
+    assert "Time to Pain Progression</td><td class=\"val-info\">8.1 mo" in gallery
+    assert "2.85 (1.98–4.12)</td><td>&lt;0.0001" in gallery
+    assert "9.1 mo" not in gallery
+    assert "7.9 mo" not in gallery
+
+    for value in ("115", "45", "85", "100", "22", "110", "63", "53", "275", "69"):
+        assert value in t21
+    for stale in ("143", "59", "126", "341", "133", "67"):
+        assert f">{stale}</td>" not in gallery
+    assert gallery.count("shift n=370; safety N=371") == 3
+
+    figure_sources = re.findall(r'<img class="fig-thumb" src="([^"]+)"', gallery)
+    assert len(figure_sources) == 7
+    for source in figure_sources:
+        assert (gallery_path.parent / source).is_file(), source
+    assert gallery.count('role="button"') == 7
+    assert gallery.count('tabindex="0"') == 7
+    assert 'aria-modal="true"' in gallery
+    assert 'aria-label="Close figure preview"' in gallery

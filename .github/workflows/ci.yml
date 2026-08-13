@@ -26,7 +26,8 @@ jobs:
   # Controlled release seal re-check: no SAS, no patient data, no renv.
   # Proves committed seals + claim docs still pass scripts/verify_release.py.
   path-a-seal-verify:
-    name: Controlled release seal verify
+    # Keep the historical required-status context used by main branch protection.
+    name: Path A seal verify (verify_release)
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:

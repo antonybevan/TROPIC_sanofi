@@ -23,6 +23,7 @@ This release replaces portfolio-style presentation and ambiguous compliance lang
 7. Corrected standard one-sided ADaM flags in paired SAS/R derivations: ADAE/ADCM `TRTEMFL`, ADLB `ANL01FL`, and ADLB `ABLFL` now use `Y`/null; the nonstandard ADLB `BASEFL` variable was removed across data, metadata, and reporting logic.
 8. Replaced promotional PDF header language with a neutral controlled-simulation identity.
 9. Added a local dashboard visual-QC record and sanitized five-panel screenshots; retained the static TFL gallery as the portable public visual surface.
+10. Added fail-closed dashboard input-domain checks so malformed numeric, arm, event, and exposure values disable affected outputs with an actionable load issue instead of surfacing a rendering error.
 
 ## Qualification decision
 

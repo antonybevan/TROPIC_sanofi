@@ -153,6 +153,10 @@
       cursor: pointer;
       transition: transform .2s, border-color .2s, box-shadow .2s;
     }
+    .fig-card:focus-visible {
+      outline: 3px solid var(--blue);
+      outline-offset: 3px;
+    }
     .fig-card:hover {
       transform: translateY(-3px);
       border-color: var(--blue);
@@ -342,7 +346,7 @@
   <div class="fig-grid">
 
     <!-- Analysis population overview (legacy CONSORT filename) -->
-    <div class="fig-card" onclick="openLightbox('output/figures/F-01-1_CONSORT_Disposition.png')">
+    <div class="fig-card" role="button" tabindex="0" aria-label="Open Analysis Population and Mortality Overview figure" onclick="openLightbox('output/figures/F-01-1_CONSORT_Disposition.png')" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openLightbox('output/figures/F-01-1_CONSORT_Disposition.png'); }">
       <img class="fig-thumb" src="output/figures/F-01-1_CONSORT_Disposition.png" alt="Analysis population and mortality overview" />
       <div class="fig-meta">
         <div class="fig-id">F-01-1</div>
@@ -352,7 +356,7 @@
     </div>
 
     <!-- KM OS -->
-    <div class="fig-card" onclick="openLightbox('output/figures/F-11-1_KM_OS.png')">
+    <div class="fig-card" role="button" tabindex="0" aria-label="Open Kaplan-Meier Overall Survival figure" onclick="openLightbox('output/figures/F-11-1_KM_OS.png')" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openLightbox('output/figures/F-11-1_KM_OS.png'); }">
       <img class="fig-thumb" src="output/figures/F-11-1_KM_OS.png" alt="KM OS" />
       <div class="fig-meta">
         <div class="fig-id">F-11-1</div>
@@ -362,7 +366,7 @@
     </div>
 
     <!-- KM PFS -->
-    <div class="fig-card" onclick="openLightbox('output/figures/F-11-2_KM_PFS.png')">
+    <div class="fig-card" role="button" tabindex="0" aria-label="Open Kaplan-Meier Progression-Free Survival figure" onclick="openLightbox('output/figures/F-11-2_KM_PFS.png')" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openLightbox('output/figures/F-11-2_KM_PFS.png'); }">
       <img class="fig-thumb" src="output/figures/F-11-2_KM_PFS.png" alt="KM PFS" />
       <div class="fig-meta">
         <div class="fig-id">F-11-2</div>
@@ -372,7 +376,7 @@
     </div>
 
     <!-- FOREST -->
-    <div class="fig-card" onclick="openLightbox('output/figures/F-12-1_Subgroup_Forest.png')">
+    <div class="fig-card" role="button" tabindex="0" aria-label="Open OS Subgroup Forest Plot figure" onclick="openLightbox('output/figures/F-12-1_Subgroup_Forest.png')" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openLightbox('output/figures/F-12-1_Subgroup_Forest.png'); }">
       <img class="fig-thumb" src="output/figures/F-12-1_Subgroup_Forest.png" alt="Forest Plot" />
       <div class="fig-meta">
         <div class="fig-id">F-12-1</div>
@@ -382,7 +386,7 @@
     </div>
 
     <!-- WATERFALL -->
-    <div class="fig-card" onclick="openLightbox('output/figures/F-13-1_PSA_Waterfall.png')">
+    <div class="fig-card" role="button" tabindex="0" aria-label="Open PSA Best Percent Change Waterfall Plot figure" onclick="openLightbox('output/figures/F-13-1_PSA_Waterfall.png')" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openLightbox('output/figures/F-13-1_PSA_Waterfall.png'); }">
       <img class="fig-thumb" src="output/figures/F-13-1_PSA_Waterfall.png" alt="PSA Waterfall" />
       <div class="fig-meta">
         <div class="fig-id">F-13-1</div>
@@ -392,7 +396,7 @@
     </div>
 
     <!-- SWIMMER -->
-    <div class="fig-card" onclick="openLightbox('output/figures/F-14-1_Swimmer_Plot.png')">
+    <div class="fig-card" role="button" tabindex="0" aria-label="Open Treatment Exposure Swimmer Plot figure" onclick="openLightbox('output/figures/F-14-1_Swimmer_Plot.png')" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openLightbox('output/figures/F-14-1_Swimmer_Plot.png'); }">
       <img class="fig-thumb" src="output/figures/F-14-1_Swimmer_Plot.png" alt="Swimmer Plot" />
       <div class="fig-meta">
         <div class="fig-id">F-14-1</div>
@@ -402,7 +406,7 @@
     </div>
 
     <!-- OPTIMUS -->
-    <div class="fig-card wide" onclick="openLightbox('output/figures/F-17-1_Optimus_Scatter.png')">
+    <div class="fig-card wide" role="button" tabindex="0" aria-label="Open Project Optimus Exposure Response Scatter figure" onclick="openLightbox('output/figures/F-17-1_Optimus_Scatter.png')" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openLightbox('output/figures/F-17-1_Optimus_Scatter.png'); }">
       <img class="fig-thumb" src="output/figures/F-17-1_Optimus_Scatter.png" alt="Project Optimus E-R" />
       <div class="fig-meta">
         <div class="fig-id">F-17-1</div>
@@ -440,8 +444,8 @@
             <tr><td><strong>Overall Survival</strong> <em>(primary)</em></td><td class="val-info">15.2 mo</td><td>12.7 mo</td><td class="val-sig">0.71 (0.60–0.85)</td><td class="val-sig">0.000216</td></tr>
             <tr><td>Progression-Free Survival</td><td class="val-info">2.7 mo</td><td>1.4 mo</td><td>0.87 (0.75–1.02)</td><td>0.089234</td></tr>
             <tr><td>Time to PSA Progression</td><td class="val-info">2.7 mo</td><td>2.2 mo</td><td class="val-sig">0.84 (0.70–0.99)</td><td>0.0319</td></tr>
-            <tr><td>Time to Tumour Progression</td><td class="val-info">9.1 mo</td><td>5.0 mo</td><td class="val-sig">0.60 (0.44–0.82)</td><td>0.0007</td></tr>
-            <tr><td>Time to Pain Progression</td><td class="val-info">7.9 mo</td><td>NE</td><td>2.84 (1.97–4.11)</td><td>&lt;0.0001</td></tr>
+            <tr><td>Time to Tumour Progression</td><td class="val-info">4.9 mo</td><td>5.0 mo</td><td>0.89 (0.66–1.22)</td><td>0.4406</td></tr>
+            <tr><td>Time to Pain Progression</td><td class="val-info">8.1 mo</td><td>NE</td><td>2.85 (1.98–4.12)</td><td>&lt;0.0001</td></tr>
           </tbody>
         </table>
       </div>
@@ -500,37 +504,36 @@
         <div class="shift-grid">
           <!-- ANC -->
           <div class="shift-mini">
-            <div class="shift-title">ANC / Neutrophils (n=371)</div>
+            <div class="shift-title">ANC / Neutrophils (shift n=370; safety N=371)</div>
             <table class="shift-table">
               <thead><tr><th>Baseline ↓ / Worst →</th><th>Gr 0</th><th>Gr 1</th><th>Gr 2</th><th>Gr 3</th><th>Gr 4</th></tr></thead>
               <tbody>
-                <tr><td>Grade 0</td><td class="heat-0">143</td><td class="heat-0">59</td><td class="heat-1">100</td><td class="heat-2">126</td><td class="heat-3">24</td></tr>
-                <tr><td>Grade 1</td><td class="heat-0">1</td><td>0</td><td>0</td><td class="heat-2">3</td><td>0</td></tr>
-                <tr><td>Grade 2</td><td>0</td><td>0</td><td>0</td><td>0</td><td class="heat-3">1</td></tr>
+                <tr><td>Grade 0</td><td class="heat-0">115</td><td class="heat-0">45</td><td class="heat-1">85</td><td class="heat-2">100</td><td class="heat-3">22</td></tr>
+                <tr><td>Grade 1</td><td class="heat-0">0</td><td>0</td><td>0</td><td class="heat-2">3</td><td>0</td></tr>
               </tbody>
             </table>
           </div>
           <!-- HGB -->
           <div class="shift-mini">
-            <div class="shift-title">Haemoglobin (n=371)</div>
+            <div class="shift-title">Haemoglobin (shift n=370; safety N=371)</div>
             <table class="shift-table">
               <thead><tr><th>Baseline ↓ / Worst →</th><th>Gr 0</th><th>Gr 1</th><th>Gr 2</th><th>Gr 3</th><th>Gr 4</th></tr></thead>
               <tbody>
-                <tr><td>Grade 0</td><td class="heat-0">135</td><td class="heat-0">89</td><td class="heat-1">5</td><td>0</td><td class="heat-3">1</td></tr>
-                <tr><td>Grade 1</td><td class="heat-0">5</td><td class="heat-0">133</td><td class="heat-1">67</td><td class="heat-2">6</td><td>0</td></tr>
-                <tr><td>Grade 2</td><td>0</td><td>0</td><td class="heat-1">12</td><td class="heat-2">1</td><td>0</td></tr>
-                <tr><td>Grade 3</td><td>0</td><td>0</td><td class="heat-1">1</td><td class="heat-2">1</td><td>0</td></tr>
+                <tr><td>Grade 0</td><td class="heat-0">110</td><td class="heat-0">63</td><td class="heat-1">4</td><td>0</td><td class="heat-3">1</td></tr>
+                <tr><td>Grade 1</td><td class="heat-0">4</td><td class="heat-0">112</td><td class="heat-1">53</td><td class="heat-2">3</td><td>0</td></tr>
+                <tr><td>Grade 2</td><td>0</td><td>2</td><td class="heat-1">13</td><td class="heat-2">3</td><td>0</td></tr>
+                <tr><td>Grade 3</td><td>0</td><td>0</td><td class="heat-1">2</td><td>0</td><td>0</td></tr>
               </tbody>
             </table>
           </div>
           <!-- PLT -->
           <div class="shift-mini">
-            <div class="shift-title">Platelets (n=371)</div>
+            <div class="shift-title">Platelets (shift n=370; safety N=371)</div>
             <table class="shift-table">
               <thead><tr><th>Baseline ↓ / Worst →</th><th>Gr 0</th><th>Gr 1</th><th>Gr 2</th><th>Gr 3</th><th>Gr 4</th></tr></thead>
               <tbody>
-                <tr><td>Grade 0</td><td class="heat-0">341</td><td class="heat-0">85</td><td class="heat-1">3</td><td>0</td><td class="heat-3">3</td></tr>
-                <tr><td>Grade 1</td><td class="heat-0">2</td><td class="heat-0">18</td><td class="heat-1">2</td><td class="heat-2">2</td><td>0</td></tr>
+                <tr><td>Grade 0</td><td class="heat-0">275</td><td class="heat-0">69</td><td class="heat-1">3</td><td>0</td><td class="heat-3">2</td></tr>
+                <tr><td>Grade 1</td><td class="heat-0">1</td><td class="heat-0">17</td><td class="heat-1">2</td><td class="heat-2">1</td><td>0</td></tr>
               </tbody>
             </table>
           </div>
@@ -556,8 +559,8 @@
 </footer>
 
 <!-- LIGHTBOX -->
-<div id="lightbox">
-  <button id="lightbox-close" onclick="closeLightbox()">✕</button>
+<div id="lightbox" role="dialog" aria-modal="true" aria-label="Figure preview">
+  <button id="lightbox-close" type="button" aria-label="Close figure preview" onclick="closeLightbox()">✕</button>
   <img id="lightbox-img" src="" alt="" />
 </div>
 

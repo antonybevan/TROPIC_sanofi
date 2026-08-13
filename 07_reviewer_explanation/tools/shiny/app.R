@@ -88,7 +88,83 @@ validate_source_data <- function(data, file, required) {
   data
 }
 
-read_figure_csv <- function(file, required) {
+validate_column_contract <- function(data, file, numeric = character(),
+                                     positive = character(),
+                                     nonnegative = character(),
+                                     binary = character(), allowed = list()) {
+  non_numeric <- numeric[!vapply(data[numeric], is.numeric, logical(1))]
+  if (length(non_numeric) > 0) {
+    return(record_load_issue(
+      file,
+      paste("non-numeric required column(s)", paste(non_numeric, collapse = ", "))
+    ))
+  }
+
+  non_finite <- numeric[vapply(
+    data[numeric],
+    function(values) any(!is.na(values) & !is.finite(values)),
+    logical(1)
+  )]
+  if (length(non_finite) > 0) {
+    return(record_load_issue(
+      file,
+      paste("non-finite value(s) in column(s)", paste(non_finite, collapse = ", "))
+    ))
+  }
+
+  non_positive <- positive[vapply(
+    data[positive],
+    function(values) any(!is.na(values) & values <= 0),
+    logical(1)
+  )]
+  if (length(non_positive) > 0) {
+    return(record_load_issue(
+      file,
+      paste("non-positive value(s) in column(s)",
+            paste(non_positive, collapse = ", "))
+    ))
+  }
+
+  negative <- nonnegative[vapply(
+    data[nonnegative],
+    function(values) any(!is.na(values) & values < 0),
+    logical(1)
+  )]
+  if (length(negative) > 0) {
+    return(record_load_issue(
+      file,
+      paste("negative value(s) in column(s)", paste(negative, collapse = ", "))
+    ))
+  }
+
+  invalid_binary <- binary[vapply(
+    data[binary],
+    function(values) any(!is.na(values) & !values %in% c(0, 1)),
+    logical(1)
+  )]
+  if (length(invalid_binary) > 0) {
+    return(record_load_issue(
+      file,
+      paste("binary domain violation(s) in column(s)",
+            paste(invalid_binary, collapse = ", "))
+    ))
+  }
+
+  for (column in names(allowed)) {
+    values <- as.character(data[[column]])
+    invalid <- unique(values[!is.na(values) & !(values %in% allowed[[column]])])
+    if (length(invalid) > 0) {
+      return(record_load_issue(
+        file,
+        paste0("unexpected value(s) in ", column, ": ",
+               paste(invalid, collapse = ", "))
+      ))
+    }
+  }
+  data
+}
+
+read_figure_csv <- function(file, required, contract = list()) {
   path <- adam_path(file)
   if (!file.exists(path)) {
     return(record_load_issue(file, "not found"))
@@ -98,10 +174,13 @@ read_figure_csv <- function(file, required) {
     error = function(error) record_load_issue(file, conditionMessage(error))
   )
   if (is.null(data)) return(NULL)
-  validate_source_data(data, file, required)
+  data <- validate_source_data(data, file, required)
+  if (is.null(data)) return(NULL)
+  do.call(validate_column_contract,
+          c(list(data = data, file = file), contract))
 }
 
-read_adam_xpt <- function(file, required) {
+read_adam_xpt <- function(file, required, contract = list()) {
   path <- adam_path(file)
   if (!file.exists(path)) {
     return(record_load_issue(file, "not found"))
@@ -111,7 +190,10 @@ read_adam_xpt <- function(file, required) {
     error = function(error) record_load_issue(file, conditionMessage(error))
   )
   if (is.null(data)) return(NULL)
-  validate_source_data(data, file, required)
+  data <- validate_source_data(data, file, required)
+  if (is.null(data)) return(NULL)
+  do.call(validate_column_contract,
+          c(list(data = data, file = file), contract))
 }
 
 # Parse the SAS-versus-R analysis-results reconciliation log into a table.
@@ -145,31 +227,61 @@ read_reconciliation <- function() {
 # Load once at start-up. The dashboard is a static view of a completed run.
 km_stats <- read_figure_csv(
   "figure_km_stats_prod.csv",
-  c("PARAMCD", "HAZARDRATIO", "WALDLOWER", "WALDUPPER")
+  c("PARAMCD", "HAZARDRATIO", "WALDLOWER", "WALDUPPER"),
+  contract = list(
+    numeric = c("HAZARDRATIO", "WALDLOWER", "WALDUPPER"),
+    positive = c("HAZARDRATIO", "WALDLOWER", "WALDUPPER")
+  )
 )
 km_risk <- read_figure_csv(
   "figure_km_risk_prod.csv",
-  c("PARAMCD", "AVALM", "TRT01P", "NRISK")
+  c("PARAMCD", "AVALM", "TRT01P", "NRISK"),
+  contract = list(
+    numeric = c("AVALM", "NRISK"),
+    nonnegative = c("AVALM", "NRISK"),
+    allowed = list(TRT01P = names(ARM_COLOURS))
+  )
 )
 waterfall <- read_figure_csv(
   "figure_waterfall_prod.csv",
-  c("TRT01P", "BEST", "RESPCAT")
+  c("TRT01P", "BEST", "RESPCAT"),
+  contract = list(
+    numeric = "BEST",
+    allowed = list(TRT01P = names(ARM_COLOURS))
+  )
 )
 swimmer <- read_figure_csv(
   "figure_swimmer_prod.csv",
-  c("TRT01P", "DURM", "DEATH")
+  c("TRT01P", "DURM", "DEATH"),
+  contract = list(
+    numeric = c("DURM", "DEATH"),
+    nonnegative = "DURM",
+    binary = "DEATH",
+    allowed = list(TRT01P = names(ARM_COLOURS))
+  )
 )
 forest_hr <- read_figure_csv(
   "forest_hr_prod.csv",
-  c("SUBGROUP", "HAZARDRATIO", "WALDLOWER", "WALDUPPER")
+  c("SUBGROUP", "HAZARDRATIO", "WALDLOWER", "WALDUPPER"),
+  contract = list(
+    numeric = c("HAZARDRATIO", "WALDLOWER", "WALDUPPER"),
+    positive = c("HAZARDRATIO", "WALDLOWER", "WALDUPPER")
+  )
 )
 adtte <- read_adam_xpt(
   "adtte_prod.xpt",
-  c("PARAMCD", "AVAL", "AVALU", "CNSR", "TRT01P")
+  c("PARAMCD", "AVAL", "AVALU", "CNSR", "TRT01P"),
+  contract = list(
+    numeric = c("AVAL", "CNSR"),
+    nonnegative = "AVAL",
+    binary = "CNSR",
+    allowed = list(TRT01P = names(ARM_COLOURS))
+  )
 )
 adae <- read_adam_xpt(
   "adae_prod.xpt",
-  c("AEDECOD", "AEBODSYS", "TRTEMFL")
+  c("AEDECOD", "AEBODSYS", "TRTEMFL"),
+  contract = list(allowed = list(TRTEMFL = c("", "Y")))
 )
 recon     <- read_reconciliation()
 

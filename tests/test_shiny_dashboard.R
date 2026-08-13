@@ -69,4 +69,28 @@ assert(any(grepl("figure_km_stats_prod.csv: missing required column",
                  malformed_app$load_issues, fixed = TRUE)),
        "Malformed hazard-ratio input was not diagnosed")
 
+# Numeric/domain corruption must fail closed before ggplot or survival code is
+# reached. readr otherwise accepts a mixed column as character, which would
+# produce a later and less actionable rendering error.
+domain_root <- tempfile("tropic-shiny-domain-")
+dir.create(file.path(domain_root, "07_reviewer_explanation", "tools", "shiny"),
+           recursive = TRUE)
+dir.create(file.path(domain_root, "04_analysis_datasets", "adam"), recursive = TRUE)
+dir.create(file.path(domain_root, "06_qc_evidence", "reconciliation"),
+           recursive = TRUE)
+invisible(file.create(file.path(domain_root, "renv.lock")))
+writeLines(
+  c("PARAMCD,HAZARDRATIO,WALDLOWER,WALDUPPER", "OS,oops,0.5,0.9"),
+  file.path(domain_root, "04_analysis_datasets", "adam",
+            "figure_km_stats_prod.csv")
+)
+on.exit(unlink(domain_root, recursive = TRUE), add = TRUE)
+
+domain_app <- source_app(domain_root)
+assert(is.null(domain_app$km_stats),
+       "Non-numeric hazard-ratio input was accepted")
+assert(any(grepl("figure_km_stats_prod.csv: non-numeric required column",
+                 domain_app$load_issues, fixed = TRUE)),
+       "Non-numeric hazard-ratio input was not diagnosed")
+
 cat("Shiny dashboard contracts: PASS\n")

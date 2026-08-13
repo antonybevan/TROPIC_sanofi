@@ -101,6 +101,20 @@ PIPELINE_CONTROL_FILES = [
     "scripts/verify_release.py",
 ]
 
+# Reviewer-facing narrative and visual surfaces are release material too. Keep
+# them in a dedicated artifact group so a corrected table, claim, or acceptance
+# screenshot cannot drift after the clinical run while the seal still passes.
+REVIEW_SURFACE_FILES = [
+    "README.md",
+    "docs/INTERVIEWER_GUIDE.md",
+    "docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md",
+    "05_outputs/tfl/TFL_Gallery.html",
+    "06_qc_evidence/audit/DASHBOARD_VISUAL_QC.md",
+]
+REVIEW_SURFACE_GLOBS = [
+    "06_qc_evidence/audit/dashboard_evidence/*.jpg",
+]
+
 # Keep the source inventory in one place.  The same digest is written into
 # pipeline_health.json at run time and recomputed here during release sealing;
 # this prevents a green health snapshot from being paired with later-edited
@@ -725,6 +739,9 @@ def build_release_run_manifest(out_dir: Path = OUT_DIR) -> dict:
         "05_outputs/ars/**/*.json",
         "05_outputs/ars/**/*.ndjson",
     ])
+    review_surface = _hash_existing(REVIEW_SURFACE_FILES) + _hash_globs(
+        REVIEW_SURFACE_GLOBS
+    )
     programs = _hash_globs(PROGRAM_GLOBS, exclude_paths=GENERATED_SOURCE_EXCLUDES)
     controls = _hash_existing(CONTROL_FILES)
     pipeline_controls = _hash_existing(PIPELINE_CONTROL_FILES)
@@ -767,6 +784,7 @@ def build_release_run_manifest(out_dir: Path = OUT_DIR) -> dict:
             "logs": logs,
             "package_files": package_hashes,
             "additive_outputs": additive_outputs,
+            "review_surface": review_surface,
         },
     }
     payload["problems"] = _binding_problems(payload)

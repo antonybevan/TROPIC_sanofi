@@ -2,7 +2,7 @@
 
 **Status:** `PASS — local acceptance capture`
 
-**Capture date:** 2026-08-12
+**Capture date:** 2026-08-13
 
 **Application:** `07_reviewer_explanation/tools/shiny/app.R`
 
@@ -10,14 +10,14 @@ This record documents a visual acceptance pass of the read-only reviewer dashboa
 
 ## Scope
 
-The capture was performed at a 1280 × 720 desktop viewport after the local production-data dashboard loaded successfully. Every navigation panel was opened and inspected:
+The capture was performed at a 1440 × 1000 desktop viewport after the local production-data dashboard loaded successfully. Each panel was activated, allowed to settle, checked for a visible rendered output, and then captured:
 
 | Panel | Acceptance evidence |
 |---|---|
 | Overview | KPI cards, subgroup forest plot, provenance and evidence-boundary copy rendered without errors |
-| Kaplan–Meier | OS survival curve rendered; endpoint selector and source disclosure visible |
+| Kaplan–Meier | OS survival curve rendered; all six endpoint choices (OS, PFS, TTPAIN, TTPSA, TTSAE, TTUMOR) were exercised and the source disclosure remained visible |
 | Response | Waterfall and swimmer plots rendered side by side |
-| Safety | Treatment-emergent filter, system-organ-class slider, preferred-term plot, and aggregate table rendered |
+| Safety | Treatment-emergent filter, system-organ-class slider (5 and restored to 10), preferred-term plot, and aggregate table rendered |
 | Reconciliation | Six endpoint rows rendered with `PASS` status and the single-author methodological boundary visible |
 
 The dashboard contract tests also passed:
@@ -28,6 +28,12 @@ Shiny dashboard contracts: PASS
 
 Rscript tests/test_shiny_dashboard_local.R
 Local Shiny dashboard production-data contracts: PASS
+
+Interactive acceptance checks also passed: the KM endpoint selector rendered a curve for every
+endpoint without a visible Shiny error; the KM/Safety sidebars collapsed and restored; the Safety
+filter was unchecked and restored; the Safety slider was moved to 5 and restored to 10; and the
+Reconciliation table sort control responded while all six rows remained `PASS`. Browser console
+error/warning logs were empty during the pass.
 ```
 
 ## Captured evidence
