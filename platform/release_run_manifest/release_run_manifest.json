@@ -3038,20 +3038,20 @@
         "size_bytes": 2916
       },
       {
-        "md5": "639d58f2c5bb40f9e54810cc3ffb38b0",
+        "md5": "d0699979e8d989328e64a19b72aa9218",
         "path": "07_reviewer_explanation/tools/shiny/app.R",
         "present": true,
-        "sha256": "ece9858ce603877f09c878633416c1de9f852bf23c595a65eaedc8c1e58f2ac3",
-        "size_bytes": 25833
+        "sha256": "7f859637c9aa618e02f106297f320772e567b2fb5e45271ee635f2a03193e446",
+        "size_bytes": 27672
       }
     ],
     "qc_files": [
       {
-        "md5": "86ab22a638ad220afa3ba8d5b80aec31",
+        "md5": "c821909364773af1c43d99873dd285fe",
         "path": "platform/pipeline_health.json",
         "present": true,
-        "sha256": "e0847deffbee6c064cf9bf0508fbf0f2689a1c96f958c5e3ced12ec1b5496945",
-        "size_bytes": 11927
+        "sha256": "54018427310de687c40f0effc12a8a40bbedcc028d9f0eaddbc7fd551048266d",
+        "size_bytes": 12850
       },
       {
         "md5": "06989db82566475af4ebd3685eb8d8a8",
@@ -3632,8 +3632,8 @@
     "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007"
   },
   "evidence_grade": "release_candidate",
-  "generated_at": "2026-08-13 19:49:07 UTC",
-  "manifest_sha256": "2a33ac3c0ca7cd793a41f446e587e5c8f78b8e2ba73b739451a88e42218189b2",
+  "generated_at": "2026-08-13 19:53:25 UTC",
+  "manifest_sha256": "9afd91ead1f624808a423aff66fc89390c8bb4329c485d3c1263f6304874ff6b",
   "problems": [],
   "qc_statuses": {
     "cbzp_bridge": {
@@ -3847,16 +3847,13 @@
   "source_control": {
     "branch": "codex/dashboard-visual-evidence",
     "dirty": false,
-    "dirty_including_seal_outputs": true,
-    "head": "f3a6c63c99776726054e3c8a29318dfadc5c002e",
+    "dirty_including_seal_outputs": false,
+    "head": "694fa4bd2e993dad41bf90623733997432b82117",
     "pipeline_control_sha256": "f1b902859d49abb4612fbe61e4eda6ff3ba2531d8aacf5db36b3e1728dd38134",
-    "source_tree_sha256": "8de5cc50456371625ea140ba9ea2cccb1158d471e74f47261f567696a2fb1d1c",
+    "source_tree_sha256": "8716a977c9fefef3f776e9ac364b3388bbe7d42edcfc8a715dece43032e61f1c",
     "staged_diff_paths": [],
     "status_porcelain": [],
-    "status_porcelain_all": [
-      " M docs/RELEASE_RUN_MANIFEST.md",
-      " M platform/release_run_manifest/release_run_manifest.json"
-    ],
+    "status_porcelain_all": [],
     "status_porcelain_sha256": "",
     "tracked_diff_paths": []
   },
