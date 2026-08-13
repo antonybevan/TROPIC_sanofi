@@ -255,8 +255,8 @@ read_reconciliation <- function() {
   }
   expected_endpoints <- c("OS", "PFS", "TTPAIN", "TTPSA", "TTSAE", "TTUMOR")
   if (anyDuplicated(d$Endpoint) ||
-      !setequal(d$Endpoint, expected_endpoints) ||
-      nrow(d) != length(expected_endpoints)) {
+        !setequal(d$Endpoint, expected_endpoints) ||
+        nrow(d) != length(expected_endpoints)) {
     return(record_load_issue(
       file, "must contain exactly one record for each production endpoint"
     ))
