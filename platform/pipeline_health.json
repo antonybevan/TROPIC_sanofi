@@ -49,7 +49,7 @@
   },
   "r_version": "R version 4.6.0 (2026-04-24)",
   "renv_lock_sha256": "a9ba2082ce1f227add5d2cb400fb70688ea5031fef238dcf1bf1928de2700630",
-  "source_tree_sha256": "ae9e63ba8702c964e7086be68618bdf667b3408f9f0d84b99dfe3151a11e016a",
+  "source_tree_sha256": "8de5cc50456371625ea140ba9ea2cccb1158d471e74f47261f567696a2fb1d1c",
   "oda_endpoint": "odaws01-apse1-2.oda.sas.com",
   "oda_attempts": 1,
   "oda_total_wait_s": 6.6,
@@ -106,15 +106,14 @@
   },
   "governance_only_reseal": {
     "status": "PASS",
-    "rebound_at": "2026-08-13T06:01:37.309055+00:00",
-    "base_revision": "f3aa081",
+    "rebound_at": "2026-08-13T19:48:40.693304+00:00",
+    "base_revision": "0d26041",
     "clinical_run_timestamp": "2026-08-12T10:28:13.216075+00:00",
-    "prior_source_tree_sha256": "cd6c368435203012747c5abcd2bd20698b96f71f4f0f24e43c9d05fbace02450",
-    "rebound_source_tree_sha256": "ae9e63ba8702c964e7086be68618bdf667b3408f9f0d84b99dfe3151a11e016a",
+    "prior_source_tree_sha256": "ae9e63ba8702c964e7086be68618bdf667b3408f9f0d84b99dfe3151a11e016a",
+    "rebound_source_tree_sha256": "8de5cc50456371625ea140ba9ea2cccb1158d471e74f47261f567696a2fb1d1c",
     "changed_paths": [
-      "docs/REPO_SURFACE_POLICY.md",
-      "platform/build_release_run_manifest.py",
-      "scripts/rebind_governance_seal.py"
+      "07_reviewer_explanation/tools/shiny/app.R",
+      "tests/test_shiny_dashboard.R"
     ],
     "clinical_run_was_not_reexecuted": true,
     "reason": "Pipeline integrity, dependency, executor-validation, regulatory-claim, external-validator-evidence, reviewer-presentation, and test controls changed; clinical derivation programs, study parameters, datasets, and statistical results did not."
@@ -232,6 +231,20 @@
         "docs/REPO_SURFACE_POLICY.md",
         "platform/build_release_run_manifest.py",
         "scripts/rebind_governance_seal.py"
+      ],
+      "clinical_run_was_not_reexecuted": true,
+      "reason": "Pipeline integrity, dependency, executor-validation, regulatory-claim, external-validator-evidence, reviewer-presentation, and test controls changed; clinical derivation programs, study parameters, datasets, and statistical results did not."
+    },
+    {
+      "status": "PASS",
+      "rebound_at": "2026-08-13T19:48:40.693304+00:00",
+      "base_revision": "0d26041",
+      "clinical_run_timestamp": "2026-08-12T10:28:13.216075+00:00",
+      "prior_source_tree_sha256": "ae9e63ba8702c964e7086be68618bdf667b3408f9f0d84b99dfe3151a11e016a",
+      "rebound_source_tree_sha256": "8de5cc50456371625ea140ba9ea2cccb1158d471e74f47261f567696a2fb1d1c",
+      "changed_paths": [
+        "07_reviewer_explanation/tools/shiny/app.R",
+        "tests/test_shiny_dashboard.R"
       ],
       "clinical_run_was_not_reexecuted": true,
       "reason": "Pipeline integrity, dependency, executor-validation, regulatory-claim, external-validator-evidence, reviewer-presentation, and test controls changed; clinical derivation programs, study parameters, datasets, and statistical results did not."
