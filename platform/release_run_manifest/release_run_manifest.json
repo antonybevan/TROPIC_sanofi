@@ -3038,20 +3038,20 @@
         "size_bytes": 2916
       },
       {
-        "md5": "d0699979e8d989328e64a19b72aa9218",
+        "md5": "4daa34e81c3abfbf32b00c850a4687aa",
         "path": "07_reviewer_explanation/tools/shiny/app.R",
         "present": true,
-        "sha256": "7f859637c9aa618e02f106297f320772e567b2fb5e45271ee635f2a03193e446",
-        "size_bytes": 27672
+        "sha256": "a1a0b9d1c5d78a5f92886d306d617b3b8911be9b6a0416c049df7ac28e36a995",
+        "size_bytes": 27676
       }
     ],
     "qc_files": [
       {
-        "md5": "c821909364773af1c43d99873dd285fe",
+        "md5": "04c79c7050e095f712d9af8f5d5422f9",
         "path": "platform/pipeline_health.json",
         "present": true,
-        "sha256": "54018427310de687c40f0effc12a8a40bbedcc028d9f0eaddbc7fd551048266d",
-        "size_bytes": 12850
+        "sha256": "8ef53c88e4c64611b0246b82c6841a7e7a4a70fc5605e64b59b8d26a0f237623",
+        "size_bytes": 13561
       },
       {
         "md5": "06989db82566475af4ebd3685eb8d8a8",
@@ -3632,8 +3632,8 @@
     "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007"
   },
   "evidence_grade": "release_candidate",
-  "generated_at": "2026-08-13 19:53:25 UTC",
-  "manifest_sha256": "9afd91ead1f624808a423aff66fc89390c8bb4329c485d3c1263f6304874ff6b",
+  "generated_at": "2026-08-13 19:58:44 UTC",
+  "manifest_sha256": "fe4953a3589c376ad4f8657cc20aa6389e8a82e4bb2d808df9353522a07208d0",
   "problems": [],
   "qc_statuses": {
     "cbzp_bridge": {
@@ -3848,9 +3848,9 @@
     "branch": "codex/dashboard-visual-evidence",
     "dirty": false,
     "dirty_including_seal_outputs": false,
-    "head": "694fa4bd2e993dad41bf90623733997432b82117",
+    "head": "35e6280caf8523038bbee19f7cbb00ed5b61b843",
     "pipeline_control_sha256": "f1b902859d49abb4612fbe61e4eda6ff3ba2531d8aacf5db36b3e1728dd38134",
-    "source_tree_sha256": "8716a977c9fefef3f776e9ac364b3388bbe7d42edcfc8a715dece43032e61f1c",
+    "source_tree_sha256": "5304210e990b4a452fa0af2d9eb2867c846637b3f12bb73449aabea0e2deb473",
     "staged_diff_paths": [],
     "status_porcelain": [],
     "status_porcelain_all": [],
