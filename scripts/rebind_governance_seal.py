@@ -30,6 +30,7 @@ ALLOWED_PATHS = (
     "config/evidence_layers.yaml",
     "config/regulatory_baseline.yaml",
     "docs/PRODUCT_CLAIM.md",
+    "docs/REPO_SURFACE_POLICY.md",
     "docs/QUALITY_SYSTEM_BOUNDARY.md",
     "docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md",
     "docs/WORKSTREAM_EXECUTION_BOARD.md",

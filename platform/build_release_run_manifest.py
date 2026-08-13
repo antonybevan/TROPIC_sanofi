@@ -106,6 +106,7 @@ PIPELINE_CONTROL_FILES = [
 # screenshot cannot drift after the clinical run while the seal still passes.
 REVIEW_SURFACE_FILES = [
     "README.md",
+    "docs/REPO_SURFACE_POLICY.md",
     "docs/INTERVIEWER_GUIDE.md",
     "docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md",
     "05_outputs/tfl/TFL_Gallery.html",
