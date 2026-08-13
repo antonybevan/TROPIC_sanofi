@@ -50,6 +50,17 @@ rendered_ui <- htmltools::renderTags(data_free_app$ui)$html
 assert(grepl('col-widths-sm="12,12"', rendered_ui, fixed = TRUE) &&
          grepl('col-widths-xl="7,5"', rendered_ui, fixed = TRUE),
        "Safety plot and table do not stack at constrained desktop widths")
+assert(grepl("affected panels show", rendered_ui, fixed = TRUE) &&
+         grepl("unavailable-data messages", rendered_ui, fixed = TRUE),
+       "Data-free dashboard overstates disabled-panel behavior")
+assert(grepl('<input id="soc_n" type="number"', rendered_ui, fixed = TRUE) &&
+         grepl('min="5" max="20" step="1"', rendered_ui, fixed = TRUE) &&
+         !grepl('id="soc_n" class="js-range-slider"', rendered_ui,
+                fixed = TRUE),
+       "Safety table-size control is not a bounded native number input")
+assert(grepl("Kaplan-Meier controls", rendered_ui, fixed = TRUE) &&
+         grepl("Safety controls", rendered_ui, fixed = TRUE),
+       "Dashboard sidebars do not expose descriptive titles")
 
 # Reject plausible-looking but structurally invalid inputs before any reactive
 # or chart code touches missing columns.

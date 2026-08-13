@@ -44,6 +44,27 @@ shiny::testServer(environment$server, {
   assert(is.list(output$ae_pt_plot), "Preferred-term safety plot did not render")
   assert(is.character(output$ae_soc_table), "Safety table did not render")
   assert(is.character(output$recon_table), "Reconciliation table did not render")
+  plot_alts <- vapply(
+    list(output$forest_plot, output$km_plot, output$waterfall_plot,
+         output$swimmer_plot, output$ae_pt_plot),
+    function(plot) plot$alt,
+    character(1)
+  )
+  assert(all(nzchar(plot_alts)) && !any(plot_alts == "Plot object") &&
+           length(unique(plot_alts)) == length(plot_alts),
+         "Dashboard plots do not expose unique meaningful alt text")
+  assert(grepl("endpoint OS", output$km_plot$alt, fixed = TRUE),
+         "Kaplan-Meier alt text does not identify the selected endpoint")
+  assert(grepl('Adverse events by system organ class',
+               output$ae_soc_table, fixed = TRUE) &&
+           grepl('"selection":{"mode":"none"',
+                 output$ae_soc_table, fixed = TRUE),
+         "Safety table lacks a caption or enables purposeless row selection")
+  assert(grepl('SAS versus R analysis-results reconciliation for the MP arm',
+               output$recon_table, fixed = TRUE) &&
+           grepl('"selection":{"mode":"none"',
+                 output$recon_table, fixed = TRUE),
+         "Reconciliation table lacks a caption or enables row selection")
   assert(nrow(ae_filtered()) == 3921,
          "Treatment-emergent safety filter did not select the expected records")
 
@@ -51,6 +72,8 @@ shiny::testServer(environment$server, {
   assert(identical(output$km_title, "Kaplan-Meier Estimate — TTUMOR"),
          "Kaplan-Meier endpoint boundary did not render")
   assert(is.list(output$km_plot), "Boundary endpoint plot did not render")
+  assert(grepl("endpoint TTUMOR", output$km_plot$alt, fixed = TRUE),
+         "Kaplan-Meier alt text did not react to the endpoint boundary")
   assert(nrow(ae_filtered()) == 5428,
          "All-events safety filter did not select the expected records")
   assert(is.character(output$ae_soc_table),

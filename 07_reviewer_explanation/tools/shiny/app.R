@@ -418,8 +418,9 @@ ui <- page_navbar(
         class = "alert alert-warning mt-3",
         role = "alert",
         tags$h4(class = "alert-heading", "Local review data are incomplete"),
-        p("The dashboard is still available, but affected panels are disabled. ",
-          "Generate the local production outputs before using this review aid."),
+        p("The dashboard is still available, but affected panels show ",
+          "unavailable-data messages. Generate the local production outputs ",
+          "before using this review aid."),
         tags$details(
           tags$summary(paste(length(load_issues), "input issue(s)")),
           tags$ul(lapply(load_issues, tags$li))
@@ -469,6 +470,7 @@ ui <- page_navbar(
     "Kaplan-Meier",
     layout_sidebar(
       sidebar = sidebar(
+        title = "Kaplan-Meier controls",
         selectInput("km_param", "Endpoint",
                     choices = km_endpoints,
                     selected = if ("OS" %in% km_endpoints) {
@@ -500,9 +502,10 @@ ui <- page_navbar(
     "Safety",
     layout_sidebar(
       sidebar = sidebar(
+        title = "Safety controls",
         checkboxInput("teae_only", "Treatment-emergent only", value = TRUE),
-        sliderInput("soc_n", "Top system organ classes", min = 5, max = 20,
-                    value = 10, step = 1),
+        numericInput("soc_n", "Top system organ classes", min = 5, max = 20,
+                     value = 10, step = 1),
         helpText("Adverse events from adae_prod.xpt (MP arm).")
       ),
       layout_columns(
@@ -558,7 +561,10 @@ server <- function(input, output, session) {
       labs(x = "Hazard ratio (log scale) — favours CbzP < 1 < favours MP",
            y = NULL) +
       theme_minimal(base_size = 13)
-  })
+  }, alt = paste(
+    "Forest plot of overall and subgroup hazard ratios on a logarithmic scale.",
+    "Values below one favour CbzP; values above one favour MP."
+  ))
 
   output$km_title <- renderText({
     req(input$km_param)
@@ -599,6 +605,28 @@ server <- function(input, output, session) {
       labs(x = paste0("Time (", unit, ")"),
            y = "Survival probability") +
       theme_minimal(base_size = 13)
+  }, alt = function() {
+    endpoint <- input$km_param
+    if (is.null(endpoint) || length(endpoint) == 0 || !nzchar(endpoint)) {
+      return("Kaplan-Meier survival curve; no endpoint is selected.")
+    }
+    arms <- if (!is.null(adtte)) {
+      adtte %>%
+        filter(PARAMCD == endpoint, !is.na(TRT01P), nzchar(trimws(TRT01P))) %>%
+        pull(TRT01P) %>%
+        as.character() %>%
+        unique() %>%
+        sort()
+    } else {
+      character(0)
+    }
+    arm_description <- if (length(arms) > 0) {
+      paste(arms, collapse = " and ")
+    } else {
+      "the available treatment arms"
+    }
+    paste0("Kaplan-Meier survival curves for endpoint ", endpoint,
+           ", comparing ", arm_description, ".")
   })
 
   output$waterfall_plot <- renderPlot({
@@ -619,7 +647,11 @@ server <- function(input, output, session) {
            y = "Best % change in PSA from baseline") +
       theme_minimal(base_size = 13) +
       theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
-  })
+  }, alt = paste(
+    "Waterfall bar chart of each subject's best percentage change in PSA from",
+    "baseline, ordered by response and grouped by treatment arm. The dashed",
+    "line marks a 50 percent reduction."
+  ))
 
   output$swimmer_plot <- renderPlot({
     validate(need(!is.null(swimmer), "Swimmer data are unavailable."))
@@ -642,7 +674,10 @@ server <- function(input, output, session) {
            caption = "× marks a death event") +
       theme_minimal(base_size = 13) +
       theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
-  })
+  }, alt = paste(
+    "Swimmer plot of duration on study in months for each subject, grouped by",
+    "treatment arm. X symbols mark death events."
+  ))
 
   ae_filtered <- reactive({
     validate(need(!is.null(adae), "adae_prod.xpt is unavailable."))
@@ -669,7 +704,10 @@ server <- function(input, output, session) {
       geom_col(fill = "#1f4e79") +
       labs(x = "Number of events", y = NULL) +
       theme_minimal(base_size = 13)
-  })
+  }, alt = paste(
+    "Bar chart of up to 15 most frequent adverse-event preferred terms under",
+    "the current treatment-emergent filter."
+  ))
 
   output$ae_soc_table <- DT::renderDT({
     soc_n <- input$soc_n
@@ -685,13 +723,29 @@ server <- function(input, output, session) {
       slice_head(n = as.integer(soc_n))
     validate(need(nrow(dat) > 0,
                   "No system-organ-class records match the current filter."))
-    DT::datatable(dat, rownames = FALSE, options = list(dom = "t", pageLength = 20))
+    DT::datatable(
+      dat,
+      rownames = FALSE,
+      caption = tags$caption(
+        class = "visually-hidden", "Adverse events by system organ class"
+      ),
+      selection = "none",
+      options = list(dom = "t", pageLength = 20)
+    )
   })
 
   output$recon_table <- DT::renderDT({
     validate(need(!is.null(recon), "Reconciliation log is unavailable."))
-    DT::datatable(recon, rownames = FALSE,
-                  options = list(dom = "t", pageLength = 20)) %>%
+    DT::datatable(
+      recon,
+      rownames = FALSE,
+      caption = tags$caption(
+        class = "visually-hidden",
+        "SAS versus R analysis-results reconciliation for the MP arm"
+      ),
+      selection = "none",
+      options = list(dom = "t", pageLength = 20)
+    ) %>%
       DT::formatStyle("Status",
                       backgroundColor = DT::styleEqual(
                         c("PASS", "FAIL"), c("#d4edda", "#f8d7da")
