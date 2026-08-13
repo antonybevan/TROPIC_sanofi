@@ -221,6 +221,46 @@ read_reconciliation <- function() {
   d <- as.data.frame(do.call(rbind, m), stringsAsFactors = FALSE)[, -1]
   names(d) <- c("Endpoint", "N (R)", "N (SAS)", "Events (R)", "Events (SAS)",
                 "Median days (R)", "Median days (SAS)", "Status")
+  count_columns <- c("N (R)", "N (SAS)", "Events (R)", "Events (SAS)")
+  malformed_counts <- vapply(
+    d[count_columns], function(values) any(!grepl("^[0-9]+$", values)),
+    logical(1)
+  )
+  parsed_counts <- lapply(d[count_columns], function(values) {
+    suppressWarnings(as.integer(values))
+  })
+  invalid_counts <- vapply(parsed_counts, function(values) any(is.na(values)),
+                           logical(1)) | malformed_counts
+  if (any(invalid_counts)) {
+    return(record_load_issue(
+      file,
+      paste("non-integer value(s) in column(s)",
+            paste(names(invalid_counts)[invalid_counts], collapse = ", "))
+    ))
+  }
+  d[count_columns] <- parsed_counts
+  if (any(!d$Status %in% c("PASS", "FAIL"))) {
+    return(record_load_issue(file, "contains unrecognised reconciliation status"))
+  }
+  inconsistent_pass <- d$Status == "PASS" &
+    (d$`N (R)` != d$`N (SAS)` |
+       d$`Events (R)` != d$`Events (SAS)` |
+       d$`Median days (R)` != d$`Median days (SAS)`)
+  if (any(inconsistent_pass)) {
+    return(record_load_issue(
+      file,
+      paste("inconsistent PASS record(s)",
+            paste(d$Endpoint[inconsistent_pass], collapse = ", "))
+    ))
+  }
+  expected_endpoints <- c("OS", "PFS", "TTPAIN", "TTPSA", "TTSAE", "TTUMOR")
+  if (anyDuplicated(d$Endpoint) ||
+      !setequal(d$Endpoint, expected_endpoints) ||
+      nrow(d) != length(expected_endpoints)) {
+    return(record_load_issue(
+      file, "must contain exactly one record for each production endpoint"
+    ))
+  }
   d
 }
 
@@ -242,6 +282,21 @@ km_risk <- read_figure_csv(
     allowed = list(TRT01P = names(ARM_COLOURS))
   )
 )
+if (!is.null(km_risk)) {
+  baseline_risk <- km_risk %>% filter(PARAMCD == "OS", AVALM == 0)
+  baseline_counts <- table(factor(
+    as.character(baseline_risk$TRT01P), levels = names(ARM_COLOURS)
+  ))
+  valid_baseline <- length(baseline_counts) == length(ARM_COLOURS) &&
+    all(baseline_counts == 1) && nrow(baseline_risk) == length(ARM_COLOURS) &&
+    all(is.finite(baseline_risk$NRISK))
+  if (!valid_baseline) {
+    km_risk <- record_load_issue(
+      "figure_km_risk_prod.csv",
+      "must contain exactly one finite OS time-zero record per treatment arm"
+    )
+  }
+}
 waterfall <- read_figure_csv(
   "figure_waterfall_prod.csv",
   c("TRT01P", "BEST", "RESPCAT"),
@@ -292,8 +347,8 @@ recon     <- read_reconciliation()
 # which is the only production source that contains both treatment arms.
 n_randomised <- if (!is.null(km_risk)) {
   baseline_risk <- km_risk %>%
-    filter(PARAMCD == "OS", AVALM == 0, is.finite(NRISK), NRISK >= 0)
-  if (nrow(baseline_risk) > 0) sum(baseline_risk$NRISK) else NA_integer_
+    filter(PARAMCD == "OS", AVALM == 0)
+  sum(baseline_risk$NRISK)
 } else {
   NA_integer_
 }
@@ -308,8 +363,15 @@ pfs_hr <- hr_for("PFS")
 # This is the pooled responder fraction in the plotted waterfall records. It is
 # descriptive only and is not the arm-specific SAP efficacy estimand.
 psa_response_rate <- if (!is.null(waterfall)) {
-  responders <- sum(grepl("PSA Response", waterfall$RESPCAT, ignore.case = TRUE))
-  round(100 * responders / nrow(waterfall), 1)
+  plotted_waterfall <- waterfall %>%
+    filter(is.finite(BEST), !is.na(TRT01P), nzchar(trimws(TRT01P)))
+  if (nrow(plotted_waterfall) > 0) {
+    responders <- sum(grepl("PSA Response", plotted_waterfall$RESPCAT,
+                            ignore.case = TRUE))
+    round(100 * responders / nrow(plotted_waterfall), 1)
+  } else {
+    NA_real_
+  }
 } else {
   NA_real_
 }
@@ -444,7 +506,7 @@ ui <- page_navbar(
         helpText("Adverse events from adae_prod.xpt (MP arm).")
       ),
       layout_columns(
-        col_widths = c(7, 5),
+        col_widths = breakpoints(sm = c(12, 12), xl = c(7, 5)),
         card(card_header("Most Frequent Preferred Terms"),
              plotOutput("ae_pt_plot", height = "460px")),
         card(card_header("Adverse Events by System Organ Class"),
@@ -584,6 +646,11 @@ server <- function(input, output, session) {
 
   ae_filtered <- reactive({
     validate(need(!is.null(adae), "adae_prod.xpt is unavailable."))
+    validate(need(
+      is.logical(input$teae_only) && length(input$teae_only) == 1 &&
+        !is.na(input$teae_only),
+      "Treatment-emergent filter is unavailable."
+    ))
     d <- adae
     if (isTRUE(input$teae_only)) d <- dplyr::filter(d, TRTEMFL == "Y")
     d
@@ -605,11 +672,17 @@ server <- function(input, output, session) {
   })
 
   output$ae_soc_table <- DT::renderDT({
+    soc_n <- input$soc_n
+    validate(need(
+      is.numeric(soc_n) && length(soc_n) == 1 && is.finite(soc_n) &&
+        soc_n >= 5 && soc_n <= 20 && soc_n == as.integer(soc_n),
+      "Top system organ classes must be a whole number from 5 to 20."
+    ))
     dat <- ae_filtered() %>%
       filter(!is.na(AEBODSYS), nzchar(trimws(AEBODSYS))) %>%
       count(`System Organ Class` = AEBODSYS, name = "Events") %>%
       arrange(desc(Events)) %>%
-      slice_head(n = input$soc_n)
+      slice_head(n = as.integer(soc_n))
     validate(need(nrow(dat) > 0,
                   "No system-organ-class records match the current filter."))
     DT::datatable(dat, rownames = FALSE, options = list(dom = "t", pageLength = 20))
