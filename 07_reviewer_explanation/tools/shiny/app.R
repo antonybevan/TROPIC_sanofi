@@ -88,7 +88,83 @@ validate_source_data <- function(data, file, required) {
   data
 }
 
-read_figure_csv <- function(file, required) {
+validate_column_contract <- function(data, file, numeric = character(),
+                                     positive = character(),
+                                     nonnegative = character(),
+                                     binary = character(), allowed = list()) {
+  non_numeric <- numeric[!vapply(data[numeric], is.numeric, logical(1))]
+  if (length(non_numeric) > 0) {
+    return(record_load_issue(
+      file,
+      paste("non-numeric required column(s)", paste(non_numeric, collapse = ", "))
+    ))
+  }
+
+  non_finite <- numeric[vapply(
+    data[numeric],
+    function(values) any(!is.na(values) & !is.finite(values)),
+    logical(1)
+  )]
+  if (length(non_finite) > 0) {
+    return(record_load_issue(
+      file,
+      paste("non-finite value(s) in column(s)", paste(non_finite, collapse = ", "))
+    ))
+  }
+
+  non_positive <- positive[vapply(
+    data[positive],
+    function(values) any(!is.na(values) & values <= 0),
+    logical(1)
+  )]
+  if (length(non_positive) > 0) {
+    return(record_load_issue(
+      file,
+      paste("non-positive value(s) in column(s)",
+            paste(non_positive, collapse = ", "))
+    ))
+  }
+
+  negative <- nonnegative[vapply(
+    data[nonnegative],
+    function(values) any(!is.na(values) & values < 0),
+    logical(1)
+  )]
+  if (length(negative) > 0) {
+    return(record_load_issue(
+      file,
+      paste("negative value(s) in column(s)", paste(negative, collapse = ", "))
+    ))
+  }
+
+  invalid_binary <- binary[vapply(
+    data[binary],
+    function(values) any(!is.na(values) & !values %in% c(0, 1)),
+    logical(1)
+  )]
+  if (length(invalid_binary) > 0) {
+    return(record_load_issue(
+      file,
+      paste("binary domain violation(s) in column(s)",
+            paste(invalid_binary, collapse = ", "))
+    ))
+  }
+
+  for (column in names(allowed)) {
+    values <- as.character(data[[column]])
+    invalid <- unique(values[!is.na(values) & !(values %in% allowed[[column]])])
+    if (length(invalid) > 0) {
+      return(record_load_issue(
+        file,
+        paste0("unexpected value(s) in ", column, ": ",
+               paste(invalid, collapse = ", "))
+      ))
+    }
+  }
+  data
+}
+
+read_figure_csv <- function(file, required, contract = list()) {
   path <- adam_path(file)
   if (!file.exists(path)) {
     return(record_load_issue(file, "not found"))
@@ -98,10 +174,13 @@ read_figure_csv <- function(file, required) {
     error = function(error) record_load_issue(file, conditionMessage(error))
   )
   if (is.null(data)) return(NULL)
-  validate_source_data(data, file, required)
+  data <- validate_source_data(data, file, required)
+  if (is.null(data)) return(NULL)
+  do.call(validate_column_contract,
+          c(list(data = data, file = file), contract))
 }
 
-read_adam_xpt <- function(file, required) {
+read_adam_xpt <- function(file, required, contract = list()) {
   path <- adam_path(file)
   if (!file.exists(path)) {
     return(record_load_issue(file, "not found"))
@@ -111,7 +190,10 @@ read_adam_xpt <- function(file, required) {
     error = function(error) record_load_issue(file, conditionMessage(error))
   )
   if (is.null(data)) return(NULL)
-  validate_source_data(data, file, required)
+  data <- validate_source_data(data, file, required)
+  if (is.null(data)) return(NULL)
+  do.call(validate_column_contract,
+          c(list(data = data, file = file), contract))
 }
 
 # Parse the SAS-versus-R analysis-results reconciliation log into a table.
@@ -139,37 +221,122 @@ read_reconciliation <- function() {
   d <- as.data.frame(do.call(rbind, m), stringsAsFactors = FALSE)[, -1]
   names(d) <- c("Endpoint", "N (R)", "N (SAS)", "Events (R)", "Events (SAS)",
                 "Median days (R)", "Median days (SAS)", "Status")
+  count_columns <- c("N (R)", "N (SAS)", "Events (R)", "Events (SAS)")
+  malformed_counts <- vapply(
+    d[count_columns], function(values) any(!grepl("^[0-9]+$", values)),
+    logical(1)
+  )
+  parsed_counts <- lapply(d[count_columns], function(values) {
+    suppressWarnings(as.integer(values))
+  })
+  invalid_counts <- vapply(parsed_counts, function(values) any(is.na(values)),
+                           logical(1)) | malformed_counts
+  if (any(invalid_counts)) {
+    return(record_load_issue(
+      file,
+      paste("non-integer value(s) in column(s)",
+            paste(names(invalid_counts)[invalid_counts], collapse = ", "))
+    ))
+  }
+  d[count_columns] <- parsed_counts
+  if (any(!d$Status %in% c("PASS", "FAIL"))) {
+    return(record_load_issue(file, "contains unrecognised reconciliation status"))
+  }
+  inconsistent_pass <- d$Status == "PASS" &
+    (d$`N (R)` != d$`N (SAS)` |
+       d$`Events (R)` != d$`Events (SAS)` |
+       d$`Median days (R)` != d$`Median days (SAS)`)
+  if (any(inconsistent_pass)) {
+    return(record_load_issue(
+      file,
+      paste("inconsistent PASS record(s)",
+            paste(d$Endpoint[inconsistent_pass], collapse = ", "))
+    ))
+  }
+  expected_endpoints <- c("OS", "PFS", "TTPAIN", "TTPSA", "TTSAE", "TTUMOR")
+  if (anyDuplicated(d$Endpoint) ||
+        !setequal(d$Endpoint, expected_endpoints) ||
+        nrow(d) != length(expected_endpoints)) {
+    return(record_load_issue(
+      file, "must contain exactly one record for each production endpoint"
+    ))
+  }
   d
 }
 
 # Load once at start-up. The dashboard is a static view of a completed run.
 km_stats <- read_figure_csv(
   "figure_km_stats_prod.csv",
-  c("PARAMCD", "HAZARDRATIO", "WALDLOWER", "WALDUPPER")
+  c("PARAMCD", "HAZARDRATIO", "WALDLOWER", "WALDUPPER"),
+  contract = list(
+    numeric = c("HAZARDRATIO", "WALDLOWER", "WALDUPPER"),
+    positive = c("HAZARDRATIO", "WALDLOWER", "WALDUPPER")
+  )
 )
 km_risk <- read_figure_csv(
   "figure_km_risk_prod.csv",
-  c("PARAMCD", "AVALM", "TRT01P", "NRISK")
+  c("PARAMCD", "AVALM", "TRT01P", "NRISK"),
+  contract = list(
+    numeric = c("AVALM", "NRISK"),
+    nonnegative = c("AVALM", "NRISK"),
+    allowed = list(TRT01P = names(ARM_COLOURS))
+  )
 )
+if (!is.null(km_risk)) {
+  baseline_risk <- km_risk %>% filter(PARAMCD == "OS", AVALM == 0)
+  baseline_counts <- table(factor(
+    as.character(baseline_risk$TRT01P), levels = names(ARM_COLOURS)
+  ))
+  valid_baseline <- length(baseline_counts) == length(ARM_COLOURS) &&
+    all(baseline_counts == 1) && nrow(baseline_risk) == length(ARM_COLOURS) &&
+    all(is.finite(baseline_risk$NRISK))
+  if (!valid_baseline) {
+    km_risk <- record_load_issue(
+      "figure_km_risk_prod.csv",
+      "must contain exactly one finite OS time-zero record per treatment arm"
+    )
+  }
+}
 waterfall <- read_figure_csv(
   "figure_waterfall_prod.csv",
-  c("TRT01P", "BEST", "RESPCAT")
+  c("TRT01P", "BEST", "RESPCAT"),
+  contract = list(
+    numeric = "BEST",
+    allowed = list(TRT01P = names(ARM_COLOURS))
+  )
 )
 swimmer <- read_figure_csv(
   "figure_swimmer_prod.csv",
-  c("TRT01P", "DURM", "DEATH")
+  c("TRT01P", "DURM", "DEATH"),
+  contract = list(
+    numeric = c("DURM", "DEATH"),
+    nonnegative = "DURM",
+    binary = "DEATH",
+    allowed = list(TRT01P = names(ARM_COLOURS))
+  )
 )
 forest_hr <- read_figure_csv(
   "forest_hr_prod.csv",
-  c("SUBGROUP", "HAZARDRATIO", "WALDLOWER", "WALDUPPER")
+  c("SUBGROUP", "HAZARDRATIO", "WALDLOWER", "WALDUPPER"),
+  contract = list(
+    numeric = c("HAZARDRATIO", "WALDLOWER", "WALDUPPER"),
+    positive = c("HAZARDRATIO", "WALDLOWER", "WALDUPPER")
+  )
 )
 adtte <- read_adam_xpt(
   "adtte_prod.xpt",
-  c("PARAMCD", "AVAL", "AVALU", "CNSR", "TRT01P")
+  c("PARAMCD", "AVAL", "AVALU", "CNSR", "TRT01P"),
+  contract = list(
+    numeric = c("AVAL", "CNSR"),
+    nonnegative = "AVAL",
+    binary = "CNSR",
+    allowed = list(TRT01P = names(ARM_COLOURS))
+  )
 )
 adae <- read_adam_xpt(
   "adae_prod.xpt",
-  c("AEDECOD", "AEBODSYS", "TRTEMFL")
+  c("AEDECOD", "AEBODSYS", "TRTEMFL"),
+  contract = list(allowed = list(TRTEMFL = c("", "Y")))
 )
 recon     <- read_reconciliation()
 
@@ -180,8 +347,8 @@ recon     <- read_reconciliation()
 # which is the only production source that contains both treatment arms.
 n_randomised <- if (!is.null(km_risk)) {
   baseline_risk <- km_risk %>%
-    filter(PARAMCD == "OS", AVALM == 0, is.finite(NRISK), NRISK >= 0)
-  if (nrow(baseline_risk) > 0) sum(baseline_risk$NRISK) else NA_integer_
+    filter(PARAMCD == "OS", AVALM == 0)
+  sum(baseline_risk$NRISK)
 } else {
   NA_integer_
 }
@@ -196,8 +363,15 @@ pfs_hr <- hr_for("PFS")
 # This is the pooled responder fraction in the plotted waterfall records. It is
 # descriptive only and is not the arm-specific SAP efficacy estimand.
 psa_response_rate <- if (!is.null(waterfall)) {
-  responders <- sum(grepl("PSA Response", waterfall$RESPCAT, ignore.case = TRUE))
-  round(100 * responders / nrow(waterfall), 1)
+  plotted_waterfall <- waterfall %>%
+    filter(is.finite(BEST), !is.na(TRT01P), nzchar(trimws(TRT01P)))
+  if (nrow(plotted_waterfall) > 0) {
+    responders <- sum(grepl("PSA Response", plotted_waterfall$RESPCAT,
+                            ignore.case = TRUE))
+    round(100 * responders / nrow(plotted_waterfall), 1)
+  } else {
+    NA_real_
+  }
 } else {
   NA_real_
 }
@@ -244,8 +418,9 @@ ui <- page_navbar(
         class = "alert alert-warning mt-3",
         role = "alert",
         tags$h4(class = "alert-heading", "Local review data are incomplete"),
-        p("The dashboard is still available, but affected panels are disabled. ",
-          "Generate the local production outputs before using this review aid."),
+        p("The dashboard is still available, but affected panels show ",
+          "unavailable-data messages. Generate the local production outputs ",
+          "before using this review aid."),
         tags$details(
           tags$summary(paste(length(load_issues), "input issue(s)")),
           tags$ul(lapply(load_issues, tags$li))
@@ -295,6 +470,7 @@ ui <- page_navbar(
     "Kaplan-Meier",
     layout_sidebar(
       sidebar = sidebar(
+        title = "Kaplan-Meier controls",
         selectInput("km_param", "Endpoint",
                     choices = km_endpoints,
                     selected = if ("OS" %in% km_endpoints) {
@@ -326,13 +502,14 @@ ui <- page_navbar(
     "Safety",
     layout_sidebar(
       sidebar = sidebar(
+        title = "Safety controls",
         checkboxInput("teae_only", "Treatment-emergent only", value = TRUE),
-        sliderInput("soc_n", "Top system organ classes", min = 5, max = 20,
-                    value = 10, step = 1),
+        numericInput("soc_n", "Top system organ classes", min = 5, max = 20,
+                     value = 10, step = 1),
         helpText("Adverse events from adae_prod.xpt (MP arm).")
       ),
       layout_columns(
-        col_widths = c(7, 5),
+        col_widths = breakpoints(sm = c(12, 12), xl = c(7, 5)),
         card(card_header("Most Frequent Preferred Terms"),
              plotOutput("ae_pt_plot", height = "460px")),
         card(card_header("Adverse Events by System Organ Class"),
@@ -384,7 +561,10 @@ server <- function(input, output, session) {
       labs(x = "Hazard ratio (log scale) — favours CbzP < 1 < favours MP",
            y = NULL) +
       theme_minimal(base_size = 13)
-  })
+  }, alt = paste(
+    "Forest plot of overall and subgroup hazard ratios on a logarithmic scale.",
+    "Values below one favour CbzP; values above one favour MP."
+  ))
 
   output$km_title <- renderText({
     req(input$km_param)
@@ -425,6 +605,28 @@ server <- function(input, output, session) {
       labs(x = paste0("Time (", unit, ")"),
            y = "Survival probability") +
       theme_minimal(base_size = 13)
+  }, alt = function() {
+    endpoint <- input$km_param
+    if (is.null(endpoint) || length(endpoint) == 0 || !nzchar(endpoint)) {
+      return("Kaplan-Meier survival curve; no endpoint is selected.")
+    }
+    arms <- if (!is.null(adtte)) {
+      adtte %>%
+        filter(PARAMCD == endpoint, !is.na(TRT01P), nzchar(trimws(TRT01P))) %>%
+        pull(TRT01P) %>%
+        as.character() %>%
+        unique() %>%
+        sort()
+    } else {
+      character(0)
+    }
+    arm_description <- if (length(arms) > 0) {
+      paste(arms, collapse = " and ")
+    } else {
+      "the available treatment arms"
+    }
+    paste0("Kaplan-Meier survival curves for endpoint ", endpoint,
+           ", comparing ", arm_description, ".")
   })
 
   output$waterfall_plot <- renderPlot({
@@ -445,7 +647,11 @@ server <- function(input, output, session) {
            y = "Best % change in PSA from baseline") +
       theme_minimal(base_size = 13) +
       theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
-  })
+  }, alt = paste(
+    "Waterfall bar chart of each subject's best percentage change in PSA from",
+    "baseline, ordered by response and grouped by treatment arm. The dashed",
+    "line marks a 50 percent reduction."
+  ))
 
   output$swimmer_plot <- renderPlot({
     validate(need(!is.null(swimmer), "Swimmer data are unavailable."))
@@ -468,10 +674,18 @@ server <- function(input, output, session) {
            caption = "× marks a death event") +
       theme_minimal(base_size = 13) +
       theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
-  })
+  }, alt = paste(
+    "Swimmer plot of duration on study in months for each subject, grouped by",
+    "treatment arm. X symbols mark death events."
+  ))
 
   ae_filtered <- reactive({
     validate(need(!is.null(adae), "adae_prod.xpt is unavailable."))
+    validate(need(
+      is.logical(input$teae_only) && length(input$teae_only) == 1 &&
+        !is.na(input$teae_only),
+      "Treatment-emergent filter is unavailable."
+    ))
     d <- adae
     if (isTRUE(input$teae_only)) d <- dplyr::filter(d, TRTEMFL == "Y")
     d
@@ -490,23 +704,48 @@ server <- function(input, output, session) {
       geom_col(fill = "#1f4e79") +
       labs(x = "Number of events", y = NULL) +
       theme_minimal(base_size = 13)
-  })
+  }, alt = paste(
+    "Bar chart of up to 15 most frequent adverse-event preferred terms under",
+    "the current treatment-emergent filter."
+  ))
 
   output$ae_soc_table <- DT::renderDT({
+    soc_n <- input$soc_n
+    validate(need(
+      is.numeric(soc_n) && length(soc_n) == 1 && is.finite(soc_n) &&
+        soc_n >= 5 && soc_n <= 20 && soc_n == as.integer(soc_n),
+      "Top system organ classes must be a whole number from 5 to 20."
+    ))
     dat <- ae_filtered() %>%
       filter(!is.na(AEBODSYS), nzchar(trimws(AEBODSYS))) %>%
       count(`System Organ Class` = AEBODSYS, name = "Events") %>%
       arrange(desc(Events)) %>%
-      slice_head(n = input$soc_n)
+      slice_head(n = as.integer(soc_n))
     validate(need(nrow(dat) > 0,
                   "No system-organ-class records match the current filter."))
-    DT::datatable(dat, rownames = FALSE, options = list(dom = "t", pageLength = 20))
+    DT::datatable(
+      dat,
+      rownames = FALSE,
+      caption = tags$caption(
+        class = "visually-hidden", "Adverse events by system organ class"
+      ),
+      selection = "none",
+      options = list(dom = "t", pageLength = 20)
+    )
   })
 
   output$recon_table <- DT::renderDT({
     validate(need(!is.null(recon), "Reconciliation log is unavailable."))
-    DT::datatable(recon, rownames = FALSE,
-                  options = list(dom = "t", pageLength = 20)) %>%
+    DT::datatable(
+      recon,
+      rownames = FALSE,
+      caption = tags$caption(
+        class = "visually-hidden",
+        "SAS versus R analysis-results reconciliation for the MP arm"
+      ),
+      selection = "none",
+      options = list(dom = "t", pageLength = 20)
+    ) %>%
       DT::formatStyle("Status",
                       backgroundColor = DT::styleEqual(
                         c("PASS", "FAIL"), c("#d4edda", "#f8d7da")

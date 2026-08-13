@@ -38,6 +38,12 @@ Open **only**:
 
 Tour doc: [`../08_submission_package/README.md`](../08_submission_package/README.md)
 
+Visual review surfaces:
+
+- [`../05_outputs/tfl/TFL_Gallery.html`](../05_outputs/tfl/TFL_Gallery.html) — portable static figure gallery
+- [`../06_qc_evidence/audit/DASHBOARD_VISUAL_QC.md`](../06_qc_evidence/audit/DASHBOARD_VISUAL_QC.md) — five-tab dashboard acceptance evidence
+- `../07_reviewer_explanation/tools/shiny/app.R` — read-only local dashboard source; authorized local production inputs are required for the data-bearing view
+
 Guides (markdown sources):
 
 - [`../07_reviewer_explanation/guides/ADRG.md`](../07_reviewer_explanation/guides/ADRG.md)

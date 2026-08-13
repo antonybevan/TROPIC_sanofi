@@ -90,6 +90,7 @@ class TestReleaseSealHelpers(unittest.TestCase):
                 "additive_outputs": [],
                 "inputs": [],
                 "logs": [],
+                "review_surface": [],
             },
             "datasets": [],
         }
@@ -113,6 +114,7 @@ class TestReleaseSealHelpers(unittest.TestCase):
                 "additive_outputs": [],
                 "inputs": [],
                 "logs": [],
+                "review_surface": [],
             },
             "datasets": [],
         }
@@ -133,6 +135,7 @@ class TestReleaseSealHelpers(unittest.TestCase):
                 "additive_outputs": [],
                 "inputs": [],
                 "logs": [],
+                "review_surface": [],
             },
             "datasets": [],
         }

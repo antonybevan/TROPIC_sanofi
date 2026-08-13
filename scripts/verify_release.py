@@ -29,6 +29,7 @@ ARTIFACT_GROUPS = (
     "additive_outputs",
     "inputs",
     "logs",
+    "review_surface",
 )
 
 
