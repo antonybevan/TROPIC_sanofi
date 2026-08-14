@@ -8,6 +8,10 @@
 
 **Checker:** [`platform/check_submission_readiness.py`](../platform/check_submission_readiness.py)
 
+**Scoped official-source inventory:** [`config/regulatory_source_inventory.yaml`](../config/regulatory_source_inventory.yaml)
+
+**Inventory checker:** [`platform/check_regulatory_source_inventory.py`](../platform/check_regulatory_source_inventory.py)
+
 ## Executive conclusion
 
 Large-pharma submission readiness is a controlled release process, not a final
@@ -42,6 +46,45 @@ written identically.
 | Simulation / innovative design | FDA’s complex-innovative-design materials ask for parameter configurations, justification, example trials, type I error, power, expected sample size/duration, and estimation properties over plausible scenarios. | Use a frozen ADEMP/OCTAVE-style protocol, null and stress scenarios, operating characteristics, MCSE/failure accounting, and a signed interpretation boundary. |
 | Model/simulation delivery | FDA’s model/data format page describes data, Define, reviewer-guide, dependency, execution-order, input/output, model-code, and simulation-code expectations. | Package the data/code/configuration/dependency graph and make replay deterministic from a clean checkout. |
 | Electronic records | FDA Part 11 guidance keeps validation and audit-trail decisions risk-based; computerized-systems guidance emphasizes secure timestamped audit trails, accuracy, completeness, and reliability. | For regulated use, add approved CSV/CSA evidence, access roles, audit-trail review, backup/restore, change control, retention, and qualified signatures. |
+
+## Scope of the official-guideline review
+
+The phrase “all guidelines” is not a defensible regulatory claim without a
+defined product, region, submission type, data source, and date. I therefore
+used the official [FDA clinical-trials guidance index](https://www.fda.gov/science-research/clinical-trials-and-human-subject-protection/clinical-trials-guidance-documents)
+and [ICH guideline index](https://admin.ich.org/page/search-index-ich-guidelines)
+as the review universe, then screened the sources against this repository’s
+declared scope. The resulting inventory contains **48 official-source entries**:
+18 applicable, 16 partially applicable, 5 deliberately out of scope, 6
+watch/not-final, and 3 requiring center or sponsor-owner confirmation. The
+inventory is checked in and validated in CI; it is not a web crawl or a claim
+that every national, indication-specific, CMC, nonclinical, or sponsor SOP
+document was reviewed.
+
+The second-pass review corrected two important status distinctions:
+
+- [ICH M15](https://database.ich.org/sites/default/files/ICH_M15_Step4_Final_Guideline_2026_0129.pdf)
+  is recorded as a **Step 4 final guideline** (2026-01-29), while the
+  repository remains explicitly **not qualified** for MIDD or filing use.
+- [ICH E6(R3) Annex 2](https://database.ich.org/sites/default/files/ICH_E6%28R3%29_Annex%202_Guideline_Step%204_2026_0603_0.pdf)
+  is recorded as final (2026-06-03) but only partially applicable because this
+  repository does not use decentralized, pragmatic, or other Annex 2 data
+  sources.
+
+The review also records the distinction between final requirements and future
+watch items: FDA’s [January 2026 Bayesian draft guidance](https://www.fda.gov/regulatory-information/search-fda-guidance-documents/use-bayesian-methodology-clinical-trials-drug-and-biological-products),
+ICH E20 adaptive designs (still under development at the assessment date),
+and CDISC ARS v2 planning material are not treated as current final
+requirements. Conversely, FDA/ICH E9(R1), FDA covariate guidance, FDA
+multiple-endpoint guidance, current eCTD regional pages, CDISC
+SDTMIG/ADaMIG/Define-XML, and the 2026 CDISC controlled-terminology release
+are explicitly mapped to controls or owner decisions.
+
+This review is also why the project does **not** claim that Git/CI is a Part 11
+validated clinical system, that public aggregate calibration is MIDD
+qualification, or that a deterministic eCTD-style directory has gateway
+acceptance. Those are separate qualification, ownership, and submission
+decisions.
 
 ## Big-pharma operating model translated to this repository
 
@@ -115,5 +158,29 @@ needed for a broader regulatory simulation claim.
 - [FDA Model | Data Format](https://www.fda.gov/about-fda/center-drug-evaluation-and-research-cder/model-data-format)
 - [FDA Computerized Systems Used in Clinical Trials](https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/fda-bioresearch-monitoring-information/guidance-industry-computerized-systems-used-clinical-trials)
 - [FDA Part 11, Electronic Records; Electronic Signatures](https://www.fda.gov/regulatory-information/search-fda-guidance-documents/part-11-electronic-records-electronic-signatures-scope-and-application)
+- [FDA Adaptive Design Clinical Trials](https://www.fda.gov/regulatory-information/search-fda-guidance-documents/adaptive-design-clinical-trials-drugs-and-biologics-guidance-industry)
+- [FDA Adjusting for Covariates](https://www.fda.gov/regulatory-information/search-fda-guidance-documents/adjusting-covariates-randomized-clinical-trials-drugs-and-biological-products)
+- [FDA Multiple Endpoints in Clinical Trials](https://www.fda.gov/media/162416/download)
+- [FDA Clinical Trial Endpoints for Cancer Drugs and Biologics](https://www.fda.gov/regulatory-information/search-fda-guidance-documents/clinical-trial-endpoints-approval-cancer-drugs-and-biologics)
+- [FDA Approaches to Assessment of Overall Survival — draft](https://www.fda.gov/regulatory-information/search-fda-guidance-documents/approaches-assessment-overall-survival-oncology-clinical-trials)
+- [FDA Data Retention When Subjects Withdraw](https://www.fda.gov/regulatory-information/search-fda-guidance-documents/data-retention-when-subjects-withdraw-fda-regulated-clinical-trials)
+- [FDA Master Protocols — draft](https://www.fda.gov/regulatory-information/search-fda-guidance-documents/master-protocols-drug-and-biological-product-development)
+- [FDA Substantial Evidence — draft](https://www.fda.gov/regulatory-information/search-fda-guidance-documents/demonstrating-substantial-evidence-effectiveness-human-drug-and-biological-products)
+- [FDA Electronic Source Data](https://www.fda.gov/regulatory-information/search-fda-guidance-documents/electronic-source-data-clinical-investigations)
+- [FDA Electronic Systems, Records, and Signatures Q&A](https://www.fda.gov/regulatory-information/search-fda-guidance-documents/electronic-systems-electronic-records-and-electronic-signatures-clinical-investigations-questions)
+- [21 CFR Part 11](https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11)
 - [FDA E9(R1) Statistical Principles](https://www.fda.gov/regulatory-information/search-fda-guidance-documents/e9r1-statistical-principles-clinical-trials-addendum-estimands-and-sensitivity-analysis-clinical)
+- [ICH E8(R1)](https://database.ich.org/sites/default/files/E8-R1_Guideline_Step4_2022_0204%20%281%29.pdf)
+- [ICH E10](https://database.ich.org/sites/default/files/E10_Guideline.pdf)
+- [ICH M15 final guideline](https://database.ich.org/sites/default/files/ICH_M15_Step4_Final_Guideline_2026_0129.pdf)
+- [ICH E6(R3) Annex 2](https://database.ich.org/sites/default/files/ICH_E6%28R3%29_Annex%202_Guideline_Step%204_2026_0603_0.pdf)
+- [ICH Q9(R1)](https://database.ich.org/sites/default/files/ICH_Q9%28R1%29_Guideline_Step4_2023_0126_0.pdf)
+- [ICH eCTD v4.0](https://admin.ich.org/page/ich-electronic-common-technical-document-ectd-v40)
+- [ICH CTD](https://admin.ich.org/page/ctd)
+- [ICH Study Tagging File](https://admin.ich.org/page/study-tagging-file-specification-and-related-files)
+- [CDISC SDTMIG v3.4](https://www.cdisc.org/standards/foundational/sdtmig/sdtmig-v3-4)
+- [CDISC ADaMIG v1.3](https://www.cdisc.org/standards/foundational/adam/adamig-v1-3)
+- [CDISC Define-XML v2.1](https://www.cdisc.org/standards/foundational/define-xml/define-xml-v2-1-0)
+- [CDISC Analysis Results Standard](https://www.cdisc.org/standards/foundational/analysis-results-standard)
+- [CDISC Controlled Terminology](https://www.cdisc.org/standards/terminology/controlled-terminology)
 - [ICH E6(R3) Good Clinical Practice](https://database.ich.org/sites/default/files/ICH_E6%28R3%29_Step4_FinalGuideline_2025_0106_ErrorCorrections_2025_1024.pdf)

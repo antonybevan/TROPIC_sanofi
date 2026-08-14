@@ -137,6 +137,19 @@ controls:
         required: true
     owner_action: "Re-run the genuine SAS/ODA production path and refresh the controlled seal before any release claim."
 
+  - id: "GOV-004"
+    domain: "regulatory_scope"
+    expectation: "Official FDA/ICH/CDISC/eCFR sources are inventoried by applicability, status, local evidence, and owner action without pretending that every guideline is relevant."
+    status: "PASS"
+    evidence:
+      - path: "config/regulatory_source_inventory.yaml"
+        required: true
+      - path: "platform/check_regulatory_source_inventory.py"
+        required: true
+      - path: "tests/test_regulatory_source_inventory.py"
+        required: true
+    owner_action: "Re-screen the FDA clinical-guidance and ICH guideline indexes when the product, region, data source, or intended use changes."
+
   - id: "STAT-001"
     domain: "statistics"
     expectation: "The estimand and intercurrent-event strategy are explicit, and sensitivity analysis is tied to the question of interest."

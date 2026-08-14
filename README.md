@@ -111,6 +111,9 @@ python3 platform/check_regulatory_baseline.py --check-only
 
 # Review the FDA/ICH readiness map; --strict is the release go/no-go mode
 python3 platform/check_submission_readiness.py
+
+# Validate the scoped official-source inventory (does not replace legal or center review)
+python3 platform/check_regulatory_source_inventory.py
 ```
 
 The full run requires the authorized local SDTM source and credentials; see [Reproducibility](00_governance/REPRODUCIBILITY.md) and the [ODA runbook](docs/runbooks/ODA_GUIDE.md). A clean clone intentionally does not contain patient-level source or derived XPTs.
