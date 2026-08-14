@@ -176,4 +176,5 @@ non-MIDD, non-confirmatory, and unsuitable for clinical or filing decisions.
 ## Reference
 
 de Bono JS, Oudard S, Ozguroglu M, et al. **Prednisone plus cabazitaxel or mitoxantrone for metastatic castration-resistant prostate cancer progressing after docetaxel treatment: a randomised open-label trial.** *Lancet.* 2010;376(9747):1147–1154.
-* Local Copy: [de_bono_lancet_2010.pdf](../01_source_data/reference_literature/de_bono_lancet_2010.pdf)
+* Local copy (licensed source, excluded from Git when present):
+  `01_source_data/reference_literature/de_bono_lancet_2010.pdf`
