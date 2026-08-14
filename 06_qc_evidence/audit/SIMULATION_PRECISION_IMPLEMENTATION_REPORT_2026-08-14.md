@@ -64,6 +64,7 @@ The resulting controls are:
 | Prospective protocol and MAP | `config/simulation_protocol.yaml` |
 | Simulation engine | `platform/simulation_precision.py` |
 | Authoritative machine result | `platform/simulation_operating_characteristics/simulation_oc_status.json` |
+| Clean-checkout parity views | `scenario_results.csv`; `representative_trials.json` (aggregate rows only) |
 | Reviewer-source generator | `platform/build_simulation_report.py` |
 | Independent checker | `platform/check_simulation_evidence.py` |
 | Human MAP/MAR | `07_reviewer_explanation/simulation_model_analysis_plan.md`; `simulation_report.md` |

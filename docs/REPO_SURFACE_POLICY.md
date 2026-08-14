@@ -74,7 +74,7 @@ Minimal machine evidence so a **bare clone** can recheck the controlled release 
 | `platform/log_cleanliness/log_cleanliness_status.json` | Log gate |
 | `platform/release_run_manifest/release_run_manifest.json` | Hash seal |
 | `platform/release_candidate/release_candidate_status.json` | RC checklist |
-| `platform/simulation_operating_characteristics/simulation_oc_status.json` | Data-free, aggregate simulation OC evidence and precision accounting |
+| `platform/simulation_operating_characteristics/simulation_oc_status.json` + checked CSV/trial sidecars | Data-free aggregate simulation OC authority plus clean-checkout parity views; no subject rows |
 | `platform/evidence/` | Frozen genuine ODA snapshot (byte-distinct proof) |
 
 Everything else regenerable is **local only**.

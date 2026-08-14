@@ -118,6 +118,8 @@ REVIEW_SURFACE_FILES = [
     "06_qc_evidence/audit/SIMULATION_PRECISION_IMPLEMENTATION_REPORT_2026-08-14.md",
     "07_reviewer_explanation/simulation_model_analysis_plan.md",
     "07_reviewer_explanation/simulation_report.md",
+    "platform/simulation_operating_characteristics/scenario_results.csv",
+    "platform/simulation_operating_characteristics/representative_trials.json",
 ]
 REVIEW_SURFACE_GLOBS = [
     "06_qc_evidence/audit/dashboard_evidence/*.jpg",

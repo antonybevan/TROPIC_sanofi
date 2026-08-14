@@ -162,11 +162,14 @@ platform/release_run_manifest/**
 platform/release_candidate/**
 !platform/release_candidate/release_candidate_status.json
 
-# Governed, data-free aggregate simulation evidence is intentionally committed:
-# it contains no patient-level rows and is the sole numerical source for the MAP/MAR.
+# Governed, data-free aggregate simulation evidence is intentionally committed.
+# The JSON is the numerical authority; two no-subject-row sidecars are retained so
+# a clean checkout can independently verify denormalized scenario/trial parity.
 !platform/simulation_operating_characteristics/
 platform/simulation_operating_characteristics/**
 !platform/simulation_operating_characteristics/simulation_oc_status.json
+!platform/simulation_operating_characteristics/scenario_results.csv
+!platform/simulation_operating_characteristics/representative_trials.json
 
 !platform/evidence/
 !platform/evidence/**

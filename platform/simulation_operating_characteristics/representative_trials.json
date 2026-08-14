@@ -1,0 +1,63 @@
+[
+  {
+    "selection_role": "reject",
+    "scenario_id": "OS_NULL_REFERENCE",
+    "scenario_seed": 2026081401,
+    "selection_seed": 2026081490,
+    "search_index": 6,
+    "endpoint": "OS",
+    "events": {
+      "control": 235,
+      "experimental": 211
+    },
+    "censors": {
+      "control": 142,
+      "experimental": 167
+    },
+    "z_statistic": -2.306365072737831,
+    "one_sided_p_value": 0.010545120946007285,
+    "alpha_one_sided": 0.025,
+    "decision": "REJECT"
+  },
+  {
+    "selection_role": "non_reject",
+    "scenario_id": "OS_NULL_REFERENCE",
+    "scenario_seed": 2026081401,
+    "selection_seed": 2026081490,
+    "search_index": 1,
+    "endpoint": "OS",
+    "events": {
+      "control": 232,
+      "experimental": 235
+    },
+    "censors": {
+      "control": 145,
+      "experimental": 143
+    },
+    "z_statistic": 0.0638508813266181,
+    "one_sided_p_value": 0.5254555182789433,
+    "alpha_one_sided": 0.025,
+    "decision": "DO_NOT_REJECT"
+  },
+  {
+    "selection_role": "near_alpha_boundary",
+    "absolute_distance_from_alpha": 4.0568838771945503e-05,
+    "scenario_id": "OS_NULL_REFERENCE",
+    "scenario_seed": 2026081401,
+    "selection_seed": 2026081490,
+    "search_index": 2945,
+    "endpoint": "OS",
+    "events": {
+      "control": 232,
+      "experimental": 211
+    },
+    "censors": {
+      "control": 145,
+      "experimental": 167
+    },
+    "z_statistic": -1.9606585934063776,
+    "one_sided_p_value": 0.024959431161228056,
+    "alpha_one_sided": 0.025,
+    "decision": "REJECT"
+  }
+]
