@@ -73,7 +73,7 @@ release seal.
 | R smoke, F-042, lab-shift, population, TFL-statistics, and figure-output suites | **PASS** |
 | Python compilation, shell `bash -n`, `git diff --check` | **PASS** |
 | Tracked credential/data filename audit and active Markdown links | **PASS** |
-| `scripts/verify_release.py` | **39/43; seal blocked by stale source/artifact hashes after this change and the existing real-SAS seal state** |
+| `scripts/verify_release.py` | **40/43; seal blocked by stale source/artifact hashes after this change and the existing real-SAS seal state** |
 
 The release-verifier failures are intentional evidence, not suppressed gates. The source tree and
 release artifacts must be regenerated and resealed after the owner-approved change set; a fresh
