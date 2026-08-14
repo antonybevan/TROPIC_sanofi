@@ -80,7 +80,9 @@ __pycache__/
 .Rprofile
 .DS_Store
 .claude/
+.hermes.md
 scratch/
+tmp/
 backup_adam/
 
 # ----- Global binary ignore (portfolio re-includes package + TFL gallery) ----

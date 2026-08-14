@@ -13,19 +13,46 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 RUN="$ROOT/.core_run"; ENGINE="$RUN/engine"; VENV="$ROOT/.core_venv"; CACHE="$ENGINE/resources/cache"
 PY="$VENV/bin/python"; CORE="$ENGINE/core.py"
+CORE_VERSION="0.16.0"
+# Immutable commit for the v0.16.0 source tree used by the committed conformance evidence.
+CORE_COMMIT="c78b05cad21379adf52c8fad5fe1760b826d1ef3"
 cd "$ROOT"
 mkdir -p "$RUN" "$ROOT/platform/conformance"
-[ -f "$RUN/.env" ] && set -a && . "$RUN/.env" && set +a || true
+chmod 700 "$RUN"
+if [ -f "$RUN/.env" ]; then
+  # The file is ignored by Git but still carries a live API credential at runtime.  Refuse to
+  # source a group/world-readable copy; this protects local workspaces and backup tooling from a
+  # secret that would otherwise be exposed before the client ever opens a network connection.
+  python3 - "$RUN/.env" <<'PY'
+import os
+import stat
+import sys
+
+path = sys.argv[1]
+mode = stat.S_IMODE(os.stat(path).st_mode)
+if mode & 0o077:
+    print(f"Refusing insecure credential file permissions for {path}: {mode:04o}; use 0600.",
+          file=sys.stderr)
+    raise SystemExit(1)
+PY
+  set -a
+  . "$RUN/.env"
+  set +a
+fi
 : "${CDISC_LIBRARY_API_KEY:?Set CDISC_LIBRARY_API_KEY (free CDISC account) or add it to .core_run/.env}"
 
 # 1. Python 3.12 venv + CORE library
 [ -d "$VENV" ] || python3.12 -m venv "$VENV"
-"$VENV/bin/pip" install --quiet --upgrade pip cdisc-rules-engine
+"$VENV/bin/pip" install --quiet --upgrade pip "cdisc-rules-engine==$CORE_VERSION"
 
 # 2. CLI + bundled rule cache (repo clone at the matching tag)
 if [ ! -f "$CORE" ]; then
-  git clone --depth 1 --branch v0.16.0 https://github.com/cdisc-org/cdisc-rules-engine "$ENGINE"
+  git clone --depth 1 --branch "v$CORE_VERSION" https://github.com/cdisc-org/cdisc-rules-engine "$ENGINE"
 fi
+test "$(git -C "$ENGINE" rev-parse HEAD)" = "$CORE_COMMIT" || {
+  echo "Refusing unverified CDISC CORE source tree; expected $CORE_COMMIT." >&2
+  exit 1
+}
 # CORE 0.16.0 CLI gate: StandardTypes omits 'adamig' though the engine requires it. Patch it
 # (portable across BSD/GNU sed via Python). Resolved upstream (PR #1733 adamig; PR #1770 the other
 # ADaM products, merged 2026-06-22); this local patch is required only while the engine is pinned

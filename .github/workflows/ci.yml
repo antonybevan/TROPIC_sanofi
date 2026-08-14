@@ -144,6 +144,7 @@ jobs:
       run: |
         python3 platform/test_oda_broker.py
         python3 tests/test_phase2_staging.py
+        python3 -m pytest -q tests/test_repository_hygiene.py tests/test_define_parser_security.py
 
     - name: Run data-free regression tests (ARM, abort telemetry, F-042)
       run: |

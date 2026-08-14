@@ -444,7 +444,17 @@ def _run_saspy_stage10():
         return 0, "ODA exhausted; honest sim fallback", "", meta
 
     sas = conn.sas
-    proj_root_oda = _resolve_oda_root(sas, PROJ_ROOT_ODA)
+    try:
+        # PROJ_ROOT_ODA is environment-controlled and is interpolated into SAS source below.
+        # Validate before the first submit, then validate the account-home expansion as well.
+        proj_root_template = seed_sdtm.validate_remote_path(PROJ_ROOT_ODA)
+        proj_root_oda = seed_sdtm.validate_remote_path(
+            _resolve_oda_root(sas, proj_root_template))
+        sdtm_remote_dir = seed_sdtm.resolve_sdtm_remote_dir(sas, proj_root_oda)
+    except ValueError as exc:
+        oda_broker.teardown(sas)
+        return 2, "", f"Invalid TROPIC_ODA_PROJ_ROOT: {exc}", {
+            "oda_last_error_class": "INVALID_REMOTE_PATH", "reconciliation": "none"}
     sas_version = _probe_sas_version(sas)  # roadmap item 5; best-effort, never gates the run
     PGMDIR_ODA = f"{proj_root_oda}/04_analysis_datasets/programs/sas"
     ADAM_ODA = f"{proj_root_oda}/04_analysis_datasets/adam"
@@ -464,14 +474,15 @@ def _run_saspy_stage10():
         # check. Default (neither flag) keeps the strict CI contract: verify, else hard-fail.
         force_sdtm = os.environ.get("TROPIC_ODA_FORCE_SDTM") == "TRUE"
         if force_sdtm or os.environ.get("TROPIC_ODA_SEED_INLINE") == "TRUE":
-            res = seed_sdtm.seed(sas, force=force_sdtm)
+            res = seed_sdtm.seed(sas, remote_dir=sdtm_remote_dir, force=force_sdtm)
             if res["status"] not in ("seeded", "already-resident"):
                 return 2, "", f"SDTM seed/verify failed: {res}", {"reconciliation": "none"}
             manifest_sha = res["manifest_sha"]
             print(f"  [ODA] SDTM {res['status']}: {res.get('uploaded', 0)} uploaded, "
                   f"{res.get('skipped', 0)} resident (manifest {manifest_sha[:12]}).")
         else:
-            ok, manifest_sha, reason = seed_sdtm.verify_resident(sas)
+            ok, manifest_sha, reason = seed_sdtm.verify_resident(
+                sas, remote_dir=sdtm_remote_dir)
             if not ok:
                 return 2, "", (f"SDTM not verified-resident on ODA ({reason}). Seed first: "
                                f"python3 platform/seed_sdtm.py  — or re-run with "

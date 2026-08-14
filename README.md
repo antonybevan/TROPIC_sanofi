@@ -111,6 +111,9 @@ python3 platform/check_regulatory_baseline.py --check-only
 
 The full run requires the authorized local SDTM source and credentials; see [Reproducibility](00_governance/REPRODUCIBILITY.md) and the [ODA runbook](docs/runbooks/ODA_GUIDE.md). A clean clone intentionally does not contain patient-level source or derived XPTs.
 
+For maintainers, [`CONTRIBUTING.md`](CONTRIBUTING.md) defines the review and release workflow;
+[`SECURITY.md`](SECURITY.md) defines the private-reporting and data-boundary rules.
+
 For reviewer-facing visuals, open the [TFL Gallery](05_outputs/tfl/TFL_Gallery.html). The [Shiny dashboard visual-QC record](06_qc_evidence/audit/DASHBOARD_VISUAL_QC.md) documents the data-bearing local acceptance capture; a bare clone safely opens the dashboard in disclosed data-free mode because patient-level inputs are not distributed.
 
 ## Regulatory baseline
@@ -128,4 +131,8 @@ Current package controls include:
 
 ## License and source rights
 
-Code and repository-authored documentation follow the repository license. Source clinical data, published materials, standards content, SAS, and Pinnacle 21 remain subject to their respective access terms and licenses. Nothing in this repository grants redistribution or regulatory-use rights to those materials.
+This repository currently declares **no open-source license**; public visibility does not grant
+permission to copy or redistribute it. See [Licensing and source rights](docs/LICENSING.md).
+Source clinical data, published materials, standards content, SAS, and Pinnacle 21 remain subject
+to their respective access terms and licenses. Nothing in this repository grants redistribution or
+regulatory-use rights to those materials.

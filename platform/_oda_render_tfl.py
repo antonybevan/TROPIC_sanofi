@@ -120,6 +120,13 @@ def main(argv=None):
     TFL_ONLY = "--tfl-only" in argv
     os.chdir(PROJECT_ROOT)
 
+    try:
+        # This value is environment-controlled and later interpolated into SAS source.  Fail
+        # before opening an ODA session if it is not a safe absolute/``~/`` path.
+        PROJ_ROOT_ODA = seed_sdtm.validate_remote_path(PROJ_ROOT_ODA)
+    except ValueError as exc:
+        sys.exit(f"ERROR: invalid TROPIC_ODA_PROJ_ROOT: {exc}")
+
     if not os.path.exists(CFG_FILE):
         sys.exit(f"ERROR: SAS config not found: {CFG_FILE}")
 
@@ -173,7 +180,12 @@ def main(argv=None):
             if "TROPIC_ODA_HOME=" in _line and "%put" not in _line and "%sysget" not in _line:
                 _home = _line.split("TROPIC_ODA_HOME=", 1)[1].strip()
                 if _home:
-                    PROJ_ROOT_ODA = PROJ_ROOT_ODA.replace("~", _home, 1)
+                    try:
+                        PROJ_ROOT_ODA = seed_sdtm.validate_remote_path(
+                            PROJ_ROOT_ODA.replace("~", _home, 1))
+                    except ValueError as exc:
+                        oda_broker.teardown(sas)
+                        sys.exit(f"ERROR: invalid ODA home returned by session: {exc}")
                     PGMDIR_ODA, CBZ_ODA, ADAM_ODA, SASFIG_ODA = _oda_paths(PROJ_ROOT_ODA)
                 break
 

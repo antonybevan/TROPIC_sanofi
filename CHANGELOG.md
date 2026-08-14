@@ -969,15 +969,15 @@ already resolved in the PCWG3 RECIST rebuild (`AVALC` widening, v3.13.0).
 - **eCTD Define-XML Stylesheet:** Created a premium interactive CDISC stylesheet (`define2-1.xsl`) with sidebar dataset navigation and metadata listings (Mo-04).
 
 ### Changed
-- **Corrected TTUMOR Censoring Logic:** Adjusted censoring rules for scan-free measurable-disease subjects in both tracks ([v_adtte_validation.R](file:///Users/apple/Desktop/TROPIC/04_analysis_datasets/programs/r/v_adtte_validation.R) and [A_adtte_generation.sas](file:///Users/apple/Desktop/TROPIC/04_analysis_datasets/programs/sas/A_adtte_generation.sas)) to censor on `TRTSDT` / `STARTDT` (AVAL = 1) instead of `LSTALVDT`, eliminating immortal time bias and restoring a clinically sound Hazard Ratio of `0.67` (p-value `0.0003`).
-- **Database Library Protections:** Remapped `sdtm` library to `04_analysis_datasets/adam/sdtm_mapped/` and configured raw libraries (`raw`, `real_sdtm`, `staging`) as `access=readonly` in [00_config.sas](file:///Users/apple/Desktop/TROPIC/04_analysis_datasets/programs/sas/00_config.sas) to prevent accidental raw data corruption on pipeline builds.
+- **Corrected TTUMOR Censoring Logic:** Adjusted censoring rules for scan-free measurable-disease subjects in both tracks ([v_adtte_validation.R](04_analysis_datasets/programs/r/v_adtte_validation.R) and [A_adtte_generation.sas](04_analysis_datasets/programs/sas/A_adtte_generation.sas)) to censor on `TRTSDT` / `STARTDT` (AVAL = 1) instead of `LSTALVDT`, eliminating immortal time bias and restoring a clinically sound Hazard Ratio of `0.67` (p-value `0.0003`).
+- **Database Library Protections:** Remapped `sdtm` library to `04_analysis_datasets/adam/sdtm_mapped/` and configured raw libraries (`raw`, `real_sdtm`, `staging`) as `access=readonly` in [00_config.sas](04_analysis_datasets/programs/sas/00_config.sas) to prevent accidental raw data corruption on pipeline builds.
 - **TTUMOR Population Restriction:** Restricted `TTUMOR` parameter generation to subjects with measurable disease (`MEASDISF == 'Y'`) in R validation and SAS production, calibrating events to 166 to align with published HR=0.61/0.62 (C-01).
 - **Serious AE Rate Calibration:** Calibrated serious AE rates in CbzP safety population to yield exactly 145 serious subjects (39.2%) matching the EPAR publication (M-03).
 - **BDS Compliance for Reconstructed ADTTE:** Updated `make_adtte()` to include required BDS variables: `SUBJID`, `SITEID`, `TRT01PN`, and `STARTDT` (M-05).
 - **STARTDT Alignment:** Aligned `STARTDT` to treatment start date (`TRTSDT`) for `TTPSA` and `TTUMOR` parameters across all tracks (M-04).
 - **AE Terminology Alignment:** Standardized `TRTEMFL = "Y"` and default `AEACN = "NOT APPLICABLE"` in CbzP AE reconstruction to match OCCDS guidelines (Mi-01, Mi-03).
-- **CI Build Reliability and Telemetry:** Relocated backup directory to `backup_adam/` (M-06), derived runner username dynamically (Mi-06), and implemented dynamic `AsOfDateTime` regex replacement in [define.xml](file:///Users/apple/Desktop/TROPIC/03_metadata/define/define.xml) on build (Mi-02).
-- **SAS Library Assignments:** Re-mapped library assignments in [00_config.sas](file:///Users/apple/Desktop/TROPIC/04_analysis_datasets/programs/sas/00_config.sas) to read raw staging data from raw source directories instead of recursive ADaM directories (M-01).
+- **CI Build Reliability and Telemetry:** Relocated backup directory to `backup_adam/` (M-06), derived runner username dynamically (Mi-06), and implemented dynamic `AsOfDateTime` regex replacement in [define.xml](03_metadata/define/define.xml) on build (Mi-02).
+- **SAS Library Assignments:** Re-mapped library assignments in [00_config.sas](04_analysis_datasets/programs/sas/00_config.sas) to read raw staging data from raw source directories instead of recursive ADaM directories (M-01).
 
 ## [2.2.0] - 2026-05-27
 

@@ -18,6 +18,9 @@
 | 6 | [`SCRIPT_MAP.md`](SCRIPT_MAP.md) | What runs vs ignore |
 | 7 | `python3 scripts/verify_release.py` | Machine re-check |
 
+Repository operating controls: [`../CONTRIBUTING.md`](../CONTRIBUTING.md) ·
+[`../SECURITY.md`](../SECURITY.md) · [`LICENSING.md`](LICENSING.md)
+
 ---
 
 ## Tour A — Reviewer / mock FDA / portfolio interviewer

@@ -91,11 +91,13 @@ def stage_inputs(source_dir: Path, output_dir: Path) -> dict:
     temporary = Path(
         tempfile.mkdtemp(prefix=".p21-adam-staging-", dir=str(output_dir.parent))
     )
+    temporary.chmod(0o700)
     rows: list[dict] = []
     try:
         for dataset, source, source_sha256, size_bytes in preflight:
             target = temporary / f"{dataset}.xpt"
             shutil.copyfile(source, target)
+            target.chmod(0o600)
             target_sha256 = _sha256(target)
             if target_sha256 != source_sha256 or target.stat().st_size != size_bytes:
                 raise RuntimeError(f"byte verification failed while staging {dataset.upper()}")
