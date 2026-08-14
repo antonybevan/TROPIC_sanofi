@@ -24,6 +24,9 @@ REQUIRED = [
     "07_reviewer_explanation/guides/SDRG.md",
     "07_reviewer_explanation/guides/BDRG.md",
     "07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md",
+    "07_reviewer_explanation/simulation_model_analysis_plan.md",
+    "07_reviewer_explanation/simulation_report.md",
+    "platform/simulation_operating_characteristics/simulation_oc_status.json",
     "docs/PRODUCT_CLAIM.md",
     "docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md",
     CURRENT_RELEASE_NOTE,
@@ -35,6 +38,8 @@ RELEASE_ID_SOURCES = [
     "07_reviewer_explanation/guides/ADRG.md",
     "07_reviewer_explanation/guides/SDRG.md",
     "07_reviewer_explanation/guides/BDRG.md",
+    "07_reviewer_explanation/simulation_model_analysis_plan.md",
+    "07_reviewer_explanation/simulation_report.md",
     "08_submission_package/README.md",
 ]
 
@@ -53,6 +58,25 @@ GUIDE_MARKERS = {
     ],
 }
 
+SIMULATION_MARKERS = {
+    "07_reviewer_explanation/simulation_model_analysis_plan.md": [
+        r"(?i)informative annex boundary",
+        r"(?i)not MIDD",
+        r"ICH M15",
+        r"ICH E9\(R1\)",
+        r"ADEMP.*OCTAVE|OCTAVE.*ADEMP",
+        r"(?i)Monte Carlo.*Wilson",
+    ],
+    "07_reviewer_explanation/simulation_report.md": [
+        r"(?i)informative annex boundary",
+        r"(?i)not MIDD",
+        r"(?i)no single overall PASS",
+        r"(?i)requested.*completed.*failed",
+        r"(?i)MCSE",
+        r"(?i)authoritative scientific JSON",
+    ],
+}
+
 # Fail if guide asserts filing readiness without negation in same line-ish window.
 OVERCLAIM = re.compile(
     r"(?i)(this package is|we are)\s+(FDA\s+)?submission[- ]ready"
@@ -63,6 +87,8 @@ REVIEWER_PDFS = [
     "08_submission_package/m5/datasets/tropic/tabulations/sdtm/csdrg.pdf",
     "08_submission_package/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
     "08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
+    "08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-model-analysis-plan.pdf",
+    "08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-report.pdf",
 ]
 
 SECONDARY_TTE_ROWS = {
@@ -234,6 +260,20 @@ def main() -> int:
         text = p.read_text(encoding="utf-8", errors="replace")
         for pat in patterns:
             add(f"marker:{rel}:{pat[:40]}", bool(re.search(pat, text, re.I)), "marker missing")
+        if OVERCLAIM.search(text):
+            add(f"overclaim:{rel}", False, "positive submission-ready claim found")
+
+    for rel, patterns in SIMULATION_MARKERS.items():
+        p = ROOT / rel
+        if not p.is_file():
+            continue
+        text = p.read_text(encoding="utf-8", errors="replace")
+        for pat in patterns:
+            add(
+                f"simulation_marker:{rel}:{pat[:40]}",
+                bool(re.search(pat, text, re.I | re.S)),
+                "simulation evidence marker missing",
+            )
         if OVERCLAIM.search(text):
             add(f"overclaim:{rel}", False, "positive submission-ready claim found")
 

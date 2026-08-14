@@ -22,6 +22,7 @@ PATHS = {
     "tfl_index": "platform/tfl_output_index_status.json",
     "metadata_control": "platform/metadata_control/metadata_control_status.json",
     "validation_strategy": "platform/validation_strategy/validation_strategy_status.json",
+    "simulation_operating_characteristics": "platform/simulation_operating_characteristics/simulation_oc_status.json",
     "log_cleanliness": "platform/log_cleanliness/log_cleanliness_status.json",
     "pipeline_health": "platform/pipeline_health.json",
     "reconciliation": "platform/reconciliation_status.json",
@@ -108,6 +109,7 @@ def build_release_checklist(out_dir, report_path):
     tfl = _load_json(PATHS["tfl_index"], {})
     metadata = _load_json(PATHS["metadata_control"], {})
     validation_strategy = _load_json(PATHS["validation_strategy"], {})
+    simulation = _load_json(PATHS["simulation_operating_characteristics"], {})
     log_cleanliness = _load_json(PATHS["log_cleanliness"], {})
     health = _load_json(PATHS["pipeline_health"], {})
     recon = _load_json(PATHS["reconciliation"], {})
@@ -146,6 +148,29 @@ def build_release_checklist(out_dir, report_path):
         _status(validation_strategy.get("status") == "PASS"),
         f"{PATHS['validation_strategy']} status={validation_strategy.get('status', 'missing')}; blocked={validation_strategy.get('blocked', 'missing')}",
         "Resolve the blocked artifacts in docs/VALIDATION_STRATEGY_CONTROL_REPORT.md before release lock." if validation_strategy.get("status") != "PASS" else "",
+    )
+    simulation_statuses = simulation.get("statuses") or {}
+    simulation_ok = (
+        (simulation_statuses.get("execution") or {}).get("status") == "PASS"
+        and (simulation_statuses.get("monte_carlo_precision") or {}).get("status") == "PASS"
+        and (simulation_statuses.get("design_operating_characteristics") or {}).get("status") == "PASS"
+        and (simulation_statuses.get("evidence_qualification") or {}).get("status") == "NOT_QUALIFIED"
+    )
+    _add(
+        rows, "G06 qc_signoff", "Simulation methods evidence is precise, verified, and remains non-qualified",
+        _status(simulation_ok),
+        (
+            f"{PATHS['simulation_operating_characteristics']} "
+            f"execution={(simulation_statuses.get('execution') or {}).get('status', 'missing')}; "
+            f"precision={(simulation_statuses.get('monte_carlo_precision') or {}).get('status', 'missing')}; "
+            f"design={(simulation_statuses.get('design_operating_characteristics') or {}).get('status', 'missing')}; "
+            f"qualification={(simulation_statuses.get('evidence_qualification') or {}).get('status', 'missing')}"
+        ),
+        (
+            "Regenerate and independently verify the frozen simulation protocol/results, or restore the "
+            "informative non-MIDD/non-confirmatory boundary before release lock."
+            if not simulation_ok else ""
+        ),
     )
     _add(
         rows, "G06 qc_signoff", "Execution logs have no unapproved warnings, errors, invalid-input notes, or uninitialized-variable findings",

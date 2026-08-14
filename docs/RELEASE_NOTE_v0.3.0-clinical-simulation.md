@@ -2,7 +2,7 @@
 
 **Release class:** Controlled clinical-submission simulation
 
-**Claim authority:** `docs/PRODUCT_CLAIM.md` version 2.0
+**Claim authority:** `docs/PRODUCT_CLAIM.md` version 2.1
 
 **Regulatory baseline:** `TROPIC-FDA-2026-08-12`
 
@@ -24,6 +24,7 @@ This release replaces portfolio-style presentation and ambiguous compliance lang
 8. Replaced promotional PDF header language with a neutral controlled-simulation identity.
 9. Added a local dashboard visual-QC record and sanitized five-panel screenshots; retained the static TFL gallery as the portable public visual surface.
 10. Added fail-closed dashboard input-domain checks so malformed numeric, arm, event, and exposure values disable affected outputs with an actionable load issue instead of surfacing a rendering error.
+11. Added a governed, data-free simulation methods annex: a frozen ICH M15/E9-aligned MAP, ten ADEMP/OCTAVE scenarios, 400,000 fixed-seed replicates, MCSE/Wilson uncertainty, deterministic representative trials and edge fixtures, independent evidence verification, and generated reviewer/PDF surfaces. The annex remains explicitly non-MIDD, non-confirmatory, and `NOT_QUALIFIED` for clinical or filing use.
 
 ## Qualification decision
 
@@ -42,7 +43,7 @@ Those gaps are explicit controls, not missing decoration. Their closure requirem
 
 The release tag may be created only after all of the following are true:
 
-- the full 37-stage DAG completed with recorded real SAS execution;
+- the full 40-stage DAG completed with recorded real SAS execution, including simulation generation, report rendering, and independent verification;
 - paired reconciliation passed at controlled tolerances;
 - metadata, TFL, PDF, cSDRG, eCTD, log, and finding gates passed;
 - the post-correction Community run was executed and every residual family was recorded without a clearance claim;

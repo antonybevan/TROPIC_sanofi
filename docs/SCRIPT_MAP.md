@@ -128,6 +128,9 @@ Helpers included by SAS (not separate DAG rows): `00_config.sas`, `L_staging_ing
 | `06_qc_evidence/reconciliation/figure_data_reconcile.R` | Figure-driving data recon (skip if no SAS exports) |
 | `03_metadata/define/check_define_conformance.R` | Spec→define |
 | `04_analysis_datasets/programs/r/spec_data_checks.R` | Spec→data |
+| `platform/simulation_precision.py` | Data-free fixed-design TTE operating characteristics, precision, seeds, and analytic benchmark |
+| `platform/check_simulation_evidence.py` | Independent recomputation of simulation bindings, accounting, uncertainty, and governed acceptance |
+| `platform/build_simulation_report.py` | JSON-bound informative simulation MAP and report |
 | `platform/check_gate_g07_reviewer_package.py` | Guides/claim lock |
 | `platform/export_datasetjson.py` | Dataset-JSON export |
 | `platform/build_ars.py` | ARS export |

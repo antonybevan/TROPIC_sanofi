@@ -197,7 +197,7 @@ def classify(rel: str):
         return ("data-tabulation-dataset", "us")
     if ext == ".xpt" and "/tabulations/sdtm/" in p:
         return ("data-tabulation-dataset", "us")
-    if ext in (".sas", ".r") and "/programs/" in p:
+    if ext in (".sas", ".r", ".txt") and "/programs/" in p:
         return ("analysis-program", "us")
     if "/5351-stud-rep-contr/" in p and ext in (".pdf", ".png", ".txt"):
         return ("study-report-body", "ich")
@@ -213,7 +213,7 @@ def required_tag_reason(rel: str):
         return "dataset transport file"
     if base.startswith("define") and ext == ".xml":
         return "Define-XML data definition"
-    if ext in (".sas", ".r") and "/programs/" in p:
+    if ext in (".sas", ".r", ".txt") and "/programs/" in p:
         return "analysis program"
     if "/5351-stud-rep-contr/" in p and ext in (".pdf", ".png", ".txt"):
         return "controlled-study-report body/appendix file"

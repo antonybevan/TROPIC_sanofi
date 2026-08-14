@@ -94,6 +94,20 @@ def manifest_sha256(manifest: dict) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
+def simulation_scientific_sha256(result: dict) -> str:
+    """Recompute the engine's canonical self-hash with the hash field excluded."""
+    unsigned = dict(result)
+    unsigned.pop("scientific_output_sha256", None)
+    encoded = json.dumps(
+        unsigned,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+        allow_nan=False,
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
 def sealed_source_problems(manifest: dict) -> list[str]:
     """Return changed/missing source files recorded by the release seal.
 
@@ -300,6 +314,40 @@ def main() -> int:
 
     vs = load("platform/validation_strategy/validation_strategy_status.json") or {}
     add("validation_strategy.PASS", vs.get("status") == "PASS", str(vs.get("status")))
+
+    simulation = load(
+        "platform/simulation_operating_characteristics/simulation_oc_status.json"
+    ) or {}
+    simulation_statuses = simulation.get("statuses") or {}
+    for key in ("execution", "monte_carlo_precision", "design_operating_characteristics"):
+        value = (simulation_statuses.get(key) or {}).get("status")
+        add(f"simulation.{key}.PASS", value == "PASS", str(value))
+    qualification = (simulation_statuses.get("evidence_qualification") or {}).get("status")
+    add("simulation.boundary_NOT_QUALIFIED", qualification == "NOT_QUALIFIED", str(qualification))
+    scenarios = simulation.get("scenarios") or []
+    requested_total = sum(
+        row.get("requested", 0)
+        for row in scenarios
+        if isinstance(row, dict)
+        and isinstance(row.get("requested", 0), int)
+        and not isinstance(row.get("requested", 0), bool)
+    )
+    add(
+        "simulation.governed_scope",
+        isinstance(scenarios, list) and len(scenarios) == 10 and requested_total == 400000,
+        f"scenarios={len(scenarios) if isinstance(scenarios, list) else 'malformed'}; requested={requested_total}",
+    )
+    recorded_simulation_sha = simulation.get("scientific_output_sha256", "")
+    try:
+        actual_simulation_sha = simulation_scientific_sha256(simulation) if simulation else ""
+    except (TypeError, ValueError):
+        actual_simulation_sha = ""
+    add(
+        "simulation.scientific_hash",
+        bool(recorded_simulation_sha) and recorded_simulation_sha == actual_simulation_sha,
+        "scientific output SHA-256 does not match canonical result content"
+        if recorded_simulation_sha != actual_simulation_sha else "",
+    )
 
     lg = load("platform/log_cleanliness/log_cleanliness_status.json") or {}
     add("log_cleanliness.PASS", lg.get("status") == "PASS", str(lg.get("status")))

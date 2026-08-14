@@ -1,0 +1,333 @@
+schema_version: "1.0.0"
+
+change_control:
+  full_run_started_after_freeze: true
+  deviations: []
+
+protocol:
+  id: "TROPIC-SIM-MAP-001"
+  version: "1.0.0"
+  status: "FROZEN_MAP"
+  frozen_on: "2026-08-14"
+  title: "Data-free fixed-design time-to-event methods evaluation"
+  question_of_interest: >-
+    Under explicit public-aggregate or stress-test assumptions, what are the
+    rejection probabilities and numerical precision of a one-sided unstratified
+    log-rank test in a simplified TROPIC-like fixed two-arm OS or PFS design?
+  objective: >-
+    Verify a reproducible simulation implementation and characterize operating
+    characteristics; do not reproduce the original TROPIC trial or estimate a
+    clinical treatment effect.
+  context_of_use: >-
+    Low-influence internal methods evaluation and reviewer training for simulation
+    engineering, numerical precision, and sensitivity to stated design assumptions.
+  decision_use: >-
+    Results may support software verification and discussion of method behavior only.
+  prohibited_uses:
+    - "No model-informed drug development (MIDD) decision."
+    - "No confirmatory efficacy, safety, benefit-risk, labeling, filing, or patient-level decision."
+    - "No claim that generated subjects are original TROPIC participants or authoritative IPD."
+    - "No sponsor, regulator, validated-system, Part 11, or independent-review qualification."
+  qualification_boundary:
+    classification: "NON_MIDD_NON_CONFIRMATORY_DATA_FREE_METHODS_EVALUATION"
+    model_influence: "LOW"
+    evidence_status: "INFORMATIONAL_ONLY"
+    authoritative_patient_data_used: false
+    external_validation_completed: false
+
+m15_assessment:
+  question_of_interest: "Defined in protocol.question_of_interest."
+  context_of_use: "Defined in protocol.context_of_use and restricted to internal methods evaluation."
+  model_influence: "Low; outputs cannot determine clinical or regulatory decisions."
+  consequence_of_wrong_decision: >-
+    Misinterpreting numerical operating characteristics as clinical evidence could
+    misstate design performance or treatment benefit; the hard use boundary prevents
+    those decisions from relying on this model.
+  model_risk: "MODERATE"
+  model_risk_rationale: >-
+    Scientific assumptions are deliberately simplified and not identifiable from
+    authoritative joint IPD. Consequence severity is potentially high, but model
+    influence is constrained to low by governance and explicit non-use controls.
+  model_impact: "LOW"
+  verification_plan:
+    - "Independent tests of log-rank sign, analytic null behavior, MCSE, and Wilson intervals."
+    - "Fail-closed schema and invariant validation before random-number generation."
+    - "Deterministic replay from unique scenario seeds and SHA-256-bound inputs."
+  validation_plan:
+    - "Analytic one-sided null rejection probability benchmark."
+    - "Scenario-derived aggregate reject, non-reject, and near-alpha trial examples selected by a frozen seed/search rule."
+    - "Artificial positive, negative, and non-estimable log-rank edge fixtures, labelled as validation fixtures rather than representative trial paths."
+    - "Event-time, censoring, accounting, and parameter-bound invariants."
+  applicability: >-
+    Applicable only to the encoded simplified fixed design, endpoints, assumptions,
+    and unstratified log-rank method; not externally validated for TROPIC decisions.
+  residual_uncertainty:
+    - "No authoritative comparator IPD or joint endpoint/covariate distribution."
+    - "Hazards, dropout, discontinuation, delayed effect, and waning are assumptions."
+    - "No independent organizational statistical or medical review."
+
+estimand:
+  id: "EST-METHODS-TTE-001"
+  framework: "ICH_E9_R1_ALIGNED_METHODS_EVALUATION"
+  population: >-
+    Hypothetical randomized participants meeting a simplified TROPIC-like analysis
+    population; fixed public-randomized-design calibration of 377 control and 378
+    experimental participants. This is distinct from the repository's available
+    real MP cohort of N=371 and does not imply that participant-level data are available.
+  treatment_conditions:
+    control: "Synthetic control strategy from randomization through follow-up."
+    experimental: "Synthetic experimental strategy from randomization through follow-up."
+  variables:
+    OS: "Time from randomization to death from any cause."
+    PFS: "Time from randomization to progression or death from any cause."
+  population_summary: >-
+    Between-arm survival-distribution contrast evaluated by the one-sided
+    intent-to-treat log-rank statistic; repeated-trial summary is rejection probability.
+  intercurrent_events:
+    permanent_treatment_discontinuation:
+      strategy: "TREATMENT_POLICY"
+      handling: >-
+        Follow-up and endpoint ascertainment continue. Reference scenarios retain the
+        assigned-arm hazard; stress scenarios explicitly allow effect waning after
+        discontinuation without censoring the endpoint.
+    subsequent_anticancer_therapy:
+      strategy: "TREATMENT_POLICY"
+      handling: >-
+        Endpoint follow-up would continue regardless of subsequent therapy; a separate
+        therapy process is not generated in this bounded implementation.
+    death:
+      strategy_OS: "OUTCOME_EVENT_NOT_INTERCURRENT"
+      strategy_PFS: "COMPOSITE"
+      handling: "Death is the OS event and is included in the PFS composite event."
+  missing_data_and_censoring:
+    independent_withdrawal:
+      classification: "MISSING_ENDPOINT_OBSERVATION_NOT_INTERCURRENT_EVENT"
+      handling: >-
+        Independently generated withdrawal censors at last observation. High-dropout
+        scenarios stress this assumption; informative withdrawal is not modeled.
+    administrative_censoring: "Censor at the fixed common analysis date after staggered enrollment."
+  estimator: "One-sided unstratified log-rank test, experimental benefit direction."
+  sensitivity_scope: >-
+    Delayed/non-proportional effects, high independent withdrawal, and
+    discontinuation-related waning are scenario assumptions, not clinical estimates.
+    Original-trial stratification factors are unavailable to this data-free DGM and
+    the production stratified analysis is therefore not reproduced.
+
+protocol_framework:
+  ADEMP:
+    aims: "Estimate Type I error or power and its Monte Carlo uncertainty for the governed scenario grid."
+    data_generating_mechanism: >-
+      Individual enrollment, piecewise-exponential endpoint time, independent
+      withdrawal, optional treatment discontinuation with post-discontinuation waning,
+      and fixed administrative censoring.
+    estimands: ["EST-METHODS-TTE-001"]
+    methods: "One-sided unstratified log-rank test at alpha 0.025."
+    performance_measures:
+      - "Rejection numerator, denominator, probability, MCSE, and 95% Wilson interval."
+      - "Completed/failed accounting and failure reasons."
+      - "Mean event and censor proportions by randomized arm."
+  OCTAVE:
+    objectives: "Verify implementation and characterize fixed-design operating characteristics."
+    characteristics: "OS/PFS baseline hazards, treatment-effect shape, withdrawal, and discontinuation assumptions."
+    trial_design: "Fixed parallel two-arm allocation with staggered enrollment and common analysis date."
+    analyses: "Intent-to-treat one-sided log-rank analysis."
+    valuation_metrics: "Type I error or power, Monte Carlo precision, event/censoring rates, and execution failures."
+    evidence: "Protocol/scenario/code hashes, deterministic trials, analytic benchmark, and machine-readable results."
+
+design:
+  allocation_basis: >-
+    Public randomized design calibration (377 control, 378 experimental), distinct
+    from the repository's available real MP N=371; no authoritative participant-level
+    comparator data are used.
+  allocation:
+    control: 377
+    experimental: 378
+  alpha_one_sided: 0.025
+  enrollment_months: 12.0
+  analysis_month: 24.0
+  batch_size: 1000
+  analysis_method: "ONE_SIDED_UNSTRATIFIED_LOGRANK"
+  omitted_design_feature: >-
+    Original stratification is not simulated because authoritative joint
+    stratification-factor distributions are unavailable.
+  endpoint_control_medians_months:
+    OS: 12.7
+    PFS: 1.4
+
+acceptance_criteria:
+  key_null_min_completed: 100000
+  alternative_min_completed: 25000
+  alternative_precision_justification: >-
+    At 25,000 completed replicates the worst-case binomial MCSE is no greater
+    than sqrt(0.25/25000)=0.003163. Alternative and stress-scenario probabilities
+    are descriptive because no sponsor-approved performance threshold or MCID is available.
+  target_mcse_key_null: 0.0005
+  max_failure_rate: 0.001
+  analytic_null_probability: 0.025
+  analytic_null_abs_tolerance_floor: 0.001
+  analytic_null_mcse_multiplier: 3.0
+  wilson_confidence_level: 0.95
+  null_acceptance: >-
+    Wilson interval contains alpha and absolute deviation is no greater than
+    max(0.001, 3*MCSE); upper Wilson bound is not required to be below alpha.
+
+representative_trial_selection:
+  scenario_id: "OS_NULL_REFERENCE"
+  scenario_seed_binding: 2026081401
+  selection_seed: 2026081490
+  search_replicates: 5000
+  batch_size: 500
+  roles:
+    reject:
+      eligibility: "one_sided_p_value < alpha"
+      selection_rule: "first eligible trial in increasing search index"
+    non_reject:
+      eligibility: "one_sided_p_value >= 0.5"
+      selection_rule: "first eligible trial in increasing search index"
+    near_alpha_boundary:
+      eligibility: "estimable trial"
+      selection_rule: "minimum absolute(one_sided_p_value - alpha), tie to smallest search index"
+
+parameter_provenance:
+  public_aggregate:
+    - "TROPIC-like arm sizes and aggregate OS/PFS medians are used only as design-calibration assumptions."
+    - "Published-effect hazard ratios are public-aggregate scenario inputs, not re-estimated effects."
+  assumed_stress:
+    - "Withdrawal, delayed-effect, and discontinuation/waning inputs are engineering stress assumptions."
+  unavailable:
+    - "Authoritative joint comparator IPD, endpoint correlations, and intercurrent-event distributions."
+
+scenarios:
+  - id: "OS_NULL_REFERENCE"
+    endpoint: "OS"
+    class: "KEY_NULL"
+    family: "NULL_REFERENCE"
+    rationale: "Reference analytic-null benchmark."
+    assumption_basis: "ASSUMED_REFERENCE"
+    seed: 2026081401
+    replicates: 100000
+    treatment_hr_segments: [{start_month: 0.0, hazard_ratio: 1.0}]
+    withdrawal_rate_12m: {control: 0.04, experimental: 0.04}
+    discontinuation_rate_12m: 0.0
+    post_discontinuation_hazard_ratio: 1.0
+
+  - id: "PFS_NULL_HIGH_DROPOUT"
+    endpoint: "PFS"
+    class: "KEY_NULL_OPERATIONAL_STRESS"
+    family: "NULL_HIGH_DROPOUT"
+    rationale: "PFS null with high independent-withdrawal operational stress."
+    assumption_basis: "ASSUMED_STRESS"
+    seed: 2026081402
+    replicates: 100000
+    treatment_hr_segments: [{start_month: 0.0, hazard_ratio: 1.0}]
+    withdrawal_rate_12m: {control: 0.25, experimental: 0.25}
+    discontinuation_rate_12m: 0.0
+    post_discontinuation_hazard_ratio: 1.0
+
+  - id: "OS_PUBLISHED_EFFECT"
+    endpoint: "OS"
+    class: "ALTERNATIVE"
+    family: "PUBLISHED_EFFECT"
+    rationale: "Public-aggregate hazard-ratio methods scenario."
+    assumption_basis: "PUBLIC_AGGREGATE"
+    seed: 2026081403
+    replicates: 25000
+    treatment_hr_segments: [{start_month: 0.0, hazard_ratio: 0.70}]
+    withdrawal_rate_12m: {control: 0.04, experimental: 0.04}
+    discontinuation_rate_12m: 0.0
+    post_discontinuation_hazard_ratio: 1.0
+
+  - id: "PFS_PUBLISHED_EFFECT"
+    endpoint: "PFS"
+    class: "ALTERNATIVE"
+    family: "PUBLISHED_EFFECT"
+    rationale: "Public-aggregate hazard-ratio methods scenario."
+    assumption_basis: "PUBLIC_AGGREGATE"
+    seed: 2026081404
+    replicates: 25000
+    treatment_hr_segments: [{start_month: 0.0, hazard_ratio: 0.74}]
+    withdrawal_rate_12m: {control: 0.08, experimental: 0.08}
+    discontinuation_rate_12m: 0.0
+    post_discontinuation_hazard_ratio: 1.0
+
+  - id: "OS_MEDIAN_CALIBRATED"
+    endpoint: "OS"
+    class: "ALTERNATIVE"
+    family: "MEDIAN_CALIBRATED"
+    rationale: "Exponential calibration to assumed aggregate medians 12.7 vs 15.1 months."
+    assumption_basis: "PUBLIC_AGGREGATE_CALIBRATION"
+    seed: 2026081405
+    replicates: 25000
+    treatment_hr_segments: [{start_month: 0.0, hazard_ratio: 0.8410596026}]
+    withdrawal_rate_12m: {control: 0.04, experimental: 0.04}
+    discontinuation_rate_12m: 0.0
+    post_discontinuation_hazard_ratio: 1.0
+
+  - id: "PFS_MEDIAN_CALIBRATED"
+    endpoint: "PFS"
+    class: "ALTERNATIVE"
+    family: "MEDIAN_CALIBRATED"
+    rationale: "Exponential calibration to assumed aggregate medians 1.4 vs 2.8 months."
+    assumption_basis: "PUBLIC_AGGREGATE_CALIBRATION"
+    seed: 2026081406
+    replicates: 25000
+    treatment_hr_segments: [{start_month: 0.0, hazard_ratio: 0.5}]
+    withdrawal_rate_12m: {control: 0.08, experimental: 0.08}
+    discontinuation_rate_12m: 0.0
+    post_discontinuation_hazard_ratio: 1.0
+
+  - id: "OS_DELAYED_NON_PH"
+    endpoint: "OS"
+    class: "ALTERNATIVE_STRESS"
+    family: "DELAYED_NON_PH"
+    rationale: "No initial effect followed by benefit; non-proportional-hazards stress."
+    assumption_basis: "ASSUMED_STRESS"
+    seed: 2026081407
+    replicates: 25000
+    treatment_hr_segments:
+      - {start_month: 0.0, hazard_ratio: 1.0}
+      - {start_month: 4.0, hazard_ratio: 0.65}
+    withdrawal_rate_12m: {control: 0.04, experimental: 0.04}
+    discontinuation_rate_12m: 0.0
+    post_discontinuation_hazard_ratio: 1.0
+
+  - id: "PFS_DELAYED_NON_PH"
+    endpoint: "PFS"
+    class: "ALTERNATIVE_STRESS"
+    family: "DELAYED_NON_PH"
+    rationale: "Short initial null period followed by benefit; non-proportional-hazards stress."
+    assumption_basis: "ASSUMED_STRESS"
+    seed: 2026081408
+    replicates: 25000
+    treatment_hr_segments:
+      - {start_month: 0.0, hazard_ratio: 1.0}
+      - {start_month: 1.0, hazard_ratio: 0.60}
+    withdrawal_rate_12m: {control: 0.08, experimental: 0.08}
+    discontinuation_rate_12m: 0.0
+    post_discontinuation_hazard_ratio: 1.0
+
+  - id: "OS_WANING_AFTER_DISCONTINUATION"
+    endpoint: "OS"
+    class: "ALTERNATIVE_STRESS"
+    family: "WANING_DISCONTINUATION"
+    rationale: "Assigned-arm effect wanes to null after independently generated discontinuation."
+    assumption_basis: "ASSUMED_STRESS"
+    seed: 2026081409
+    replicates: 25000
+    treatment_hr_segments: [{start_month: 0.0, hazard_ratio: 0.70}]
+    withdrawal_rate_12m: {control: 0.04, experimental: 0.04}
+    discontinuation_rate_12m: 0.35
+    post_discontinuation_hazard_ratio: 1.0
+
+  - id: "PFS_WANING_AFTER_DISCONTINUATION"
+    endpoint: "PFS"
+    class: "ALTERNATIVE_STRESS"
+    family: "WANING_DISCONTINUATION"
+    rationale: "Assigned-arm effect wanes to null after independently generated discontinuation."
+    assumption_basis: "ASSUMED_STRESS"
+    seed: 2026081410
+    replicates: 25000
+    treatment_hr_segments: [{start_month: 0.0, hazard_ratio: 0.74}]
+    withdrawal_rate_12m: {control: 0.08, experimental: 0.08}
+    discontinuation_rate_12m: 0.45
+    post_discontinuation_hazard_ratio: 1.0

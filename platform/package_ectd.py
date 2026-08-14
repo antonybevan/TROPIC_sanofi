@@ -131,6 +131,11 @@ def md_to_pdf(md_path, pdf_path):
     from fpdf.outline import TableOfContents
 
     font_family = "submission"
+    keep_heading_with_next = Path(md_path).name in {
+        "analysis_report.md",
+        "simulation_model_analysis_plan.md",
+        "simulation_report.md",
+    }
 
     class PDF(FPDF):
         def header(self):
@@ -299,6 +304,13 @@ def md_to_pdf(md_path, pdf_path):
         if heading:
             level = len(heading.group(1)) - 1
             title = clean_markdown(heading.group(2), replaced)
+            # Reserve enough room for the heading itself plus the first paragraph
+            # or a table header and its first data row.  A 25 mm guard still let a
+            # level-two heading land above the footer while fpdf moved the table to
+            # the next page; 40 mm keeps that review-hostile orphan together without
+            # disabling automatic row-level table pagination.
+            if keep_heading_with_next and pdf.will_page_break(40):
+                pdf.add_page()
             pdf.start_section(title, level=level, strict=False)
             sizes = (15, 13, 11.5, 10.5)
             heights = (8, 7, 6, 5.5)
@@ -492,6 +504,8 @@ def main(data_free=False):
     define_src_dir = "03_metadata/define"
     guides_src_dir = "07_reviewer_explanation/guides"
     csr_src_file = "07_reviewer_explanation/analysis_report.md"
+    simulation_map_src_file = "07_reviewer_explanation/simulation_model_analysis_plan.md"
+    simulation_report_src_file = "07_reviewer_explanation/simulation_report.md"
     tfl_src_dir = "05_outputs/tfl/output"
     
     m5_root = os.path.join("08_submission_package", "m5")
@@ -508,7 +522,8 @@ def main(data_free=False):
     # Check that required input files/directories exist. The data-free preview needs none
     # of the (uncommitted, licensed) source/derived data, so its required set is narrower.
     required_inputs = [
-        define_src_dir, guides_src_dir, csr_src_file, tfl_src_dir,
+        define_src_dir, guides_src_dir, csr_src_file,
+        simulation_map_src_file, simulation_report_src_file, tfl_src_dir,
         "04_analysis_datasets/programs/sas", "04_analysis_datasets/programs/r", "05_outputs/tfl"
     ]
     if not data_free:
@@ -611,8 +626,11 @@ def main(data_free=False):
     shutil.copy(os.path.join(define_src_dir, "define2-1.xsl"), os.path.join(m5_adam_datasets_dir, "define2-1.xsl"))
     print("  Copied ADaM define.xml and define2-1.xsl.")
 
-    # 6. Generate PDFs for Reviewer's Guides and CSR
-    print("Generating Reviewer's Guides and CSR PDFs...")
+    # 6. Generate PDFs for Reviewer's Guides, CSR, and the informative simulation
+    # methods-evaluation annex.  The simulation documents are static reviewer
+    # surfaces generated from the governed protocol and authoritative aggregate
+    # JSON; they do not promote reconstructed/synthetic records to filing evidence.
+    print("Generating Reviewer's Guides, CSR, and simulation evidence PDFs...")
     # cSDRG
     _require_exists(os.path.join(guides_src_dir, "SDRG.md"), "cSDRG (Clinical Study Data Reviewer's Guide)")
     md_to_pdf(os.path.join(guides_src_dir, "SDRG.md"), os.path.join(m5_sdtm_dir, "csdrg.pdf"))
@@ -622,7 +640,18 @@ def main(data_free=False):
     # CSR
     _require_exists(csr_src_file, "Clinical Study Report source")
     md_to_pdf(csr_src_file, os.path.join(m5_csr_dir, "csr.pdf"))
-    print("  Successfully generated cSDRG, ADRG, and CSR PDFs.")
+    # Informative simulation MAP/MAR annex
+    _require_exists(simulation_map_src_file, "Simulation Model Analysis Plan source")
+    md_to_pdf(
+        simulation_map_src_file,
+        os.path.join(m5_csr_dir, "simulation-model-analysis-plan.pdf"),
+    )
+    _require_exists(simulation_report_src_file, "Simulation Model Analysis Report source")
+    md_to_pdf(
+        simulation_report_src_file,
+        os.path.join(m5_csr_dir, "simulation-report.pdf"),
+    )
+    print("  Successfully generated cSDRG, ADRG, CSR, simulation MAP, and simulation report PDFs.")
     
     # 7. Copy the available source CRF. Do not fabricate a placeholder CRF.
     copy_source_crf(os.path.join(m5_sdtm_dir, "blankcrf.pdf"))
@@ -648,14 +677,20 @@ def main(data_free=False):
         shutil.copy(f, m5_adam_programs_dir)
     # spec -> define conformance program. Its report is QC evidence under platform/conformance/,
     # not a Module 5 package leaf.
-    extra_programs = ["03_metadata/define/check_define_conformance.R"]
+    extra_programs = [
+        ("03_metadata/define/check_define_conformance.R", None),
+        ("platform/simulation_precision.py", "simulation_precision.py.txt"),
+        ("platform/check_simulation_evidence.py", "check_simulation_evidence.py.txt"),
+        ("platform/build_simulation_report.py", "build_simulation_report.py.txt"),
+        ("config/simulation_protocol.yaml", "simulation_protocol.yaml.txt"),
+    ]
     n_extra = 0
-    for f in extra_programs:
+    for f, packaged_name in extra_programs:
         if os.path.exists(f):
-            shutil.copy(f, m5_adam_programs_dir)
+            shutil.copy(f, os.path.join(m5_adam_programs_dir, packaged_name or os.path.basename(f)))
             n_extra += 1
     print(f"  Successfully copied {len(sas_files)} SAS files, {len(r_files)} R files, "
-          f"{len(tfl_programs)} TFL R scripts, and {n_extra} conformance program(s).")
+          f"{len(tfl_programs)} TFL R scripts, and {n_extra} extra program/control source file(s).")
     
     # 9. Copy output TFLs into CSR Appendices
     print("Copying output TFLs (tables, listings, figures) to CSR appendices...")

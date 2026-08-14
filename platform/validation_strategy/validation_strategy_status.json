@@ -1,8 +1,8 @@
 {
   "status": "PASS",
-  "generated_at": "2026-07-09 16:40:36 UTC",
-  "artifacts": 11,
-  "pass": 11,
+  "generated_at": "2026-08-14 04:28:48 UTC",
+  "artifacts": 12,
+  "pass": 12,
   "blocked": 0,
   "strategy": "config/validation_strategy.yaml",
   "items": [
@@ -528,6 +528,139 @@
           "status": "PASS",
           "evidence": "Required reviewer/documentation artifact is present.",
           "file": "07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md",
+          "field": "",
+          "actual": "present",
+          "expected": "present"
+        }
+      ]
+    },
+    {
+      "id": "simulation_methods_evaluation",
+      "name": "Data-free simulation operating-characteristic evidence",
+      "risk_tier": "high",
+      "gate": "G06",
+      "owner": "statistical_programming_qc",
+      "status": "PASS",
+      "decision_impact": "Could misstate method behavior or Monte Carlo precision if assumptions, implementation, accounting, or scope boundaries drift.",
+      "traceability": "current-practice research -> frozen YAML MAP/estimand -> simulation engine -> independent verifier -> authoritative aggregate JSON -> generated MAP/report -> Module 5-style annex",
+      "checks": [
+        {
+          "check_id": "simulation_execution_pass",
+          "status": "PASS",
+          "evidence": "The governed simulation run completed with exact requested/completed/failed accounting.",
+          "file": "platform/simulation_operating_characteristics/simulation_oc_status.json",
+          "field": "statuses.execution.status",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        },
+        {
+          "check_id": "simulation_precision_pass",
+          "status": "PASS",
+          "evidence": "All scenarios met their prespecified replication, failure-rate, and Monte Carlo precision controls.",
+          "file": "platform/simulation_operating_characteristics/simulation_oc_status.json",
+          "field": "statuses.monte_carlo_precision.status",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        },
+        {
+          "check_id": "simulation_design_check_pass",
+          "status": "PASS",
+          "evidence": "The analytic-null and deterministic method checks passed; alternative power remains descriptive without a clinical threshold.",
+          "file": "platform/simulation_operating_characteristics/simulation_oc_status.json",
+          "field": "statuses.design_operating_characteristics.status",
+          "actual": "PASS",
+          "expected": "PASS",
+          "freshness_failure": null
+        },
+        {
+          "check_id": "simulation_boundary_preserved",
+          "status": "PASS",
+          "evidence": "The evidence remains explicitly informative, data-free, non-MIDD, and non-confirmatory.",
+          "file": "platform/simulation_operating_characteristics/simulation_oc_status.json",
+          "field": "statuses.evidence_qualification.status",
+          "actual": "NOT_QUALIFIED",
+          "expected": "NOT_QUALIFIED",
+          "freshness_failure": null
+        },
+        {
+          "check_id": "file:docs/SIMULATION_PRECISION_RESEARCH.md",
+          "status": "PASS",
+          "evidence": "Required reviewer/documentation artifact is present.",
+          "file": "docs/SIMULATION_PRECISION_RESEARCH.md",
+          "field": "",
+          "actual": "present",
+          "expected": "present"
+        },
+        {
+          "check_id": "file:config/simulation_protocol.yaml",
+          "status": "PASS",
+          "evidence": "Required reviewer/documentation artifact is present.",
+          "file": "config/simulation_protocol.yaml",
+          "field": "",
+          "actual": "present",
+          "expected": "present"
+        },
+        {
+          "check_id": "file:platform/simulation_precision.py",
+          "status": "PASS",
+          "evidence": "Required reviewer/documentation artifact is present.",
+          "file": "platform/simulation_precision.py",
+          "field": "",
+          "actual": "present",
+          "expected": "present"
+        },
+        {
+          "check_id": "file:platform/check_simulation_evidence.py",
+          "status": "PASS",
+          "evidence": "Required reviewer/documentation artifact is present.",
+          "file": "platform/check_simulation_evidence.py",
+          "field": "",
+          "actual": "present",
+          "expected": "present"
+        },
+        {
+          "check_id": "file:tests/test_simulation_precision.py",
+          "status": "PASS",
+          "evidence": "Required reviewer/documentation artifact is present.",
+          "file": "tests/test_simulation_precision.py",
+          "field": "",
+          "actual": "present",
+          "expected": "present"
+        },
+        {
+          "check_id": "file:tests/test_simulation_evidence.py",
+          "status": "PASS",
+          "evidence": "Required reviewer/documentation artifact is present.",
+          "file": "tests/test_simulation_evidence.py",
+          "field": "",
+          "actual": "present",
+          "expected": "present"
+        },
+        {
+          "check_id": "file:tests/test_simulation_report.py",
+          "status": "PASS",
+          "evidence": "Required reviewer/documentation artifact is present.",
+          "file": "tests/test_simulation_report.py",
+          "field": "",
+          "actual": "present",
+          "expected": "present"
+        },
+        {
+          "check_id": "file:07_reviewer_explanation/simulation_model_analysis_plan.md",
+          "status": "PASS",
+          "evidence": "Required reviewer/documentation artifact is present.",
+          "file": "07_reviewer_explanation/simulation_model_analysis_plan.md",
+          "field": "",
+          "actual": "present",
+          "expected": "present"
+        },
+        {
+          "check_id": "file:07_reviewer_explanation/simulation_report.md",
+          "status": "PASS",
+          "evidence": "Required reviewer/documentation artifact is present.",
+          "file": "07_reviewer_explanation/simulation_report.md",
           "field": "",
           "actual": "present",
           "expected": "present"

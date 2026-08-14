@@ -92,6 +92,9 @@ workstreams:
       - 02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx
       - config/ctq_traceability.yaml
       - 07_reviewer_explanation/analysis_report.md
+      - docs/SIMULATION_PRECISION_RESEARCH.md
+      - config/simulation_protocol.yaml
+      - 07_reviewer_explanation/simulation_model_analysis_plan.md
       - 07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md
       - docs/workstreams/reviews/F042_DELAYED_SECOND_PASS_REVIEW_2026-08-04.md
 
@@ -155,6 +158,9 @@ workstreams:
       - platform/log_cleanliness/log_cleanliness_status.json
       - platform/verify_evidence.py
       - platform/conformance
+      - platform/simulation_precision.py
+      - platform/check_simulation_evidence.py
+      - platform/simulation_operating_characteristics/simulation_oc_status.json
 
   reviewer_package:
     function: "Reviewer explanation and regulatory package"
@@ -167,6 +173,10 @@ workstreams:
       - 07_reviewer_explanation/guides/SDRG.md
       - 07_reviewer_explanation/guides/BDRG.md
       - 07_reviewer_explanation/analysis_report.md
+      - 07_reviewer_explanation/simulation_model_analysis_plan.md
+      - 07_reviewer_explanation/simulation_report.md
+      - platform/build_simulation_report.py
+      - tests/test_simulation_evidence.py
       - platform/package_ectd.py
       - platform/build_ectd_backbone.py
       - platform/materialize_ectd.py

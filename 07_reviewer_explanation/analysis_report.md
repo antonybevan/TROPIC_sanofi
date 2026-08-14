@@ -132,11 +132,30 @@ FDA Project Optimus alignment: the subject-level all-cycles RDI is paired with t
 | Independent Validation | R 4.6.0 / Pharmaverse | ADaMIG v1.3 |
 | Reconciliation | `diffdf` package | 100% cell-by-cell match |
 | TFL Generation | ggplot2, survival, patchwork | ICH E3 / NEJM style |
-| Orchestration | Python 3.10 (cibuild.py) | Manifest-driven 37-stage CI pipeline |
+| Orchestration | Python 3.10+ (`cibuild.py`) | Manifest-driven 40-stage CI pipeline |
+| Simulation methods annex | Python 3.12.13, NumPy 2.2.6, float64/PCG64 | Frozen data-free MAP, 400,000 replicates, independent evidence verification |
 
 ---
 
-## 8. Data Provenance & Limitations
+## 8. Informative Simulation Methods Annex
+
+The submission-style package includes a separately governed, data-free fixed-design
+time-to-event methods evaluation. Its [Model Analysis Plan](simulation_model_analysis_plan.md)
+and [Model Analysis Report](simulation_report.md) are generated from a frozen YAML protocol
+and authoritative aggregate JSON. Across ten scenarios, 400,000/400,000 requested
+replicates completed with no failures. The two analytic-null estimates were 2.525% and
+2.504% at one-sided alpha 2.5%, with MCSE 0.000496 and 0.000494; both prespecified null
+checks passed.
+
+This annex is deliberately separate from the clinical analyses above. It uses a public
+377/378 design calibration and engineering stress assumptions, not authoritative TROPIC
+IPD; it omits original-trial stratification and has no sponsor-approved minimum effect or
+power threshold. Its evidence qualification remains `NOT_QUALIFIED`: informative,
+non-MIDD, non-confirmatory, and unsuitable for clinical or filing decisions.
+
+---
+
+## 9. Data Provenance & Limitations
 
 > [!IMPORTANT]
 > **Real data (MP arm):** All 371 MP-arm patients, 5,428 AE records, 266 OS events, and ~79,000 laboratory records are derived directly from the official Sanofi de-identified public SDTM release (dated June 2013).

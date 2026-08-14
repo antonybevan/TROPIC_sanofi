@@ -90,6 +90,12 @@ layers:
       - path: config/ctq_traceability.yaml
         status: required
         role: "Machine-readable CTQ, estimand, artifact, and validation traceability register."
+      - path: docs/SIMULATION_PRECISION_RESEARCH.md
+        status: required
+        role: "Current-practice ICH M15/E9, FDA, ADEMP, and OCTAVE research decision and qualification boundary."
+      - path: config/simulation_protocol.yaml
+        status: required
+        role: "Governed data-free simulation MAP, estimand, risk assessment, scenario registry, seeds, and acceptance criteria."
 
   metadata:
     objective: "Provide machine-readable and reviewer-readable dataset metadata, controlled terminology, and traceability."
@@ -280,6 +286,18 @@ layers:
       - path: platform/build_release_run_manifest.py
         status: required
         role: "Current release-run hash binding manifest generator."
+      - path: platform/simulation_precision.py
+        status: required
+        role: "Deterministic individual-level TTE methods-evaluation and Monte Carlo precision engine."
+      - path: platform/check_simulation_evidence.py
+        status: required
+        role: "Independent fail-closed recomputation of simulation bindings, metrics, accounting, acceptance, and reviewer-report parity."
+      - path: platform/build_simulation_report.py
+        status: required
+        role: "Deterministic simulation MAP/report generator from governed configuration and aggregate results."
+      - path: platform/simulation_operating_characteristics/simulation_oc_status.json
+        status: required
+        role: "Authoritative aggregate simulation results, seed ledger, replicate accounting, uncertainty, and separated statuses."
       - path: platform/pipeline_health.json
         status: generated
         role: "Latest run health record."
@@ -377,6 +395,15 @@ layers:
       - path: 07_reviewer_explanation/analysis_report.md
         status: required
         role: "Reviewer-facing analysis report and concordance narrative."
+      - path: 07_reviewer_explanation/simulation_model_analysis_plan.md
+        status: required
+        role: "Generated prospective simulation Model Analysis Plan; informative, non-MIDD methods-evaluation scope."
+      - path: 07_reviewer_explanation/simulation_report.md
+        status: required
+        role: "Generated simulation Model Analysis Report with JSON-bound results and limitations."
+      - path: tests/test_simulation_evidence.py
+        status: required
+        role: "Malformed-evidence mutation suite for the independent simulation verifier."
       - path: docs/DELIVERY_EVIDENCE_DASHBOARD.md
         status: generated
         role: "Generated delivery/evidence architecture dashboard."
@@ -405,3 +432,9 @@ layers:
       - path: platform/materialize_ectd.py
         status: required
         role: "Sequence materialization script."
+      - path: 08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-model-analysis-plan.pdf
+        status: generated
+        role: "Submission-style rendered copy of the informative simulation MAP."
+      - path: 08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-report.pdf
+        status: generated
+        role: "Submission-style rendered copy of the informative simulation report."

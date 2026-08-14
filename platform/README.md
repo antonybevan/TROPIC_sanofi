@@ -31,6 +31,9 @@ Read **CORE** only, then SUPPORT when you need ODA/seals.
 | `check_gate_g00_governance.py` | Product-claim / scope lock |
 | `check_gate_g02_specification.py` | SAP / spec lock |
 | `gen_adam_labels.R` | ADaM label/order artifacts |
+| `simulation_precision.py` | Governed data-free TTE methods evaluation and authoritative aggregate OC JSON |
+| `check_simulation_evidence.py` | Independent fail-closed verification of simulation hashes, metrics, accounting, and acceptance |
+| `build_simulation_report.py` | Deterministic simulation MAP/report generation from YAML + aggregate JSON |
 | `check_gate_g07_reviewer_package.py` | Reviewer guides lock |
 | `export_datasetjson.py` | Dataset-JSON export (additive layer) |
 | `build_ars.py` | ARS export (additive layer) |
@@ -92,7 +95,7 @@ They do **not** derive ADSL/ADTTE.
 | `validate_core_rules.py` · `run_adam_conformance.sh` · `run_core_conformance.sh` | CORE/local rules |
 | `apply_metadata_lineage.py` | Lineage check vs YAML |
 | `lint_sas.py` | SAS lint |
-| `ct_cross_validation.py` · `date_precision_sensitivity.py` | Sensitivity / CT labs |
+| `ct_cross_validation.py` · `date_precision_sensitivity.py` | Supporting sensitivity / CT labs |
 | `tte_utils.py` | Shared TTE helpers |
 
 ---
