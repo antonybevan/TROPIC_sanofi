@@ -22,6 +22,7 @@ The binding claim is [Product and Evidence Claim](docs/PRODUCT_CLAIM.md). The qu
 | [Dashboard visual QC](06_qc_evidence/audit/DASHBOARD_VISUAL_QC.md) | Five-tab local dashboard acceptance evidence |
 | [Simulation Model Analysis Plan](07_reviewer_explanation/simulation_model_analysis_plan.md) | Prospective M15/ADEMP/OCTAVE methods-evaluation protocol, estimand, scenarios, and precision criteria |
 | [Simulation Model Analysis Report](07_reviewer_explanation/simulation_report.md) | Generated operating characteristics, Monte Carlo uncertainty, representative trials, and limitations |
+| [FDA/ICH readiness research](docs/FDA_READINESS_RESEARCH_2026-08-15.md) | Big-pharma pre-shipment control model, official sources, and current blockers |
 | [Current release note](docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) | Release evidence and residual limitations |
 | [Reviewer guide](docs/INTERVIEWER_GUIDE.md) | A short, evidence-led walkthrough |
 
@@ -107,6 +108,9 @@ python3 platform/cibuild.py --real-sas
 
 # Recheck the current regulatory and qualification boundary
 python3 platform/check_regulatory_baseline.py --check-only
+
+# Review the FDA/ICH readiness map; --strict is the release go/no-go mode
+python3 platform/check_submission_readiness.py
 ```
 
 The full run requires the authorized local SDTM source and credentials; see [Reproducibility](00_governance/REPRODUCIBILITY.md) and the [ODA runbook](docs/runbooks/ODA_GUIDE.md). A clean clone intentionally does not contain patient-level source or derived XPTs.

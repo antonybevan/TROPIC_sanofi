@@ -16,7 +16,8 @@
 | 4 | [`../08_submission_package/README.md`](../08_submission_package/README.md) | Review package tour |
 | 5 | [`RELEASE_NOTE_v0.3.0-clinical-simulation.md`](RELEASE_NOTE_v0.3.0-clinical-simulation.md) | Current controlled release narrative |
 | 6 | [`SCRIPT_MAP.md`](SCRIPT_MAP.md) | What runs vs ignore |
-| 7 | `python3 scripts/verify_release.py` | Machine re-check |
+| 7 | [`FDA_READINESS_RESEARCH_2026-08-15.md`](FDA_READINESS_RESEARCH_2026-08-15.md) | FDA/ICH pre-shipment evidence map and blockers |
+| 8 | `python3 scripts/verify_release.py` | Machine re-check |
 
 Repository operating controls: [`../CONTRIBUTING.md`](../CONTRIBUTING.md) ·
 [`../SECURITY.md`](../SECURITY.md) · [`LICENSING.md`](LICENSING.md)
@@ -174,6 +175,7 @@ Typical local outputs (not portfolio face):
 | [`SUBMISSION_REPO_PRESENTATION_RESEARCH.md`](SUBMISSION_REPO_PRESENTATION_RESEARCH.md) | Why dual surface; noise diagnosis |
 | [`REGULATORY_WORKFLOW_RESEARCH.md`](REGULATORY_WORKFLOW_RESEARCH.md) | Industry workflow grounding |
 | [`SIMULATION_PRECISION_RESEARCH.md`](SIMULATION_PRECISION_RESEARCH.md) | Current ICH M15/E9, FDA, ADEMP, and OCTAVE basis for the data-free simulation methods evaluation |
+| [`FDA_READINESS_RESEARCH_2026-08-15.md`](FDA_READINESS_RESEARCH_2026-08-15.md) | FDA/ICH and big-pharma pre-shipment controls mapped to this repository |
 | [`../06_qc_evidence/audit/SIMULATION_PRECISION_IMPLEMENTATION_REPORT_2026-08-14.md`](../06_qc_evidence/audit/SIMULATION_PRECISION_IMPLEMENTATION_REPORT_2026-08-14.md) | Implementation, adversarial findings, exact results, verification, and fresh-SAS limitation |
 | [`I_J_generalisation_plan.md`](I_J_generalisation_plan.md) | Multi-study generalisation notes |
 
