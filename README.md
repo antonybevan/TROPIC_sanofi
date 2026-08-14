@@ -20,6 +20,8 @@ The binding claim is [Product and Evidence Claim](docs/PRODUCT_CLAIM.md). The qu
 | [Traceability matrix](07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md) | Source-to-analysis-to-output lineage |
 | [TFL Gallery](05_outputs/tfl/TFL_Gallery.html) | Portable static figure review surface |
 | [Dashboard visual QC](06_qc_evidence/audit/DASHBOARD_VISUAL_QC.md) | Five-tab local dashboard acceptance evidence |
+| [Simulation Model Analysis Plan](07_reviewer_explanation/simulation_model_analysis_plan.md) | Prospective M15/ADEMP/OCTAVE methods-evaluation protocol, estimand, scenarios, and precision criteria |
+| [Simulation Model Analysis Report](07_reviewer_explanation/simulation_report.md) | Generated operating characteristics, Monte Carlo uncertainty, representative trials, and limitations |
 | [Current release note](docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) | Release evidence and residual limitations |
 | [Reviewer guide](docs/INTERVIEWER_GUIDE.md) | A short, evidence-led walkthrough |
 
@@ -36,6 +38,7 @@ The binding claim is [Product and Evidence Claim](docs/PRODUCT_CLAIM.md). The qu
 | Standards | ADaMIG 1.3, SDTMIG 3.4, Define-XML 2.1, local stylesheet, CDISC CORE | Alignment and local conformance, not agency acceptance |
 | Pinnacle 21 | Community 4.1.0, FDA engine 2508.1, ADaMIG 1.3 (FDA), 7 datasets / 121,320 records / 0 rejects | Informative only; 30 open issue groups (2,373 occurrences) and an incompatible-CLI caveat remain; Enterprise not executed |
 | Submission package | Deterministic Module 5-style tree, cSDRG/ADRG, programs, Define, eCTD v3.2.2 example backbone | Structural simulation; no gateway submission |
+| Simulation precision | Governed fixed-design TTE methods evaluation with explicit seeds, high-replication null scenarios, MCSE/Wilson intervals, and generated MAP/report | Informative engineering evidence only; public aggregate and stress assumptions are not original-trial IPD, an MCID, or a pivotal design decision |
 | Release control | CI, findings, logs, SHA-256 manifests, clean-checkout verification | Integrity controls, not Part 11 electronic signatures |
 
 ## Data provenance
@@ -47,9 +50,16 @@ The binding claim is [Product and Evidence Claim](docs/PRODUCT_CLAIM.md). The qu
 
 OS and PFS use published Kaplan-Meier reconstruction methods for the CbzP comparator. Secondary CbzP endpoints are synthetic. Comparative outputs are therefore descriptive demonstrations and must not be described as confirmatory trial results.
 
+The separate simulation-precision workstream is data-free. It uses public
+aggregate assumptions and explicitly labelled stress scenarios to evaluate the
+numerical behavior of a simplified TROPIC-like fixed two-arm time-to-event
+design. It does not simulate authoritative TROPIC patients, validate a clinical
+minimum effect, or change the product claim. See the
+[current-practice research decision](docs/SIMULATION_PRECISION_RESEARCH.md).
+
 ## Controlled pipeline
 
-The study manifest drives a 37-stage evidence chain:
+The study manifest drives a 40-stage evidence chain:
 
 ```text
 authorized SDTM
@@ -58,6 +68,7 @@ authorized SDTM
   -> record, value, and result reconciliation
   -> catalog-controlled tables, figures, and listings
   -> Define-XML, ARM, and specification conformance
+  -> governed simulation operating characteristics and generated MAP/report
   -> reviewer guides and CSR
   -> Module 5/eCTD-style materialization
   -> log, finding, manifest, and release seals

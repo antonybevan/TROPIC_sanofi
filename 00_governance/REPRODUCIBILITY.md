@@ -10,6 +10,8 @@ than a blanket "fully reproducible" claim.
 > 1. Inspect the Module 5–style package face (`08_submission_package/m5/`)
 > 2. Re-check Path A seals: `python3 scripts/verify_release.py`
 > 3. Run the data-free smoke: `python3 platform/cibuild.py --demo`
+> 4. Reproduce the governed, aggregate simulation evidence:
+>    `python3 platform/simulation_precision.py`
 >
 > What is allowed in git vs local-only: [`docs/REPO_SURFACE_POLICY.md`](../docs/REPO_SURFACE_POLICY.md).  
 > Interviewer walk: [`docs/INTERVIEWER_GUIDE.md`](../docs/INTERVIEWER_GUIDE.md).
@@ -47,6 +49,21 @@ python3 platform/cibuild.py --demo
 
 This test exercises the reconciliation methodology directly (it is not tautological) and
 requires only R.
+
+The simulation methods evaluation is also fully data-free. With the locked Python
+dependencies installed, a reviewer can regenerate its authoritative aggregate JSON,
+independently verify the accounting and uncertainty, and rebuild both reviewer sources:
+
+```bash
+python3 platform/simulation_precision.py
+python3 platform/build_simulation_report.py
+python3 platform/check_simulation_evidence.py
+```
+
+The governed protocol records ten explicit scenario seeds and 400,000 total requested
+replicates. Two key null scenarios use 100,000 replicates each; all remaining
+alternative or stress scenarios use 25,000. No patient-level source record is read or
+written. Runtime depends on the local NumPy build and CPU.
 
 ## 3. Reproducing the REAL pipeline (given data access)
 
@@ -88,6 +105,12 @@ The synthetic comparator arm is regenerated (deterministically, fixed seeds) by
   for `renv::restore()` to reproduce the exact library.
 - **Platform:** developed on macOS (Apple silicon) and SAS ODA (Linux). The orchestrator
   resolves `Rscript` from `PATH`; ODA paths are configurable (no hard-coded user paths).
+- **Simulation evidence:** each scenario has a unique governed seed. The JSON records
+  protocol, scenario, code, and scientific-output hashes; requested, completed, and
+  failed replicates; rejection numerators/denominators; MCSE; and Wilson intervals.
+  Identical protocol, code, dependency, and seed inputs must reproduce identical
+  scientific content. The scope is informative methods evaluation only, not MIDD or
+  confirmatory clinical evidence.
 
 ## 5. Data provenance
 - **Real (MP arm, N=371):** official Sanofi de-identified SDTM public release (2013),

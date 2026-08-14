@@ -781,8 +781,8 @@ def run_single_stage(stage, from_stage, sas_mode, results, expected_stage_names=
                 rc = 1
                 stderr = f"{gate_name} status unreadable at {status_path}: {exc}"
 
-    # Stage 26 checks the committed reviewer surface before downstream packaging.
-    # Stage 30 then regenerates those PDFs, so immediately re-run G07 against the
+    # G07 checks the committed reviewer surface before downstream packaging.
+    # The packaging stage then regenerates those PDFs, so immediately re-run G07 against the
     # newly rendered files; otherwise a renderer regression is visible only on the
     # next pipeline invocation.
     if stage["name"] == "eCTD Final Package" and rc == 0:

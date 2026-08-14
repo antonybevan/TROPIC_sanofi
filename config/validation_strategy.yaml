@@ -140,6 +140,30 @@ checks:
     op: equals
     value: PASS
     evidence: "SAS/R execution logs contain no unapproved errors, warnings, invalid-input notes, uninitialized variables, or risky conversion/merge notes."
+  simulation_execution_pass:
+    file: platform/simulation_operating_characteristics/simulation_oc_status.json
+    field: statuses.execution.status
+    op: equals
+    value: PASS
+    evidence: "The governed simulation run completed with exact requested/completed/failed accounting."
+  simulation_precision_pass:
+    file: platform/simulation_operating_characteristics/simulation_oc_status.json
+    field: statuses.monte_carlo_precision.status
+    op: equals
+    value: PASS
+    evidence: "All scenarios met their prespecified replication, failure-rate, and Monte Carlo precision controls."
+  simulation_design_check_pass:
+    file: platform/simulation_operating_characteristics/simulation_oc_status.json
+    field: statuses.design_operating_characteristics.status
+    op: equals
+    value: PASS
+    evidence: "The analytic-null and deterministic method checks passed; alternative power remains descriptive without a clinical threshold."
+  simulation_boundary_preserved:
+    file: platform/simulation_operating_characteristics/simulation_oc_status.json
+    field: statuses.evidence_qualification.status
+    op: equals
+    value: NOT_QUALIFIED
+    evidence: "The evidence remains explicitly informative, data-free, non-MIDD, and non-confirmatory."
 
 artifacts:
   - id: source_profile
@@ -263,6 +287,29 @@ artifacts:
       - 07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md
     required_checks:
       - ctq_traceability_pass
+
+  - id: simulation_methods_evaluation
+    name: Data-free simulation operating-characteristic evidence
+    owner: statistical_programming_qc
+    gate: G06
+    risk_tier: high
+    decision_impact: "Could misstate method behavior or Monte Carlo precision if assumptions, implementation, accounting, or scope boundaries drift."
+    traceability: "current-practice research -> frozen YAML MAP/estimand -> simulation engine -> independent verifier -> authoritative aggregate JSON -> generated MAP/report -> Module 5-style annex"
+    required_files:
+      - docs/SIMULATION_PRECISION_RESEARCH.md
+      - config/simulation_protocol.yaml
+      - platform/simulation_precision.py
+      - platform/check_simulation_evidence.py
+      - tests/test_simulation_precision.py
+      - tests/test_simulation_evidence.py
+      - tests/test_simulation_report.py
+      - 07_reviewer_explanation/simulation_model_analysis_plan.md
+      - 07_reviewer_explanation/simulation_report.md
+    required_checks:
+      - simulation_execution_pass
+      - simulation_precision_pass
+      - simulation_design_check_pass
+      - simulation_boundary_preserved
 
   - id: log_cleanliness
     name: SAS/R log cleanliness gate

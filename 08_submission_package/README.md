@@ -18,7 +18,9 @@ The package is fit for technical review of a submission-style clinical programmi
 | 4 | `m5/datasets/tropic/tabulations/sdtm/datasets/define.xml` | SDTM metadata with separate local stylesheet |
 | 5 | `m5/53-clin-stud-rep/.../tropic/csr.pdf` | Controlled narrative and output appendices |
 | 6 | `m5/datasets/tropic/bimo/datasets/bdrg.pdf` | BIMO/clinsite explanation |
-| 7 | `ectd/0000/` | Example eCTD v3.2.2 sequence and STF backbone |
+| 7 | `m5/53-clin-stud-rep/.../tropic/simulation-model-analysis-plan.pdf` | Informative, prospectively governed simulation protocol and acceptance criteria |
+| 8 | `m5/53-clin-stud-rep/.../tropic/simulation-report.pdf` | Generated simulation operating characteristics, precision accounting, and limitations |
+| 9 | `ectd/0000/` | Example eCTD v3.2.2 sequence and STF backbone |
 
 ## Package contract
 
@@ -31,13 +33,14 @@ m5/
       blankcrf.pdf                  source blank CRF; not annotated
     analysis/adam/
       datasets/define.xml + define2-1.xsl + ADaM XPTs
-      programs/                     SAS and R source programs
+      programs/                     SAS/R programs plus plain-text Python/YAML simulation sources
       adrg.pdf
     bimo/datasets/
       clinsite.xpt
       bdrg.pdf
   53-clin-stud-rep/.../tropic/
     csr.pdf + controlled tables and figures
+    simulation-model-analysis-plan.pdf + simulation-report.pdf
 ```
 
 The package generator enforces the FDA June 2026 cSDRG filename `csdrg.pdf`. The legacy `sdrg.pdf` path fails the regulatory-baseline gate. `blankcrf.pdf` is classified as a source study-report document; it is not renamed or tagged as an annotated CRF.
@@ -55,6 +58,7 @@ The packaged analysis datasets contain the real de-identified MP arm only. The r
 | Metadata | XSD, Define checks, ARM contract, spec-to-Define and spec-to-data | Local standards conformance |
 | Pinnacle 21 | Community 4.1.0 / FDA 2508.1; 7 datasets, 121,320 records, 0 rejects, 30 open groups / 2,373 occurrences | Informative issue-discovery evidence only; compatibility caveat retained and Enterprise not executed |
 | Package | PDF structure, fonts, bookmarks, links, STF classification, checksums, backbone validation | Structural simulation |
+| Simulation methods | Governed protocol, deterministic scenario seeds, analytic null benchmark, complete replicate accounting, MCSE and Wilson intervals | Informative methods-evaluation only; not MIDD, confirmatory efficacy, a sponsor-approved design, or a clinical decision |
 | Release | SHA-256 manifests, CI, clean-checkout verifier | Integrity and reproducibility, not Part 11 |
 
 See [`docs/QUALITY_SYSTEM_BOUNDARY.md`](../docs/QUALITY_SYSTEM_BOUNDARY.md) for the exact work required before regulated reuse.

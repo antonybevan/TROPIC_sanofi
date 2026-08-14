@@ -1,0 +1,1086 @@
+{
+  "schema_version": "1.0.0",
+  "change_control": {
+    "full_run_started_after_freeze": true,
+    "deviations": []
+  },
+  "protocol": {
+    "id": "TROPIC-SIM-MAP-001",
+    "version": "1.0.0",
+    "status": "FROZEN_MAP",
+    "path": "config/simulation_protocol.yaml",
+    "protocol_sha256": "09798cd52adedd742a10f39266c67df0d9fe40b4c693912e4962b47601446b61",
+    "scenario_registry_sha256": "da115050f9d3fb69202b7154814c0eb204852efbe99f9b6107e548419f3f7768",
+    "code_sha256": "3fb535efdfea04955795619e0d209723aa35f88d70ce9429ae4667adc4ec0da2"
+  },
+  "qualification_boundary": {
+    "classification": "NON_MIDD_NON_CONFIRMATORY_DATA_FREE_METHODS_EVALUATION",
+    "model_influence": "LOW",
+    "evidence_status": "INFORMATIONAL_ONLY",
+    "authoritative_patient_data_used": false,
+    "external_validation_completed": false
+  },
+  "m15_assessment": {
+    "question_of_interest": "Defined in protocol.question_of_interest.",
+    "context_of_use": "Defined in protocol.context_of_use and restricted to internal methods evaluation.",
+    "model_influence": "Low; outputs cannot determine clinical or regulatory decisions.",
+    "consequence_of_wrong_decision": "Misinterpreting numerical operating characteristics as clinical evidence could misstate design performance or treatment benefit; the hard use boundary prevents those decisions from relying on this model.",
+    "model_risk": "MODERATE",
+    "model_risk_rationale": "Scientific assumptions are deliberately simplified and not identifiable from authoritative joint IPD. Consequence severity is potentially high, but model influence is constrained to low by governance and explicit non-use controls.",
+    "model_impact": "LOW",
+    "verification_plan": [
+      "Independent tests of log-rank sign, analytic null behavior, MCSE, and Wilson intervals.",
+      "Fail-closed schema and invariant validation before random-number generation.",
+      "Deterministic replay from unique scenario seeds and SHA-256-bound inputs."
+    ],
+    "validation_plan": [
+      "Analytic one-sided null rejection probability benchmark.",
+      "Scenario-derived aggregate reject, non-reject, and near-alpha trial examples selected by a frozen seed/search rule.",
+      "Artificial positive, negative, and non-estimable log-rank edge fixtures, labelled as validation fixtures rather than representative trial paths.",
+      "Event-time, censoring, accounting, and parameter-bound invariants."
+    ],
+    "applicability": "Applicable only to the encoded simplified fixed design, endpoints, assumptions, and unstratified log-rank method; not externally validated for TROPIC decisions.",
+    "residual_uncertainty": [
+      "No authoritative comparator IPD or joint endpoint/covariate distribution.",
+      "Hazards, dropout, discontinuation, delayed effect, and waning are assumptions.",
+      "No independent organizational statistical or medical review."
+    ]
+  },
+  "estimand": {
+    "id": "EST-METHODS-TTE-001",
+    "framework": "ICH_E9_R1_ALIGNED_METHODS_EVALUATION",
+    "population": "Hypothetical randomized participants meeting a simplified TROPIC-like analysis population; fixed public-randomized-design calibration of 377 control and 378 experimental participants. This is distinct from the repository's available real MP cohort of N=371 and does not imply that participant-level data are available.",
+    "treatment_conditions": {
+      "control": "Synthetic control strategy from randomization through follow-up.",
+      "experimental": "Synthetic experimental strategy from randomization through follow-up."
+    },
+    "variables": {
+      "OS": "Time from randomization to death from any cause.",
+      "PFS": "Time from randomization to progression or death from any cause."
+    },
+    "population_summary": "Between-arm survival-distribution contrast evaluated by the one-sided intent-to-treat log-rank statistic; repeated-trial summary is rejection probability.",
+    "intercurrent_events": {
+      "permanent_treatment_discontinuation": {
+        "strategy": "TREATMENT_POLICY",
+        "handling": "Follow-up and endpoint ascertainment continue. Reference scenarios retain the assigned-arm hazard; stress scenarios explicitly allow effect waning after discontinuation without censoring the endpoint."
+      },
+      "subsequent_anticancer_therapy": {
+        "strategy": "TREATMENT_POLICY",
+        "handling": "Endpoint follow-up would continue regardless of subsequent therapy; a separate therapy process is not generated in this bounded implementation."
+      },
+      "death": {
+        "strategy_OS": "OUTCOME_EVENT_NOT_INTERCURRENT",
+        "strategy_PFS": "COMPOSITE",
+        "handling": "Death is the OS event and is included in the PFS composite event."
+      }
+    },
+    "missing_data_and_censoring": {
+      "independent_withdrawal": {
+        "classification": "MISSING_ENDPOINT_OBSERVATION_NOT_INTERCURRENT_EVENT",
+        "handling": "Independently generated withdrawal censors at last observation. High-dropout scenarios stress this assumption; informative withdrawal is not modeled."
+      },
+      "administrative_censoring": "Censor at the fixed common analysis date after staggered enrollment."
+    },
+    "estimator": "One-sided unstratified log-rank test, experimental benefit direction.",
+    "sensitivity_scope": "Delayed/non-proportional effects, high independent withdrawal, and discontinuation-related waning are scenario assumptions, not clinical estimates. Original-trial stratification factors are unavailable to this data-free DGM and the production stratified analysis is therefore not reproduced."
+  },
+  "protocol_framework": {
+    "ADEMP": {
+      "aims": "Estimate Type I error or power and its Monte Carlo uncertainty for the governed scenario grid.",
+      "data_generating_mechanism": "Individual enrollment, piecewise-exponential endpoint time, independent withdrawal, optional treatment discontinuation with post-discontinuation waning, and fixed administrative censoring.",
+      "estimands": [
+        "EST-METHODS-TTE-001"
+      ],
+      "methods": "One-sided unstratified log-rank test at alpha 0.025.",
+      "performance_measures": [
+        "Rejection numerator, denominator, probability, MCSE, and 95% Wilson interval.",
+        "Completed/failed accounting and failure reasons.",
+        "Mean event and censor proportions by randomized arm."
+      ]
+    },
+    "OCTAVE": {
+      "objectives": "Verify implementation and characterize fixed-design operating characteristics.",
+      "characteristics": "OS/PFS baseline hazards, treatment-effect shape, withdrawal, and discontinuation assumptions.",
+      "trial_design": "Fixed parallel two-arm allocation with staggered enrollment and common analysis date.",
+      "analyses": "Intent-to-treat one-sided log-rank analysis.",
+      "valuation_metrics": "Type I error or power, Monte Carlo precision, event/censoring rates, and execution failures.",
+      "evidence": "Protocol/scenario/code hashes, deterministic trials, analytic benchmark, and machine-readable results."
+    }
+  },
+  "design": {
+    "allocation_basis": "Public randomized design calibration (377 control, 378 experimental), distinct from the repository's available real MP N=371; no authoritative participant-level comparator data are used.",
+    "allocation": {
+      "control": 377,
+      "experimental": 378
+    },
+    "alpha_one_sided": 0.025,
+    "enrollment_months": 12.0,
+    "analysis_month": 24.0,
+    "batch_size": 1000,
+    "analysis_method": "ONE_SIDED_UNSTRATIFIED_LOGRANK",
+    "omitted_design_feature": "Original stratification is not simulated because authoritative joint stratification-factor distributions are unavailable.",
+    "endpoint_control_medians_months": {
+      "OS": 12.7,
+      "PFS": 1.4
+    }
+  },
+  "acceptance_criteria": {
+    "key_null_min_completed": 100000,
+    "alternative_min_completed": 25000,
+    "alternative_precision_justification": "At 25,000 completed replicates the worst-case binomial MCSE is no greater than sqrt(0.25/25000)=0.003163. Alternative and stress-scenario probabilities are descriptive because no sponsor-approved performance threshold or MCID is available.",
+    "target_mcse_key_null": 0.0005,
+    "max_failure_rate": 0.001,
+    "analytic_null_probability": 0.025,
+    "analytic_null_abs_tolerance_floor": 0.001,
+    "analytic_null_mcse_multiplier": 3.0,
+    "wilson_confidence_level": 0.95,
+    "null_acceptance": "Wilson interval contains alpha and absolute deviation is no greater than max(0.001, 3*MCSE); upper Wilson bound is not required to be below alpha."
+  },
+  "representative_trial_selection": {
+    "scenario_id": "OS_NULL_REFERENCE",
+    "scenario_seed_binding": 2026081401,
+    "selection_seed": 2026081490,
+    "search_replicates": 5000,
+    "batch_size": 500,
+    "roles": {
+      "reject": {
+        "eligibility": "one_sided_p_value < alpha",
+        "selection_rule": "first eligible trial in increasing search index"
+      },
+      "non_reject": {
+        "eligibility": "one_sided_p_value >= 0.5",
+        "selection_rule": "first eligible trial in increasing search index"
+      },
+      "near_alpha_boundary": {
+        "eligibility": "estimable trial",
+        "selection_rule": "minimum absolute(one_sided_p_value - alpha), tie to smallest search index"
+      }
+    }
+  },
+  "software_identity": {
+    "python": {
+      "major": 3,
+      "minor": 12,
+      "patch": 13,
+      "version": "3.12.13"
+    },
+    "numpy_version": "2.2.6",
+    "pyyaml_version": "6.0.3",
+    "floating_point_dtype": "float64",
+    "random_number_generator": "numpy.random.PCG64",
+    "dependency_lock": "requirements-ci.lock"
+  },
+  "methods": {
+    "data_level": "INDIVIDUAL_SIMULATED_SUBJECT",
+    "event_model": "PIECEWISE_EXPONENTIAL",
+    "random_number_generator": "numpy.random.Generator(PCG64)",
+    "analysis_method": "ONE_SIDED_UNSTRATIFIED_LOGRANK",
+    "benefit_direction": "NEGATIVE_Z",
+    "continuous_time_ties": "PROBABILITY_ZERO",
+    "limitation": "Original stratification is not simulated because authoritative joint stratification-factor distributions are unavailable."
+  },
+  "scenarios": [
+    {
+      "id": "OS_NULL_REFERENCE",
+      "endpoint": "OS",
+      "class": "KEY_NULL",
+      "family": "NULL_REFERENCE",
+      "rationale": "Reference analytic-null benchmark.",
+      "assumption_basis": "ASSUMED_REFERENCE",
+      "seed": 2026081401,
+      "requested": 100000,
+      "completed": 100000,
+      "failed": 0,
+      "failure_rate": 0.0,
+      "failures": {},
+      "rejection": {
+        "numerator": 2525,
+        "denominator": 100000,
+        "estimate": 0.02525,
+        "mcse": 0.0004961092369629898,
+        "wilson_95": {
+          "lower": 0.024295728061159816,
+          "upper": 0.026240745189237788,
+          "confidence_level": 0.95
+        }
+      },
+      "events": {
+        "control": {
+          "total": 22738600,
+          "denominator": 37700000,
+          "mean_count_per_trial": 227.386,
+          "mean_proportion": 0.6031458885941644
+        },
+        "experimental": {
+          "total": 22797886,
+          "denominator": 37800000,
+          "mean_count_per_trial": 227.97886,
+          "mean_proportion": 0.6031186772486773
+        }
+      },
+      "censoring": {
+        "control": {
+          "total": 14961400,
+          "denominator": 37700000,
+          "mean_count_per_trial": 149.614,
+          "mean_proportion": 0.39685411140583554
+        },
+        "experimental": {
+          "total": 15002114,
+          "denominator": 37800000,
+          "mean_count_per_trial": 150.02114,
+          "mean_proportion": 0.39688132275132276
+        }
+      },
+      "experimental_discontinuations_before_event": {
+        "total": 0,
+        "denominator": 37800000,
+        "mean_proportion": 0.0
+      },
+      "analytic_null_benchmark": {
+        "expected_probability": 0.025,
+        "absolute_deviation": 0.0002500000000000002,
+        "acceptance_tolerance": 0.0014883277108889694,
+        "wilson_contains_expected": true,
+        "acceptance_status": "PASS"
+      },
+      "statuses": {
+        "execution": {
+          "status": "PASS",
+          "reason": "Run executed and all replicates are accounted: requested=100000, completed=100000, failed=0."
+        },
+        "precision": {
+          "status": "PASS",
+          "reason": "Completed 100000 >= 100000; failure rate 0 <= 0.001; MCSE 0.000496109 <= 0.0005."
+        },
+        "design_operating_characteristic": {
+          "status": "PASS",
+          "reason": "Wilson contains alpha=True; absolute deviation 0.00025 <= tolerance 0.00148833 is True."
+        }
+      },
+      "scenario_sha256": "7adc14f9810532d962c09ca7dbff26c177370ed9eed7e45ee1a5a23042d450a7"
+    },
+    {
+      "id": "PFS_NULL_HIGH_DROPOUT",
+      "endpoint": "PFS",
+      "class": "KEY_NULL_OPERATIONAL_STRESS",
+      "family": "NULL_HIGH_DROPOUT",
+      "rationale": "PFS null with high independent-withdrawal operational stress.",
+      "assumption_basis": "ASSUMED_STRESS",
+      "seed": 2026081402,
+      "requested": 100000,
+      "completed": 100000,
+      "failed": 0,
+      "failure_rate": 0.0,
+      "failures": {},
+      "rejection": {
+        "numerator": 2504,
+        "denominator": 100000,
+        "estimate": 0.02504,
+        "mcse": 0.000494095116349069,
+        "wilson_95": {
+          "lower": 0.02408968280708746,
+          "upper": 0.026026806576817427,
+          "confidence_level": 0.95
+        }
+      },
+      "events": {
+        "control": {
+          "total": 35946428,
+          "denominator": 37700000,
+          "mean_count_per_trial": 359.46428,
+          "mean_proportion": 0.9534861538461539
+        },
+        "experimental": {
+          "total": 36040903,
+          "denominator": 37800000,
+          "mean_count_per_trial": 360.40903,
+          "mean_proportion": 0.9534630423280424
+        }
+      },
+      "censoring": {
+        "control": {
+          "total": 1753572,
+          "denominator": 37700000,
+          "mean_count_per_trial": 17.53572,
+          "mean_proportion": 0.046513846153846156
+        },
+        "experimental": {
+          "total": 1759097,
+          "denominator": 37800000,
+          "mean_count_per_trial": 17.59097,
+          "mean_proportion": 0.046536957671957674
+        }
+      },
+      "experimental_discontinuations_before_event": {
+        "total": 0,
+        "denominator": 37800000,
+        "mean_proportion": 0.0
+      },
+      "analytic_null_benchmark": {
+        "expected_probability": 0.025,
+        "absolute_deviation": 3.999999999999837e-05,
+        "acceptance_tolerance": 0.001482285349047207,
+        "wilson_contains_expected": true,
+        "acceptance_status": "PASS"
+      },
+      "statuses": {
+        "execution": {
+          "status": "PASS",
+          "reason": "Run executed and all replicates are accounted: requested=100000, completed=100000, failed=0."
+        },
+        "precision": {
+          "status": "PASS",
+          "reason": "Completed 100000 >= 100000; failure rate 0 <= 0.001; MCSE 0.000494095 <= 0.0005."
+        },
+        "design_operating_characteristic": {
+          "status": "PASS",
+          "reason": "Wilson contains alpha=True; absolute deviation 4e-05 <= tolerance 0.00148229 is True."
+        }
+      },
+      "scenario_sha256": "8107f34d985c617abd9c505588fb5735f7f5602216420ec9e083024101c6183e"
+    },
+    {
+      "id": "OS_PUBLISHED_EFFECT",
+      "endpoint": "OS",
+      "class": "ALTERNATIVE",
+      "family": "PUBLISHED_EFFECT",
+      "rationale": "Public-aggregate hazard-ratio methods scenario.",
+      "assumption_basis": "PUBLIC_AGGREGATE",
+      "seed": 2026081403,
+      "requested": 25000,
+      "completed": 25000,
+      "failed": 0,
+      "failure_rate": 0.0,
+      "failures": {},
+      "rejection": {
+        "numerator": 23688,
+        "denominator": 25000,
+        "estimate": 0.94752,
+        "mcse": 0.001410331161110751,
+        "wilson_95": {
+          "lower": 0.9446864044339995,
+          "upper": 0.9502160863233293,
+          "confidence_level": 0.95
+        }
+      },
+      "events": {
+        "control": {
+          "total": 5682208,
+          "denominator": 9425000,
+          "mean_count_per_trial": 227.28832,
+          "mean_proportion": 0.6028867904509284
+        },
+        "experimental": {
+          "total": 4533372,
+          "denominator": 9450000,
+          "mean_count_per_trial": 181.33488,
+          "mean_proportion": 0.47972190476190474
+        }
+      },
+      "censoring": {
+        "control": {
+          "total": 3742792,
+          "denominator": 9425000,
+          "mean_count_per_trial": 149.71168,
+          "mean_proportion": 0.39711320954907164
+        },
+        "experimental": {
+          "total": 4916628,
+          "denominator": 9450000,
+          "mean_count_per_trial": 196.66512,
+          "mean_proportion": 0.5202780952380952
+        }
+      },
+      "experimental_discontinuations_before_event": {
+        "total": 0,
+        "denominator": 9450000,
+        "mean_proportion": 0.0
+      },
+      "analytic_null_benchmark": null,
+      "statuses": {
+        "execution": {
+          "status": "PASS",
+          "reason": "Run executed and all replicates are accounted: requested=25000, completed=25000, failed=0."
+        },
+        "precision": {
+          "status": "PASS",
+          "reason": "Completed 25000 >= 25000; failure rate 0 <= 0.001."
+        },
+        "design_operating_characteristic": {
+          "status": "NOT_PREDEFINED",
+          "reason": "No minimum power criterion was prespecified; estimate is descriptive."
+        }
+      },
+      "scenario_sha256": "4aa624a9495fc3c5ea0f3fd41650e539618761281efcb710c71b13d68bd2f615"
+    },
+    {
+      "id": "PFS_PUBLISHED_EFFECT",
+      "endpoint": "PFS",
+      "class": "ALTERNATIVE",
+      "family": "PUBLISHED_EFFECT",
+      "rationale": "Public-aggregate hazard-ratio methods scenario.",
+      "assumption_basis": "PUBLIC_AGGREGATE",
+      "seed": 2026081404,
+      "requested": 25000,
+      "completed": 25000,
+      "failed": 0,
+      "failure_rate": 0.0,
+      "failures": {},
+      "rejection": {
+        "numerator": 24581,
+        "denominator": 25000,
+        "estimate": 0.98324,
+        "mcse": 0.0008118892141172956,
+        "wilson_95": {
+          "lower": 0.9815728750494409,
+          "upper": 0.9847586400416647,
+          "confidence_level": 0.95
+        }
+      },
+      "events": {
+        "control": {
+          "total": 9291339,
+          "denominator": 9425000,
+          "mean_count_per_trial": 371.65356,
+          "mean_proportion": 0.9858184615384615
+        },
+        "experimental": {
+          "total": 9250919,
+          "denominator": 9450000,
+          "mean_count_per_trial": 370.03676,
+          "mean_proportion": 0.9789332275132275
+        }
+      },
+      "censoring": {
+        "control": {
+          "total": 133661,
+          "denominator": 9425000,
+          "mean_count_per_trial": 5.34644,
+          "mean_proportion": 0.01418153846153846
+        },
+        "experimental": {
+          "total": 199081,
+          "denominator": 9450000,
+          "mean_count_per_trial": 7.96324,
+          "mean_proportion": 0.021066772486772488
+        }
+      },
+      "experimental_discontinuations_before_event": {
+        "total": 0,
+        "denominator": 9450000,
+        "mean_proportion": 0.0
+      },
+      "analytic_null_benchmark": null,
+      "statuses": {
+        "execution": {
+          "status": "PASS",
+          "reason": "Run executed and all replicates are accounted: requested=25000, completed=25000, failed=0."
+        },
+        "precision": {
+          "status": "PASS",
+          "reason": "Completed 25000 >= 25000; failure rate 0 <= 0.001."
+        },
+        "design_operating_characteristic": {
+          "status": "NOT_PREDEFINED",
+          "reason": "No minimum power criterion was prespecified; estimate is descriptive."
+        }
+      },
+      "scenario_sha256": "abf18d3af342404d347c4f3efc140af77f51b988d4c2efdc13d31e8417b9edf5"
+    },
+    {
+      "id": "OS_MEDIAN_CALIBRATED",
+      "endpoint": "OS",
+      "class": "ALTERNATIVE",
+      "family": "MEDIAN_CALIBRATED",
+      "rationale": "Exponential calibration to assumed aggregate medians 12.7 vs 15.1 months.",
+      "assumption_basis": "PUBLIC_AGGREGATE_CALIBRATION",
+      "seed": 2026081405,
+      "requested": 25000,
+      "completed": 25000,
+      "failed": 0,
+      "failure_rate": 0.0,
+      "failures": {},
+      "rejection": {
+        "numerator": 10919,
+        "denominator": 25000,
+        "estimate": 0.43676,
+        "mcse": 0.00313688190660726,
+        "wilson_95": {
+          "lower": 0.430622004927946,
+          "upper": 0.4429174267946733,
+          "confidence_level": 0.95
+        }
+      },
+      "events": {
+        "control": {
+          "total": 5684412,
+          "denominator": 9425000,
+          "mean_count_per_trial": 227.37648,
+          "mean_proportion": 0.6031206366047746
+        },
+        "experimental": {
+          "total": 5122317,
+          "denominator": 9450000,
+          "mean_count_per_trial": 204.89268,
+          "mean_proportion": 0.542044126984127
+        }
+      },
+      "censoring": {
+        "control": {
+          "total": 3740588,
+          "denominator": 9425000,
+          "mean_count_per_trial": 149.62352,
+          "mean_proportion": 0.39687936339522545
+        },
+        "experimental": {
+          "total": 4327683,
+          "denominator": 9450000,
+          "mean_count_per_trial": 173.10732,
+          "mean_proportion": 0.45795587301587304
+        }
+      },
+      "experimental_discontinuations_before_event": {
+        "total": 0,
+        "denominator": 9450000,
+        "mean_proportion": 0.0
+      },
+      "analytic_null_benchmark": null,
+      "statuses": {
+        "execution": {
+          "status": "PASS",
+          "reason": "Run executed and all replicates are accounted: requested=25000, completed=25000, failed=0."
+        },
+        "precision": {
+          "status": "PASS",
+          "reason": "Completed 25000 >= 25000; failure rate 0 <= 0.001."
+        },
+        "design_operating_characteristic": {
+          "status": "NOT_PREDEFINED",
+          "reason": "No minimum power criterion was prespecified; estimate is descriptive."
+        }
+      },
+      "scenario_sha256": "0b9c86fe0ad86e93cd56d2084cf4b5d31e775668efcae0aed188366e06bfaf70"
+    },
+    {
+      "id": "PFS_MEDIAN_CALIBRATED",
+      "endpoint": "PFS",
+      "class": "ALTERNATIVE",
+      "family": "MEDIAN_CALIBRATED",
+      "rationale": "Exponential calibration to assumed aggregate medians 1.4 vs 2.8 months.",
+      "assumption_basis": "PUBLIC_AGGREGATE_CALIBRATION",
+      "seed": 2026081406,
+      "requested": 25000,
+      "completed": 25000,
+      "failed": 0,
+      "failure_rate": 0.0,
+      "failures": {},
+      "rejection": {
+        "numerator": 25000,
+        "denominator": 25000,
+        "estimate": 1.0,
+        "mcse": 0.0,
+        "wilson_95": {
+          "lower": 0.9998463652544344,
+          "upper": 1.0,
+          "confidence_level": 0.95
+        }
+      },
+      "events": {
+        "control": {
+          "total": 9290558,
+          "denominator": 9425000,
+          "mean_count_per_trial": 371.62232,
+          "mean_proportion": 0.9857355968169761
+        },
+        "experimental": {
+          "total": 9055751,
+          "denominator": 9450000,
+          "mean_count_per_trial": 362.23004,
+          "mean_proportion": 0.9582805291005291
+        }
+      },
+      "censoring": {
+        "control": {
+          "total": 134442,
+          "denominator": 9425000,
+          "mean_count_per_trial": 5.37768,
+          "mean_proportion": 0.014264403183023872
+        },
+        "experimental": {
+          "total": 394249,
+          "denominator": 9450000,
+          "mean_count_per_trial": 15.76996,
+          "mean_proportion": 0.0417194708994709
+        }
+      },
+      "experimental_discontinuations_before_event": {
+        "total": 0,
+        "denominator": 9450000,
+        "mean_proportion": 0.0
+      },
+      "analytic_null_benchmark": null,
+      "statuses": {
+        "execution": {
+          "status": "PASS",
+          "reason": "Run executed and all replicates are accounted: requested=25000, completed=25000, failed=0."
+        },
+        "precision": {
+          "status": "PASS",
+          "reason": "Completed 25000 >= 25000; failure rate 0 <= 0.001."
+        },
+        "design_operating_characteristic": {
+          "status": "NOT_PREDEFINED",
+          "reason": "No minimum power criterion was prespecified; estimate is descriptive."
+        }
+      },
+      "scenario_sha256": "61fc45f12ce1db4b691c82d8252f5263cc8ed225a5d2d482c9e985e1b5017028"
+    },
+    {
+      "id": "OS_DELAYED_NON_PH",
+      "endpoint": "OS",
+      "class": "ALTERNATIVE_STRESS",
+      "family": "DELAYED_NON_PH",
+      "rationale": "No initial effect followed by benefit; non-proportional-hazards stress.",
+      "assumption_basis": "ASSUMED_STRESS",
+      "seed": 2026081407,
+      "requested": 25000,
+      "completed": 25000,
+      "failed": 0,
+      "failure_rate": 0.0,
+      "failures": {},
+      "rejection": {
+        "numerator": 20166,
+        "denominator": 25000,
+        "estimate": 0.80664,
+        "mcse": 0.002497774292445176,
+        "wilson_95": {
+          "lower": 0.80169749117647,
+          "upper": 0.8114882877067695,
+          "confidence_level": 0.95
+        }
+      },
+      "events": {
+        "control": {
+          "total": 5686315,
+          "denominator": 9425000,
+          "mean_count_per_trial": 227.4526,
+          "mean_proportion": 0.6033225464190981
+        },
+        "experimental": {
+          "total": 4675982,
+          "denominator": 9450000,
+          "mean_count_per_trial": 187.03928,
+          "mean_proportion": 0.49481291005291006
+        }
+      },
+      "censoring": {
+        "control": {
+          "total": 3738685,
+          "denominator": 9425000,
+          "mean_count_per_trial": 149.5474,
+          "mean_proportion": 0.39667745358090184
+        },
+        "experimental": {
+          "total": 4774018,
+          "denominator": 9450000,
+          "mean_count_per_trial": 190.96072,
+          "mean_proportion": 0.5051870899470899
+        }
+      },
+      "experimental_discontinuations_before_event": {
+        "total": 0,
+        "denominator": 9450000,
+        "mean_proportion": 0.0
+      },
+      "analytic_null_benchmark": null,
+      "statuses": {
+        "execution": {
+          "status": "PASS",
+          "reason": "Run executed and all replicates are accounted: requested=25000, completed=25000, failed=0."
+        },
+        "precision": {
+          "status": "PASS",
+          "reason": "Completed 25000 >= 25000; failure rate 0 <= 0.001."
+        },
+        "design_operating_characteristic": {
+          "status": "NOT_PREDEFINED",
+          "reason": "No minimum power criterion was prespecified; estimate is descriptive."
+        }
+      },
+      "scenario_sha256": "8f4757706e1587997cc40bc36ecc5e7fe1a45a42744fe38c8be9a0eb8a2a10cb"
+    },
+    {
+      "id": "PFS_DELAYED_NON_PH",
+      "endpoint": "PFS",
+      "class": "ALTERNATIVE_STRESS",
+      "family": "DELAYED_NON_PH",
+      "rationale": "Short initial null period followed by benefit; non-proportional-hazards stress.",
+      "assumption_basis": "ASSUMED_STRESS",
+      "seed": 2026081408,
+      "requested": 25000,
+      "completed": 25000,
+      "failed": 0,
+      "failure_rate": 0.0,
+      "failures": {},
+      "rejection": {
+        "numerator": 24564,
+        "denominator": 25000,
+        "estimate": 0.98256,
+        "mcse": 0.0008279093283687535,
+        "wilson_95": {
+          "lower": 0.9808616213200491,
+          "upper": 0.9841101027143105,
+          "confidence_level": 0.95
+        }
+      },
+      "events": {
+        "control": {
+          "total": 9290984,
+          "denominator": 9425000,
+          "mean_count_per_trial": 371.63936,
+          "mean_proportion": 0.9857807957559682
+        },
+        "experimental": {
+          "total": 9214857,
+          "denominator": 9450000,
+          "mean_count_per_trial": 368.59428,
+          "mean_proportion": 0.9751171428571429
+        }
+      },
+      "censoring": {
+        "control": {
+          "total": 134016,
+          "denominator": 9425000,
+          "mean_count_per_trial": 5.36064,
+          "mean_proportion": 0.01421920424403183
+        },
+        "experimental": {
+          "total": 235143,
+          "denominator": 9450000,
+          "mean_count_per_trial": 9.40572,
+          "mean_proportion": 0.024882857142857144
+        }
+      },
+      "experimental_discontinuations_before_event": {
+        "total": 0,
+        "denominator": 9450000,
+        "mean_proportion": 0.0
+      },
+      "analytic_null_benchmark": null,
+      "statuses": {
+        "execution": {
+          "status": "PASS",
+          "reason": "Run executed and all replicates are accounted: requested=25000, completed=25000, failed=0."
+        },
+        "precision": {
+          "status": "PASS",
+          "reason": "Completed 25000 >= 25000; failure rate 0 <= 0.001."
+        },
+        "design_operating_characteristic": {
+          "status": "NOT_PREDEFINED",
+          "reason": "No minimum power criterion was prespecified; estimate is descriptive."
+        }
+      },
+      "scenario_sha256": "b857a9a989abae48810e5718eca46519c3bccdbba7929fa74a68bfce23b31727"
+    },
+    {
+      "id": "OS_WANING_AFTER_DISCONTINUATION",
+      "endpoint": "OS",
+      "class": "ALTERNATIVE_STRESS",
+      "family": "WANING_DISCONTINUATION",
+      "rationale": "Assigned-arm effect wanes to null after independently generated discontinuation.",
+      "assumption_basis": "ASSUMED_STRESS",
+      "seed": 2026081409,
+      "requested": 25000,
+      "completed": 25000,
+      "failed": 0,
+      "failure_rate": 0.0,
+      "failures": {},
+      "rejection": {
+        "numerator": 19647,
+        "denominator": 25000,
+        "estimate": 0.78588,
+        "mcse": 0.0025943987789081306,
+        "wilson_95": {
+          "lower": 0.7807513516611335,
+          "upper": 0.7909208061367419,
+          "confidence_level": 0.95
+        }
+      },
+      "events": {
+        "control": {
+          "total": 5683972,
+          "denominator": 9425000,
+          "mean_count_per_trial": 227.35888,
+          "mean_proportion": 0.6030739522546419
+        },
+        "experimental": {
+          "total": 4848207,
+          "denominator": 9450000,
+          "mean_count_per_trial": 193.92828,
+          "mean_proportion": 0.5130377777777778
+        }
+      },
+      "censoring": {
+        "control": {
+          "total": 3741028,
+          "denominator": 9425000,
+          "mean_count_per_trial": 149.64112,
+          "mean_proportion": 0.3969260477453581
+        },
+        "experimental": {
+          "total": 4601793,
+          "denominator": 9450000,
+          "mean_count_per_trial": 184.07172,
+          "mean_proportion": 0.48696222222222224
+        }
+      },
+      "experimental_discontinuations_before_event": {
+        "total": 4577020,
+        "denominator": 9450000,
+        "mean_proportion": 0.48434074074074074
+      },
+      "analytic_null_benchmark": null,
+      "statuses": {
+        "execution": {
+          "status": "PASS",
+          "reason": "Run executed and all replicates are accounted: requested=25000, completed=25000, failed=0."
+        },
+        "precision": {
+          "status": "PASS",
+          "reason": "Completed 25000 >= 25000; failure rate 0 <= 0.001."
+        },
+        "design_operating_characteristic": {
+          "status": "NOT_PREDEFINED",
+          "reason": "No minimum power criterion was prespecified; estimate is descriptive."
+        }
+      },
+      "scenario_sha256": "b24e9201196c430248db4ed62b7dd0b078d2afdd4f91a77682802c47c3e30374"
+    },
+    {
+      "id": "PFS_WANING_AFTER_DISCONTINUATION",
+      "endpoint": "PFS",
+      "class": "ALTERNATIVE_STRESS",
+      "family": "WANING_DISCONTINUATION",
+      "rationale": "Assigned-arm effect wanes to null after independently generated discontinuation.",
+      "assumption_basis": "ASSUMED_STRESS",
+      "seed": 2026081410,
+      "requested": 25000,
+      "completed": 25000,
+      "failed": 0,
+      "failure_rate": 0.0,
+      "failures": {},
+      "rejection": {
+        "numerator": 24036,
+        "denominator": 25000,
+        "estimate": 0.96144,
+        "mcse": 0.0012177541032573043,
+        "wilson_95": {
+          "lower": 0.9589814832385567,
+          "upper": 0.9637567303274556,
+          "confidence_level": 0.95
+        }
+      },
+      "events": {
+        "control": {
+          "total": 9290916,
+          "denominator": 9425000,
+          "mean_count_per_trial": 371.63664,
+          "mean_proportion": 0.9857735809018567
+        },
+        "experimental": {
+          "total": 9262479,
+          "denominator": 9450000,
+          "mean_count_per_trial": 370.49916,
+          "mean_proportion": 0.9801565079365079
+        }
+      },
+      "censoring": {
+        "control": {
+          "total": 134084,
+          "denominator": 9425000,
+          "mean_count_per_trial": 5.36336,
+          "mean_proportion": 0.014226419098143235
+        },
+        "experimental": {
+          "total": 187521,
+          "denominator": 9450000,
+          "mean_count_per_trial": 7.50084,
+          "mean_proportion": 0.019843492063492063
+        }
+      },
+      "experimental_discontinuations_before_event": {
+        "total": 1131276,
+        "denominator": 9450000,
+        "mean_proportion": 0.11971174603174603
+      },
+      "analytic_null_benchmark": null,
+      "statuses": {
+        "execution": {
+          "status": "PASS",
+          "reason": "Run executed and all replicates are accounted: requested=25000, completed=25000, failed=0."
+        },
+        "precision": {
+          "status": "PASS",
+          "reason": "Completed 25000 >= 25000; failure rate 0 <= 0.001."
+        },
+        "design_operating_characteristic": {
+          "status": "NOT_PREDEFINED",
+          "reason": "No minimum power criterion was prespecified; estimate is descriptive."
+        }
+      },
+      "scenario_sha256": "ee4aae8c9cdb8db3d8898e754b3dcd55f4f1fd7f5646a0808b95cef13ccd33fd"
+    }
+  ],
+  "representative_trials": [
+    {
+      "selection_role": "reject",
+      "scenario_id": "OS_NULL_REFERENCE",
+      "scenario_seed": 2026081401,
+      "selection_seed": 2026081490,
+      "search_index": 6,
+      "endpoint": "OS",
+      "events": {
+        "control": 235,
+        "experimental": 211
+      },
+      "censors": {
+        "control": 142,
+        "experimental": 167
+      },
+      "z_statistic": -2.306365072737831,
+      "one_sided_p_value": 0.010545120946007285,
+      "alpha_one_sided": 0.025,
+      "decision": "REJECT"
+    },
+    {
+      "selection_role": "non_reject",
+      "scenario_id": "OS_NULL_REFERENCE",
+      "scenario_seed": 2026081401,
+      "selection_seed": 2026081490,
+      "search_index": 1,
+      "endpoint": "OS",
+      "events": {
+        "control": 232,
+        "experimental": 235
+      },
+      "censors": {
+        "control": 145,
+        "experimental": 143
+      },
+      "z_statistic": 0.0638508813266181,
+      "one_sided_p_value": 0.5254555182789433,
+      "alpha_one_sided": 0.025,
+      "decision": "DO_NOT_REJECT"
+    },
+    {
+      "selection_role": "near_alpha_boundary",
+      "absolute_distance_from_alpha": 4.0568838771945503e-05,
+      "scenario_id": "OS_NULL_REFERENCE",
+      "scenario_seed": 2026081401,
+      "selection_seed": 2026081490,
+      "search_index": 2945,
+      "endpoint": "OS",
+      "events": {
+        "control": 232,
+        "experimental": 211
+      },
+      "censors": {
+        "control": 145,
+        "experimental": 167
+      },
+      "z_statistic": -1.9606585934063776,
+      "one_sided_p_value": 0.024959431161228056,
+      "alpha_one_sided": 0.025,
+      "decision": "REJECT"
+    }
+  ],
+  "validation": {
+    "analytic_null_benchmark": {
+      "status": "PASS",
+      "rule": "Wilson interval contains alpha and absolute deviation is no greater than max(0.001, 3*MCSE); upper Wilson bound is not required to be below alpha.",
+      "scenario_ids": [
+        "OS_NULL_REFERENCE",
+        "PFS_NULL_HIGH_DROPOUT"
+      ]
+    },
+    "representative_trial_selection": {
+      "status": "PASS",
+      "roles_found": [
+        "reject",
+        "non_reject",
+        "near_alpha_boundary"
+      ],
+      "note": "Scenario-derived aggregate trial examples; no subject rows are retained."
+    },
+    "logrank_edge_fixtures": [
+      {
+        "id": "POSITIVE_FAVORABLE",
+        "role": "positive",
+        "seed": 2026081491,
+        "analysis_status": "COMPLETED",
+        "failure_reason": null,
+        "z_statistic": -7.513809106125761,
+        "one_sided_p_value": 2.871565587840094e-14,
+        "reject": true,
+        "events": 48,
+        "expected": "COMPLETED_REJECT",
+        "validation_status": "PASS"
+      },
+      {
+        "id": "NEGATIVE_UNFAVORABLE",
+        "role": "negative",
+        "seed": 2026081492,
+        "analysis_status": "COMPLETED",
+        "failure_reason": null,
+        "z_statistic": 7.513809106125761,
+        "one_sided_p_value": 0.9999999999999712,
+        "reject": false,
+        "events": 48,
+        "expected": "COMPLETED_DO_NOT_REJECT",
+        "validation_status": "PASS"
+      },
+      {
+        "id": "BOUNDARY_NO_EVENTS",
+        "role": "boundary_non_estimable",
+        "seed": 2026081493,
+        "analysis_status": "FAILED",
+        "failure_reason": "zero_logrank_variance",
+        "z_statistic": null,
+        "one_sided_p_value": null,
+        "reject": null,
+        "events": 0,
+        "expected": "FAILED_ZERO_VARIANCE",
+        "validation_status": "PASS"
+      }
+    ],
+    "logrank_edge_fixture_status": {
+      "status": "PASS",
+      "note": "Artificial positive, negative, and non-estimable fixtures; not simulated trial paths."
+    },
+    "accounting_identity": {
+      "status": "PASS",
+      "rule": "requested = completed + failed for every scenario"
+    }
+  },
+  "statuses": {
+    "execution": {
+      "status": "PASS",
+      "reason": "Every run executed and requested/completed/failed accounting is complete."
+    },
+    "monte_carlo_precision": {
+      "status": "PASS",
+      "reason": "Every scenario met its prespecified replication, failure-rate, and MCSE controls."
+    },
+    "design_operating_characteristics": {
+      "status": "PASS",
+      "reason": "Analytic null, scenario-derived trial selection, and log-rank edge checks passed."
+    },
+    "evidence_qualification": {
+      "status": "NOT_QUALIFIED",
+      "reason": "Informational, data-free, non-MIDD, non-confirmatory methods evaluation only."
+    }
+  },
+  "scientific_output_sha256": "bad4514234456f7749160ea56888867d63fbf60825716783c77a55817fa11c2b"
+}

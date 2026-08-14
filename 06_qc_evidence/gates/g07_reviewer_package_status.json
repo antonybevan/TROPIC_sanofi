@@ -2,7 +2,7 @@
   "gate": "G07",
   "name": "reviewer_package_lock",
   "status": "PASS",
-  "generated_at": "2026-08-12T10:28:06Z",
+  "generated_at": "2026-08-14T04:36:07Z",
   "checks": [
     {
       "name": "exists:07_reviewer_explanation/guides/ADRG.md",
@@ -21,6 +21,21 @@
     },
     {
       "name": "exists:07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:07_reviewer_explanation/simulation_model_analysis_plan.md",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:07_reviewer_explanation/simulation_report.md",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "exists:platform/simulation_operating_characteristics/simulation_oc_status.json",
       "ok": true,
       "detail": "present"
     },
@@ -65,6 +80,16 @@
       "detail": "expected one current-release line binding v0.3.0-clinical-simulation to docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md; found=['**Current controlled release:** tag `v0.3.0-clinical-simulation` \u00b7 [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) \u00b7 `python3 scripts/verify_release.py`']"
     },
     {
+      "name": "release_identity:07_reviewer_explanation/simulation_model_analysis_plan.md",
+      "ok": true,
+      "detail": "expected one current-release line binding v0.3.0-clinical-simulation to docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md; found=['**Current sealed controlled release:** `v0.3.0-clinical-simulation` \u00b7 [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md)']"
+    },
+    {
+      "name": "release_identity:07_reviewer_explanation/simulation_report.md",
+      "ok": true,
+      "detail": "expected one current-release line binding v0.3.0-clinical-simulation to docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md; found=['**Current sealed controlled release:** `v0.3.0-clinical-simulation` \u00b7 [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md)']"
+    },
+    {
       "name": "release_identity:08_submission_package/README.md",
       "ok": true,
       "detail": "expected one current-release line binding v0.3.0-clinical-simulation to docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md; found=['**Current controlled release:** [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) \u00b7 tag `v0.3.0-clinical-simulation`']"
@@ -93,6 +118,66 @@
       "name": "marker:07_reviewer_explanation/guides/BDRG.md:clinsite|BIMO|site",
       "ok": true,
       "detail": "marker missing"
+    },
+    {
+      "name": "simulation_marker:07_reviewer_explanation/simulation_model_analysis_plan.md:(?i)informative annex boundary",
+      "ok": true,
+      "detail": "simulation evidence marker missing"
+    },
+    {
+      "name": "simulation_marker:07_reviewer_explanation/simulation_model_analysis_plan.md:(?i)not MIDD",
+      "ok": true,
+      "detail": "simulation evidence marker missing"
+    },
+    {
+      "name": "simulation_marker:07_reviewer_explanation/simulation_model_analysis_plan.md:ICH M15",
+      "ok": true,
+      "detail": "simulation evidence marker missing"
+    },
+    {
+      "name": "simulation_marker:07_reviewer_explanation/simulation_model_analysis_plan.md:ICH E9\\(R1\\)",
+      "ok": true,
+      "detail": "simulation evidence marker missing"
+    },
+    {
+      "name": "simulation_marker:07_reviewer_explanation/simulation_model_analysis_plan.md:ADEMP.*OCTAVE|OCTAVE.*ADEMP",
+      "ok": true,
+      "detail": "simulation evidence marker missing"
+    },
+    {
+      "name": "simulation_marker:07_reviewer_explanation/simulation_model_analysis_plan.md:(?i)Monte Carlo.*Wilson",
+      "ok": true,
+      "detail": "simulation evidence marker missing"
+    },
+    {
+      "name": "simulation_marker:07_reviewer_explanation/simulation_report.md:(?i)informative annex boundary",
+      "ok": true,
+      "detail": "simulation evidence marker missing"
+    },
+    {
+      "name": "simulation_marker:07_reviewer_explanation/simulation_report.md:(?i)not MIDD",
+      "ok": true,
+      "detail": "simulation evidence marker missing"
+    },
+    {
+      "name": "simulation_marker:07_reviewer_explanation/simulation_report.md:(?i)no single overall PASS",
+      "ok": true,
+      "detail": "simulation evidence marker missing"
+    },
+    {
+      "name": "simulation_marker:07_reviewer_explanation/simulation_report.md:(?i)requested.*completed.*failed",
+      "ok": true,
+      "detail": "simulation evidence marker missing"
+    },
+    {
+      "name": "simulation_marker:07_reviewer_explanation/simulation_report.md:(?i)MCSE",
+      "ok": true,
+      "detail": "simulation evidence marker missing"
+    },
+    {
+      "name": "simulation_marker:07_reviewer_explanation/simulation_report.md:(?i)authoritative scientific JSON",
+      "ok": true,
+      "detail": "simulation evidence marker missing"
     },
     {
       "name": "traceability.no_active_L01_claim",
@@ -387,7 +472,7 @@
     {
       "name": "reviewer_pdf.hyperlinks:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
       "ok": true,
-      "detail": "link_annotations=45"
+      "detail": "link_annotations=48"
     },
     {
       "name": "reviewer_pdf.minimum_font_size:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
@@ -396,6 +481,136 @@
     },
     {
       "name": "reviewer_pdf.metadata_title:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
+      "ok": true,
+      "detail": "PDF title metadata is empty"
+    },
+    {
+      "name": "reviewer_pdf.no_symbol_substitution:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-model-analysis-plan.pdf",
+      "ok": true,
+      "detail": "rendered threshold substitutions: []"
+    },
+    {
+      "name": "reviewer_pdf.no_raw_markdown:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-model-analysis-plan.pdf",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "reviewer_pdf.release_identity:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-model-analysis-plan.pdf",
+      "ok": true,
+      "detail": "rendered PDF does not identify current release v0.3.0-clinical-simulation"
+    },
+    {
+      "name": "reviewer_pdf.letter_page_size:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-model-analysis-plan.pdf",
+      "ok": true,
+      "detail": "612 x 792 pts (letter)"
+    },
+    {
+      "name": "reviewer_pdf.fast_web_view:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-model-analysis-plan.pdf",
+      "ok": true,
+      "detail": "Optimized=yes"
+    },
+    {
+      "name": "reviewer_pdf.not_encrypted:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-model-analysis-plan.pdf",
+      "ok": true,
+      "detail": "Encrypted=no"
+    },
+    {
+      "name": "reviewer_pdf.version_1_7:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-model-analysis-plan.pdf",
+      "ok": true,
+      "detail": "PDF version=1.7"
+    },
+    {
+      "name": "reviewer_pdf.fonts_embedded:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-model-analysis-plan.pdf",
+      "ok": true,
+      "detail": "fonts=3; unembedded=[]"
+    },
+    {
+      "name": "reviewer_pdf.all_pages_letter:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-model-analysis-plan.pdf",
+      "ok": true,
+      "detail": "letter=13/13"
+    },
+    {
+      "name": "reviewer_pdf.bookmarks:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-model-analysis-plan.pdf",
+      "ok": true,
+      "detail": "outlines=2; page_mode=/UseOutlines"
+    },
+    {
+      "name": "reviewer_pdf.hyperlinks:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-model-analysis-plan.pdf",
+      "ok": true,
+      "detail": "link_annotations=66"
+    },
+    {
+      "name": "reviewer_pdf.minimum_font_size:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-model-analysis-plan.pdf",
+      "ok": true,
+      "detail": "minimum rendered text size=9.0"
+    },
+    {
+      "name": "reviewer_pdf.metadata_title:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-model-analysis-plan.pdf",
+      "ok": true,
+      "detail": "PDF title metadata is empty"
+    },
+    {
+      "name": "reviewer_pdf.no_symbol_substitution:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-report.pdf",
+      "ok": true,
+      "detail": "rendered threshold substitutions: []"
+    },
+    {
+      "name": "reviewer_pdf.no_raw_markdown:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-report.pdf",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "reviewer_pdf.release_identity:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-report.pdf",
+      "ok": true,
+      "detail": "rendered PDF does not identify current release v0.3.0-clinical-simulation"
+    },
+    {
+      "name": "reviewer_pdf.letter_page_size:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-report.pdf",
+      "ok": true,
+      "detail": "612 x 792 pts (letter)"
+    },
+    {
+      "name": "reviewer_pdf.fast_web_view:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-report.pdf",
+      "ok": true,
+      "detail": "Optimized=yes"
+    },
+    {
+      "name": "reviewer_pdf.not_encrypted:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-report.pdf",
+      "ok": true,
+      "detail": "Encrypted=no"
+    },
+    {
+      "name": "reviewer_pdf.version_1_7:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-report.pdf",
+      "ok": true,
+      "detail": "PDF version=1.7"
+    },
+    {
+      "name": "reviewer_pdf.fonts_embedded:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-report.pdf",
+      "ok": true,
+      "detail": "fonts=3; unembedded=[]"
+    },
+    {
+      "name": "reviewer_pdf.all_pages_letter:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-report.pdf",
+      "ok": true,
+      "detail": "letter=15/15"
+    },
+    {
+      "name": "reviewer_pdf.bookmarks:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-report.pdf",
+      "ok": true,
+      "detail": "outlines=2; page_mode=/UseOutlines"
+    },
+    {
+      "name": "reviewer_pdf.hyperlinks:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-report.pdf",
+      "ok": true,
+      "detail": "link_annotations=66"
+    },
+    {
+      "name": "reviewer_pdf.minimum_font_size:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-report.pdf",
+      "ok": true,
+      "detail": "minimum rendered text size=9.0"
+    },
+    {
+      "name": "reviewer_pdf.metadata_title:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-report.pdf",
       "ok": true,
       "detail": "PDF title metadata is empty"
     }

@@ -43,6 +43,19 @@ class TestReleaseSealHelpers(unittest.TestCase):
         manifest["status"] = "FAIL"
         self.assertNotEqual(manifest["manifest_sha256"], verify_release.manifest_sha256(manifest))
 
+    def test_simulation_scientific_hash_excludes_only_its_self_seal(self):
+        result = {"schema_version": "1.0.0", "scenarios": [{"id": "S1"}]}
+        result["scientific_output_sha256"] = verify_release.simulation_scientific_sha256(result)
+        self.assertEqual(
+            result["scientific_output_sha256"],
+            verify_release.simulation_scientific_sha256(result),
+        )
+        result["scenarios"][0]["id"] = "CHANGED"
+        self.assertNotEqual(
+            result["scientific_output_sha256"],
+            verify_release.simulation_scientific_sha256(result),
+        )
+
     def test_source_hashes_detect_changed_source(self):
         manifest = {
             "artifacts": {

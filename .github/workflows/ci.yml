@@ -150,6 +150,10 @@ jobs:
         python3 -m pytest -q tests/test_pipeline_abort_scope.py tests/test_define_arm_contract.py tests/test_f042_sas_response_control.py tests/test_submission_surface.py
         Rscript tests/test_f042_provisional_pain_derivation.R
 
+    - name: Validate simulation precision and reviewer evidence
+      run: |
+        python3 -m pytest -q tests/test_simulation_precision.py tests/test_simulation_evidence.py tests/test_simulation_report.py
+
     - name: Run clinical pipeline smoke test (Demo)
       run: |
         python3 platform/cibuild.py --demo

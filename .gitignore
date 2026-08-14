@@ -162,6 +162,12 @@ platform/release_run_manifest/**
 platform/release_candidate/**
 !platform/release_candidate/release_candidate_status.json
 
+# Governed, data-free aggregate simulation evidence is intentionally committed:
+# it contains no patient-level rows and is the sole numerical source for the MAP/MAR.
+!platform/simulation_operating_characteristics/
+platform/simulation_operating_characteristics/**
+!platform/simulation_operating_characteristics/simulation_oc_status.json
+
 !platform/evidence/
 !platform/evidence/**
 

@@ -17,6 +17,7 @@ from check_gate_g07_reviewer_package import (  # noqa: E402
     _tfl_secondary_metrics,
 )
 from package_ectd import split_markdown_table_row  # noqa: E402
+from build_ectd_backbone import classify  # noqa: E402
 from validate_ectd_sequence import validate_sequence  # noqa: E402
 
 
@@ -56,6 +57,43 @@ def test_packaged_tfl_driver_includes_its_runtime_helper():
     )
     for name in ("tfl_generation.R", "tfl_stats.R", "lab_shift_table.R"):
         assert (package_dir / name).read_bytes() == (source_dir / name).read_bytes()
+
+
+def test_packaged_simulation_sources_are_exact_plain_text_analysis_programs():
+    package_dir = ROOT / "08_submission_package/m5/datasets/tropic/analysis/adam/programs"
+    sources = {
+        "simulation_precision.py.txt": ROOT / "platform/simulation_precision.py",
+        "check_simulation_evidence.py.txt": ROOT / "platform/check_simulation_evidence.py",
+        "build_simulation_report.py.txt": ROOT / "platform/build_simulation_report.py",
+        "simulation_protocol.yaml.txt": ROOT / "config/simulation_protocol.yaml",
+    }
+    for packaged_name, source in sources.items():
+        packaged = package_dir / packaged_name
+        assert packaged.read_bytes() == source.read_bytes()
+        tag, info = classify(
+            f"m5/datasets/tropic/analysis/adam/programs/{packaged_name}"
+        )
+        assert (tag, info) == ("analysis-program", "us")
+
+
+def test_simulation_report_keeps_table_heading_with_first_table_row():
+    """A reviewer heading must not be orphaned above the page footer."""
+    from pypdf import PdfReader
+
+    report = (
+        ROOT
+        / "08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/"
+        "mcrpc/5351-stud-rep-contr/tropic/simulation-report.pdf"
+    )
+    pages = [page.extract_text() or "" for page in PdfReader(report).pages]
+    heading = "Representative Simulated Trial Paths"
+    # Page 1 is the generated table of contents and legitimately repeats the
+    # heading text; inspect the section occurrence in the document body.
+    heading_pages = [index for index, text in enumerate(pages[1:], 1) if heading in text]
+    assert len(heading_pages) == 1
+    heading_page = " ".join(pages[heading_pages[0]].split())
+    assert "Search index" in heading_page
+    assert "reject" in heading_page
 
 
 def test_analysis_report_secondary_tte_rows_match_generated_table():

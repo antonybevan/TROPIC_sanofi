@@ -56,6 +56,7 @@ Full walk: [`INTERVIEWER_GUIDE.md`](INTERVIEWER_GUIDE.md).
 - `docs/SCRIPT_MAP.md` · `docs/INDEX.md` · this policy  
 - `docs/workstreams/` packs that explain residual risk  
 - `07_reviewer_explanation/guides/`  
+- `07_reviewer_explanation/simulation_model_analysis_plan.md` · `simulation_report.md`
 - Findings disposition board + findings register  
 
 ### D. Sealed run evidence
@@ -73,6 +74,7 @@ Minimal machine evidence so a **bare clone** can recheck the controlled release 
 | `platform/log_cleanliness/log_cleanliness_status.json` | Log gate |
 | `platform/release_run_manifest/release_run_manifest.json` | Hash seal |
 | `platform/release_candidate/release_candidate_status.json` | RC checklist |
+| `platform/simulation_operating_characteristics/simulation_oc_status.json` | Data-free, aggregate simulation OC evidence and precision accounting |
 | `platform/evidence/` | Frozen genuine ODA snapshot (byte-distinct proof) |
 
 Everything else regenerable is **local only**.

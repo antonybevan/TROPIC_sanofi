@@ -113,6 +113,14 @@ infrastructure_stages:
     - { name: "Figure-Data Reconciliation (SAS vs R)",       script: "06_qc_evidence/reconciliation/figure_data_reconcile.R", runner: rscript }
     - { name: "ADaM Spec to Define Conformance",             script: "03_metadata/define/check_define_conformance.R", runner: rscript }
     - { name: "ADaM Spec to Data Conformance",               script: "04_analysis_datasets/programs/r/spec_data_checks.R",       runner: rscript }
+    # Data-free, public-assumption methods evaluation. The first stage writes the
+    # authoritative aggregate operating-characteristic JSON; the next stage renders
+    # reviewer MAP/MAR sources exclusively from that JSON and the governed YAML;
+    # an independent checker then recomputes the complete bundle before G07.
+    # These informative artifacts do not change the clinical product claim.
+    - { name: "Simulation Operating Characteristics",          script: "platform/simulation_precision.py",      runner: python }
+    - { name: "Simulation MAP and Report",                     script: "platform/build_simulation_report.py",  runner: python }
+    - { name: "Simulation Evidence Independent Verification",  script: "platform/check_simulation_evidence.py", runner: python }
     # G07 reviewer package lock: ADRG/SDRG/BDRG + residual/claim pointers must hold before
     # Dataset-JSON/ARS/USDM/eCTD materialization is treated as reviewer-facing packaging.
     - { name: "Reviewer Package Lock (G07)",                 script: "platform/check_gate_g07_reviewer_package.py", runner: python, gated: true }

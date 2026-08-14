@@ -2,9 +2,9 @@
 
 **Document ID:** TROPIC-PEC-001
 
-**Version:** 2.0
+**Version:** 2.1
 
-**Effective date:** 2026-08-12
+**Effective date:** 2026-08-14
 
 **Status:** Active
 
@@ -29,6 +29,9 @@ TROPIC may be described as demonstrating:
 5. Deterministic reviewer-guide, CSR, and Module 5-style package generation using current FDA cSDRG naming.
 6. Hash-bound run evidence, CI controls, findings disposition, and reproducible release verification.
 7. A real Pinnacle 21 Community validation run recorded as informative evidence with its compatibility caveat.
+8. A governed, data-free fixed-design time-to-event methods evaluation with
+   explicit assumptions and seeds, high-replication operating characteristics,
+   Monte Carlo uncertainty, analytic benchmarking, and generated MAP/report.
 
 ## Evidence grades
 
@@ -40,6 +43,7 @@ TROPIC may be described as demonstrating:
 | Release hashes and Git/CI history | Integrity evidence | Reproducibility and change-detection controls |
 | Pinnacle 21 Community 4.1.0 / FDA 2508.1 | Informative only | 7 datasets and 121,320 records processed with 0 rejects; 30 open issue groups / 2,373 occurrences and a compatibility caveat remain; not licensed Enterprise clearance |
 | eCTD-style backbone validation | Structural simulation | Package engineering evidence; not gateway acceptance |
+| Simulation operating characteristics | Informative methods evidence | Reproducible behavior of the encoded simplified design and analysis under public-aggregate or stress assumptions; not original-trial, MIDD, or confirmatory evidence |
 
 ## Prohibited claims
 
@@ -53,6 +57,7 @@ TROPIC may be described as demonstrating:
 | Confirmatory comparative efficacy | The CbzP comparator is reconstructed/synthetic and is used only in reporting outputs |
 | Annotated CRF delivered | The package contains a source blank CRF, not an annotated CRF |
 | FDA validation or certification | FDA does not certify this repository; local validation is not agency acceptance |
+| MIDD-qualified model, pivotal design validation, or clinically accepted power | The simulation uses simplified public-aggregate and engineering-stress assumptions, no authoritative joint comparator IPD, no approved MCID, and no regulator alignment |
 
 ## Data and analysis boundary
 
@@ -62,6 +67,7 @@ TROPIC may be described as demonstrating:
 | Reconciled ADaM | MP, N=371 | SAS/R production and validation scope | XPT payloads are not redistributed in a clean public clone |
 | CbzP comparator | N=378 | Reconstructed OS/PFS and synthetic secondary endpoints | TFL-only; never represented as source or reconciled package ADaM |
 | Comparative results | MP plus reconstructed/synthetic CbzP | Descriptive simulation | Non-confirmatory and not submission evidence |
+| Simulation virtual participants | Fixed data-free design, aggregate assumptions only | Hypothetical methods-evaluation records generated in memory | Aggregate operating characteristics only; never represented as TROPIC source/IPD or used for clinical decisions |
 
 The programming authority is `02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx`. It is an author-developed control specification, not a sponsor-approved SAP.
 

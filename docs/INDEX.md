@@ -169,6 +169,8 @@ Typical local outputs (not portfolio face):
 | [`PIPELINE_ARCHITECTURE_REDESIGN.md`](PIPELINE_ARCHITECTURE_REDESIGN.md) | Evidence-chain redesign & migration map |
 | [`SUBMISSION_REPO_PRESENTATION_RESEARCH.md`](SUBMISSION_REPO_PRESENTATION_RESEARCH.md) | Why dual surface; noise diagnosis |
 | [`REGULATORY_WORKFLOW_RESEARCH.md`](REGULATORY_WORKFLOW_RESEARCH.md) | Industry workflow grounding |
+| [`SIMULATION_PRECISION_RESEARCH.md`](SIMULATION_PRECISION_RESEARCH.md) | Current ICH M15/E9, FDA, ADEMP, and OCTAVE basis for the data-free simulation methods evaluation |
+| [`../06_qc_evidence/audit/SIMULATION_PRECISION_IMPLEMENTATION_REPORT_2026-08-14.md`](../06_qc_evidence/audit/SIMULATION_PRECISION_IMPLEMENTATION_REPORT_2026-08-14.md) | Implementation, adversarial findings, exact results, verification, and fresh-SAS limitation |
 | [`I_J_generalisation_plan.md`](I_J_generalisation_plan.md) | Multi-study generalisation notes |
 
 ---

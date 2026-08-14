@@ -2,9 +2,9 @@
 
 **Document ID:** TROPIC-QSB-001
 
-**Version:** 1.0
+**Version:** 1.1
 
-**Effective date:** 2026-08-12
+**Effective date:** 2026-08-14
 
 **Status:** Controlled
 
@@ -33,6 +33,7 @@ These assertions are machine-checked by `platform/check_regulatory_baseline.py`.
 | Pinnacle 21 | Pinnacle 21 Community 4.1.0 executed with FDA engine 2508.1 and ADaMIG 1.3 (FDA): 7 datasets, 121,320 records, 0 rejects, and 30 open issue groups / 2,373 occurrences. The hash-bound aggregate evidence is recorded in `06_qc_evidence/conformance/p21_adam_runrecord.md` and `p21_adam_summary.json`. | Informative only. The open findings require qualified disposition; Community is not Enterprise, is not licensed submission clearance, and the generated workbook itself reports an incompatible-CLI condition. |
 | CDISC and Define-XML | ADaMIG 1.3, SDTMIG 3.4, Define-XML 2.1, local stylesheets, schema checks, CORE rules, and spec-to-data/Define controls are present. | Alignment and conformance evidence are not equivalent to regulator acceptance. |
 | eCTD | A deterministic Module 5-style package and structurally validated example backbone are produced. | No ESG or regulatory gateway submission was executed; application identifiers are simulation values. |
+| Simulation methods evaluation | A governed data-free protocol, explicit scenario seeds, high-replication operating characteristics, MCSE/Wilson intervals, analytic null checks, and generated MAP/report are present. | Public aggregate calibration and stress assumptions are not authoritative joint IPD, external validation, a sponsor-approved MCID/design, MIDD qualification, or regulator acceptance. Model influence remains restricted to low, informative engineering use. |
 | CRF | The public source blank CRF is retained and classified as study-report body. | It is not an annotated CRF and is never tagged or renamed as `acrf.pdf`. |
 
 ## What is required for regulated reuse
@@ -61,10 +62,24 @@ These assertions are machine-checked by `platform/check_regulatory_baseline.py`.
 4. Obtain independent standards/QC review of the issue dispositions and retain the approved report in the qualified document system.
 5. Rerun after every material data, metadata, program, or rule-pack change and bind the final report to the submitted package hash.
 
+### Model/simulation qualification for decision use
+
+1. Define the intended decision, clinical context of use, model influence,
+   consequence of error, and risk under ICH M15 with accountable sponsor owners.
+2. Replace illustrative aggregate/stress inputs with qualified evidence and assess
+   parameter, model-form, intercurrent-event, and joint-distribution uncertainty.
+3. Preapprove the estimand-aligned MAP, clinically meaningful effect, design
+   acceptance criteria, and complete operating-characteristic scenario grid.
+4. Independently verify the simulation and analysis implementations and validate
+   applicability against external or otherwise independent evidence proportionate to risk.
+5. Obtain qualified statistical/medical review and regulator alignment before any
+   pivotal-design, MIDD, labeling, filing, or patient-level decision use.
+
 ## Governing references
 
 - [FDA Study Data Technical Conformance Guide, June 2026](https://www.fda.gov/media/153632/download)
 - [FDA Electronic Systems, Electronic Records, and Electronic Signatures in Clinical Investigations, October 2024](https://www.fda.gov/media/166215/download)
 - [21 CFR Part 11](https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11)
 - [ICH E6(R3), Step 4](https://database.ich.org/sites/default/files/ICH_E6%28R3%29_Step4_FinalGuideline_2025_0106.pdf)
+- [ICH M15, Step 4 final guideline](https://database.ich.org/sites/default/files/ICH_M15_Step4_Final_Guideline_2026_0129.pdf)
 - [Pinnacle 21 Community and Enterprise comparison](https://help.pinnacle21.certara.net/en/articles/10517281-p21-community-vs-p21-enterprise)
