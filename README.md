@@ -23,6 +23,7 @@ The binding claim is [Product and Evidence Claim](docs/PRODUCT_CLAIM.md). The qu
 | [Simulation Model Analysis Plan](07_reviewer_explanation/simulation_model_analysis_plan.md) | Prospective M15/ADEMP/OCTAVE methods-evaluation protocol, estimand, scenarios, and precision criteria |
 | [Simulation Model Analysis Report](07_reviewer_explanation/simulation_report.md) | Generated operating characteristics, Monte Carlo uncertainty, representative trials, and limitations |
 | [FDA/ICH readiness research](docs/FDA_READINESS_RESEARCH_2026-08-15.md) | Big-pharma pre-shipment control model, official sources, and current blockers |
+| [Scoped official-source inventory](config/regulatory_source_inventory.yaml) | 48 FDA/ICH/CDISC/eCFR entries classified by applicability, final/draft status, evidence, and owner action |
 | [Current release note](docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) | Release evidence and residual limitations |
 | [Reviewer guide](docs/INTERVIEWER_GUIDE.md) | A short, evidence-led walkthrough |
 
