@@ -59,6 +59,10 @@ TFL_OUTPUT_DIR = "05_outputs/tfl/output"
 TFL_BACKUP_DIR = "backup_tfl_output"
 ECTD_SEQ_DIR = "08_submission_package/ectd/0000"
 ECTD_BACKUP_DIR = "backup_ectd_backbone"
+# One canonical master-driver log is used for both ODA and local SAS.  The
+# cleanliness gate and release manifest therefore always inspect the current
+# execution rather than whichever mode happened to run previously.
+SAS_MASTER_LOG = "04_analysis_datasets/programs/sas/oda_master_driver.log"
 
 # Scope of the pre-run snapshot (deliberately narrow, stated here once so every caller-facing
 # message below can quote it instead of implying broader coverage than actually exists): the
@@ -526,13 +530,13 @@ filename drv "{PGMDIR_ODA}/00_master_driver.sas";
                 "oda_endpoint": conn.endpoint, "oda_exec_timeout": True,
                 "reconciliation": "none"}
         try:
-            with open("04_analysis_datasets/programs/sas/oda_master_driver.log", "w", encoding="utf-8") as _lf:
+            with open(SAS_MASTER_LOG, "w", encoding="utf-8") as _lf:
                 _lf.write(log)
         except OSError:
             pass
         warn = [l for l in log.splitlines() if l.strip().startswith("WARNING:")]
         if warn:
-            print(f"  [ODA] SAS log has {len(warn)} WARNING line(s) (see oda_master_driver.log).")
+            print(f"  [ODA] SAS log has {len(warn)} WARNING line(s) (see {SAS_MASTER_LOG}).")
         err = [l.strip() for l in log.splitlines() if l.strip().startswith("ERROR:")]
         if err:
             return 1, "", "\n".join(err), {"oda_endpoint": conn.endpoint, "reconciliation": "none"}
@@ -699,12 +703,12 @@ def run_stage_execution(stage, sas_mode):
             sas_exe = shutil.which("sas")
             print(f"  [REAL SAS] Located local SAS engine at: {sas_exe}")
             print("  [REAL SAS] Compiling SAS production master suite (04_analysis_datasets/programs/sas/00_master_driver.sas)...")
-            sas_cmd = [sas_exe, "-sysin", "04_analysis_datasets/programs/sas/00_master_driver.sas", "-log", "04_analysis_datasets/programs/sas/00_master_driver.log", "-print", "04_analysis_datasets/programs/sas/00_master_driver.lst"]
+            sas_cmd = [sas_exe, "-sysin", "04_analysis_datasets/programs/sas/00_master_driver.sas", "-log", SAS_MASTER_LOG, "-print", "04_analysis_datasets/programs/sas/00_master_driver.lst"]
             rc, stdout, stderr = run_command(sas_cmd, timeout=STAGE_TIMEOUT_S)
             if rc == 0:
                 print("  [REAL SAS] Master driver executed successfully. Actual SAS XPTs generated.")
             else:
-                print("  [REAL SAS FAILED] SAS master execution failed! Check log: 04_analysis_datasets/programs/sas/00_master_driver.log")
+                print(f"  [REAL SAS FAILED] SAS master execution failed! Check log: {SAS_MASTER_LOG}")
             return rc, stdout, stderr
         elif sas_mode == "cached":
             print("  [CACHED SAS] Reconciling against PRE-EXISTING *_prod.xpt (SAS not re-run this session).")
@@ -1535,7 +1539,7 @@ def write_telemetry(results, sas_mode="sim", expected_stage_names=None):
     # 'local' mode genuinely can use the log-banner approach: a fresh subprocess SAS writes
     # its own startup banner into its own -log file from the first line.
     if effective_mode == "local":
-        health["sas_version"] = _sas_version_from_log("04_analysis_datasets/programs/sas/00_master_driver.log")
+        health["sas_version"] = _sas_version_from_log(SAS_MASTER_LOG)
 
     if effective_mode in ("oda", "local"):
         offenders = _prod_v_byte_identical(STUDY_DATASETS)

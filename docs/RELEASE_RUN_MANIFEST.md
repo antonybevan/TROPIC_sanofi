@@ -1,19 +1,19 @@
 # TROPIC Release-Run Manifest
 
-Generated: 2026-08-13 19:58:44 UTC
+Generated: 2026-08-15 01:02:08 UTC
 
 > Hash-sealed run manifest for current artifacts. This is not an electronic signature or Part 11 attestation.
 
 ## Verdict
 
-- Status: `PASS`
-- Evidence grade: `release_candidate`
-- Manifest SHA-256 seal: `fe4953a3589c376ad4f8657cc20aa6389e8a82e4bb2d808df9353522a07208d0`
+- Status: `FAIL`
+- Evidence grade: `failed_binding`
+- Manifest SHA-256 seal: `0f144b2ed7f4466835723a0f74d11d4ce5b1a4bf022a30e8e8a2c026e84de510`
 - SAS execution mode: `oda`
 - Pipeline health: `GREEN`
-- Run scope: `full_dag` (37 recorded / 36 release-required upstream stages)
-- Git HEAD: `35e6280caf8523038bbee19f7cbb00ed5b61b843`
-- Worktree dirty: `False`
+- Run scope: `partial_dag` (37 recorded / 39 release-required upstream stages)
+- Git HEAD: `1ba24d9a0a266d5bb78215de4a55bf114d9c8a4c`
+- Worktree dirty: `True`
 - SAS companion figures: `in_dag_real_sas_companion`; current with health=`True`
 
 ## Status meanings
@@ -24,20 +24,27 @@ Generated: 2026-08-13 19:58:44 UTC
 
 ## Problems
 
-No release-run binding problems detected.
+- pipeline_health.json source_tree_sha256 does not match the current control/program tree
+- governance-only seal rebind does not match current source tree
+
+## Remediation reasons (block release-candidate PASS)
+
+- pipeline_health does not cover a full current DAG run (37 recorded in health / 39 release-required upstream stages; missing=3; not_run=0). Acceptable as targeted remediation evidence only.
+- stages missing from pipeline_health: Simulation Operating Characteristics, Simulation MAP and Report, Simulation Evidence Independent Verification
+- git worktree is dirty (22 porcelain entries); release-candidate lock requires a clean committed state
 
 ## Dataset Binding
 
 | Dataset | Prod MD5 | Validation MD5 | Distinct | Package match | Sequence match |
 | --- | --- | --- | --- | --- | --- |
-| ADSL | 4ed95a1b98c18ba2f6f45cbef2832f4f | 11cbb9ce0a28717cc85fe18fe25bd7c1 | yes | yes | yes |
-| ADEX | 19e77f8c0404e24985367e8a9b12cae6 | 9fcf09fee23d4a213a646f8fa12d2c03 | yes | yes | yes |
-| ADCM | 405cf0291f382e0f8f6feba685d04edc | f4208aeac57dac410cadc3df53c56961 | yes | yes | yes |
-| ADAE | de4fbb341f002a9ea016173342c1634b | cb4cc20bed60d456269e42266abf4603 | yes | yes | yes |
-| ADLB | e1cc58e2a6cecb45cafbd69fb4e53d77 | 3cc14032497b30c2d46aeac2d1a34e88 | yes | yes | yes |
-| ADRS | 2499d595f1b21a828fcb9885d7b19535 | 52ef9d97b18345d27c7bf3a113572d3c | yes | yes | yes |
-| ADTTE | 91412ee2309930aff89814c959f3a41a | 4ab58004322aef0c9a14ee5e1dadbd5f | yes | yes | yes |
-| CLINSITE | a6feae0d4b1d18a84c833479493025b3 | 1ffc083af386d50a46d9eb43d172b73a | yes | yes | yes |
+| ADSL | 4ed95a1b98c18ba2f6f45cbef2832f4f | 3d71d58bd32b8694d17cf15a78ea43c7 | yes | yes | yes |
+| ADEX | 19e77f8c0404e24985367e8a9b12cae6 | d621a587446386a5590d29cb1d9ad7ce | yes | yes | yes |
+| ADCM | 405cf0291f382e0f8f6feba685d04edc | 21a5ed39e46a2b2721b6a6b0a9c3dfd2 | yes | yes | yes |
+| ADAE | de4fbb341f002a9ea016173342c1634b | 2966750a603b182c50642cff3337f1f1 | yes | yes | yes |
+| ADLB | e1cc58e2a6cecb45cafbd69fb4e53d77 | 62a81d964f1ea3cf7e492c38d2a18d16 | yes | yes | yes |
+| ADRS | 2499d595f1b21a828fcb9885d7b19535 | 6b07678ec50eab43c598b450da4c7a44 | yes | yes | yes |
+| ADTTE | 91412ee2309930aff89814c959f3a41a | 5ed2bd6946db54a6179f213663c82417 | yes | yes | yes |
+| CLINSITE | a6feae0d4b1d18a84c833479493025b3 | 844f666ba4132f41a35886253c4ee7fb | yes | yes | yes |
 
 ## QC Verdicts
 
@@ -55,6 +62,7 @@ No release-run binding problems detected.
 | log_cleanliness | PASS | platform/log_cleanliness/log_cleanliness_status.json |
 | tfl_output_index | pass | platform/tfl_output_index_status.json |
 | validation_strategy | PASS | platform/validation_strategy/validation_strategy_status.json |
+| simulation_operating_characteristics | PASS | platform/simulation_operating_characteristics/simulation_oc_status.json |
 | regulatory_baseline | PASS | 06_qc_evidence/gates/regulatory_baseline_status.json |
 
 ## Machine-Readable Outputs

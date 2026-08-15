@@ -454,6 +454,20 @@ def _normal_cdf(value: float) -> float:
     return 0.5 * math.erfc(-value / math.sqrt(2.0))
 
 
+def _strict_binary_vector(values: Sequence[Any], name: str) -> np.ndarray:
+    """Return a numeric 0/1 vector without coercing malformed values."""
+    array = np.asarray(values)
+    _require(array.ndim == 1, f"{name} must be a one-dimensional vector")
+    _require(
+        np.issubdtype(array.dtype, np.number) or np.issubdtype(array.dtype, np.bool_),
+        f"{name} must be numeric 0/1 values",
+    )
+    numeric = array.astype(float, copy=False)
+    _require(np.all(np.isfinite(numeric)) and np.all(np.isin(numeric, [0.0, 1.0])),
+             f"{name} must contain only 0/1 values")
+    return numeric.astype(np.int8, copy=False)
+
+
 def logrank_batch(times: np.ndarray, events: np.ndarray, treatment: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """Vectorized no-tie log-rank Z statistics and estimability flags.
 
@@ -470,11 +484,25 @@ def logrank_batch(times: np.ndarray, events: np.ndarray, treatment: np.ndarray) 
              "logrank treatment must be a subject vector matching times columns")
     _require(np.all(np.isfinite(times)) and np.all(times >= 0.0),
              "logrank times must be finite and non-negative")
-    _require(np.all(np.isin(events, [0, 1])), "logrank events must contain only 0/1")
-    _require(np.all(np.isin(treatment, [0, 1])) and len(np.unique(treatment)) == 2,
+    _require(
+        (np.issubdtype(events.dtype, np.number) or np.issubdtype(events.dtype, np.bool_))
+        and np.all(np.isfinite(events.astype(float)))
+        and np.all(np.isin(events, [0, 1])),
+        "logrank events must contain only numeric 0/1 values",
+    )
+    _require(
+        (np.issubdtype(treatment.dtype, np.number) or np.issubdtype(treatment.dtype, np.bool_))
+        and np.all(np.isfinite(treatment.astype(float)))
+        and np.all(np.isin(treatment, [0, 1]))
+        and len(np.unique(treatment)) == 2,
              "logrank treatment must contain both 0 and 1")
 
     order = np.argsort(times, axis=1, kind="stable")
+    sorted_times = np.take_along_axis(times, order, axis=1)
+    _require(
+        not np.any(np.diff(sorted_times, axis=1) == 0.0),
+        "logrank_batch implements the governed continuous-time no-tie method; tied times are unsupported",
+    )
     sorted_events = np.take_along_axis(events.astype(float), order, axis=1)
     arm_matrix = np.broadcast_to(treatment, times.shape)
     sorted_arm = np.take_along_axis(arm_matrix, order, axis=1).astype(float)
@@ -505,9 +533,16 @@ def logrank_batch(times: np.ndarray, events: np.ndarray, treatment: np.ndarray) 
 
 def summarize_trial(times: Sequence[float], events: Sequence[int], treatment: Sequence[int],
                     alpha: float = 0.025) -> dict[str, Any]:
-    time_array = np.asarray(times, dtype=float)[None, :]
-    event_array = np.asarray(events, dtype=int)[None, :]
-    treatment_array = np.asarray(treatment, dtype=int)
+    raw_times = np.asarray(times)
+    _require(
+        raw_times.ndim == 1 and np.issubdtype(raw_times.dtype, np.number),
+        "times must be a one-dimensional numeric vector",
+    )
+    time_array = raw_times.astype(float, copy=False)[None, :]
+    event_array = _strict_binary_vector(events, "events")[None, :]
+    treatment_array = _strict_binary_vector(treatment, "treatment")
+    _require(time_array.shape[1] == event_array.shape[1] == treatment_array.shape[0],
+             "times, events, and treatment must have equal length")
     statistic, estimable = logrank_batch(time_array, event_array, treatment_array)
     if not bool(estimable[0]):
         return {

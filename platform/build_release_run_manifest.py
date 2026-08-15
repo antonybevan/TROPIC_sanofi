@@ -191,7 +191,7 @@ def _source_tree_sha256(controls: list, programs: list) -> str:
 
 def _current_source_tree_sha256() -> str:
     """Recompute the run-binding digest from the current source/control tree."""
-    controls = _hash_existing(CONTROL_FILES)
+    controls = _hash_existing(CONTROL_FILES, required=True)
     programs = _hash_globs(PROGRAM_GLOBS, exclude_paths=GENERATED_SOURCE_EXCLUDES)
     return _source_tree_sha256(controls, programs)
 
@@ -390,12 +390,26 @@ def _git_state() -> dict:
     }
 
 
-def _hash_existing(paths: list[str]) -> list[dict]:
+def _hash_existing(paths: list[str], *, required: bool = False) -> list[dict]:
+    """Hash a fixed path list, optionally failing closed on missing paths.
+
+    Review surfaces are intentionally optional in a data-free checkout, but the
+    fixed control and pipeline-control registries are part of the release
+    identity. Silently dropping one of those files would make the source-tree
+    digest incomplete and could allow an unsealed control change.
+    """
     rows = []
+    missing = []
     for rel_path in paths:
         path = ROOT / rel_path
         if path.exists():
             rows.append(_hash_file(path))
+        else:
+            missing.append(rel_path)
+    if required and missing:
+        raise RuntimeError(
+            "required release-control file(s) missing: " + ", ".join(missing)
+        )
     return rows
 
 
@@ -773,8 +787,8 @@ def build_release_run_manifest(out_dir: Path = OUT_DIR) -> dict:
         REVIEW_SURFACE_GLOBS
     )
     programs = _hash_globs(PROGRAM_GLOBS, exclude_paths=GENERATED_SOURCE_EXCLUDES)
-    controls = _hash_existing(CONTROL_FILES)
-    pipeline_controls = _hash_existing(PIPELINE_CONTROL_FILES)
+    controls = _hash_existing(CONTROL_FILES, required=True)
+    pipeline_controls = _hash_existing(PIPELINE_CONTROL_FILES, required=True)
 
     expected_stages = _expected_stage_names(manifest)
     run_completeness = _run_completeness(health, expected_stages)

@@ -1,10 +1,10 @@
 {
-  "status": "PASS",
-  "generated_at": "2026-08-12 12:18:53 UTC",
-  "checks": 18,
+  "status": "BLOCKED",
+  "generated_at": "2026-08-15 01:02:22 UTC",
+  "checks": 19,
   "pass": 18,
   "warning": 0,
-  "blocker": 0,
+  "blocker": 1,
   "active_audit_findings": 0,
   "confirmed_critical_major_findings": 0,
   "live_sas_execution_mode": "oda",
@@ -28,6 +28,13 @@
       "check": "Risk-based validation strategy is satisfied by current evidence",
       "status": "PASS",
       "evidence": "platform/validation_strategy/validation_strategy_status.json status=PASS; blocked=0",
+      "required_action": ""
+    },
+    {
+      "gate": "G06 qc_signoff",
+      "check": "Simulation methods evidence is precise, verified, and remains non-qualified",
+      "status": "PASS",
+      "evidence": "platform/simulation_operating_characteristics/simulation_oc_status.json execution=PASS; precision=PASS; design=PASS; qualification=NOT_QUALIFIED",
       "required_action": ""
     },
     {
@@ -110,9 +117,9 @@
     {
       "gate": "G09 release_candidate_lock",
       "check": "Current release-run manifest is release-candidate grade (full DAG, clean tree)",
-      "status": "PASS",
-      "evidence": "platform/release_run_manifest/release_run_manifest.json status=PASS; evidence_grade=release_candidate; run_scope=full_dag; seal=6810b9f6506f8605eb35675f048776afc6c1be6db26ef477cddf2f060bc9f5fd",
-      "required_action": ""
+      "status": "BLOCKER",
+      "evidence": "platform/release_run_manifest/release_run_manifest.json status=FAIL; evidence_grade=failed_binding; run_scope=partial_dag; seal=0f144b2ed7f4466835723a0f74d11d4ce5b1a4bf022a30e8e8a2c026e84de510",
+      "required_action": "Release manifest must be status=PASS (not REMEDIATION/FAIL): full current DAG, clean worktree, and current-run binding. REMEDIATION is valid development evidence only."
     },
     {
       "gate": "G09 release_candidate_lock",
@@ -132,7 +139,7 @@
       "gate": "G08 submission_package_materialization",
       "check": "Complete eCTD sequence inventory, checksums, support files, XML references, and run record validate",
       "status": "PASS",
-      "evidence": "platform/validate_ectd_sequence.py status=PASS; leaves=93/93; unexpected=0; problems=[]",
+      "evidence": "platform/validate_ectd_sequence.py status=PASS; leaves=99/99; unexpected=0; problems=[]",
       "required_action": ""
     }
   ]
