@@ -61,6 +61,7 @@ seal; the readiness checker records the remaining owner actions.
 - `07_reviewer_explanation/guides/`  
 - `07_reviewer_explanation/simulation_model_analysis_plan.md` · `simulation_report.md`
 - Findings disposition board + findings register  
+- Historical audit baselines and closure records under `06_qc_evidence/audit/run_records/`
 
 ### D. Sealed run evidence
 

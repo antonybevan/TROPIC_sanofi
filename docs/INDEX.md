@@ -17,7 +17,8 @@
 | 5 | [`RELEASE_NOTE_v0.3.0-clinical-simulation.md`](RELEASE_NOTE_v0.3.0-clinical-simulation.md) | Current controlled release narrative |
 | 6 | [`SCRIPT_MAP.md`](SCRIPT_MAP.md) | What runs vs ignore |
 | 7 | [`FDA_READINESS_RESEARCH_2026-08-15.md`](FDA_READINESS_RESEARCH_2026-08-15.md) | FDA/ICH pre-shipment evidence map and blockers |
-| 8 | `python3 scripts/verify_release.py` | Machine re-check |
+| 8 | [`../config/regulatory_source_inventory.yaml`](../config/regulatory_source_inventory.yaml) | Machine-checked scoped FDA/ICH/CDISC/eCFR source classifications |
+| 9 | `python3 scripts/verify_release.py` | Machine re-check |
 
 Repository operating controls: [`../CONTRIBUTING.md`](../CONTRIBUTING.md) ·
 [`../SECURITY.md`](../SECURITY.md) · [`LICENSING.md`](LICENSING.md)
@@ -176,6 +177,7 @@ Typical local outputs (not portfolio face):
 | [`REGULATORY_WORKFLOW_RESEARCH.md`](REGULATORY_WORKFLOW_RESEARCH.md) | Industry workflow grounding |
 | [`SIMULATION_PRECISION_RESEARCH.md`](SIMULATION_PRECISION_RESEARCH.md) | Current ICH M15/E9, FDA, ADEMP, and OCTAVE basis for the data-free simulation methods evaluation |
 | [`FDA_READINESS_RESEARCH_2026-08-15.md`](FDA_READINESS_RESEARCH_2026-08-15.md) | FDA/ICH and big-pharma pre-shipment controls mapped to this repository |
+| [`../config/regulatory_source_inventory.yaml`](../config/regulatory_source_inventory.yaml) | Scoped official-source classifications and owner actions |
 | [`../06_qc_evidence/audit/SIMULATION_PRECISION_IMPLEMENTATION_REPORT_2026-08-14.md`](../06_qc_evidence/audit/SIMULATION_PRECISION_IMPLEMENTATION_REPORT_2026-08-14.md) | Implementation, adversarial findings, exact results, verification, and fresh-SAS limitation |
 | [`I_J_generalisation_plan.md`](I_J_generalisation_plan.md) | Multi-study generalisation notes |
 
