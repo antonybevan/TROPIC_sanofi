@@ -1,6 +1,6 @@
 # TROPIC Release-Run Manifest
 
-Generated: 2026-08-15 01:02:08 UTC
+Generated: 2026-08-15 01:12:13 UTC
 
 > Hash-sealed run manifest for current artifacts. This is not an electronic signature or Part 11 attestation.
 
@@ -8,12 +8,12 @@ Generated: 2026-08-15 01:02:08 UTC
 
 - Status: `FAIL`
 - Evidence grade: `failed_binding`
-- Manifest SHA-256 seal: `0f144b2ed7f4466835723a0f74d11d4ce5b1a4bf022a30e8e8a2c026e84de510`
+- Manifest SHA-256 seal: `6a214a682d7419a4ae7be7953562f67c69c7951491894ac20326be565dc62f6a`
 - SAS execution mode: `oda`
 - Pipeline health: `GREEN`
 - Run scope: `partial_dag` (37 recorded / 39 release-required upstream stages)
-- Git HEAD: `1ba24d9a0a266d5bb78215de4a55bf114d9c8a4c`
-- Worktree dirty: `True`
+- Git HEAD: `0ee4deff32c0ea758d100928a40cb45a45e2bad4`
+- Worktree dirty: `False`
 - SAS companion figures: `in_dag_real_sas_companion`; current with health=`True`
 
 ## Status meanings
@@ -31,7 +31,6 @@ Generated: 2026-08-15 01:02:08 UTC
 
 - pipeline_health does not cover a full current DAG run (37 recorded in health / 39 release-required upstream stages; missing=3; not_run=0). Acceptable as targeted remediation evidence only.
 - stages missing from pipeline_health: Simulation Operating Characteristics, Simulation MAP and Report, Simulation Evidence Independent Verification
-- git worktree is dirty (22 porcelain entries); release-candidate lock requires a clean committed state
 
 ## Dataset Binding
 
