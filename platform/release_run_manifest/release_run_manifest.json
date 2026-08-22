@@ -340,11 +340,11 @@
         "size_bytes": 7782
       },
       {
-        "md5": "64cfd7b2c65b44685efd46041f77b850",
+        "md5": "d115a24629988a395f77d7c8d637d677",
         "path": "06_qc_evidence/conformance/p21_adam_summary.json",
         "present": true,
-        "sha256": "e64856322c99a7c3bf2f71b3d0880fa3f9bcf1bc4a1d4f2006b61b5e3d23e66a",
-        "size_bytes": 8352
+        "sha256": "43fbb2d6f8f6ecd6d2130511a07885cc0ab2434d757292ce7273a0d5673f786d",
+        "size_bytes": 8354
       },
       {
         "md5": "df49adc0bbf6f1c550e3a5cb4e71400a",
@@ -3208,11 +3208,11 @@
     ],
     "qc_files": [
       {
-        "md5": "be468d3a0e35181a0092d4d14e23f7a0",
+        "md5": "da29a36baff51ab4b98a326669eb8601",
         "path": "platform/pipeline_health.json",
         "present": true,
-        "sha256": "8c7a422f5436a41e635dd6b123157f05b12b3e9a541031930cbe84264dd85543",
-        "size_bytes": 5951
+        "sha256": "4e628f87a73906327f8d664b08c8a7a0d8c140d48806ef2e7bb7c87811516857",
+        "size_bytes": 6626
       },
       {
         "md5": "06989db82566475af4ebd3685eb8d8a8",
@@ -3299,11 +3299,11 @@
         "size_bytes": 38666
       },
       {
-        "md5": "3f8a047645529aff37535a14600496f0",
+        "md5": "c1b598cb3b9de8fe590ac25a0b7ab635",
         "path": "06_qc_evidence/gates/regulatory_baseline_status.json",
         "present": true,
-        "sha256": "3b80f478a39d50c45a744a804cc6221168c5ec7ed808b3fb7c6aa7718793b2de",
-        "size_bytes": 11363
+        "sha256": "c69d909b380b0fc7630d44dc950d4c0ce938e189c7ef90118240beb75de10ea4",
+        "size_bytes": 11431
       }
     ],
     "review_surface": [
@@ -3835,8 +3835,8 @@
     "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007"
   },
   "evidence_grade": "release_candidate",
-  "generated_at": "2026-08-22 15:19:05 UTC",
-  "manifest_sha256": "8ffa14fdaa3e67d74882e576162c382574ce7b19901acc585a226297fabe6421",
+  "generated_at": "2026-08-22 15:20:02 UTC",
+  "manifest_sha256": "efd901226aef1bb60f86de94eaf3bb194d95a035c9c5bcc686155b474b3daf55",
   "problems": [],
   "qc_statuses": {
     "cbzp_bridge": {
@@ -4062,18 +4062,13 @@
   "source_control": {
     "branch": "codex/repo-professional-build",
     "dirty": false,
-    "dirty_including_seal_outputs": true,
-    "head": "1371d9c9c9be0a50bdf02c60ffdc72615520a7fe",
+    "dirty_including_seal_outputs": false,
+    "head": "7aefe817d99b6037486176a16f79c069a652775d",
     "pipeline_control_sha256": "5d2054ba70b500e248b0a575aa97a62c1ecdb1fd7267a20e06b39f9a8b4b6263",
-    "source_tree_sha256": "deffb216c8b86961b872e74e8cc5866656a6c492f0032908689458c215380d14",
+    "source_tree_sha256": "9109c49f495b386ea92c1bbfbbee073f3e92d00f5ad146e48f6be7f2fd226797",
     "staged_diff_paths": [],
     "status_porcelain": [],
-    "status_porcelain_all": [
-      " M docs/RELEASE_CANDIDATE_CHECKLIST.md",
-      " M docs/RELEASE_RUN_MANIFEST.md",
-      " M platform/release_candidate/release_candidate_status.json",
-      " M platform/release_run_manifest/release_run_manifest.json"
-    ],
+    "status_porcelain_all": [],
     "status_porcelain_sha256": "",
     "tracked_diff_paths": []
   },
