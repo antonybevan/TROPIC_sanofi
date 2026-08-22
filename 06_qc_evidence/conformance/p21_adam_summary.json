@@ -75,7 +75,7 @@
     {"domain": "ADAE", "id": "AD0099", "found": 6, "message": "ASTDY is greater than AENDY"},
     {"domain": "ADAE", "id": "AD0200", "found": 1, "message": "ADaM/dataset variable type mismatch"},
     {"domain": "ADAE", "id": "AD0361", "found": 6, "message": "Value of ASTDT is greater than value of AENDT"},
-    {"domain": "ADAE", "id": "CT2001", "found": 124, "message": "AEACN value not found in Action Taken with Study Treatment non-extensible codelist"},
+    {"domain": "ADAE", "id": "CT2001", "found": 124, "message": "AEACN value not found in 'Action Taken with Study Treatment' non-extensible codelist"},
     {"domain": "ADAE", "id": "SD0059", "found": 4, "message": "Define.xml/dataset variable type mismatch"},
     {"domain": "ADCM", "id": "AD0018", "found": 2, "message": "Variable label mismatch between dataset and ADaM standard"},
     {"domain": "ADCM", "id": "AD0046", "found": 24, "message": "ASTDY = 0"},
