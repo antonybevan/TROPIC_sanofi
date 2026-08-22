@@ -160,9 +160,9 @@
   "software_identity": {
     "python": {
       "major": 3,
-      "minor": 12,
-      "patch": 13,
-      "version": "3.12.13"
+      "minor": 11,
+      "patch": 15,
+      "version": "3.11.15"
     },
     "numpy_version": "2.2.6",
     "pyyaml_version": "6.0.3",
@@ -1082,5 +1082,5 @@
       "reason": "Informational, data-free, non-MIDD, non-confirmatory methods evaluation only."
     }
   },
-  "scientific_output_sha256": "46ca63556e65c649b17c7ace2b70447691fd50d621c84d630880bb988fdb643e"
+  "scientific_output_sha256": "4e3b819118be9fc4e011a74d2a1f58d1a6526b9f31c25758f7ea7605b6d56cfb"
 }

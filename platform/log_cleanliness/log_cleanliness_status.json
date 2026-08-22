@@ -1,6 +1,6 @@
 {
   "status": "PASS",
-  "generated_at": "2026-08-12 10:28:07 UTC",
+  "generated_at": "2026-08-22 14:55:23 UTC",
   "config": "config/log_cleanliness.yaml",
   "coverage": "configured_persisted_logs_only",
   "coverage_note": "Scans only logs listed in config/log_cleanliness.yaml (required/optional). rscript/python stage stdout/stderr is not persisted by cibuild.py and is outside this gate; PASS means configured persisted logs are clean, not full pipeline stdout/stderr clean. not_available = no required logs on disk (typical data-free CI checkout); seal re-check uses committed PASS evidence.",
@@ -43,7 +43,7 @@
     {
       "status": "REVIEWED_EXCEPTION",
       "file": "04_analysis_datasets/programs/sas/oda_master_driver.log",
-      "line": 2861,
+      "line": 2873,
       "rule_id": "ADAE_SOURCE_TEAE_PRETRT",
       "severity": "major",
       "message": "WARNING: [ADAE-QC] 44 source-classified TEAE rows precede treatment.",

@@ -207,7 +207,7 @@ These deliberately artificial separated-time and zero-event fixtures verify sign
 
 | Component | Recorded identity |
 | --- | --- |
-| Python | 3.12.13 |
+| Python | 3.11.15 |
 | NumPy | 2.2.6 |
 | PyYAML | 6.0.3 |
 | Floating-point dtype | float64 |
@@ -234,11 +234,11 @@ These deliberately artificial separated-time and zero-event fixtures verify sign
 | Artifact | SHA-256 |
 | --- | --- |
 | Governed protocol | 09798cd52adedd742a10f39266c67df0d9fe40b4c693912e4962b47601446b61 |
-| Authoritative result file | 16bfab6f9abc171fa52ddd9d6d7c5035a4502c37956851cc247c51b8bc3d4fb8 |
+| Authoritative result file | 61a109fd903067a217c5df427908d3877a0bf54605af405f9226a31dab9fdbb3 |
 | Protocol recorded by result | 09798cd52adedd742a10f39266c67df0d9fe40b4c693912e4962b47601446b61 |
 | Scenario registry | da115050f9d3fb69202b7154814c0eb204852efbe99f9b6107e548419f3f7768 |
 | Simulation code | 3f5de78d6b174def4a8b92e77d4cde7064f25477f4cb18be76a295cbe17cc3ac |
-| Scientific output | 46ca63556e65c649b17c7ace2b70447691fd50d621c84d630880bb988fdb643e |
+| Scientific output | 4e3b819118be9fc4e011a74d2a1f58d1a6526b9f31c25758f7ea7605b6d56cfb |
 
 Reproduce the scientific JSON with `python3 platform/simulation_precision.py`; rebuild both reviewer documents with `python3 platform/build_simulation_report.py`. Identical governed inputs and seeds must reproduce byte-identical scientific content and reviewer reports.
 
