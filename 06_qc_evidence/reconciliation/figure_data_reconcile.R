@@ -110,7 +110,7 @@ r_water <- adlb |>
   inner_join(adsl |> select(USUBJID, PSABL), by = "USUBJID") |>
   filter(!is.na(PSABL), PSABL >= 20) |>
   mutate(RESPCAT = case_when(
-    BEST <= -50 ~ "PSA Response (>=50% dec)",
+    BEST <= -50 ~ "PSA Response (at least 50% decrease)",
     BEST < 0 ~ "PSA Decrease (<50%)",
     TRUE ~ "PSA Increase"
   )) |>

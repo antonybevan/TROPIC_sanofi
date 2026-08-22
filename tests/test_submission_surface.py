@@ -147,3 +147,12 @@ def test_tfl_gallery_matches_controlled_tables_and_is_keyboard_accessible():
     assert gallery.count('tabindex="0"') == 7
     assert 'aria-modal="true"' in gallery
     assert 'aria-label="Close figure preview"' in gallery
+    figure_alts = re.findall(r'<img class="fig-thumb"[^>]+alt="([^"]+)"', gallery)
+    assert len(figure_alts) == 7
+    assert all(len(alt.split()) >= 12 for alt in figure_alts)
+    assert "function openLightbox(src, altText)" in gallery
+    assert "image.alt = altText" in gallery
+    assert "completed/discontinued" not in gallery
+    assert "prior docetaxel response" not in gallery
+    assert "red = progressors" not in gallery.lower()
+    assert "does not by itself establish clinical progression" in gallery

@@ -346,18 +346,18 @@
   <div class="fig-grid">
 
     <!-- Analysis population overview (legacy CONSORT filename) -->
-    <div class="fig-card" role="button" tabindex="0" aria-label="Open Analysis Population and Mortality Overview figure" onclick="openLightbox('output/figures/F-01-1_CONSORT_Disposition.png')" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openLightbox('output/figures/F-01-1_CONSORT_Disposition.png'); }">
-      <img class="fig-thumb" src="output/figures/F-01-1_CONSORT_Disposition.png" alt="Analysis population and mortality overview" />
+    <div class="fig-card" role="button" tabindex="0" aria-label="Open Analysis Population and Mortality Overview figure" onclick="openLightbox('output/figures/F-01-1_CONSORT_Disposition.png', this.querySelector('img').alt)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openLightbox('output/figures/F-01-1_CONSORT_Disposition.png', this.querySelector('img').alt); }">
+      <img class="fig-thumb" src="output/figures/F-01-1_CONSORT_Disposition.png" alt="Population flow: 749 patients in the ITT population, 742 in the Safety Population, and 490 deaths during study; arm-specific safety counts and deaths are displayed." />
       <div class="fig-meta">
         <div class="fig-id">F-01-1</div>
         <div class="fig-name">Analysis Population and Mortality Overview</div>
-        <div class="fig-desc">Patient flow from enrolment through ITT population, completed/discontinued, and deaths.</div>
+        <div class="fig-desc">Analysis-population flow from the 749-patient ITT population to the 742-patient Safety Population, with arm-specific and overall deaths.</div>
       </div>
     </div>
 
     <!-- KM OS -->
-    <div class="fig-card" role="button" tabindex="0" aria-label="Open Kaplan-Meier Overall Survival figure" onclick="openLightbox('output/figures/F-11-1_KM_OS.png')" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openLightbox('output/figures/F-11-1_KM_OS.png'); }">
-      <img class="fig-thumb" src="output/figures/F-11-1_KM_OS.png" alt="KM OS" />
+    <div class="fig-card" role="button" tabindex="0" aria-label="Open Kaplan-Meier Overall Survival figure" onclick="openLightbox('output/figures/F-11-1_KM_OS.png', this.querySelector('img').alt)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openLightbox('output/figures/F-11-1_KM_OS.png', this.querySelector('img').alt); }">
+      <img class="fig-thumb" src="output/figures/F-11-1_KM_OS.png" alt="Kaplan-Meier overall-survival curves with censor marks and numbers at risk for synthetic CbzP and real MP; stratified hazard ratio 0.71, 95% confidence interval 0.60 to 0.85." />
       <div class="fig-meta">
         <div class="fig-id">F-11-1</div>
         <div class="fig-name">Kaplan–Meier: Overall Survival</div>
@@ -366,8 +366,8 @@
     </div>
 
     <!-- KM PFS -->
-    <div class="fig-card" role="button" tabindex="0" aria-label="Open Kaplan-Meier Progression-Free Survival figure" onclick="openLightbox('output/figures/F-11-2_KM_PFS.png')" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openLightbox('output/figures/F-11-2_KM_PFS.png'); }">
-      <img class="fig-thumb" src="output/figures/F-11-2_KM_PFS.png" alt="KM PFS" />
+    <div class="fig-card" role="button" tabindex="0" aria-label="Open Kaplan-Meier Progression-Free Survival figure" onclick="openLightbox('output/figures/F-11-2_KM_PFS.png', this.querySelector('img').alt)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openLightbox('output/figures/F-11-2_KM_PFS.png', this.querySelector('img').alt); }">
+      <img class="fig-thumb" src="output/figures/F-11-2_KM_PFS.png" alt="Kaplan-Meier progression-free-survival curves with censor marks and numbers at risk for synthetic CbzP and real MP; stratified hazard ratio 0.87, 95% confidence interval 0.75 to 1.02." />
       <div class="fig-meta">
         <div class="fig-id">F-11-2</div>
         <div class="fig-name">Kaplan–Meier: Progression-Free Survival</div>
@@ -376,28 +376,28 @@
     </div>
 
     <!-- FOREST -->
-    <div class="fig-card" role="button" tabindex="0" aria-label="Open OS Subgroup Forest Plot figure" onclick="openLightbox('output/figures/F-12-1_Subgroup_Forest.png')" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openLightbox('output/figures/F-12-1_Subgroup_Forest.png'); }">
-      <img class="fig-thumb" src="output/figures/F-12-1_Subgroup_Forest.png" alt="Forest Plot" />
+    <div class="fig-card" role="button" tabindex="0" aria-label="Open OS Subgroup Forest Plot figure" onclick="openLightbox('output/figures/F-12-1_Subgroup_Forest.png', this.querySelector('img').alt)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openLightbox('output/figures/F-12-1_Subgroup_Forest.png', this.querySelector('img').alt); }">
+      <img class="fig-thumb" src="output/figures/F-12-1_Subgroup_Forest.png" alt="Forest plot of unadjusted overall-survival hazard ratios and 95% confidence intervals across the ITT population and prespecified subgroup levels; no interaction tests were performed." />
       <div class="fig-meta">
         <div class="fig-id">F-12-1</div>
         <div class="fig-name">OS Subgroup Forest Plot</div>
-        <div class="fig-desc">Pre-specified subgroup analysis of Overall Survival by ECOG, pain, visceral disease, and prior docetaxel response.</div>
+        <div class="fig-desc">Pre-specified subgroup analysis of Overall Survival by age, ECOG, measurable and visceral disease, pain, and progression during versus after docetaxel. No interaction tests were performed.</div>
       </div>
     </div>
 
     <!-- WATERFALL -->
-    <div class="fig-card" role="button" tabindex="0" aria-label="Open PSA Best Percent Change Waterfall Plot figure" onclick="openLightbox('output/figures/F-13-1_PSA_Waterfall.png')" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openLightbox('output/figures/F-13-1_PSA_Waterfall.png'); }">
-      <img class="fig-thumb" src="output/figures/F-13-1_PSA_Waterfall.png" alt="PSA Waterfall" />
+    <div class="fig-card" role="button" tabindex="0" aria-label="Open PSA Best Percent Change Waterfall Plot figure" onclick="openLightbox('output/figures/F-13-1_PSA_Waterfall.png', this.querySelector('img').alt)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openLightbox('output/figures/F-13-1_PSA_Waterfall.png', this.querySelector('img').alt); }">
+      <img class="fig-thumb" src="output/figures/F-13-1_PSA_Waterfall.png" alt="Waterfall plot of each eligible subject's best PSA percentage change from baseline, separated by synthetic CbzP and real MP; the dashed line marks a 50 percent decrease." />
       <div class="fig-meta">
         <div class="fig-id">F-13-1</div>
         <div class="fig-name">PSA Best % Change — Waterfall Plot</div>
-        <div class="fig-desc">Maximum PSA decrease from baseline per patient. Blue = ≥50% responders, red = progressors.</div>
+        <div class="fig-desc">Best PSA percentage change from baseline per eligible subject. Dark blue indicates a decrease of at least 50%; red indicates a PSA increase and does not by itself establish clinical progression.</div>
       </div>
     </div>
 
     <!-- SWIMMER -->
-    <div class="fig-card" role="button" tabindex="0" aria-label="Open Treatment Exposure Swimmer Plot figure" onclick="openLightbox('output/figures/F-14-1_Swimmer_Plot.png')" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openLightbox('output/figures/F-14-1_Swimmer_Plot.png'); }">
-      <img class="fig-thumb" src="output/figures/F-14-1_Swimmer_Plot.png" alt="Swimmer Plot" />
+    <div class="fig-card" role="button" tabindex="0" aria-label="Open Treatment Exposure Swimmer Plot figure" onclick="openLightbox('output/figures/F-14-1_Swimmer_Plot.png', this.querySelector('img').alt)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openLightbox('output/figures/F-14-1_Swimmer_Plot.png', this.querySelector('img').alt); }">
+      <img class="fig-thumb" src="output/figures/F-14-1_Swimmer_Plot.png" alt="Swimmer plot of the 30 longest treatment exposures in each arm; bar length is duration in months and an X marks death during study." />
       <div class="fig-meta">
         <div class="fig-id">F-14-1</div>
         <div class="fig-name">Treatment Exposure — Swimmer Plot</div>
@@ -406,8 +406,8 @@
     </div>
 
     <!-- OPTIMUS -->
-    <div class="fig-card wide" role="button" tabindex="0" aria-label="Open Project Optimus Exposure Response Scatter figure" onclick="openLightbox('output/figures/F-17-1_Optimus_Scatter.png')" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openLightbox('output/figures/F-17-1_Optimus_Scatter.png'); }">
-      <img class="fig-thumb" src="output/figures/F-17-1_Optimus_Scatter.png" alt="Project Optimus E-R" />
+    <div class="fig-card wide" role="button" tabindex="0" aria-label="Open Project Optimus Exposure Response Scatter figure" onclick="openLightbox('output/figures/F-17-1_Optimus_Scatter.png', this.querySelector('img').alt)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openLightbox('output/figures/F-17-1_Optimus_Scatter.png', this.querySelector('img').alt); }">
+      <img class="fig-thumb" src="output/figures/F-17-1_Optimus_Scatter.png" alt="Exploratory scatter plot of relative dose intensity against Cycle 1 ANC nadir on a logarithmic scale for synthetic CbzP and real MP, with descriptive LOESS curves and the Grade 4 neutropenia threshold." />
       <div class="fig-meta">
         <div class="fig-id">F-17-1</div>
         <div class="fig-name">FDA Project Optimus — Exposure–Response Scatter</div>
@@ -565,13 +565,16 @@
 </div>
 
 <script>
-  function openLightbox(src) {
-    document.getElementById('lightbox-img').src = src;
+  function openLightbox(src, altText) {
+    const image = document.getElementById('lightbox-img');
+    image.src = src;
+    image.alt = altText;
     document.getElementById('lightbox').classList.add('open');
   }
   function closeLightbox() {
     document.getElementById('lightbox').classList.remove('open');
     document.getElementById('lightbox-img').src = '';
+    document.getElementById('lightbox-img').alt = '';
   }
   document.getElementById('lightbox').addEventListener('click', function(e) {
     if (e.target === this) closeLightbox();
