@@ -22,6 +22,8 @@ The binding claim is [Product and Evidence Claim](docs/PRODUCT_CLAIM.md). The qu
 | [Dashboard visual QC](06_qc_evidence/audit/DASHBOARD_VISUAL_QC.md) | Five-tab local dashboard acceptance evidence |
 | [Simulation Model Analysis Plan](07_reviewer_explanation/simulation_model_analysis_plan.md) | Prospective M15/ADEMP/OCTAVE methods-evaluation protocol, estimand, scenarios, and precision criteria |
 | [Simulation Model Analysis Report](07_reviewer_explanation/simulation_report.md) | Generated operating characteristics, Monte Carlo uncertainty, representative trials, and limitations |
+| [FDA/ICH readiness research](docs/FDA_READINESS_RESEARCH_2026-08-15.md) | Big-pharma pre-shipment control model, official sources, and current blockers |
+| [Scoped official-source inventory](config/regulatory_source_inventory.yaml) | 48 FDA/ICH/CDISC/eCFR entries classified by applicability, final/draft status, evidence, and owner action |
 | [Current release note](docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) | Release evidence and residual limitations |
 | [Reviewer guide](docs/INTERVIEWER_GUIDE.md) | A short, evidence-led walkthrough |
 
@@ -107,9 +109,18 @@ python3 platform/cibuild.py --real-sas
 
 # Recheck the current regulatory and qualification boundary
 python3 platform/check_regulatory_baseline.py --check-only
+
+# Review the FDA/ICH readiness map; --strict is the release go/no-go mode
+python3 platform/check_submission_readiness.py
+
+# Validate the scoped official-source inventory (does not replace legal or center review)
+python3 platform/check_regulatory_source_inventory.py
 ```
 
 The full run requires the authorized local SDTM source and credentials; see [Reproducibility](00_governance/REPRODUCIBILITY.md) and the [ODA runbook](docs/runbooks/ODA_GUIDE.md). A clean clone intentionally does not contain patient-level source or derived XPTs.
+
+For maintainers, [`CONTRIBUTING.md`](CONTRIBUTING.md) defines the review and release workflow;
+[`SECURITY.md`](SECURITY.md) defines the private-reporting and data-boundary rules.
 
 For reviewer-facing visuals, open the [TFL Gallery](05_outputs/tfl/TFL_Gallery.html). The [Shiny dashboard visual-QC record](06_qc_evidence/audit/DASHBOARD_VISUAL_QC.md) documents the data-bearing local acceptance capture; a bare clone safely opens the dashboard in disclosed data-free mode because patient-level inputs are not distributed.
 
@@ -128,4 +139,8 @@ Current package controls include:
 
 ## License and source rights
 
-Code and repository-authored documentation follow the repository license. Source clinical data, published materials, standards content, SAS, and Pinnacle 21 remain subject to their respective access terms and licenses. Nothing in this repository grants redistribution or regulatory-use rights to those materials.
+This repository currently declares **no open-source license**; public visibility does not grant
+permission to copy or redistribute it. See [Licensing and source rights](docs/LICENSING.md).
+Source clinical data, published materials, standards content, SAS, and Pinnacle 21 remain subject
+to their respective access terms and licenses. Nothing in this repository grants redistribution or
+regulatory-use rights to those materials.

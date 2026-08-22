@@ -30,6 +30,7 @@ Read **CORE** only, then SUPPORT when you need ODA/seals.
 |---|---|
 | `check_gate_g00_governance.py` | Product-claim / scope lock |
 | `check_gate_g02_specification.py` | SAP / spec lock |
+| `check_regulatory_source_inventory.py` | Fail-closed validation of the scoped FDA/ICH/CDISC/eCFR source inventory |
 | `gen_adam_labels.R` | ADaM label/order artifacts |
 | `simulation_precision.py` | Governed data-free TTE methods evaluation and authoritative aggregate OC JSON |
 | `check_simulation_evidence.py` | Independent fail-closed verification of simulation hashes, metrics, accounting, and acceptance |

@@ -59,6 +59,10 @@ TFL_OUTPUT_DIR = "05_outputs/tfl/output"
 TFL_BACKUP_DIR = "backup_tfl_output"
 ECTD_SEQ_DIR = "08_submission_package/ectd/0000"
 ECTD_BACKUP_DIR = "backup_ectd_backbone"
+# One canonical master-driver log is used for both ODA and local SAS.  The
+# cleanliness gate and release manifest therefore always inspect the current
+# execution rather than whichever mode happened to run previously.
+SAS_MASTER_LOG = "04_analysis_datasets/programs/sas/oda_master_driver.log"
 
 # Scope of the pre-run snapshot (deliberately narrow, stated here once so every caller-facing
 # message below can quote it instead of implying broader coverage than actually exists): the
@@ -444,7 +448,17 @@ def _run_saspy_stage10():
         return 0, "ODA exhausted; honest sim fallback", "", meta
 
     sas = conn.sas
-    proj_root_oda = _resolve_oda_root(sas, PROJ_ROOT_ODA)
+    try:
+        # PROJ_ROOT_ODA is environment-controlled and is interpolated into SAS source below.
+        # Validate before the first submit, then validate the account-home expansion as well.
+        proj_root_template = seed_sdtm.validate_remote_path(PROJ_ROOT_ODA)
+        proj_root_oda = seed_sdtm.validate_remote_path(
+            _resolve_oda_root(sas, proj_root_template))
+        sdtm_remote_dir = seed_sdtm.resolve_sdtm_remote_dir(sas, proj_root_oda)
+    except ValueError as exc:
+        oda_broker.teardown(sas)
+        return 2, "", f"Invalid TROPIC_ODA_PROJ_ROOT: {exc}", {
+            "oda_last_error_class": "INVALID_REMOTE_PATH", "reconciliation": "none"}
     sas_version = _probe_sas_version(sas)  # roadmap item 5; best-effort, never gates the run
     PGMDIR_ODA = f"{proj_root_oda}/04_analysis_datasets/programs/sas"
     ADAM_ODA = f"{proj_root_oda}/04_analysis_datasets/adam"
@@ -464,14 +478,15 @@ def _run_saspy_stage10():
         # check. Default (neither flag) keeps the strict CI contract: verify, else hard-fail.
         force_sdtm = os.environ.get("TROPIC_ODA_FORCE_SDTM") == "TRUE"
         if force_sdtm or os.environ.get("TROPIC_ODA_SEED_INLINE") == "TRUE":
-            res = seed_sdtm.seed(sas, force=force_sdtm)
+            res = seed_sdtm.seed(sas, remote_dir=sdtm_remote_dir, force=force_sdtm)
             if res["status"] not in ("seeded", "already-resident"):
                 return 2, "", f"SDTM seed/verify failed: {res}", {"reconciliation": "none"}
             manifest_sha = res["manifest_sha"]
             print(f"  [ODA] SDTM {res['status']}: {res.get('uploaded', 0)} uploaded, "
                   f"{res.get('skipped', 0)} resident (manifest {manifest_sha[:12]}).")
         else:
-            ok, manifest_sha, reason = seed_sdtm.verify_resident(sas)
+            ok, manifest_sha, reason = seed_sdtm.verify_resident(
+                sas, remote_dir=sdtm_remote_dir)
             if not ok:
                 return 2, "", (f"SDTM not verified-resident on ODA ({reason}). Seed first: "
                                f"python3 platform/seed_sdtm.py  — or re-run with "
@@ -515,13 +530,13 @@ filename drv "{PGMDIR_ODA}/00_master_driver.sas";
                 "oda_endpoint": conn.endpoint, "oda_exec_timeout": True,
                 "reconciliation": "none"}
         try:
-            with open("04_analysis_datasets/programs/sas/oda_master_driver.log", "w", encoding="utf-8") as _lf:
+            with open(SAS_MASTER_LOG, "w", encoding="utf-8") as _lf:
                 _lf.write(log)
         except OSError:
             pass
         warn = [l for l in log.splitlines() if l.strip().startswith("WARNING:")]
         if warn:
-            print(f"  [ODA] SAS log has {len(warn)} WARNING line(s) (see oda_master_driver.log).")
+            print(f"  [ODA] SAS log has {len(warn)} WARNING line(s) (see {SAS_MASTER_LOG}).")
         err = [l.strip() for l in log.splitlines() if l.strip().startswith("ERROR:")]
         if err:
             return 1, "", "\n".join(err), {"oda_endpoint": conn.endpoint, "reconciliation": "none"}
@@ -688,12 +703,12 @@ def run_stage_execution(stage, sas_mode):
             sas_exe = shutil.which("sas")
             print(f"  [REAL SAS] Located local SAS engine at: {sas_exe}")
             print("  [REAL SAS] Compiling SAS production master suite (04_analysis_datasets/programs/sas/00_master_driver.sas)...")
-            sas_cmd = [sas_exe, "-sysin", "04_analysis_datasets/programs/sas/00_master_driver.sas", "-log", "04_analysis_datasets/programs/sas/00_master_driver.log", "-print", "04_analysis_datasets/programs/sas/00_master_driver.lst"]
+            sas_cmd = [sas_exe, "-sysin", "04_analysis_datasets/programs/sas/00_master_driver.sas", "-log", SAS_MASTER_LOG, "-print", "04_analysis_datasets/programs/sas/00_master_driver.lst"]
             rc, stdout, stderr = run_command(sas_cmd, timeout=STAGE_TIMEOUT_S)
             if rc == 0:
                 print("  [REAL SAS] Master driver executed successfully. Actual SAS XPTs generated.")
             else:
-                print("  [REAL SAS FAILED] SAS master execution failed! Check log: 04_analysis_datasets/programs/sas/00_master_driver.log")
+                print(f"  [REAL SAS FAILED] SAS master execution failed! Check log: {SAS_MASTER_LOG}")
             return rc, stdout, stderr
         elif sas_mode == "cached":
             print("  [CACHED SAS] Reconciling against PRE-EXISTING *_prod.xpt (SAS not re-run this session).")
@@ -1524,7 +1539,7 @@ def write_telemetry(results, sas_mode="sim", expected_stage_names=None):
     # 'local' mode genuinely can use the log-banner approach: a fresh subprocess SAS writes
     # its own startup banner into its own -log file from the first line.
     if effective_mode == "local":
-        health["sas_version"] = _sas_version_from_log("04_analysis_datasets/programs/sas/00_master_driver.log")
+        health["sas_version"] = _sas_version_from_log(SAS_MASTER_LOG)
 
     if effective_mode in ("oda", "local"):
         offenders = _prod_v_byte_identical(STUDY_DATASETS)

@@ -238,6 +238,7 @@ def _write_ndjson(doc, path, ndjson_schema):
         for row in doc["rows"]:
             fh.write(json.dumps(row, ensure_ascii=False, allow_nan=False,
                                 separators=(",", ":")) + "\n")
+    os.chmod(path, 0o600)
 
 
 def _read_dataset_output(path: str, ndjson: bool) -> dict[str, Any]:
@@ -264,6 +265,7 @@ def _prepare_output_dir(out_dir: str, expected_names: list[str], ndjson: bool) -
     being mistaken for current evidence.
     """
     os.makedirs(out_dir, exist_ok=True)
+    os.chmod(out_dir, 0o700)
     expected = {str(name).lower() for name in expected_names}
     active_suffix = ".ndjson" if ndjson else ".json"
     removed: list[str] = []
@@ -316,6 +318,7 @@ def convert_set(items, out_dir, mdv_oid, meta_ref, schema, ndjson_schema=None):
             with open(out_path, "w", encoding="utf-8") as fh:
                 json.dump(doc, fh, ensure_ascii=False, allow_nan=False,
                           separators=(",", ":"))
+            os.chmod(out_path, 0o600)
         _reconcile_output(out_path, xpt_path, ndjson_schema is not None)
         size = os.path.getsize(out_path)
         results.append((ds_name.upper(), "VALID", nrec, ncol, f"{size/1024:.0f} KB"))

@@ -26,7 +26,7 @@ ALLOWED_PATHS = (
     "08_submission_package/README.md",
     "CHANGELOG.md",
     "README.md",
-    "TROPIC_PIPELINE_AUDIT_CLOSURE_2026-08-10.md",
+    "06_qc_evidence/audit/run_records/2026-08-09-pipeline-audit/TROPIC_PIPELINE_AUDIT_CLOSURE_2026-08-10.md",
     "config/evidence_layers.yaml",
     "config/regulatory_baseline.yaml",
     "docs/PRODUCT_CLAIM.md",

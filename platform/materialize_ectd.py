@@ -149,6 +149,9 @@ def main():
         # from an earlier build whose XPT timestamps differ) re-copy from the repo source; the
         # previous logic trusted any existing dest and so failed verification on every re-run.
         if os.path.exists(dest) and _verify_dest(dest, href, recorded, cache) == recorded.lower():
+            if os.path.splitext(dest)[1].lower() in {".xpt", ".sas7bdat"}:
+                os.chmod(os.path.dirname(dest), 0o700)
+                os.chmod(dest, 0o600)
             in_place += 1
             verified += 1
             continue
@@ -157,6 +160,11 @@ def main():
             continue
         os.makedirs(os.path.dirname(dest), exist_ok=True)
         shutil.copy2(src, dest); copied += 1
+        if os.path.splitext(dest)[1].lower() in {".xpt", ".sas7bdat"}:
+            # Materialized patient-level transport files are local controlled artifacts, not a
+            # public review surface.  Keep both the file and its dataset directory least-privilege.
+            os.chmod(os.path.dirname(dest), 0o700)
+            os.chmod(dest, 0o600)
         # Always a genuine re-hash here (never routed through the cache lookup): dest was just
         # written, so this is the one place correctness must not lean on a cached value at all.
         actual = md5(dest)

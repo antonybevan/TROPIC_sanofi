@@ -434,6 +434,17 @@ def copy_source_crf(pdf_path):
         "Release note: this is not an annotated CRF unless annotation evidence is supplied."
     )
 
+
+def _copy_patient_file(src, dest):
+    """Copy a patient-level transport file with least-privilege local permissions."""
+    shutil.copy2(src, dest)
+    os.chmod(dest, 0o600)
+
+
+def _secure_patient_dir(path):
+    """Keep generated patient-level package directories inaccessible to other local users."""
+    os.chmod(path, 0o700)
+
 def copy_uplifted_sdtm34_xpts(sdtm34_dir, out_dir):
     """Copy the SDTMIG 3.4 XPT layer that matches define_sdtm.xml."""
     xpts = sorted(glob.glob(os.path.join(sdtm34_dir, "*.xpt")))
@@ -444,8 +455,9 @@ def copy_uplifted_sdtm34_xpts(sdtm34_dir, out_dir):
             "Raw SDTMIG 3.1.1 conversion is not allowed when define_sdtm.xml declares SDTMIG 3.4."
         )
     os.makedirs(out_dir, exist_ok=True)
+    _secure_patient_dir(out_dir)
     for f in xpts:
-        shutil.copy2(f, os.path.join(out_dir, os.path.basename(f)))
+        _copy_patient_file(f, os.path.join(out_dir, os.path.basename(f)))
     print(f"Copied {len(xpts)} uplifted SDTMIG 3.4 XPT datasets from {sdtm34_dir}.")
 
 
@@ -543,6 +555,9 @@ def main(data_free=False):
     os.makedirs(m5_adam_programs_dir, exist_ok=True)
     os.makedirs(m5_bimo_dir, exist_ok=True)
     os.makedirs(m5_csr_dir, exist_ok=True)
+    if not data_free:
+        for patient_dir in (m5_sdtm_datasets_dir, m5_adam_datasets_dir, m5_bimo_dir):
+            _secure_patient_dir(patient_dir)
     
     print(f"Created target folder structure under {m5_root}/.")
     
@@ -574,7 +589,7 @@ def main(data_free=False):
             base = os.path.basename(f)
             new_base = base.replace("_prod.xpt", ".xpt")
             dest = os.path.join(m5_adam_datasets_dir, new_base)
-            shutil.copy(f, dest)
+            _copy_patient_file(f, dest)
             print(f"  Copied and renamed: {base} -> {new_base}")
 
     # 4b. Copy BIMO Datasets + its data-definition guide (BDRG). clinsite is delivered
@@ -584,7 +599,7 @@ def main(data_free=False):
     if data_free:
         write_dataset_placeholder(m5_bimo_dir)
     elif os.path.exists(bimo_prod_file):
-        shutil.copy(bimo_prod_file, os.path.join(m5_bimo_dir, "clinsite.xpt"))
+        _copy_patient_file(bimo_prod_file, os.path.join(m5_bimo_dir, "clinsite.xpt"))
         print("  Copied BIMO clinsite.xpt.")
     else:
         # clinsite is a required BIMO deliverable (per the BIMO TCG comment above), not an

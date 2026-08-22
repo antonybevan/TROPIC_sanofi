@@ -77,14 +77,20 @@ Factory triage: [`../platform/README.md`](../platform/README.md)
 
 ```bash
 python3 scripts/verify_release.py
+python3 platform/check_submission_readiness.py
 ```
 
-Expected: **VERIFY_RELEASE: PASS** on the committed seal set (no ODA required).
+On the current public branch, the readiness profile is intentionally
+**BLOCKED** and the release verifier stops on stale source/artifact hashes.
+That is the correct result until an authorized full SAS/ODA run refreshes the
+controlled seal; do not present this branch as FDA-ready or as a green filing
+release.
 
 Also open:
 
 - [`RELEASE_NOTE_v0.3.0-clinical-simulation.md`](RELEASE_NOTE_v0.3.0-clinical-simulation.md)
 - [`QUALITY_SYSTEM_BOUNDARY.md`](QUALITY_SYSTEM_BOUNDARY.md)
+- [`FDA_READINESS_RESEARCH_2026-08-15.md`](FDA_READINESS_RESEARCH_2026-08-15.md)
 - [`workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)
 - Frozen ODA snapshot: `platform/evidence/`
 

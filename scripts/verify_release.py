@@ -32,6 +32,65 @@ ARTIFACT_GROUPS = (
     "review_surface",
 )
 
+# Keep this no-dependency registry in the Path-A verifier.  The verifier runs
+# before CI installs the project environment, so it cannot import the manifest
+# builder.  The corresponding builder registry is tested for set equality.
+FIXED_CONTROL_FILES = (
+    "00_governance/REPRODUCIBILITY.md",
+    "config/study_manifest.yaml",
+    "config/study_config.yaml",
+    "config/tfl_output_catalog.yaml",
+    "config/validation_strategy.yaml",
+    "config/ctq_traceability.yaml",
+    "config/delivery_workstreams.yaml",
+    "config/evidence_layers.yaml",
+    "config/metadata_lineage.yaml",
+    "config/log_cleanliness.yaml",
+    "config/regulatory_baseline.yaml",
+    "config/fda_readiness_profile.yaml",
+    "config/regulatory_source_inventory.yaml",
+    "config/simulation_protocol.yaml",
+    "docs/PRODUCT_CLAIM.md",
+    "docs/QUALITY_SYSTEM_BOUNDARY.md",
+    "docs/FDA_READINESS_RESEARCH_2026-08-15.md",
+    "docs/SIMULATION_PRECISION_RESEARCH.md",
+    "06_qc_evidence/conformance/p21_adam_runrecord.md",
+    "06_qc_evidence/conformance/p21_adam_summary.json",
+    "03_metadata/adam/ADaM_spec.xlsx",
+    "03_metadata/define/define.xml",
+    "03_metadata/define/define_sdtm.xml",
+    "04_analysis_datasets/programs/sas/U_xpt_export.sas",
+    "04_analysis_datasets/programs/sas/_adam_labels.sas",
+    "04_analysis_datasets/programs/r/config_study.R",
+    "04_analysis_datasets/programs/r/adam_var_labels.csv",
+    "04_analysis_datasets/programs/r/spec_data_checks.R",
+    "06_qc_evidence/reconciliation/cross_lang_audit.R",
+    "06_qc_evidence/reconciliation/results_reconcile.R",
+    "06_qc_evidence/reconciliation/forest_reconcile.R",
+    "06_qc_evidence/reconciliation/figure_data_reconcile.R",
+    "platform/cibuild.py",
+    "platform/check_log_cleanliness.py",
+    "platform/package_ectd.py",
+    "platform/stage_p21_adam_inputs.py",
+    "platform/build_ectd_backbone.py",
+    "platform/materialize_ectd.py",
+    "05_outputs/tfl/tfl_generation.R",
+    "05_outputs/tfl/lab_shift_table.R",
+    "05_outputs/tfl/tfl_stats.R",
+)
+
+PIPELINE_CONTROL_FILES = (
+    ".github/CODEOWNERS",
+    ".github/workflows/ci.yml",
+    ".gitleaks.toml",
+    ".pre-commit-config.yaml",
+    "requirements-ci.txt",
+    "requirements-ci.lock",
+    "renv.lock",
+    "scripts/rebind_governance_seal.py",
+    "scripts/verify_release.py",
+)
+
 
 def load(rel: str):
     path = ROOT / rel
@@ -117,6 +176,38 @@ def sealed_source_problems(manifest: dict) -> list[str]:
     """
     problems = []
     artifacts = manifest.get("artifacts") or {}
+    controls = (manifest.get("artifacts") or {}).get("controls") or []
+    control_paths = [row.get("path") for row in controls]
+    expected_controls = set(FIXED_CONTROL_FILES)
+    actual_controls = {path for path in control_paths if path}
+    duplicate_controls = sorted(
+        path for path in actual_controls if control_paths.count(path) > 1
+    )
+    missing_controls = sorted(expected_controls - actual_controls)
+    unexpected_controls = sorted(actual_controls - expected_controls)
+    if duplicate_controls:
+        problems.append("controls: duplicate fixed control entries: " + ", ".join(duplicate_controls))
+    if missing_controls:
+        problems.append("controls: fixed control seal incomplete: " + ", ".join(missing_controls))
+    if unexpected_controls:
+        problems.append("controls: unexpected fixed control entries: " + ", ".join(unexpected_controls))
+
+    pipeline_controls = (manifest.get("artifacts") or {}).get("pipeline_controls") or []
+    pipeline_paths = [row.get("path") for row in pipeline_controls]
+    expected_pipeline = set(PIPELINE_CONTROL_FILES)
+    actual_pipeline = {path for path in pipeline_paths if path}
+    duplicate_pipeline = sorted(
+        path for path in actual_pipeline if pipeline_paths.count(path) > 1
+    )
+    missing_pipeline = sorted(expected_pipeline - actual_pipeline)
+    unexpected_pipeline = sorted(actual_pipeline - expected_pipeline)
+    if duplicate_pipeline:
+        problems.append("pipeline_controls: duplicate entries: " + ", ".join(duplicate_pipeline))
+    if missing_pipeline:
+        problems.append("pipeline_controls: seal incomplete: " + ", ".join(missing_pipeline))
+    if unexpected_pipeline:
+        problems.append("pipeline_controls: unexpected entries: " + ", ".join(unexpected_pipeline))
+
     for group in ("controls", "programs", "pipeline_controls"):
         if group == "pipeline_controls" and group not in artifacts:
             continue
@@ -358,36 +449,44 @@ def main() -> int:
     rm = load("platform/release_run_manifest/release_run_manifest.json") or {}
     expected_manifest_sha = rm.get("manifest_sha256", "")
     actual_manifest_sha = manifest_sha256(rm) if rm else ""
-    add("release_manifest.seal", bool(expected_manifest_sha) and expected_manifest_sha == actual_manifest_sha,
+    manifest_seal_ok = bool(expected_manifest_sha) and expected_manifest_sha == actual_manifest_sha
+    add("release_manifest.seal", manifest_seal_ok,
         "manifest SHA-256 does not match payload" if expected_manifest_sha != actual_manifest_sha else "")
     sealed_tree = (rm.get("source_control") or {}).get("source_tree_sha256")
     actual_tree = source_tree_sha256(rm) if rm else ""
-    add("release_manifest.source_tree_matches", bool(sealed_tree) and sealed_tree == actual_tree,
+    source_tree_ok = bool(sealed_tree) and sealed_tree == actual_tree
+    add("release_manifest.source_tree_matches", source_tree_ok,
         "sealed source-tree digest does not match the current checkout"
         if sealed_tree != actual_tree else "")
     recorded_clean = (rm.get("source_control") or {}).get("dirty") is False
     add("release_manifest.recorded_clean_worktree", recorded_clean,
         str((rm.get("source_control") or {}).get("dirty")))
-    add("release_manifest.current_material_worktree_clean", git_material_worktree_clean(),
+    current_clean = git_material_worktree_clean()
+    add("release_manifest.current_material_worktree_clean", current_clean,
         "git worktree has material dirt outside release seal outputs")
     source_problems = sealed_source_problems(rm) if rm else ["release manifest missing"]
-    add("release_manifest.source_hashes", not source_problems,
+    source_hashes_ok = not source_problems
+    add("release_manifest.source_hashes", source_hashes_ok,
         ", ".join(source_problems[:8]) + (" ..." if len(source_problems) > 8 else ""))
     expected_stage_names = (rm.get("run_completeness") or {}).get("expected_stage_names") or []
     actual_stage_names = list(stages)
-    add(
-        "release_manifest.stage_set_matches",
+    stage_set_ok = (
         bool(expected_stage_names)
         and len(actual_stage_names) == len(expected_stage_names)
-        and set(actual_stage_names) == set(expected_stage_names),
+        and set(actual_stage_names) == set(expected_stage_names)
+    )
+    add(
+        "release_manifest.stage_set_matches",
+        stage_set_ok,
         f"health={len(actual_stage_names)} manifest={len(expected_stage_names)}",
     )
     artifact_problems, verified_artifacts, skipped_artifacts = (
         sealed_artifact_problems(rm) if rm else (["release manifest missing"], 0, 0)
     )
+    artifact_hashes_ok = not artifact_problems
     add(
         "release_manifest.artifact_hashes",
-        not artifact_problems,
+        artifact_hashes_ok,
         "; ".join(artifact_problems[:8])
         + (" ..." if len(artifact_problems) > 8 else "")
         + f" (verified={verified_artifacts}, optional_missing={skipped_artifacts})",
@@ -395,15 +494,36 @@ def main() -> int:
     pipeline_rows = (rm.get("artifacts") or {}).get("pipeline_controls") if rm else None
     expected_pipeline_digest = (rm.get("source_control") or {}).get("pipeline_control_sha256")
     pipeline_digest = rows_sha256(pipeline_rows or [])
-    add(
-        "release_manifest.pipeline_controls",
+    pipeline_controls_ok = (
         bool(pipeline_rows)
         and not any(p.startswith("pipeline_controls:") for p in source_problems)
         and bool(expected_pipeline_digest)
-        and pipeline_digest == expected_pipeline_digest,
+        and pipeline_digest == expected_pipeline_digest
+    )
+    add(
+        "release_manifest.pipeline_controls",
+        pipeline_controls_ok,
         "pipeline CI/control files are not bound to the release seal",
     )
-    add("release_manifest.PASS", rm.get("status") == "PASS", str(rm.get("status")))
+    current_binding_ok = all(
+        (
+            manifest_seal_ok,
+            source_tree_ok,
+            recorded_clean,
+            current_clean,
+            source_hashes_ok,
+            stage_set_ok,
+            artifact_hashes_ok,
+            pipeline_controls_ok,
+        )
+    )
+    add(
+        "release_manifest.PASS",
+        rm.get("status") == "PASS" and current_binding_ok,
+        str(rm.get("status"))
+        if current_binding_ok
+        else "recorded PASS is stale because current seal checks failed",
+    )
     add(
         "release_manifest.grade",
         rm.get("evidence_grade") == "release_candidate",
@@ -411,8 +531,20 @@ def main() -> int:
     )
 
     rc = load("platform/release_candidate/release_candidate_status.json") or {}
-    add("release_candidate.PASS", rc.get("status") == "PASS", str(rc.get("status")))
-    add("release_candidate.blockers_0", rc.get("blocker", 1) == 0, str(rc.get("blocker")))
+    add(
+        "release_candidate.PASS",
+        rc.get("status") == "PASS" and current_binding_ok,
+        str(rc.get("status"))
+        if current_binding_ok
+        else "recorded PASS is stale because current seal checks failed",
+    )
+    add(
+        "release_candidate.blockers_0",
+        rc.get("blocker", 1) == 0 and current_binding_ok,
+        str(rc.get("blocker"))
+        if current_binding_ok
+        else "current release seal has blocking failures",
+    )
 
     try:
         sys.path.insert(0, str(ROOT / "platform"))

@@ -1,0 +1,292 @@
+schema_version: "1.0"
+profile_id: "TROPIC-FDA-READINESS-001"
+assessed_on: "2026-08-15"
+profile_owner: "TROPIC repository maintainers"
+
+# This is a readiness evidence map, not an assertion that the repository is a
+# regulatory submission or that its computerized systems are Part 11 validated.
+# The checker intentionally permits an informative report with blockers; --strict
+# is the go/no-go mode and must remain red until the named owner actions are done.
+scope:
+  product_class: "controlled_clinical_submission_simulation"
+  intended_use: "interview and technical-review demonstration"
+  release_claim: "NOT_FOR_REGULATORY_SUBMISSION"
+  clinical_claim: "No confirmatory or patient-level efficacy claim"
+  strict_gate_policy: "BLOCK_ON_BLOCKED_OR_NOT_QUALIFIED"
+
+sources:
+  - id: "FDA-TCG-2026"
+    authority: "FDA"
+    title: "Study Data Technical Conformance Guide"
+    version: "June 2026"
+    checked_on: "2026-08-15"
+    url: "https://www.fda.gov/media/153632/download"
+  - id: "FDA-ECTD"
+    authority: "FDA"
+    title: "Electronic Common Technical Document (eCTD)"
+    version: "current center/sequence version must be confirmed per filing"
+    checked_on: "2026-08-15"
+    url: "https://www.fda.gov/drugs/electronic-regulatory-submission-and-review/electronic-common-technical-document-ectd"
+  - id: "FDA-ECTD-322"
+    authority: "FDA"
+    title: "eCTD v3.2.2 submission standards and validation criteria"
+    version: "current page checked 2026-08-15"
+    checked_on: "2026-08-15"
+    url: "https://www.fda.gov/drugs/electronic-regulatory-submission-and-review/ectd-submission-standards-ectd-v322-and-regional-m1"
+  - id: "FDA-ECTD-40"
+    authority: "FDA"
+    title: "Electronic Common Technical Document (eCTD) v4.0"
+    version: "current page checked 2026-08-15"
+    checked_on: "2026-08-15"
+    url: "https://www.fda.gov/drugs/electronic-regulatory-submission-and-review/electronic-common-technical-document-ectd-v40"
+  - id: "FDA-DATA-STANDARDS-RESOURCES"
+    authority: "FDA"
+    title: "Study Data Standards Resources"
+    version: "current page checked 2026-08-15"
+    checked_on: "2026-08-15"
+    url: "https://www.fda.gov/industry/fda-data-standards-advisory-board/study-data-standards-resources"
+  - id: "FDA-DATA-STANDARDS-CATALOG"
+    authority: "FDA"
+    title: "Data Standards Catalog"
+    version: "current page checked 2026-08-15"
+    checked_on: "2026-08-15"
+    url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/data-standards-catalog"
+  - id: "FDA-STANDARDIZED-DATA-SAMPLE"
+    authority: "FDA"
+    title: "Submit Standardized Data Sample"
+    version: "current page checked 2026-08-15"
+    checked_on: "2026-08-15"
+    url: "https://www.fda.gov/drugs/electronic-regulatory-submission-and-review/submit-standardized-data-sample-fda"
+  - id: "FDA-CITD"
+    authority: "FDA"
+    title: "Complex Innovative Trial Design Meeting Program"
+    version: "current page checked 2026-08-15"
+    checked_on: "2026-08-15"
+    url: "https://www.fda.gov/drugs/development-resources/complex-innovative-trial-design-meeting-program"
+  - id: "FDA-MODEL-DATA"
+    authority: "FDA"
+    title: "Model | Data Format"
+    version: "current page checked 2026-08-15"
+    checked_on: "2026-08-15"
+    url: "https://www.fda.gov/about-fda/center-drug-evaluation-and-research-cder/model-data-format"
+  - id: "FDA-COMPUTERIZED-SYSTEMS"
+    authority: "FDA"
+    title: "Computerized Systems Used in Clinical Trials"
+    version: "current page checked 2026-08-15"
+    checked_on: "2026-08-15"
+    url: "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/fda-bioresearch-monitoring-information/guidance-industry-computerized-systems-used-clinical-trials"
+  - id: "FDA-PART-11"
+    authority: "FDA"
+    title: "Part 11, Electronic Records; Electronic Signatures"
+    version: "current page checked 2026-08-15"
+    checked_on: "2026-08-15"
+    url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/part-11-electronic-records-electronic-signatures-scope-and-application"
+  - id: "ICH-E6-R3"
+    authority: "ICH"
+    title: "Good Clinical Practice E6(R3)"
+    version: "final adopted 2025-01-06; error corrections 2025-10-24"
+    checked_on: "2026-08-15"
+    url: "https://database.ich.org/sites/default/files/ICH_E6%28R3%29_Step4_FinalGuideline_2025_0106_ErrorCorrections_2025_1024.pdf"
+  - id: "FDA-E9-R1"
+    authority: "FDA/ICH"
+    title: "E9(R1) Statistical Principles: Estimands and Sensitivity Analysis"
+    version: "final guidance"
+    checked_on: "2026-08-15"
+    url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/e9r1-statistical-principles-clinical-trials-addendum-estimands-and-sensitivity-analysis-clinical"
+
+# Status is an assessed state, not a generated green badge. PASS means the
+# local evidence is present for this scope; PARTIAL means the evidence exists
+# but is bounded; BLOCKED/NOT_QUALIFIED are intentional release blockers.
+controls:
+  - id: "GOV-001"
+    domain: "governance"
+    expectation: "The product claim, intended use, and prohibited regulatory claims are explicit before release."
+    status: "PASS"
+    evidence:
+      - path: "docs/PRODUCT_CLAIM.md"
+        required: true
+      - path: "docs/QUALITY_SYSTEM_BOUNDARY.md"
+        required: true
+      - path: "config/regulatory_baseline.yaml"
+        required: true
+    owner_action: "Reapprove the claim if the intended use or data boundary changes."
+
+  - id: "GOV-002"
+    domain: "governance"
+    expectation: "The statistical objective, estimand, scenario assumptions, and precision acceptance criteria are prospective and frozen."
+    status: "PASS"
+    evidence:
+      - path: "config/simulation_protocol.yaml"
+        required: true
+      - path: "07_reviewer_explanation/simulation_model_analysis_plan.md"
+        required: true
+      - path: "07_reviewer_explanation/simulation_report.md"
+        required: true
+    owner_action: "Record an approved change-control decision before modifying the frozen protocol."
+
+  - id: "GOV-003"
+    domain: "governance"
+    expectation: "The release is reproducible, hash-bound, and independently re-checkable from a clean checkout."
+    status: "PARTIAL"
+    evidence:
+      - path: "scripts/verify_release.py"
+        required: true
+      - path: "platform/check_simulation_evidence.py"
+        required: true
+      - path: "docs/RELEASE_RUN_MANIFEST.md"
+        required: true
+    owner_action: "Re-run the genuine SAS/ODA production path and refresh the controlled seal before any release claim."
+
+  - id: "GOV-004"
+    domain: "regulatory_scope"
+    expectation: "Official FDA/ICH/CDISC/eCFR sources are inventoried by applicability, status, local evidence, and owner action without pretending that every guideline is relevant."
+    status: "PASS"
+    evidence:
+      - path: "config/regulatory_source_inventory.yaml"
+        required: true
+      - path: "platform/check_regulatory_source_inventory.py"
+        required: true
+      - path: "tests/test_regulatory_source_inventory.py"
+        required: true
+    owner_action: "Re-screen the FDA clinical-guidance and ICH guideline indexes when the product, region, data source, or intended use changes."
+
+  - id: "STAT-001"
+    domain: "statistics"
+    expectation: "The estimand and intercurrent-event strategy are explicit, and sensitivity analysis is tied to the question of interest."
+    status: "PARTIAL"
+    evidence:
+      - path: "07_reviewer_explanation/simulation_model_analysis_plan.md"
+        required: true
+      - path: "02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx"
+        required: true
+      - path: "07_reviewer_explanation/analysis_report.md"
+        required: true
+    owner_action: "For a real study, obtain statistician and clinical approval of the final E9(R1) estimand and sensitivity set."
+
+  - id: "STAT-002"
+    domain: "simulation"
+    expectation: "A structured simulation protocol covers plausible/null/stress scenarios, design operating characteristics, and Monte Carlo precision."
+    status: "PASS"
+    evidence:
+      - path: "config/simulation_protocol.yaml"
+        required: true
+      - path: "platform/simulation_operating_characteristics/simulation_oc_status.json"
+        required: true
+      - path: "platform/simulation_operating_characteristics/scenario_results.csv"
+        required: true
+      - path: "platform/simulation_operating_characteristics/representative_trials.json"
+        required: true
+    owner_action: "Add sponsor-approved thresholds and scenario evidence before using simulation results for design decisions."
+
+  - id: "STAT-003"
+    domain: "simulation"
+    expectation: "Numerical results have an analytic benchmark, complete replicate accounting, deterministic seeds, independent verification, and an explicit qualification boundary."
+    status: "PASS"
+    evidence:
+      - path: "platform/simulation_precision.py"
+        required: true
+      - path: "platform/check_simulation_evidence.py"
+        required: true
+      - path: "tests/test_simulation_evidence.py"
+        required: true
+      - path: "06_qc_evidence/audit/SIMULATION_PRECISION_IMPLEMENTATION_REPORT_2026-08-14.md"
+        required: true
+    owner_action: "Prespecify and implement correlated endpoints, missing-data mechanisms, outer-loop parameter uncertainty, and an independent engine if the intended question requires them."
+
+  - id: "STAT-004"
+    domain: "simulation"
+    expectation: "Model risk is qualified against the intended use, including joint dependence, missingness, estimator reproduction, and independent validation."
+    status: "NOT_QUALIFIED"
+    evidence:
+      - path: "docs/FDA_READINESS_RESEARCH_2026-08-15.md"
+        required: true
+    owner_action: "Do not use this simulation as MIDD, confirmatory, filing, or patient-level evidence; design a qualification study before expanding scope."
+
+  - id: "DATA-001"
+    domain: "data_and_standards"
+    expectation: "Standardized datasets, Define-XML, reviewer guides, and source-to-analysis traceability are co-located and explain known differences."
+    status: "PARTIAL"
+    evidence:
+      - path: "03_metadata/define/define.xml"
+        required: true
+      - path: "03_metadata/define/define_sdtm.xml"
+        required: true
+      - path: "07_reviewer_explanation/guides/ADRG.md"
+        required: true
+      - path: "07_reviewer_explanation/guides/SDRG.md"
+        required: true
+      - path: "07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md"
+        required: true
+    owner_action: "Run the applicable FDA/CDISC standards and controlled-terminology checks on the authorized data-bearing package and disposition all findings."
+
+  - id: "DATA-002"
+    domain: "data_and_standards"
+    expectation: "A validator report, run record, and reviewer-facing explanation exist for conformance findings."
+    status: "PARTIAL"
+    evidence:
+      - path: "06_qc_evidence/conformance/p21_adam_summary.json"
+        required: true
+      - path: "06_qc_evidence/conformance/p21_adam_runrecord.md"
+        required: true
+      - path: "06_qc_evidence/audit/run_records/SUBMISSION_STANDARDS_REMEDIATION.md"
+        required: true
+    owner_action: "Resolve or formally accept open findings with sponsor ownership; confirm tool/version compatibility and licensed-use status."
+
+  - id: "SYSTEM-001"
+    domain: "computerized_systems"
+    expectation: "Systems and interfaces are fit-for-purpose, risk-based validated, access-controlled, backed up, change-controlled, and auditable."
+    status: "NOT_QUALIFIED"
+    evidence:
+      - path: "docs/QUALITY_SYSTEM_BOUNDARY.md"
+        required: true
+      - path: "SECURITY.md"
+        required: true
+    owner_action: "For regulated use, execute an approved CSV/CSA lifecycle with requirements, IQ/OQ/PQ or equivalent risk-based evidence, audit-trail review, access review, backup/restore, and change control."
+
+  - id: "SUB-001"
+    domain: "submission"
+    expectation: "The eCTD-style package has correct leaf classification, reviewer-guide placement, metadata, links, and current center-specific standards."
+    status: "PARTIAL"
+    evidence:
+      - path: "08_submission_package/README.md"
+        required: true
+      - path: "08_submission_package/ectd/0000/index.xml"
+        required: true
+      - path: "08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf"
+        required: true
+      - path: "08_submission_package/m5/datasets/tropic/tabulations/sdtm/csdrg.pdf"
+        required: true
+    owner_action: "Confirm the relevant center, application type, eCTD version, validation criteria, gateway rules, and sample-submission expectations immediately before filing."
+
+  - id: "SUB-002"
+    domain: "release"
+    expectation: "The final release seal is green after the complete authorized production run, with no stale source/artifact hashes."
+    status: "BLOCKED"
+    evidence:
+      - path: "scripts/verify_release.py"
+        required: true
+      - path: "docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md"
+        required: true
+    owner_action: "Run the real SAS/ODA path, refresh all controlled manifests and package artifacts, and obtain owner/statistical/medical review before shipping."
+
+  - id: "QC-001"
+    domain: "quality_control"
+    expectation: "Critical outputs have risk-based independent verification and documented reviewer disposition."
+    status: "NOT_QUALIFIED"
+    evidence:
+      - path: "config/validation_strategy.yaml"
+        required: true
+      - path: "06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md"
+        required: true
+    owner_action: "For a regulated submission, assign independent QC reviewers outside the authoring chain and capture approvals in the governed quality system."
+
+  - id: "RIGHTS-001"
+    domain: "data_rights"
+    expectation: "Data, standards, software, and third-party report redistribution rights are explicit."
+    status: "PARTIAL"
+    evidence:
+      - path: "docs/LICENSING.md"
+        required: true
+      - path: "00_governance/REPRODUCIBILITY.md"
+        required: true
+    owner_action: "Obtain written sponsor/data-owner and vendor permissions for any external or filing use; rotate local credentials before sharing a working copy."

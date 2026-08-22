@@ -83,7 +83,7 @@ def test_current_baseline_requires_completed_exact_byte_rerun():
         if row["name"] == "p21.summary.exact_byte_rerun_boundary"
     )
     assert timestamp_check["ok"], timestamp_check
-    assert "bound=2026-08-12T10:28:13.216075+00:00" in timestamp_check["detail"]
+    assert "bound=2026-08-22T15:08:13.116044+00:00" in timestamp_check["detail"]
     assert boundary_check["ok"], boundary_check
     assert boundary_check["detail"] == (
         "exact current production bytes validated under standard submission filenames"
@@ -161,7 +161,7 @@ def test_definitive_p21_summary_is_self_reconciling_and_non_qualifying():
     assert summary["validation"]["process_completed"] is True
     assert summary["validation"]["compatibility_caveat"] == "Incompatible CLI used"
     assert summary["validation"]["raw_report_sha256"] == (
-        "8184a5ccedca45ccd25c444cc3aca350798085a26d03153dfbb122da9c217024"
+        "9a8af3bddfaddb7dd9ebe02bccec8da307d3236567a0c6b59ab40d955d80a93c"
     )
     assert summary["validation"]["input_content_transformations"] == 0
     assert "standard submission filenames" in summary["validation"]["input_filename_contract"]
@@ -184,13 +184,13 @@ def test_definitive_p21_summary_is_self_reconciling_and_non_qualifying():
         "adtte.xpt",
     }
     assert {row["dataset"]: row["sha256"] for row in summary["datasets"]} == {
-        "ADAE": "fcad58d6706ecfc8cd4508f874fcdd343a1f42588686edc4932ca8edaaab2a93",
-        "ADCM": "87a5c0c51f139c9fc18eeb01612bf413d159c9d71b638233155944d06637a6d0",
-        "ADEX": "88f48e9a46775ef5b9e8d40395c277badde3ebdc83fee153fea6e7793c28240d",
-        "ADLB": "e2e11cfc900be0129ef5e6d6dfeeabbd36b04bec57be5353eaa1165fb7bf10cd",
-        "ADRS": "2355507061b1c37743cd0d543ff2bb129ddbbc33d48e74f755dad711bbd4ab4f",
-        "ADSL": "b4f465cc39e4a90706c72bde69cc21b56f5aab11506f25af1190d0e9b96459ad",
-        "ADTTE": "377e13bf3b34524692b48ed77f56df1beec8b5b972c7015cf09220c530173840",
+        "ADAE": "f3725c23ac84c7f9b27b026be794bdce8696d8f912f9f238059d9583b711c9eb",
+        "ADCM": "78203f0e65e1b7c807f38ad5f44cd631c1c7f2e757fe92883a07cad60a86486c",
+        "ADEX": "14cba1a78142ae1b93c718f8e6a30341cf3aff1e93ab8b003e734b9d0289ec0e",
+        "ADLB": "935798a5be62bf9443acedc297873d4021520a2aebfd33b6e115733e130e16d9",
+        "ADRS": "972b2839f937bccf5b3c5e6514d40ef830a27ecc0022ceaa5ae58b1fb2c768a3",
+        "ADSL": "6320f2685e4f2cb1470b9a2c21a5e70b75be558c41644f78590f4005ee710a5e",
+        "ADTTE": "e2107540b51c031dee46a489975da32c2cd219e325e3dc42b3d79c1f4b3a893a",
     }
     assert totals["issue_groups"] == len(summary["issues"])
     assert totals["issue_occurrences"] == sum(row["found"] for row in summary["issues"])
@@ -198,13 +198,13 @@ def test_definitive_p21_summary_is_self_reconciling_and_non_qualifying():
         row["occurrences"] for row in summary["residual_families"]
     )
     assert summary["pipeline_binding"] == {
-        "health_timestamp": "2026-08-12T10:28:13.216075+00:00",
+        "health_timestamp": "2026-08-22T15:08:13.116044+00:00",
         "pipeline_health_status": "GREEN",
         "sas_execution_mode": "oda",
         "run_scope": "full_dag",
-        "stages_expected": 37,
-        "stages_recorded": 37,
-        "source_tree_sha256": "25eea11519389347cf943ecdb2c57c55733c32f781241f158d91acca35eb6fa5",
+        "stages_expected": 40,
+        "stages_recorded": 40,
+        "source_tree_sha256": "c1aaa7b100d80e2fdaceaf50dda04c0d23a4c6c349007acfa63ab93096f9d6c0",
     }
     assert summary["remediation_comparison"]["occurrences_eliminated"] == 84238
     assert summary["remediation_comparison"]["percent_reduction"] == 97.3
@@ -218,7 +218,7 @@ def test_definitive_p21_summary_is_self_reconciling_and_non_qualifying():
         "independent_qc_approved": False,
     }
     assert summary["exact_byte_rerun"] == {
-        "health_timestamp": "2026-08-12T10:28:13.216075+00:00",
+        "health_timestamp": "2026-08-22T15:08:13.116044+00:00",
         "completed": True,
         "datasets_validated": 7,
         "input_hashes_match_current_production_xpts": True,
@@ -226,6 +226,6 @@ def test_definitive_p21_summary_is_self_reconciling_and_non_qualifying():
         "content_transformations": 0,
         "process_completed": True,
         "report_sha256": (
-            "8184a5ccedca45ccd25c444cc3aca350798085a26d03153dfbb122da9c217024"
+            "9a8af3bddfaddb7dd9ebe02bccec8da307d3236567a0c6b59ab40d955d80a93c"
         ),
     }

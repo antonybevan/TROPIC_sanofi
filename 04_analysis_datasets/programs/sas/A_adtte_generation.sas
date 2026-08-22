@@ -389,6 +389,17 @@ proc sql;
       and r.ADT <= &STUDY_CUTOFF_DT.;
 quit;
 
+proc sql noprint;
+    select count(*), count(distinct usubjid)
+        into :_n_psa_prog trimmed, :_n_psa_prog_unique trimmed
+    from work.psa_prog_dates;
+quit;
+%if &_n_psa_prog. ne &_n_psa_prog_unique. %then %do;
+    %put ERROR: [ADTTE-QC] TTPSA progression source is not unique by USUBJID.;
+    %let SYSCC=8;
+    %abort cancel;
+%end;
+
 proc sql;
     create table work.psa_censor_dates as
     select l.usubjid, max(l.ADT) as last_psa_dt format=yymmdd10.
@@ -540,9 +551,31 @@ proc sql noprint;
     select count(*) into :_n_tte_bad_origin trimmed
     from adam.adtte
     where missing(STARTDT) or missing(ADT) or ADT < STARTDT or AVAL < 1;
+    select count(*) into :_n_tte_bad_cnsr trimmed
+    from adam.adtte
+    where missing(CNSR) or CNSR not in (0, 1);
+    select count(*) into :_n_tte_dup_key trimmed
+    from (
+        select USUBJID, PARAMCD
+        from adam.adtte
+        group by USUBJID, PARAMCD
+        having count(*) > 1
+    );
 quit;
 %if &_n_tte_bad_origin. > 0 %then %do;
     %put ERROR: [ADTTE-QC] &_n_tte_bad_origin. records have missing or pre-origin dates.;
+    %let SYSCC=8;
+    %abort cancel;
+%end;
+%if &_n_tte_bad_cnsr. > 0 %then %do;
+    %put ERROR: [ADTTE-QC] &_n_tte_bad_cnsr. records have invalid CNSR values.;
+    %let SYSCC=8;
+    %abort cancel;
+%end;
+%if &_n_tte_dup_key. > 0 %then %do;
+    %put ERROR: [ADTTE-QC] &_n_tte_dup_key. duplicate USUBJID/PARAMCD keys.;
+    %let SYSCC=8;
+    %abort cancel;
 %end;
 
 proc sort data=adam.adtte;

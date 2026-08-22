@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-08-12T10:28:13.216075+00:00",
+  "timestamp": "2026-08-22T15:08:13.116044+00:00",
   "runner": "apple (System Agent)",
   "pipeline_health_status": "GREEN",
   "sas_execution_mode": "oda",
   "schema_version": "run_scope_v1",
   "run_scope": "full_dag",
-  "stages_expected": 37,
-  "stages_recorded": 37,
+  "stages_expected": 40,
+  "stages_recorded": 40,
   "stages_not_run": [],
   "stages": {
     "Governance Scope Lock (G00)": "PASS",
@@ -37,6 +37,9 @@
     "Figure-Data Reconciliation (SAS vs R)": "PASS",
     "ADaM Spec to Define Conformance": "PASS",
     "ADaM Spec to Data Conformance": "PASS",
+    "Simulation Operating Characteristics": "PASS",
+    "Simulation MAP and Report": "PASS",
+    "Simulation Evidence Independent Verification": "PASS",
     "Reviewer Package Lock (G07)": "PASS",
     "Dataset-JSON Export (v1.1)": "PASS",
     "Analysis Results Standard (ARS v1.0)": "PASS",
@@ -49,10 +52,10 @@
   },
   "r_version": "R version 4.6.0 (2026-04-24)",
   "renv_lock_sha256": "a9ba2082ce1f227add5d2cb400fb70688ea5031fef238dcf1bf1928de2700630",
-  "source_tree_sha256": "5304210e990b4a452fa0af2d9eb2867c846637b3f12bb73449aabea0e2deb473",
+  "source_tree_sha256": "9109c49f495b386ea92c1bbfbbee073f3e92d00f5ad146e48f6be7f2fd226797",
   "oda_endpoint": "odaws01-apse1-2.oda.sas.com",
   "oda_attempts": 1,
-  "oda_total_wait_s": 6.6,
+  "oda_total_wait_s": 6.2,
   "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007",
   "reconciliation": "SAS_vs_R",
   "probe_nonce_echoed": true,
@@ -106,13 +109,14 @@
   },
   "governance_only_reseal": {
     "status": "PASS",
-    "rebound_at": "2026-08-13T19:58:44.579770+00:00",
-    "base_revision": "37b5e6e",
-    "clinical_run_timestamp": "2026-08-12T10:28:13.216075+00:00",
-    "prior_source_tree_sha256": "8716a977c9fefef3f776e9ac364b3388bbe7d42edcfc8a715dece43032e61f1c",
-    "rebound_source_tree_sha256": "5304210e990b4a452fa0af2d9eb2867c846637b3f12bb73449aabea0e2deb473",
+    "rebound_at": "2026-08-22T15:19:54.395071+00:00",
+    "base_revision": "9c2c7b8",
+    "clinical_run_timestamp": "2026-08-22T15:08:13.116044+00:00",
+    "prior_source_tree_sha256": "deffb216c8b86961b872e74e8cc5866656a6c492f0032908689458c215380d14",
+    "rebound_source_tree_sha256": "9109c49f495b386ea92c1bbfbbee073f3e92d00f5ad146e48f6be7f2fd226797",
     "changed_paths": [
-      "07_reviewer_explanation/tools/shiny/app.R"
+      "06_qc_evidence/conformance/p21_adam_summary.json",
+      "06_qc_evidence/gates/regulatory_baseline_status.json"
     ],
     "clinical_run_was_not_reexecuted": true,
     "reason": "Pipeline integrity, dependency, executor-validation, regulatory-claim, external-validator-evidence, reviewer-presentation, and test controls changed; clinical derivation programs, study parameters, datasets, and statistical results did not."
@@ -120,158 +124,32 @@
   "governance_reseal_chain": [
     {
       "status": "PASS",
-      "rebound_at": "2026-08-12T10:41:08.049854+00:00",
-      "base_revision": "14fe396",
-      "clinical_run_timestamp": "2026-08-12T10:28:13.216075+00:00",
-      "prior_source_tree_sha256": "21b5d67359c2ab8b733be9ea1d3d3a09131b43051b9d3c0a3017139d609af2a4",
-      "rebound_source_tree_sha256": "7a06242b76a0953a54ec8f01e558869dca6f1d5ded130a4e0029a3ad431495fa",
+      "rebound_at": "2026-08-22T15:18:44.065574+00:00",
+      "base_revision": "56a2a6f",
+      "clinical_run_timestamp": "2026-08-22T15:08:13.116044+00:00",
+      "prior_source_tree_sha256": "c1aaa7b100d80e2fdaceaf50dda04c0d23a4c6c349007acfa63ab93096f9d6c0",
+      "rebound_source_tree_sha256": "deffb216c8b86961b872e74e8cc5866656a6c492f0032908689458c215380d14",
       "changed_paths": [
         "06_qc_evidence/conformance/p21_adam_runrecord.md",
-        "06_qc_evidence/conformance/p21_adam_summary.json",
-        "tests/test_regulatory_baseline.py"
-      ],
-      "clinical_run_was_not_reexecuted": true,
-      "reason": "Pipeline integrity, dependency, executor-validation, regulatory-claim, external-validator-evidence, and test controls changed; clinical derivation programs, study parameters, datasets, and statistical results did not."
-    },
-    {
-      "status": "PASS",
-      "rebound_at": "2026-08-12T10:43:27.870828+00:00",
-      "base_revision": "00f4f22",
-      "clinical_run_timestamp": "2026-08-12T10:28:13.216075+00:00",
-      "prior_source_tree_sha256": "7a06242b76a0953a54ec8f01e558869dca6f1d5ded130a4e0029a3ad431495fa",
-      "rebound_source_tree_sha256": "25eea11519389347cf943ecdb2c57c55733c32f781241f158d91acca35eb6fa5",
-      "changed_paths": [
         "06_qc_evidence/conformance/p21_adam_summary.json",
         "06_qc_evidence/gates/regulatory_baseline_status.json",
-        "platform/check_regulatory_baseline.py",
-        "platform/pipeline_health.json",
-        "scripts/rebind_governance_seal.py",
-        "tests/test_regulatory_baseline.py"
-      ],
-      "clinical_run_was_not_reexecuted": true,
-      "reason": "Pipeline integrity, dependency, executor-validation, regulatory-claim, external-validator-evidence, and test controls changed; clinical derivation programs, study parameters, datasets, and statistical results did not."
-    },
-    {
-      "status": "PASS",
-      "rebound_at": "2026-08-12T11:31:05.048134+00:00",
-      "base_revision": "1a6b189b0b59e9784faf93f0eece3f8b8a1c56c1",
-      "clinical_run_timestamp": "2026-08-12T10:28:13.216075+00:00",
-      "prior_source_tree_sha256": "25eea11519389347cf943ecdb2c57c55733c32f781241f158d91acca35eb6fa5",
-      "rebound_source_tree_sha256": "e535b7c3fed330d1fa65f98986baa089cf0e19f928995d9c571ccaffb8766de6",
-      "changed_paths": [
-        ".github/workflows/ci.yml",
-        "06_qc_evidence/conformance/p21_adam_runrecord.md",
-        "06_qc_evidence/conformance/p21_adam_summary.json",
         "config/regulatory_baseline.yaml",
-        "platform/build_release_run_manifest.py",
         "platform/check_regulatory_baseline.py",
-        "platform/stage_p21_adam_inputs.py",
-        "scripts/rebind_governance_seal.py",
-        "tests/test_p21_staging.py",
         "tests/test_regulatory_baseline.py"
       ],
       "clinical_run_was_not_reexecuted": true,
-      "reason": "Pipeline integrity, dependency, executor-validation, regulatory-claim, external-validator-evidence, and test controls changed; clinical derivation programs, study parameters, datasets, and statistical results did not."
-    },
-    {
-      "status": "PASS",
-      "rebound_at": "2026-08-12T12:18:25.297856+00:00",
-      "base_revision": "43097f1",
-      "clinical_run_timestamp": "2026-08-12T10:28:13.216075+00:00",
-      "prior_source_tree_sha256": "e535b7c3fed330d1fa65f98986baa089cf0e19f928995d9c571ccaffb8766de6",
-      "rebound_source_tree_sha256": "31e2df88517d231624a5c56fbdb5c74398b240a452e5863f5ca618248fd3f29c",
-      "changed_paths": [
-        ".github/workflows/ci.yml",
-        "07_reviewer_explanation/tools/shiny/app.R",
-        "platform/build_release_run_manifest.py",
-        "scripts/rebind_governance_seal.py",
-        "tests/test_shiny_dashboard.R",
-        "tests/test_shiny_dashboard_local.R"
-      ],
-      "clinical_run_was_not_reexecuted": true,
       "reason": "Pipeline integrity, dependency, executor-validation, regulatory-claim, external-validator-evidence, reviewer-presentation, and test controls changed; clinical derivation programs, study parameters, datasets, and statistical results did not."
     },
     {
       "status": "PASS",
-      "rebound_at": "2026-08-13T05:50:13.672016+00:00",
-      "base_revision": "fb39f07",
-      "clinical_run_timestamp": "2026-08-12T10:28:13.216075+00:00",
-      "prior_source_tree_sha256": "31e2df88517d231624a5c56fbdb5c74398b240a452e5863f5ca618248fd3f29c",
-      "rebound_source_tree_sha256": "cd6c368435203012747c5abcd2bd20698b96f71f4f0f24e43c9d05fbace02450",
+      "rebound_at": "2026-08-22T15:19:54.395071+00:00",
+      "base_revision": "9c2c7b8",
+      "clinical_run_timestamp": "2026-08-22T15:08:13.116044+00:00",
+      "prior_source_tree_sha256": "deffb216c8b86961b872e74e8cc5866656a6c492f0032908689458c215380d14",
+      "rebound_source_tree_sha256": "9109c49f495b386ea92c1bbfbbee073f3e92d00f5ad146e48f6be7f2fd226797",
       "changed_paths": [
-        ".github/workflows/ci.yml",
-        "05_outputs/tfl/TFL_Gallery.html",
-        "06_qc_evidence/audit/DASHBOARD_VISUAL_QC.md",
-        "06_qc_evidence/audit/dashboard_evidence/kaplan_meier.jpg",
-        "06_qc_evidence/audit/dashboard_evidence/overview.jpg",
-        "06_qc_evidence/audit/dashboard_evidence/reconciliation.jpg",
-        "06_qc_evidence/audit/dashboard_evidence/response.jpg",
-        "06_qc_evidence/audit/dashboard_evidence/safety.jpg",
-        "07_reviewer_explanation/tools/shiny/app.R",
-        "docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md",
-        "platform/build_release_run_manifest.py",
-        "scripts/rebind_governance_seal.py",
-        "scripts/verify_release.py",
-        "tests/test_shiny_dashboard.R",
-        "tests/test_submission_surface.py",
-        "tests/test_verify_release.py"
-      ],
-      "clinical_run_was_not_reexecuted": true,
-      "reason": "Pipeline integrity, dependency, executor-validation, regulatory-claim, external-validator-evidence, reviewer-presentation, and test controls changed; clinical derivation programs, study parameters, datasets, and statistical results did not."
-    },
-    {
-      "status": "PASS",
-      "rebound_at": "2026-08-13T06:01:37.309055+00:00",
-      "base_revision": "f3aa081",
-      "clinical_run_timestamp": "2026-08-12T10:28:13.216075+00:00",
-      "prior_source_tree_sha256": "cd6c368435203012747c5abcd2bd20698b96f71f4f0f24e43c9d05fbace02450",
-      "rebound_source_tree_sha256": "ae9e63ba8702c964e7086be68618bdf667b3408f9f0d84b99dfe3151a11e016a",
-      "changed_paths": [
-        "docs/REPO_SURFACE_POLICY.md",
-        "platform/build_release_run_manifest.py",
-        "scripts/rebind_governance_seal.py"
-      ],
-      "clinical_run_was_not_reexecuted": true,
-      "reason": "Pipeline integrity, dependency, executor-validation, regulatory-claim, external-validator-evidence, reviewer-presentation, and test controls changed; clinical derivation programs, study parameters, datasets, and statistical results did not."
-    },
-    {
-      "status": "PASS",
-      "rebound_at": "2026-08-13T19:48:40.693304+00:00",
-      "base_revision": "0d26041",
-      "clinical_run_timestamp": "2026-08-12T10:28:13.216075+00:00",
-      "prior_source_tree_sha256": "ae9e63ba8702c964e7086be68618bdf667b3408f9f0d84b99dfe3151a11e016a",
-      "rebound_source_tree_sha256": "8de5cc50456371625ea140ba9ea2cccb1158d471e74f47261f567696a2fb1d1c",
-      "changed_paths": [
-        "07_reviewer_explanation/tools/shiny/app.R",
-        "tests/test_shiny_dashboard.R"
-      ],
-      "clinical_run_was_not_reexecuted": true,
-      "reason": "Pipeline integrity, dependency, executor-validation, regulatory-claim, external-validator-evidence, reviewer-presentation, and test controls changed; clinical derivation programs, study parameters, datasets, and statistical results did not."
-    },
-    {
-      "status": "PASS",
-      "rebound_at": "2026-08-13T19:53:25.792642+00:00",
-      "base_revision": "c872b43",
-      "clinical_run_timestamp": "2026-08-12T10:28:13.216075+00:00",
-      "prior_source_tree_sha256": "8de5cc50456371625ea140ba9ea2cccb1158d471e74f47261f567696a2fb1d1c",
-      "rebound_source_tree_sha256": "8716a977c9fefef3f776e9ac364b3388bbe7d42edcfc8a715dece43032e61f1c",
-      "changed_paths": [
-        "07_reviewer_explanation/tools/shiny/app.R",
-        "tests/test_shiny_dashboard.R",
-        "tests/test_shiny_dashboard_local.R"
-      ],
-      "clinical_run_was_not_reexecuted": true,
-      "reason": "Pipeline integrity, dependency, executor-validation, regulatory-claim, external-validator-evidence, reviewer-presentation, and test controls changed; clinical derivation programs, study parameters, datasets, and statistical results did not."
-    },
-    {
-      "status": "PASS",
-      "rebound_at": "2026-08-13T19:58:44.579770+00:00",
-      "base_revision": "37b5e6e",
-      "clinical_run_timestamp": "2026-08-12T10:28:13.216075+00:00",
-      "prior_source_tree_sha256": "8716a977c9fefef3f776e9ac364b3388bbe7d42edcfc8a715dece43032e61f1c",
-      "rebound_source_tree_sha256": "5304210e990b4a452fa0af2d9eb2867c846637b3f12bb73449aabea0e2deb473",
-      "changed_paths": [
-        "07_reviewer_explanation/tools/shiny/app.R"
+        "06_qc_evidence/conformance/p21_adam_summary.json",
+        "06_qc_evidence/gates/regulatory_baseline_status.json"
       ],
       "clinical_run_was_not_reexecuted": true,
       "reason": "Pipeline integrity, dependency, executor-validation, regulatory-claim, external-validator-evidence, reviewer-presentation, and test controls changed; clinical derivation programs, study parameters, datasets, and statistical results did not."

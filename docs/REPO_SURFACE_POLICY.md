@@ -19,13 +19,16 @@ This is **reproducible factory + honest sealed evidence + clean review face.**
 | 3 | `08_submission_package/m5/` | Module 5–style **review package** (data-free preview) |
 | 4 | `07_reviewer_explanation/guides/` | ADRG · cSDRG source · BDRG |
 | 5 | `docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md` | Current controlled release narrative |
-| 6 | `python3 scripts/verify_release.py` | Re-check seals without SAS |
-| 7 | `docs/SCRIPT_MAP.md` · `platform/README.md` | If they want the factory |
+| 6 | `docs/FDA_READINESS_RESEARCH_2026-08-15.md` | FDA/ICH pre-shipment controls and honest blockers |
+| 7 | `python3 scripts/verify_release.py` | Re-check seals without SAS |
+| 8 | `docs/SCRIPT_MAP.md` · `platform/README.md` | If they want the factory |
 
 **Interview line:**  
 Package under `m5/`. Factory is programs, orchestration, and evidence. Patient data are not in Git. CbzP is synthetic/reconstructed and TFL-only. This is not a filing.
 
-Full walk: [`INTERVIEWER_GUIDE.md`](INTERVIEWER_GUIDE.md).
+Full walk: [`INTERVIEWER_GUIDE.md`](INTERVIEWER_GUIDE.md). The current branch
+is a controlled simulation and intentionally does not advertise a green filing
+seal; the readiness checker records the remaining owner actions.
 
 ---
 
@@ -58,6 +61,7 @@ Full walk: [`INTERVIEWER_GUIDE.md`](INTERVIEWER_GUIDE.md).
 - `07_reviewer_explanation/guides/`  
 - `07_reviewer_explanation/simulation_model_analysis_plan.md` · `simulation_report.md`
 - Findings disposition board + findings register  
+- Historical audit baselines and closure records under `06_qc_evidence/audit/run_records/`
 
 ### D. Sealed run evidence
 

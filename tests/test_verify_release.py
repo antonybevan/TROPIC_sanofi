@@ -66,9 +66,19 @@ class TestReleaseSealHelpers(unittest.TestCase):
                 }],
             }
         }
-        self.assertEqual([], verify_release.sealed_source_problems(manifest))
+        with patch.multiple(
+            verify_release,
+            FIXED_CONTROL_FILES=(),
+            PIPELINE_CONTROL_FILES=(),
+        ):
+            self.assertEqual([], verify_release.sealed_source_problems(manifest))
         self.source.write_text("print('changed')\n", encoding="utf-8")
-        self.assertEqual(["platform/example.py"], verify_release.sealed_source_problems(manifest))
+        with patch.multiple(
+            verify_release,
+            FIXED_CONTROL_FILES=(),
+            PIPELINE_CONTROL_FILES=(),
+        ):
+            self.assertEqual(["platform/example.py"], verify_release.sealed_source_problems(manifest))
 
     def test_source_tree_digest_detects_changed_source(self):
         manifest = {
@@ -167,6 +177,36 @@ class TestReleaseSealHelpers(unittest.TestCase):
 
     def test_secret_scanner_policy_is_bound_as_pipeline_control(self):
         self.assertIn(".gitleaks.toml", build_release_run_manifest.PIPELINE_CONTROL_FILES)
+
+    def test_verifier_and_builder_fixed_control_registries_match(self):
+        self.assertEqual(
+            set(verify_release.FIXED_CONTROL_FILES),
+            set(build_release_run_manifest.CONTROL_FILES),
+        )
+        self.assertEqual(
+            set(verify_release.PIPELINE_CONTROL_FILES),
+            set(build_release_run_manifest.PIPELINE_CONTROL_FILES),
+        )
+
+    def test_missing_fixed_control_is_a_seal_failure(self):
+        manifest = {
+            "artifacts": {
+                "controls": [{
+                    "path": "platform/example.py",
+                    "sha256": verify_release.sha256(self.source),
+                }],
+                "programs": [],
+                "pipeline_controls": [],
+            }
+        }
+        with patch.object(verify_release, "FIXED_CONTROL_FILES", ("platform/example.py", "missing.md")):
+            problems = verify_release.sealed_source_problems(manifest)
+        self.assertTrue(any("fixed control seal incomplete" in item for item in problems))
+
+    def test_builder_required_hashes_fail_closed(self):
+        with patch.object(build_release_run_manifest, "ROOT", Path(self.tmp.name)):
+            with self.assertRaisesRegex(RuntimeError, "required release-control"):
+                build_release_run_manifest._hash_existing(["missing-control.md"], required=True)
 
 
 if __name__ == "__main__":

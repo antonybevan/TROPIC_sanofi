@@ -5,6 +5,7 @@ Covers acceptance criteria §7: earned-mode (probe), teardown on failed spawn, f
 backoff-not-blind-loop, idempotent seed, unverified-library detection.
 """
 import os
+import pickle
 import sys
 import json
 import glob
@@ -488,6 +489,25 @@ class TestCtCrossValidation(unittest.TestCase):
         self.assertEqual(results[0]["missing_decodes"], ["Y"])
         self.assertEqual(results[0]["decode_mismatches"], ["N"])
 
+    def test_offline_cache_path_rejects_traversal_and_symlink(self):
+        with self.assertRaises(ValueError):
+            CTV._validated_cache_path("../outside", "2026-03-27")
+        with self.assertRaises(ValueError):
+            CTV._validated_cache_path("adamct", "../../outside")
+        with tempfile.TemporaryDirectory() as td:
+            original_cache = CTV.CACHE
+            CTV.CACHE = td
+            try:
+                target = os.path.join(td, "adamct-2026-03-27.pkl")
+                link = os.path.join(td, "sdtmct-2026-03-27.pkl")
+                with open(target, "wb") as handle:
+                    handle.write(b"not a pickle")
+                os.symlink(target, link)
+                with self.assertRaises(ValueError):
+                    CTV._validated_cache_path("sdtmct", "2026-03-27")
+            finally:
+                CTV.CACHE = original_cache
+
 
 class TestFailoverStatus(unittest.TestCase):
     def _cfg(self, text):
@@ -887,6 +907,58 @@ class TestSeedIdempotent(unittest.TestCase):
         self.assertIn("VERIFY_SKIPPED", res["mismatches"][0])
         self.assertNotEqual(sas.uploaded[-1], S.MANIFEST_NAME)
 
+    def test_remote_paths_are_restricted_before_sas_interpolation(self):
+        for path in ("~/TROPIC", "/home/test/TROPIC", "/home/test/a_b-1.2", "/"):
+            self.assertEqual(S.validate_remote_path(path), path)
+        for path in ("relative/path", "/home/test/../escape", "/home/test/with space",
+                     '/home/test/";run;/*', "/home/test/$MACRO", "/home/test//nested",
+                     "~other/TROPIC", ""):
+            with self.assertRaises(ValueError, msg=path):
+                S.validate_remote_path(path)
+
+    def test_malicious_remote_path_never_reaches_sas_submit(self):
+        calls = []
+        sas = type("Sas", (), {
+            "submit": lambda self, code: calls.append(code) or {"LOG": ""},
+        })()
+        with self.assertRaises(ValueError):
+            S._ensure_remote_dir(sas, '/home/test/"; %include "/tmp/evil.sas"; /*')
+        self.assertEqual(calls, [])
+
+    def test_malicious_remote_home_is_rejected(self):
+        sas = type("Sas", (), {
+            "submit": lambda self, code: {
+                "LOG": 'TROPIC_ODA_HOME=/home/test"; %include "/tmp/evil.sas"; /*\n'
+            },
+        })()
+        with self.assertRaises(ValueError):
+            S._resolve_oda_home(sas, "~/TROPIC")
+
+    def test_stage10_sdtm_path_is_bound_to_project_root(self):
+        sas = type("Sas", (), {
+            "submit": lambda self, code: {"LOG": "TROPIC_ODA_HOME=/home/test\n"},
+        })()
+        with mock.patch.dict(os.environ, {"TROPIC_ODA_SDTM_DIR": "/home/test/decoy"}):
+            with self.assertRaisesRegex(ValueError, "canonical project-root"):
+                S.resolve_sdtm_remote_dir(sas, "/home/test/TROPIC")
+        with mock.patch.dict(os.environ, {
+            "TROPIC_ODA_SDTM_DIR": "/home/test/TROPIC/01_source_data/real_sdtm",
+        }):
+            self.assertEqual(
+                S.resolve_sdtm_remote_dir(sas, "/home/test/TROPIC"),
+                "/home/test/TROPIC/01_source_data/real_sdtm",
+            )
+
+    def test_local_sdtm_manifest_rejects_symlink_inputs(self):
+        with tempfile.TemporaryDirectory() as td:
+            target = os.path.join(td, "real.sas7bdat")
+            link = os.path.join(td, "dm.sas7bdat")
+            with open(target, "wb") as handle:
+                handle.write(b"not a dataset")
+            os.symlink(target, link)
+            with self.assertRaisesRegex(ValueError, "non-regular SDTM"):
+                S.compute_local_manifest(td)
+
 
 class TestOdaRenderTflHelpers(unittest.TestCase):
     def setUp(self):
@@ -899,6 +971,23 @@ class TestOdaRenderTflHelpers(unittest.TestCase):
             import _oda_render_tfl as R
             importlib.reload(R)
             connect.assert_not_called()
+
+    def test_offline_ct_pickle_loader_allows_data_and_blocks_globals(self):
+        with tempfile.TemporaryDirectory() as td:
+            safe_path = os.path.join(td, "safe.pkl")
+            with open(safe_path, "wb") as handle:
+                pickle.dump({"codelists": [{"terms": [], "extensible": False}]}, handle)
+            self.assertEqual(CTV._safe_pickle_load(safe_path)["codelists"][0]["terms"], [])
+
+            class Evil:
+                def __reduce__(self):
+                    return (eval, ("1 + 1",))
+
+            evil_path = os.path.join(td, "evil.pkl")
+            with open(evil_path, "wb") as handle:
+                pickle.dump(Evil(), handle)
+            with self.assertRaises(pickle.UnpicklingError):
+                CTV._safe_pickle_load(evil_path)
 
     def test_errors_in_detects_sas_error_signatures(self):
         log = "\n".join([
@@ -948,6 +1037,35 @@ class TestOdaRenderTflHelpers(unittest.TestCase):
 
 
 class TestCibuildOdaStage(unittest.TestCase):
+    def test_stage10_rejects_invalid_root_before_sas_code(self):
+        class Sas:
+            def __init__(self):
+                self.submits = []
+                self.ended = False
+
+            def submit(self, code):
+                self.submits.append(code)
+                return {"LOG": ""}
+
+            def endsas(self):
+                self.ended = True
+
+        sas = Sas()
+        conn = type("Conn", (), {"sas": sas, "endpoint": "fake-oda"})()
+        original_root = C.PROJ_ROOT_ODA
+        C.PROJ_ROOT_ODA = '/home/test/"; %include "/tmp/evil.sas"; /*'
+        try:
+            with mock.patch.object(B, "preflight", return_value={"oda_preflight_ok": True}), \
+                 mock.patch.object(B, "connect", return_value=conn):
+                rc, _, stderr, meta = C._run_saspy_stage10()
+        finally:
+            C.PROJ_ROOT_ODA = original_root
+        self.assertEqual(rc, 2)
+        self.assertIn("Invalid TROPIC_ODA_PROJ_ROOT", stderr)
+        self.assertEqual(meta["oda_last_error_class"], "INVALID_REMOTE_PATH")
+        self.assertEqual(sas.submits, [])
+        self.assertTrue(sas.ended)
+
     def test_stage10_fails_before_program_upload_when_remote_pgmdir_missing(self):
         class Sas:
             def __init__(self):

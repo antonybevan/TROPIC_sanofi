@@ -343,14 +343,25 @@ proc sql;
     left join work.docetaxel_summary as doc on dm.usubjid = doc.usubjid;
 quit;
 
-/* ADaM QC: one row per DM subject; arm from DM map only */
-data _null_;
-    if 0 then set adam.adsl nobs=n_adsl;
-    if 0 then set sdtm.dm nobs=n_dm;
-    putlog "NOTE: [ADSL-QC] ADSL n=" n_adsl " DM n=" n_dm;
-    if n_adsl ne n_dm then
-        putlog "WARNING: [ADSL-QC] ADSL row count differs from DM — check joins.";
-run;
+/* ADaM QC: one row per DM subject; arm from DM map only.  These are hard
+   controls because a many-to-one join can silently expand every downstream
+   population and endpoint. */
+proc sql noprint;
+    select count(*), count(distinct usubjid)
+        into :_n_adsl_qc trimmed, :_n_adsl_unique trimmed
+    from adam.adsl;
+    select count(*), count(distinct usubjid)
+        into :_n_dm_qc trimmed, :_n_dm_unique trimmed
+    from sdtm.dm;
+quit;
+%put NOTE: [ADSL-QC] ADSL n=&_n_adsl_qc unique USUBJID=&_n_adsl_unique
+    DM n=&_n_dm_qc unique USUBJID=&_n_dm_unique.;
+%if &_n_adsl_qc. ne &_n_dm_qc. or &_n_adsl_unique. ne &_n_adsl_qc.
+      or &_n_dm_unique. ne &_n_dm_qc. %then %do;
+    %put ERROR: [ADSL-QC] ADSL must contain exactly one nonmissing USUBJID per DM subject.;
+    %let SYSCC=8;
+    %abort cancel;
+%end;
 proc freq data=adam.adsl noprint;
     tables TRT01P*TRT01A / out=work.adsl_trt;
 run;

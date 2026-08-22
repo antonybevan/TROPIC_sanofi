@@ -1,8 +1,8 @@
 {
   "status": "PASS",
-  "generated_at": "2026-08-12 12:18:53 UTC",
-  "checks": 18,
-  "pass": 18,
+  "generated_at": "2026-08-22 15:20:04 UTC",
+  "checks": 19,
+  "pass": 19,
   "warning": 0,
   "blocker": 0,
   "active_audit_findings": 0,
@@ -28,6 +28,13 @@
       "check": "Risk-based validation strategy is satisfied by current evidence",
       "status": "PASS",
       "evidence": "platform/validation_strategy/validation_strategy_status.json status=PASS; blocked=0",
+      "required_action": ""
+    },
+    {
+      "gate": "G06 qc_signoff",
+      "check": "Simulation methods evidence is precise, verified, and remains non-qualified",
+      "status": "PASS",
+      "evidence": "platform/simulation_operating_characteristics/simulation_oc_status.json execution=PASS; precision=PASS; design=PASS; qualification=NOT_QUALIFIED",
       "required_action": ""
     },
     {
@@ -111,14 +118,14 @@
       "gate": "G09 release_candidate_lock",
       "check": "Current release-run manifest is release-candidate grade (full DAG, clean tree)",
       "status": "PASS",
-      "evidence": "platform/release_run_manifest/release_run_manifest.json status=PASS; evidence_grade=release_candidate; run_scope=full_dag; seal=6810b9f6506f8605eb35675f048776afc6c1be6db26ef477cddf2f060bc9f5fd",
+      "evidence": "platform/release_run_manifest/release_run_manifest.json status=PASS; evidence_grade=release_candidate; run_scope=full_dag; seal=efd901226aef1bb60f86de94eaf3bb194d95a035c9c5bcc686155b474b3daf55",
       "required_action": ""
     },
     {
       "gate": "G09 release_candidate_lock",
       "check": "Pipeline health records a full current DAG run",
       "status": "PASS",
-      "evidence": "platform/pipeline_health.json run_scope=full_dag; stages_recorded=37; stages_expected=37; stages_not_run=0",
+      "evidence": "platform/pipeline_health.json run_scope=full_dag; stages_recorded=40; stages_expected=40; stages_not_run=0",
       "required_action": ""
     },
     {
@@ -132,7 +139,7 @@
       "gate": "G08 submission_package_materialization",
       "check": "Complete eCTD sequence inventory, checksums, support files, XML references, and run record validate",
       "status": "PASS",
-      "evidence": "platform/validate_ectd_sequence.py status=PASS; leaves=93/93; unexpected=0; problems=[]",
+      "evidence": "platform/validate_ectd_sequence.py status=PASS; leaves=99/99; unexpected=0; problems=[]",
       "required_action": ""
     }
   ]

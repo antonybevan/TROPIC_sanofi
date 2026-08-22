@@ -54,13 +54,37 @@
             run;
         %end;
         %else %do;
-            /* For other domains, extract standard IDVAR name (e.g. AESEQ) */
+            /* Use a governed domain-to-IDVAR map.  IDVAR is source data and must never become
+               executable macro source; unexpected values fail the ingest before any sort/merge. */
             %let idvar_name = ;
-            proc sql noprint;
-                select distinct idvar into :idvar_name trimmed
-                from realsdtm.supp&domain.
-                where not missing(idvar);
-            quit;
+            %if %upcase(&domain.) = AE %then %let idvar_name = AESEQ;
+            %else %if %upcase(&domain.) = CM %then %let idvar_name = CMSEQ;
+            %else %if %upcase(&domain.) = DS %then %let idvar_name = DSSEQ;
+            %else %if %upcase(&domain.) = EG %then %let idvar_name = EGSEQ;
+            %else %if %upcase(&domain.) = EX %then %let idvar_name = EXSEQ;
+            %else %if %upcase(&domain.) = IE %then %let idvar_name = IESEQ;
+            %else %if %upcase(&domain.) = LB %then %let idvar_name = LBSEQ;
+            %else %if %upcase(&domain.) = LS %then %let idvar_name = LSSEQ;
+            %else %if %upcase(&domain.) = MH %then %let idvar_name = MHSEQ;
+            %else %if %upcase(&domain.) = PE %then %let idvar_name = PESEQ;
+            %else %if %upcase(&domain.) = PR %then %let idvar_name = PRSEQ;
+
+            data _null_;
+                set realsdtm.supp&domain.(keep=idvar);
+                %if &idvar_name. ne %str() %then %do;
+                    if not missing(idvar) and upcase(strip(idvar)) ne "&idvar_name." then do;
+                        put "ERROR: [SUPP-IDVAR] Unexpected IDVAR for SUPP&domain.: " idvar=;
+                        abort return 8;
+                    end;
+                %end;
+                %else %do;
+                    if not missing(idvar) then do;
+                        put "ERROR: [SUPP-IDVAR] Unsupported nonblank IDVAR for SUPP&domain.: " idvar=;
+                        abort return 8;
+                    end;
+                %end;
+            run;
+            %if &syscc. > 4 %then %return;
             
             %if &idvar_name. ne %str() %then %do;
                 /* Convert IDVARVAL to numeric matching standard ID variable name */

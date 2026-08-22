@@ -1,6 +1,6 @@
 # TROPIC Release-Run Manifest
 
-Generated: 2026-08-13 19:58:44 UTC
+Generated: 2026-08-22 15:20:02 UTC
 
 > Hash-sealed run manifest for current artifacts. This is not an electronic signature or Part 11 attestation.
 
@@ -8,11 +8,11 @@ Generated: 2026-08-13 19:58:44 UTC
 
 - Status: `PASS`
 - Evidence grade: `release_candidate`
-- Manifest SHA-256 seal: `fe4953a3589c376ad4f8657cc20aa6389e8a82e4bb2d808df9353522a07208d0`
+- Manifest SHA-256 seal: `efd901226aef1bb60f86de94eaf3bb194d95a035c9c5bcc686155b474b3daf55`
 - SAS execution mode: `oda`
 - Pipeline health: `GREEN`
-- Run scope: `full_dag` (37 recorded / 36 release-required upstream stages)
-- Git HEAD: `35e6280caf8523038bbee19f7cbb00ed5b61b843`
+- Run scope: `full_dag` (40 recorded / 39 release-required upstream stages)
+- Git HEAD: `7aefe817d99b6037486176a16f79c069a652775d`
 - Worktree dirty: `False`
 - SAS companion figures: `in_dag_real_sas_companion`; current with health=`True`
 
@@ -30,14 +30,14 @@ No release-run binding problems detected.
 
 | Dataset | Prod MD5 | Validation MD5 | Distinct | Package match | Sequence match |
 | --- | --- | --- | --- | --- | --- |
-| ADSL | 4ed95a1b98c18ba2f6f45cbef2832f4f | 11cbb9ce0a28717cc85fe18fe25bd7c1 | yes | yes | yes |
-| ADEX | 19e77f8c0404e24985367e8a9b12cae6 | 9fcf09fee23d4a213a646f8fa12d2c03 | yes | yes | yes |
-| ADCM | 405cf0291f382e0f8f6feba685d04edc | f4208aeac57dac410cadc3df53c56961 | yes | yes | yes |
-| ADAE | de4fbb341f002a9ea016173342c1634b | cb4cc20bed60d456269e42266abf4603 | yes | yes | yes |
-| ADLB | e1cc58e2a6cecb45cafbd69fb4e53d77 | 3cc14032497b30c2d46aeac2d1a34e88 | yes | yes | yes |
-| ADRS | 2499d595f1b21a828fcb9885d7b19535 | 52ef9d97b18345d27c7bf3a113572d3c | yes | yes | yes |
-| ADTTE | 91412ee2309930aff89814c959f3a41a | 4ab58004322aef0c9a14ee5e1dadbd5f | yes | yes | yes |
-| CLINSITE | a6feae0d4b1d18a84c833479493025b3 | 1ffc083af386d50a46d9eb43d172b73a | yes | yes | yes |
+| ADSL | bf45bd9b872cbd7bda5074da236e2049 | 3d9593a132a791b9adb4d7d8dd2ddbef | yes | yes | yes |
+| ADEX | 46efb3a4b69d9b7a8f27c4385124f8ad | c137f8dc1b204e420795e075eedd78f4 | yes | yes | yes |
+| ADCM | fdaafe05a1095b0faf7e5603b067d4f1 | 7392a2ef5c22de1c409abbb8482e9dd5 | yes | yes | yes |
+| ADAE | 4b0b5881a281fc474887327569894fe6 | f29e57748a3d565285b2b06fce812ffe | yes | yes | yes |
+| ADLB | 0d52a21346cf5007bf4f47d01e6218f1 | 1909743f5695e61ac83b68ff6e55b258 | yes | yes | yes |
+| ADRS | 9bf00f9d6fea7bacde81db7d1b41b775 | b446d77efcd86c071433a8ef13ba0e14 | yes | yes | yes |
+| ADTTE | d24f63d6ba92a49ecef392867f269550 | 5c50541f567e2f87bf7ab1434ad9c75d | yes | yes | yes |
+| CLINSITE | 4bb2c8b02a3c7d295fcafccac33ac105 | 634dff0fdc2a2c641f4e0e4cc1b1aa45 | yes | yes | yes |
 
 ## QC Verdicts
 
@@ -55,6 +55,7 @@ No release-run binding problems detected.
 | log_cleanliness | PASS | platform/log_cleanliness/log_cleanliness_status.json |
 | tfl_output_index | pass | platform/tfl_output_index_status.json |
 | validation_strategy | PASS | platform/validation_strategy/validation_strategy_status.json |
+| simulation_operating_characteristics | PASS | platform/simulation_operating_characteristics/simulation_oc_status.json |
 | regulatory_baseline | PASS | 06_qc_evidence/gates/regulatory_baseline_status.json |
 
 ## Machine-Readable Outputs
