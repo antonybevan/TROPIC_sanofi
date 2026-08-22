@@ -329,8 +329,8 @@ def evaluate(root: Path = ROOT) -> dict:
         "pipeline_health_status": "GREEN",
         "sas_execution_mode": "oda",
         "run_scope": "full_dag",
-        "stages_expected": 37,
-        "stages_recorded": 37,
+        "stages_expected": 40,
+        "stages_recorded": 40,
     }
     for key, expected in binding_expectations.items():
         actual = pipeline_binding.get(key)
