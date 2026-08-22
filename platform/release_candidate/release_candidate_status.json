@@ -1,6 +1,6 @@
 {
   "status": "PASS",
-  "generated_at": "2026-08-22 14:57:01 UTC",
+  "generated_at": "2026-08-22 15:19:07 UTC",
   "checks": 19,
   "pass": 19,
   "warning": 0,
@@ -118,7 +118,7 @@
       "gate": "G09 release_candidate_lock",
       "check": "Current release-run manifest is release-candidate grade (full DAG, clean tree)",
       "status": "PASS",
-      "evidence": "platform/release_run_manifest/release_run_manifest.json status=PASS; evidence_grade=release_candidate; run_scope=full_dag; seal=ffbf37b2afebed86c3fafe5932994c37c6ffbab93db0a85d79e79a7353cfaa54",
+      "evidence": "platform/release_run_manifest/release_run_manifest.json status=PASS; evidence_grade=release_candidate; run_scope=full_dag; seal=8ffa14fdaa3e67d74882e576162c382574ce7b19901acc585a226297fabe6421",
       "required_action": ""
     },
     {
