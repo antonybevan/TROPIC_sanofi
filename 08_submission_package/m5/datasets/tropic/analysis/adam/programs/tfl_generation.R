@@ -430,10 +430,14 @@ er_plot <- ggplot(er_data, aes(x = RDI, y = ANC, color = TRT01P)) +
               se = FALSE, linewidth = 1.2) +
   scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"),
     labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) + # nolint
-  scale_shape_manual(values = c("CbzP" = 21, "MP" = 24),
-    labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) +
-  scale_linetype_manual(values = c("CbzP" = "solid", "MP" = "dashed"),
-    labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) +
+  scale_shape_manual(
+    values = c("CbzP" = 21, "MP" = 24),
+    labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")
+  ) +
+  scale_linetype_manual(
+    values = c("CbzP" = "solid", "MP" = "dashed"),
+    labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")
+  ) +
   labs(
     title = "F-17-1: Project Optimus Exposure-Response Analysis",
     subtitle = "Continuous ANC Nadir (Cycle 1) vs Relative Dose Intensity (RDI) by Arm\nDescriptive LOESS curves fitted on the log10 ANC scale", # nolint
@@ -445,10 +449,12 @@ er_plot <- ggplot(er_data, aes(x = RDI, y = ANC, color = TRT01P)) +
     caption = synth_cap
   ) +
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "#e74c3c", linewidth = 0.8) + # nolint
-  annotate("text", x = 43, y = 0.72,
+  annotate(
+    "text", x = 43, y = 0.72,
     label = "Grade 4 neutropenia threshold\n(below 0.5 × 10³ cells/µL)",
     color = "#e74c3c", # nolint
-    size = 3.2, fontface = "bold", family = "serif", hjust = 0) +
+    size = 3.2, fontface = "bold", family = "serif", hjust = 0
+  ) +
   scale_y_log10(
     limits = c(0.05, 100),
     breaks = c(0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100),
@@ -1094,7 +1100,10 @@ waterfall_plot <- ggplot(psa_lb, aes(
   ) +
   facet_wrap(~TRT_LABEL, scales = "free_x", ncol = 2) +
   labs(
-    title = "F-13-1: PSA Best Percentage Change from Baseline - Waterfall Plot (Baseline PSA 20 micrograms/L or higher)",
+    title = paste0(
+      "F-13-1: PSA Best Percentage Change from Baseline - Waterfall Plot ",
+      "(Baseline PSA 20 micrograms/L or higher)"
+    ),
     subtitle = paste0(
       "Each bar represents one subject's maximum PSA decrease (or increase), sorted within arm.\n",
       "Population: baseline PSA 20 micrograms/L or higher; dashed line denotes the 50% decrease response threshold."
