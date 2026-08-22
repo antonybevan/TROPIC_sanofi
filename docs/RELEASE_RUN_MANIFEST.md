@@ -1,18 +1,18 @@
 # TROPIC Release-Run Manifest
 
-Generated: 2026-08-15 01:12:13 UTC
+Generated: 2026-08-22 14:56:59 UTC
 
 > Hash-sealed run manifest for current artifacts. This is not an electronic signature or Part 11 attestation.
 
 ## Verdict
 
-- Status: `FAIL`
-- Evidence grade: `failed_binding`
-- Manifest SHA-256 seal: `6a214a682d7419a4ae7be7953562f67c69c7951491894ac20326be565dc62f6a`
+- Status: `PASS`
+- Evidence grade: `release_candidate`
+- Manifest SHA-256 seal: `ffbf37b2afebed86c3fafe5932994c37c6ffbab93db0a85d79e79a7353cfaa54`
 - SAS execution mode: `oda`
 - Pipeline health: `GREEN`
-- Run scope: `partial_dag` (37 recorded / 39 release-required upstream stages)
-- Git HEAD: `0ee4deff32c0ea758d100928a40cb45a45e2bad4`
+- Run scope: `full_dag` (40 recorded / 39 release-required upstream stages)
+- Git HEAD: `78621548559b64d5fca64efb7feee9a002c24f0a`
 - Worktree dirty: `False`
 - SAS companion figures: `in_dag_real_sas_companion`; current with health=`True`
 
@@ -24,26 +24,20 @@ Generated: 2026-08-15 01:12:13 UTC
 
 ## Problems
 
-- pipeline_health.json source_tree_sha256 does not match the current control/program tree
-- governance-only seal rebind does not match current source tree
-
-## Remediation reasons (block release-candidate PASS)
-
-- pipeline_health does not cover a full current DAG run (37 recorded in health / 39 release-required upstream stages; missing=3; not_run=0). Acceptable as targeted remediation evidence only.
-- stages missing from pipeline_health: Simulation Operating Characteristics, Simulation MAP and Report, Simulation Evidence Independent Verification
+No release-run binding problems detected.
 
 ## Dataset Binding
 
 | Dataset | Prod MD5 | Validation MD5 | Distinct | Package match | Sequence match |
 | --- | --- | --- | --- | --- | --- |
-| ADSL | 4ed95a1b98c18ba2f6f45cbef2832f4f | 3d71d58bd32b8694d17cf15a78ea43c7 | yes | yes | yes |
-| ADEX | 19e77f8c0404e24985367e8a9b12cae6 | d621a587446386a5590d29cb1d9ad7ce | yes | yes | yes |
-| ADCM | 405cf0291f382e0f8f6feba685d04edc | 21a5ed39e46a2b2721b6a6b0a9c3dfd2 | yes | yes | yes |
-| ADAE | de4fbb341f002a9ea016173342c1634b | 2966750a603b182c50642cff3337f1f1 | yes | yes | yes |
-| ADLB | e1cc58e2a6cecb45cafbd69fb4e53d77 | 62a81d964f1ea3cf7e492c38d2a18d16 | yes | yes | yes |
-| ADRS | 2499d595f1b21a828fcb9885d7b19535 | 6b07678ec50eab43c598b450da4c7a44 | yes | yes | yes |
-| ADTTE | 91412ee2309930aff89814c959f3a41a | 5ed2bd6946db54a6179f213663c82417 | yes | yes | yes |
-| CLINSITE | a6feae0d4b1d18a84c833479493025b3 | 844f666ba4132f41a35886253c4ee7fb | yes | yes | yes |
+| ADSL | 8072ce822a6827324929137236134d42 | 07c1e3d83bd79e46dc8c5668889b48b9 | yes | yes | yes |
+| ADEX | c95b3aa6f1dd70b5a352fcfd1e2d46d2 | 997aec389b2df21eefcf10640e288f79 | yes | yes | yes |
+| ADCM | 21b2e2c30d5a465530dfa46d27d41a13 | dfbf0696478239b3a083c03f5d746c33 | yes | yes | yes |
+| ADAE | 192b13d0803d8e351e04dfc9a4811592 | d2a71d353bd1dc7b6300d4e1a3878fe8 | yes | yes | yes |
+| ADLB | 54afdf012d3c192cab62949fd7cfdc4a | f5bcfb2ccde02031257163368539e027 | yes | yes | yes |
+| ADRS | c9698bfad3e31833d5c1a3e8daca4a44 | 41f9ea0924a7cc4d5e3922c07675ca7f | yes | yes | yes |
+| ADTTE | a1980c3c1fcd8bc6d87c7296766e0fa7 | 6da1a6615413384ddf9011f94d386f14 | yes | yes | yes |
+| CLINSITE | 9dfeca7a2b298c49cd9fc4c5fb4b77a5 | 673c49b1564c5040b3110e6abb5ec714 | yes | yes | yes |
 
 ## QC Verdicts
 
