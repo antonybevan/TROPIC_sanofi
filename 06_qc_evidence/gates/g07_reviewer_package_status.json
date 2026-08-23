@@ -2,7 +2,7 @@
   "gate": "G07",
   "name": "reviewer_package_lock",
   "status": "PASS",
-  "generated_at": "2026-08-22T15:08:06Z",
+  "generated_at": "2026-08-23T17:47:28Z",
   "checks": [
     {
       "name": "exists:07_reviewer_explanation/guides/ADRG.md",
@@ -62,37 +62,37 @@
     {
       "name": "release_identity:07_reviewer_explanation/analysis_report.md",
       "ok": true,
-      "detail": "expected one current-release line binding v0.3.0-clinical-simulation to docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md; found=['**Current controlled release:** tag `v0.3.0-clinical-simulation` \u00b7 [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) \u00b7 controlled clinical-submission simulation']"
+      "detail": "expected one current-release line binding v0.3.0-clinical-simulation to docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md; found=['**Current controlled release candidate:** `v0.3.0-clinical-simulation` (unreleased; tag gated by the conditional note) \u00b7 [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) \u00b7 controlled clinical-submission simulation']"
     },
     {
       "name": "release_identity:07_reviewer_explanation/guides/ADRG.md",
       "ok": true,
-      "detail": "expected one current-release line binding v0.3.0-clinical-simulation to docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md; found=['**Current controlled release:** tag `v0.3.0-clinical-simulation` \u00b7 [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) \u00b7 `python3 scripts/verify_release.py`']"
+      "detail": "expected one current-release line binding v0.3.0-clinical-simulation to docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md; found=['**Current controlled release candidate:** `v0.3.0-clinical-simulation` (unreleased; tag gated by the conditional note) \u00b7 [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) \u00b7 `python3 scripts/verify_release.py`']"
     },
     {
       "name": "release_identity:07_reviewer_explanation/guides/SDRG.md",
       "ok": true,
-      "detail": "expected one current-release line binding v0.3.0-clinical-simulation to docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md; found=['**Current controlled release:** tag `v0.3.0-clinical-simulation` \u00b7 [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) \u00b7 `python3 scripts/verify_release.py`']"
+      "detail": "expected one current-release line binding v0.3.0-clinical-simulation to docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md; found=['**Current controlled release candidate:** `v0.3.0-clinical-simulation` (unreleased; tag gated by the conditional note) \u00b7 [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) \u00b7 `python3 scripts/verify_release.py`']"
     },
     {
       "name": "release_identity:07_reviewer_explanation/guides/BDRG.md",
       "ok": true,
-      "detail": "expected one current-release line binding v0.3.0-clinical-simulation to docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md; found=['**Current controlled release:** tag `v0.3.0-clinical-simulation` \u00b7 [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) \u00b7 `python3 scripts/verify_release.py`']"
+      "detail": "expected one current-release line binding v0.3.0-clinical-simulation to docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md; found=['**Current controlled release candidate:** `v0.3.0-clinical-simulation` (unreleased; tag gated by the conditional note) \u00b7 [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) \u00b7 `python3 scripts/verify_release.py`']"
     },
     {
       "name": "release_identity:07_reviewer_explanation/simulation_model_analysis_plan.md",
       "ok": true,
-      "detail": "expected one current-release line binding v0.3.0-clinical-simulation to docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md; found=['**Current sealed controlled release:** `v0.3.0-clinical-simulation` \u00b7 [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md)']"
+      "detail": "expected one current-release line binding v0.3.0-clinical-simulation to docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md; found=['**Current controlled release candidate:** `v0.3.0-clinical-simulation` (unreleased) \u00b7 [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md)']"
     },
     {
       "name": "release_identity:07_reviewer_explanation/simulation_report.md",
       "ok": true,
-      "detail": "expected one current-release line binding v0.3.0-clinical-simulation to docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md; found=['**Current sealed controlled release:** `v0.3.0-clinical-simulation` \u00b7 [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md)']"
+      "detail": "expected one current-release line binding v0.3.0-clinical-simulation to docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md; found=['**Current controlled release candidate:** `v0.3.0-clinical-simulation` (unreleased) \u00b7 [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md)']"
     },
     {
       "name": "release_identity:08_submission_package/README.md",
       "ok": true,
-      "detail": "expected one current-release line binding v0.3.0-clinical-simulation to docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md; found=['**Current controlled release:** [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) \u00b7 tag `v0.3.0-clinical-simulation`']"
+      "detail": "expected one current-release line binding v0.3.0-clinical-simulation to docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md; found=[\"**Current controlled release candidate:** [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md). The `v0.3.0-clinical-simulation` tag does not exist until the note's promotion contract is satisfied after merge.\"]"
     },
     {
       "name": "marker:07_reviewer_explanation/guides/ADRG.md:PRODUCT_CLAIM|non-submission|controlled|",
@@ -235,6 +235,11 @@
       "detail": "rendered PDF does not identify current release v0.3.0-clinical-simulation"
     },
     {
+      "name": "reviewer_pdf.unreleased_candidate_boundary:08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
+      "ok": true,
+      "detail": "rendered PDF must identify the current controlled release candidate as unreleased and must not call it tagged/sealed"
+    },
+    {
       "name": "reviewer_pdf.letter_page_size:08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
       "ok": true,
       "detail": "612 x 792 pts (letter)"
@@ -300,6 +305,11 @@
       "detail": "rendered PDF does not identify current release v0.3.0-clinical-simulation"
     },
     {
+      "name": "reviewer_pdf.unreleased_candidate_boundary:08_submission_package/m5/datasets/tropic/tabulations/sdtm/csdrg.pdf",
+      "ok": true,
+      "detail": "rendered PDF must identify the current controlled release candidate as unreleased and must not call it tagged/sealed"
+    },
+    {
       "name": "reviewer_pdf.letter_page_size:08_submission_package/m5/datasets/tropic/tabulations/sdtm/csdrg.pdf",
       "ok": true,
       "detail": "612 x 792 pts (letter)"
@@ -363,6 +373,11 @@
       "name": "reviewer_pdf.release_identity:08_submission_package/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
       "ok": true,
       "detail": "rendered PDF does not identify current release v0.3.0-clinical-simulation"
+    },
+    {
+      "name": "reviewer_pdf.unreleased_candidate_boundary:08_submission_package/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
+      "ok": true,
+      "detail": "rendered PDF must identify the current controlled release candidate as unreleased and must not call it tagged/sealed"
     },
     {
       "name": "reviewer_pdf.bdrg_investigator_expression",
@@ -435,6 +450,11 @@
       "detail": "rendered PDF does not identify current release v0.3.0-clinical-simulation"
     },
     {
+      "name": "reviewer_pdf.unreleased_candidate_boundary:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
+      "ok": true,
+      "detail": "rendered PDF must identify the current controlled release candidate as unreleased and must not call it tagged/sealed"
+    },
+    {
       "name": "reviewer_pdf.letter_page_size:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
       "ok": true,
       "detail": "612 x 792 pts (letter)"
@@ -500,6 +520,11 @@
       "detail": "rendered PDF does not identify current release v0.3.0-clinical-simulation"
     },
     {
+      "name": "reviewer_pdf.unreleased_candidate_boundary:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-model-analysis-plan.pdf",
+      "ok": true,
+      "detail": "rendered PDF must identify the current controlled release candidate as unreleased and must not call it tagged/sealed"
+    },
+    {
       "name": "reviewer_pdf.letter_page_size:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-model-analysis-plan.pdf",
       "ok": true,
       "detail": "612 x 792 pts (letter)"
@@ -563,6 +588,11 @@
       "name": "reviewer_pdf.release_identity:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-report.pdf",
       "ok": true,
       "detail": "rendered PDF does not identify current release v0.3.0-clinical-simulation"
+    },
+    {
+      "name": "reviewer_pdf.unreleased_candidate_boundary:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-report.pdf",
+      "ok": true,
+      "detail": "rendered PDF must identify the current controlled release candidate as unreleased and must not call it tagged/sealed"
     },
     {
       "name": "reviewer_pdf.letter_page_size:08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-report.pdf",
