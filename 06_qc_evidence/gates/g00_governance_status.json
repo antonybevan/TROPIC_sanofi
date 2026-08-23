@@ -2,7 +2,7 @@
   "gate": "G00",
   "name": "governance_scope_lock",
   "status": "PASS",
-  "generated_at": "2026-08-22T15:02:03Z",
+  "generated_at": "2026-08-23T17:36:54Z",
   "checks": [
     {
       "name": "exists:docs/PRODUCT_CLAIM.md",
@@ -73,6 +73,21 @@
       "name": "product_claim.forbids_part11",
       "ok": true,
       "detail": "must explicitly reject Part 11 claim"
+    },
+    {
+      "name": "workstream_board.current_candidate_identity",
+      "ok": true,
+      "detail": "candidate identity and unreleased boundary present"
+    },
+    {
+      "name": "findings.csv_schema",
+      "ok": true,
+      "detail": "50 rows; exact 11-column schema"
+    },
+    {
+      "name": "findings.unique_ids_and_required_fields",
+      "ok": true,
+      "detail": "unique IDs; required fields populated"
     },
     {
       "name": "findings.no_confirmed_crit_major",
