@@ -5,9 +5,11 @@ import argparse
 import csv
 import json
 import os
+import subprocess
 import sys
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
+from pathlib import Path
 
 import yaml
 from lxml import etree
@@ -27,6 +29,25 @@ METADATA_DRIFT_PATH = "06_qc_evidence/audit/metadata_data_drift.csv"
 ARS_ARD_PATH = "05_outputs/ars/tropic_ard.csv"
 ARS_EVENT_PATH = "05_outputs/ars/tropic_reporting_event.json"
 METADATA_LINEAGE_PATH = "config/metadata_lineage.yaml"
+ROOT = Path(__file__).resolve().parents[1]
+PREREQUISITE_BUILDERS = (
+    "06_qc_evidence/audit/build_variable_traceability.py",
+    "06_qc_evidence/audit/build_metadata_drift.py",
+)
+TRACEABILITY_FIELDS = {
+    "dataset",
+    "variable",
+    "actual_xpt_variable_present",
+    "traceability_status",
+}
+DRIFT_FIELDS = {
+    "standard",
+    "dataset",
+    "missing_from_data",
+    "not_in_define",
+    "unlabelled_data_variables",
+    "derived_variables_without_method",
+}
 
 
 def _load_json(path, default=None):
@@ -48,6 +69,39 @@ def _read_csv(path):
         return []
     with open(path, "r", encoding="utf-8", newline="") as f:
         return list(csv.DictReader(f))
+
+
+def _refresh_prerequisite_evidence():
+    """Regenerate local traceability/drift inputs immediately before evaluation."""
+    for script in PREREQUISITE_BUILDERS:
+        subprocess.run([sys.executable, script], cwd=ROOT, check=True)
+
+
+def _required_input_findings(trace_rows, drift_rows):
+    findings = []
+    for name, rows, required in (
+        ("adam_variable_traceability", trace_rows, TRACEABILITY_FIELDS),
+        ("metadata_data_drift", drift_rows, DRIFT_FIELDS),
+    ):
+        if not rows:
+            findings.append(
+                {
+                    "severity": "critical",
+                    "finding": f"{name}_missing_or_empty",
+                    "detail": "required regenerated evidence contains no rows",
+                }
+            )
+            continue
+        missing_fields = sorted(required - set(rows[0]))
+        if missing_fields:
+            findings.append(
+                {
+                    "severity": "critical",
+                    "finding": f"{name}_schema_invalid",
+                    "detail": "missing fields: " + ", ".join(missing_fields),
+                }
+            )
+    return findings
 
 
 def _sheet_rows(path, sheet):
@@ -215,7 +269,27 @@ def build_metadata_control_report(out_dir, report_path):
         if r.get("classification") == "unverifiable-numeric" or r.get("status") == "review"
     ]
     unresolved_ct_gap_ids = sorted(c for c in ct_gap_ids if c not in ct_dispositions)
-    findings = []
+    findings = _required_input_findings(trace_rows, drift_rows)
+    trace_gaps = [r for r in trace_rows if r.get("traceability_status") != "DOCUMENTED"]
+    trace_missing_actual = [
+        r for r in trace_rows if r.get("actual_xpt_variable_present") != "YES"
+    ]
+    if trace_gaps:
+        findings.append(
+            {
+                "severity": "major",
+                "finding": "variable_traceability_gaps_present",
+                "detail": f"{len(trace_gaps)} variable rows",
+            }
+        )
+    if trace_missing_actual:
+        findings.append(
+            {
+                "severity": "major",
+                "finding": "traceability_variables_missing_from_current_xpt",
+                "detail": f"{len(trace_missing_actual)} variable rows",
+            }
+        )
     if spec_define.get("status") != "PASS":
         findings.append({"severity": "critical", "finding": "spec_define_conformance_not_pass", "detail": spec_define.get("status", "missing")})
     if spec_data.get("status") != "PASS":
@@ -408,10 +482,11 @@ def main(argv=None):
     parser.add_argument("--report", default="docs/METADATA_CONTROL_REPORT.md")
     args = parser.parse_args(argv)
 
+    _refresh_prerequisite_evidence()
     status = build_metadata_control_report(args.out_dir, args.report)
     print(f"Metadata control status: {status['status']}")
     print(f"Wrote {args.report}")
-    return 0
+    return 0 if status["status"] == "pass" else 1
 
 
 if __name__ == "__main__":

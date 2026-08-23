@@ -2,10 +2,10 @@
 
 **Workstream:** Statistical Specification (G02)  
 **Product claim:** Path A  
-**As of:** 2026-08-09
+**As of:** 2026-08-23
 **Authorities:** SAP v4.0 · `config/study_config.yaml` · `config/tfl_output_catalog.yaml` · ADRG · [Section 2 audit](../../06_qc_evidence/audit/section_reviews/SECTION_02_POPULATIONS_ENDPOINTS_AUDIT_2026-08-03.md)
 
-**Decision handoff:** The F-042 accountable-author review packet and [F-042 / T-11-8 Endpoint Decision Record](decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md) record Antony Bevan's 2026-08-04 adoption of ED-01–ED-07 as written. Phase 2 implementation is now present in separate SAS and R tracks under the [approval specification](decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md), [quantified impact appendix](decisions/F042_PFS_PAIN_IMPACT_APPENDIX_2026-08-03.md), and [CM/PR source qualification audit](decisions/F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.md). The expanded 37-stage real-SAS rerun, delayed second-pass review, and pipeline release seal are complete for Path A; Git review/commit/tag remains a separate governance step. No independent, sponsor, or regulated approval is claimed.
+**Decision handoff:** The F-042 accountable-author review packet and [F-042 / T-11-8 Endpoint Decision Record](decisions/ENDPOINT_DECISION_RECORD_F042_T11_8_2026-08-03.md) record Antony Bevan's 2026-08-04 adoption of ED-01–ED-07 as written. Phase 2 implementation is now present in separate SAS and R tracks under the [approval specification](decisions/F042_ENDPOINT_APPROVAL_SPEC_2026-08-03.md), [quantified impact appendix](decisions/F042_PFS_PAIN_IMPACT_APPENDIX_2026-08-03.md), and [CM/PR source qualification audit](decisions/F042_PR_SOURCE_QUALIFICATION_AUDIT_2026-08-03.md). The complete manifest-defined genuine-SAS DAG, delayed second-pass review, and release seal are the technical evidence; the v0.3.0 candidate remains unreleased. No independent, sponsor, or regulated approval is claimed.
 
 ---
 
@@ -127,7 +127,7 @@ The orchestrator **does stage-gate G02** through `platform/check_gate_g02_specif
 - [x] ED-01–ED-07 adopted by Antony Bevan with single-author limitation acknowledgement
 - [x] SAP-native `T-11-3`–`T-11-8` mapping implemented in code, catalog, metadata and reviewer guides
 - [x] TTUMOR ITT primary and CM+PR-qualified pain derivation implemented in separate SAS/R tracks
-- [x] Full 37-stage real-SAS DAG, delayed second-pass review and pipeline release seal recorded for this change set
+- [x] Complete manifest-defined genuine-SAS DAG, delayed second-pass review, and pipeline release seal required for this change set
 - [x] T-11-5 same-component maintenance corrected in SAS and a subject-level SAS/R endpoint gate made release-blocking
 
 Board status: **GREEN for Path A only when the current machine evidence satisfies the

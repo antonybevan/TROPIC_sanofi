@@ -31,14 +31,6 @@ REQUIRED = [
     "config/regulatory_baseline.yaml",
 ]
 
-# Must appear in PRODUCT_CLAIM (case-insensitive).
-CLAIM_MUST = [
-    r"controlled",
-    r"non[- ]submission",
-    r"controlled clinical-submission simulation",
-    r"not.*Part 11|non-Part 11|not a Part 11",
-]
-
 # Forbidden as standalone overclaim in PRODUCT_CLAIM without negation nearby.
 # We only fail if PRODUCT_CLAIM asserts filing readiness as a positive claim.
 # Tables of "Forbidden claim" rows that mention overclaim phrases are OK.
@@ -46,6 +38,20 @@ FORBIDDEN_POSITIVE = [
     r"(?i)this package is FDA submission[- ]ready",
     r"(?i)this package is NDA[- ]ready",
     r"(?i)we (are|have) (FDA )?submission[- ]ready",
+]
+
+FINDINGS_FIELDS = [
+    "ID",
+    "severity",
+    "category",
+    "status",
+    "evidence",
+    "standard_or_rule",
+    "remediation",
+    "effort",
+    "disposition_class",
+    "disposition_date",
+    "disposition_note",
 ]
 
 
@@ -80,10 +86,67 @@ def main() -> int:
         if re.search(pat, text):
             add(f"forbidden_claim:{pat}", False, "positive overclaim found in PRODUCT_CLAIM")
 
+    board_paths = (
+        ROOT / "docs/WORKSTREAM_EXECUTION_BOARD.md",
+        ROOT / "config/workstream_execution_board.yaml",
+    )
+    board_text = "\n".join(
+        path.read_text(encoding="utf-8") for path in board_paths if path.is_file()
+    )
+    board_lower = board_text.lower()
+    stale_board_markers = [
+        marker
+        for marker in ("37/37", "uncommitted audited worktree", "v0.2.2-portfolio` current")
+        if marker.lower() in board_lower
+    ]
+    add(
+        "workstream_board.current_candidate_identity",
+        "v0.3.0-clinical-simulation" in board_text
+        and "unreleased" in board_lower
+        and not stale_board_markers,
+        (
+            f"stale markers={stale_board_markers}"
+            if stale_board_markers
+            else "candidate identity and unreleased boundary present"
+        ),
+    )
+
     # Findings: no active CONFIRMED Critical/Major
     reg = ROOT / "06_qc_evidence/audit/findings_register.csv"
     if reg.is_file():
-        rows = list(csv.DictReader(reg.open(encoding="utf-8")))
+        with reg.open(encoding="utf-8", newline="") as handle:
+            reader = csv.DictReader(handle)
+            rows = list(reader)
+        malformed = [
+            index
+            for index, row in enumerate(rows, start=2)
+            if None in row or any(row.get(field) is None for field in FINDINGS_FIELDS)
+        ]
+        add(
+            "findings.csv_schema",
+            reader.fieldnames == FINDINGS_FIELDS and not malformed,
+            (
+                f"header={reader.fieldnames}; malformed_rows={malformed}"
+                if reader.fieldnames != FINDINGS_FIELDS or malformed
+                else f"{len(rows)} rows; exact {len(FINDINGS_FIELDS)}-column schema"
+            ),
+        )
+        ids = [str(row.get("ID") or "").strip() for row in rows]
+        duplicate_ids = sorted({item for item in ids if item and ids.count(item) > 1})
+        missing_required = [
+            index
+            for index, row in enumerate(rows, start=2)
+            if not all(str(row.get(field) or "").strip() for field in ("ID", "severity", "category", "status"))
+        ]
+        add(
+            "findings.unique_ids_and_required_fields",
+            not duplicate_ids and not missing_required,
+            (
+                f"duplicates={duplicate_ids}; missing_required_rows={missing_required}"
+                if duplicate_ids or missing_required
+                else "unique IDs; required fields populated"
+            ),
+        )
         bad = [
             r.get("ID", "?")
             for r in rows
@@ -92,6 +155,8 @@ def main() -> int:
         ]
         add("findings.no_confirmed_crit_major", not bad, str(bad) if bad else "none")
     else:
+        add("findings.csv_schema", False, "register missing")
+        add("findings.unique_ids_and_required_fields", False, "register missing")
         add("findings.no_confirmed_crit_major", False, "register missing")
 
     status = "PASS" if not problems else "FAIL"

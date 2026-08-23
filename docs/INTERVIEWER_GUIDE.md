@@ -80,11 +80,12 @@ python3 scripts/verify_release.py
 python3 platform/check_submission_readiness.py
 ```
 
-On the current public branch, the readiness profile is intentionally
-**BLOCKED** and the release verifier stops on stale source/artifact hashes.
-That is the correct result until an authorized full SAS/ODA run refreshes the
-controlled seal; do not present this branch as FDA-ready or as a green filing
-release.
+These commands answer different questions. On a clean, hash-sealed release-candidate
+commit, `verify_release.py` must pass the controlled technical evidence. The broader
+readiness profile remains intentionally **BLOCKED / NOT_QUALIFIED** because sponsor
+authority, independent approval, Enterprise validation, aCRF/application identifiers,
+Part 11 controls, and gateway acceptance are absent. A green technical seal must never
+be presented as FDA readiness or a green filing release.
 
 Also open:
 

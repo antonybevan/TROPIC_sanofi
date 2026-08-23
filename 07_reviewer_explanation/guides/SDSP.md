@@ -6,9 +6,11 @@
 **Basis:** SAP v4.0 lock review; current FDA Study Data Technical Conformance Guide and CDISC standards.
 
 > **Current lock status:** `02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx` is the programming authority.
-> This SDSP is a remediation-control plan, not a final submission plan. The SAP lock memo
-> (`06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md`) still blocks submission release until SDTM package-source
-> drift, eCTD stale-payload controls, CRF provenance, and final conformance evidence are closed.
+> This SDSP is a remediation-control plan, not a final submission plan. The controlled
+> demonstration package now passes its SDTM/package/eCTD technical gates. Submission
+> release remains prohibited by the recorded product boundary and external dependencies:
+> sponsor authority, qualified independent review, licensed Enterprise validation,
+> a true aCRF/application identifiers, and organizational Part 11 controls.
 
 The SDSP describes the data standards, versions, and conformance approach used for the
 study's tabulation and analysis data, and discloses planned exceptions — the single
@@ -42,8 +44,11 @@ two Define-XML files, and the traceability matrix.
   conversion is not acceptable for a release package.
 - **ADaM:** CORE ships no executable ADaM rules yet; interim coverage via project custom
   CORE rules (`conformance_rules/adam/`) + `adam_conf_check.R`.
-- **Pinnacle 21 / Certara:** the authoritative business-rule run remains **pending** a
-  non-expired engine licence (terminal-session item).
+- **Pinnacle 21 / Certara:** Community 4.1.0 / FDA 2508.1 processed the final seven
+  ADaM datasets (121,320 records; 0 rejects). Its 30 open issue groups / 2,373
+  occurrences and incompatible-CLI caveat remain informative-only evidence;
+  qualified licensed Enterprise execution and independent disposition approval were
+  not performed.
 - **Dataset-JSON:** treated as an auxiliary machine-readable layer. Schema and round-trip
   evidence must be regenerated after the final SAP v4.0 data/metadata lock.
 

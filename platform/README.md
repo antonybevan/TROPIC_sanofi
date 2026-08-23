@@ -20,7 +20,6 @@ Read **CORE** only, then SUPPORT when you need ODA/seals.
 | **REPORT** | Regenerates control markdown/CSV — not ADaM science | No (while learning) |
 | **LAB / OUT_OF_DAG** | Capability demo or optional tool | Only if needed |
 | **TEST** | Unit/integration tests for platform pieces | Devs only |
-| **ARCHIVE** | Moved to `tools/archive/` — not live | Never as prod |
 
 ---
 
@@ -43,6 +42,7 @@ Read **CORE** only, then SUPPORT when you need ODA/seals.
 | `build_ectd_backbone.py` | eCTD index / STF |
 | `materialize_ectd.py` | Materialize sequence `ectd/0000/` |
 | `validate_ectd_sequence.py` | Reject extras and validate leaves, UTIL assets, XML/DTD references, and run-record counts |
+| `build_metadata_control_report.py` | Refresh traceability/drift evidence and fail closed on missing or inconsistent metadata |
 | `check_log_cleanliness.py` | Log gate |
 | `build_release_run_manifest.py` | Hash seal binding |
 
@@ -60,9 +60,13 @@ QC recon scripts live under `06_qc_evidence/reconciliation/`.
 | `oda_broker.py` | Resilient SAS OnDemand connection |
 | `seed_sdtm.py` | Job A: seed SDTM on ODA |
 | `generate_config.py` | YAML → generated SAS config |
+| `check_regulatory_baseline.py` | Verify the controlled regulatory-baseline evidence and qualification boundary |
+| `check_submission_readiness.py` | Grade the explicit submission-readiness profile without overclaiming portfolio evidence |
+| `define_arm_contract.py` | Executable Define-XML/ARM contract consumed by gates and tests |
+| `stage_p21_adam_inputs.py` | Securely stage byte-identical ADaM XPTs under validator-standard filenames |
 | `build_release_candidate_checklist.py` | RC checklist machine grade |
 | `verify_evidence.py` | Evidence checks |
-| `_oda_render_tfl.py` | Manual SAS figure renderer/diagnostic; the release DAG renders companions in Stage 14 |
+| `_oda_render_tfl.py` | Manual SAS figure renderer/diagnostic; the release DAG renders companions in the SAS Production stage |
 
 Release re-check from repo root: `python3 scripts/verify_release.py`
 
@@ -79,6 +83,7 @@ They do **not** derive ADSL/ADTTE.
 | `build_delivery_dashboard.py` | `docs/DELIVERY_EVIDENCE_DASHBOARD.md` |
 | `build_orchestrator_gate_map.py` | `docs/ORCHESTRATOR_GATE_MAP.md` |
 | `build_tfl_output_index.py` | `docs/TFL_OUTPUT_INDEX.md` |
+| `ci_coverage_summary.py` | CI/conformance coverage boundary summary |
 | `build_metadata_control_report.py` | metadata control report |
 | `build_validation_strategy_report.py` | validation strategy report |
 | `build_source_profile.py` | source profile |
@@ -147,7 +152,7 @@ python3 platform/build_delivery_controls.py
 | Action | Where |
 |---|---|
 | What is allowed in git | [`docs/REPO_SURFACE_POLICY.md`](../docs/REPO_SURFACE_POLICY.md) |
-| Dead / one-off code | `tools/archive/` **local only** (gitignored) |
+| Dead / one-off code | Removed from the working repository; Git history and the dated cleanup audit preserve provenance |
 | Orphan disposition | `06_qc_evidence/audit/orphans_dangling_deadcode.csv` |
 | Human spine | `docs/SCRIPT_MAP.md` |
 | Interviewer walk | `docs/INTERVIEWER_GUIDE.md` |

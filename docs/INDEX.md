@@ -71,7 +71,7 @@ Repository operating controls: [`../CONTRIBUTING.md`](../CONTRIBUTING.md) ·
 |---|---|
 | [`../platform/README.md`](../platform/README.md) | Factory tiers (what to ignore) |
 | [`../platform/cibuild.py`](../platform/cibuild.py) | Orchestrator |
-| `tools/archive/` (local-only, intentionally excluded) | Dead/one-off code (not spine) |
+| [`../06_qc_evidence/audit/REPOSITORY_CLEANUP_AUDIT_2026-08-23.md`](../06_qc_evidence/audit/REPOSITORY_CLEANUP_AUDIT_2026-08-23.md) | Dead/orphan cleanup decisions and retained-surface rationale |
 | [`../platform/package_ectd.py`](../platform/package_ectd.py) | Module 5 packager |
 | [`../scripts/verify_release.py`](../scripts/verify_release.py) | Seal re-check |
 | [`runbooks/ODA_GUIDE.md`](runbooks/ODA_GUIDE.md) | Real SAS / ODA operator path |
@@ -88,7 +88,7 @@ Repository operating controls: [`../CONTRIBUTING.md`](../CONTRIBUTING.md) ·
 | `03_metadata/define/` | Define-XML + validation tools |
 | [`PIPELINE_ARCHITECTURE_REDESIGN.md`](PIPELINE_ARCHITECTURE_REDESIGN.md) | Evidence-chain architecture |
 | [`BIOMETRICS_DELIVERY_OPERATING_MODEL.md`](BIOMETRICS_DELIVERY_OPERATING_MODEL.md) | Department operating model |
-| [`ORCHESTRATOR_GATE_MAP.md`](ORCHESTRATOR_GATE_MAP.md) | Stage ↔ gate mapping |
+| `ORCHESTRATOR_GATE_MAP.md` (generated locally by [`build_orchestrator_gate_map.py`](../platform/build_orchestrator_gate_map.py)) | Stage ↔ gate mapping |
 
 ### B4 — Multi-study / tests
 

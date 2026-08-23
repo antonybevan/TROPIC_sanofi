@@ -208,6 +208,12 @@ class TestReleaseSealHelpers(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "required release-control"):
                 build_release_run_manifest._hash_existing(["missing-control.md"], required=True)
 
+    def test_release_binding_requires_metadata_control_pass(self):
+        self.assertTrue(build_release_run_manifest._metadata_control_pass({"status": "pass"}))
+        self.assertTrue(build_release_run_manifest._metadata_control_pass({"status": "PASS"}))
+        for status in ({}, {"status": "missing"}, {"status": "warning"}, {"status": "FAIL"}):
+            self.assertFalse(build_release_run_manifest._metadata_control_pass(status))
+
 
 if __name__ == "__main__":
     unittest.main()

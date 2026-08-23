@@ -27,7 +27,7 @@ The binding claim is [Product and Evidence Claim](docs/PRODUCT_CLAIM.md). The qu
 | [Current release note](docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) | Release evidence and residual limitations |
 | [Reviewer guide](docs/INTERVIEWER_GUIDE.md) | A short, evidence-led walkthrough |
 
-**Current controlled release:** tag `v0.3.0-clinical-simulation` · [release note](docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md)
+**Current controlled release candidate:** `v0.3.0-clinical-simulation` · [conditional release note](docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md). The Git tag is created only after merge, clean-checkout verification, and green default-branch CI.
 
 ## Evidence at a glance
 
@@ -61,7 +61,7 @@ minimum effect, or change the product claim. See the
 
 ## Controlled pipeline
 
-The study manifest drives a 40-stage evidence chain:
+The study manifest drives a 41-stage evidence chain:
 
 ```text
 authorized SDTM

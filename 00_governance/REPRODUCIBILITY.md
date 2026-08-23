@@ -8,7 +8,7 @@ than a blanket "fully reproducible" claim.
 > SDTM and SAS/ODA credentials are deliberately excluded — that is correct clinical
 > portfolio practice). It **can**:
 > 1. Inspect the Module 5–style package face (`08_submission_package/m5/`)
-> 2. Re-check Path A seals: `python3 scripts/verify_release.py`
+> 2. Re-check the current release seals: `python3 scripts/verify_release.py`
 > 3. Run the data-free smoke: `python3 platform/cibuild.py --demo`
 > 4. Reproduce the governed, aggregate simulation evidence:
 >    `python3 platform/simulation_precision.py`
@@ -80,7 +80,7 @@ written. Runtime depends on the local NumPy build and CPU.
   `sascfg_personal.py` + `~/.authinfo` (key `oda`, perm 600). For ODA the SDTM is seeded
   once via Job A; see [`docs/runbooks/ODA_GUIDE.md`](../docs/runbooks/ODA_GUIDE.md).
 
-### Run matrix (Stage 14 mode is resolved at runtime and saved to `pipeline_health.json`)
+### Run matrix (the named SAS Production stage resolves mode at runtime and records it in `pipeline_health.json`)
 | Command | SAS source | Reconciliation meaning |
 |---|---|---|
 | `seed_sdtm.py` then `cibuild.py --real-sas` (ODA) | SAS 9.4 on ODA, this run | **genuine** SAS↔R double programming (mode `oda`, earned via live probe + verified manifest) |

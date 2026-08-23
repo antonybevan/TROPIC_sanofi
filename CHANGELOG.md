@@ -1,15 +1,15 @@
 # Changelog
 
-All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be documented in this file. This log serves as the program version control history, in support of 21 CFR Part 11 electronic records auditing.
+All notable changes to the **TROPIC (Study EFC6193 / XRP6258)** pipeline will be documented in this file. This is a controlled engineering change history; it is not a validated 21 CFR Part 11 audit trail or electronic-signature record.
 
-## [v0.3.0-clinical-simulation] - 2026-08-12
+## [Unreleased] — target `v0.3.0-clinical-simulation`
 
 ### Controlled clinical-simulation release
 
 - Established a binding, machine-checked product claim and quality-system boundary: this is a controlled clinical-submission simulation, not a filing, Part 11 validated system, independent organizational QC approval, licensed Enterprise clearance, or gateway acceptance.
 - Aligned the reviewer package to the FDA June 2026 cSDRG naming convention, retained the source blank CRF without misrepresenting it as an aCRF, and added a fail-closed regulatory-baseline gate.
 - Corrected one-sided ADaM flags across paired SAS/R derivations, specification, Define-XML, and data (`TRTEMFL`, `ANL01FL`, and standard `ABLFL`); removed nonstandard `BASEFL`.
-- Completed the full 37-stage real-SAS pipeline and paired reconciliation.
+- Retained the prior genuine-SAS full-DAG/reconciliation evidence and added a fail-closed metadata-evidence refresh before final log/release binding; the expanded 41-stage candidate must complete a fresh genuine-SAS run and reseal before promotion.
 - Superseded the earlier engine-expired P21 record with a definitive Community 4.1.0 / FDA 2508.1 run on the final seven ADaM XPTs: 121,320 records, 0 rejects, 30 open issue groups, and 2,373 aggregate occurrences. This is informative-only evidence; the generated report retains an incompatible-CLI caveat and licensed Enterprise was not executed.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.

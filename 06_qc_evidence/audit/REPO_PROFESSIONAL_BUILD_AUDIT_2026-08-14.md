@@ -96,7 +96,9 @@ genuine SAS/ODA run is required before the project can claim a current clinical 
 
 The independent repository security scan is recorded in the Codex Security workbench for scan
 `59885955-dad6-4f4d-89e8-aceb41c7f99e` and completed with 8 reportable findings (3 high, 3 medium,
-2 low) against the pre-audit revision. The generated [security report](</private/var/folders/tw/50q5v91j4tg_9dqh1wnvmrd00000gn/T/codex-security-scans-1RYFF6/TROPIC/94b6b1af8bce21850dbd0cade3e8c4df48a616e9_20260814T160203Z_4gynbb84/report.md>) and canonical artifacts are the machine-backed record; this document records the implementation and validation handoff.
+2 low) against the pre-audit revision. The canonical workbench record is identified
+by the scan ID above; its temporary machine-local report path was intentionally not
+retained as a repository link. This document records the implementation and validation handoff.
 
 Disposition: patient-output permissions, Define-XML entity handling, SUPP-IDVAR interpolation,
 ODA path/root binding, CT-cache traversal/deserialization, and manifest-name traversal are fixed

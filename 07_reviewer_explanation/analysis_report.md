@@ -1,7 +1,7 @@
 # TROPIC Controlled Clinical Analysis Report
 ## Study EFC6193 / XRP6258 — Abbreviated Clinical Study Summary
 
-**Current controlled release:** tag `v0.3.0-clinical-simulation` · [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) · controlled clinical-submission simulation
+**Current controlled release candidate:** `v0.3.0-clinical-simulation` (unreleased; tag gated by the conditional note) · [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) · controlled clinical-submission simulation
 
 > **SAP v4.0 lock note (2026-06-25):** This report is a generated demonstration output under
 > remediation control. It is not a clinical study report for submission and it is not a source
@@ -132,7 +132,7 @@ FDA Project Optimus alignment: the subject-level all-cycles RDI is paired with t
 | Independent Validation | R 4.6.0 / Pharmaverse | ADaMIG v1.3 |
 | Reconciliation | `diffdf` package | 100% cell-by-cell match |
 | TFL Generation | ggplot2, survival, patchwork | ICH E3 / NEJM style |
-| Orchestration | Python 3.10+ (`cibuild.py`) | Manifest-driven 40-stage CI pipeline |
+| Orchestration | Python 3.10+ (`cibuild.py`) | Manifest-driven 41-stage CI pipeline |
 | Simulation methods annex | Python 3.12.13, NumPy 2.2.6, float64/PCG64 | Frozen data-free MAP, 400,000 replicates, independent evidence verification |
 
 ---

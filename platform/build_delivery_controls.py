@@ -47,6 +47,8 @@ CHECK_COMMANDS = [
 ]
 
 COMPILE_TARGETS = [
+    "06_qc_evidence/audit/build_variable_traceability.py",
+    "06_qc_evidence/audit/build_metadata_drift.py",
     "platform/build_delivery_controls.py",
     "platform/build_source_profile.py",
     "platform/build_tfl_output_index.py",

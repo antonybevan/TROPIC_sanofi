@@ -2,7 +2,7 @@
 
 This directory is the reviewer-facing surface of the TROPIC controlled clinical-submission simulation. The numbered folders elsewhere in the repository are the production and evidence factory; they are not presented as an eCTD submission.
 
-**Current controlled release:** [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) · tag `v0.3.0-clinical-simulation`
+**Current controlled release candidate:** [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md). The `v0.3.0-clinical-simulation` tag does not exist until the note's promotion contract is satisfied after merge.
 
 ## Fitness statement
 

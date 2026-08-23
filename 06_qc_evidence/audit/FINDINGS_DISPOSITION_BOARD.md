@@ -1,6 +1,6 @@
 # TROPIC Findings Disposition Board
 
-**Date:** 2026-08-10
+**Date:** 2026-08-23
 **Product claim:** Controlled **non-submission demonstration** programming pipeline  
 **Authority:** SAP v4.0 locked for remediation (`06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md`); not sponsor-approved for filing  
 
@@ -10,7 +10,7 @@
 
 > **2026-08-05 control update:** F-042’s register row is synchronized with the implemented/sealed Path A state and the GOV-STAT-01 closure. F-043 records and remediates the abort-path telemetry defect that could label a truncated RED run as `full_dag`; the historical run record remains unchanged as evidence.
 
-> **2026-08-10 forensic closure update:** The expanded live-ODA pipeline completed
+> **Historical 2026-08-10 forensic closure update:** The expanded live-ODA pipeline completed
 > 37/37 stages GREEN after source/staging isolation, endpoint, date, source-sequence,
 > metadata-key, reconciliation, narrative-consistency, and log-cleanliness repairs.
 > Technical Path A implementation is ready for review; the working tree remains
@@ -22,6 +22,19 @@
 > retains 30 open issue groups / 2,373 occurrences and an incompatible-CLI caveat.
 > F-016 remains ACCEPTED because licensed, qualified Enterprise execution and
 > independent disposition approval were not performed.
+
+> **2026-08-23 repository-hygiene update:** F-024 is RESOLVED. The living orphan
+> register is now generated from the current manifest, catalog, eCTD index, and
+> filesystem and contains 0 confirmed cleanup findings. The abandoned local code
+> archive and tracked empty listing placeholder were removed; no stale NDJSON or
+> unindexed Module 5 XPT remains. Intentional package materialization copies are
+> retained and hash-controlled.
+
+> **2026-08-23 candidate-control update:** The governed manifest now defines 41
+> stages, including a fail-closed metadata-control evidence refresh. Promotion of the
+> unreleased v0.3.0 candidate requires all 41 stages under genuine SAS, a clean release
+> seal, complete tests, and CI; moving run status is authoritative only in the machine
+> health/manifest/checklist evidence.
 
 ## Disposition classes
 
@@ -42,7 +55,7 @@
 | **F-027** | Minor | `scope_out_with_disclosure` | **ACCEPTED** | ALB/LDH not on Sanofi CRF LABH/LABB panels and not in PDS LB — Class C; ADSL placeholders remain Assigned (not “PDS stripped collected labs”). |
 | **F-028** | Major | `scope_out_with_disclosure` | **ACCEPTED** | One subject has EXTRT=XRP6258 (10 cycles) while DM.ARM is MITOXANTRONE for all 371. Arm authority = DM/ADSL; do not re-code EX. SDTM E2E 2026-07-09. |
 | **F-011** | Major | `resolve_now` | **RESOLVED** | T-11-8 now uses observed baseline PSA >=20 (excluding `PSABLIF='Y'` fallback values; CbzP 145/361; MP 61/329); the set is shared by the R output, SAS companion, and regression contract. |
-| **F-039** | Major | `resolve_now` | **RESOLVED** | Stage-14 SAS companions are current-run evidence: UTC health timestamps plus bounded same-run mtime ordering produce a PASS index with zero stale/missing companions. |
+| **F-039** | Major | `resolve_now` | **RESOLVED** | SAS Production-stage companions are current-run evidence: UTC health timestamps plus bounded same-run mtime ordering produce a PASS index with zero stale/missing companions. |
 | **F-012** | Major | `non_submission_demo_limit` | **ACCEPTED** | N=749 = real MP 371 + synthetic CbzP 378; protocol ITT 755 needs full two-arm IPD. Figures must not be read as original-trial ITT. |
 | **F-014** | Major | `resolve_now` | **RESOLVED 2026-08-04** | ARM now has 10 ResultDisplays / 18 AnalysisResults covering every controlled analysis output except the non-analysis F-01-1 flow diagram. OS/PFS declare ADSL covariates, display names bind to controlled TFL IDs, TTUMOR is ITT-primary, and TTPAIN/response/Optimus results are represented. `platform/define_arm_contract.py` makes these claims executable. Deferred SAP outputs remain outside the controlled catalog and are not an F-014 defect. |
 | **F-015** | Major | `external_dependency` + `scope_out_with_disclosure` | **ACCEPTED** | Full CORE breadth on every SDTM domain + residual issue disposition is a conformance program beyond current targeted SDTMIG 3.4 run. Known residuals stay in CORE run records/SDRG. |
@@ -62,7 +75,7 @@
 
 | ID | Decision |
 |---|---|
-| **F-024** | Keep CONFIRMED as living orphan register hygiene; not a G06 Crit/Major blocker. |
+| **F-024** | **RESOLVED 2026-08-23** — current register has 23 classified rows, 0 confirmed cleanup findings, 0 unindexed XPTs, no false listing, and no stale NDJSON; the dead local archive was removed recoverably. |
 | **F-043** | **RESOLVED** — abort telemetry now binds the complete manifest stage map in serial and parallel failure paths; historical truncated-run evidence is retained and future failures must report `partial_dag` with `stages_not_run`. |
 
 ## Release-candidate implication
@@ -85,4 +98,4 @@ After this board:
 
 1. Keep register and board synchronized with every remediation cut.
 2. Preserve the explicit non-submission disclosures (especially F-003/F-005/F-012/F-025).
-3. Rebuild the RC checklist and release-run manifest after the clean commit; a dirty worktree remains the only current seal blocker.
+3. Rebuild the RC checklist and release-run manifest after every approved change; promote only a clean sealed commit with green CI.

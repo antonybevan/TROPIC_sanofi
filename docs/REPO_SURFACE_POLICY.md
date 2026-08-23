@@ -94,7 +94,7 @@ Everything else regenerable is **local only**.
 | Build outputs | `04_analysis_datasets/adam/*`, Dataset-JSON bodies | Rebuild from programs |
 | Factory telemetry piles | Most `platform/**/*_status.json`, inventory CSVs | Regenerable noise |
 | Generated control reports | `docs/*_REPORT.md`, dashboards, gate-map dumps | `build_delivery_controls.py` |
-| Dead / one-off code | `tools/archive/**` | Not portfolio face |
+| Dead / one-off code | Removed from the working repository; blocked from reintroduction by `.gitignore` | Recoverable from Git history and the dated cleanup audit only |
 | Tool installs | `.core_engine/`, `.p21/`, `renv/library/` | Re-downloadable |
 | Runtime caches | `stage_cache.json`, ODA locks, logs | Ephemeral |
 

@@ -8,7 +8,7 @@
 
 **Status:** Active
 
-**Current controlled release:** `v0.3.0-clinical-simulation`
+**Current controlled release candidate:** `v0.3.0-clinical-simulation` (unreleased; tag gated by the conditional release note)
 
 **Regulatory baseline:** `config/regulatory_baseline.yaml`
 

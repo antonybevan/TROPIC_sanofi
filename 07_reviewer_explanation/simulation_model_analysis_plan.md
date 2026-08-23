@@ -1,6 +1,6 @@
 # TROPIC Simulation Model Analysis Plan
 
-**Current sealed controlled release:** `v0.3.0-clinical-simulation` · [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md)
+**Current controlled release candidate:** `v0.3.0-clinical-simulation` (unreleased) · [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md)
 
 > **Informative annex boundary.** This plan is a data-free simulation-science methods evaluation layered on the historical sealed clinical-simulation release. It is not MIDD evidence, a filing artifact, confirmatory efficacy evidence, sponsor approval, or evidence of regulator acceptance.
 

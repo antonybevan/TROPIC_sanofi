@@ -82,6 +82,12 @@ CONTROL_FILES = [
     "06_qc_evidence/reconciliation/results_reconcile.R",
     "06_qc_evidence/reconciliation/forest_reconcile.R",
     "06_qc_evidence/reconciliation/figure_data_reconcile.R",
+    "06_qc_evidence/audit/build_variable_traceability.py",
+    "06_qc_evidence/audit/build_metadata_drift.py",
+    "06_qc_evidence/audit/build_orphan_register.py",
+    "06_qc_evidence/audit/findings_register.csv",
+    "06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md",
+    "06_qc_evidence/audit/orphans_dangling_deadcode.csv",
     "platform/cibuild.py",
     "platform/check_log_cleanliness.py",
     "platform/package_ectd.py",
@@ -119,6 +125,7 @@ REVIEW_SURFACE_FILES = [
     "05_outputs/tfl/TFL_Gallery.html",
     "06_qc_evidence/audit/DASHBOARD_VISUAL_QC.md",
     "06_qc_evidence/audit/SIMULATION_PRECISION_IMPLEMENTATION_REPORT_2026-08-14.md",
+    "06_qc_evidence/audit/REPOSITORY_CLEANUP_AUDIT_2026-08-23.md",
     "07_reviewer_explanation/simulation_model_analysis_plan.md",
     "07_reviewer_explanation/simulation_report.md",
     "platform/simulation_operating_characteristics/scenario_results.csv",
@@ -306,7 +313,7 @@ def _sas_companion_freshness(health: dict) -> dict:
         "stale_paths": stale,
         "all_current_with_pipeline_health": bool(files) and not stale,
         "note": (
-            "SAS companion figures are rendered by the real-SAS Stage 14 session and "
+            "SAS companion figures are rendered by the manifest-named SAS Production stage and "
             "their figure-driving CSVs are reconciled before release sealing."
         ),
     }
@@ -507,6 +514,10 @@ def _qc_statuses() -> tuple[dict, list[dict]]:
     return statuses, hashes
 
 
+def _metadata_control_pass(status: dict) -> bool:
+    return str(status.get("status", "")).lower() == "pass"
+
+
 def _binding_problems(payload: dict) -> list[str]:
     """Hard binding failures (package/data/QC integrity). These always force FAIL."""
     problems = []
@@ -530,6 +541,7 @@ def _binding_problems(payload: dict) -> list[str]:
     figure_data = _load_json(QC_FILES["figure_data_reconciliation"])
     spec_define = _load_json(QC_FILES["spec_define"])
     spec_data = _load_json(QC_FILES["spec_data"])
+    metadata_control = _load_json(QC_FILES["metadata_control"])
     log_cleanliness = _load_json(QC_FILES["log_cleanliness"])
     regulatory_baseline = _load_json(QC_FILES["regulatory_baseline"])
     simulation = _load_json(QC_FILES["simulation_operating_characteristics"])
@@ -554,6 +566,8 @@ def _binding_problems(payload: dict) -> list[str]:
         problems.append("spec-to-Define conformance is not PASS")
     if spec_data.get("status") != "PASS":
         problems.append("spec-to-data conformance is not PASS")
+    if not _metadata_control_pass(metadata_control):
+        problems.append("metadata control evidence refresh is not PASS")
     if log_cleanliness.get("status") != "PASS":
         problems.append("log cleanliness gate is not PASS")
     if regulatory_baseline.get("status") != "PASS":

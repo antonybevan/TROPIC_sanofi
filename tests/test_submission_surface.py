@@ -13,6 +13,7 @@ from check_gate_g07_reviewer_package import (  # noqa: E402
     CURRENT_RELEASE_NOTE,
     RELEASE_ID_SOURCES,
     SECONDARY_TTE_ROWS,
+    _pdf_identifies_unreleased_candidate,
     _report_secondary_metrics,
     _tfl_secondary_metrics,
 )
@@ -38,6 +39,20 @@ def test_current_release_identity_is_bound_across_reviewer_sources():
         assert len(lines) == 1, (rel, lines)
         assert CURRENT_RELEASE in lines[0]
         assert CURRENT_RELEASE_NOTE in lines[0]
+
+
+def test_pdf_release_identity_rejects_tagged_or_sealed_candidate_language():
+    good = (
+        "Current controlled release candidate: v0.3.0-clinical-simulation "
+        "(unreleased; tag gated by the conditional note)"
+    )
+    assert _pdf_identifies_unreleased_candidate(good)
+    assert not _pdf_identifies_unreleased_candidate(
+        "Current controlled release: tag v0.3.0-clinical-simulation"
+    )
+    assert not _pdf_identifies_unreleased_candidate(
+        "Current sealed controlled release: v0.3.0-clinical-simulation"
+    )
 
 
 def test_committed_ectd_surface_has_no_extras_or_broken_support_references():

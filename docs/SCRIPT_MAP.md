@@ -1,21 +1,22 @@
-# TROPIC Script Map — What Runs, What Doesn’t, How to Learn
+# TROPIC Script Map — Execution and Navigation
 
-**Purpose:** Stop reverse-engineering a junk drawer.  
+**Purpose:** Provide a controlled map of executed, supporting, reporting, and optional code.
 **Authority:** `config/study_manifest.yaml` + `platform/cibuild.py`  
-**Claim:** Path A demo (`docs/PRODUCT_CLAIM.md`)  
-**Date:** 2026-07-09
+**Claim:** Controlled clinical-submission simulation (`docs/PRODUCT_CLAIM.md`)
+**Date:** 2026-08-23
 
-If a file is not listed here as CORE or clearly SUPPORT, treat it as **secondary** until proven otherwise.
+If a file is not listed here as CORE or clearly SUPPORT, treat it as **secondary**
+and consult its classified tier before using it as release evidence.
 
 ---
 
-## 0. How to fix the “everything looks like junk” problem
+## 0. Navigation model
 
-| Wrong approach | Right approach |
+| Inefficient approach | Controlled approach |
 |---|---|
 | Open `platform/` and try to read every `.py` | Read this map → then **only CORE** files |
-| Assume every file is production | Tier files: CORE / SUPPORT / REPORT / ARCHIVE |
-| Delete half the repo in panic | Classify first; delete only confirmed dead |
+| Assume every file is production | Tier files: CORE / SUPPORT / REPORT / LAB/OUT-OF-DAG |
+| Delete unfamiliar files | Classify first; delete only confirmed dead material |
 | Learn random folders | Learn in **pipeline order** (section 2) |
 
 **Hard rule:**  
@@ -59,7 +60,8 @@ Anything not on that list is not the main spine.
     08_submission_package/m5/  +  07_reviewer_explanation/guides/
 ```
 
-**That’s the project.** Everything else is either support for one box, or noise.
+**That is the execution spine.** Everything else is classified support, reporting,
+test, optional capability, or historical evidence.
 
 ---
 
@@ -129,8 +131,8 @@ Helpers included by SAS (not separate DAG rows): `00_config.sas`, `L_staging_ing
 | `03_metadata/define/check_define_conformance.R` | Spec→define |
 | `04_analysis_datasets/programs/r/spec_data_checks.R` | Spec→data |
 | `platform/simulation_precision.py` | Data-free fixed-design TTE operating characteristics, precision, seeds, and analytic benchmark |
-| `platform/check_simulation_evidence.py` | Independent recomputation of simulation bindings, accounting, uncertainty, and governed acceptance |
 | `platform/build_simulation_report.py` | JSON-bound informative simulation MAP and report |
+| `platform/check_simulation_evidence.py` | Independent recomputation of simulation bindings, accounting, uncertainty, and governed acceptance |
 | `platform/check_gate_g07_reviewer_package.py` | Guides/claim lock |
 | `platform/export_datasetjson.py` | Dataset-JSON export |
 | `platform/build_ars.py` | ARS export |
@@ -138,11 +140,12 @@ Helpers included by SAS (not separate DAG rows): `00_config.sas`, `L_staging_ing
 | `platform/package_ectd.py` | Build `m5/` |
 | `platform/build_ectd_backbone.py` | eCTD index/STF |
 | `platform/materialize_ectd.py` | Sequence materialize |
-| `platform/validate_ectd_sequence.py` | Complete G08 sequence-surface validation |
+| `platform/validate_ectd_sequence.py` | Complete G08 sequence-surface validation invoked by materialization/package controls |
+| `platform/build_metadata_control_report.py` | Refresh metadata traceability/drift evidence and fail closed |
 | `platform/check_log_cleanliness.py` | Log gate |
 | `platform/build_release_run_manifest.py` | Hash seal |
 
-**~40 orchestrated steps. That is the spine.**
+**41 orchestrated stages. The manifest remains the numeric authority.**
 
 ---
 
@@ -154,15 +157,15 @@ Helpers included by SAS (not separate DAG rows): `00_config.sas`, `L_staging_ing
 | `platform/manifest.py` | Loaded by cibuild |
 | `platform/oda_broker.py` · `seed_sdtm.py` | Real ODA SAS only |
 | `platform/generate_config.py` | Regen SAS config from YAML |
-| `platform/_oda_render_tfl.py` | Manual SAS figure diagnostic (release DAG uses `cibuild.py` Stage 14) |
+| `platform/_oda_render_tfl.py` | Manual SAS figure diagnostic (release DAG uses the named SAS Production stage) |
 | `scripts/verify_release.py` | Re-check seals |
-| `01_source_data/reconstruct_cbzp_*.R` · `export_cbzp_xpt.R` | Build synthetic arm (manual / pre-req) |
+| `01_source_data/reconstruct_cbzp_*.R` · `guyot_validation_report.R` · `export_cbzp_xpt.R` | Orchestrated synthetic-arm reconstruction, validation, and export |
 | `04_analysis_datasets/programs/r/config_study.R` · `load_spec.R` · `activate_renv.R` | Shared R helpers |
 | `05_outputs/tfl/tfl_stats.R` · `lab_shift_table.R` | Sourced by TFL suite |
 
 ---
 
-## 5. CONTROL REPORTS — not junk, but not the product
+## 5. CONTROL REPORTS — supporting evidence, not clinical derivation
 
 These **regenerate markdown/CSV status**. They do **not** derive ADSL.
 
@@ -170,7 +173,6 @@ Examples:
 
 - `build_delivery_dashboard.py`
 - `build_tfl_output_index.py`
-- `build_metadata_control_report.py`
 - `build_validation_strategy_report.py`
 - `build_orchestrator_gate_map.py`
 - `build_source_profile.py`
@@ -183,23 +185,22 @@ Ignore while learning biometrics. Use only when checking delivery/control status
 
 ---
 
-## 6. Known non-spine / stale-ish (from orphan register)
+## 6. Classified non-spine and conditional items
 
 Source of truth for this section:  
 `06_qc_evidence/audit/orphans_dangling_deadcode.csv`
 
 | Item | Status | What to do |
 |---|---|---|
-| `figure_data_reconcile.R` | **On DAG** (after forest); `not_available` if SAS figure CSVs absent | Keep; re-run full DAG to refresh seal stage list |
+| `figure_data_reconcile.R` | **On DAG** (after forest); current full run PASS | Keep; absence of SAS figure CSVs must never be presented as PASS |
 | SAS `T_tfl_generation.sas` + `_oda_render_tfl.py` | TFL program is in the real-SAS DAG; `_oda_render_tfl.py` is manual diagnostic-only | Classified in `platform/README.md` |
 | Dataset-JSON / ARS / USDM outputs | Built on DAG; **not** eCTD primary path | CLASSIFIED_ADDITIVE (folder READMEs) |
-| `tools/archive/**` | Dead / one-time / migration | Do not run as prod |
-| Manual CbzP reconstruct scripts | Pre-req, not every DAG tick | Documented; bind hashes on release |
+| CbzP reconstruction/validation/export | **On DAG** before SAS production; Guyot helper is sourced transitively | Keep deterministic bridge and disclosure controls |
 | 18 deferred TFLs in catalog | Explicitly **not in scope** | Not “missing bugs” — deferred by control |
 
 **Done vs not done is not “count files.”** It is:
 
-| Done (Path A seal) | Not done / deferred |
+| Done for the controlled scope | Not done / deferred |
 |---|---|
 | Dual-lang ADaM + recon on MP | Org GxP double programming |
 | admiral core (ADSL, OS, PFS) | Full admiral every domain |
@@ -223,7 +224,7 @@ Deferred TFLs: `config/tfl_output_catalog.yaml`
 ### Phase B — Label the factory ✅ (2026-07-09 cleanup)
 
 1. `platform/README.md` tiers: CORE_DAG · SUPPORT · REPORT · LAB  
-2. Confirmed dead → `tools/archive/`  
+2. Confirmed dead code removed from the working repository; recovery remains possible from Git history
 3. `figure_data_reconcile.R` wired on DAG + graceful `not_available`  
 4. Additive layers labeled (Dataset-JSON / ARS / USDM READMEs)  
 5. Orphan register statuses updated  
@@ -234,7 +235,7 @@ Deferred TFLs: `config/tfl_output_catalog.yaml`
 
 1. `docs/REPO_SURFACE_POLICY.md` + `docs/INTERVIEWER_GUIDE.md`  
 2. `.gitignore` seal allowlist; untrack regenerable reports / inventory dumps  
-3. Dead code local under `tools/archive/` (gitignored, not portfolio)  
+3. Dead local archive removed; `.gitignore` retains a recurrence guard
 4. Optional later: split `platform/` subfolders; re-seal after real full DAG  
 
 **Success:** bare clone shows package + claim + seals — not a status-JSON landfill.

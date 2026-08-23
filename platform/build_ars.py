@@ -160,7 +160,7 @@ def build():
             "contents": contents,
         },
         "referenceDocuments": [
-            {"id": "RD.SAP", "name": "TROPIC SAP v3.0", "location": "02_specifications/sap/TROPIC_SAP_v3.0.docx"},
+            {"id": "RD.SAP", "name": "TROPIC SAP v4.0", "location": "02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx"},
             {"id": "RD.ADRG", "name": "Analysis Data Reviewer's Guide",
              "location": "07_reviewer_explanation/guides/ADRG.md"},
         ],

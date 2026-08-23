@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Path A release verification without re-running ODA/SAS.
+"""Controlled-candidate release verification without re-running ODA/SAS.
 
 Rechecks sealed control JSONs, product claim docs, and findings disposition.
 Exit 0 only if all hard checks pass.
@@ -68,6 +68,12 @@ FIXED_CONTROL_FILES = (
     "06_qc_evidence/reconciliation/results_reconcile.R",
     "06_qc_evidence/reconciliation/forest_reconcile.R",
     "06_qc_evidence/reconciliation/figure_data_reconcile.R",
+    "06_qc_evidence/audit/build_variable_traceability.py",
+    "06_qc_evidence/audit/build_metadata_drift.py",
+    "06_qc_evidence/audit/build_orphan_register.py",
+    "06_qc_evidence/audit/findings_register.csv",
+    "06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md",
+    "06_qc_evidence/audit/orphans_dangling_deadcode.csv",
     "platform/cibuild.py",
     "platform/check_log_cleanliness.py",
     "platform/package_ectd.py",
@@ -591,7 +597,7 @@ def main() -> int:
     else:
         add("findings.no_confirmed_crit_major", False, "missing findings_register.csv")
 
-    print("=== TROPIC Path A release verification (no ODA rerun) ===")
+    print("=== TROPIC controlled-candidate release verification (no ODA rerun) ===")
     print(f"root: {ROOT}")
     print()
     for name, cond, detail in checks:

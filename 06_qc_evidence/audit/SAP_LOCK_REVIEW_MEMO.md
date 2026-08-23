@@ -5,7 +5,21 @@
 **Review date:** 2026-06-25
 **Reviewer posture:** clinical programming / data standards lock-gate review
 
-## 1. Lock verdict
+> **Current-status addendum — 2026-08-23.** Sections 1–6 preserve the original
+> June lock review and remediation order; their finding counts and “must fix” wording
+> are historical baseline facts, not the current register state. The living register now
+> contains 50 findings: 34 `RESOLVED` and 16 `ACCEPTED`. Critical F-001 (eCTD
+> integrity), F-002 (SDTM metadata/data drift), and F-004 (false listing) are resolved.
+> Critical F-003 (synthetic-comparator scientific boundary) and F-005 (true filing
+> metadata/aCRF boundary) remain accepted, explicitly disclosed limits. Licensed
+> Enterprise validation, independent qualified review, sponsor approval, Part 11
+> validation, true application identity/aCRF, full authoritative two-arm IPD, and gateway
+> acceptance remain external qualification gaps. Current status is controlled by
+> `findings_register.csv`, `FINDINGS_DISPOSITION_BOARD.md`, and
+> `docs/PRODUCT_CLAIM.md`; SAP v4.0 remains an internal programming authority, never a
+> sponsor-approved filing SAP.
+
+## 1. Historical lock verdict (2026-06-25)
 
 | Decision | Verdict | Rationale |
 |---|---:|---|
@@ -15,12 +29,12 @@
 
 Bottom line: **lock SAP v4.0 for remediation execution, not for submission use.**
 
-## 2. Evidence checked
+## 2. Evidence checked at the historical lock review
 
 | Evidence item | Result |
 |---|---|
-| SAP file exists | `/Users/apple/Desktop/TROPIC/02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx` |
-| Reproducible builder exists | `/Users/apple/Desktop/TROPIC/06_qc_evidence/audit/build_industry_sap_v4.py` |
+| SAP file exists | `02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx` |
+| Reproducible builder exists | `06_qc_evidence/audit/build_industry_sap_v4.py` |
 | Rendered QA evidence exists | `06_qc_evidence/audit/sap_v40_render/TROPIC_SAP_v4.0_industry_grade.pdf`; `06_qc_evidence/audit/sap_v40_render/contact_sheet.png` |
 | Rendered page count | 22 pages |
 | Structural content | 239 paragraphs, 40 tables, 59 headings |
@@ -66,7 +80,7 @@ Bottom line: **lock SAP v4.0 for remediation execution, not for submission use.*
 | F-024 dead/orphan artifacts | Minor | 16, 17 | Remove/archive/integrate orphaned artifacts. |
 | F-025 Part 11 controls | Major | 1, 6.3, 16, 18 | Remains unverified until governed execution evidence exists. |
 
-## 5. Remediation order
+## 5. Historical remediation order
 
 ### Phase 0 - Lock baseline
 

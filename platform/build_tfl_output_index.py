@@ -56,7 +56,7 @@ CATALOG = {
         "adam_inputs": "ADTTE (OS), ADSL",
         "generator": "05_outputs/tfl/tfl_generation.R compute_tte_stats() / KM plot",
         "arm": "RD.EFFICACY.SURVIVAL",
-        "qc": "ADTTE reconciliation; numerical results reconciliation; R primary output hash; SAS companion rendered in real-SAS Stage 14",
+        "qc": "ADTTE reconciliation; numerical results reconciliation; R primary output hash; SAS companion rendered in the SAS Production stage",
     },
     "F-11-2": {
         "title": "Kaplan-Meier Progression-Free Survival",
@@ -67,7 +67,7 @@ CATALOG = {
         "adam_inputs": "ADTTE (PFS), ADSL",
         "generator": "05_outputs/tfl/tfl_generation.R compute_tte_stats() / KM plot",
         "arm": "RD.EFFICACY.SURVIVAL",
-        "qc": "ADTTE reconciliation; numerical results reconciliation; R primary output hash; SAS companion rendered in real-SAS Stage 14",
+        "qc": "ADTTE reconciliation; numerical results reconciliation; R primary output hash; SAS companion rendered in the SAS Production stage",
     },
     "F-12-1": {
         "title": "Overall Survival Subgroup Forest Plot",
@@ -78,7 +78,7 @@ CATALOG = {
         "adam_inputs": "ADTTE (OS), ADSL covariates",
         "generator": "05_outputs/tfl/tfl_generation.R subgroup Cox model",
         "arm": "RD.EFFICACY.SUBGROUP",
-        "qc": "ADTTE/ADSL reconciliation; forest HR reconciliation; R primary output hash; SAS companion rendered in real-SAS Stage 14",
+        "qc": "ADTTE/ADSL reconciliation; forest HR reconciliation; R primary output hash; SAS companion rendered in the SAS Production stage",
     },
     "F-13-1": {
         "title": "PSA Best Percentage Change from Baseline Waterfall",
@@ -89,7 +89,7 @@ CATALOG = {
         "adam_inputs": "ADLB (PSA), ADSL",
         "generator": "05_outputs/tfl/tfl_generation.R PSA best-change waterfall",
         "arm": "RD.EFFICACY.PSA.RESPONSE",
-        "qc": "ADLB/ADSL reconciliation; R primary output hash; SAS companion rendered in real-SAS Stage 14",
+        "qc": "ADLB/ADSL reconciliation; R primary output hash; SAS companion rendered in the SAS Production stage",
     },
     "F-14-1": {
         "title": "Treatment Exposure Duration Swimmer Plot",
@@ -100,7 +100,7 @@ CATALOG = {
         "adam_inputs": "ADEX, ADSL",
         "generator": "05_outputs/tfl/tfl_generation.R exposure swimmer plot",
         "arm": "RD.SAFETY.EXPOSURE",
-        "qc": "ADEX/ADSL reconciliation; R primary output hash; SAS companion rendered in real-SAS Stage 14",
+        "qc": "ADEX/ADSL reconciliation; R primary output hash; SAS companion rendered in the SAS Production stage",
     },
     "F-17-1": {
         "title": "Project Optimus Exposure-Response Scatter",
@@ -111,7 +111,7 @@ CATALOG = {
         "adam_inputs": "ADEX (RDI), ADLB (ANC nadir)",
         "generator": "05_outputs/tfl/tfl_generation.R LOESS exposure-response scatter",
         "arm": "RD.OPTIMUS.ER",
-        "qc": "ADEX/ADLB reconciliation; R primary output hash; SAS companion rendered in real-SAS Stage 14",
+        "qc": "ADEX/ADLB reconciliation; R primary output hash; SAS companion rendered in the SAS Production stage",
     },
     "T-11-3": {
         "title": "PSA Response Rate",
@@ -640,7 +640,7 @@ def _build_markdown(generated_at, rows, unindexed, extracted_ids, missing_catalo
         "This is output-control evidence, not a claim that every output is submission-ready. "
         f"**Controlled scope authority:** `{CONTROLLED_CATALOG_PATH}` "
         f"(SAP authority: {controlled.get('sap_authority', 'SAP v4.0')}). "
-        "SAS companion figures are rendered in the real-SAS Stage 14 session and "
+        "SAS companion figures are rendered in the manifest-named SAS Production stage and "
         "their figure-driving datasets are reconciled before release sealing.",
         "",
         "## Summary",
@@ -667,7 +667,7 @@ def _build_markdown(generated_at, rows, unindexed, extracted_ids, missing_catalo
         "",
         _md_table(["File", "Detected IDs"], extracted_rows),
         "",
-        "## SAS Companion Figures (real-SAS Stage 14)",
+        "## SAS Companion Figures (real-SAS Production stage)",
         "",
         _md_table(
             ["ID", "SAS companion file", "Presence", "Scope", "Freshness", "mtime UTC", "SHA-256"],

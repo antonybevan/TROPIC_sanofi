@@ -31,8 +31,8 @@
   "referenceDocuments": [
     {
       "id": "RD.SAP",
-      "name": "TROPIC SAP v3.0",
-      "location": "02_specifications/sap/TROPIC_SAP_v3.0.docx"
+      "name": "TROPIC SAP v4.0",
+      "location": "02_specifications/sap/TROPIC_SAP_v4.0_industry_grade.docx"
     },
     {
       "id": "RD.ADRG",

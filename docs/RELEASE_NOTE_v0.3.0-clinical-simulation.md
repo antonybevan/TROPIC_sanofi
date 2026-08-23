@@ -43,7 +43,7 @@ Those gaps are explicit controls, not missing decoration. Their closure requirem
 
 The release tag may be created only after all of the following are true:
 
-- the full 40-stage DAG completed with recorded real SAS execution, including simulation generation, report rendering, and independent verification;
+- the full 41-stage DAG completed with recorded real SAS execution, including simulation generation, report rendering, independent verification, and fail-closed metadata-evidence refresh;
 - paired reconciliation passed at controlled tolerances;
 - metadata, TFL, PDF, cSDRG, eCTD, log, and finding gates passed;
 - the post-correction Community run was executed and every residual family was recorded without a clearance claim;

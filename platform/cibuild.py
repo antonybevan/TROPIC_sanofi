@@ -341,6 +341,7 @@ def _sim_byte_copy(datasets):
             tmp_file = prod_file + ".part"
             with open(val_file, "rb") as fs, open(tmp_file, "wb") as fd:
                 fd.write(fs.read())
+            os.chmod(tmp_file, 0o600)
             os.replace(tmp_file, prod_file)  # atomic promotion: never leave a truncated *_prod.xpt
             print(f"    Simulated {ds}_prod.xpt generated.")
 
@@ -409,9 +410,11 @@ def _atomic_download(sas, local_path, remote_path):
     timeout, SIGKILL teardown) can leave a truncated file there that the provenance guard's
     byte-distinctness check cannot tell apart from a genuine, complete download. os.replace() is
     atomic on both POSIX and Windows, so local_path only ever exists as the old file or the
-    complete new one, never a partial write."""
+    complete new one, never a partial write. The completed temporary file is restricted before
+    promotion so patient-derived XPT/CSV downloads never inherit saspy's world-readable default."""
     tmp_path = local_path + ".part"
     sas.download(tmp_path, remote_path)
+    os.chmod(tmp_path, 0o600)
     os.replace(tmp_path, local_path)
 
 
@@ -802,7 +805,11 @@ def run_single_stage(stage, from_stage, sas_mode, results, expected_stage_names=
     # next pipeline invocation.
     if stage["name"] == "eCTD Final Package" and rc == 0:
         rc_g07, out_g07, err_g07 = run_command(
-            [sys.executable, "platform/check_gate_g07_reviewer_package.py"],
+            [
+                sys.executable,
+                "platform/check_gate_g07_reviewer_package.py",
+                "--require-current-pdf",
+            ],
             timeout=STAGE_TIMEOUT_S,
         )
         if rc_g07 != 0:
