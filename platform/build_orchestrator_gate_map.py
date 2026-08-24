@@ -54,8 +54,13 @@ STAGE_GATE_RULES = [
     ("eCTD Final Package", ["G08"], "Module 5 package assembly"),
     ("eCTD Backbone + STF (sequence 0000)", ["G08"], "eCTD backbone and STF assembly"),
     ("Materialize eCTD Sequence", ["G08", "G09"], "sequence materialization and checksum verification"),
+    (
+        "Metadata Control Evidence Refresh",
+        ["G03", "G06"],
+        "fail-closed variable traceability and metadata-drift evidence refresh",
+    ),
     ("Log Cleanliness Gate", ["G06", "G09"], "execution-log scan for unapproved warnings/errors and reviewed exception caps"),
-    ("Release Run Manifest Binding", ["G09"], "current run hash binding and QC verdict seal"),
+    ("Release Run Manifest Binding", ["G05", "G06", "G09"], "post-output TFL index refresh plus current-run hash binding and QC verdict seal"),
 ]
 
 

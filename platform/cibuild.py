@@ -741,6 +741,38 @@ def run_stage_execution(stage, sas_mode):
             rc, stdout, stderr = 0, "Simulated SAS compilation (byte-copy) complete.", ""
             return rc, stdout, stderr
     else:
+        # The detailed TFL index must describe the outputs promoted by this run,
+        # not the pre-run files that may have been present when architecture
+        # reports were last generated. Refresh it immediately before the release
+        # manifest consumes its status, and fail closed on either execution or
+        # machine-status failure. Keeping this inside the existing release-binding
+        # stage avoids a positional stage-count dependency while preserving the
+        # required post-output ordering.
+        if stage["name"] == "Release Run Manifest Binding":
+            index_cmd = [sys.executable, "platform/build_tfl_output_index.py"]
+            idx_rc, idx_stdout, idx_stderr = run_command(
+                index_cmd,
+                timeout=STAGE_TIMEOUT_S,
+            )
+            if idx_rc != 0:
+                return (
+                    idx_rc,
+                    idx_stdout,
+                    "Pre-release TFL output index refresh failed: "
+                    + (idx_stderr or idx_stdout).strip(),
+                )
+            try:
+                with open("platform/tfl_output_index_status.json", encoding="utf-8") as handle:
+                    index_status = json.load(handle)
+            except (FileNotFoundError, json.JSONDecodeError, OSError) as exc:
+                return 1, idx_stdout, f"Pre-release TFL output index status unreadable: {exc}"
+            if index_status.get("status") != "pass":
+                return (
+                    1,
+                    idx_stdout,
+                    "Pre-release TFL output index did not pass: "
+                    + repr(index_status.get("status")),
+                )
         return run_command(stage["cmd"], timeout=STAGE_TIMEOUT_S)
 
 def _abort_pipeline(results, sas_mode, expected_stage_names=None):

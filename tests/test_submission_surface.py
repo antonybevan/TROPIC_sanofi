@@ -19,6 +19,7 @@ from check_gate_g07_reviewer_package import (  # noqa: E402
 )
 from package_ectd import split_markdown_table_row  # noqa: E402
 from build_ectd_backbone import classify  # noqa: E402
+from build_release_run_manifest import REVIEW_SURFACE_FILES  # noqa: E402
 from validate_ectd_sequence import validate_sequence  # noqa: E402
 
 
@@ -39,6 +40,18 @@ def test_current_release_identity_is_bound_across_reviewer_sources():
         assert len(lines) == 1, (rel, lines)
         assert CURRENT_RELEASE in lines[0]
         assert CURRENT_RELEASE_NOTE in lines[0]
+
+
+def test_current_audit_and_navigation_surfaces_are_release_sealed():
+    required = {
+        "docs/INDEX.md",
+        "06_qc_evidence/audit/DASHBOARD_VISUAL_QC.md",
+        "06_qc_evidence/audit/FIGURE_AUDIT_2026-08-23.md",
+        "06_qc_evidence/audit/REPOSITORY_CLEANUP_AUDIT_2026-08-23.md",
+        "06_qc_evidence/audit/SIMULATION_PRECISION_IMPLEMENTATION_REPORT_2026-08-14.md",
+    }
+    assert required <= set(REVIEW_SURFACE_FILES)
+    assert all((ROOT / path).is_file() for path in required)
 
 
 def test_pdf_release_identity_rejects_tagged_or_sealed_candidate_language():
@@ -165,8 +178,14 @@ def test_tfl_gallery_matches_controlled_tables_and_is_keyboard_accessible():
     figure_alts = re.findall(r'<img class="fig-thumb"[^>]+alt="([^"]+)"', gallery)
     assert len(figure_alts) == 7
     assert all(len(alt.split()) >= 12 for alt in figure_alts)
-    assert "function openLightbox(src, altText)" in gallery
+    assert "function openLightbox(src, altText, trigger)" in gallery
     assert "image.alt = altText" in gallery
+    assert gallery.count(", this); }") == 7
+    assert "document.getElementById('lightbox-close').focus()" in gallery
+    assert "lightboxTrigger.focus()" in gallery
+    assert "lightbox.setAttribute('aria-hidden', 'false')" in gallery
+    assert "lightbox.setAttribute('aria-hidden', 'true')" in gallery
+    assert "document.body.style.overflow = 'hidden'" in gallery
     assert "completed/discontinued" not in gallery
     assert "prior docetaxel response" not in gallery
     assert "red = progressors" not in gallery.lower()

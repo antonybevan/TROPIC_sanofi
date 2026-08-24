@@ -1,7 +1,9 @@
 # TROPIC Figure, Mathematics, Provenance, and Submission-Surface Audit
 
-**Audit date:** 2026-08-22  
+**Audit date:** 2026-08-23
+
 **Scope:** All seven R figures, all six SAS companion figures, the figure gallery, figure-level numerical reconciliation, the Module 5 reviewer surface, and the materialized eCTD sequence 0000.  
+
 **Disposition:** Complete. No open figure defect was found after the final regeneration and verification pass.
 
 ## 1. Qualification statement
@@ -20,14 +22,14 @@ The audit used the current FDA Study Data Technical Conformance Guide (June 2026
 | Colour accessibility | KM and exposure-response treatment groups relied too heavily on colour. | KM curves now use solid/dashed lines and distinct censor marks. Exposure-response plots use circle/triangle points and solid/dashed fitted curves. A final visual pass caught and removed a SAS `SYMBOL=` override that had collapsed both point groups to circles. |
 | Exposure-response completeness | The SAS RDI axis could clip a subject above 105%. | The fixed maximum was removed; the final SAS figure includes the observed RDI=106 point. |
 | Scientific wording | PSA category wording, measurement units, gallery descriptions, and some interpretation text were imprecise or overclaimed. | Wording now states `at least 50% decrease`, uses professional units, and avoids unsupported efficacy, significance, or tolerability claims. |
-| Gallery accessibility | Figure thumbnails did not provide meaningful alternate text. | Each figure now has descriptive alternate text, propagated to the lightbox view and enforced by tests. |
+| Gallery accessibility | Figure thumbnails did not provide meaningful alternate text; the modal also failed to take and restore focus, which made later cards unreliable under repeated keyboard use. | Each figure now has descriptive alternate text. The modal receives focus, traps `Tab`, exposes its open/closed state, locks background scrolling, and restores focus to the invoking card. Source contracts and repeated browser interaction cover the lifecycle. |
 | Track identification | The SAS swimmer figure did not clearly identify its production track. | The title now states `SAS Production Track`. |
 
 ## 3. Final artifact generation and provenance
 
-- R figures were regenerated from `05_outputs/tfl/tfl_generation.R` against the governed analysis inputs.
-- SAS companion figures and figure-data CSVs were regenerated in a live SAS OnDemand for Academics workspace through `platform/_oda_render_tfl.py --tfl-only`.
-- The live ODA connection was nonce-probed before it earned `oda` status. The run uploaded the final SAS source, purged prior remote outputs, rendered all six expected PNGs, downloaded them transactionally, and terminated the session cleanly.
+- R figures were regenerated from `05_outputs/tfl/tfl_generation.R` against the governed analysis inputs during the current full pipeline.
+- SAS companion figures and figure-data CSVs were regenerated in a live SAS OnDemand for Academics workspace by `platform/cibuild.py --real-sas`.
+- The live ODA connection was nonce-probed before it earned `oda` status. The run uploaded the final SAS source, rendered all six expected PNGs, downloaded outputs transactionally, and terminated the session cleanly.
 - SASPy 5.107.1 used the three SAS AES client jars required for ODA's SAS 9.4 M7-or-later encryption handshake. No encryption setting was disabled or weakened.
 - `04_analysis_datasets/programs/sas/oda_tfl.log` contains the completion marker and zero `ERROR:` or `WARNING:` lines.
 - The regenerated source and figure artifacts were copied into Module 5 and then materialized into eCTD sequence 0000.
@@ -43,27 +45,34 @@ The audit used the current FDA Study Data Technical Conformance Guide (June 2026
 | Swimmer data | PASS — 60 subjects, durations, and death markers identical. |
 | Exposure-response data | PASS — 730 joined observations identical. |
 | Figure dimensions/opacity | PASS — all 13 PNGs meet the governed 2400-pixel output contracts. |
-| Visual QA | PASS — all 13 final PNGs inspected; all six generated reviewer PDFs, 62 pages total, rendered and inspected. |
+| Visual QA | PASS — all 13 final PNGs inspected individually and in R/SAS contact sheets; all six generated reviewer PDFs, 62 pages total, rendered and inspected. |
 | Source → Module 5 → eCTD equality | PASS — 15 governed program/figure assets, 45 copies, byte-identical. |
 | eCTD sequence integrity | PASS — 99/99 leaves MD5-verified; complete inventory/support/XML/run-record validation passed. |
 
-## 5. Automated regression evidence
+## 5. Browser and document inspection evidence
 
-- Python suite: **240 passed**.
+- The static gallery was exercised through the local browser surface. All seven cards passed click-open, `Escape`-close, `Enter`-open, and repeated close cycles. First and last cards additionally passed close-button activation, `Space` activation, `Tab` focus trapping, and focus restoration.
+- The initial browser pass exposed the focus-lifecycle defect recorded in section 2. The source was corrected and the complete seven-card matrix was rerun successfully.
+- Gallery HTML and all seven R figure assets returned successful HTTP responses. Ordinary browser requests for absent favicon files were unrelated to the product surface.
+- The current PDFs were rendered with Poppler at 100 dpi: ADRG 14 pages, cSDRG 8, BDRG 5, CSR 7, simulation MAP 13, and simulation report 15. Contact sheets and dense pages were inspected at full rendered resolution. No clipping, overlap, blank page, malformed glyph, missing content, or margin loss was observed.
+- All six PDFs are US Letter, PDF 1.7, and unencrypted. This is visual/structural acceptance evidence, not a tagged-PDF accessibility claim.
+
+## 6. Automated regression evidence
+
+- Python suite: **166 passed**; ODA/broker unit suite: **95 passed**.
 - R smoke, derivation, lab-shift, figure, population, dashboard, and TFL-statistics suites: **all passed**.
 - Figure semantic contracts now cover non-estimable subgroups, ITT naming, explicit population denominators, subgroup interpretation, non-colour cues, data-inclusive RDI axes, SAS marker mapping, subgroup N, and production-track labelling.
-- Pipeline manifest DAG: **PASS** — 40 stages, scripts, gate wiring, ordering, and parallel boundaries valid.
+- Pipeline manifest DAG: **PASS** — 41 stages, scripts, gate wiring, ordering, and parallel boundaries valid.
 - Repository diff whitespace check: **PASS**.
 
-## 6. Package status
+## 7. Package status
 
 The Module 5 reviewer package and eCTD sequence 0000 were rebuilt after the final SAS rendering. The generated CSR, simulation plan, simulation report, ADRG, BDRG, and cSDRG have no observed clipping, overlap, or malformed-glyph defects. The final package preserves the synthetic/non-confirmatory disclosure on the relevant figures.
 
-## 7. Governing references
+## 8. Governing references
 
 - FDA, *Study Data Technical Conformance Guide — Technical Specifications Document*, June 2026: https://www.fda.gov/regulatory-information/search-fda-guidance-documents/study-data-technical-conformance-guide-technical-specifications-document
 - FDA, *Study Data Standards Resources*: https://www.fda.gov/industry/fda-data-standards-advisory-board/study-data-standards-resources
 - FDA, *Electronic Regulatory Submission and Review*: https://www.fda.gov/drugs/forms-submission-requirements/electronic-regulatory-submission-and-review
 - ICH, *E3 — Structure and Content of Clinical Study Reports*: https://admin.ich.org/node/603
 - SASPy, *Configuration — SAS IOM Client Encryption Jars*: https://sassoftware.github.io/saspy/configuration.html#sas-iom-client-encryption-jars
-

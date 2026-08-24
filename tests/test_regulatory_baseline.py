@@ -10,7 +10,11 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "platform"))
 
 from build_ectd_backbone import classify  # noqa: E402
-from check_regulatory_baseline import _valid_reseal_chain, evaluate  # noqa: E402
+from check_regulatory_baseline import (  # noqa: E402
+    _manifest_stage_names,
+    _valid_reseal_chain,
+    evaluate,
+)
 
 _RESEAL_SPEC = importlib.util.spec_from_file_location(
     "rebind_governance_seal",
@@ -82,12 +86,36 @@ def test_current_baseline_requires_completed_exact_byte_rerun():
         row for row in result["checks"]
         if row["name"] == "p21.summary.exact_byte_rerun_boundary"
     )
+    stage_check = next(
+        row for row in result["checks"]
+        if row["name"] == "p21.pipeline_binding.health_stage_contract"
+    )
     assert timestamp_check["ok"], timestamp_check
-    assert "bound=2026-08-22T15:08:13.116044+00:00" in timestamp_check["detail"]
+    assert "bound=2026-08-23T17:47:35.766117+00:00" in timestamp_check["detail"]
+    assert stage_check["ok"], stage_check
+    assert stage_check["detail"] == "manifest=41; expected=41; recorded=41; pass=41"
     assert boundary_check["ok"], boundary_check
     assert boundary_check["detail"] == (
         "exact current production bytes validated under standard submission filenames"
     )
+
+
+def test_regulatory_stage_contract_is_derived_from_manifest():
+    import yaml
+
+    manifest = yaml.safe_load(
+        (ROOT / "config/study_manifest.yaml").read_text(encoding="utf-8")
+    )
+    names = _manifest_stage_names(manifest)
+    assert len(names) == 41
+    assert len(set(names)) == 41
+    assert names[0] == "Governance Scope Lock (G00)"
+    assert names[-1] == "Release Run Manifest Binding"
+
+
+def test_regulatory_stage_contract_fails_closed_on_malformed_sections():
+    assert _manifest_stage_names({"infrastructure_stages": []}) == []
+    assert _manifest_stage_names({"datasets": {"name": "not-a-list"}}) == []
 
 
 def test_prior_governance_reseal_validation_is_history_independent():
@@ -161,7 +189,7 @@ def test_definitive_p21_summary_is_self_reconciling_and_non_qualifying():
     assert summary["validation"]["process_completed"] is True
     assert summary["validation"]["compatibility_caveat"] == "Incompatible CLI used"
     assert summary["validation"]["raw_report_sha256"] == (
-        "9a8af3bddfaddb7dd9ebe02bccec8da307d3236567a0c6b59ab40d955d80a93c"
+        "05cf6f82c46ba958fdd659f9f60f41fa5e9fd2bf7f59eba443b83fd428d89cb5"
     )
     assert summary["validation"]["input_content_transformations"] == 0
     assert "standard submission filenames" in summary["validation"]["input_filename_contract"]
@@ -184,13 +212,13 @@ def test_definitive_p21_summary_is_self_reconciling_and_non_qualifying():
         "adtte.xpt",
     }
     assert {row["dataset"]: row["sha256"] for row in summary["datasets"]} == {
-        "ADAE": "f3725c23ac84c7f9b27b026be794bdce8696d8f912f9f238059d9583b711c9eb",
-        "ADCM": "78203f0e65e1b7c807f38ad5f44cd631c1c7f2e757fe92883a07cad60a86486c",
-        "ADEX": "14cba1a78142ae1b93c718f8e6a30341cf3aff1e93ab8b003e734b9d0289ec0e",
-        "ADLB": "935798a5be62bf9443acedc297873d4021520a2aebfd33b6e115733e130e16d9",
-        "ADRS": "972b2839f937bccf5b3c5e6514d40ef830a27ecc0022ceaa5ae58b1fb2c768a3",
-        "ADSL": "6320f2685e4f2cb1470b9a2c21a5e70b75be558c41644f78590f4005ee710a5e",
-        "ADTTE": "e2107540b51c031dee46a489975da32c2cd219e325e3dc42b3d79c1f4b3a893a",
+        "ADAE": "dd3bf9eeb204a7d54e63e2f4c0545e353ee943774be1620071bfe5ded9b33a67",
+        "ADCM": "506f7eee97c9fd52df10c9b254b976f0759c32932a54cfb53a783c07b731bbdb",
+        "ADEX": "6b6c974ba4fb85c543806fa47502f3f4b0c4d0a4bb88580cbc1f86f1a96889eb",
+        "ADLB": "92f2404520923f89f9e680b66f76b078af77098500d6856f00ba9b754d698c02",
+        "ADRS": "2a6d97e8add31ffc69b9adebab08a9d69cebb38957cf2488281da495b69a21e1",
+        "ADSL": "9a2d00b02e00c0be0f1785df4797a1bc988371f400e9c6114cb0e3e7811ab2d9",
+        "ADTTE": "665dd7eeca6854633124764f82f3e8a0f4b880169f92c02a7d19a1bbd0bb53ff",
     }
     assert totals["issue_groups"] == len(summary["issues"])
     assert totals["issue_occurrences"] == sum(row["found"] for row in summary["issues"])
@@ -198,13 +226,13 @@ def test_definitive_p21_summary_is_self_reconciling_and_non_qualifying():
         row["occurrences"] for row in summary["residual_families"]
     )
     assert summary["pipeline_binding"] == {
-        "health_timestamp": "2026-08-22T15:08:13.116044+00:00",
+        "health_timestamp": "2026-08-23T17:47:35.766117+00:00",
         "pipeline_health_status": "GREEN",
         "sas_execution_mode": "oda",
         "run_scope": "full_dag",
-        "stages_expected": 40,
-        "stages_recorded": 40,
-        "source_tree_sha256": "c1aaa7b100d80e2fdaceaf50dda04c0d23a4c6c349007acfa63ab93096f9d6c0",
+        "stages_expected": 41,
+        "stages_recorded": 41,
+        "source_tree_sha256": "6b2e272130b0936f4f2156bf8f4352f4c3428a9c01eb772e29614c14ce970e91",
     }
     assert summary["remediation_comparison"]["occurrences_eliminated"] == 84238
     assert summary["remediation_comparison"]["percent_reduction"] == 97.3
@@ -218,7 +246,7 @@ def test_definitive_p21_summary_is_self_reconciling_and_non_qualifying():
         "independent_qc_approved": False,
     }
     assert summary["exact_byte_rerun"] == {
-        "health_timestamp": "2026-08-22T15:08:13.116044+00:00",
+        "health_timestamp": "2026-08-23T17:47:35.766117+00:00",
         "completed": True,
         "datasets_validated": 7,
         "input_hashes_match_current_production_xpts": True,
@@ -226,6 +254,6 @@ def test_definitive_p21_summary_is_self_reconciling_and_non_qualifying():
         "content_transformations": 0,
         "process_completed": True,
         "report_sha256": (
-            "9a8af3bddfaddb7dd9ebe02bccec8da307d3236567a0c6b59ab40d955d80a93c"
+            "05cf6f82c46ba958fdd659f9f60f41fa5e9fd2bf7f59eba443b83fd428d89cb5"
         ),
     }

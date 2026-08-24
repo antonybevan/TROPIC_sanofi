@@ -31,6 +31,33 @@ REQUIRED_ASSERTIONS = {
 }
 
 
+def _manifest_stage_names(manifest: dict) -> list[str]:
+    """Return the exact executor stage contract represented by the study manifest."""
+    if not isinstance(manifest, dict):
+        return []
+    infrastructure = manifest.get("infrastructure_stages")
+    datasets = manifest.get("datasets")
+    if not isinstance(infrastructure, dict) or not isinstance(datasets, list):
+        return []
+    pre = infrastructure.get("pre")
+    pre_sas = infrastructure.get("pre_sas")
+    post = infrastructure.get("post")
+    if not all(isinstance(section, list) for section in (pre, pre_sas, post)):
+        return []
+    try:
+        names = [str(row["name"]) for row in pre]
+        names.extend(
+            str(row.get("val_stage") or f"R {str(row['name']).upper()} Validation")
+            for row in datasets
+        )
+        names.extend(str(row["name"]) for row in pre_sas)
+        names.append("SAS Production (ODA/Real/Simulated)")
+        names.extend(str(row["name"]) for row in post)
+    except (AttributeError, KeyError, TypeError):
+        return []
+    return names
+
+
 def _sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -325,12 +352,56 @@ def evaluate(root: Path = ROOT) -> dict:
             True,
             str(pipeline_health_path.relative_to(root)),
         )
+    manifest_path = root / "config/study_manifest.yaml"
+    try:
+        study_manifest = yaml.safe_load(manifest_path.read_text(encoding="utf-8")) or {}
+    except (OSError, yaml.YAMLError) as exc:
+        study_manifest = {}
+        add("p21.pipeline_binding.manifest_readable", False, str(exc))
+    else:
+        add(
+            "p21.pipeline_binding.manifest_readable",
+            True,
+            str(manifest_path.relative_to(root)),
+        )
+    manifest_stage_names = _manifest_stage_names(study_manifest)
+    manifest_stage_count = len(manifest_stage_names)
+    health_stages_expected = pipeline_health.get("stages_expected")
+    health_stages_recorded = pipeline_health.get("stages_recorded")
+    health_stages = pipeline_health.get("stages")
+    health_stage_names = set(health_stages) if isinstance(health_stages, dict) else set()
+    manifest_stage_name_set = set(manifest_stage_names)
+    health_pass_count = (
+        sum(status == "PASS" for status in health_stages.values())
+        if isinstance(health_stages, dict)
+        else 0
+    )
+    health_stage_contract_ok = (
+        manifest_stage_count > 0
+        and len(manifest_stage_name_set) == manifest_stage_count
+        and isinstance(health_stages_expected, int)
+        and not isinstance(health_stages_expected, bool)
+        and isinstance(health_stages_recorded, int)
+        and not isinstance(health_stages_recorded, bool)
+        and health_stages_expected == manifest_stage_count
+        and health_stages_recorded == manifest_stage_count
+        and health_stage_names == manifest_stage_name_set
+        and health_pass_count == manifest_stage_count
+    )
+    add(
+        "p21.pipeline_binding.health_stage_contract",
+        health_stage_contract_ok,
+        (
+            f"manifest={manifest_stage_count}; expected={health_stages_expected}; "
+            f"recorded={health_stages_recorded}; pass={health_pass_count}"
+        ),
+    )
     binding_expectations = {
         "pipeline_health_status": "GREEN",
         "sas_execution_mode": "oda",
         "run_scope": "full_dag",
-        "stages_expected": 40,
-        "stages_recorded": 40,
+        "stages_expected": health_stages_expected,
+        "stages_recorded": health_stages_recorded,
     }
     for key, expected in binding_expectations.items():
         actual = pipeline_binding.get(key)

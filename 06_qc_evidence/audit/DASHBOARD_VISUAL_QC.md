@@ -1,8 +1,10 @@
 # Dashboard Visual QC — local acceptance evidence
 
-**Status:** `PASS — local acceptance capture`
+**Status:** `PASS — local acceptance capture and live reconfirmation`
 
 **Capture date:** 2026-08-13
+
+**Live reconfirmation date:** 2026-08-23
 
 **Application:** `07_reviewer_explanation/tools/shiny/app.R`
 
@@ -10,15 +12,18 @@ This record documents a visual acceptance pass of the read-only reviewer dashboa
 
 ## Scope
 
-The capture was performed at a 1440 × 1000 desktop viewport after the local production-data dashboard loaded successfully. Each panel was activated, allowed to settle, checked for a visible rendered output, and then captured:
+The retained capture was performed at a 1440 × 1000 desktop viewport. On
+2026-08-23 the current application was then exercised again through the live local
+browser surface against the governed production outputs. Each panel was activated,
+allowed to settle, and checked for a visible rendered output:
 
 | Panel | Acceptance evidence |
 |---|---|
 | Overview | KPI cards, subgroup forest plot, provenance and evidence-boundary copy rendered without errors |
-| Kaplan–Meier | OS survival curve rendered; all six endpoint choices (OS, PFS, TTPAIN, TTPSA, TTSAE, TTUMOR) were exercised and the source disclosure remained visible |
+| Kaplan–Meier | All six endpoint choices (OS, PFS, TTPAIN, TTPSA, TTSAE, TTUMOR) were exercised twice, forward and reverse; each title, plot alternate text, and source disclosure matched the selection |
 | Response | Waterfall and swimmer plots rendered side by side |
-| Safety | Treatment-emergent filter, system-organ-class slider (5 and restored to 10), preferred-term plot, and aggregate table rendered |
-| Reconciliation | Six endpoint rows rendered with `PASS` status and the single-author methodological boundary visible |
+| Safety | Treatment-emergent filter was toggled four times; valid bounds 5 and 20 produced exactly 5 and 20 rows; invalid 4, 21, 5.5, and blank inputs failed closed with the governed validation message and no disconnect; value 10 restored 10 rows |
+| Reconciliation | Six endpoint rows rendered with `PASS` status; the sort control was exercised three times and changed row order without changing the six PASS results |
 
 The dashboard contract tests also passed:
 
@@ -28,13 +33,22 @@ Shiny dashboard contracts: PASS
 
 Rscript tests/test_shiny_dashboard_local.R
 Local Shiny dashboard production-data contracts: PASS
-
-Interactive acceptance checks also passed: the KM endpoint selector rendered a curve for every
-endpoint without a visible Shiny error; the KM/Safety sidebars collapsed and restored; the Safety
-filter was unchecked and restored; the Safety slider was moved to 5 and restored to 10; and the
-Reconciliation table sort control responded while all six rows remained `PASS`. Browser console
-error/warning logs were empty during the pass.
 ```
+
+Interactive acceptance checks also passed: all five tabs were visited twice in forward/reverse
+order; every KM endpoint rendered without a visible Shiny error; the KM and Safety sidebars
+collapsed while their outputs remained available; the Safety controls survived repeated valid and
+invalid input; and the Reconciliation sort remained semantically stable. The Response plots were
+also checked after their reactive render settled. Reloading restored a clean Overview state.
+
+The Safari-rendered surface was used for visual acceptance. Chrome exposed the
+application accessibility tree and successful resources but its Computer Use
+capture returned an unpainted viewport; Safari rendering confirmed this was a
+browser-capture/compositor limitation rather than a product rendering failure.
+Safari's accessibility tree also retained stale expanded state after the KM sidebar
+collapsed even though the visual control changed and reload recovered cleanly. This
+tool/library behavior is not represented as proof of conformance; the product's
+source contracts and visual result are the controlled evidence.
 
 ## Captured evidence
 
