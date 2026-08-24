@@ -333,6 +333,11 @@ def test_ci_security_controls_are_pinned_and_non_cancelling() -> None:
     workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
     precommit = (ROOT / ".pre-commit-config.yaml").read_text(encoding="utf-8")
 
+    pull_request_block = workflow.split("pull_request:", 1)[1].split(
+        "workflow_dispatch:", 1
+    )[0]
+    assert "main" in pull_request_block
+    assert "'codex/**'" in pull_request_block
     assert "github.event_name" in workflow.split("jobs:", 1)[0]
     assert "actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294" in workflow
     assert "fail-on-severity: moderate" in workflow

@@ -4,7 +4,9 @@ on:
   push:
     branches: [ main, 'codex/**' ]
   pull_request:
-    branches: [ main ]
+    # Stacked Codex branches are reviewed before their parent reaches main. Keep
+    # PR-only controls (especially dependency review) active on both surfaces.
+    branches: [ main, 'codex/**' ]
   workflow_dispatch:
     inputs:
       run_live_ct:
