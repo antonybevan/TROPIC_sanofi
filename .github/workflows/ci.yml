@@ -119,10 +119,10 @@ jobs:
       run: |
         # Run every boundary report even when the external-run baseline is RED.
         # The final non-zero status blocks release without suppressing functional CI.
-        status=0
-        python3 -m pytest -q -m release_qualification tests/test_regulatory_baseline.py || status=1
-        python3 platform/check_regulatory_baseline.py --check-only || status=1
-        exit "$status"
+        qualification_rc=0
+        python3 -m pytest -q -m release_qualification tests/test_regulatory_baseline.py || qualification_rc=1
+        python3 platform/check_regulatory_baseline.py --check-only || qualification_rc=1
+        exit "$qualification_rc"
 
   validate:
     # Keep the historical required-status context used by main branch protection.
