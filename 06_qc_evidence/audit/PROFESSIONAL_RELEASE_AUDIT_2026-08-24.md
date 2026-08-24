@@ -72,9 +72,9 @@ qualification, validator, and submission-operations evidence exists.
 | Regenerated simulation bundle and independent verifier | **PASS; 400,000/400,000 completed, 0 failed; qualification remains NOT_QUALIFIED** |
 | Draft eCTD materialization | **PASS; 99/99 leaves, 0 unexpected files** |
 | Generated PDF review | **PASS; 6 PDFs / 62 pages, all fonts embedded, no visual or bounds defect; 6/6 byte-identical on rebuild** |
-| Complete functional Python collection | **285 passed; 2 current-production qualification checks explicitly separated** |
+| Complete functional Python collection | **286 passed; 2 current-production qualification checks explicitly separated** |
 | Current-production qualification collection | **2 failed as designed while the genuine external run is RED/stale** |
-| Stacked pull-request CI before final professional-build push | **Functional/conformance PASS; CodeQL Python PASS; CodeQL Actions PASS; dependency review PASS after graph enablement; qualification/seal FAIL as designed** |
+| Pull-request CI run `32761881322` | **Functional/conformance PASS; CodeQL Python PASS; CodeQL Actions PASS; dependency review PASS; qualification/seal FAIL as designed** |
 
 The mathematical source change initially made the checked-in simulation/package
 hashes stale. Those mismatches were not waived: the 400,000-replicate bundle, reports,
@@ -93,10 +93,14 @@ regression:
 | `b0a96455-345f-45d6-a3ac-de4c574d31a4` | Three dependency-boundary findings: hidden tracked/bytecode drift, inherited Python execution state, and non-final-ancestor symlink traversal. **Fixed.** |
 | `4a95442d-3b42-42f3-8fec-9445594a11c4` | The original three paths were closed; one additional inherited proxy/custom-CA transport path remained. The wrapper and credential child now use literal environment allowlists. **Fixed and locally regression-tested.** |
 
-The final committed-head rescan is performed after the honest RED/BLOCKED release
-surfaces are regenerated. Advisory-intelligence lookup was unavailable because no TAC
-connector was installed/authenticated; this limitation did not replace source review,
-controlled reproductions, or the complete eight-file security inventory.
+Full committed-range scan `8177f83b-ba84-4ef7-8ff2-55adf3fd758b` reviewed all ten
+security-relevant implementation/generated surfaces with complete coverage and **zero
+findings**. After the final Path A reporting/visibility correction and exact blocked
+rebinding, narrow committed-range scan `365c1e56-7537-434e-ab90-04d5c737fbe4`
+reviewed its three security-relevant surfaces with complete coverage and **zero
+findings**. Advisory-intelligence lookup was unavailable because no TAC connector was
+installed/authenticated; this limitation did not replace source review, controlled
+reproductions, or complete frozen-diff inventories.
 
 ## Controlled execution evidence and blocker
 
@@ -115,8 +119,9 @@ controlled reproductions, or the complete eight-file security inventory.
   Final state is **RED, partial_dag, 18/41 recorded, 23 not run**.
 - Rollback: **PASS** for controlled ADaM XPT, TFL-output, and sequence surfaces covered
   by the run backup. No simulated result was accepted as double programming.
-- Release verifier: **24/43 checks passed; FAIL**. No new release manifest, candidate
-  checklist, governance reseal, tag, or promotion was created.
+- Release verifier: **28/43 checks passed; FAIL**. An honest `FAIL / failed_binding`
+  manifest and `BLOCKED` checklist were regenerated from clean committed source; no
+  governance reseal, tag, or promotion was created.
 - Recommended retry window from the existing successful-connect ledger:
   **19:00-22:00 local**. This is an operational hint, not a service guarantee.
 
@@ -127,12 +132,15 @@ current source identity and is prohibited by the new release policy.
 ## Continuous-integration disposition
 
 The pull-request run at
-`https://github.com/antonybevan/TROPIC_sanofi/actions/runs/32716139620`
+`https://github.com/antonybevan/TROPIC_sanofi/actions/runs/32761881322`
 demonstrated the intended separation of concerns. `Run Tests & Conformance Gates`,
-`CodeQL SAST (python)`, and `CodeQL SAST (actions)` passed. The independently required
-`Path A seal verify (verify_release)` and the explicit current-external-run
-qualification job failed because the genuine SAS/ODA baseline is RED and stale; those
-failures must not be bypassed.
+`Dependency review (PR delta)`, `CodeQL SAST (python)`, and `CodeQL SAST (actions)`
+passed. The independently required `Path A seal verify (verify_release)` failed 28/43
+and the explicit current-external-run qualification collection failed its two current
+baseline assertions because the genuine SAS/ODA baseline is RED, partial, and stale;
+those failures must not be bypassed. The Path A verifier-regression step is marked
+`!cancelled()` so it still runs after an expected red boundary without changing the
+job's failed conclusion.
 
 The repository Dependency graph was enabled through **Settings -> Advanced Security**
 and GitHub confirmed the saved setting. The SPDX 2.3 SBOM endpoint then returned five
