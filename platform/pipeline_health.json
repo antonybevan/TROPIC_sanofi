@@ -53,7 +53,7 @@
   },
   "r_version": "R version 4.6.0 (2026-04-24)",
   "renv_lock_sha256": "a9ba2082ce1f227add5d2cb400fb70688ea5031fef238dcf1bf1928de2700630",
-  "source_tree_sha256": "6b2e272130b0936f4f2156bf8f4352f4c3428a9c01eb772e29614c14ce970e91",
+  "source_tree_sha256": "ac7a0d69a318688abf72a59d9498dd196cf00f62b0e8c915dead36893dcde872",
   "oda_endpoint": "odaws01-apse1-2.oda.sas.com",
   "oda_attempts": 1,
   "oda_total_wait_s": 9.3,
@@ -107,5 +107,71 @@
     ],
     "byte_distinct": true,
     "sdtm_manifest_sha": "matches current SDTM source (329430f6361e)"
-  }
+  },
+  "governance_only_reseal": {
+    "status": "PASS",
+    "rebound_at": "2026-08-24T06:04:06.160249+00:00",
+    "base_revision": "09c004fef13358815eab3bd90fc9c669cd1320a4",
+    "clinical_run_timestamp": "2026-08-23T17:47:35.766117+00:00",
+    "prior_source_tree_sha256": "6b2e272130b0936f4f2156bf8f4352f4c3428a9c01eb772e29614c14ce970e91",
+    "rebound_source_tree_sha256": "ac7a0d69a318688abf72a59d9498dd196cf00f62b0e8c915dead36893dcde872",
+    "changed_paths": [
+      "05_outputs/tfl/TFL_Gallery.html",
+      "06_qc_evidence/audit/DASHBOARD_VISUAL_QC.md",
+      "06_qc_evidence/audit/FIGURE_AUDIT_2026-08-23.md",
+      "06_qc_evidence/audit/REPOSITORY_CLEANUP_AUDIT_2026-08-23.md",
+      "06_qc_evidence/audit/SIMULATION_PRECISION_IMPLEMENTATION_REPORT_2026-08-14.md",
+      "06_qc_evidence/audit/findings_register.csv",
+      "06_qc_evidence/conformance/p21_adam_runrecord.md",
+      "06_qc_evidence/conformance/p21_adam_summary.json",
+      "06_qc_evidence/gates/regulatory_baseline_status.json",
+      "config/regulatory_baseline.yaml",
+      "docs/INDEX.md",
+      "platform/build_orchestrator_gate_map.py",
+      "platform/build_release_run_manifest.py",
+      "platform/check_regulatory_baseline.py",
+      "platform/cibuild.py",
+      "platform/tfl_output_index_status.json",
+      "scripts/rebind_governance_seal.py",
+      "tests/test_pipeline_dag.py",
+      "tests/test_regulatory_baseline.py",
+      "tests/test_submission_surface.py"
+    ],
+    "clinical_run_was_not_reexecuted": true,
+    "reason": "Pipeline integrity, dependency, executor-validation, regulatory-claim, external-validator-evidence, reviewer-presentation, and test controls changed; clinical derivation programs, study parameters, datasets, and statistical results did not."
+  },
+  "governance_reseal_chain": [
+    {
+      "status": "PASS",
+      "rebound_at": "2026-08-24T06:04:06.160249+00:00",
+      "base_revision": "09c004fef13358815eab3bd90fc9c669cd1320a4",
+      "clinical_run_timestamp": "2026-08-23T17:47:35.766117+00:00",
+      "prior_source_tree_sha256": "6b2e272130b0936f4f2156bf8f4352f4c3428a9c01eb772e29614c14ce970e91",
+      "rebound_source_tree_sha256": "ac7a0d69a318688abf72a59d9498dd196cf00f62b0e8c915dead36893dcde872",
+      "changed_paths": [
+        "05_outputs/tfl/TFL_Gallery.html",
+        "06_qc_evidence/audit/DASHBOARD_VISUAL_QC.md",
+        "06_qc_evidence/audit/FIGURE_AUDIT_2026-08-23.md",
+        "06_qc_evidence/audit/REPOSITORY_CLEANUP_AUDIT_2026-08-23.md",
+        "06_qc_evidence/audit/SIMULATION_PRECISION_IMPLEMENTATION_REPORT_2026-08-14.md",
+        "06_qc_evidence/audit/findings_register.csv",
+        "06_qc_evidence/conformance/p21_adam_runrecord.md",
+        "06_qc_evidence/conformance/p21_adam_summary.json",
+        "06_qc_evidence/gates/regulatory_baseline_status.json",
+        "config/regulatory_baseline.yaml",
+        "docs/INDEX.md",
+        "platform/build_orchestrator_gate_map.py",
+        "platform/build_release_run_manifest.py",
+        "platform/check_regulatory_baseline.py",
+        "platform/cibuild.py",
+        "platform/tfl_output_index_status.json",
+        "scripts/rebind_governance_seal.py",
+        "tests/test_pipeline_dag.py",
+        "tests/test_regulatory_baseline.py",
+        "tests/test_submission_surface.py"
+      ],
+      "clinical_run_was_not_reexecuted": true,
+      "reason": "Pipeline integrity, dependency, executor-validation, regulatory-claim, external-validator-evidence, reviewer-presentation, and test controls changed; clinical derivation programs, study parameters, datasets, and statistical results did not."
+    }
+  ]
 }
