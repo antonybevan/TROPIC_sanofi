@@ -1,0 +1,7 @@
+# Reproducible CDISC CORE 0.16.0 environment for CPython 3.12 on POSIX.
+# Install requirements-core-build.lock first, then install this file with
+# --no-build-isolation so the source-only titlecase build cannot fetch packages.
+--require-hashes
+--only-binary=:all:
+--no-binary=titlecase
+-r requirements-core.lock

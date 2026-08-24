@@ -204,3 +204,26 @@ model for clinical or filing use.
 At the report date the correct delivery state was **tested draft submission
 project; not promotion-ready**. The later technical closure does not remove the
 scientific, sponsor, independent-review, Enterprise, Part 11, or filing boundaries.
+
+## 10. 2026-08-24 mathematics and logic re-audit
+
+The survival and simulation mathematics were independently traced again from the
+protocol inputs through the engine, machine evidence, independent checker, and
+reviewer outputs. The log-rank statistic orientation, one-sided tail probability,
+null rejection rule, inverse-CDF event-time generation, piecewise-hazard integration
+and inversion, dropout handling, Monte Carlo accounting, MCSE, and Wilson interval
+calculations were consistent with their stated contracts. The independent checker
+continues to recompute decision and uncertainty fields without importing the engine.
+
+New boundary regressions exercise exact piecewise-hazard change points and
+hazard/inverse round trips; annual event probabilities of 0, 0.04, 0.25, 0.75, and
+0.999 through the annual-probability → monthly-hazard → probability transform; and
+Kaplan–Meier median behavior with tied events and with a not-reached median. These
+augment, rather than replace, the pinned 400,000-replicate evidence and malformed
+evidence-path tests.
+
+No new mathematical defect was identified. This conclusion is software and
+numerical verification for the declared model only: it is not model qualification,
+clinical validation, a sponsor-approved operating-characteristic target, or evidence
+of FDA acceptability. The current source-changing security/provenance remediations
+still require a fresh full run and seal before candidate promotion.

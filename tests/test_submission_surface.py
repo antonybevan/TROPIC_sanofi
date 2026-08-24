@@ -47,6 +47,8 @@ def test_current_audit_and_navigation_surfaces_are_release_sealed():
         "docs/INDEX.md",
         "06_qc_evidence/audit/DASHBOARD_VISUAL_QC.md",
         "06_qc_evidence/audit/FIGURE_AUDIT_2026-08-23.md",
+        "06_qc_evidence/audit/PROFESSIONAL_RELEASE_AUDIT_2026-08-24.md",
+        "06_qc_evidence/audit/REPO_PROFESSIONAL_BUILD_AUDIT_2026-08-14.md",
         "06_qc_evidence/audit/REPOSITORY_CLEANUP_AUDIT_2026-08-23.md",
         "06_qc_evidence/audit/SIMULATION_PRECISION_IMPLEMENTATION_REPORT_2026-08-14.md",
     }
@@ -147,6 +149,12 @@ def test_tfl_gallery_matches_controlled_tables_and_is_keyboard_accessible():
     t21 = (ROOT / "05_outputs/tfl/output/tables/T-21-Lab_Shift_Tables.txt").read_text(
         encoding="utf-8"
     )
+
+    # The gallery must remain a portable offline review artifact. Loading a web
+    # font leaks an otherwise local review session and makes rendering depend on
+    # network availability.
+    assert "fonts.googleapis.com" not in gallery
+    assert not re.search(r'<(?:link|script)\b[^>]+(?:href|src)="https?://', gallery)
 
     # The gallery is a committed reviewer surface, so its endpoint and shift cells
     # must remain synchronized with the generated, controlled text outputs.

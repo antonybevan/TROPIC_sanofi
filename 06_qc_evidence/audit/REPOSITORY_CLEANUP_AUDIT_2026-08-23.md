@@ -113,7 +113,25 @@ The following are not abandoned programming items and were not auto-fixed:
   requires an approved scope decision rather than automatic imputation;
 - W-ADAM-05/full deferred TFL or ARS expansion, which requires approved SAP scope.
 
-## Closing verification record
+## 2026-08-24 security and release-integrity addendum
+
+A reportable standard whole-repository Codex Security scan completed as scan
+`81056d45-0e9b-4bb9-854e-efb3a93ffc38`. It validated one High and five Medium
+findings, now recorded as F-051–F-056: governance-reseal authorization, mutable
+worktree identity during reseal, Module 5 source-symlink containment, eCTD
+destination/root race and symlink containment, pre-validation execution of the
+personal ODA configuration, and dependency/validation-rule supply-chain locking.
+
+The remediations centralize the reseal policy at every consumer, bind source identity
+to immutable Git objects, use descriptor-relative no-follow filesystem operations,
+validate ODA configuration bytes before interpretation, restrict CDISC credential
+scope, hash-lock Python build/runtime artifacts, and independently lock the custom
+CORE rule surface. Focused adversarial tests cover the reported paths and cross-review
+variants. Because these changes alter controlled source, the historical closing
+record below remains evidence for the 2026-08-23 revision only; a new genuine-SAS
+run and release seal are required for the current candidate.
+
+## Historical closing verification record
 
 ### Production execution and numerical evidence
 
@@ -186,8 +204,8 @@ verify the resulting commit again from a fresh checkout, and require the GitHub 
 checks. Those machine records and PR checks are the authoritative seal/CI evidence;
 they do not turn the demonstration into a filing-ready or validated system.
 
-The Codex Security deep-scan worker was not reportable in this environment because
-its managed read-only filesystem permission profile could not be established. No
-claim of a completed deep security scan is made. Secret scanning, dependency locks,
-static source controls, fail-closed path/credential handling, and repository hygiene
-tests remain in the executed CI/local control surface.
+The repository-wide scan cited in the 2026-08-24 addendum is a completed standard
+single-pass scan, not a claim of formal penetration testing, organizational security
+validation, or a deep multi-pass assessment. Its six validated findings and the
+implemented dispositions are preserved in `findings_register.csv`; clean-checkout CI
+and the fresh release run remain the final candidate-level verification evidence.

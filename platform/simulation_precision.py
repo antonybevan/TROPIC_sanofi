@@ -607,6 +607,13 @@ def logrank_edge_fixtures(alpha: float = 0.025) -> list[dict[str, Any]]:
 
 
 def _annual_probability_to_monthly_hazard(probability: float) -> float:
+    _require(
+        isinstance(probability, (int, float))
+        and not isinstance(probability, bool)
+        and math.isfinite(float(probability))
+        and 0.0 <= float(probability) < 1.0,
+        "annual probability must be finite and in [0, 1)",
+    )
     if probability == 0.0:
         return 0.0
     return -math.log1p(-probability) / 12.0

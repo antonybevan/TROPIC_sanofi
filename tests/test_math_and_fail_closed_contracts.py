@@ -52,6 +52,19 @@ def test_logrank_rejects_ties_for_no_tie_algorithm() -> None:
         )
 
 
+def test_kaplan_meier_median_handles_event_ties_and_not_reached() -> None:
+    assert TTE.km_median_days(
+        np.array([1.0, 1.0, 2.0, 4.0]),
+        np.array([1, 1, 0, 0]),
+    ) == pytest.approx(1.0)
+    assert np.isnan(
+        TTE.km_median_days(
+            np.array([1.0, 2.0, 3.0, 4.0]),
+            np.array([1, 0, 0, 0]),
+        )
+    )
+
+
 @pytest.mark.parametrize(
     ("times", "events"),
     [

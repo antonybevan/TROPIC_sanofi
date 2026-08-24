@@ -76,3 +76,27 @@ The Module 5 reviewer package and eCTD sequence 0000 were rebuilt after the fina
 - FDA, *Electronic Regulatory Submission and Review*: https://www.fda.gov/drugs/forms-submission-requirements/electronic-regulatory-submission-and-review
 - ICH, *E3 — Structure and Content of Clinical Study Reports*: https://admin.ich.org/node/603
 - SASPy, *Configuration — SAS IOM Client Encryption Jars*: https://sassoftware.github.io/saspy/configuration.html#sas-iom-client-encryption-jars
+
+## 9. 2026-08-24 independent re-review
+
+The complete final-figure surface was inspected again at original resolution: all
+seven R figures and all six SAS companions. Labels, legends, denominators, censor
+marks, line/marker differentiation, risk tables, forest estimates, treatment-arm
+identity, axes, clipping, opacity, and synthetic/non-confirmatory disclosures were
+checked. No additional visual or numerical defect was found. The structured
+reconciliation remained PASS, including maximum KM OS/PFS deltas of 0.00040 and
+0.00037 against the 0.01 tolerance and exact risk-table, waterfall, swimmer, and
+exposure-response counts.
+
+The gallery and dashboard were then exercised twice through the browser and again
+through macOS Safari Computer Use. Every one of the seven gallery cards was opened by
+pointer and keyboard; modal focus entry, trapping, restoration, close control,
+`Escape`, repeated open/close, and 390/768/1440-pixel layouts passed. Every dashboard
+tab, all six time-to-event endpoint choices, safety filters, valid and invalid numeric
+bounds, reconciliation-table sorting, sidebar state, keyboard navigation, and mobile
+layout were exercised repeatedly. The browser console remained free of product
+warnings/errors, and no external script, stylesheet, or font request was present.
+
+This is a second visual/interaction acceptance pass over the current artifacts. If
+the mandatory fresh genuine-SAS run changes any governed figure bytes, the changed
+artifacts must be re-inspected before the candidate is promoted.

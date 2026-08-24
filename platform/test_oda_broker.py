@@ -514,6 +514,7 @@ class TestFailoverStatus(unittest.TestCase):
         path = os.path.join(tempfile.mkdtemp(), "sascfg_personal.py")
         with open(path, "w", encoding="utf-8") as f:
             f.write(text)
+        os.chmod(path, 0o600)
         return path
 
     def test_single_host_reports_missing_regional_failover_hosts(self):
@@ -546,24 +547,117 @@ class TestPreflight(unittest.TestCase):
         path = os.path.join(tempfile.mkdtemp(), "sascfg_personal.py")
         with open(path, "w", encoding="utf-8") as f:
             f.write(text)
+        os.chmod(path, 0o600)
         return path
+
+    @staticmethod
+    def _ready_preflight(cfg):
+        stat_obj = type("S", (), {"st_mode": 0o100600})()
+        run_obj = type("R", (), {"stderr": 'openjdk version "26.0.1"', "stdout": ""})()
+        saspy_mod = type("Saspy", (), {"__version__": "test"})()
+        return B.preflight(
+            cfg_file=cfg, authinfo_path="/tmp/.authinfo", which_fn=lambda x: "/bin/java",
+            exists_fn=lambda p: True, stat_fn=lambda p: stat_obj, run_fn=lambda *a, **k: run_obj,
+            saspy_importer=lambda: saspy_mod)
 
     def test_preflight_ok_is_credential_safe(self):
         cfg = self._cfg(
             "oda = {'java': 'java', 'iomhost': ['odaws01-apse1-2.oda.sas.com', "
             "'odaws02-apse1-2.oda.sas.com'], 'iomport': 8591, 'authkey': 'oda'}\n"
         )
-        stat_obj = type("S", (), {"st_mode": 0o100600})()
-        run_obj = type("R", (), {"stderr": 'openjdk version "26.0.1"', "stdout": ""})()
-        saspy_mod = type("Saspy", (), {"__version__": "test"})()
-        status = B.preflight(
-            cfg_file=cfg, authinfo_path="/tmp/.authinfo", which_fn=lambda x: "/bin/java",
-            exists_fn=lambda p: True, stat_fn=lambda p: stat_obj, run_fn=lambda *a, **k: run_obj,
-            saspy_importer=lambda: saspy_mod)
+        status = self._ready_preflight(cfg)
         self.assertTrue(status["oda_preflight_ok"])
         self.assertEqual(status["oda_preflight_missing"], [])
         self.assertTrue(status["oda_failover_configured"])
+        for key in B._CFG_SECURITY_KEYS:
+            self.assertTrue(status["oda_preflight_required"][key])
         self.assertNotIn("password", json.dumps(status).lower())
+
+    def test_default_session_factory_preserves_secure_config_behavior(self):
+        source = (
+            "oda = {'iomhost': ['odaws01-euw1.oda.sas.com', "
+            "'odaws02-euw1.oda.sas.com'], 'authkey': 'oda'}\n"
+        )
+        cfg = self._cfg(source)
+        captured = {}
+        sentinel = object()
+
+        def sas_session(**kwargs):
+            private_cfg = kwargs["cfgfile"]
+            captured["path"] = private_cfg
+            captured["mode"] = os.stat(private_cfg).st_mode & 0o777
+            with open(private_cfg, "r", encoding="utf-8") as handle:
+                captured["source"] = handle.read()
+            return sentinel
+
+        saspy_mod = type("Saspy", (), {"SASsession": staticmethod(sas_session)})()
+        with mock.patch.object(B, "CFG_FILE", cfg), mock.patch.dict(
+                sys.modules, {"saspy": saspy_mod}):
+            sas, host = B._default_session_factory(5)
+
+        self.assertIs(sas, sentinel)
+        self.assertEqual(host, "odaws01-euw1.oda.sas.com")
+        self.assertEqual(captured["source"], source)
+        self.assertEqual(captured["mode"], 0o600)
+        self.assertNotEqual(captured["path"], cfg)
+        self.assertFalse(os.path.exists(captured["path"]))
+
+    def test_insecure_mode_payload_is_never_executed(self):
+        with tempfile.TemporaryDirectory() as td:
+            marker = os.path.join(td, "executed")
+            cfg = os.path.join(td, "sascfg_personal.py")
+            with open(cfg, "w", encoding="utf-8") as handle:
+                handle.write(
+                    f"open({marker!r}, 'w').write('executed')\n"
+                    "oda = {'iomhost': 'odaws01-apse1.oda.sas.com', 'authkey': 'oda'}\n"
+                )
+            os.chmod(cfg, 0o644)
+
+            self.assertEqual(B._read_oda_cfg(cfg), {})
+            status = self._ready_preflight(cfg)
+            self.assertFalse(status["oda_preflight_ok"])
+            self.assertIn("cfg_file_mode_600", status["oda_preflight_missing"])
+            with mock.patch.object(B, "CFG_FILE", cfg):
+                with self.assertRaises(B.OdaFatal):
+                    B._default_session_factory(1)
+            self.assertFalse(os.path.exists(marker))
+
+    def test_symlink_payload_is_never_executed(self):
+        with tempfile.TemporaryDirectory() as td:
+            marker = os.path.join(td, "executed")
+            target = os.path.join(td, "payload.py")
+            cfg = os.path.join(td, "sascfg_personal.py")
+            with open(target, "w", encoding="utf-8") as handle:
+                handle.write(
+                    f"open({marker!r}, 'w').write('executed')\n"
+                    "oda = {'iomhost': 'odaws01-apse1.oda.sas.com', 'authkey': 'oda'}\n"
+                )
+            os.chmod(target, 0o600)
+            os.symlink(target, cfg)
+
+            self.assertEqual(B._read_oda_cfg(cfg), {})
+            status = self._ready_preflight(cfg)
+            self.assertFalse(status["oda_preflight_ok"])
+            self.assertIn("cfg_file_not_symlink", status["oda_preflight_missing"])
+            with mock.patch.object(B, "CFG_FILE", cfg):
+                with self.assertRaises(B.OdaFatal):
+                    B._default_session_factory(1)
+            self.assertFalse(os.path.exists(marker))
+
+    def test_oversized_payload_is_bounded_and_never_executed(self):
+        with tempfile.TemporaryDirectory() as td:
+            marker = os.path.join(td, "executed")
+            cfg = os.path.join(td, "sascfg_personal.py")
+            with open(cfg, "w", encoding="utf-8") as handle:
+                handle.write(f"open({marker!r}, 'w').write('executed')\n")
+                handle.write("#" + ("x" * B._MAX_CFG_BYTES))
+            os.chmod(cfg, 0o600)
+
+            parsed, checks, advisory = B._load_oda_cfg(cfg)
+            self.assertEqual(parsed, {})
+            self.assertFalse(checks["cfg_file_bounded"])
+            self.assertIn("size limit", advisory["cfg_file_error"])
+            self.assertFalse(os.path.exists(marker))
 
     def test_preflight_reports_missing_required_local_prereqs(self):
         cfg = self._cfg("oda = {'iomhost': 'odaws01-apse1.oda.sas.com'}\n")

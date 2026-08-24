@@ -16,6 +16,8 @@ from pathlib import Path
 
 import yaml
 
+from governance_reseal_policy import governance_chain_policy_problems
+
 
 ROOT = Path(__file__).resolve().parents[1]
 BASELINE = ROOT / "config/regulatory_baseline.yaml"
@@ -73,36 +75,26 @@ def _valid_reseal_chain(pipeline_health: dict) -> tuple[bool, list[str], str]:
     retains an append-only ``governance_reseal_chain``. Every hop must be PASS,
     disclose that clinical execution was not repeated, and link prior -> rebound.
     """
+    policy_problems = governance_chain_policy_problems(pipeline_health)
+    if policy_problems:
+        return False, [], "; ".join(policy_problems)
+
     current = str(pipeline_health.get("source_tree_sha256") or "")
     chain = pipeline_health.get("governance_reseal_chain")
     if chain is None:
         legacy = pipeline_health.get("governance_only_reseal")
         chain = [legacy] if isinstance(legacy, dict) else []
-    if not isinstance(chain, list) or not all(isinstance(row, dict) for row in chain):
-        return False, [], "malformed governance reseal chain"
 
     accepted: list[str] = []
-    expected_prior = ""
-    for index, row in enumerate(chain):
+    for row in chain:
         prior = str(row.get("prior_source_tree_sha256") or "")
         rebound = str(row.get("rebound_source_tree_sha256") or "")
-        if (
-            row.get("status") != "PASS"
-            or row.get("clinical_run_was_not_reexecuted") is not True
-            or not prior
-            or not rebound
-            or (index and prior != expected_prior)
-        ):
-            return False, accepted, f"invalid governance reseal hop {index + 1}"
         if not accepted:
             accepted.append(prior)
         accepted.append(rebound)
-        expected_prior = rebound
-    if chain and expected_prior != current:
-        return False, accepted, "governance reseal chain does not end at current health digest"
     if not chain and current:
         accepted.append(current)
-    return bool(current), accepted, f"validated_hops={len(chain)}"
+    return True, accepted, f"validated_hops={len(chain)}"
 
 
 def evaluate(root: Path = ROOT) -> dict:

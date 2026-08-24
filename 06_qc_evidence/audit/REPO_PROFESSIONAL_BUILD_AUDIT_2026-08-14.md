@@ -105,3 +105,33 @@ ODA path/root binding, CT-cache traversal/deserialization, and manifest-name tra
 and regression-tested. Credential rotation/backup cleanup remains owner action, and end-to-end
 dependency hash locking (Python/R artifacts) remains a follow-up before treating the build as
 fully supply-chain hardened.
+
+## 2026-08-24 professional-build second pass
+
+The follow-up whole-repository review completed standard security scan
+`81056d45-0e9b-4bb9-854e-efb3a93ffc38` and closed the six validated findings in
+F-051–F-056. In particular, the earlier Python supply-chain follow-up is now
+implemented for the CI and CORE execution surfaces: runtime and build requirements
+are artifact-hash locked, build isolation is disabled, installed distributions are
+checked, Dependabot covers GitHub Actions and Python, dependency review blocks new
+moderate-or-higher dependency risk, and CodeQL analyzes both Python and GitHub
+Actions using commit-pinned actions.
+
+Repository conventions now also include `.editorconfig`, a PR template, current
+dependency-update policy, a concise factual changelog, a consistent `renv.lock`
+including the R linter toolchain, and a self-contained TFL gallery with no externally
+loaded scripts, styles, or fonts. The regulatory inventory distinguishes released
+requirements from drafts/review material—most notably Step 2b ICH E20 and the CDISC
+Package 62 public-review material—and
+the filing profile explicitly blocks regulatory shipment pending sponsor-specific
+qualification, QC, rights, current validator evidence, and accountable approvals.
+
+The release boundary was strengthened beyond the original audit: governance reseals
+are authorized by a single downstream-enforced policy and immutable Git objects;
+package/eCTD filesystem operations fail closed on symlinks, parent swaps, and
+unreadable descendants; the ODA personal configuration is validated before execution;
+CDISC credentials are scoped to the one network operation that needs them; and the
+custom CORE rule set is independently hash locked. These source changes require a new
+genuine-SAS full-DAG run, clean seal, clean-checkout verification, and green PR checks
+before promotion. They do not alter the non-submission, non-Part-11, non-FDA-approved
+product boundary.

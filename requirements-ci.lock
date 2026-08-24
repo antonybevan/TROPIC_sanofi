@@ -1,51 +1,99 @@
-# Refreshed from the Python 3.10 CI resolution on 2026-08-09; includes the
+# Refreshed from the Python 3.10 CI resolution on 2026-08-24; includes the
 # submission-PDF renderer/inspection dependencies used by G07.
-# All direct and transitive packages are version-pinned; refresh this file only
-# through an intentional dependency audit and CI run.
-annotated-types==0.8.0
-attrs==26.1.0
-beautifulsoup4==4.15.0
-certifi==2026.7.22
-charset-normalizer==3.4.9
-defusedxml==0.7.1
-docraptor==3.1.0
-et-xmlfile==2.0.0
-exceptiongroup==1.3.1
-fhir-core==1.1.10
-fhir.resources==8.3.0
-fonttools==4.60.2
-fpdf2==2.8.4
-idna==3.18
-iniconfig==2.3.0
-jsonschema==4.25.1
-jsonschema-specifications==2025.9.1
-lxml==6.1.1
-numpy==2.2.6
-openpyxl==3.1.5
-packaging==26.3
-pandas==2.3.3
-Pillow==11.3.0
-pluggy==1.6.0
-pydantic==2.13.4
-pydantic-core==2.46.4
-Pygments==2.20.0
-pypdf==6.15.0
-pyreadstat==1.2.9
-pytest==8.4.2
-python-dateutil==2.9.0.post0
-pytz==2026.3.post1
-PyYAML==6.0.3
-referencing==0.37.0
-requests==2.34.2
-rpds-py==0.30.0
-saspy==5.107.1
-six==1.17.0
-soupsieve==2.9.1
-stringcase==1.2.0
-tomli==2.4.1
-typing-extensions==4.16.0
-typing-inspection==0.4.2
-tzdata==2026.3
-urllib3==2.7.0
-usdm==0.66.0
-yattag==1.16.1
+# All direct and transitive packages are version- and artifact-pinned for the
+# Ubuntu x86_64 / CPython 3.10 CI target. Refresh only through an intentional
+# dependency audit and a hash-enforced CI run.
+annotated-types==0.8.0 \
+    --hash=sha256:f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0
+attrs==26.1.0 \
+    --hash=sha256:c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309
+beautifulsoup4==4.15.0 \
+    --hash=sha256:d6f88de62e1d4e38ecb1077eb9724cd0eff29d2a08ca16a401e9b9e93f117cf9
+certifi==2026.7.22 \
+    --hash=sha256:62f22742b58a1a33014a2b6b706588a8d7e2a88ae7bd1a6ebe8c992928483775
+charset-normalizer==3.4.9 \
+    --hash=sha256:9bb41182d93ea91f60b4bc8fbf4c820c69ef8a12ab2d917f3f1834f1acad07e8
+defusedxml==0.7.1 \
+    --hash=sha256:a352e7e428770286cc899e2542b6cdaedb2b4953ff269a210103ec58f6198a61
+docraptor==3.1.0 \
+    --hash=sha256:044cef59c44546c15106668973168c540eefb5344532bb782540beaa6828901b
+et-xmlfile==2.0.0 \
+    --hash=sha256:7a91720bc756843502c3b7504c77b8fe44217c85c537d85037f0f536151b2caa
+exceptiongroup==1.3.1 \
+    --hash=sha256:a7a39a3bd276781e98394987d3a5701d0c4edffb633bb7a5144577f82c773598
+fhir-core==1.1.10 \
+    --hash=sha256:bdbe6164e26843e7e63559a08961e44df54b1ed8bd52a1df415ee8c02f7ec965
+fhir.resources==8.3.0 \
+    --hash=sha256:151e6c9b4336e36383cc2aaf2067a6f112a420fce1c7bd289182e55dd950871b
+fonttools==4.60.2 \
+    --hash=sha256:677aa92d84d335e4d301d8ba04afca6f575316bc647b6782cb0921943fcb6343
+fpdf2==2.8.4 \
+    --hash=sha256:bce1afc437107906dcdb0b95c300c7501002fe412c2ed36fa33c8f0a2f87ef3e
+idna==3.18 \
+    --hash=sha256:7f952cbe720b688055e3f87de14f5c3e5fdaa8bc3928985c4077ca689de849a2
+iniconfig==2.3.0 \
+    --hash=sha256:f631c04d2c48c52b84d0d0549c99ff3859c98df65b3101406327ecc7d53fbf12
+jsonschema==4.25.1 \
+    --hash=sha256:3fba0169e345c7175110351d456342c364814cfcf3b964ba4587f22915230a63
+jsonschema-specifications==2025.9.1 \
+    --hash=sha256:98802fee3a11ee76ecaca44429fda8a41bff98b00a0f2838151b113f210cc6fe
+lxml==6.1.1 \
+    --hash=sha256:98fc784c2c1440667aeedf8465bdfe10208acf0ead656a2c68627299f546b315
+numpy==2.2.6 \
+    --hash=sha256:fc7b73d02efb0e18c000e9ad8b83480dfcd5dfd11065997ed4c6747470ae8915
+openpyxl==3.1.5 \
+    --hash=sha256:5282c12b107bffeef825f4617dc029afaf41d0ea60823bbb665ef3079dc79de2
+packaging==26.3 \
+    --hash=sha256:d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c
+pandas==2.3.3 \
+    --hash=sha256:dd7478f1463441ae4ca7308a70e90b33470fa593429f9d4c578dd00d1fa78838
+Pillow==11.3.0 \
+    --hash=sha256:4445fa62e15936a028672fd48c4c11a66d641d2c05726c7ec1f8ba6a572036ae
+pluggy==1.6.0 \
+    --hash=sha256:e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746
+pydantic==2.13.4 \
+    --hash=sha256:45a282cde31d808236fd7ea9d919b128653c8b38b393d1c4ab335c62924d9aba
+pydantic-core==2.46.4 \
+    --hash=sha256:395aebd9183f9d112f569aeb5b2214d1a10a33bec8456447f7fbdfa51d38d4cd
+Pygments==2.20.0 \
+    --hash=sha256:81a9e26dd42fd28a23a2d169d86d7ac03b46e2f8b59ed4698fb4785f946d0176
+pypdf==6.15.0 \
+    --hash=sha256:14e001d6504822cb1ca9c7ed9a69bccb320f59b320730f55af804361abe4d5ee
+pyreadstat==1.2.9 \
+    --hash=sha256:a5bd3dad326ac798a3d9a1c44935362e5e751316b7a965caa769a55673501302
+pytest==8.4.2 \
+    --hash=sha256:872f880de3fc3a5bdc88a11b39c9710c3497a547cfa9320bc3c5e62fbf272e79
+python-dateutil==2.9.0.post0 \
+    --hash=sha256:a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427
+pytz==2026.3.post1 \
+    --hash=sha256:dd95840dd199baea12d9cc096a1d452caa6596a1c1e4b5f3dbd1541855d5e815
+PyYAML==6.0.3 \
+    --hash=sha256:9c7708761fccb9397fe64bbc0395abcae8c4bf7b0eac081e12b809bf47700d0b
+referencing==0.37.0 \
+    --hash=sha256:381329a9f99628c9069361716891d34ad94af76e461dcb0335825aecc7692231
+requests==2.34.2 \
+    --hash=sha256:2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0
+rpds-py==0.30.0 \
+    --hash=sha256:0c0e95f6819a19965ff420f65578bacb0b00f251fefe2c8b23347c37174271f3
+saspy==5.107.1 \
+    --hash=sha256:c518d75d913ebddc5bf3fa55899062c5abdda6b8df3441fb7a12563e4c240867
+six==1.17.0 \
+    --hash=sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274
+soupsieve==2.9.1 \
+    --hash=sha256:4f4477399246b7a0c720a88ca2454b11cd6bb9ae4c9d170140786e916776c14c
+stringcase==1.2.0 \
+    --hash=sha256:48a06980661908efe8d9d34eab2b6c13aefa2163b3ced26972902e3bdfd87008
+tomli==2.4.1 \
+    --hash=sha256:0d85819802132122da43cb86656f8d1f8c6587d54ae7dcaf30e90533028b49fe
+typing-extensions==4.16.0 \
+    --hash=sha256:481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8
+typing-inspection==0.4.2 \
+    --hash=sha256:4ed1cacbdc298c220f1bd249ed5287caa16f34d44ef4e9c3d0cbad5b521545e7
+tzdata==2026.3 \
+    --hash=sha256:dc096730c87af6cab1b171c9d532be840741ff5d459015e7f6947bd7d7e54931
+urllib3==2.7.0 \
+    --hash=sha256:9fb4c81ebbb1ce9531cce37674bbc6f1360472bc18ca9a553ede278ef7276897
+usdm==0.66.0 \
+    --hash=sha256:f628b164eb65c7275ffdbbca3b850fd4d52a4a08e59ab3738f6c5267676e379a
+yattag==1.16.1 \
+    --hash=sha256:baa8f254e7ea5d3e0618281ad2ff5610e0e5360b3608e695c29bfb3b29d051f4

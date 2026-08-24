@@ -9,11 +9,18 @@ from __future__ import annotations
 import csv
 import hashlib
 import json
+import os
+import stat
 import subprocess
 import sys
-from pathlib import Path
+from contextlib import contextmanager
+from pathlib import Path, PurePosixPath
+from typing import Iterator
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "platform"))
+from governance_reseal_policy import governance_chain_policy_problems  # noqa: E402
+
 SEAL_SELF_PATH_PREFIXES = (
     "platform/release_run_manifest/",
     "platform/release_candidate/",
@@ -56,6 +63,7 @@ FIXED_CONTROL_FILES = (
     "docs/SIMULATION_PRECISION_RESEARCH.md",
     "06_qc_evidence/conformance/p21_adam_runrecord.md",
     "06_qc_evidence/conformance/p21_adam_summary.json",
+    "platform/conformance_rules/adam/RULES.lock",
     "03_metadata/adam/ADaM_spec.xlsx",
     "03_metadata/define/define.xml",
     "03_metadata/define/define_sdtm.xml",
@@ -87,33 +95,322 @@ FIXED_CONTROL_FILES = (
 
 PIPELINE_CONTROL_FILES = (
     ".github/CODEOWNERS",
+    ".github/dependabot.yml",
     ".github/workflows/ci.yml",
     ".gitleaks.toml",
     ".pre-commit-config.yaml",
+    "requirements-core-build.lock",
+    "requirements-core.txt",
+    "requirements-core.lock",
+    "requirements-ci-build.lock",
     "requirements-ci.txt",
     "requirements-ci.lock",
     "renv.lock",
+    "platform/conformance_rules/adam/RULES.lock",
+    "platform/governance_reseal_policy.py",
     "scripts/rebind_governance_seal.py",
     "scripts/verify_release.py",
 )
 
+# Keep these derivation rules independent from the manifest builder.  A
+# compromised builder cannot authorize an omitted tracked test, ADaM rule, or
+# workflow by changing its own registry alone.
+PROGRAM_GLOBS = (
+    "04_analysis_datasets/programs/sas/**/*.sas",
+    "04_analysis_datasets/programs/r/**/*.R",
+    "06_qc_evidence/reconciliation/**/*.R",
+    "platform/*.py",
+    "platform/*.R",
+    "03_metadata/define/*.py",
+    "03_metadata/define/*.R",
+    "05_outputs/tfl/**/*.R",
+    "07_reviewer_explanation/tools/shiny/**/*.R",
+)
+GENERATED_SOURCE_EXCLUDES = {
+    "04_analysis_datasets/programs/sas/00_config_generated.sas",
+}
+TRACKED_INVENTORY_ROOTS = (
+    "tests",
+    ".github/workflows",
+    "platform/conformance_rules/adam",
+)
+
+
+class UnsafeReleaseFileError(RuntimeError):
+    """A sealed input was not a stable repository-contained regular file."""
+
+
+def _release_path_parts(rel_path: str) -> tuple[str, ...]:
+    candidate = PurePosixPath(rel_path)
+    if (
+        not rel_path
+        or candidate.is_absolute()
+        or not candidate.parts
+        or any(part in {"", ".", ".."} for part in candidate.parts)
+    ):
+        raise UnsafeReleaseFileError(f"unsafe release path: {rel_path!r}")
+    return candidate.parts
+
+
+def _stable_metadata(st: os.stat_result) -> tuple[int, int, int, int, int, int]:
+    return (
+        st.st_dev,
+        st.st_ino,
+        st.st_mode,
+        st.st_size,
+        st.st_mtime_ns,
+        st.st_ctime_ns,
+    )
+
+
+@contextmanager
+def _open_stable_regular(rel_path: str) -> Iterator[tuple[int, os.stat_result]]:
+    """Descriptor-relative, no-follow open with pre/post identity checks."""
+    parts = _release_path_parts(rel_path)
+    nofollow = getattr(os, "O_NOFOLLOW", 0)
+    directory = getattr(os, "O_DIRECTORY", 0)
+    if not nofollow or not directory:
+        raise UnsafeReleaseFileError(
+            "release hashing requires O_NOFOLLOW and O_DIRECTORY support"
+        )
+
+    descriptors: list[int] = []
+    directory_checks: list[tuple[int, str, tuple[int, int]]] = []
+    leaf_fd: int | None = None
+    try:
+        root_before = os.stat(ROOT, follow_symlinks=False)
+        if not stat.S_ISDIR(root_before.st_mode):
+            raise UnsafeReleaseFileError("release repository root is not a directory")
+        root_fd = os.open(ROOT, os.O_RDONLY | directory | nofollow)
+        root_opened = os.fstat(root_fd)
+        if (
+            not stat.S_ISDIR(root_opened.st_mode)
+            or (root_before.st_dev, root_before.st_ino)
+            != (root_opened.st_dev, root_opened.st_ino)
+        ):
+            os.close(root_fd)
+            raise UnsafeReleaseFileError("release repository root changed during open")
+        descriptors.append(root_fd)
+        parent_fd = root_fd
+        for component in parts[:-1]:
+            before = os.stat(component, dir_fd=parent_fd, follow_symlinks=False)
+            if not stat.S_ISDIR(before.st_mode):
+                raise UnsafeReleaseFileError(
+                    f"release path ancestor is not a directory: {rel_path}"
+                )
+            child_fd = os.open(
+                component,
+                os.O_RDONLY | directory | nofollow,
+                dir_fd=parent_fd,
+            )
+            opened = os.fstat(child_fd)
+            if (
+                not stat.S_ISDIR(opened.st_mode)
+                or (before.st_dev, before.st_ino) != (opened.st_dev, opened.st_ino)
+            ):
+                os.close(child_fd)
+                raise UnsafeReleaseFileError(
+                    f"release path ancestor changed during open: {rel_path}"
+                )
+            directory_checks.append(
+                (parent_fd, component, (opened.st_dev, opened.st_ino))
+            )
+            descriptors.append(child_fd)
+            parent_fd = child_fd
+
+        leaf = parts[-1]
+        before = os.stat(leaf, dir_fd=parent_fd, follow_symlinks=False)
+        if not stat.S_ISREG(before.st_mode):
+            raise UnsafeReleaseFileError(
+                f"release input is not a regular file: {rel_path}"
+            )
+        leaf_fd = os.open(leaf, os.O_RDONLY | nofollow, dir_fd=parent_fd)
+        opened = os.fstat(leaf_fd)
+        if (
+            not stat.S_ISREG(opened.st_mode)
+            or (before.st_dev, before.st_ino) != (opened.st_dev, opened.st_ino)
+        ):
+            raise UnsafeReleaseFileError(
+                f"release input changed during open: {rel_path}"
+            )
+
+        yield leaf_fd, opened
+
+        after = os.fstat(leaf_fd)
+        try:
+            current = os.stat(leaf, dir_fd=parent_fd, follow_symlinks=False)
+        except OSError as exc:
+            raise UnsafeReleaseFileError(
+                f"release input changed during hashing: {rel_path}"
+            ) from exc
+        if (
+            not stat.S_ISREG(current.st_mode)
+            or _stable_metadata(opened) != _stable_metadata(after)
+            or (opened.st_dev, opened.st_ino) != (current.st_dev, current.st_ino)
+        ):
+            raise UnsafeReleaseFileError(
+                f"release input changed during hashing: {rel_path}"
+            )
+        try:
+            root_current = os.stat(ROOT, follow_symlinks=False)
+        except OSError as exc:
+            raise UnsafeReleaseFileError(
+                "release repository root changed during hashing"
+            ) from exc
+        if (
+            not stat.S_ISDIR(root_current.st_mode)
+            or (root_opened.st_dev, root_opened.st_ino)
+            != (root_current.st_dev, root_current.st_ino)
+        ):
+            raise UnsafeReleaseFileError(
+                "release repository root changed during hashing"
+            )
+        for ancestor_fd, component, identity in directory_checks:
+            try:
+                current_dir = os.stat(
+                    component, dir_fd=ancestor_fd, follow_symlinks=False
+                )
+            except OSError as exc:
+                raise UnsafeReleaseFileError(
+                    f"release path ancestor changed during hashing: {rel_path}"
+                ) from exc
+            if (
+                not stat.S_ISDIR(current_dir.st_mode)
+                or (current_dir.st_dev, current_dir.st_ino) != identity
+            ):
+                raise UnsafeReleaseFileError(
+                    f"release path ancestor changed during hashing: {rel_path}"
+                )
+    finally:
+        if leaf_fd is not None:
+            os.close(leaf_fd)
+        for descriptor in reversed(descriptors):
+            os.close(descriptor)
+
 
 def load(rel: str):
-    path = ROOT / rel
-    if not path.is_file():
+    try:
+        raw = _read_regular_bytes(rel)
+    except FileNotFoundError:
         return None
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
+        return json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
         return None
 
 
 def sha256(path: Path) -> str:
+    try:
+        rel_path = path.relative_to(ROOT).as_posix()
+    except ValueError as exc:
+        raise UnsafeReleaseFileError(
+            f"release path escapes repository root: {path}"
+        ) from exc
     h = hashlib.sha256()
-    with path.open("rb") as f:
-        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+    with _open_stable_regular(rel_path) as (fd, _):
+        while True:
+            chunk = os.read(fd, 1024 * 1024)
+            if not chunk:
+                break
             h.update(chunk)
     return h.hexdigest()
+
+
+def _read_regular_bytes(rel_path: str) -> bytes:
+    chunks: list[bytes] = []
+    with _open_stable_regular(rel_path) as (fd, _):
+        while True:
+            chunk = os.read(fd, 1024 * 1024)
+            if not chunk:
+                return b"".join(chunks)
+            chunks.append(chunk)
+
+
+def _tracked_governing_inventory() -> tuple[set[str], set[str]]:
+    """Independently derive tracked fresh-run programs/rules and workflows."""
+    try:
+        raw = subprocess.check_output(
+            ["git", "ls-files", "-z", "--", *TRACKED_INVENTORY_ROOTS],
+            cwd=ROOT,
+            stderr=subprocess.DEVNULL,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise RuntimeError("cannot derive tracked release-control inventory") from exc
+    paths = {
+        item.decode("utf-8")
+        for item in raw.split(b"\0")
+        if item
+    }
+    programs = {
+        path
+        for path in paths
+        if (
+            path.startswith("tests/")
+            and (path.endswith(".py") or path.endswith(".R"))
+        )
+        or (
+            path.startswith("platform/conformance_rules/adam/")
+            and (path.endswith(".yml") or path.endswith(".yaml"))
+        )
+        or (
+            path.startswith(".github/workflows/")
+            and (path.endswith(".yml") or path.endswith(".yaml"))
+        )
+    }
+    workflows = {
+        path
+        for path in paths
+        if path.startswith(".github/workflows/")
+        and (path.endswith(".yml") or path.endswith(".yaml"))
+    }
+    return programs, workflows
+
+
+def _static_program_inventory() -> set[str]:
+    """Derive static program membership and reject matching unsafe leaves."""
+    paths: set[str] = set()
+    for pattern in PROGRAM_GLOBS:
+        for path in sorted(ROOT.glob(pattern)):
+            rel_path = path.relative_to(ROOT).as_posix()
+            if rel_path in GENERATED_SOURCE_EXCLUDES or rel_path in paths:
+                continue
+            try:
+                leaf_lstat = path.lstat()
+            except FileNotFoundError as exc:
+                raise UnsafeReleaseFileError(
+                    f"release glob entry changed during enumeration: {rel_path}"
+                ) from exc
+            if stat.S_ISDIR(leaf_lstat.st_mode):
+                continue
+            # Opening and closing through the stable helper validates type,
+            # containment, every ancestor, and the post-open identity.
+            with _open_stable_regular(rel_path):
+                pass
+            paths.add(rel_path)
+    return paths
+
+
+def _inventory_membership_problems(
+    group: str, rows: object, expected: set[str]
+) -> list[str]:
+    if not isinstance(rows, list):
+        return [f"{group}: seal inventory is not a list"]
+    raw_paths = [row.get("path") if isinstance(row, dict) else None for row in rows]
+    paths = [path for path in raw_paths if isinstance(path, str) and path]
+    actual = set(paths)
+    duplicates = sorted(path for path in actual if paths.count(path) > 1)
+    missing = sorted(expected - actual)
+    unexpected = sorted(actual - expected)
+    problems: list[str] = []
+    if duplicates:
+        problems.append(f"{group}: duplicate entries: " + ", ".join(duplicates))
+    if missing:
+        problems.append(f"{group}: seal incomplete: " + ", ".join(missing))
+    if unexpected:
+        problems.append(f"{group}: unexpected entries: " + ", ".join(unexpected))
+    if len(paths) != len(raw_paths):
+        problems.append(f"{group}: seal contains entries without valid paths")
+    return problems
 
 
 def git_head() -> str:
@@ -182,51 +479,59 @@ def sealed_source_problems(manifest: dict) -> list[str]:
     """
     problems = []
     artifacts = manifest.get("artifacts") or {}
-    controls = (manifest.get("artifacts") or {}).get("controls") or []
-    control_paths = [row.get("path") for row in controls]
-    expected_controls = set(FIXED_CONTROL_FILES)
-    actual_controls = {path for path in control_paths if path}
-    duplicate_controls = sorted(
-        path for path in actual_controls if control_paths.count(path) > 1
+    controls = artifacts.get("controls")
+    problems.extend(
+        _inventory_membership_problems(
+            "controls", controls, set(FIXED_CONTROL_FILES)
+        )
     )
-    missing_controls = sorted(expected_controls - actual_controls)
-    unexpected_controls = sorted(actual_controls - expected_controls)
-    if duplicate_controls:
-        problems.append("controls: duplicate fixed control entries: " + ", ".join(duplicate_controls))
-    if missing_controls:
-        problems.append("controls: fixed control seal incomplete: " + ", ".join(missing_controls))
-    if unexpected_controls:
-        problems.append("controls: unexpected fixed control entries: " + ", ".join(unexpected_controls))
-
-    pipeline_controls = (manifest.get("artifacts") or {}).get("pipeline_controls") or []
-    pipeline_paths = [row.get("path") for row in pipeline_controls]
-    expected_pipeline = set(PIPELINE_CONTROL_FILES)
-    actual_pipeline = {path for path in pipeline_paths if path}
-    duplicate_pipeline = sorted(
-        path for path in actual_pipeline if pipeline_paths.count(path) > 1
-    )
-    missing_pipeline = sorted(expected_pipeline - actual_pipeline)
-    unexpected_pipeline = sorted(actual_pipeline - expected_pipeline)
-    if duplicate_pipeline:
-        problems.append("pipeline_controls: duplicate entries: " + ", ".join(duplicate_pipeline))
-    if missing_pipeline:
-        problems.append("pipeline_controls: seal incomplete: " + ", ".join(missing_pipeline))
-    if unexpected_pipeline:
-        problems.append("pipeline_controls: unexpected entries: " + ", ".join(unexpected_pipeline))
+    try:
+        tracked_programs, tracked_workflows = _tracked_governing_inventory()
+        expected_programs = _static_program_inventory() | tracked_programs
+        expected_pipeline = set(PIPELINE_CONTROL_FILES) | tracked_workflows
+    except (RuntimeError, OSError) as exc:
+        problems.append(f"release inventory derivation failed: {exc}")
+        expected_programs = None
+        expected_pipeline = None
+    if expected_programs is not None:
+        problems.extend(
+            _inventory_membership_problems(
+                "programs", artifacts.get("programs"), expected_programs
+            )
+        )
+    if expected_pipeline is not None:
+        problems.extend(
+            _inventory_membership_problems(
+                "pipeline_controls",
+                artifacts.get("pipeline_controls"),
+                expected_pipeline,
+            )
+        )
 
     for group in ("controls", "programs", "pipeline_controls"):
-        if group == "pipeline_controls" and group not in artifacts:
-            continue
         for row in artifacts.get(group) or []:
-            rel = row.get("path")
-            expected = row.get("sha256")
-            if not rel or not expected:
+            if not isinstance(row, dict):
                 problems.append(f"{group}: invalid seal entry {row!r}")
                 continue
-            path = ROOT / rel
-            if not path.is_file():
+            rel = row.get("path")
+            expected = row.get("sha256")
+            if (
+                not isinstance(rel, str)
+                or not rel
+                or not isinstance(expected, str)
+                or not expected
+            ):
+                problems.append(f"{group}: invalid seal entry {row!r}")
+                continue
+            try:
+                actual = sha256(ROOT / rel)
+            except FileNotFoundError:
                 problems.append(f"{rel}: missing")
-            elif sha256(path) != expected:
+                continue
+            except (UnsafeReleaseFileError, OSError) as exc:
+                problems.append(f"{rel}: unsafe release input: {exc}")
+                continue
+            if actual != expected:
                 problems.append(rel)
     return problems
 
@@ -246,12 +551,12 @@ def _git_tracked(rel: str) -> bool:
 
 
 def _safe_path(rel: str) -> Path | None:
-    """Resolve a manifest path without allowing it to escape the repository root."""
-    candidate = (ROOT / rel).resolve()
-    root = ROOT.resolve()
-    if candidate != root and root not in candidate.parents:
+    """Validate a manifest path lexically; secure opens reject link traversal."""
+    try:
+        _release_path_parts(rel)
+    except (TypeError, UnsafeReleaseFileError):
         return None
-    return candidate
+    return ROOT / rel
 
 
 def sealed_artifact_problems(manifest: dict) -> tuple[list[str], int, int]:
@@ -283,13 +588,17 @@ def sealed_artifact_problems(manifest: dict) -> tuple[list[str], int, int]:
             if path is None:
                 problems.append(f"{group}:{rel}: path escapes repository root")
                 continue
-            if not path.is_file():
+            try:
+                actual = sha256(path)
+            except FileNotFoundError:
                 if _git_tracked(rel):
                     problems.append(f"{group}:{rel}: tracked artifact missing")
                 else:
                     skipped += 1
                 continue
-            actual = sha256(path)
+            except (UnsafeReleaseFileError, OSError) as exc:
+                problems.append(f"{group}:{rel}: unsafe artifact: {exc}")
+                continue
             if actual != expected:
                 problems.append(f"{group}:{rel}: sha256 mismatch")
             else:
@@ -306,12 +615,19 @@ def sealed_artifact_problems(manifest: dict) -> tuple[list[str], int, int]:
             path = _safe_path(rel)
             if path is None:
                 problems.append(f"datasets:{ds}:{label}: path escapes repository root")
-            elif not path.is_file():
+                continue
+            try:
+                actual = sha256(path)
+            except FileNotFoundError:
                 if _git_tracked(rel):
                     problems.append(f"datasets:{ds}:{label}: tracked artifact missing")
                 else:
                     skipped += 1
-            elif sha256(path) != expected:
+                continue
+            except (UnsafeReleaseFileError, OSError) as exc:
+                problems.append(f"datasets:{ds}:{label}: unsafe artifact: {exc}")
+                continue
+            if actual != expected:
                 problems.append(f"datasets:{ds}:{label}: sha256 mismatch")
             else:
                 verified += 1
@@ -341,12 +657,17 @@ def source_tree_sha256(manifest: dict) -> str:
     artifacts = manifest.get("artifacts") or {}
     for group in ("controls", "programs"):
         for row in artifacts.get(group) or []:
+            if not isinstance(row, dict):
+                continue
             rel = row.get("path")
             expected = row.get("sha256")
             if not rel or not expected:
                 continue
-            path = ROOT / rel
-            if path.is_file() and sha256(path) == expected:
+            try:
+                actual = sha256(ROOT / rel)
+            except (FileNotFoundError, UnsafeReleaseFileError, OSError):
+                continue
+            if actual == expected:
                 rows.append((rel, expected))
     h = hashlib.sha256()
     h.update(b"\n".join(f"{rel}\0{expected}".encode("utf-8") for rel, expected in sorted(rows)))
@@ -377,15 +698,12 @@ def main() -> int:
     non_pass = [k for k, v in stages.items() if v not in {"PASS", "SKIPPED"}]
     add("health.all_pass_or_skip", not non_pass, str(non_pass[:8]))
     add("health.provenance", (h.get("provenance_guard") or {}).get("passed") is True, "")
-    governance_reseal = h.get("governance_only_reseal") or {}
-    if governance_reseal:
-        add(
-            "health.governance_only_reseal",
-            governance_reseal.get("status") == "PASS"
-            and governance_reseal.get("clinical_run_was_not_reexecuted") is True
-            and governance_reseal.get("rebound_source_tree_sha256") == h.get("source_tree_sha256"),
-            "governance-only rebind disclosure is incomplete",
-        )
+    governance_problems = governance_chain_policy_problems(h)
+    add(
+        "health.governance_reseal_policy",
+        not governance_problems,
+        "; ".join(governance_problems),
+    )
 
     r = load("platform/reconciliation_status.json") or {}
     add("recon.PASS", r.get("overall") == "PASS", str(r.get("overall")))

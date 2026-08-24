@@ -57,13 +57,25 @@ import io
 import os
 import urllib.request
 import zipfile
+from pathlib import Path
 from xml.sax.saxutils import escape, quoteattr
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+from safe_filesystem import (
+    UnsafePathError,
+    atomic_write_bytes,
+    atomic_write_text,
+    digest_file,
+    regular_file_exists,
+    safe_makedirs,
+    walk_regular_files,
+)
+
+ROOT = Path(__file__).resolve().parents[1]
 SEQ = "0000"
-SEQ_ROOT = os.path.join(ROOT, "08_submission_package/ectd", SEQ)
-PACKAGE_ROOT = os.path.join(ROOT, "08_submission_package")
-M5_SRC = os.path.join(PACKAGE_ROOT, "m5")
+PACKAGE_ROOT = ROOT / "08_submission_package"
+ECTD_ROOT = PACKAGE_ROOT / "ectd"
+SEQ_ROOT = ECTD_ROOT / SEQ
+M5_SRC = PACKAGE_ROOT / "m5"
 
 STUDY_ID = "TROPIC"
 STUDY_TITLE = ("A randomized, open-label, multicenter study of cabazitaxel plus "
@@ -108,12 +120,9 @@ SUPPORT_FILES = {
 }
 
 
-def md5_of(path: str) -> str:
-    h = hashlib.md5()
-    with open(path, "rb") as fh:
-        for chunk in iter(lambda: fh.read(1 << 20), b""):
-            h.update(chunk)
-    return h.hexdigest()
+def md5_of(path: str | os.PathLike[str], root=None) -> str:
+    authorized_root = Path(root) if root is not None else Path(path).parent
+    return digest_file(path, authorized_root, "md5")
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -124,12 +133,11 @@ def validate_support_files() -> None:
     """Fail closed when an official eCTD support file is absent or altered."""
     problems = []
     for rel, metadata in SUPPORT_FILES.items():
-        path = os.path.join(SEQ_ROOT, *rel.split("/"))
-        if not os.path.isfile(path):
+        path = SEQ_ROOT.joinpath(*rel.split("/"))
+        if not regular_file_exists(path, SEQ_ROOT):
             problems.append(f"missing {rel}")
             continue
-        with open(path, "rb") as fh:
-            actual = sha256_bytes(fh.read())
+        actual = digest_file(path, SEQ_ROOT, "sha256")
         if actual != metadata["sha256"]:
             problems.append(
                 f"checksum mismatch {rel}: expected {metadata['sha256']}, got {actual}"
@@ -144,6 +152,7 @@ def validate_support_files() -> None:
 
 def sync_style_support_files() -> None:
     """Download checksum-pinned official stylesheets from the FDA/ICH sources."""
+    safe_makedirs(SEQ_ROOT, ECTD_ROOT)
     for rel, metadata in SUPPORT_FILES.items():
         url = metadata.get("url")
         if not url:
@@ -161,10 +170,8 @@ def sync_style_support_files() -> None:
                 f"Refusing changed official support file {rel}: expected "
                 f"{metadata['sha256']}, got {actual}"
             )
-        path = os.path.join(SEQ_ROOT, *rel.split("/"))
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, "wb") as fh:
-            fh.write(data)
+        path = SEQ_ROOT.joinpath(*rel.split("/"))
+        atomic_write_bytes(path, data, SEQ_ROOT)
         print(f"Synced official support file: {rel}")
 
 
@@ -234,17 +241,14 @@ def collect():
     eCTD leaves for this package."""
     keep_ext = {".xpt", ".sas", ".r", ".pdf", ".xml", ".xsl", ".xlsx", ".png", ".txt"}
     items = []
-    for dirpath, _dirs, files in os.walk(M5_SRC):
-        reldir = "/" + os.path.relpath(dirpath, PACKAGE_ROOT).replace(os.sep, "/").lower()
-        for f in files:
-            ext = os.path.splitext(f)[1].lower()
-            if ext not in keep_ext:
-                continue
-            src = os.path.join(dirpath, f)
-            rel = os.path.relpath(src, PACKAGE_ROOT).replace(os.sep, "/")  # 'm5/...'
-            tag, info = classify(rel)
-            items.append({"src": src, "href": rel, "tag": tag, "info": info,
-                          "title": os.path.basename(rel)})
+    for src in walk_regular_files(M5_SRC):
+        ext = src.suffix.lower()
+        if ext not in keep_ext:
+            continue
+        rel = src.relative_to(PACKAGE_ROOT).as_posix()  # 'm5/...'
+        tag, info = classify(rel)
+        items.append({"src": src, "href": rel, "tag": tag, "info": info,
+                      "title": src.name})
     assert_required_tags(items)
     # deterministic order: category rank, then path
     rank = {"data-tabulation-data-definition": 0, "data-tabulation-dataset": 1,
@@ -392,41 +396,46 @@ def build_regional():
 
 def main():
     items = collect()
-    os.makedirs(os.path.join(SEQ_ROOT, "m1", "us"), exist_ok=True)
-    os.makedirs(os.path.join(SEQ_ROOT, "util", "dtd"), exist_ok=True)
-    os.makedirs(os.path.join(SEQ_ROOT, "util", "style"), exist_ok=True)
+    safe_makedirs(SEQ_ROOT, ECTD_ROOT)
+    safe_makedirs(SEQ_ROOT / "m1/us", SEQ_ROOT)
+    safe_makedirs(SEQ_ROOT / "util/dtd", SEQ_ROOT)
+    safe_makedirs(SEQ_ROOT / "util/style", SEQ_ROOT)
     validate_support_files()
-    stf_path = os.path.join(SEQ_ROOT, STF_DIR_REL, STF_NAME)
-    os.makedirs(os.path.dirname(stf_path), exist_ok=True)
+    stf_path = SEQ_ROOT.joinpath(*STF_DIR_REL.split("/"), STF_NAME)
+    safe_makedirs(stf_path.parent, SEQ_ROOT)
 
     # checksums of real source files (content leaves)
-    checks = {it["id"]: md5_of(it["src"]) for it in items}
+    checks = {it["id"]: md5_of(it["src"], M5_SRC) for it in items}
 
     # regional stub
-    regional_path = os.path.join(SEQ_ROOT, "m1", "us", "us-regional.xml")
-    with open(regional_path, "w", encoding="utf-8") as fh:
-        fh.write(build_regional())
-    regional_md5 = md5_of(regional_path)
+    regional_path = SEQ_ROOT / "m1/us/us-regional.xml"
+    atomic_write_text(regional_path, build_regional(), SEQ_ROOT)
+    regional_md5 = md5_of(regional_path, SEQ_ROOT)
     regional_href = "m1/us/us-regional.xml"
 
     # STF (checksum computed after writing)
-    with open(stf_path, "w", encoding="utf-8") as fh:
-        fh.write(build_stf(items, stf_path))
-    checks["Lstf0001"] = md5_of(stf_path)
+    atomic_write_text(stf_path, build_stf(items, stf_path), SEQ_ROOT)
+    checks["Lstf0001"] = md5_of(stf_path, SEQ_ROOT)
 
     # backbone
-    index_path = os.path.join(SEQ_ROOT, "index.xml")
-    with open(index_path, "w", encoding="utf-8") as fh:
-        fh.write(build_index(items, checks, regional_href, regional_md5))
-    with open(os.path.join(SEQ_ROOT, "index-md5.txt"), "w", encoding="utf-8") as fh:
-        fh.write(md5_of(index_path) + "\n")
+    index_path = SEQ_ROOT / "index.xml"
+    atomic_write_text(
+        index_path,
+        build_index(items, checks, regional_href, regional_md5),
+        SEQ_ROOT,
+    )
+    atomic_write_text(
+        SEQ_ROOT / "index-md5.txt",
+        md5_of(index_path, SEQ_ROOT) + "\n",
+        SEQ_ROOT,
+    )
 
     tagged = sum(1 for it in items if it["tag"])
     print(f"eCTD sequence {SEQ} written under 08_submission_package/ectd/{SEQ}/")
     print(f"  content leaves : {len(items)} ({tagged} STF-tagged, "
           f"{len(items) - tagged} untagged support files)")
     print(f"  + STF leaf, + regional leaf")
-    print(f"  index-md5.txt  : {md5_of(index_path)}")
+    print(f"  index-md5.txt  : {md5_of(index_path, SEQ_ROOT)}")
     by_tag = {}
     for it in items:
         by_tag[it["tag"]] = by_tag.get(it["tag"], 0) + 1
@@ -443,6 +452,9 @@ if __name__ == "__main__":
         help="Download the checksum-pinned official ICH/FDA stylesheets before building.",
     )
     args = parser.parse_args()
-    if args.sync_support_files:
-        sync_style_support_files()
-    raise SystemExit(main())
+    try:
+        if args.sync_support_files:
+            sync_style_support_files()
+        raise SystemExit(main())
+    except UnsafePathError as exc:
+        raise SystemExit(f"REFUSING unsafe eCTD backbone path: {exc}") from exc

@@ -1,6 +1,6 @@
 # FDA/ICH pre-shipment readiness research
 
-**Assessment date:** 2026-08-15
+**Assessment date:** 2026-08-24 (currency recheck; original scoped assessment 2026-08-15)
 
 **Repository scope:** TROPIC controlled clinical-submission simulation
 
@@ -22,12 +22,13 @@ the eCTD package from controlled sources, and obtain documented statistical,
 clinical, data-management, programming, quality, and submission-owner review.
 
 TROPIC now exposes that pattern as a machine-readable readiness profile. The
-profile is deliberately **blocked** for regulatory use: the public repository
-does not contain a genuine final SAS/ODA seal, organizationally independent QC,
-Part 11/CSV qualification, sponsor-approved simulation thresholds, or the
-licensed/data-owner approvals needed for a filing. That is the professional
-answer in an interview: the controls are visible, and the boundary is not
-hand-waved.
+profile is deliberately **blocked** for regulatory use. A current genuine
+SAS/ODA engineering seal, when present, closes only the controlled software-run
+gate; it does not provide organizationally independent QC, Part 11/CSV
+qualification, sponsor-approved simulation thresholds, qualified regulator
+validator acceptance, or the licensed/data-owner approvals needed for a filing.
+That is the professional answer in an interview: the controls are visible, and
+the boundary is not hand-waved.
 
 ## What FDA/ICH sources make explicit
 
@@ -54,8 +55,8 @@ defined product, region, submission type, data source, and date. I therefore
 used the official [FDA clinical-trials guidance index](https://www.fda.gov/science-research/clinical-trials-and-human-subject-protection/clinical-trials-guidance-documents)
 and [ICH guideline index](https://admin.ich.org/page/search-index-ich-guidelines)
 as the review universe, then screened the sources against this repository’s
-declared scope. The resulting inventory contains **48 official-source entries**:
-18 applicable, 16 partially applicable, 5 deliberately out of scope, 6
+declared scope. The resulting inventory contains **50 official-source entries**:
+18 applicable, 17 partially applicable, 5 deliberately out of scope, 7
 watch/not-final, and 3 requiring center or sponsor-owner confirmation. The
 inventory is checked in and validated in CI; it is not a web crawl or a claim
 that every national, indication-specific, CMC, nonclinical, or sponsor SOP
@@ -71,9 +72,33 @@ The second-pass review corrected two important status distinctions:
   repository does not use decentralized, pragmatic, or other Annex 2 data
   sources.
 
+The 2026-08-24 currency recheck added four release-critical distinctions:
+
+- FDA's June 2026 Study Data Technical Conformance Guide remains the current
+  project baseline; an actual submission must still use the versions supported
+  in the FDA Data Standards Catalog for its submission date and center.
+- FDA currently supports both eCTD v3.2.2 and v4.0. FDA describes v4.0 as
+  available for new applications and does not yet support forward compatibility
+  from an existing v3.2.2 application. The repository's v3.2.2 sequence is
+  therefore a structural demonstration, not a recommendation for a future filing.
+- FDA's v4 regional standards page was updated 2026-07-09, while the current
+  v3.2.2 validation-criteria release is version 4.5 (2025-10-20). The applicable
+  regional controlled vocabulary, technical-conformance guide, validation
+  criteria, and transmission specification must be frozen together at filing.
+- ICH E20 remains a Step 2a/b draft under Step 3 review after regional
+  consultation, not a Step 4 final guideline. Its detailed operating-characteristic
+  expectations are useful research context but are not promoted to a current final
+  requirement in this repository.
+- CDISC's CORE page (updated 2026-05-15) reports 1,563 of 1,880 target rules
+  complete (83%) and still presents CORE v1.0 as roadmap work. CORE is therefore
+  retained as a transparent lifecycle conformance control, not described as a
+  comprehensive clearance. Controlled Terminology Package 62 remains public-review
+  material; the latest released terminology baseline remains 2026-03-27.
+
 The review also records the distinction between final requirements and future
 watch items: FDA’s [January 2026 Bayesian draft guidance](https://www.fda.gov/regulatory-information/search-fda-guidance-documents/use-bayesian-methodology-clinical-trials-drug-and-biological-products),
-ICH E20 adaptive designs (still under development at the assessment date),
+ICH E20 adaptive designs (Step 2b draft under post-consultation review at the
+currency-recheck date),
 and CDISC ARS v2 planning material are not treated as current final
 requirements. Conversely, FDA/ICH E9(R1), FDA covariate guidance, FDA
 multiple-endpoint guidance, current eCTD regional pages, CDISC
@@ -183,4 +208,6 @@ needed for a broader regulatory simulation claim.
 - [CDISC Define-XML v2.1](https://www.cdisc.org/standards/foundational/define-xml/define-xml-v2-1-0)
 - [CDISC Analysis Results Standard](https://www.cdisc.org/standards/foundational/analysis-results-standard)
 - [CDISC Controlled Terminology](https://www.cdisc.org/standards/terminology/controlled-terminology)
+- [CDISC Open Rules Engine (CORE)](https://www.cdisc.org/core)
+- [CDISC Controlled Terminology Package 62 — public review](https://www.cdisc.org/public-review/controlled-terminology-package-62)
 - [ICH E6(R3) Good Clinical Practice](https://database.ich.org/sites/default/files/ICH_E6%28R3%29_Step4_FinalGuideline_2025_0106_ErrorCorrections_2025_1024.pdf)

@@ -1,6 +1,6 @@
 schema_version: "1.0"
-inventory_id: "TROPIC-OFFICIAL-SOURCES-2026-08-15"
-assessed_on: "2026-08-15"
+inventory_id: "TROPIC-OFFICIAL-SOURCES-2026-08-24"
+assessed_on: "2026-08-24"
 owner: "TROPIC repository maintainers"
 
 # This is a scoped source inventory, not a claim that every FDA, ICH, CDISC,
@@ -52,7 +52,7 @@ sources:
   - id: "FDA-DATA-STANDARDS-RESOURCES"
     authority: "FDA"
     title: "Study Data Standards Resources"
-    version_or_status: "current page checked 2026-08-15"
+    version_or_status: "current page checked 2026-08-24"
     status: "APPLICABLE"
     url: "https://www.fda.gov/industry/fda-data-standards-advisory-board/study-data-standards-resources"
     repo_evidence:
@@ -64,7 +64,7 @@ sources:
   - id: "FDA-DATA-STANDARDS-CATALOG"
     authority: "FDA"
     title: "Data Standards Catalog"
-    version_or_status: "current catalog page checked 2026-08-15"
+    version_or_status: "current catalog page checked 2026-08-24"
     status: "NEEDS_OWNER_CONFIRMATION"
     url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/data-standards-catalog"
     repo_evidence:
@@ -75,7 +75,7 @@ sources:
   - id: "FDA-STANDARDIZED-DATA-SAMPLE"
     authority: "FDA"
     title: "Submit Standardized Data Sample to FDA"
-    version_or_status: "current process page checked 2026-08-15"
+    version_or_status: "current process page checked 2026-08-24"
     status: "APPLICABLE"
     url: "https://www.fda.gov/drugs/electronic-regulatory-submission-and-review/submit-standardized-data-sample-fda"
     repo_evidence:
@@ -87,7 +87,7 @@ sources:
   - id: "FDA-ECTD-322"
     authority: "FDA"
     title: "eCTD v3.2.2 and regional M1 submission standards"
-    version_or_status: "current page checked 2026-08-15; version and validation criteria are versioned"
+    version_or_status: "supported; validation criteria v4.5 dated 2025-10-20; page checked 2026-08-24"
     status: "APPLICABLE"
     url: "https://www.fda.gov/drugs/electronic-regulatory-submission-and-review/ectd-submission-standards-ectd-v322-and-regional-m1"
     repo_evidence:
@@ -99,19 +99,19 @@ sources:
   - id: "FDA-ECTD-40"
     authority: "FDA"
     title: "Electronic Common Technical Document (eCTD) v4.0"
-    version_or_status: "FDA page checked 2026-08-15; center transition is ongoing"
+    version_or_status: "new applications only; no v3.2.2-to-v4 forward compatibility yet; checked 2026-08-24"
     status: "NEEDS_OWNER_CONFIRMATION"
     url: "https://www.fda.gov/drugs/electronic-regulatory-submission-and-review/electronic-common-technical-document-ectd-v40"
     repo_evidence:
       - "config/fda_readiness_profile.yaml"
       - "08_submission_package/README.md"
-    decision: "v4.0 is a current regional option, but the correct choice depends on center and application context."
+    decision: "v4.0 is a current regional option for new applications, but the correct choice depends on center and application history; this v3.2.2 demonstration is not a filing-version recommendation."
     owner_action: "Obtain center-specific submission-owner confirmation rather than selecting v3.2.2 or v4.0 by habit."
 
   - id: "ICH-ECTD-40"
     authority: "ICH"
     title: "ICH eCTD v4.0 specification and implementation guidance"
-    version_or_status: "Step 4; implementation guide v1.7 and controlled vocabulary v1.0.3 checked 2026-08-15"
+    version_or_status: "Step 4; implementation guide v1.7 and controlled vocabulary v1.0.3, June 2026; checked 2026-08-24"
     status: "NEEDS_OWNER_CONFIRMATION"
     url: "https://admin.ich.org/page/ich-electronic-common-technical-document-ectd-v40"
     repo_evidence:
@@ -122,7 +122,7 @@ sources:
   - id: "ICH-CTD-M4"
     authority: "ICH"
     title: "Common Technical Document (CTD)"
-    version_or_status: "current ICH page checked 2026-08-15"
+    version_or_status: "current ICH page checked 2026-08-24"
     status: "APPLICABLE"
     url: "https://admin.ich.org/page/ctd"
     repo_evidence:
@@ -134,7 +134,7 @@ sources:
   - id: "ICH-STF"
     authority: "ICH"
     title: "Study Tagging File specification"
-    version_or_status: "current ICH page checked 2026-08-15"
+    version_or_status: "current ICH page checked 2026-08-24"
     status: "APPLICABLE"
     url: "https://admin.ich.org/page/study-tagging-file-specification-and-related-files"
     repo_evidence:
@@ -145,7 +145,7 @@ sources:
   - id: "FDA-MODEL-DATA-FORMAT"
     authority: "FDA"
     title: "Model | Data Format"
-    version_or_status: "current page checked 2026-08-15"
+    version_or_status: "current page checked 2026-08-24"
     status: "APPLICABLE"
     url: "https://www.fda.gov/about-fda/center-drug-evaluation-and-research-cder/model-data-format"
     repo_evidence:
@@ -219,7 +219,7 @@ sources:
   - id: "FDA-CITD"
     authority: "FDA"
     title: "Complex Innovative Trial Design Meeting Program"
-    version_or_status: "current FDA program page checked 2026-08-15"
+    version_or_status: "current FDA program page checked 2026-08-24"
     status: "PARTIALLY_APPLICABLE"
     url: "https://www.fda.gov/drugs/development-resources/complex-innovative-trial-design-meeting-program"
     repo_evidence:
@@ -243,7 +243,7 @@ sources:
   - id: "FDA-MULTIPLE-ENDPOINTS"
     authority: "FDA"
     title: "Multiple Endpoints in Clinical Trials"
-    version_or_status: "FDA guidance checked 2026-08-15"
+    version_or_status: "FDA guidance checked 2026-08-24"
     status: "PARTIALLY_APPLICABLE"
     url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/multiple-endpoints-clinical-trials"
     repo_evidence:
@@ -361,13 +361,13 @@ sources:
   - id: "ICH-E20"
     authority: "ICH"
     title: "E20 Adaptive Designs for Clinical Trials"
-    version_or_status: "under development; Step 4 expected October 2026"
+    version_or_status: "Step 2a/b draft dated 2025-06-25; regional consultation completed and comments under Step 3 review; not Step 4 final as checked 2026-08-24"
     status: "WATCH_NOT_FINAL"
     url: "https://admin.ich.org/node/603"
     repo_evidence:
       - "config/regulatory_source_inventory.yaml"
-    decision: "The project uses the final FDA 2019 adaptive-design guidance for benchmarking; E20 is not treated as a final ICH requirement before its status changes."
-    owner_action: "Monitor the ICH work plan and update the protocol only after a final guideline and applicable regional implementation exist."
+    decision: "The Step 2b draft gives useful simulation operating-characteristic context, but the project uses final FDA guidance for current benchmarking and does not treat E20 as a final ICH requirement."
+    owner_action: "Monitor consultation/finalization and update the protocol only after Step 4 and applicable regional implementation exist."
 
   - id: "ICH-Q9-R1"
     authority: "ICH"
@@ -396,7 +396,7 @@ sources:
   - id: "FDA-ESOURCE"
     authority: "FDA"
     title: "Electronic Source Data in Clinical Investigations"
-    version_or_status: "FDA guidance checked 2026-08-15"
+    version_or_status: "FDA guidance checked 2026-08-24"
     status: "PARTIALLY_APPLICABLE"
     url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/electronic-source-data-clinical-investigations"
     repo_evidence:
@@ -419,7 +419,7 @@ sources:
   - id: "FDA-COMPUTERIZED-SYSTEMS"
     authority: "FDA"
     title: "Computerized Systems Used in Clinical Trials"
-    version_or_status: "FDA guidance checked 2026-08-15"
+    version_or_status: "FDA guidance checked 2026-08-24"
     status: "PARTIALLY_APPLICABLE"
     url: "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/fda-bioresearch-monitoring-information/guidance-industry-computerized-systems-used-clinical-trials"
     repo_evidence:
@@ -431,7 +431,7 @@ sources:
   - id: "FDA-PART-11-GUIDANCE"
     authority: "FDA"
     title: "Part 11, Electronic Records; Electronic Signatures — Scope and Application"
-    version_or_status: "FDA guidance checked 2026-08-15"
+    version_or_status: "FDA guidance checked 2026-08-24"
     status: "PARTIALLY_APPLICABLE"
     url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/part-11-electronic-records-electronic-signatures-scope-and-application"
     repo_evidence:
@@ -443,7 +443,7 @@ sources:
   - id: "ECFR-21-CFR-PART-11"
     authority: "U.S. eCFR"
     title: "21 CFR Part 11 Electronic Records; Electronic Signatures"
-    version_or_status: "current eCFR checked 2026-08-13"
+    version_or_status: "current eCFR checked 2026-08-24"
     status: "PARTIALLY_APPLICABLE"
     url: "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11"
     repo_evidence:
@@ -454,7 +454,7 @@ sources:
   - id: "ECFR-21-CFR-PART-312"
     authority: "U.S. eCFR"
     title: "21 CFR Part 312 Investigational New Drug Application"
-    version_or_status: "current eCFR checked 2026-08-15"
+    version_or_status: "current eCFR checked 2026-08-24"
     status: "OUT_OF_SCOPE"
     url: "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-D/part-312"
     repo_evidence:
@@ -465,7 +465,7 @@ sources:
   - id: "FDA-RISK-BASED-MONITORING"
     authority: "FDA"
     title: "Oversight of Clinical Investigations — Risk-Based Approach to Monitoring"
-    version_or_status: "FDA guidance and Q&A checked 2026-08-15"
+    version_or_status: "FDA guidance and Q&A checked 2026-08-24"
     status: "OUT_OF_SCOPE"
     url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/oversight-clinical-investigations-risk-based-approach-monitoring"
     repo_evidence:
@@ -487,7 +487,7 @@ sources:
   - id: "CDISC-SDTMIG-3-4"
     authority: "CDISC"
     title: "SDTM Implementation Guide v3.4"
-    version_or_status: "published 2021-11-29; known issues/errata page checked 2026-08-15"
+    version_or_status: "published 2021-11-29; known issues/errata page checked 2026-08-24"
     status: "APPLICABLE"
     url: "https://www.cdisc.org/standards/foundational/sdtmig/sdtmig-v3-4"
     repo_evidence:
@@ -525,7 +525,7 @@ sources:
   - id: "CDISC-ARS"
     authority: "CDISC"
     title: "Analysis Results Standard"
-    version_or_status: "current ARS page checked 2026-08-15"
+    version_or_status: "current ARS page checked 2026-08-24"
     status: "APPLICABLE"
     url: "https://www.cdisc.org/standards/foundational/analysis-results-standard"
     repo_evidence:
@@ -537,7 +537,7 @@ sources:
   - id: "CDISC-CONTROLLED-TERMINOLOGY-2026-03"
     authority: "CDISC"
     title: "CDISC Controlled Terminology"
-    version_or_status: "2026-03-27 release page checked 2026-08-15"
+    version_or_status: "2026-03-27 release page checked 2026-08-24"
     status: "APPLICABLE"
     url: "https://www.cdisc.org/standards/terminology/controlled-terminology"
     repo_evidence:
@@ -545,6 +545,31 @@ sources:
       - "03_metadata/define/define.xml"
     decision: "Controlled terminology is versioned and can change independently of an implementation guide; the exact authorized release is a submission decision."
     owner_action: "Pin the exact terminology package, license/rights, and validator configuration for the final data-bearing package."
+
+  - id: "CDISC-CORE-2026"
+    authority: "CDISC"
+    title: "CDISC Open Rules and Open Rules Engine (CORE)"
+    version_or_status: "official page updated 2026-05-15; 1,563/1,880 target rules (83%) reported complete; CORE v1.0 remained a roadmap target"
+    status: "PARTIALLY_APPLICABLE"
+    url: "https://www.cdisc.org/core"
+    repo_evidence:
+      - "platform/run_core_conformance.sh"
+      - "platform/conformance_rules/adam"
+      - "platform/validate_core_rules.py"
+    decision: "CORE is a transparent reference engine and lifecycle conformance control, but its published roadmap is incomplete and this repository executes a bounded custom ADaM ruleset; neither condition supports a comprehensive validator-clearance claim."
+    owner_action: "Freeze the exact engine, official/custom rule revisions, standards metadata, and findings dispositions; also run the sponsor-required current licensed validator before a real submission."
+
+  - id: "CDISC-CT-PACKAGE-62-WATCH"
+    authority: "CDISC"
+    title: "Controlled Terminology Package 62 public-review material"
+    version_or_status: "public-review package; comments were due 2026-07-10; not a released CT package as checked 2026-08-24"
+    status: "WATCH_NOT_FINAL"
+    url: "https://www.cdisc.org/public-review/controlled-terminology-package-62"
+    repo_evidence:
+      - "config/regulatory_source_inventory.yaml"
+      - "docs/FDA_READINESS_RESEARCH_2026-08-15.md"
+    decision: "Public-review terms and changes are monitored but are not promoted into the controlled package; the latest released CT baseline remains 2026-03-27."
+    owner_action: "Adopt a later terminology package only after formal release, FDA support/applicability review, impact assessment, and approved change control."
 
   - id: "ICH-M1-MEDDRA"
     authority: "ICH"
@@ -561,7 +586,7 @@ sources:
   - id: "CDISC-ARS-2-WATCH"
     authority: "CDISC"
     title: "Analysis Results Standard v2.0 development"
-    version_or_status: "development/webinar planning material checked 2026-08-15; not final"
+    version_or_status: "development/webinar planning material checked 2026-08-24; not final"
     status: "WATCH_NOT_FINAL"
     url: "https://www.cdisc.org/events/webinar/members-only-webinar-help-shape-next-generation-analysis-results-standards-ars-v2-0"
     repo_evidence:
@@ -583,7 +608,7 @@ sources:
   - id: "ICH-OFFICIAL-INDEX"
     authority: "ICH"
     title: "Official ICH guideline search index"
-    version_or_status: "current index checked 2026-08-15"
+    version_or_status: "current index checked 2026-08-24"
     status: "APPLICABLE"
     url: "https://admin.ich.org/page/search-index-ich-guidelines"
     repo_evidence:
@@ -595,7 +620,7 @@ sources:
   - id: "FDA-CLINICAL-GUIDANCE-INDEX"
     authority: "FDA"
     title: "Clinical Trials Guidance Documents index"
-    version_or_status: "current index checked 2026-08-15"
+    version_or_status: "current index checked 2026-08-24"
     status: "APPLICABLE"
     url: "https://www.fda.gov/science-research/clinical-trials-and-human-subject-protection/clinical-trials-guidance-documents"
     repo_evidence:

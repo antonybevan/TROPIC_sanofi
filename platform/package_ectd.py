@@ -8,13 +8,35 @@ metadata, reviewer guides, and clinical study reports (CSR) with output TFLs.
 import os
 import sys
 import shutil
-import glob
-import hashlib
 import re
 import argparse
 import subprocess
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
+
+from safe_filesystem import (
+    UnsafePathError,
+    atomic_write_text,
+    digest_file,
+    directory_exists,
+    iter_regular_files,
+    prepare_destination,
+    read_text as safe_read_text,
+    regular_file_exists,
+    require_directory,
+    require_regular_file,
+    safe_chmod,
+    safe_copy_file,
+    safe_copytree,
+    safe_makedirs,
+    safe_rmtree,
+)
+
+
+ROOT = Path(__file__).resolve().parents[1]
+PACKAGE_ROOT = ROOT / "08_submission_package"
+M5_ROOT = PACKAGE_ROOT / "m5"
 
 # Fixed submission-surface remediation date keeps the rendered reviewer guides
 # and CSR byte-reproducible while accurately post-dating their 2026-08-05 content.
@@ -113,9 +135,12 @@ def _submission_font_files():
         ("arial.ttf", "arialbd.ttf", "ariali.ttf", "arialbi.ttf"),
     ]
     for root in roots:
+        if not os.path.lexists(root):
+            continue
+        require_directory(root, root)
         for names in families:
             paths = tuple(root / name for name in names)
-            if all(path.is_file() for path in paths):
+            if all(regular_file_exists(path, root) for path in paths):
                 return paths
     raise SystemExit(
         "No embeddable Arial/Liberation Sans family found. Install fonts-liberation "
@@ -123,7 +148,7 @@ def _submission_font_files():
     )
 
 
-def md_to_pdf(md_path, pdf_path):
+def md_to_pdf(md_path, pdf_path, *, source_root, destination_root):
     """Convert Markdown to a navigable, submission-oriented PDF using fpdf2."""
     from fpdf import FPDF
     from fpdf.enums import MethodReturnValue, XPos, YPos
@@ -177,8 +202,8 @@ def md_to_pdf(md_path, pdf_path):
     pdf.add_page()
     pdf.set_font(font_family, size=10)
 
-    with open(md_path, "r", encoding="utf-8") as f:
-        lines = f.readlines()
+    source_path = require_regular_file(md_path, source_root)
+    lines = safe_read_text(source_path, source_root).splitlines(keepends=True)
     document_title = next(
         (clean_markdown(line.strip()[2:]) for line in lines if line.strip().startswith("# ")),
         Path(md_path).stem,
@@ -358,135 +383,158 @@ def md_to_pdf(md_path, pdf_path):
         raise ValueError(
             f"Refusing PDF with {replaced[0]} unsupported character substitution(s): {md_path}"
         )
-    pdf_target = Path(pdf_path).resolve()
-    pdf_target.parent.mkdir(parents=True, exist_ok=True)
+    pdf_target = prepare_destination(pdf_path, destination_root)
     ghostscript = shutil.which("gs")
     if not ghostscript:
         raise SystemExit(
             "Ghostscript is required to linearize reviewer PDFs for Fast Web View."
         )
-    raw_path = f"{pdf_target}.raw.pdf"
-    optimized_path = f"{pdf_target}.optimized.pdf"
-    pdf.output(raw_path)
-    raw_digest = hashlib.sha256(Path(raw_path).read_bytes()).hexdigest()
-    document_uuid = (
-        f"{raw_digest[:8]}-{raw_digest[8:12]}-{raw_digest[12:16]}-"
-        f"{raw_digest[16:20]}-{raw_digest[20:32]}"
-    )
-    environment = os.environ.copy()
-    environment["SOURCE_DATE_EPOCH"] = str(int(_PDF_DATE.timestamp()))
-    command = [
-        ghostscript,
-        "-q",
-        "-dBATCH",
-        "-dNOPAUSE",
-        "-dSAFER",
-        "-sDEVICE=pdfwrite",
-        "-dCompatibilityLevel=1.7",
-        "-dFastWebView=true",
-        "-dOmitID=true",
-        "-dEmbedAllFonts=true",
-        "-dSubsetFonts=false",
-        "-dPreserveAnnots=true",
-        "-dAutoRotatePages=/None",
-        f"-sDocumentUUID={document_uuid}",
-        f"-sInstanceUUID={document_uuid}",
-        f"-sOutputFile={optimized_path}",
-        "-c",
-        (
-            "[ /CreationDate "
-            f"({_PDF_DATE.astimezone(timezone.utc).strftime('D:%Y%m%d%H%M%SZ')}) "
-            "/ModDate "
-            f"({_PDF_DATE.astimezone(timezone.utc).strftime('D:%Y%m%d%H%M%SZ')}) "
-            "/DOCINFO pdfmark"
-        ),
-        "-f",
-        raw_path,
-    ]
-    try:
+    # FPDF and Ghostscript accept pathnames rather than already-open descriptors.
+    # Render in a private directory, then promote the verified regular file with
+    # the descriptor-relative destination primitive.  This keeps a racing swap
+    # of a package ancestor from redirecting either renderer outside the package.
+    with tempfile.TemporaryDirectory(prefix="tropic-pdf-render-") as temporary:
+        temporary_root = Path(temporary)
+        raw_path = temporary_root / "document.raw.pdf"
+        optimized_path = temporary_root / "document.optimized.pdf"
+        pdf.output(raw_path)
+        raw_digest = digest_file(raw_path, temporary_root, "sha256")
+        document_uuid = (
+            f"{raw_digest[:8]}-{raw_digest[8:12]}-{raw_digest[12:16]}-"
+            f"{raw_digest[16:20]}-{raw_digest[20:32]}"
+        )
+        environment = os.environ.copy()
+        environment["SOURCE_DATE_EPOCH"] = str(int(_PDF_DATE.timestamp()))
+        command = [
+            ghostscript,
+            "-q",
+            "-dBATCH",
+            "-dNOPAUSE",
+            "-dSAFER",
+            "-sDEVICE=pdfwrite",
+            "-dCompatibilityLevel=1.7",
+            "-dFastWebView=true",
+            "-dOmitID=true",
+            "-dEmbedAllFonts=true",
+            "-dSubsetFonts=false",
+            "-dPreserveAnnots=true",
+            "-dAutoRotatePages=/None",
+            f"-sDocumentUUID={document_uuid}",
+            f"-sInstanceUUID={document_uuid}",
+            f"-sOutputFile={optimized_path}",
+            "-c",
+            (
+                "[ /CreationDate "
+                f"({_PDF_DATE.astimezone(timezone.utc).strftime('D:%Y%m%d%H%M%SZ')}) "
+                "/ModDate "
+                f"({_PDF_DATE.astimezone(timezone.utc).strftime('D:%Y%m%d%H%M%SZ')}) "
+                "/DOCINFO pdfmark"
+            ),
+            "-f",
+            raw_path,
+        ]
         subprocess.run(
             command,
             check=True,
-            cwd=pdf_target.parent,
+            cwd=temporary_root,
             env=environment,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
         )
-        os.replace(optimized_path, pdf_target)
-    finally:
-        if os.path.exists(raw_path):
-            os.remove(raw_path)
-        if os.path.exists(optimized_path):
-            os.remove(optimized_path)
+        require_regular_file(optimized_path, temporary_root)
+        safe_copy_file(
+            optimized_path,
+            pdf_target,
+            source_root=temporary_root,
+            destination_root=destination_root,
+            mode=0o644,
+        )
 
-def copy_source_crf(pdf_path):
+def copy_source_crf(pdf_path, *, source_root, destination_root):
     """Copy the available source CRF; never generate a fabricated CRF placeholder."""
-    src = "01_source_data/Sanofi CRF Tropic.pdf"
-    if not os.path.exists(src):
+    src = Path(source_root) / "Sanofi CRF Tropic.pdf"
+    if not regular_file_exists(src, source_root):
         sys.exit(
             "Missing source CRF: 01_source_data/Sanofi CRF Tropic.pdf. "
             "The package refuses to create a placeholder CRF."
         )
-    shutil.copy2(src, pdf_path)
+    safe_copy_file(
+        src,
+        pdf_path,
+        source_root=source_root,
+        destination_root=destination_root,
+    )
     print(
         "Copied source CRF to blankcrf.pdf. "
         "Release note: this is not an annotated CRF unless annotation evidence is supplied."
     )
 
 
-def _copy_patient_file(src, dest):
+def _copy_patient_file(src, dest, *, source_root, destination_root):
     """Copy a patient-level transport file with least-privilege local permissions."""
-    shutil.copy2(src, dest)
-    os.chmod(dest, 0o600)
+    safe_copy_file(
+        src,
+        dest,
+        source_root=source_root,
+        destination_root=destination_root,
+        mode=0o600,
+    )
 
 
-def _secure_patient_dir(path):
+def _secure_patient_dir(path, *, destination_root):
     """Keep generated patient-level package directories inaccessible to other local users."""
-    os.chmod(path, 0o700)
+    safe_chmod(path, 0o700, destination_root, directory=True)
 
-def copy_uplifted_sdtm34_xpts(sdtm34_dir, out_dir):
+def copy_uplifted_sdtm34_xpts(sdtm34_dir, out_dir, *, destination_root):
     """Copy the SDTMIG 3.4 XPT layer that matches define_sdtm.xml."""
-    xpts = sorted(glob.glob(os.path.join(sdtm34_dir, "*.xpt")))
+    require_directory(sdtm34_dir, sdtm34_dir)
+    xpts = iter_regular_files(sdtm34_dir, "*.xpt")
     if not xpts:
         sys.exit(
             "Missing uplifted SDTMIG 3.4 XPT layer at .core_run/sdtm34/*.xpt. "
             "Run: Rscript platform/uplift_sdtm_34.R before building a full package. "
             "Raw SDTMIG 3.1.1 conversion is not allowed when define_sdtm.xml declares SDTMIG 3.4."
         )
-    os.makedirs(out_dir, exist_ok=True)
-    _secure_patient_dir(out_dir)
+    safe_makedirs(out_dir, destination_root)
+    _secure_patient_dir(out_dir, destination_root=destination_root)
     for f in xpts:
-        _copy_patient_file(f, os.path.join(out_dir, os.path.basename(f)))
+        _copy_patient_file(
+            f,
+            Path(out_dir) / f.name,
+            source_root=sdtm34_dir,
+            destination_root=destination_root,
+        )
     print(f"Copied {len(xpts)} uplifted SDTMIG 3.4 XPT datasets from {sdtm34_dir}.")
 
 
-def _require_exists(path, what):
+def _require_exists(path, what, *, root, directory=False):
     """Fail with a clear, actionable message -- matching copy_source_crf/copy_uplifted_sdtm34_xpts's
     existing style -- instead of a raw FileNotFoundError traceback when a file this packaging
-    step depends on (but doesn't itself copy/render) is missing. Used ahead of a bare shutil.copy
+    step depends on (but doesn't itself copy/render) is missing. Used ahead of a safe copy
     or md_to_pdf call for a file that's required, not merely optional-if-present."""
-    if not os.path.exists(path):
+    exists = directory_exists(path, root) if directory else regular_file_exists(path, root)
+    if not exists:
         sys.exit(f"Missing required file for eCTD packaging: {path} ({what}). "
                   "Ensure the pipeline has run successfully before packaging.")
 
 
-def copy_if_present(src, action, label):
+def copy_if_present(src, action, label, *, source_root):
     """Run `action()` (a copy/render) if `src` exists; otherwise print an explicit
     '[WARNING] ... omitted' line, so a maintainer sees a missing optional full-mode artifact in
     the console log instead of needing to diff directory listings against expectations. These
     are optional-if-present artifacts (BDRG render, ADaM spec)
     -- not hard requirements like the ADaM/BIMO datasets, so a missing one warns, not fails."""
-    if os.path.exists(src):
+    if regular_file_exists(src, source_root):
         action()
         return True
     print(f"  [WARNING] {label} not found at '{src}' — omitted from the package.")
     return False
 
 
-def write_dataset_placeholder(folder):
+def write_dataset_placeholder(folder, *, destination_root):
     """In data-free preview mode, drop a note where the patient-level *.xpt would sit."""
-    os.makedirs(folder, exist_ok=True)
+    safe_makedirs(folder, destination_root)
     note = (
         "DATASETS EXCLUDED FROM THIS DATA-FREE PREVIEW\n"
         "=============================================\n\n"
@@ -501,8 +549,11 @@ def write_dataset_placeholder(folder):
         "To materialise the datasets locally (with the licensed source data present):\n"
         "    python3 platform/package_ectd.py\n"
     )
-    with open(os.path.join(folder, "README_datasets_excluded.txt"), "w", encoding="utf-8") as fh:
-        fh.write(note)
+    atomic_write_text(
+        Path(folder) / "README_datasets_excluded.txt",
+        note,
+        destination_root,
+    )
 
 
 def main(data_free=False):
@@ -510,54 +561,74 @@ def main(data_free=False):
     print(f"=== STARTING eCTD MODULE 5 PACKAGING ({mode}) ===")
     
     # 1. Define paths
-    sdtm_src_dir = "01_source_data/real_sdtm"
-    sdtm34_xpt_dir = ".core_run/sdtm34"
-    adam_src_dir = "04_analysis_datasets/adam"
-    define_src_dir = "03_metadata/define"
-    guides_src_dir = "07_reviewer_explanation/guides"
-    csr_src_file = "07_reviewer_explanation/analysis_report.md"
-    simulation_map_src_file = "07_reviewer_explanation/simulation_model_analysis_plan.md"
-    simulation_report_src_file = "07_reviewer_explanation/simulation_report.md"
-    tfl_src_dir = "05_outputs/tfl/output"
+    source_data_root = ROOT / "01_source_data"
+    sdtm_src_dir = source_data_root / "real_sdtm"
+    sdtm34_xpt_dir = ROOT / ".core_run/sdtm34"
+    adam_src_dir = ROOT / "04_analysis_datasets/adam"
+    define_src_dir = ROOT / "03_metadata/define"
+    guides_src_dir = ROOT / "07_reviewer_explanation/guides"
+    reviewer_root = ROOT / "07_reviewer_explanation"
+    csr_src_file = reviewer_root / "analysis_report.md"
+    simulation_map_src_file = reviewer_root / "simulation_model_analysis_plan.md"
+    simulation_report_src_file = reviewer_root / "simulation_report.md"
+    tfl_root = ROOT / "05_outputs/tfl"
+    tfl_src_dir = tfl_root / "output"
+    sas_program_dir = ROOT / "04_analysis_datasets/programs/sas"
+    r_program_dir = ROOT / "04_analysis_datasets/programs/r"
     
-    m5_root = os.path.join("08_submission_package", "m5")
-    m5_sdtm_dir = os.path.join(m5_root, "datasets/tropic/tabulations/sdtm")
-    m5_sdtm_datasets_dir = os.path.join(m5_sdtm_dir, "datasets")
+    m5_root = M5_ROOT
+    m5_sdtm_dir = m5_root / "datasets/tropic/tabulations/sdtm"
+    m5_sdtm_datasets_dir = m5_sdtm_dir / "datasets"
     
-    m5_adam_dir = os.path.join(m5_root, "datasets/tropic/analysis/adam")
-    m5_adam_datasets_dir = os.path.join(m5_adam_dir, "datasets")
-    m5_adam_programs_dir = os.path.join(m5_adam_dir, "programs")
+    m5_adam_dir = m5_root / "datasets/tropic/analysis/adam"
+    m5_adam_datasets_dir = m5_adam_dir / "datasets"
+    m5_adam_programs_dir = m5_adam_dir / "programs"
     
-    m5_bimo_dir = os.path.join(m5_root, "datasets/tropic/bimo/datasets")
-    m5_csr_dir = os.path.join(m5_root, "53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic")
+    m5_bimo_dir = m5_root / "datasets/tropic/bimo/datasets"
+    m5_csr_dir = m5_root / "53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic"
     
     # Check that required input files/directories exist. The data-free preview needs none
     # of the (uncommitted, licensed) source/derived data, so its required set is narrower.
     required_inputs = [
-        define_src_dir, guides_src_dir, csr_src_file,
-        simulation_map_src_file, simulation_report_src_file, tfl_src_dir,
-        "04_analysis_datasets/programs/sas", "04_analysis_datasets/programs/r", "05_outputs/tfl"
+        (define_src_dir, ROOT / "03_metadata", True),
+        (guides_src_dir, reviewer_root, True),
+        (csr_src_file, reviewer_root, False),
+        (simulation_map_src_file, reviewer_root, False),
+        (simulation_report_src_file, reviewer_root, False),
+        (tfl_src_dir, tfl_root, True),
+        (sas_program_dir, ROOT / "04_analysis_datasets/programs", True),
+        (r_program_dir, ROOT / "04_analysis_datasets/programs", True),
+        (tfl_root, ROOT / "05_outputs", True),
     ]
     if not data_free:
-        required_inputs = [sdtm_src_dir, adam_src_dir] + required_inputs
-    for inp in required_inputs:
-        if not os.path.exists(inp):
+        required_inputs = [
+            (sdtm_src_dir, source_data_root, True),
+            (adam_src_dir, ROOT / "04_analysis_datasets", True),
+            (sdtm34_xpt_dir, ROOT / ".core_run", True),
+        ] + required_inputs
+    for inp, authorized_root, is_directory in required_inputs:
+        exists = (
+            directory_exists(inp, authorized_root)
+            if is_directory
+            else regular_file_exists(inp, authorized_root)
+        )
+        if not exists:
             print(f"Error: Missing required input '{inp}'. Ensure pipeline has run successfully.")
             sys.exit(1)
             
     # 2. Re-create target folder structure
-    if os.path.exists(m5_root):
+    if os.path.lexists(m5_root):
         print(f"Cleaning existing {m5_root}/ folder...")
-        shutil.rmtree(m5_root)
+        safe_rmtree(m5_root, PACKAGE_ROOT)
         
-    os.makedirs(m5_sdtm_datasets_dir, exist_ok=True)
-    os.makedirs(m5_adam_datasets_dir, exist_ok=True)
-    os.makedirs(m5_adam_programs_dir, exist_ok=True)
-    os.makedirs(m5_bimo_dir, exist_ok=True)
-    os.makedirs(m5_csr_dir, exist_ok=True)
+    safe_makedirs(m5_sdtm_datasets_dir, PACKAGE_ROOT)
+    safe_makedirs(m5_adam_datasets_dir, PACKAGE_ROOT)
+    safe_makedirs(m5_adam_programs_dir, PACKAGE_ROOT)
+    safe_makedirs(m5_bimo_dir, PACKAGE_ROOT)
+    safe_makedirs(m5_csr_dir, PACKAGE_ROOT)
     if not data_free:
         for patient_dir in (m5_sdtm_datasets_dir, m5_adam_datasets_dir, m5_bimo_dir):
-            _secure_patient_dir(patient_dir)
+            _secure_patient_dir(patient_dir, destination_root=m5_root)
     
     print(f"Created target folder structure under {m5_root}/.")
     
@@ -567,39 +638,53 @@ def main(data_free=False):
     # packaging fallback because it creates metadata/data drift.
     if data_free:
         print("Preview mode: skipping SDTM dataset conversion (patient-level data excluded).")
-        write_dataset_placeholder(m5_sdtm_datasets_dir)
+        write_dataset_placeholder(m5_sdtm_datasets_dir, destination_root=m5_root)
     else:
         print("Copying uplifted SDTMIG 3.4 datasets to Version 5 XPT package folder...")
-        copy_uplifted_sdtm34_xpts(sdtm34_xpt_dir, m5_sdtm_datasets_dir)
+        copy_uplifted_sdtm34_xpts(
+            sdtm34_xpt_dir,
+            m5_sdtm_datasets_dir,
+            destination_root=m5_root,
+        )
             
     # 4. Copy ADaM Datasets and strip '_prod' suffix (skipped in data-free preview)
     if data_free:
         print("Preview mode: skipping ADaM dataset copy (patient-level data excluded).")
-        write_dataset_placeholder(m5_adam_datasets_dir)
+        write_dataset_placeholder(m5_adam_datasets_dir, destination_root=m5_root)
     else:
         print("Copying ADaM datasets...")
         adam_prod_files = [
-            f for f in glob.glob(os.path.join(adam_src_dir, "*_prod.xpt"))
-            if os.path.basename(f).lower() != "clinsite_prod.xpt"
+            f for f in iter_regular_files(adam_src_dir, "*_prod.xpt")
+            if f.name.lower() != "clinsite_prod.xpt"
         ]
         if not adam_prod_files:
             print("Error: No ADaM '*_prod.xpt' datasets found in 04_analysis_datasets/adam/.")
             sys.exit(1)
         for f in adam_prod_files:
-            base = os.path.basename(f)
+            base = f.name
             new_base = base.replace("_prod.xpt", ".xpt")
-            dest = os.path.join(m5_adam_datasets_dir, new_base)
-            _copy_patient_file(f, dest)
+            dest = m5_adam_datasets_dir / new_base
+            _copy_patient_file(
+                f,
+                dest,
+                source_root=adam_src_dir,
+                destination_root=m5_root,
+            )
             print(f"  Copied and renamed: {base} -> {new_base}")
 
     # 4b. Copy BIMO Datasets + its data-definition guide (BDRG). clinsite is delivered
     # with its own documentation (it is NOT in the ADaM define.xml) per the BIMO TCG.
     print("Copying BIMO package...")
-    bimo_prod_file = os.path.join(adam_src_dir, "clinsite_prod.xpt")
+    bimo_prod_file = adam_src_dir / "clinsite_prod.xpt"
     if data_free:
-        write_dataset_placeholder(m5_bimo_dir)
-    elif os.path.exists(bimo_prod_file):
-        _copy_patient_file(bimo_prod_file, os.path.join(m5_bimo_dir, "clinsite.xpt"))
+        write_dataset_placeholder(m5_bimo_dir, destination_root=m5_root)
+    elif regular_file_exists(bimo_prod_file, adam_src_dir):
+        _copy_patient_file(
+            bimo_prod_file,
+            m5_bimo_dir / "clinsite.xpt",
+            source_root=adam_src_dir,
+            destination_root=m5_root,
+        )
         print("  Copied BIMO clinsite.xpt.")
     else:
         # clinsite is a required BIMO deliverable (per the BIMO TCG comment above), not an
@@ -608,37 +693,77 @@ def main(data_free=False):
         print("Error: Missing BIMO 'clinsite_prod.xpt' in 04_analysis_datasets/adam/. Ensure pipeline has run "
               "successfully.")
         sys.exit(1)
-    bdrg_file = "07_reviewer_explanation/guides/BDRG.md"
+    bdrg_file = guides_src_dir / "BDRG.md"
     # Rendered to PDF for parity with the SDRG/ADRG reviewer guides (a submission package
     # ships rendered guides, not raw Markdown).
-    if copy_if_present(bdrg_file,
-                        lambda: md_to_pdf(bdrg_file, os.path.join(m5_bimo_dir, "bdrg.pdf")),
-                        "BDRG (07_reviewer_explanation/guides/BDRG.md)"):
+    if copy_if_present(
+        bdrg_file,
+        lambda: md_to_pdf(
+            bdrg_file,
+            m5_bimo_dir / "bdrg.pdf",
+            source_root=guides_src_dir,
+            destination_root=m5_root,
+        ),
+        "BDRG (07_reviewer_explanation/guides/BDRG.md)",
+        source_root=guides_src_dir,
+    ):
         print("  Generated BIMO data reviewer's guide (bdrg.pdf).")
 
     # 4c. Copy the authoritative ADaM specification (audit C-4 inversion): ADaM_spec.xlsx
     # is the upstream metadata control source (CDISC/Pinnacle-21 metacore format) that
     # governs define.xml -- not a rendering derived from it.
     print("Copying authoritative ADaM specification...")
-    spec_file = "03_metadata/adam/ADaM_spec.xlsx"
-    if copy_if_present(spec_file,
-                        lambda: shutil.copy(spec_file, os.path.join(m5_adam_dir, "ADaM_spec.xlsx")),
-                        "ADaM specification (03_metadata/adam/ADaM_spec.xlsx)"):
+    adam_metadata_root = ROOT / "03_metadata/adam"
+    spec_file = adam_metadata_root / "ADaM_spec.xlsx"
+    if copy_if_present(
+        spec_file,
+        lambda: safe_copy_file(
+            spec_file,
+            m5_adam_dir / "ADaM_spec.xlsx",
+            source_root=adam_metadata_root,
+            destination_root=m5_root,
+        ),
+        "ADaM specification (03_metadata/adam/ADaM_spec.xlsx)",
+        source_root=adam_metadata_root,
+    ):
         print("  Copied ADaM_spec.xlsx (governing specification).")
         
     # 5. Co-locate Define-XML metadata
     print("Copying Define-XML metadata...")
     # SDTM Define
-    _require_exists(os.path.join(define_src_dir, "define_sdtm.xml"), "SDTM Define-XML")
-    shutil.copy(os.path.join(define_src_dir, "define_sdtm.xml"), os.path.join(m5_sdtm_datasets_dir, "define.xml"))
-    _require_exists(os.path.join(define_src_dir, "define2-1.xsl"), "Define-XML stylesheet")
-    shutil.copy(os.path.join(define_src_dir, "define2-1.xsl"), os.path.join(m5_sdtm_datasets_dir, "define2-1.xsl"))
+    sdtm_define = define_src_dir / "define_sdtm.xml"
+    define_style = define_src_dir / "define2-1.xsl"
+    _require_exists(sdtm_define, "SDTM Define-XML", root=define_src_dir)
+    safe_copy_file(
+        sdtm_define,
+        m5_sdtm_datasets_dir / "define.xml",
+        source_root=define_src_dir,
+        destination_root=m5_root,
+    )
+    _require_exists(define_style, "Define-XML stylesheet", root=define_src_dir)
+    safe_copy_file(
+        define_style,
+        m5_sdtm_datasets_dir / "define2-1.xsl",
+        source_root=define_src_dir,
+        destination_root=m5_root,
+    )
     print("  Copied SDTM define.xml and define2-1.xsl.")
     # ADaM Define
-    _require_exists(os.path.join(define_src_dir, "define.xml"), "ADaM Define-XML")
-    shutil.copy(os.path.join(define_src_dir, "define.xml"), os.path.join(m5_adam_datasets_dir, "define.xml"))
-    _require_exists(os.path.join(define_src_dir, "define2-1.xsl"), "Define-XML stylesheet")
-    shutil.copy(os.path.join(define_src_dir, "define2-1.xsl"), os.path.join(m5_adam_datasets_dir, "define2-1.xsl"))
+    adam_define = define_src_dir / "define.xml"
+    _require_exists(adam_define, "ADaM Define-XML", root=define_src_dir)
+    safe_copy_file(
+        adam_define,
+        m5_adam_datasets_dir / "define.xml",
+        source_root=define_src_dir,
+        destination_root=m5_root,
+    )
+    _require_exists(define_style, "Define-XML stylesheet", root=define_src_dir)
+    safe_copy_file(
+        define_style,
+        m5_adam_datasets_dir / "define2-1.xsl",
+        source_root=define_src_dir,
+        destination_root=m5_root,
+    )
     print("  Copied ADaM define.xml and define2-1.xsl.")
 
     # 6. Generate PDFs for Reviewer's Guides, CSR, and the informative simulation
@@ -647,62 +772,123 @@ def main(data_free=False):
     # JSON; they do not promote reconstructed/synthetic records to filing evidence.
     print("Generating Reviewer's Guides, CSR, and simulation evidence PDFs...")
     # cSDRG
-    _require_exists(os.path.join(guides_src_dir, "SDRG.md"), "cSDRG (Clinical Study Data Reviewer's Guide)")
-    md_to_pdf(os.path.join(guides_src_dir, "SDRG.md"), os.path.join(m5_sdtm_dir, "csdrg.pdf"))
+    sdrg_file = guides_src_dir / "SDRG.md"
+    _require_exists(
+        sdrg_file,
+        "cSDRG (Clinical Study Data Reviewer's Guide)",
+        root=guides_src_dir,
+    )
+    md_to_pdf(
+        sdrg_file,
+        m5_sdtm_dir / "csdrg.pdf",
+        source_root=guides_src_dir,
+        destination_root=m5_root,
+    )
     # ADRG
-    _require_exists(os.path.join(guides_src_dir, "ADRG.md"), "ADRG (Analysis Data Reviewer's Guide)")
-    md_to_pdf(os.path.join(guides_src_dir, "ADRG.md"), os.path.join(m5_adam_dir, "adrg.pdf"))
+    adrg_file = guides_src_dir / "ADRG.md"
+    _require_exists(
+        adrg_file,
+        "ADRG (Analysis Data Reviewer's Guide)",
+        root=guides_src_dir,
+    )
+    md_to_pdf(
+        adrg_file,
+        m5_adam_dir / "adrg.pdf",
+        source_root=guides_src_dir,
+        destination_root=m5_root,
+    )
     # CSR
-    _require_exists(csr_src_file, "Clinical Study Report source")
-    md_to_pdf(csr_src_file, os.path.join(m5_csr_dir, "csr.pdf"))
+    _require_exists(csr_src_file, "Clinical Study Report source", root=reviewer_root)
+    md_to_pdf(
+        csr_src_file,
+        m5_csr_dir / "csr.pdf",
+        source_root=reviewer_root,
+        destination_root=m5_root,
+    )
     # Informative simulation MAP/MAR annex
-    _require_exists(simulation_map_src_file, "Simulation Model Analysis Plan source")
+    _require_exists(
+        simulation_map_src_file,
+        "Simulation Model Analysis Plan source",
+        root=reviewer_root,
+    )
     md_to_pdf(
         simulation_map_src_file,
-        os.path.join(m5_csr_dir, "simulation-model-analysis-plan.pdf"),
+        m5_csr_dir / "simulation-model-analysis-plan.pdf",
+        source_root=reviewer_root,
+        destination_root=m5_root,
     )
-    _require_exists(simulation_report_src_file, "Simulation Model Analysis Report source")
+    _require_exists(
+        simulation_report_src_file,
+        "Simulation Model Analysis Report source",
+        root=reviewer_root,
+    )
     md_to_pdf(
         simulation_report_src_file,
-        os.path.join(m5_csr_dir, "simulation-report.pdf"),
+        m5_csr_dir / "simulation-report.pdf",
+        source_root=reviewer_root,
+        destination_root=m5_root,
     )
     print("  Successfully generated cSDRG, ADRG, CSR, simulation MAP, and simulation report PDFs.")
     
     # 7. Copy the available source CRF. Do not fabricate a placeholder CRF.
-    copy_source_crf(os.path.join(m5_sdtm_dir, "blankcrf.pdf"))
+    copy_source_crf(
+        m5_sdtm_dir / "blankcrf.pdf",
+        source_root=source_data_root,
+        destination_root=m5_root,
+    )
     
     # 8. Copy programs (SAS, R, TFL source codes)
     print(f"Copying analysis and validation programs to {m5_adam_programs_dir}/...")
     # SAS programs
-    sas_files = glob.glob(os.path.join("04_analysis_datasets/programs/sas", "*.sas"))
+    sas_files = iter_regular_files(sas_program_dir, "*.sas")
     for f in sas_files:
-        shutil.copy(f, m5_adam_programs_dir)
+        safe_copy_file(
+            f,
+            m5_adam_programs_dir / f.name,
+            source_root=sas_program_dir,
+            destination_root=m5_root,
+        )
     # R programs
-    r_files = glob.glob(os.path.join("04_analysis_datasets/programs/r", "*.R"))
+    r_files = iter_regular_files(r_program_dir, "*.R")
     for f in r_files:
-        shutil.copy(f, m5_adam_programs_dir)
+        safe_copy_file(
+            f,
+            m5_adam_programs_dir / f.name,
+            source_root=r_program_dir,
+            destination_root=m5_root,
+        )
     # TFL programs
     tfl_programs = [
-        "05_outputs/tfl/tfl_generation.R",
-        "05_outputs/tfl/tfl_stats.R",
-        "05_outputs/tfl/lab_shift_table.R",
+        tfl_root / "tfl_generation.R",
+        tfl_root / "tfl_stats.R",
+        tfl_root / "lab_shift_table.R",
     ]
     for f in tfl_programs:
-        _require_exists(f, f"TFL program {f}")
-        shutil.copy(f, m5_adam_programs_dir)
+        _require_exists(f, f"TFL program {f}", root=tfl_root)
+        safe_copy_file(
+            f,
+            m5_adam_programs_dir / f.name,
+            source_root=tfl_root,
+            destination_root=m5_root,
+        )
     # spec -> define conformance program. Its report is QC evidence under platform/conformance/,
     # not a Module 5 package leaf.
     extra_programs = [
-        ("03_metadata/define/check_define_conformance.R", None),
-        ("platform/simulation_precision.py", "simulation_precision.py.txt"),
-        ("platform/check_simulation_evidence.py", "check_simulation_evidence.py.txt"),
-        ("platform/build_simulation_report.py", "build_simulation_report.py.txt"),
-        ("config/simulation_protocol.yaml", "simulation_protocol.yaml.txt"),
+        (define_src_dir / "check_define_conformance.R", None, define_src_dir),
+        (ROOT / "platform/simulation_precision.py", "simulation_precision.py.txt", ROOT / "platform"),
+        (ROOT / "platform/check_simulation_evidence.py", "check_simulation_evidence.py.txt", ROOT / "platform"),
+        (ROOT / "platform/build_simulation_report.py", "build_simulation_report.py.txt", ROOT / "platform"),
+        (ROOT / "config/simulation_protocol.yaml", "simulation_protocol.yaml.txt", ROOT / "config"),
     ]
     n_extra = 0
-    for f, packaged_name in extra_programs:
-        if os.path.exists(f):
-            shutil.copy(f, os.path.join(m5_adam_programs_dir, packaged_name or os.path.basename(f)))
+    for f, packaged_name, source_root in extra_programs:
+        if regular_file_exists(f, source_root):
+            safe_copy_file(
+                f,
+                m5_adam_programs_dir / (packaged_name or f.name),
+                source_root=source_root,
+                destination_root=m5_root,
+            )
             n_extra += 1
     print(f"  Successfully copied {len(sas_files)} SAS files, {len(r_files)} R files, "
           f"{len(tfl_programs)} TFL R scripts, and {n_extra} extra program/control source file(s).")
@@ -711,12 +897,17 @@ def main(data_free=False):
     print("Copying output TFLs (tables, listings, figures) to CSR appendices...")
     # Preserve subdirectories: figures, tables, listings
     for subdir in ["figures", "tables", "listings"]:
-        src_path = os.path.join(tfl_src_dir, subdir)
-        dest_path = os.path.join(m5_csr_dir, subdir)
-        if os.path.exists(src_path):
+        src_path = tfl_src_dir / subdir
+        dest_path = m5_csr_dir / subdir
+        if directory_exists(src_path, tfl_src_dir):
             # Never ship VCS scaffolding (.gitkeep) or other hidden files in a submission.
-            shutil.copytree(src_path, dest_path,
-                            ignore=shutil.ignore_patterns(".gitkeep", ".*"))
+            safe_copytree(
+                src_path,
+                dest_path,
+                source_root=tfl_src_dir,
+                destination_root=m5_root,
+                ignore=shutil.ignore_patterns(".gitkeep", ".*"),
+            )
             print(f"  Copied subdirectory {subdir} -> {dest_path}")
             
     print("\n=== eCTD MODULE 5 PACKAGING COMPLETED SUCCESSFULLY ===")
@@ -735,4 +926,7 @@ if __name__ == "__main__":
              "with placeholder notes where the patient-level *.xpt would sit (no source data "
              "or SAS engine required).")
     args = parser.parse_args()
-    main(data_free=args.preview)
+    try:
+        main(data_free=args.preview)
+    except UnsafePathError as exc:
+        raise SystemExit(f"REFUSING unsafe eCTD package path: {exc}") from exc

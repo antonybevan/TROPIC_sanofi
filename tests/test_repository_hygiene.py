@@ -108,12 +108,83 @@ def test_present_local_credentials_have_restrictive_permissions() -> None:
         assert runtime.stat().st_mode & 0o077 == 0
 
 
-def test_core_runner_checks_ignored_credential_permissions_before_sourcing() -> None:
+def test_core_runner_loads_ignored_credential_without_shell_sourcing() -> None:
     runner = (ROOT / "platform/run_core_conformance.sh").read_text(encoding="utf-8")
-    assert "stat.S_IMODE" in runner
     assert 'chmod 700 "$RUN"' in runner
-    assert "Refusing insecure credential file permissions" in runner
-    assert 'set -a' in runner
+    capture = runner.index('TROPIC_INHERITED_CDISC_LIBRARY_API_KEY="${CDISC_LIBRARY_API_KEY-}"')
+    deexport = runner.index("export -n TROPIC_INHERITED_CDISC_LIBRARY_API_KEY", capture)
+    initial_unset = runner.index("unset CDISC_LIBRARY_API_KEY", capture)
+    install = runner.index('env -u CDISC_LIBRARY_API_KEY')
+    clone = runner.index("git clone")
+    patch = runner.index("grep -q 'ADAMIG")
+    update_cache = runner.index(
+        'python3 -I -S "$ROOT/platform/run_core_update_cache.py"', patch
+    )
+    final_unset = runner.index("unset TROPIC_INHERITED_CDISC_LIBRARY_API_KEY", update_cache)
+    assert capture < deexport < initial_unset < install < clone < patch < update_cache
+    assert update_cache < final_unset
+    assert runner.count('python3 -I -S "$ROOT/platform/run_core_update_cache.py"') == 1
+    assert 'printf \'%s\' "$TROPIC_INHERITED_CDISC_LIBRARY_API_KEY"' in runner
+    assert '. "$RUN/.env"' not in runner
+
+
+def test_ci_python_dependencies_are_artifact_hash_locked() -> None:
+    entrypoint = (ROOT / "requirements-ci.txt").read_text(encoding="utf-8")
+    lock = (ROOT / "requirements-ci.lock").read_text(encoding="utf-8")
+    build_lock = (ROOT / "requirements-ci-build.lock").read_text(encoding="utf-8")
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+
+    assert "--require-hashes" in entrypoint
+    assert "--only-binary=:all:" in entrypoint
+    assert "--no-binary=stringcase" in entrypoint
+    assert "--no-binary=yattag" in entrypoint
+    for locked in (lock, build_lock):
+        pins = [line for line in locked.splitlines() if "==" in line]
+        hashes = [line for line in locked.splitlines() if "--hash=sha256:" in line]
+        assert pins
+        assert len(pins) == len(hashes)
+        assert all(line.endswith(" \\") for line in pins)
+    assert workflow.count(
+        "pip install --require-hashes --only-binary=:all: "
+        "--requirement requirements-ci-build.lock"
+    ) == 2
+    assert workflow.count(
+        "pip install --require-hashes --no-build-isolation "
+        "--requirement requirements-ci.txt"
+    ) == 2
+
+
+def test_core_python_dependencies_are_artifact_hash_locked() -> None:
+    entrypoint = (ROOT / "requirements-core.txt").read_text(encoding="utf-8")
+    lock = (ROOT / "requirements-core.lock").read_text(encoding="utf-8")
+    build_lock = (ROOT / "requirements-core-build.lock").read_text(encoding="utf-8")
+    runner = (ROOT / "platform/run_core_conformance.sh").read_text(encoding="utf-8")
+
+    assert "--require-hashes" in entrypoint
+    assert "--only-binary=:all:" in entrypoint
+    assert "--no-binary=titlecase" in entrypoint
+    assert "-r requirements-core.lock" in entrypoint
+    for locked in (lock, build_lock):
+        lines = locked.splitlines()
+        pin_indices = [index for index, line in enumerate(lines) if "==" in line]
+        assert pin_indices
+        for offset, start in enumerate(pin_indices):
+            end = pin_indices[offset + 1] if offset + 1 < len(pin_indices) else len(lines)
+            block = lines[start:end]
+            assert lines[start].endswith(" \\")
+            assert any("--hash=sha256:" in line for line in block)
+    assert "cdisc-rules-engine==0.16.0" in lock
+    assert runner.count(
+        "env -u CDISC_LIBRARY_API_KEY -u TROPIC_INHERITED_CDISC_LIBRARY_API_KEY"
+    ) >= 7
+    assert runner.count('"$VENV/bin/python" -m pip install') == 2
+    assert '--requirement "$ROOT/requirements-core-build.lock"' in runner
+    assert '--requirement "$ROOT/requirements-core.txt"' in runner
+    assert "--require-hashes --only-binary=:all:" in runner
+    assert "--require-hashes --no-build-isolation" in runner
+    assert '"$VENV/bin/python" -m pip check' in runner
+    assert '"cdisc-rules-engine==$CORE_VERSION"' not in runner
+    assert "--upgrade pip" not in runner
 
 
 def test_manifest_dataset_names_are_safe_path_segments() -> None:
@@ -132,10 +203,10 @@ def test_manifest_dataset_names_are_safe_path_segments() -> None:
 
 def test_patient_level_generators_request_least_privilege_permissions() -> None:
     for relative, markers in {
-        "platform/package_ectd.py": ("_copy_patient_file", "os.chmod(dest, 0o600)", "0o700"),
+        "platform/package_ectd.py": ("_copy_patient_file", "mode=0o600", "safe_chmod(path, 0o700"),
         "platform/export_datasetjson.py": ("os.chmod(out_dir, 0o700)", "os.chmod(out_path, 0o600)"),
         "platform/stage_p21_adam_inputs.py": ("temporary.chmod(0o700)", "target.chmod(0o600)"),
-        "platform/materialize_ectd.py": ("os.chmod(dest, 0o600)", "os.chmod(os.path.dirname(dest), 0o700)"),
+        "platform/materialize_ectd.py": ("safe_chmod(dest, 0o600, SEQ)", "safe_chmod(dest.parent, 0o700"),
     }.items():
         source = (ROOT / relative).read_text(encoding="utf-8")
         for marker in markers:
@@ -148,9 +219,11 @@ def test_patient_level_generators_request_least_privilege_permissions() -> None:
 
 def test_core_conformance_runner_pins_source_and_package_versions() -> None:
     source = (ROOT / "platform/run_core_conformance.sh").read_text(encoding="utf-8")
+    lock = (ROOT / "requirements-core.lock").read_text(encoding="utf-8")
     assert 'CORE_VERSION="0.16.0"' in source
     assert 'CORE_COMMIT="c78b05cad21379adf52c8fad5fe1760b826d1ef3"' in source
-    assert '"cdisc-rules-engine==$CORE_VERSION"' in source
+    assert "cdisc-rules-engine==0.16.0" in lock
+    assert 'm.version("cdisc-rules-engine")' in source
 
 
 def test_manifest_infrastructure_stages_are_unique() -> None:
@@ -254,6 +327,25 @@ def test_traceability_matrix_has_exact_manifest_infrastructure_stage_numbers() -
 def test_ci_collects_the_complete_python_test_directory() -> None:
     workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
     assert "python3 -m pytest -q tests\n" in workflow
+
+
+def test_ci_security_controls_are_pinned_and_non_cancelling() -> None:
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    precommit = (ROOT / ".pre-commit-config.yaml").read_text(encoding="utf-8")
+
+    assert "github.event_name" in workflow.split("jobs:", 1)[0]
+    assert "actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294" in workflow
+    assert "fail-on-severity: moderate" in workflow
+    assert workflow.count(
+        "github/codeql-action/init@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28"
+    ) == 1
+    assert workflow.count(
+        "github/codeql-action/analyze@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28"
+    ) == 1
+    assert "language: [python, actions]" in workflow
+    assert "gitleaks_8.30.1_linux_x64.tar.gz" in workflow
+    assert "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb" in workflow
+    assert "rev: 83d9cd684c87d95d656c1458ef04895a7f1cbd8e" in precommit
 
 
 def test_release_verifier_uses_current_candidate_terminology() -> None:
