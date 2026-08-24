@@ -277,10 +277,10 @@
         "size_bytes": 3388
       },
       {
-        "md5": "502e00c910929b9960bdb6ea02d38d9a",
+        "md5": "fa3f2df2c972d0f85a516eb80e044471",
         "path": "config/regulatory_baseline.yaml",
         "present": true,
-        "sha256": "0e9791db5df34fe376e0c13b4780c99b87eff71024dc08e7f4e307cec8fe0429",
+        "sha256": "cacc02aa9556492a3b308160ece2ed87d15708a7892a0586806ec856e989e04b",
         "size_bytes": 2975
       },
       {
@@ -333,18 +333,18 @@
         "size_bytes": 7553
       },
       {
-        "md5": "bc8faaa1beed28ea7d0ae6976cb10f88",
+        "md5": "69d8ea91345cc0e5a57352e3706afc0a",
         "path": "06_qc_evidence/conformance/p21_adam_runrecord.md",
         "present": true,
-        "sha256": "538714aa4e7ff6ce82e32f622c47c971c813a4c274f8e8906bf9a720161fd42b",
-        "size_bytes": 7782
+        "sha256": "68ce4ff64b3f2f1e1a9aa8e7080797cfaac9fca19796f74626e146c713a828f5",
+        "size_bytes": 7861
       },
       {
-        "md5": "d115a24629988a395f77d7c8d637d677",
+        "md5": "9e69497cbbfb1a5d75f71bc1b7afe163",
         "path": "06_qc_evidence/conformance/p21_adam_summary.json",
         "present": true,
-        "sha256": "43fbb2d6f8f6ecd6d2130511a07885cc0ab2434d757292ce7273a0d5673f786d",
-        "size_bytes": 8354
+        "sha256": "e9d7134a70c89a0fcf3c8ebe6ce5fa936a24fc4a995601fe667a40ca26cea5f6",
+        "size_bytes": 8447
       },
       {
         "md5": "df49adc0bbf6f1c550e3a5cb4e71400a",
@@ -452,11 +452,11 @@
         "size_bytes": 12367
       },
       {
-        "md5": "3169ef25a77b0ed07a708c1cca01aed5",
+        "md5": "9060fa6f998ac84f1e25abbe77399075",
         "path": "06_qc_evidence/audit/findings_register.csv",
         "present": true,
-        "sha256": "9ea2b2b0982f5d3b049560c35da92e380f193a91b051b06b5cc8a5f72e235e31",
-        "size_bytes": 34396
+        "sha256": "245867cc1d99108d920646cb73364f6dfac71b7f50817d6fc63ae2ed1e79a814",
+        "size_bytes": 34531
       },
       {
         "md5": "d8577f646cb44a282255766155886830",
@@ -473,11 +473,11 @@
         "size_bytes": 5346
       },
       {
-        "md5": "6894ba9c5b1efb676db9cfc624f3be60",
+        "md5": "beae0bedf69041ae20ae1784289b3fbe",
         "path": "platform/cibuild.py",
         "present": true,
-        "sha256": "7b093dc36c14be0a40f0de7e6418a10781d4f44a2509ad42afd3991411110582",
-        "size_bytes": 89184
+        "sha256": "4ec76d79e4bc34dbfb7e6eec6b9493a0d0db1fd093c2ccbf63f48d50c8a67bac",
+        "size_bytes": 90854
       },
       {
         "md5": "0e3c954425abe1d45501fb0345bd4ec8",
@@ -2560,11 +2560,11 @@
         "size_bytes": 252146
       },
       {
-        "md5": "a4a55415b049f6b7d5af4909da304113",
+        "md5": "6b75e4fe8ceaccd972129f83e8c244e4",
         "path": "scripts/rebind_governance_seal.py",
         "present": true,
-        "sha256": "47b0665e7192dece52adde21c95e050db6327d542c4e5aa57888706d710368c8",
-        "size_bytes": 9479
+        "sha256": "0f7dfb7679d5f53595e16323222e1cb866e07de99883be9f53c3915e476fec74",
+        "size_bytes": 9799
       },
       {
         "md5": "96dd11372168d4ee6ea4311ff4d91ddf",
@@ -2905,11 +2905,11 @@
         "size_bytes": 19994
       },
       {
-        "md5": "8ccda296f6860693923bd097ab9068f9",
+        "md5": "8ab3ef5ccd297fb75f78fefd22e07125",
         "path": "platform/build_orchestrator_gate_map.py",
         "present": true,
-        "sha256": "80af6775368191a43666975a46e88cdbcd6b8f3024c447ab6a8f6f09cc351f2a",
-        "size_bytes": 12871
+        "sha256": "e56343991c7a768d45245b2477ab2a06257975d8c9f04ae77de310f0d0909c3c",
+        "size_bytes": 13083
       },
       {
         "md5": "978f4a4e03c05a50c18b846c88f66cab",
@@ -2919,11 +2919,11 @@
         "size_bytes": 23077
       },
       {
-        "md5": "2107c8fb0af26ac041c31c69c0bf2f4f",
+        "md5": "b2b955253ea7fec3ee0672a35211f2aa",
         "path": "platform/build_release_run_manifest.py",
         "present": true,
-        "sha256": "efeb2e272d15ec2198db9b9eefa878da257ff94dd15b28e86cc65162d6ba5ae0",
-        "size_bytes": 39232
+        "sha256": "b8c9163f2dafadbc27695456150c3903b6a8e75e55a4ca0c1996fbd6a40cfbbc",
+        "size_bytes": 39308
       },
       {
         "md5": "3bf71b018bbf5047a832f2d1f9e3e2ad",
@@ -3003,11 +3003,11 @@
         "size_bytes": 12792
       },
       {
-        "md5": "92efb72144628fd65b2e39c8fa1a30db",
+        "md5": "86210434d4ece3c07185ec4b176ca48d",
         "path": "platform/check_regulatory_baseline.py",
         "present": true,
-        "sha256": "73105d5bc3544d9cb0c888fb63b036c37a37392fe19d4c9f1039332bbfc37629",
-        "size_bytes": 18277
+        "sha256": "0e3e782152bb1021147670cfdb2b771bf986f2201c9b9d9fc826d6c05b1906e5",
+        "size_bytes": 21322
       },
       {
         "md5": "25d50f30a44cd32dac9ad5e52f0ee0d7",
@@ -3045,11 +3045,11 @@
         "size_bytes": 2186
       },
       {
-        "md5": "6894ba9c5b1efb676db9cfc624f3be60",
+        "md5": "beae0bedf69041ae20ae1784289b3fbe",
         "path": "platform/cibuild.py",
         "present": true,
-        "sha256": "7b093dc36c14be0a40f0de7e6418a10781d4f44a2509ad42afd3991411110582",
-        "size_bytes": 89184
+        "sha256": "4ec76d79e4bc34dbfb7e6eec6b9493a0d0db1fd093c2ccbf63f48d50c8a67bac",
+        "size_bytes": 90854
       },
       {
         "md5": "ac41b275170fd64ecd5f4fb41461775d",
@@ -3250,11 +3250,11 @@
     ],
     "qc_files": [
       {
-        "md5": "962914216f7cdb9a9a42008ff2ca0674",
+        "md5": "0f28061b50e1453e9dc2b2d25480d6fa",
         "path": "platform/pipeline_health.json",
         "present": true,
-        "sha256": "d65a24aae1b7ffeb826b3968e251c762ba87841abbe6471896ff613b62837472",
-        "size_bytes": 3852
+        "sha256": "42c06bb703c7b68c675bedf19e4c85a62e860ec4a4626cf081e8ea29b4ba1704",
+        "size_bytes": 7446
       },
       {
         "md5": "06989db82566475af4ebd3685eb8d8a8",
@@ -3292,24 +3292,24 @@
         "size_bytes": 265
       },
       {
-        "md5": "7a7b73c583ae313f94fd4ec8f4c7f563",
+        "md5": "f73482ba9a42b0847a20c9bae2a2ffae",
         "path": "platform/conformance/spec_define_conformance.json",
         "present": true,
-        "sha256": "4e22a06c506ab137a23f143404d7afcdef89e194310cff5dcd3cae60e6d3e371",
+        "sha256": "71c0d2211314a451c69cd067f76a04e477e64c3dccc76545e659c828822fa3c1",
         "size_bytes": 258
       },
       {
-        "md5": "7200a5110b27471ef3cdef99f35fb58d",
+        "md5": "7959157a8499cf2daf0932b82de52c67",
         "path": "platform/conformance/spec_data_conformance.json",
         "present": true,
-        "sha256": "97a9a3e78d5aaa619624487c78253fa100b477884aa5ee3e43e815136b8bee50",
+        "sha256": "87ac470fad326df6e93e22ac296acc514044ee482eb2f2c4b4f2e7bff405d2c8",
         "size_bytes": 3257
       },
       {
-        "md5": "27ec4c353b2a080be298d2d8c5c7ee16",
+        "md5": "7c6101df1d8ae54280aa94ec4a0343da",
         "path": "platform/metadata_control/metadata_control_status.json",
         "present": true,
-        "sha256": "e9a9250db4b7bdb80de0e2d30207eb64a770085e74a4fb299b48ca3f53b831e2",
+        "sha256": "ecbf2c7eaae0036f211a297eeb3d4d5746ec9b17fbbc2fe819e83de00dc65549",
         "size_bytes": 1101
       },
       {
@@ -3320,10 +3320,10 @@
         "size_bytes": 2979
       },
       {
-        "md5": "59782a4dff3804e74cf453b7ed30fb24",
+        "md5": "23181d24b748739c66dd5949b1909c00",
         "path": "platform/tfl_output_index_status.json",
         "present": true,
-        "sha256": "ad17d5cd093d15b26ff2926438fccabcd22121ea905cb2dab867d1f86228a256",
+        "sha256": "f12e72aced843a4cd8d6a59ffec83b79c86e286d5cc59c65e36fbba82dcf6a23",
         "size_bytes": 960
       },
       {
@@ -3341,11 +3341,11 @@
         "size_bytes": 38666
       },
       {
-        "md5": "c1b598cb3b9de8fe590ac25a0b7ab635",
+        "md5": "a7fd199dcd5c19e6796bc92d337b5465",
         "path": "06_qc_evidence/gates/regulatory_baseline_status.json",
         "present": true,
-        "sha256": "c69d909b380b0fc7630d44dc950d4c0ce938e189c7ef90118240beb75de10ea4",
-        "size_bytes": 11431
+        "sha256": "b439ab0e8371dee1250235f1e4720702fac1485ca207a96e60c9487d1e7bac50",
+        "size_bytes": 11583
       }
     ],
     "review_surface": [
@@ -3355,6 +3355,13 @@
         "present": true,
         "sha256": "31f370ad01167ab827f97ca20cc9641036a19a4078ef3d0b0fe0efe31bbfc111",
         "size_bytes": 9928
+      },
+      {
+        "md5": "c5d4934b8e10511c423f0dc5cabbe066",
+        "path": "docs/INDEX.md",
+        "present": true,
+        "sha256": "4214d38067f181d19858cc66598840f5d56f41b1f05c754d2e8e837d30dc6811",
+        "size_bytes": 11021
       },
       {
         "md5": "9beaf686d7cbafb1526f1e2099e62b9e",
@@ -3378,32 +3385,39 @@
         "size_bytes": 3964
       },
       {
-        "md5": "7b8ae2b1c2de5cbb1f38c752a2c1ec7e",
+        "md5": "7ab4af4b55193181801e663b6e8b5c73",
         "path": "05_outputs/tfl/TFL_Gallery.html",
         "present": true,
-        "sha256": "dece97a1cf8f80897e39e9945271d8fd20d3df0b37481903acc5ce8c9e6cd7ff",
-        "size_bytes": 27662
+        "sha256": "d32b428ad439da36ffa7efe3e7721d5f190d8b6072b555f5a6cac4c26dfc8fb4",
+        "size_bytes": 28549
       },
       {
-        "md5": "b21b05b624ea6e0b08dfc9ea145d2327",
+        "md5": "6e24edec8de6b62f5e63a0a09ff434b3",
         "path": "06_qc_evidence/audit/DASHBOARD_VISUAL_QC.md",
         "present": true,
-        "sha256": "4ff5ab5d750ffbb3e1d442fc72e0c1348ce9ae717d359db4eee3af64a96f1c87",
-        "size_bytes": 3254
+        "sha256": "b3604e555c6645bb32713ffd2278fe5eff24cf6359467659eb6c519acb1477e3",
+        "size_bytes": 4258
       },
       {
-        "md5": "1cd80ce601fc251e58bca811e5f88489",
+        "md5": "6c0e4e04de12bb79b4579d3b0dbd4bab",
+        "path": "06_qc_evidence/audit/FIGURE_AUDIT_2026-08-23.md",
+        "present": true,
+        "sha256": "190a110c72862d0ae0626dfff8fe975d7efb6583a3973f3b7108f1cf32c081fb",
+        "size_bytes": 8492
+      },
+      {
+        "md5": "24367ae4ae73e0f514a67a9a30127c9f",
         "path": "06_qc_evidence/audit/SIMULATION_PRECISION_IMPLEMENTATION_REPORT_2026-08-14.md",
         "present": true,
-        "sha256": "fd6a5f9c117e431f4869cfecf157b0e1e9bff7e4b074ccf4605c1efa20b1d3e2",
-        "size_bytes": 12027
+        "sha256": "62f372b84a9eb489eb65879cec9c5527299b2754ccb6ff696e0e2c336d306bb0",
+        "size_bytes": 12179
       },
       {
-        "md5": "3e5d52f9ea35f1c105d7764046cb45ce",
+        "md5": "d9ffaca9c864296c1c636374842978b9",
         "path": "06_qc_evidence/audit/REPOSITORY_CLEANUP_AUDIT_2026-08-23.md",
         "present": true,
-        "sha256": "6a67067acb917688145c961d9b3a5663abfec3caae2b540e8c3a99ac54f288cc",
-        "size_bytes": 7917
+        "sha256": "f6c4fa3bb0b2b9bc9bd4e50ed98ed37c8e82d8f61929a8836f72bda8aea3de95",
+        "size_bytes": 13155
       },
       {
         "md5": "953eb18641edf3f3311a8ad2ca7ef468",
@@ -3868,17 +3882,17 @@
   "environment": {
     "oda_endpoint": "odaws01-apse1-2.oda.sas.com",
     "pipeline_run_scope": "full_dag",
-    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
-    "python": "3.14.6",
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "python": "3.11.15",
     "r_version": "R version 4.6.0 (2026-04-24)",
     "renv_lock_sha256": "a9ba2082ce1f227add5d2cb400fb70688ea5031fef238dcf1bf1928de2700630",
     "sas_execution_mode": "oda",
     "sas_version": "9.04.01M8P022223",
     "sdtm_manifest_sha": "329430f6361e8bd0ec019a692ea856a8025b20b572a28a5d30a714ca5cf0d007"
   },
-  "evidence_grade": "remediation_partial_or_dirty",
-  "generated_at": "2026-08-23 17:47:38 UTC",
-  "manifest_sha256": "e197502a74185ccd56aa50cc133ae13798aa757c72233ac7850959f21f62ea2e",
+  "evidence_grade": "release_candidate",
+  "generated_at": "2026-08-24 06:04:52 UTC",
+  "manifest_sha256": "ed9ff4a0b4a66ffba14e6c18e7f779a3182dd80140b407ce61d9ce858a336c7b",
   "problems": [],
   "qc_statuses": {
     "cbzp_bridge": {
@@ -4008,12 +4022,50 @@
       "status": "PASS"
     }
   },
-  "remediation_reasons": [
-    "git worktree is dirty (16 porcelain entries); release-candidate lock requires a clean committed state"
-  ],
+  "remediation_reasons": [],
   "run_completeness": {
     "expected_stage_names": [
-      "SAS Production (ODA/Real/Simulated)"
+      "Governance Scope Lock (G00)",
+      "Analysis Specification Lock (G02)",
+      "ADaM Spec Label/Order Artifacts",
+      "Real SDTM Staging Ingest",
+      "R SDTM Validation",
+      "R ADSL Validation",
+      "R ADEX Validation",
+      "R ADCM Validation",
+      "R ADAE Validation",
+      "R ADLB Validation",
+      "R ADRS Validation",
+      "R ADTTE Validation",
+      "R BIMO Validation",
+      "Synthetic Comparator Reconstruction",
+      "Guyot Reconstruction Validation",
+      "Synthetic Comparator XPT Export",
+      "SAS Production (ODA/Real/Simulated)",
+      "Cross-Language Audit Reconcile",
+      "Admiral ADSL Re-derivation",
+      "Admiral ADTTE Re-derivation (OS/PFS)",
+      "Admiral Core Reconciliation",
+      "Synthetic Comparator Bridge Parity",
+      "Efficacy & Safety TFL Suite Compilation",
+      "Numerical Results Reconciliation (SAS vs R)",
+      "Forest-HR Reconciliation (SAS vs R)",
+      "Figure-Data Reconciliation (SAS vs R)",
+      "ADaM Spec to Define Conformance",
+      "ADaM Spec to Data Conformance",
+      "Simulation Operating Characteristics",
+      "Simulation MAP and Report",
+      "Simulation Evidence Independent Verification",
+      "Reviewer Package Lock (G07)",
+      "Dataset-JSON Export (v1.1)",
+      "Analysis Results Standard (ARS v1.0)",
+      "USDM Study Definition (v3.0)",
+      "eCTD Final Package",
+      "eCTD Backbone + STF (sequence 0000)",
+      "Materialize eCTD Sequence",
+      "Metadata Control Evidence Refresh",
+      "Log Cleanliness Gate",
+      "Release Run Manifest Binding"
     ],
     "failed": [],
     "health_run_scope": "full_dag",
@@ -4021,9 +4073,9 @@
     "non_success": [],
     "not_run": [],
     "run_scope": "full_dag",
-    "stages_expected": 1,
+    "stages_expected": 41,
     "stages_recorded_in_health": 41,
-    "stages_required_for_release": 1
+    "stages_required_for_release": 40
   },
   "sas_companion_figures": {
     "all_current_with_pipeline_health": true,
@@ -4066,69 +4118,16 @@
   },
   "source_control": {
     "branch": "codex/repo-professional-build",
-    "dirty": true,
-    "dirty_including_seal_outputs": true,
-    "head": "0f59df2de429f126d5cb5909a68dbbc4da5d029e",
-    "pipeline_control_sha256": "06c0b39150ba8f8d147e87133c30cf12795ba93e6b16f687b35e31137b21c20f",
-    "source_tree_sha256": "6b2e272130b0936f4f2156bf8f4352f4c3428a9c01eb772e29614c14ce970e91",
+    "dirty": false,
+    "dirty_including_seal_outputs": false,
+    "head": "29cca6ef4b56fdae2b4bbefa6b909ee970e84301",
+    "pipeline_control_sha256": "dc452b46c242f1c39809627d007dc532e3256321db2c868709760c5a79dda1ab",
+    "source_tree_sha256": "ac7a0d69a318688abf72a59d9498dd196cf00f62b0e8c915dead36893dcde872",
     "staged_diff_paths": [],
-    "status_porcelain": [
-      " M 01_source_data/guyot_validation_report.md",
-      " M 05_outputs/ars/tropic_reporting_event.json",
-      " M 06_qc_evidence/gates/g00_governance_status.json",
-      " M 06_qc_evidence/gates/g02_specification_status.json",
-      " M 06_qc_evidence/gates/g07_reviewer_package_status.json",
-      " M 08_submission_package/ectd/0000/index-md5.txt",
-      " M 08_submission_package/ectd/0000/index.xml",
-      " M 08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
-      " M 08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-model-analysis-plan.pdf",
-      " M 08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-report.pdf",
-      " M 08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
-      " M 08_submission_package/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
-      " M 08_submission_package/m5/datasets/tropic/tabulations/sdtm/csdrg.pdf",
-      " M platform/admiral_reconciliation_status.json",
-      " M platform/log_cleanliness/log_cleanliness_status.json",
-      " M platform/pipeline_health.json"
-    ],
-    "status_porcelain_all": [
-      " M 01_source_data/guyot_validation_report.md",
-      " M 05_outputs/ars/tropic_reporting_event.json",
-      " M 06_qc_evidence/gates/g00_governance_status.json",
-      " M 06_qc_evidence/gates/g02_specification_status.json",
-      " M 06_qc_evidence/gates/g07_reviewer_package_status.json",
-      " M 08_submission_package/ectd/0000/index-md5.txt",
-      " M 08_submission_package/ectd/0000/index.xml",
-      " M 08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
-      " M 08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-model-analysis-plan.pdf",
-      " M 08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-report.pdf",
-      " M 08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
-      " M 08_submission_package/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
-      " M 08_submission_package/m5/datasets/tropic/tabulations/sdtm/csdrg.pdf",
-      " M docs/RELEASE_RUN_MANIFEST.md",
-      " M platform/admiral_reconciliation_status.json",
-      " M platform/log_cleanliness/log_cleanliness_status.json",
-      " M platform/pipeline_health.json",
-      " M platform/release_run_manifest/release_run_manifest.json"
-    ],
-    "status_porcelain_sha256": "9a8ffdb5c79801f1bc5f9063ca3758c2e3ab01a5a6307684a8840d93c256cfaf",
-    "tracked_diff_paths": [
-      "01_source_data/guyot_validation_report.md",
-      "05_outputs/ars/tropic_reporting_event.json",
-      "06_qc_evidence/gates/g00_governance_status.json",
-      "06_qc_evidence/gates/g02_specification_status.json",
-      "06_qc_evidence/gates/g07_reviewer_package_status.json",
-      "08_submission_package/ectd/0000/index-md5.txt",
-      "08_submission_package/ectd/0000/index.xml",
-      "08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/csr.pdf",
-      "08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-model-analysis-plan.pdf",
-      "08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/simulation-report.pdf",
-      "08_submission_package/m5/datasets/tropic/analysis/adam/adrg.pdf",
-      "08_submission_package/m5/datasets/tropic/bimo/datasets/bdrg.pdf",
-      "08_submission_package/m5/datasets/tropic/tabulations/sdtm/csdrg.pdf",
-      "platform/admiral_reconciliation_status.json",
-      "platform/log_cleanliness/log_cleanliness_status.json",
-      "platform/pipeline_health.json"
-    ]
+    "status_porcelain": [],
+    "status_porcelain_all": [],
+    "status_porcelain_sha256": "",
+    "tracked_diff_paths": []
   },
-  "status": "REMEDIATION"
+  "status": "PASS"
 }
