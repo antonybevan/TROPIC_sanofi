@@ -93,19 +93,17 @@ def test_runner_verifies_rules_credential_free_before_install_and_core() -> None
         'TROPIC_INHERITED_CDISC_LIBRARY_API_KEY="${CDISC_LIBRARY_API_KEY-}"'
     )
     initial_unset = runner.index("unset CDISC_LIBRARY_API_KEY", capture)
-    install = runner.index('"$VENV/bin/python" -m pip install', calls[0])
+    install = runner.index('"$PY" -I -m pip install', calls[0])
     clone = runner.index("git clone", install)
     update_cache = runner.index(
-        'python3 -I -S "$ROOT/platform/run_core_update_cache.py"', clone
+        '"$PY" -I -S "$ROOT/platform/run_core_update_cache.py"', clone
     )
     final_unset = runner.index("unset TROPIC_INHERITED_CDISC_LIBRARY_API_KEY", update_cache)
-    adam_core = runner.index('"$PY" "$CORE" validate -s adamig', calls[1])
+    adam_core = runner.index('"$PY" -E -s -B "$CORE" validate -s adamig', calls[1])
     assert initial_unset < calls[0] < install < clone < update_cache
     assert update_cache < final_unset < calls[1] < adam_core
-    assert (
-        "env -u CDISC_LIBRARY_API_KEY -u "
-        "TROPIC_INHERITED_CDISC_LIBRARY_API_KEY" in runner
-    )
+    assert "env -i" in runner
+    assert "clean_env python3 -I -S -" in runner
     assert "python3 -I -S - \"$ROOT\"" in runner
     assert 'export -n TROPIC_INHERITED_CDISC_LIBRARY_API_KEY' in runner
     assert '-lr "$RULES_DIR"' in runner

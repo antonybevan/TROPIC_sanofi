@@ -114,18 +114,31 @@ def test_core_runner_loads_ignored_credential_without_shell_sourcing() -> None:
     capture = runner.index('TROPIC_INHERITED_CDISC_LIBRARY_API_KEY="${CDISC_LIBRARY_API_KEY-}"')
     deexport = runner.index("export -n TROPIC_INHERITED_CDISC_LIBRARY_API_KEY", capture)
     initial_unset = runner.index("unset CDISC_LIBRARY_API_KEY", capture)
-    install = runner.index('env -u CDISC_LIBRARY_API_KEY')
+    install = runner.index('clean_env python3.12 -I -m venv')
     clone = runner.index("git clone")
-    patch = runner.index("grep -q 'ADAMIG")
+    source_lock = runner.index(
+        '"$PY" -I -S "$ROOT/platform/verify_core_source.py"'
+    )
     update_cache = runner.index(
-        'python3 -I -S "$ROOT/platform/run_core_update_cache.py"', patch
+        '"$PY" -I -S "$ROOT/platform/run_core_update_cache.py"', source_lock
     )
     final_unset = runner.index("unset TROPIC_INHERITED_CDISC_LIBRARY_API_KEY", update_cache)
-    assert capture < deexport < initial_unset < install < clone < patch < update_cache
+    assert capture < deexport < initial_unset < install < clone < source_lock < update_cache
     assert update_cache < final_unset
-    assert runner.count('python3 -I -S "$ROOT/platform/run_core_update_cache.py"') == 1
+    assert runner.count('"$PY" -I -S "$ROOT/platform/run_core_update_cache.py"') == 1
     assert 'printf \'%s\' "$TROPIC_INHERITED_CDISC_LIBRARY_API_KEY"' in runner
     assert '. "$RUN/.env"' not in runner
+    assert "env -i" in runner
+    assert 'credential_env "$PY" -I -S "$ROOT/platform/run_core_update_cache.py"' in runner
+    assert runner.count("/usr/bin/env -i") == 2
+    credential_block = runner[runner.index("credential_env()") : update_cache]
+    for inherited_name in (
+        "HTTPS_PROXY",
+        "REQUESTS_CA_BUNDLE",
+        "CURL_CA_BUNDLE",
+        "HOME=",
+    ):
+        assert inherited_name not in credential_block
 
 
 def test_ci_python_dependencies_are_artifact_hash_locked() -> None:
@@ -133,7 +146,13 @@ def test_ci_python_dependencies_are_artifact_hash_locked() -> None:
     lock = (ROOT / "requirements-ci.lock").read_text(encoding="utf-8")
     build_lock = (ROOT / "requirements-ci-build.lock").read_text(encoding="utf-8")
     workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    runtime_pin = (ROOT / ".python-version").read_text(encoding="utf-8").strip()
 
+    assert runtime_pin == "3.12.13"
+    assert workflow.count("python-version: '3.12.13'") == 4
+    assert "python-version: '3.10" not in workflow
+    assert "CPython 3.12.13 / Ubuntu x86_64" in entrypoint
+    assert "CPython 3.12 CI target" in lock
     assert "--require-hashes" in entrypoint
     assert "--only-binary=:all:" in entrypoint
     assert "--no-binary=stringcase" in entrypoint
@@ -174,15 +193,17 @@ def test_core_python_dependencies_are_artifact_hash_locked() -> None:
             assert lines[start].endswith(" \\")
             assert any("--hash=sha256:" in line for line in block)
     assert "cdisc-rules-engine==0.16.0" in lock
-    assert runner.count(
-        "env -u CDISC_LIBRARY_API_KEY -u TROPIC_INHERITED_CDISC_LIBRARY_API_KEY"
-    ) >= 7
-    assert runner.count('"$VENV/bin/python" -m pip install') == 2
+    assert runner.count("clean_env ") >= 12
+    assert runner.count('"$PY" -I -m pip install') == 2
     assert '--requirement "$ROOT/requirements-core-build.lock"' in runner
     assert '--requirement "$ROOT/requirements-core.txt"' in runner
     assert "--require-hashes --only-binary=:all:" in runner
     assert "--require-hashes --no-build-isolation" in runner
-    assert '"$VENV/bin/python" -m pip check' in runner
+    assert '"$PY" -I -m pip check' in runner
+    assert 'VENV="$(mktemp -d "$RUN/core-venv.XXXXXXXX")"' in runner
+    assert 'trap cleanup_core_venv EXIT' in runner
+    assert 'git -C "$ENGINE" clean -ffdx -e resources/cache/' in runner
+    assert runner.count('"$PY" -E -s -B "$CORE" validate') == 3
     assert '"cdisc-rules-engine==$CORE_VERSION"' not in runner
     assert "--upgrade pip" not in runner
 
@@ -224,6 +245,7 @@ def test_core_conformance_runner_pins_source_and_package_versions() -> None:
     assert 'CORE_COMMIT="c78b05cad21379adf52c8fad5fe1760b826d1ef3"' in source
     assert "cdisc-rules-engine==0.16.0" in lock
     assert 'm.version("cdisc-rules-engine")' in source
+    assert '"$PY" -I -S "$ROOT/platform/verify_core_source.py"' in source
 
 
 def test_manifest_infrastructure_stages_are_unique() -> None:

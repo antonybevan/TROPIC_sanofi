@@ -23,7 +23,7 @@ The binding claim is [Product and Evidence Claim](docs/PRODUCT_CLAIM.md). The qu
 | [Simulation Model Analysis Plan](07_reviewer_explanation/simulation_model_analysis_plan.md) | Prospective M15/ADEMP/OCTAVE methods-evaluation protocol, estimand, scenarios, and precision criteria |
 | [Simulation Model Analysis Report](07_reviewer_explanation/simulation_report.md) | Generated operating characteristics, Monte Carlo uncertainty, representative trials, and limitations |
 | [FDA/ICH readiness research](docs/FDA_READINESS_RESEARCH_2026-08-15.md) | Big-pharma pre-shipment control model, official sources, and current blockers |
-| [Scoped official-source inventory](config/regulatory_source_inventory.yaml) | 48 FDA/ICH/CDISC/eCFR entries classified by applicability, final/draft status, evidence, and owner action |
+| [Scoped official-source inventory](config/regulatory_source_inventory.yaml) | 50 FDA/ICH/CDISC/eCFR entries classified by applicability, final/draft status, evidence, and owner action |
 | [Current release note](docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) | Release evidence and residual limitations |
 | [Reviewer guide](docs/INTERVIEWER_GUIDE.md) | A short, evidence-led walkthrough |
 
@@ -95,7 +95,16 @@ tests/                     data-free and data-bearing regression checks
 
 ## Run and verify
 
-Requirements: Python 3.10+, R 4.6.0+, and either SAS 9.4 or configured SAS OnDemand access for a genuine production run.
+Requirements: CPython 3.12.13 (pinned by `.python-version` and CI), R 4.6.0+, and
+either SAS 9.4 or configured SAS OnDemand access for a genuine production run. The
+[runtime migration record](docs/workstreams/decisions/PYTHON_RUNTIME_MIGRATION_2026-08-24.md)
+documents lifecycle rationale, artifact-lock scope, acceptance criteria, and rollback.
+
+Bootstrap dependencies before the first command. The exact data-free reviewer
+profile and Ubuntu lock-equivalent CI replay are in
+[`docs/runbooks/ENVIRONMENT_BOOTSTRAP.md`](docs/runbooks/ENVIRONMENT_BOOTSTRAP.md).
+The Python lock is an Ubuntu 24.04 x86_64 / CPython 3.12.13 claim; it is not a
+generic cross-platform wheel claim.
 
 ```bash
 # Recheck the committed release without patient data or SAS
@@ -121,6 +130,9 @@ The full run requires the authorized local SDTM source and credentials; see [Rep
 
 For maintainers, [`CONTRIBUTING.md`](CONTRIBUTING.md) defines the review and release workflow;
 [`SECURITY.md`](SECURITY.md) defines the private-reporting and data-boundary rules.
+Release operators must follow
+[`docs/runbooks/RELEASE_PROMOTION.md`](docs/runbooks/RELEASE_PROMOTION.md), including
+its no-go, clean-checkout, default-branch, tag-verification, and rollback steps.
 
 For reviewer-facing visuals, open the [TFL Gallery](05_outputs/tfl/TFL_Gallery.html). The [Shiny dashboard visual-QC record](06_qc_evidence/audit/DASHBOARD_VISUAL_QC.md) documents the data-bearing local acceptance capture; a bare clone safely opens the dashboard in disclosed data-free mode because patient-level inputs are not distributed.
 

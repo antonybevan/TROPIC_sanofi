@@ -69,7 +69,7 @@ Minimal machine evidence so a **bare clone** can recheck the controlled release 
 
 | Artifact | Role |
 |---|---|
-| `platform/pipeline_health.json` | Run identity (mode, full_dag, GREEN) |
+| `platform/pipeline_health.json` | Run identity and current truth (including RED/partial no-go evidence) |
 | `platform/reconciliation_status.json` | SAS↔R dataset recon |
 | `platform/results_reconciliation_status.json` | Results recon |
 | `platform/admiral_reconciliation_status.json` | Third engine |
@@ -80,6 +80,8 @@ Minimal machine evidence so a **bare clone** can recheck the controlled release 
 | `platform/release_candidate/release_candidate_status.json` | RC checklist |
 | `platform/simulation_operating_characteristics/simulation_oc_status.json` + checked CSV/trial sidecars | Data-free aggregate simulation OC authority plus clean-checkout parity views; no subject rows |
 | `platform/evidence/` | Frozen genuine ODA snapshot (byte-distinct proof) |
+| `platform/conformance/core_cache_manifest.json` | Non-content SHA-256 inventory for the retained/downloaded CORE cache |
+| `platform/conformance/CORE*_RUN_RECORD.md` | Aggregate CORE execution and limitation record; detailed issue JSON stays local |
 
 Everything else regenerable is **local only**.
 
@@ -106,7 +108,7 @@ Version **code, controlled documents, and sealed evidence**, not transient runti
 
 | Who | What they can do |
 |---|---|
-| **Any interviewer (bare clone)** | Read `m5/` + guides; run `scripts/verify_release.py`; run `python3 platform/cibuild.py --demo` |
+| **Any interviewer (bare clone)** | Read `m5/` + guides; run `scripts/verify_release.py`; after controlled bootstrap, run `python3 platform/cibuild.py --demo` |
 | **GitHub Actions** | Job `Path A seal verify (verify_release)` reruns `scripts/verify_release.py` on push/PR (no SAS/data) |
 | **You with SDTM + ODA/local SAS** | Full dual-language DAG; re-seal; refresh package |
 | **Nobody from public git alone** | Re-derive real MP patient-level ADaM without licensed source |
@@ -118,7 +120,7 @@ Details: [`00_governance/REPRODUCIBILITY.md`](../00_governance/REPRODUCIBILITY.m
 1. **Environment** pinned (`renv.lock`).  
 2. **Pipeline structure** declared (`study_manifest.yaml`).  
 3. **Code** complete for dual-language + package.  
-4. **Demo path** works without data.  
+4. **Demo path** works without data after the documented locked bootstrap.
 5. **Seal re-check** works without re-running ODA.  
 6. **Real path** documented when data/credentials exist.
 
@@ -127,6 +129,9 @@ It does **not** mean “every intermediate JSON is in GitHub.”
 ---
 
 ## 5. How to refresh the sealed surface (operators)
+
+This section is only the repository-surface rule. The required end-to-end
+operator sequence is [`runbooks/RELEASE_PROMOTION.md`](runbooks/RELEASE_PROMOTION.md).
 
 After a genuine full run you intend to show:
 

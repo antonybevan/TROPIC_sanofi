@@ -130,6 +130,7 @@ platform/validation_strategy/
 platform/release_candidate/
 platform/release_run_manifest/
 platform/conformance/*.json
+!platform/conformance/core_cache_manifest.json
 
 # Intermediate recon statuses (not the seal allowlist)
 platform/cbzp_bridge_status.json

@@ -16,21 +16,73 @@ TROPIC_INHERITED_CDISC_LIBRARY_API_KEY="${CDISC_LIBRARY_API_KEY-}"
 export -n TROPIC_INHERITED_CDISC_LIBRARY_API_KEY
 unset CDISC_LIBRARY_API_KEY
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-RUN="$ROOT/.core_run"; ENGINE="$RUN/engine"; VENV="$ROOT/.core_venv"; CACHE="$ENGINE/resources/cache"
-PY="$VENV/bin/python"; CORE="$ENGINE/core.py"
+RUN="$ROOT/.core_run"; ENGINE="$RUN/engine"; CACHE="$ENGINE/resources/cache"
+VENV=""; PY=""; CORE="$ENGINE/core.py"
 RULES_DIR="$ROOT/platform/conformance_rules/adam"
 CORE_VERSION="0.16.0"
 # Immutable commit for the v0.16.0 source tree used by the committed conformance evidence.
 CORE_COMMIT="c78b05cad21379adf52c8fad5fe1760b826d1ef3"
 cd "$ROOT"
 
+# Execute every dependency/source/cache control from a minimal environment.
+# This excludes inherited Python and dynamic-loader search state before any
+# process can prepare code that will later receive the Library credential.
+clean_env() {
+  /usr/bin/env -i \
+    "PATH=$PATH" \
+    "HOME=$HOME" \
+    "TMPDIR=${TMPDIR:-/tmp}" \
+    "LANG=${LANG:-C}" \
+    "LC_ALL=${LC_ALL-}" \
+    "TZ=${TZ-}" \
+    "HTTPS_PROXY=${HTTPS_PROXY-}" \
+    "https_proxy=${https_proxy-}" \
+    "HTTP_PROXY=${HTTP_PROXY-}" \
+    "http_proxy=${http_proxy-}" \
+    "NO_PROXY=${NO_PROXY-}" \
+    "no_proxy=${no_proxy-}" \
+    "REQUESTS_CA_BUNDLE=${REQUESTS_CA_BUNDLE-}" \
+    "CURL_CA_BUNDLE=${CURL_CA_BUNDLE-}" \
+    "PIP_CONFIG_FILE=/dev/null" \
+    "GIT_CONFIG_GLOBAL=/dev/null" \
+    "GIT_CONFIG_NOSYSTEM=1" \
+    "GIT_NO_REPLACE_OBJECTS=1" \
+    "GIT_OPTIONAL_LOCKS=0" \
+    "$@"
+}
+
+# The wrapper reads the key from stdin, so even its own process receives only
+# deterministic locale/path state. The wrapper then constructs a second,
+# literal allowlist for the credential-bearing CORE child; no inherited proxy,
+# custom CA, netrc, HOME, Python, or loader configuration crosses the boundary.
+credential_env() {
+  /usr/bin/env -i \
+    "PATH=/usr/bin:/bin" \
+    "LANG=C" \
+    "LC_ALL=C" \
+    "TZ=UTC" \
+    "$@"
+}
+
+# The Python environment is rebuilt from exact hash locks for every governed
+# run. Keep it in a randomized, owner-only directory and remove it on every
+# exit so prior sitecustomize/modules cannot persist into a credential-bearing
+# child.
+cleanup_core_venv() {
+  case "${VENV-}" in
+    "$RUN"/core-venv.*)
+      rm -rf -- "$VENV"
+      ;;
+  esac
+}
+trap cleanup_core_venv EXIT
+
 # Verify the exact custom-rule directory through no-follow file descriptors. RULES.lock is
 # sorted UTF-8 JSON using the schema tropic-core-custom-rule-lock/v1; every rule row contains a
 # directory-local YAML basename and its lowercase SHA-256 digest. No other directory entry is
 # accepted because CORE also interprets ungoverned .json/.yml/.yaml files as executable rules.
 verify_core_rules() {
-  env -u CDISC_LIBRARY_API_KEY -u TROPIC_INHERITED_CDISC_LIBRARY_API_KEY \
-    python3 -I -S - "$ROOT" <<'PY_CORE_RULE_LOCK'
+  clean_env python3 -I -S - "$ROOT" <<'PY_CORE_RULE_LOCK'
 import hashlib
 import json
 import os
@@ -185,22 +237,24 @@ PY_CORE_RULE_LOCK
 verify_core_rules
 mkdir -p "$RUN" "$ROOT/platform/conformance"
 chmod 700 "$RUN"
+test -d "$RUN" && test ! -L "$RUN" || {
+  echo "Refusing unsafe .core_run directory." >&2
+  exit 1
+}
+VENV="$(mktemp -d "$RUN/core-venv.XXXXXXXX")"
+chmod 700 "$VENV"
+PY="$VENV/bin/python"
 
 # 1. Install local CORE dependencies before loading the Library API credential. Explicitly
 # remove an inherited key from the installer environment as well, so package build/install hooks
 # never receive the credential even when the caller exported it before invoking this script.
-[ -d "$VENV" ] || env -u CDISC_LIBRARY_API_KEY \
-  -u TROPIC_INHERITED_CDISC_LIBRARY_API_KEY python3.12 -m venv "$VENV"
-env -u CDISC_LIBRARY_API_KEY -u TROPIC_INHERITED_CDISC_LIBRARY_API_KEY \
-  "$VENV/bin/python" -m pip install --quiet --require-hashes --only-binary=:all: \
+clean_env python3.12 -I -m venv "$VENV"
+clean_env "$PY" -I -m pip install --quiet --require-hashes --only-binary=:all: \
     --requirement "$ROOT/requirements-core-build.lock"
-env -u CDISC_LIBRARY_API_KEY -u TROPIC_INHERITED_CDISC_LIBRARY_API_KEY \
-  "$VENV/bin/python" -m pip install --quiet --require-hashes --no-build-isolation \
+clean_env "$PY" -I -m pip install --quiet --require-hashes --no-build-isolation \
     --requirement "$ROOT/requirements-core.txt"
-env -u CDISC_LIBRARY_API_KEY -u TROPIC_INHERITED_CDISC_LIBRARY_API_KEY \
-  "$VENV/bin/python" -m pip check
-test "$(env -u CDISC_LIBRARY_API_KEY -u TROPIC_INHERITED_CDISC_LIBRARY_API_KEY \
-  "$VENV/bin/python" -c \
+clean_env "$PY" -I -m pip check
+test "$(clean_env "$PY" -I -c \
   'import importlib.metadata as m; print(m.version("cdisc-rules-engine"))')" = "$CORE_VERSION" || {
   echo "Refusing unexpected CDISC CORE package version; expected $CORE_VERSION." >&2
   exit 1
@@ -208,34 +262,47 @@ test "$(env -u CDISC_LIBRARY_API_KEY -u TROPIC_INHERITED_CDISC_LIBRARY_API_KEY \
 
 # 2. CLI + bundled rule cache (repo clone at the matching tag)
 if [ ! -f "$CORE" ]; then
-  env -u CDISC_LIBRARY_API_KEY -u TROPIC_INHERITED_CDISC_LIBRARY_API_KEY \
-    git clone --depth 1 --branch "v$CORE_VERSION" https://github.com/cdisc-org/cdisc-rules-engine "$ENGINE"
+  clean_env git clone --depth 1 --branch "v$CORE_VERSION" \
+    https://github.com/cdisc-org/cdisc-rules-engine "$ENGINE"
 fi
-test "$(env -u CDISC_LIBRARY_API_KEY -u TROPIC_INHERITED_CDISC_LIBRARY_API_KEY \
-  git -C "$ENGINE" rev-parse HEAD)" = "$CORE_COMMIT" || {
+test "$(clean_env git -C "$ENGINE" rev-parse HEAD)" = "$CORE_COMMIT" || {
   echo "Refusing unverified CDISC CORE source tree; expected $CORE_COMMIT." >&2
   exit 1
 }
-# CORE 0.16.0 CLI gate: StandardTypes omits 'adamig' though the engine requires it. Patch it
-# (portable across BSD/GNU sed via Python). Resolved upstream (PR #1733 adamig; PR #1770 the other
-# ADaM products, merged 2026-06-22); this local patch is required only while the engine is pinned
-# to v0.16.0.
-STD_TYPES="$ENGINE/cdisc_rules_engine/enums/standard_types.py"
-grep -q 'ADAMIG = "adamig"' "$STD_TYPES" || "$VENV/bin/python" - "$STD_TYPES" <<'PYEOF'
-import sys
-p = sys.argv[1]; s = open(p).read()
-open(p, "w").write(s.replace('    ADAM = "adam"\n', '    ADAM = "adam"\n    ADAMIG = "adamig"\n', 1))
-PYEOF
+# Remove ignored bytecode and all other non-cache extras from the disposable
+# vendor checkout before the independent byte-for-byte verifier runs. -B on
+# every later CORE process prevents those files from being recreated.
+clean_env git -C "$ENGINE" clean -ffdx -e resources/cache/
+# Verify every executable CORE source file before any credential is loaded.
+# The verifier applies/accepts only the deterministic ADaM CLI compatibility
+# patch (upstream PRs #1733/#1770); cache drift is checked separately below.
+clean_env "$PY" -I -S "$ROOT/platform/verify_core_source.py" \
+    --engine "$ENGINE" --commit "$CORE_COMMIT"
 
-# 3. One-time library metadata cache (ADaM/SDTM standard + CT) via CDISC Library. Stream the
+# 3. Before any credential-bearing cache refresh, fail closed on a populated
+# local cache that differs from the committed authority. A genuinely missing or
+# empty cache is allowed only here for the first download; the post-refresh
+# check below is always strict.
+clean_env "$PY" "$ROOT/platform/verify_core_cache.py" \
+  --cache "$CACHE" \
+  --manifest "$ROOT/platform/conformance/core_cache_manifest.json" \
+  --allow-initial-empty-cache
+
+# One-time library metadata cache (ADaM/SDTM standard + CT) via CDISC Library. Stream the
 # captured inherited key to a credential-free parser; it no-follow-opens an optional exact-0600
 # .env and launches update-cache directly with the selected key only in that child's environment.
 printf '%s' "$TROPIC_INHERITED_CDISC_LIBRARY_API_KEY" | \
-  env -u CDISC_LIBRARY_API_KEY -u TROPIC_INHERITED_CDISC_LIBRARY_API_KEY \
-    python3 -I -S "$ROOT/platform/run_core_update_cache.py" \
+  credential_env "$PY" -I -S "$ROOT/platform/run_core_update_cache.py" \
       "$RUN/.env" "$PY" "$CORE" "$CACHE"
 unset CDISC_LIBRARY_API_KEY
 unset TROPIC_INHERITED_CDISC_LIBRARY_API_KEY
+
+# Fail closed again if the downloaded Library cache differs from the reviewed,
+# committed inventory. Cache refresh is a separate explicit maintainer action;
+# the ordinary run never rewrites its authority.
+clean_env "$PY" "$ROOT/platform/verify_core_cache.py" \
+  --cache "$CACHE" \
+  --manifest "$ROOT/platform/conformance/core_cache_manifest.json"
 
 # 4a. SDTM baseline: convert the PRISTINE 3.1.1 source sas7bdat -> v5 XPT, validate against CORE's
 #     published SDTMIG 3.2 rules. NOTE: source is SDTMIG 3.1.1; CORE's lowest rule set is 3.2 ->
@@ -244,8 +311,8 @@ rm -rf "$RUN/sdtm"; mkdir -p "$RUN/sdtm"   # clean dir: validate only these std 
 Rscript -e 'library(haven); d<-c("dm","ae","ex","ds","vs");
   for(x in d) write_xpt(read_sas(sprintf("01_source_data/real_sdtm/%s.sas7bdat",x)), sprintf(".core_run/sdtm/%s.xpt",x), name=toupper(x), version=5)'
 cp "$ROOT/03_metadata/define/define_sdtm.xml" "$RUN/sdtm/define.xml"
-"$PY" "$CORE" validate -s sdtmig -v 3.2 -d "$RUN/sdtm" -ft xpt -dxp "$RUN/sdtm/define.xml" -ca "$CACHE" \
-  -rt "$CACHE/../templates/report-template.xlsx" -ps 1 -of JSON \
+clean_env "$PY" -E -s -B "$CORE" validate -s sdtmig -v 3.2 -d "$RUN/sdtm" -ft xpt -dxp "$RUN/sdtm/define.xml" -ca "$CACHE" \
+  -rt "$ENGINE/resources/templates/report-template.xlsx" -ps 1 -of JSON \
   -o "$ROOT/platform/conformance/core_sdtm_report"
 
 # 4b. SDTM authoritative: uplift the pristine source to the SDTMIG 3.4 derived layer (the version the
@@ -255,8 +322,8 @@ Rscript "$ROOT/platform/uplift_sdtm_34.R"
 rm -rf "$RUN/sdtm34_std"; mkdir -p "$RUN/sdtm34_std"   # clean dir: same 5 std domains as the baseline (avoids large-supp deadlock)
 for x in dm ae ex ds vs; do cp "$RUN/sdtm34/$x.xpt" "$RUN/sdtm34_std/$x.xpt"; done
 cp "$ROOT/03_metadata/define/define_sdtm.xml" "$RUN/sdtm34_std/define.xml"
-"$PY" "$CORE" validate -s sdtmig -v 3.4 -d "$RUN/sdtm34_std" -ft xpt -dxp "$RUN/sdtm34_std/define.xml" -ca "$CACHE" \
-  -rt "$CACHE/../templates/report-template.xlsx" -ps 1 -of JSON \
+clean_env "$PY" -E -s -B "$CORE" validate -s sdtmig -v 3.4 -d "$RUN/sdtm34_std" -ft xpt -dxp "$RUN/sdtm34_std/define.xml" -ca "$CACHE" \
+  -rt "$ENGINE/resources/templates/report-template.xlsx" -ps 1 -of JSON \
   -o "$ROOT/platform/conformance/core_sdtm34_report"
 
 # 5. ADaM: recheck the governed rule files immediately before CORE reads them, then validate the
@@ -265,9 +332,9 @@ verify_core_rules
 rm -rf "$RUN/adam"; mkdir -p "$RUN/adam"; for f in "$ROOT"/04_analysis_datasets/adam/*_prod.xpt; do b=$(basename "$f" _prod.xpt); cp "$f" "$RUN/adam/$b.xpt"; done
 rm -f "$RUN/adam/clinsite.xpt"   # BIMO dataset, not ADaM
 cp "$ROOT/03_metadata/define/define.xml" "$RUN/adam/define.xml"
-"$PY" "$CORE" validate -s adamig -v 1.3 -d "$RUN/adam" -ft xpt -dxp "$RUN/adam/define.xml" \
+clean_env "$PY" -E -s -B "$CORE" validate -s adamig -v 1.3 -d "$RUN/adam" -ft xpt -dxp "$RUN/adam/define.xml" \
   -lr "$RULES_DIR" -ca "$CACHE" \
-  -rt "$CACHE/../templates/report-template.xlsx" -ps 1 -of JSON \
+  -rt "$ENGINE/resources/templates/report-template.xlsx" -ps 1 -of JSON \
   -o "$ROOT/platform/conformance/core_adam_report"
 
 echo "Done. Reports in platform/conformance/ (core_sdtm34_report.json [authoritative], core_sdtm_report.json [3.2 baseline], core_adam_report.json)."

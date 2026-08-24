@@ -75,7 +75,10 @@ Repository operating controls: [`../CONTRIBUTING.md`](../CONTRIBUTING.md) ·
 | [`../platform/package_ectd.py`](../platform/package_ectd.py) | Module 5 packager |
 | [`../scripts/verify_release.py`](../scripts/verify_release.py) | Seal re-check |
 | [`runbooks/ODA_GUIDE.md`](runbooks/ODA_GUIDE.md) | Real SAS / ODA operator path |
+| [`runbooks/ENVIRONMENT_BOOTSTRAP.md`](runbooks/ENVIRONMENT_BOOTSTRAP.md) | Hash-verified reviewer setup and Ubuntu CI replay |
+| [`runbooks/RELEASE_PROMOTION.md`](runbooks/RELEASE_PROMOTION.md) | Fail-closed promotion, tag verification, and rollback |
 | [`runbooks/OFFLINE_LAYER_RUNBOOK.md`](runbooks/OFFLINE_LAYER_RUNBOOK.md) | Dataset-JSON / ARS / USDM offline |
+| [`workstreams/decisions/PYTHON_RUNTIME_MIGRATION_2026-08-24.md`](workstreams/decisions/PYTHON_RUNTIME_MIGRATION_2026-08-24.md) | Controlled Python lifecycle and artifact-lock decision |
 
 ### B3 — Analysis programs & specs
 

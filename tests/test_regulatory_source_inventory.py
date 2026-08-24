@@ -45,6 +45,13 @@ def test_checked_in_inventory_is_structurally_valid_and_scoped() -> None:
     assert result["scope"]["intended_use"] == "interview and technical-review demonstration"
 
 
+def test_readme_reports_the_machine_checked_inventory_count() -> None:
+    result = evaluate_inventory(INVENTORY)
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    expected = f"{result['source_count']} FDA/ICH/CDISC/eCFR entries"
+    assert expected in readme
+
+
 def test_inventory_cli_passes_and_reports_all_status_buckets() -> None:
     command = [
         sys.executable,

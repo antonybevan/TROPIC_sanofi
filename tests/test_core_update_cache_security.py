@@ -6,6 +6,7 @@ import importlib.util
 import io
 import os
 import subprocess
+import sys
 from pathlib import Path
 from unittest.mock import patch
 
@@ -58,6 +59,9 @@ def test_wrapper_nofollow_loads_exact_0600_file_and_scopes_key_to_child(
     assert result == 0
     assert captured["command"] == [
         "/controlled/python",
+        "-E",
+        "-s",
+        "-B",
         "/controlled/core.py",
         "update-cache",
         "-c",
@@ -72,6 +76,91 @@ def test_wrapper_nofollow_loads_exact_0600_file_and_scopes_key_to_child(
     output = capsys.readouterr()
     assert "file-key-value" not in output.out + output.err
     assert "inherited-key-value" not in output.out + output.err
+
+
+def test_wrapper_uses_literal_allowlist_for_credential_child(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("CDISC_LIBRARY_API_KEY", raising=False)
+    monkeypatch.setenv("PYTHONPATH", str(tmp_path / "inject"))
+    monkeypatch.setenv("PYTHONHOME", str(tmp_path / "fake-home"))
+    monkeypatch.setenv("DYLD_INSERT_LIBRARIES", str(tmp_path / "inject.dylib"))
+    monkeypatch.setenv("LD_PRELOAD", str(tmp_path / "inject.so"))
+    monkeypatch.setenv("LD_AUDIT", str(tmp_path / "audit.so"))
+    monkeypatch.setenv("VIRTUAL_ENV", str(tmp_path / "old-venv"))
+    monkeypatch.setenv("HTTPS_PROXY", "https://127.0.0.1:4443")
+    monkeypatch.setenv("ALL_PROXY", "socks5://127.0.0.1:4444")
+    monkeypatch.setenv("REQUESTS_CA_BUNDLE", str(tmp_path / "attacker-ca.pem"))
+    monkeypatch.setenv("CURL_CA_BUNDLE", str(tmp_path / "attacker-ca.pem"))
+    monkeypatch.setenv("SSL_CERT_FILE", str(tmp_path / "attacker-ca.pem"))
+    monkeypatch.setenv("NETRC", str(tmp_path / "attacker-netrc"))
+    monkeypatch.setenv("HOME", str(tmp_path / "attacker-home"))
+    monkeypatch.setenv("TROPIC_UNRELATED_SENTINEL", "must-not-propagate")
+    captured = {}
+
+    def fake_run(command, **kwargs):
+        captured["command"] = command
+        captured["environment"] = kwargs["env"]
+        return subprocess.CompletedProcess(command, 0)
+
+    with patch.object(run_core_update_cache.subprocess, "run", side_effect=fake_run):
+        result = run_core_update_cache.main(
+            _arguments(tmp_path / "missing.env"),
+            stdin=io.BytesIO(b"fake-nonsecret-key"),
+        )
+
+    assert result == 0
+    assert captured["command"][1:4] == ["-E", "-s", "-B"]
+    environment = captured["environment"]
+    assert environment == {
+        "CDISC_LIBRARY_API_KEY": "fake-nonsecret-key",
+        "PATH": os.defpath,
+        "LANG": "C",
+        "LC_ALL": "C",
+        "TZ": "UTC",
+    }
+
+
+def test_inherited_pythonpath_cannot_execute_with_child_credential(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("CDISC_LIBRARY_API_KEY", raising=False)
+    injection_dir = tmp_path / "injection"
+    injection_dir.mkdir()
+    marker = tmp_path / "injected-code-ran"
+    (injection_dir / "rogue.py").write_text(
+        "import os\n"
+        "from pathlib import Path\n"
+        "Path(os.environ['TROPIC_TEST_MARKER']).write_text("
+        "str('CDISC_LIBRARY_API_KEY' in os.environ), encoding='utf-8')\n",
+        encoding="utf-8",
+    )
+    core = tmp_path / "fake_core.py"
+    core.write_text(
+        "try:\n"
+        "    import rogue  # noqa: F401\n"
+        "except ModuleNotFoundError:\n"
+        "    raise SystemExit(0)\n"
+        "raise SystemExit(9)\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("PYTHONPATH", str(injection_dir))
+    monkeypatch.setenv("TROPIC_TEST_MARKER", str(marker))
+
+    result = run_core_update_cache.main(
+        [
+            str(tmp_path / "missing.env"),
+            os.fsdecode(os.path.realpath(sys.executable)),
+            str(core),
+            str(tmp_path / "cache"),
+        ],
+        stdin=io.BytesIO(b"fake-nonsecret-key"),
+    )
+
+    assert result == 0
+    assert not marker.exists()
 
 
 def test_wrapper_preserves_inherited_key_when_env_file_is_absent(

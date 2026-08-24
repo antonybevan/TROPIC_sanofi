@@ -93,11 +93,14 @@ class TestReleaseSealHelpers(unittest.TestCase):
                     "sha256": verify_release.sha256(self.source),
                 }],
                 "pipeline_controls": [],
+                "review_surface": [],
             }
         }
         with patch.multiple(
             verify_release,
             FIXED_CONTROL_FILES=(),
+            FIXED_REVIEW_SURFACE_FILES=(),
+            REVIEW_SURFACE_GLOBS=(),
             PIPELINE_CONTROL_FILES=(),
             _tracked_governing_inventory=lambda: (set(), set()),
         ):
@@ -106,6 +109,8 @@ class TestReleaseSealHelpers(unittest.TestCase):
         with patch.multiple(
             verify_release,
             FIXED_CONTROL_FILES=(),
+            FIXED_REVIEW_SURFACE_FILES=(),
+            REVIEW_SURFACE_GLOBS=(),
             PIPELINE_CONTROL_FILES=(),
             _tracked_governing_inventory=lambda: (set(), set()),
         ):
@@ -127,6 +132,38 @@ class TestReleaseSealHelpers(unittest.TestCase):
         self.assertNotEqual(d_before, d_after)
         # recomputation is deterministic for an unchanged checkout
         self.assertEqual(d_after, verify_release.source_tree_sha256(manifest))
+
+    def test_source_tree_digest_binds_pipeline_only_control(self):
+        pipeline = verify_release.ROOT / ".python-version"
+        pipeline.write_text("3.12.13\n", encoding="utf-8")
+        manifest = {
+            "artifacts": {
+                "controls": [],
+                "programs": [],
+                "pipeline_controls": [{
+                    "path": ".python-version",
+                    "sha256": verify_release.sha256(pipeline),
+                }],
+            }
+        }
+        before = verify_release.source_tree_sha256(manifest)
+        self.assertEqual(
+            before,
+            build_release_run_manifest._source_tree_sha256(
+                [], [], manifest["artifacts"]["pipeline_controls"]
+            ),
+        )
+        pipeline.write_text("3.12.14\n", encoding="utf-8")
+        self.assertNotEqual(before, verify_release.source_tree_sha256(manifest))
+
+    def test_source_tree_digest_deduplicates_overlapping_inventory_rows(self):
+        row = {"path": "shared.py", "sha256": "d" * 64}
+        self.assertEqual(
+            build_release_run_manifest._source_tree_sha256([row]),
+            build_release_run_manifest._source_tree_sha256(
+                [row], [dict(row)], [dict(row)]
+            ),
+        )
 
     def test_artifact_hash_recheck_detects_present_drift(self):
         artifact = verify_release.ROOT / "05_outputs" / "table.csv"
@@ -195,7 +232,33 @@ class TestReleaseSealHelpers(unittest.TestCase):
         }
         with patch.object(verify_release, "_git_tracked", return_value=True):
             problems, _, _ = verify_release.sealed_artifact_problems(manifest)
-        self.assertIn("qc_files:tracked.csv: tracked artifact missing", problems)
+        self.assertIn("qc_files:tracked.csv: required artifact missing", problems)
+
+    def test_missing_review_surface_is_required_even_after_tracked_deletion(self):
+        manifest = {
+            "artifacts": {
+                "qc_files": [],
+                "tfl_outputs": [],
+                "package_files": [],
+                "additive_outputs": [],
+                "inputs": [],
+                "logs": [],
+                "review_surface": [{
+                    "path": "CHANGELOG.md",
+                    "present": True,
+                    "sha256": "c" * 64,
+                }],
+            },
+            "datasets": [],
+        }
+        with patch.object(verify_release, "_git_tracked", return_value=False):
+            problems, verified, skipped = verify_release.sealed_artifact_problems(
+                manifest
+            )
+        self.assertIn(
+            "review_surface:CHANGELOG.md: required artifact missing", problems
+        )
+        self.assertEqual((0, 0), (verified, skipped))
 
     def test_material_worktree_clean_ignores_release_seal_outputs(self):
         with patch.object(verify_release.subprocess, "check_output", return_value=""):
@@ -234,6 +297,22 @@ class TestReleaseSealHelpers(unittest.TestCase):
         )
         self.assertTrue(expected.issubset(verify_release.PIPELINE_CONTROL_FILES))
 
+    def test_runtime_and_repository_surface_policies_are_sealed(self):
+        pipeline = {".gitignore", ".python-version"}
+        fixed = {
+            "CONTRIBUTING.md",
+            "SECURITY.md",
+            "docs/runbooks/ENVIRONMENT_BOOTSTRAP.md",
+            "docs/runbooks/RELEASE_PROMOTION.md",
+            "docs/workstreams/decisions/PYTHON_RUNTIME_MIGRATION_2026-08-24.md",
+        }
+        self.assertTrue(
+            pipeline.issubset(build_release_run_manifest.PIPELINE_CONTROL_FILES)
+        )
+        self.assertTrue(pipeline.issubset(verify_release.PIPELINE_CONTROL_FILES))
+        self.assertTrue(fixed.issubset(build_release_run_manifest.CONTROL_FILES))
+        self.assertTrue(fixed.issubset(verify_release.FIXED_CONTROL_FILES))
+
     def test_adam_rules_lock_is_a_fresh_run_control(self):
         path = "platform/conformance_rules/adam/RULES.lock"
         self.assertIn(path, build_release_run_manifest.CONTROL_FILES)
@@ -241,6 +320,30 @@ class TestReleaseSealHelpers(unittest.TestCase):
         self.assertIn(path, build_release_run_manifest.PIPELINE_CONTROL_FILES)
         self.assertIn(path, verify_release.PIPELINE_CONTROL_FILES)
         self.assertFalse(is_resealable_path(path))
+
+    def test_core_cache_authority_is_bound_as_a_fresh_run_control(self):
+        fixed = "platform/conformance/core_cache_manifest.json"
+        records = {
+            "platform/conformance/CORE_RUN_RECORD.md",
+            "platform/conformance/CORE_SDTM34_RUN_RECORD.md",
+        }
+        pipeline = {
+            fixed,
+            "platform/run_core_conformance.sh",
+            "platform/run_core_update_cache.py",
+            "platform/verify_core_cache.py",
+            "platform/verify_core_source.py",
+        }
+        self.assertIn(fixed, build_release_run_manifest.CONTROL_FILES)
+        self.assertIn(fixed, verify_release.FIXED_CONTROL_FILES)
+        self.assertTrue(records.issubset(build_release_run_manifest.CONTROL_FILES))
+        self.assertTrue(records.issubset(verify_release.FIXED_CONTROL_FILES))
+        self.assertTrue(
+            pipeline.issubset(build_release_run_manifest.PIPELINE_CONTROL_FILES)
+        )
+        self.assertTrue(pipeline.issubset(verify_release.PIPELINE_CONTROL_FILES))
+        for path in pipeline:
+            self.assertFalse(is_resealable_path(path))
 
     def test_governance_policy_is_bound_as_pipeline_control(self):
         self.assertIn(
@@ -403,6 +506,14 @@ class TestReleaseSealHelpers(unittest.TestCase):
             set(verify_release.PIPELINE_CONTROL_FILES),
             set(build_release_run_manifest.PIPELINE_CONTROL_FILES),
         )
+        self.assertEqual(
+            set(verify_release.FIXED_REVIEW_SURFACE_FILES),
+            set(build_release_run_manifest.REVIEW_SURFACE_FILES),
+        )
+        self.assertEqual(
+            set(verify_release.REVIEW_SURFACE_GLOBS),
+            set(build_release_run_manifest.REVIEW_SURFACE_GLOBS),
+        )
 
     def test_missing_fixed_control_is_a_seal_failure(self):
         manifest = {
@@ -476,11 +587,14 @@ class TestReleaseSealHelpers(unittest.TestCase):
                 "controls": [],
                 "programs": program_rows,
                 "pipeline_controls": pipeline_rows,
+                "review_surface": [],
             }
         }
         with patch.multiple(
             verify_release,
             FIXED_CONTROL_FILES=(),
+            FIXED_REVIEW_SURFACE_FILES=(),
+            REVIEW_SURFACE_GLOBS=(),
             PIPELINE_CONTROL_FILES=(),
             PROGRAM_GLOBS=(),
         ):
@@ -500,6 +614,8 @@ class TestReleaseSealHelpers(unittest.TestCase):
         with patch.multiple(
             verify_release,
             FIXED_CONTROL_FILES=(),
+            FIXED_REVIEW_SURFACE_FILES=(),
+            REVIEW_SURFACE_GLOBS=(),
             PIPELINE_CONTROL_FILES=(),
             PROGRAM_GLOBS=(),
         ):
@@ -527,11 +643,14 @@ class TestReleaseSealHelpers(unittest.TestCase):
                 "controls": [],
                 "programs": [source_row, dict(source_row), extra_row],
                 "pipeline_controls": [extra_row, dict(extra_row)],
+                "review_surface": [],
             }
         }
         with patch.multiple(
             verify_release,
             FIXED_CONTROL_FILES=(),
+            FIXED_REVIEW_SURFACE_FILES=(),
+            REVIEW_SURFACE_GLOBS=(),
             PIPELINE_CONTROL_FILES=(),
             PROGRAM_GLOBS=("platform/*.py",),
             _tracked_governing_inventory=lambda: (set(), set()),
@@ -614,7 +733,7 @@ class TestReleaseSealHelpers(unittest.TestCase):
         real_open = build_release_run_manifest.os.open
         swapped = False
 
-        def swapping_open(path, flags, mode=0o777, *, dir_fd=None):
+        def swapping_open(path, flags, mode=0o600, *, dir_fd=None):
             nonlocal swapped
             if path == "victim.py" and dir_fd is not None and not swapped:
                 swapped = True
@@ -643,7 +762,7 @@ class TestReleaseSealHelpers(unittest.TestCase):
         real_open = build_release_run_manifest.os.open
         swapped = False
 
-        def swapping_open(path, flags, mode=0o777, *, dir_fd=None):
+        def swapping_open(path, flags, mode=0o600, *, dir_fd=None):
             nonlocal swapped
             if path == "sealed" and dir_fd is not None and not swapped:
                 swapped = True

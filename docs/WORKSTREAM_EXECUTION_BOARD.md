@@ -1,8 +1,8 @@
 # TROPIC Workstream Execution Board
 
 **Status:** Active operating board — not a decorative architecture map  
-**As of:** 2026-08-23 (professional-build cleanup)
-**Current candidate:** `v0.3.0-clinical-simulation` — **unreleased**; promotion is conditional on the release note, clean seal, and CI
+**As of:** 2026-08-24 (failed external-run evidence reconciled)
+**Current candidate:** `v0.3.0-clinical-simulation` — **unreleased / NO-GO**; live telemetry is RED, `sim`, and `partial_dag`
 **Latest tagged release:** `v0.2.2-portfolio` — immutable historical evidence, not the current candidate
 **Evidence authority:** stage count/status come from `platform/pipeline_health.json`; promotion grade comes from `platform/release_run_manifest/release_run_manifest.json`, the RC checklist, and `scripts/verify_release.py`
 **Current controls:** manifest defines 41 stages; complete test collection is enforced in CI; moving run/check counts are not duplicated on this board
@@ -18,19 +18,19 @@
 
 ## 0. Straight talk
 
-We proved the **machine can enforce truth** (full DAG, dual-language recon, admiral, seals).  
-That is **Release Engineering / platform** success.
+The machine currently enforces the uncomfortable truth: the latest ODA handshake
+failed, the fallback run is partial/simulated, and release promotion is blocked.
+Prior genuine full-DAG evidence proves the workflow has run before; it is not the
+current candidate state.
 
-We have **not** yet run this repository like a submission-style operating model where each function owns evidence, hands off through gates, and can be challenged in review.  
-If we only keep sealing the DAG, this becomes a strong solo portfolio — not a career-grade submission operating system.
-
-**This board is the correction.**  
-Every workstream below is how we operate next. Reviews are **team by team**, not “one more green JSON.”
+The workstream model is implemented. Reviews remain function-by-function, while
+release authority always comes from the current telemetry, manifest, checklist,
+and protected CI contexts—not from a manually copied GREEN narrative.
 
 | Layer | What is true today |
 |---|---|
-| Platform / DAG | Green — do not re-litigate without a regression |
-| Department evidence packs | Uneven — this board ranks the work |
+| Platform / DAG | **RED for current promotion** — latest run is partial/simulated; retry genuine SAS/ODA |
+| Department evidence packs | Implemented for the controlled scope; maintain and challenge residuals |
 | Submission-grade package | **Not claimed** — and must not be claimed until G00 product decision changes |
 
 ---
@@ -120,11 +120,11 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | Field | Content |
 |---|---|
 | **Owned artifacts** | SAS production + R validation programs · ADaM XPTs · BIMO clinsite · TFL suite · `config/tfl_output_catalog.yaml` · forest/results drivers · safety ADaM (ADAE/ADLB/ADEX) |
-| **Current status** | **GREEN for the controlled claim** — dual-lang recon PASS; TFL controlled catalog PASS; admiral T1 in DAG PASS; safety programming present |
+| **Current status** | **GREEN historical/program asset; RED current promotion** — controlled outputs and prior reconciliations exist, but the latest run did not complete genuine SAS/R or the downstream DAG |
 | **Open risks** | 18 deferred SAP TFL IDs; synthetic CbzP in TFLs; F-012 N=749 vs 755; manual SAS renderer remains diagnostic-only |
 | **Required evidence pack** | (1) Program inventory by domain · (2) Catalog in-scope vs deferred · (3) Recon status JSON · (4) Admiral status · (5) TFL index + hashes · (6) Safety table list (T-20/T-21) |
-| **Release gate** | G04/G05 — currently satisfied for controlled scope |
-| **Next action** | **Do not expand scope casually.** Programming workstream review: walk ADSL → ADTTE → ADAE → T-20 with catalog and recon evidence only |
+| **Release gate** | G04/G05 — not satisfied for the current candidate until a genuine full-DAG rerun refreshes same-run evidence |
+| **Next action** | Retry genuine SAS/ODA in the governed window, then walk ADSL → ADTTE → ADAE → T-20 with current-run catalog and reconciliation evidence |
 
 ---
 
@@ -134,7 +134,7 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | Field | Content |
 |---|---|
 | **Owned artifacts** | Risk-based validation plan · config/validation_strategy.yaml · recon (dataset/results/forest/admiral) · log cleanliness · findings register · disposition board · CORE local rules |
-| **Current status** | **GREEN for controlled-scope residual communication** — known-differences memo filed; machine gates PASS; Community aggregate evidence is reconciled; still AMBER for licensed validator and full CORE depth (owned with WS-3) |
+| **Current status** | **GREEN residual-risk framework; RED current qualification** — known differences and Community evidence remain filed, while current-run qualification and release verification fail closed |
 | **Open risks** | Single-author tracks; log coverage = persisted logs only; Community findings open; licensed Enterprise and qualified disposition approval external |
 | **Required evidence pack** | (1) Validation strategy control report · (2) Recon/admiral status · (3) Log cleanliness · (4) Findings + disposition · (5) **`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`** |
 | **Release gate** | G06 |
@@ -162,11 +162,11 @@ Every workstream below is how we operate next. Reviews are **team by team**, not
 | Field | Content |
 |---|---|
 | **Owned artifacts** | cibuild · study_manifest · renv.lock · delivery controls · evidence layers · release-run manifest · RC checklist · eCTD package/backbone · tag · CI |
-| **Current status** | **GREEN only when current machine evidence passes** — `scripts/verify_release.py` + `.sh`; legacy-named CI job `path-a-seal-verify` + full-suite step |
-| **Open risks** | Seal ≠ submission; EXAMPLE eCTD; CI does not re-run ODA (by design) |
+| **Current status** | **RED / NO-GO** — current telemetry is partial/simulated, the release verifier and qualification context are red, and the PR remains draft until external evidence is refreshed |
+| **Open risks** | ODA handshake unavailable; stale historical claims; seal ≠ submission; EXAMPLE eCTD; CI does not re-run ODA (by design) |
 | **Required evidence pack** | (1) pipeline_health · (2) release_run_manifest · (3) RC status · (4) tag · (5) release note · (6) CI `path-a-seal-verify` · (7) `scripts/verify_release.py` |
 | **Release gate** | G09 — PASS only for a clean, current, fully verified candidate |
-| **Next action** | Maintain seal allowlist; regenerate and visually check PDFs; watch CI on the candidate PR |
+| **Next action** | Reconcile live summaries to RED, keep the PR draft, retry ODA, then follow `docs/runbooks/RELEASE_PROMOTION.md` without bypassing a gate |
 
 ---
 
@@ -214,9 +214,9 @@ WS-7 Release ──G08/G09──► unreleased candidate (tag only after the con
 
 Not “another GREEN JSON.”
 
-**v0.2 workstream-operated demo package:**
+**v0.3 controlled-simulation candidate acceptance:**
 
-- Every WS row is GREEN or WAIVED with pack file on disk  
+- Every WS row is GREEN or WAIVED for the current run, with its pack on disk
 - Known-differences memo complete  
 - External validation index complete (RUN / NOT_AVAILABLE / residual)  
 - ADRG/SDRG/BDRG read as controlled guides  
@@ -229,17 +229,13 @@ Not “another GREEN JSON.”
 
 ---
 
-## 8. Immediate next command (continue operating)
+## 8. Immediate next operation
 
-**Done recently:** portfolio surface · Section 0 governance/SAP audit · Section 1 source/SDTM audit · WS-6 guides · CORE matrix · CI green · **D-012 CRF grounding audit**
+1. Keep the candidate PR draft and the live release surfaces RED/BLOCKED.
+2. Retry the genuine SAS/ODA full DAG in the empirically governed window.
+3. If it succeeds, regenerate package/seals, run clean-checkout verification, and
+   complete the protected PR/default-branch/tag sequence.
+4. If it fails, preserve the failure and stop; do not promote historical evidence.
 
-**Next (controlled audit sequence):**
-
-1. Audit Section 2 populations/endpoints/estimands against SAP, config, ADaM, and controlled TFLs.
-2. Audit Section 3 ADaM metadata, Define-XML, ARM, and traceability.
-3. Continue through TFLs, QC, writing, and package integrity before issuing a successor candidate release note.
-
-```bash
-python3 scripts/verify_release.py   # local
-# CI: job path-a-seal-verify + validate step "Path A release verification"
-```
+See [`runbooks/RELEASE_PROMOTION.md`](runbooks/RELEASE_PROMOTION.md) for the exact
+commands, no-go criteria, tag verification, and rollback behavior.

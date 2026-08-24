@@ -13,6 +13,15 @@ Authoritative CDISC CORE validation of the SDTMIG 3.4 uplifted SDTM (terminal se
 - Conformance_Details: {"Report_Generation": "2026-06-20T16:18:44", "Total_Runtime": "78.4 seconds", "CORE_Engine_Version": "0.16.0", "Issue_Limit_Per_Rule": "None", "Issue_Limit_Per_Dataset": "None", "Issue_Limit_Per_Sheet
 - Domains validated: DM, AE, EX, DS, VS (matches the prior 3.2 baseline set)
 - Report: `platform/conformance/core_sdtm34_report.json`
+- Retained-cache lock: `platform/conformance/core_cache_manifest.json` (214 files;
+  manifest SHA-256 `5212dbf1268010f085894247af331da87514ef6ba2c8ea95dd811f274e0cd897`).
+  Captured 2026-08-24 from the retained cache whose entries predate the final
+  2026-06-22 reports; this is post-run provenance, not a contemporaneous signature.
+- Future reruns additionally rebuild the hash-locked Python environment, clean generated
+  bytecode, verify every executable source byte/index entry against the pinned commit, apply only
+  the deterministic ADaM CLI compatibility patch through no-follow descriptors, and isolate the
+  credential wrapper/child from inherited Python, dynamic-loader, proxy, custom-CA, netrc, HOME,
+  and arbitrary caller state.
 
 ## Result: 20 distinct issues / 13010 occurrences
 

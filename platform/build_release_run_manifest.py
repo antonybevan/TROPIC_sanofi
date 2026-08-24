@@ -56,6 +56,8 @@ QC_FILES = {
 
 CONTROL_FILES = [
     "00_governance/REPRODUCIBILITY.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
     "config/study_manifest.yaml",
     "config/study_config.yaml",
     "config/tfl_output_catalog.yaml",
@@ -73,9 +75,15 @@ CONTROL_FILES = [
     "docs/QUALITY_SYSTEM_BOUNDARY.md",
     "docs/FDA_READINESS_RESEARCH_2026-08-15.md",
     "docs/SIMULATION_PRECISION_RESEARCH.md",
+    "docs/runbooks/ENVIRONMENT_BOOTSTRAP.md",
+    "docs/runbooks/RELEASE_PROMOTION.md",
+    "docs/workstreams/decisions/PYTHON_RUNTIME_MIGRATION_2026-08-24.md",
     "06_qc_evidence/conformance/p21_adam_runrecord.md",
     "06_qc_evidence/conformance/p21_adam_summary.json",
     "platform/conformance_rules/adam/RULES.lock",
+    "platform/conformance/core_cache_manifest.json",
+    "platform/conformance/CORE_RUN_RECORD.md",
+    "platform/conformance/CORE_SDTM34_RUN_RECORD.md",
     "03_metadata/adam/ADaM_spec.xlsx",
     "03_metadata/define/define.xml",
     "03_metadata/define/define_sdtm.xml",
@@ -105,10 +113,13 @@ CONTROL_FILES = [
     "05_outputs/tfl/tfl_stats.R",
 ]
 
-# Pipeline controls have their own digest. Tracked workflow definitions are
-# additionally included in the source/program inventory because changing or
-# adding executable CI authority requires a fresh genuine run.
+# Pipeline controls have their own integrity digest and are also part of the
+# genuine-run source-tree digest.  A runtime, dependency, cache-authority, or
+# release-control change therefore requires a fresh genuine run even when that
+# file is not otherwise included in the control/program inventories.
 PIPELINE_CONTROL_FILES = [
+    ".gitignore",
+    ".python-version",
     ".github/CODEOWNERS",
     ".github/dependabot.yml",
     ".github/workflows/ci.yml",
@@ -122,6 +133,11 @@ PIPELINE_CONTROL_FILES = [
     "requirements-ci.lock",
     "renv.lock",
     "platform/conformance_rules/adam/RULES.lock",
+    "platform/conformance/core_cache_manifest.json",
+    "platform/run_core_conformance.sh",
+    "platform/run_core_update_cache.py",
+    "platform/verify_core_cache.py",
+    "platform/verify_core_source.py",
     "platform/governance_reseal_policy.py",
     "scripts/rebind_governance_seal.py",
     "scripts/verify_release.py",
@@ -135,7 +151,10 @@ REVIEW_SURFACE_FILES = [
     "README.md",
     "08_submission_package/README.md",
     "docs/INDEX.md",
+    "docs/BIOMETRICS_DELIVERY_OPERATING_MODEL.md",
+    "docs/PIPELINE_ARCHITECTURE_REDESIGN.md",
     "docs/REPO_SURFACE_POLICY.md",
+    "docs/WORKSTREAM_EXECUTION_BOARD.md",
     "docs/INTERVIEWER_GUIDE.md",
     "docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md",
     "05_outputs/tfl/TFL_Gallery.html",
@@ -407,32 +426,41 @@ def _sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def _source_tree_sha256(controls: list, programs: list) -> str:
-    """Digest of sealed material source (controls + programs), seal-output-free.
+def _source_tree_sha256(*row_groups: list) -> str:
+    """Digest of all run-affecting sealed source, without seal outputs.
 
     Replaces HEAD-based staleness binding: committing the tracked seal advances
     HEAD past the recorded head, so a committed manifest can never satisfy a
     current_HEAD equality check (audit CRITICAL). The source-tree digest attests
-    to the exact source/config/program tree the seal was built from, is stable
-    across the seal commit (seal outputs are in neither group), and is
-    recomputable in a bare clone.
+    to the exact source/config/program/pipeline-control tree the seal was built
+    from, is stable across the seal commit (seal outputs are in no input group),
+    and is recomputable in a bare clone. Identical paths shared by inventories
+    are intentionally deduplicated.
     """
     rows = sorted(
-        (r["path"], r["sha256"]) for r in (controls + programs)
-        if r.get("sha256")
+        {
+            (row["path"], row["sha256"])
+            for group in row_groups
+            for row in group
+            if row.get("sha256")
+        }
     )
     return _sha256_bytes(b"\n".join(f"{p}\0{s}".encode("utf-8") for p, s in rows))
 
 
 def _current_source_tree_sha256() -> str:
-    """Recompute the run-binding digest from the current source/control tree."""
+    """Recompute the run binding from all current run-affecting controls."""
     controls = _hash_existing(CONTROL_FILES, required=True)
-    tracked_programs, _ = _tracked_governing_inventory()
+    tracked_programs, tracked_workflows = _tracked_governing_inventory()
     programs = _merge_hash_rows(
         _hash_globs(PROGRAM_GLOBS, exclude_paths=GENERATED_SOURCE_EXCLUDES),
         _hash_existing(tracked_programs, required=True),
     )
-    return _source_tree_sha256(controls, programs)
+    pipeline_controls = _merge_hash_rows(
+        _hash_existing(PIPELINE_CONTROL_FILES, required=True),
+        _hash_existing(tracked_workflows, required=True),
+    )
+    return _source_tree_sha256(controls, programs, pipeline_controls)
 
 
 def _hash_file(path: Path) -> dict:
@@ -1122,7 +1150,7 @@ def build_release_run_manifest(out_dir: Path = OUT_DIR) -> dict:
         "05_outputs/ars/**/*.json",
         "05_outputs/ars/**/*.ndjson",
     ])
-    review_surface = _hash_existing(REVIEW_SURFACE_FILES) + _hash_globs(
+    review_surface = _hash_existing(REVIEW_SURFACE_FILES, required=True) + _hash_globs(
         REVIEW_SURFACE_GLOBS
     )
     tracked_programs, tracked_workflows = _tracked_governing_inventory()
@@ -1141,7 +1169,9 @@ def build_release_run_manifest(out_dir: Path = OUT_DIR) -> dict:
     sas_companion_figures = _sas_companion_freshness(health)
 
     git_state = _git_state()
-    git_state["source_tree_sha256"] = _source_tree_sha256(controls, programs)
+    git_state["source_tree_sha256"] = _source_tree_sha256(
+        controls, programs, pipeline_controls
+    )
     git_state["pipeline_control_sha256"] = _source_tree_sha256(pipeline_controls, [])
 
     payload = {

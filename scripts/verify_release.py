@@ -44,6 +44,8 @@ ARTIFACT_GROUPS = (
 # builder.  The corresponding builder registry is tested for set equality.
 FIXED_CONTROL_FILES = (
     "00_governance/REPRODUCIBILITY.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
     "config/study_manifest.yaml",
     "config/study_config.yaml",
     "config/tfl_output_catalog.yaml",
@@ -61,9 +63,15 @@ FIXED_CONTROL_FILES = (
     "docs/QUALITY_SYSTEM_BOUNDARY.md",
     "docs/FDA_READINESS_RESEARCH_2026-08-15.md",
     "docs/SIMULATION_PRECISION_RESEARCH.md",
+    "docs/runbooks/ENVIRONMENT_BOOTSTRAP.md",
+    "docs/runbooks/RELEASE_PROMOTION.md",
+    "docs/workstreams/decisions/PYTHON_RUNTIME_MIGRATION_2026-08-24.md",
     "06_qc_evidence/conformance/p21_adam_runrecord.md",
     "06_qc_evidence/conformance/p21_adam_summary.json",
     "platform/conformance_rules/adam/RULES.lock",
+    "platform/conformance/core_cache_manifest.json",
+    "platform/conformance/CORE_RUN_RECORD.md",
+    "platform/conformance/CORE_SDTM34_RUN_RECORD.md",
     "03_metadata/adam/ADaM_spec.xlsx",
     "03_metadata/define/define.xml",
     "03_metadata/define/define_sdtm.xml",
@@ -94,6 +102,8 @@ FIXED_CONTROL_FILES = (
 )
 
 PIPELINE_CONTROL_FILES = (
+    ".gitignore",
+    ".python-version",
     ".github/CODEOWNERS",
     ".github/dependabot.yml",
     ".github/workflows/ci.yml",
@@ -107,9 +117,44 @@ PIPELINE_CONTROL_FILES = (
     "requirements-ci.lock",
     "renv.lock",
     "platform/conformance_rules/adam/RULES.lock",
+    "platform/conformance/core_cache_manifest.json",
+    "platform/run_core_conformance.sh",
+    "platform/run_core_update_cache.py",
+    "platform/verify_core_cache.py",
+    "platform/verify_core_source.py",
     "platform/governance_reseal_policy.py",
     "scripts/rebind_governance_seal.py",
     "scripts/verify_release.py",
+)
+
+# Independent expected inventory for the reviewer-facing artifact group.  This
+# prevents a compromised or accidentally edited manifest builder from silently
+# omitting an active claim, runbook, visual, or audit narrative.
+FIXED_REVIEW_SURFACE_FILES = (
+    "CHANGELOG.md",
+    "README.md",
+    "08_submission_package/README.md",
+    "docs/INDEX.md",
+    "docs/BIOMETRICS_DELIVERY_OPERATING_MODEL.md",
+    "docs/PIPELINE_ARCHITECTURE_REDESIGN.md",
+    "docs/REPO_SURFACE_POLICY.md",
+    "docs/WORKSTREAM_EXECUTION_BOARD.md",
+    "docs/INTERVIEWER_GUIDE.md",
+    "docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md",
+    "05_outputs/tfl/TFL_Gallery.html",
+    "06_qc_evidence/audit/DASHBOARD_VISUAL_QC.md",
+    "06_qc_evidence/audit/FIGURE_AUDIT_2026-08-23.md",
+    "06_qc_evidence/audit/PROFESSIONAL_RELEASE_AUDIT_2026-08-24.md",
+    "06_qc_evidence/audit/REPO_PROFESSIONAL_BUILD_AUDIT_2026-08-14.md",
+    "06_qc_evidence/audit/SIMULATION_PRECISION_IMPLEMENTATION_REPORT_2026-08-14.md",
+    "06_qc_evidence/audit/REPOSITORY_CLEANUP_AUDIT_2026-08-23.md",
+    "07_reviewer_explanation/simulation_model_analysis_plan.md",
+    "07_reviewer_explanation/simulation_report.md",
+    "platform/simulation_operating_characteristics/scenario_results.csv",
+    "platform/simulation_operating_characteristics/representative_trials.json",
+)
+REVIEW_SURFACE_GLOBS = (
+    "06_qc_evidence/audit/dashboard_evidence/*.[jJ][pP][gG]",
 )
 
 # Keep these derivation rules independent from the manifest builder.  A
@@ -390,6 +435,28 @@ def _static_program_inventory() -> set[str]:
     return paths
 
 
+def _static_review_surface_inventory() -> set[str]:
+    """Derive the exact local review-image inventory with stable no-follow opens."""
+    paths = set(FIXED_REVIEW_SURFACE_FILES)
+    for pattern in REVIEW_SURFACE_GLOBS:
+        for path in sorted(ROOT.glob(pattern)):
+            rel_path = path.relative_to(ROOT).as_posix()
+            if rel_path in paths:
+                continue
+            try:
+                leaf_lstat = path.lstat()
+            except FileNotFoundError as exc:
+                raise UnsafeReleaseFileError(
+                    f"review-surface entry changed during enumeration: {rel_path}"
+                ) from exc
+            if stat.S_ISDIR(leaf_lstat.st_mode):
+                continue
+            with _open_stable_regular(rel_path):
+                pass
+            paths.add(rel_path)
+    return paths
+
+
 def _inventory_membership_problems(
     group: str, rows: object, expected: set[str]
 ) -> list[str]:
@@ -485,6 +552,18 @@ def sealed_source_problems(manifest: dict) -> list[str]:
             "controls", controls, set(FIXED_CONTROL_FILES)
         )
     )
+    try:
+        expected_review_surface = _static_review_surface_inventory()
+    except (RuntimeError, OSError) as exc:
+        problems.append(f"review-surface inventory derivation failed: {exc}")
+    else:
+        problems.extend(
+            _inventory_membership_problems(
+                "review_surface",
+                artifacts.get("review_surface"),
+                expected_review_surface,
+            )
+        )
     try:
         tracked_programs, tracked_workflows = _tracked_governing_inventory()
         expected_programs = _static_program_inventory() | tracked_programs
@@ -591,8 +670,12 @@ def sealed_artifact_problems(manifest: dict) -> tuple[list[str], int, int]:
             try:
                 actual = sha256(path)
             except FileNotFoundError:
-                if _git_tracked(rel):
-                    problems.append(f"{group}:{rel}: tracked artifact missing")
+                # Reviewer/audit surfaces are committed release claims, not
+                # optional local data. A deletion removes a path from
+                # ``git ls-files`` at that revision, so relying on trackedness
+                # alone would let a phantom manifest row hide the missing file.
+                if group == "review_surface" or _git_tracked(rel):
+                    problems.append(f"{group}:{rel}: required artifact missing")
                 else:
                     skipped += 1
                 continue
@@ -655,7 +738,7 @@ def source_tree_sha256(manifest: dict) -> str:
     """
     rows = []
     artifacts = manifest.get("artifacts") or {}
-    for group in ("controls", "programs"):
+    for group in ("controls", "programs", "pipeline_controls"):
         for row in artifacts.get(group) or []:
             if not isinstance(row, dict):
                 continue
@@ -670,7 +753,12 @@ def source_tree_sha256(manifest: dict) -> str:
             if actual == expected:
                 rows.append((rel, expected))
     h = hashlib.sha256()
-    h.update(b"\n".join(f"{rel}\0{expected}".encode("utf-8") for rel, expected in sorted(rows)))
+    h.update(
+        b"\n".join(
+            f"{rel}\0{expected}".encode("utf-8")
+            for rel, expected in sorted(set(rows))
+        )
+    )
     return h.hexdigest()
 
 

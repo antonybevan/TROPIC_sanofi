@@ -1,4 +1,4 @@
-# Hash-locked Python 3.10 / Ubuntu x86_64 CI environment. Binary packages are
+# Hash-locked CPython 3.12.13 / Ubuntu x86_64 CI environment. Binary packages are
 # restricted to the exact wheels recorded in the lock; the two projects that do
 # not publish wheels are restricted to their exact, hashed source archives.
 --require-hashes

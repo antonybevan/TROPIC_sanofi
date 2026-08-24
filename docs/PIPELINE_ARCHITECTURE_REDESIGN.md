@@ -1,8 +1,8 @@
-# TROPIC Pipeline Architecture Redesign
+# TROPIC Pipeline Evidence Architecture
 
-> Status: proposed target operating model. This document is a controlled blueprint
-> for redesigning the repository around a submission-style evidence flow before any
-> physical file migration is attempted.
+> Status: implemented no-move evidence architecture; physical directory migration
+> remains explicitly deferred. This document records both the design rationale and
+> its implementation disposition.
 
 ## 1. Objective
 
@@ -13,7 +13,7 @@ The weakness is architectural readability. The numbered folders describe executi
 history more than they describe how a biometrics programming function thinks about
 evidence.
 
-The redesigned architecture should make this chain obvious:
+The implemented architecture makes this chain explicit:
 
 ```text
 source data

@@ -602,7 +602,7 @@ class TestPreflight(unittest.TestCase):
         self.assertNotEqual(captured["path"], cfg)
         self.assertFalse(os.path.exists(captured["path"]))
 
-    def test_insecure_mode_payload_is_never_executed(self):
+    def test_noncompliant_mode_payload_is_never_executed(self):
         with tempfile.TemporaryDirectory() as td:
             marker = os.path.join(td, "executed")
             cfg = os.path.join(td, "sascfg_personal.py")
@@ -611,7 +611,10 @@ class TestPreflight(unittest.TestCase):
                     f"open({marker!r}, 'w').write('executed')\n"
                     "oda = {'iomhost': 'odaws01-apse1.oda.sas.com', 'authkey': 'oda'}\n"
                 )
-            os.chmod(cfg, 0o644)
+            # Owner-read-only is deliberately not the broker's exact 0600
+            # credential contract, while avoiding any group/world exposure in
+            # this negative test fixture.
+            os.chmod(cfg, 0o400)
 
             self.assertEqual(B._read_oda_cfg(cfg), {})
             status = self._ready_preflight(cfg)

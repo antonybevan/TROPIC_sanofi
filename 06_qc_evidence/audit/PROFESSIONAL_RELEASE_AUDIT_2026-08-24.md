@@ -47,7 +47,7 @@ qualification, validator, and submission-operations evidence exists.
 | Release provenance | A shared fail-closed reseal policy requires an authenticated committed predecessor, immutable Git blobs, exact change inventory, clean worktree, and continuous chain. |
 | Release inventory | Git-tracked tests, workflows, and ADaM CORE rules are discovered independently and enter the source seal; duplicate, missing, extra, malformed, symlinked, or non-regular rows fail. |
 | Filesystem safety | Module 5/eCTD reads, copies, replaces, permissions, enumeration, and cleanup are descriptor-relative and no-follow, with stable identity checks and parent-swap rejection. |
-| Credentials | The personal ODA configuration and CDISC key file must be stable, bounded, current-UID regular files with exact restrictive mode before use; credentials are scoped only to the child that needs them. |
+| Credentials | The personal ODA configuration and CDISC key file must be stable, bounded, current-UID regular files with exact restrictive mode before use. The CDISC wrapper and key-bearing child use literal environment allowlists, so inherited Python, loader, proxy, custom-CA, netrc, HOME, and arbitrary caller state cannot accompany the key. |
 | Supply chain | CI and CORE Python runtime/build inputs are version-and-artifact-hash locked; build isolation is disabled; GitHub Actions are commit pinned; dependency review, CodeQL, and Gitleaks are CI controls. |
 | Numerical logic | Piecewise-hazard inversion boundaries, annual-probability conversion, log-rank direction, tied/not-reached KM medians, analytic null behavior, Wilson intervals, MCSE, replicate accounting, and invalid inputs have executable checks. |
 | Reviewer surfaces | The TFL gallery is self-contained and keyboard accessible; current audit, navigation, claim, simulation, and figure surfaces are release-hash bound. |
@@ -56,7 +56,7 @@ qualification, validator, and submission-operations evidence exists.
 
 | Check | Result |
 |---|---|
-| Focused security/math/repository tests | **99 passed** |
+| Focused CORE source/cache/credential regressions | **71 passed** |
 | ODA broker security and orchestration unit suite | **99 passed** |
 | R endpoint, lab-shift, figure, population, and dashboard contracts | **PASS** |
 | Figure contract | **13/13 PNGs passed** (7 R, 6 SAS; 2400 px wide, opaque) |
@@ -72,14 +72,31 @@ qualification, validator, and submission-operations evidence exists.
 | Regenerated simulation bundle and independent verifier | **PASS; 400,000/400,000 completed, 0 failed; qualification remains NOT_QUALIFIED** |
 | Draft eCTD materialization | **PASS; 99/99 leaves, 0 unexpected files** |
 | Generated PDF review | **PASS; 6 PDFs / 62 pages, all fonts embedded, no visual or bounds defect; 6/6 byte-identical on rebuild** |
-| Integrated Python collection after regeneration | **258 passed; 2 deliberate current-baseline failures while run status is RED** |
-| Clean-checkout functional replay | **257 passed, 1 data-dependent skip, 2 current-production qualification checks explicitly separated** |
-| Pull-request CI at `eabfd0a7` | **Functional/conformance PASS; CodeQL Python PASS; CodeQL Actions PASS; qualification/seal FAIL as designed; dependency review blocked by repository setting** |
+| Complete functional Python collection | **285 passed; 2 current-production qualification checks explicitly separated** |
+| Current-production qualification collection | **2 failed as designed while the genuine external run is RED/stale** |
+| Stacked pull-request CI before final professional-build push | **Functional/conformance PASS; CodeQL Python PASS; CodeQL Actions PASS; dependency review PASS after graph enablement; qualification/seal FAIL as designed** |
 
 The mathematical source change initially made the checked-in simulation/package
 hashes stale. Those mismatches were not waived: the 400,000-replicate bundle, reports,
 program copy, PDFs, and eCTD indexes were regenerated and independently reverified.
 That data-free work does not substitute for the missing genuine SAS run.
+
+## Security review and remediation evidence
+
+Three frozen working-tree security reviews found seven validated issues; every issue
+was reproduced with synthetic/temp fixtures before remediation and now has a focused
+regression:
+
+| Scan | Result and disposition |
+|---|---|
+| `6e422514-5a53-404e-8332-71629365101d` | Three release-integrity findings: phantom reviewer surface, pipeline-only controls outside the genuine-run binding, and a cache-lock symlink write. **Fixed.** |
+| `b0a96455-345f-45d6-a3ac-de4c574d31a4` | Three dependency-boundary findings: hidden tracked/bytecode drift, inherited Python execution state, and non-final-ancestor symlink traversal. **Fixed.** |
+| `4a95442d-3b42-42f3-8fec-9445594a11c4` | The original three paths were closed; one additional inherited proxy/custom-CA transport path remained. The wrapper and credential child now use literal environment allowlists. **Fixed and locally regression-tested.** |
+
+The final committed-head rescan is performed after the honest RED/BLOCKED release
+surfaces are regenerated. Advisory-intelligence lookup was unavailable because no TAC
+connector was installed/authenticated; this limitation did not replace source review,
+controlled reproductions, or the complete eight-file security inventory.
 
 ## Controlled execution evidence and blocker
 
@@ -117,14 +134,12 @@ demonstrated the intended separation of concerns. `Run Tests & Conformance Gates
 qualification job failed because the genuine SAS/ODA baseline is RED and stale; those
 failures must not be bypassed.
 
-`Dependency review (PR delta)` reached the pinned GitHub action with the correct
-read-only contents permission, but GitHub rejected it because the repository's
-Dependency graph is disabled. This is an administrative prerequisite, not a workflow
-or dependency defect. Enable **Settings -> Advanced Security -> Dependency graph**,
-wait for initial graph population, and rerun the failed job. Do not use `warn-only` or
-`continue-on-error` as a substitute. After the first successful run, add dependency
-review and the explicit qualification context to protected-branch required checks;
-CodeQL contexts should also be required for the professional release branch.
+The repository Dependency graph was enabled through **Settings -> Advanced Security**
+and GitHub confirmed the saved setting. The SPDX 2.3 SBOM endpoint then returned five
+packages and five relationships, and the pinned `Dependency review (PR delta)` rerun
+passed. No `warn-only` or `continue-on-error` bypass was introduced. Changing protected
+branch required contexts remains a repository-owner governance action and was not
+silently performed as part of this code change.
 
 ## Residual boundaries
 
@@ -140,5 +155,7 @@ CodeQL contexts should also be required for the professional release branch.
    rules in addition to its other checks.
 6. No Git/CI/ODA artifact is presented as an electronic signature, organizational
    validation, or Part 11 audit trail.
-7. Python 3.10 remains supported only through October 2026; a controlled runtime
-   migration must be qualified before that deadline.
+7. Python is a lifecycle-controlled dependency. The engineering and CI runtime is
+   migrated to CPython 3.12.13, whose upstream security support ends in October 2028;
+   the next genuine full-DAG run must refresh the release seal on that source/runtime
+   baseline.

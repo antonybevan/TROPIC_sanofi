@@ -10,12 +10,18 @@ Contributions should keep the review surface, evidence boundary, and release con
 - Read [`docs/PRODUCT_CLAIM.md`](docs/PRODUCT_CLAIM.md) and
   [`docs/REPO_SURFACE_POLICY.md`](docs/REPO_SURFACE_POLICY.md) before changing a controlled
   surface.
-- Run `python3 scripts/verify_release.py` and `python3 -m pytest -q` when the local prerequisites
-  are available. For R-facing changes, run the affected `Rscript` test files as well.
+- Run `python3 scripts/verify_release.py` and
+  `python3 -m pytest -q -m "not release_qualification" tests` when the local prerequisites are
+  available. The two `release_qualification` assertions require a current genuine full-DAG run
+  and are executed by their dedicated fail-closed CI job; do not deselect any other test. For
+  R-facing changes, run the affected `Rscript` test files as well.
 - Run `git diff --check`. Run the repository pre-commit hooks and the pinned gitleaks check when
   those tools are installed.
 - Explain any unavailable dependency, licensed input, SAS/ODA execution, or stale seal in the PR
   description. Do not weaken a gate to make a check green.
+- Bootstrap the supported reviewer or Ubuntu CI-replay environment from
+  [`docs/runbooks/ENVIRONMENT_BOOTSTRAP.md`](docs/runbooks/ENVIRONMENT_BOOTSTRAP.md);
+  do not treat an arbitrary local interpreter as lock-equivalent evidence.
 
 ## Change and review expectations
 
@@ -38,3 +44,5 @@ handoff, and open a draft PR when a required external run or owner decision is s
 Release promotion is allowed only after `scripts/verify_release.py`, the applicable data/QC gates,
 and the source/artifact hash seal agree. A demo, cached run, or data-free simulation is informative
 and must retain its explicit provenance label.
+Follow [`docs/runbooks/RELEASE_PROMOTION.md`](docs/runbooks/RELEASE_PROMOTION.md) for
+the complete clean-checkout, PR, default-branch, tag, no-go, and rollback sequence.

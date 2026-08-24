@@ -156,13 +156,19 @@ def _read_inherited_key(stream: BinaryIO) -> str | None:
 
 
 def _child_environment(key: str) -> dict[str, str]:
-    environment = {
-        name: os.environ[name]
-        for name in os.environ
-        if name not in {"CDISC_LIBRARY_API_KEY", "TROPIC_INHERITED_CDISC_LIBRARY_API_KEY"}
+    # This process transmits the key to the fixed CDISC Library HTTPS endpoint.
+    # Start from a literal allowlist: inherited proxy, custom-CA, netrc, home,
+    # Python, loader, and arbitrary application state must never share the
+    # credential-bearing process.  ``os.defpath`` is a deterministic fallback
+    # for any non-Python utility the pinned client may need; the interpreter and
+    # CORE script themselves are supplied as explicit absolute paths.
+    return {
+        "CDISC_LIBRARY_API_KEY": key,
+        "PATH": os.defpath,
+        "LANG": "C",
+        "LC_ALL": "C",
+        "TZ": "UTC",
     }
-    environment["CDISC_LIBRARY_API_KEY"] = key
-    return environment
 
 
 def main(argv: Sequence[str] | None = None, *, stdin: BinaryIO | None = None) -> int:
@@ -192,7 +198,11 @@ def main(argv: Sequence[str] | None = None, *, stdin: BinaryIO | None = None) ->
 
     try:
         result = subprocess.run(
-            [python, core, "update-cache", "-c", cache],
+            # -E ignores interpreter environment variables, -s excludes the
+            # user site, and -B prevents reusable bytecode in the verified
+            # checkout. The wrapper also removes equivalent environment and
+            # dynamic-loader injection state before adding the credential.
+            [python, "-E", "-s", "-B", core, "update-cache", "-c", cache],
             check=False,
             env=_child_environment(key),
             stdin=subprocess.DEVNULL,
