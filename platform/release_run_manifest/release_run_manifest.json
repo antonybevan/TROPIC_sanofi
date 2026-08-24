@@ -2588,11 +2588,11 @@
         "size_bytes": 484
       },
       {
-        "md5": "72ab1aa227928853d29422098d0b6a2f",
+        "md5": "6aa6ca059a8dac2749a0df0e6bb4f062",
         "path": ".github/workflows/ci.yml",
         "present": true,
-        "sha256": "3010076a8f3b2535cb197e6d4c9927c2b0d31045679bd1305c67f83a2f9e7e3c",
-        "size_bytes": 16330
+        "sha256": "f99d50aaae7283fc61fefd47ee09aaa29b6f36350adc2f4e4ebce1471e168b30",
+        "size_bytes": 16637
       },
       {
         "md5": "d267aa81e3d5b445455b0c8c329412d9",
@@ -2728,20 +2728,20 @@
         "size_bytes": 19979
       },
       {
-        "md5": "040500911ac1ea594bffecf05632d181",
+        "md5": "c0c6bff0a47bb9d1a2b4d5ceae93e8d7",
         "path": "scripts/verify_release.py",
         "present": true,
-        "sha256": "87a5b1299779dc0e9a473951ccde118ff7cc598ec1f18ee55b339cd133e8d0e0",
-        "size_bytes": 40103
+        "sha256": "acfc0143dc82ccac8252cca770f993f3512e3930c6cb9892f003dc502475d4e2",
+        "size_bytes": 40193
       }
     ],
     "programs": [
       {
-        "md5": "72ab1aa227928853d29422098d0b6a2f",
+        "md5": "6aa6ca059a8dac2749a0df0e6bb4f062",
         "path": ".github/workflows/ci.yml",
         "present": true,
-        "sha256": "3010076a8f3b2535cb197e6d4c9927c2b0d31045679bd1305c67f83a2f9e7e3c",
-        "size_bytes": 16330
+        "sha256": "f99d50aaae7283fc61fefd47ee09aaa29b6f36350adc2f4e4ebce1471e168b30",
+        "size_bytes": 16637
       },
       {
         "md5": "a0fdbde219c2fe94f74ebd43b74d7444",
@@ -3668,11 +3668,11 @@
         "size_bytes": 3479
       },
       {
-        "md5": "0ff5ce7930c035de1332bf312a021e32",
+        "md5": "38bedfc9c9dc4e7d262019edc7db72b7",
         "path": "tests/test_repository_hygiene.py",
         "present": true,
-        "sha256": "4eefa7c9fbed7981b59ef927e9d0c562bab17d22da34799ea481c1e603cb6d3b",
-        "size_bytes": 18910
+        "sha256": "e10f9918223d0959c64de8b94f5cc85829b43ebfa34df1d6ae31c73ddfe304f2",
+        "size_bytes": 19412
       },
       {
         "md5": "f51f4a5937992d33cf2167ea66a64d60",
@@ -4444,8 +4444,8 @@
     "sdtm_manifest_sha": null
   },
   "evidence_grade": "failed_binding",
-  "generated_at": "2026-08-24 18:16:18 UTC",
-  "manifest_sha256": "a462888cae6e822dbb44fa2f326f820ca214772167e2e7855a0e763dd255188e",
+  "generated_at": "2026-08-24 18:25:35 UTC",
+  "manifest_sha256": "15bc8151aa3d86b23efee519d2f8b9f2b11a9b69637629ef884ab2ab248aa3f0",
   "problems": [
     "pipeline_health.json source_tree_sha256 does not match the current control/program tree",
     "pipeline_health.json is not GREEN",
@@ -4717,9 +4717,9 @@
     "branch": "codex/repo-professional-build",
     "dirty": false,
     "dirty_including_seal_outputs": false,
-    "head": "2d97d34c365d52ca34b1568e974a0bbca6e977a9",
-    "pipeline_control_sha256": "0e254c8b9756fb6f854c1dbeaa1fd0c5cf2dddd1d3123446abaf0ba0b77204d0",
-    "source_tree_sha256": "70954e26243762413fc789b20c2f896a72d30c0ef6f22b65236412fdc5f3f155",
+    "head": "a074f2791a9a65a079a9474fb3f49c64d06c4cba",
+    "pipeline_control_sha256": "814f543fa1c35802ba5f4483a292440019f803e87e94fb4c6835c8126a2693d1",
+    "source_tree_sha256": "b7ddcd7157eff20eeb562df15cfb40884c1c32d79a91b3bfc1ef574c8500ce32",
     "staged_diff_paths": [],
     "status_porcelain": [],
     "status_porcelain_all": [],
