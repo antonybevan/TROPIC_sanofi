@@ -73,6 +73,8 @@ qualification, validator, and submission-operations evidence exists.
 | Draft eCTD materialization | **PASS; 99/99 leaves, 0 unexpected files** |
 | Generated PDF review | **PASS; 6 PDFs / 62 pages, all fonts embedded, no visual or bounds defect; 6/6 byte-identical on rebuild** |
 | Integrated Python collection after regeneration | **258 passed; 2 deliberate current-baseline failures while run status is RED** |
+| Clean-checkout functional replay | **257 passed, 1 data-dependent skip, 2 current-production qualification checks explicitly separated** |
+| Pull-request CI at `eabfd0a7` | **Functional/conformance PASS; CodeQL Python PASS; CodeQL Actions PASS; qualification/seal FAIL as designed; dependency review blocked by repository setting** |
 
 The mathematical source change initially made the checked-in simulation/package
 hashes stale. Those mismatches were not waived: the 400,000-replicate bundle, reports,
@@ -104,6 +106,25 @@ That data-free work does not substitute for the missing genuine SAS run.
 The correct disposition is **external blocker, retry required**. Skipping the SAS gate,
 using cached output, or rebinding the 2026-08-23 genuine run would contradict the
 current source identity and is prohibited by the new release policy.
+
+## Continuous-integration disposition
+
+The pull-request run at
+`https://github.com/antonybevan/TROPIC_sanofi/actions/runs/32716139620`
+demonstrated the intended separation of concerns. `Run Tests & Conformance Gates`,
+`CodeQL SAST (python)`, and `CodeQL SAST (actions)` passed. The independently required
+`Path A seal verify (verify_release)` and the explicit current-external-run
+qualification job failed because the genuine SAS/ODA baseline is RED and stale; those
+failures must not be bypassed.
+
+`Dependency review (PR delta)` reached the pinned GitHub action with the correct
+read-only contents permission, but GitHub rejected it because the repository's
+Dependency graph is disabled. This is an administrative prerequisite, not a workflow
+or dependency defect. Enable **Settings -> Advanced Security -> Dependency graph**,
+wait for initial graph population, and rerun the failed job. Do not use `warn-only` or
+`continue-on-error` as a substitute. After the first successful run, add dependency
+review and the explicit qualification context to protected-branch required checks;
+CodeQL contexts should also be required for the professional release branch.
 
 ## Residual boundaries
 
