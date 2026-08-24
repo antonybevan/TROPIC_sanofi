@@ -3945,11 +3945,11 @@
         "size_bytes": 10023
       },
       {
-        "md5": "0eb878411198a8b0f231e0a77b26a8b8",
+        "md5": "85cc5e5b7fae14e17ecc98d0fecdece0",
         "path": "06_qc_evidence/audit/PROFESSIONAL_RELEASE_AUDIT_2026-08-24.md",
         "present": true,
-        "sha256": "b7b3a131f403927d8371bf598a896e1f7fd66eb16847f60dc7257e5ad35935d5",
-        "size_bytes": 11070
+        "sha256": "6f9312b00f0c8bbb6e836fbf3cc5aa52b62cd8eaae75b7d57c89a2bbc54d7991",
+        "size_bytes": 11650
       },
       {
         "md5": "c4a35ad77732d877c0e7986df8bef21b",
@@ -4444,8 +4444,8 @@
     "sdtm_manifest_sha": null
   },
   "evidence_grade": "failed_binding",
-  "generated_at": "2026-08-24 18:25:35 UTC",
-  "manifest_sha256": "15bc8151aa3d86b23efee519d2f8b9f2b11a9b69637629ef884ab2ab248aa3f0",
+  "generated_at": "2026-08-24 18:28:15 UTC",
+  "manifest_sha256": "5cfe39b98f1a440fcb977e7b179e284157800eaa1280d3c80f584e2c4d8c6950",
   "problems": [
     "pipeline_health.json source_tree_sha256 does not match the current control/program tree",
     "pipeline_health.json is not GREEN",
@@ -4717,7 +4717,7 @@
     "branch": "codex/repo-professional-build",
     "dirty": false,
     "dirty_including_seal_outputs": false,
-    "head": "a074f2791a9a65a079a9474fb3f49c64d06c4cba",
+    "head": "149c30e87dc863299b7b4fda9e12e713c44cf872",
     "pipeline_control_sha256": "814f543fa1c35802ba5f4483a292440019f803e87e94fb4c6835c8126a2693d1",
     "source_tree_sha256": "b7ddcd7157eff20eeb562df15cfb40884c1c32d79a91b3bfc1ef574c8500ce32",
     "staged_diff_paths": [],
