@@ -173,6 +173,18 @@ def test_ci_python_dependencies_are_artifact_hash_locked() -> None:
     ) == 3
 
 
+def test_path_a_runs_verifier_regressions_after_expected_boundary_failure() -> None:
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    path_a = workflow[
+        workflow.index("path-a-seal-verify:") : workflow.index(
+            "qualification-boundary:"
+        )
+    ]
+    test_step = path_a[path_a.index("- name: Test release-seal verifier") :]
+    assert "if: ${{ !cancelled() }}" in test_step
+    assert "run: python3 tests/test_verify_release.py" in test_step
+
+
 def test_core_python_dependencies_are_artifact_hash_locked() -> None:
     entrypoint = (ROOT / "requirements-core.txt").read_text(encoding="utf-8")
     lock = (ROOT / "requirements-core.lock").read_text(encoding="utf-8")

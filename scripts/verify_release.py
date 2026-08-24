@@ -934,7 +934,10 @@ def main() -> int:
         rm.get("status") == "PASS" and current_binding_ok,
         str(rm.get("status"))
         if current_binding_ok
-        else "recorded PASS is stale because current seal checks failed",
+        else (
+            f"recorded_status={rm.get('status')}; "
+            "current seal checks failed"
+        ),
     )
     add(
         "release_manifest.grade",
@@ -948,7 +951,10 @@ def main() -> int:
         rc.get("status") == "PASS" and current_binding_ok,
         str(rc.get("status"))
         if current_binding_ok
-        else "recorded PASS is stale because current seal checks failed",
+        else (
+            f"recorded_status={rc.get('status')}; "
+            "current seal checks failed"
+        ),
     )
     add(
         "release_candidate.blockers_0",

@@ -94,6 +94,11 @@ jobs:
         bash scripts/verify_release.sh
 
     - name: Test release-seal verifier
+      # The current external boundary may correctly make the preceding gate red.
+      # Still execute the verifier regressions; this does not alter the job's
+      # failed conclusion and prevents an expected boundary failure from hiding
+      # an implementation regression.
+      if: ${{ !cancelled() }}
       run: python3 tests/test_verify_release.py
 
   qualification-boundary:
