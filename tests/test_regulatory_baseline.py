@@ -62,6 +62,7 @@ def _reseal_health(*, changed_paths: list[str]) -> dict:
     }
 
 
+@pytest.mark.release_qualification
 def test_current_regulatory_baseline_is_closed():
     result = evaluate(ROOT)
     assert result["status"] == "PASS", result["problems"]
@@ -325,6 +326,7 @@ def test_governance_reseal_chain_rejects_discontinuous_history():
     assert not ok
 
 
+@pytest.mark.release_qualification
 def test_current_baseline_requires_completed_exact_byte_rerun():
     result = evaluate(ROOT)
     timestamp_check = next(

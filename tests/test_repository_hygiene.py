@@ -147,11 +147,11 @@ def test_ci_python_dependencies_are_artifact_hash_locked() -> None:
     assert workflow.count(
         "pip install --require-hashes --only-binary=:all: "
         "--requirement requirements-ci-build.lock"
-    ) == 2
+    ) == 3
     assert workflow.count(
         "pip install --require-hashes --no-build-isolation "
         "--requirement requirements-ci.txt"
-    ) == 2
+    ) == 3
 
 
 def test_core_python_dependencies_are_artifact_hash_locked() -> None:
@@ -326,7 +326,36 @@ def test_traceability_matrix_has_exact_manifest_infrastructure_stage_numbers() -
 
 def test_ci_collects_the_complete_python_test_directory() -> None:
     workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
-    assert "python3 -m pytest -q tests\n" in workflow
+    assert 'python3 -m pytest -q -m "not release_qualification" tests\n' in workflow
+    assert "name: Regulatory qualification boundary (current external run)" in workflow
+    assert "python3 -m pytest -q -m release_qualification tests/test_regulatory_baseline.py" in workflow
+    assert workflow.index("qualification-boundary:") < workflow.index("validate:")
+    assert "name: Run Tests & Conformance Gates" in workflow
+    assert workflow.count("python3 scripts/verify_release.py") == 1
+    assert "Checkout clean seal copy" not in workflow
+    assert workflow.count("python3 platform/check_submission_readiness.py") == 1
+    assert workflow.count("python3 platform/check_regulatory_source_inventory.py") == 1
+    validate_block = workflow.split("  validate:\n", 1)[1].split(
+        "  ct-cross-validation:\n", 1
+    )[0]
+    assert "Regulatory readiness and source-inventory structural controls" in validate_block
+    assert "needs: qualification-boundary" not in validate_block
+    assert "check_regulatory_baseline.py" not in validate_block
+    assert "verify_release.py" not in validate_block
+    qualification_block = workflow.split("  qualification-boundary:\n", 1)[1].split(
+        "  validate:\n", 1
+    )[0]
+    assert "python3 -m pytest -q -m release_qualification" in qualification_block
+    assert "platform/check_regulatory_baseline.py --check-only" in qualification_block
+    assert "check_submission_readiness.py" not in qualification_block
+    assert "check_regulatory_source_inventory.py" not in qualification_block
+
+    baseline_tests = (ROOT / "tests/test_regulatory_baseline.py").read_text(
+        encoding="utf-8"
+    )
+    assert baseline_tests.count("@pytest.mark.release_qualification") == 2
+    pytest_config = (ROOT / "pytest.ini").read_text(encoding="utf-8")
+    assert "release_qualification:" in pytest_config
 
 
 def test_ci_security_controls_are_pinned_and_non_cancelling() -> None:
