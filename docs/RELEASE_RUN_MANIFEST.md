@@ -1,20 +1,20 @@
 # TROPIC Release-Run Manifest
 
-Generated: 2026-08-24 06:04:52 UTC
+Generated: 2026-08-24 18:16:18 UTC
 
 > Hash-sealed run manifest for current artifacts. This is not an electronic signature or Part 11 attestation.
 
 ## Verdict
 
-- Status: `PASS`
-- Evidence grade: `release_candidate`
-- Manifest SHA-256 seal: `ed9ff4a0b4a66ffba14e6c18e7f779a3182dd80140b407ce61d9ce858a336c7b`
-- SAS execution mode: `oda`
-- Pipeline health: `GREEN`
-- Run scope: `full_dag` (41 recorded / 40 release-required upstream stages)
-- Git HEAD: `29cca6ef4b56fdae2b4bbefa6b909ee970e84301`
+- Status: `FAIL`
+- Evidence grade: `failed_binding`
+- Manifest SHA-256 seal: `a462888cae6e822dbb44fa2f326f820ca214772167e2e7855a0e763dd255188e`
+- SAS execution mode: `sim`
+- Pipeline health: `RED`
+- Run scope: `partial_dag` (18 recorded / 40 release-required upstream stages)
+- Git HEAD: `2d97d34c365d52ca34b1568e974a0bbca6e977a9`
 - Worktree dirty: `False`
-- SAS companion figures: `in_dag_real_sas_companion`; current with health=`True`
+- SAS companion figures: `in_dag_real_sas_companion`; current with health=`False`
 
 ## Status meanings
 
@@ -24,7 +24,17 @@ Generated: 2026-08-24 06:04:52 UTC
 
 ## Problems
 
-No release-run binding problems detected.
+- pipeline_health.json source_tree_sha256 does not match the current control/program tree
+- pipeline_health.json is not GREEN
+- live run is not bound to a real SAS execution mode
+- pipeline provenance_guard did not pass
+- dataset reconciliation is not non-simulated PASS
+- F-042 pain-response SAS/R reconciliation is not PASS
+
+## Remediation reasons (block release-candidate PASS)
+
+- pipeline_health does not cover a full current DAG run (18 recorded in health / 40 release-required upstream stages; missing=22; not_run=0). Acceptable as targeted remediation evidence only.
+- stages missing from pipeline_health: Admiral ADSL Re-derivation, Admiral ADTTE Re-derivation (OS/PFS), Admiral Core Reconciliation, Synthetic Comparator Bridge Parity, Efficacy & Safety TFL Suite Compilation, Numerical Results Reconciliation (SAS vs R), Forest-HR Reconciliation (SAS vs R), Figure-Data Reconciliation (SAS vs R) (+14 more)
 
 ## Dataset Binding
 
@@ -43,8 +53,8 @@ No release-run binding problems detected.
 
 | Check | Status | Source |
 | --- | --- | --- |
-| pipeline_health | GREEN | platform/pipeline_health.json |
-| reconciliation | PASS | platform/reconciliation_status.json |
+| pipeline_health | RED | platform/pipeline_health.json |
+| reconciliation | FAIL | platform/reconciliation_status.json |
 | results_reconciliation | PASS | platform/results_reconciliation_status.json |
 | forest_reconciliation | PASS | platform/forest_reconciliation_status.json |
 | figure_data_reconciliation | PASS | platform/figure_data_reconciliation_status.json |
