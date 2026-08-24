@@ -240,6 +240,9 @@ def test_atomic_copy_rejects_in_place_source_change_before_promotion(
 def test_pdf_renderer_never_hands_final_package_path_to_third_party_writers() -> None:
     source = inspect.getsource(package.md_to_pdf)
     assert "TemporaryDirectory" in source
+    assert "dir=render_temp_parent" in source
+    assert "safe_chmod(render_temp_parent, 0o700, ROOT, directory=True)" in source
+    assert package.PDF_RENDER_ROOT == ROOT / "tmp" / "pdf-render"
     assert "safe_copy_file(" in source
     assert "os.replace(" not in source
     assert "cwd=temporary_root" in source

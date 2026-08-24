@@ -46,6 +46,8 @@ to avoid implying releases that did not exist.
 
 - Closed validated release-provenance and link-resolution defects found during
   the final production-grade security pass.
+- Made PDF/Ghostscript staging portable under the no-follow filesystem policy by
+  using a controlled repository-local temporary root on macOS.
 - Reconciled current official-source statuses and removed stale future-version
   wording from the regulatory inventory.
 

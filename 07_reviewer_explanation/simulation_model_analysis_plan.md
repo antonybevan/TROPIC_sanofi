@@ -15,8 +15,8 @@
 | Full run started after freeze | Yes |
 | Prospectively recorded deviations | None |
 | Governed protocol SHA-256 | 09798cd52adedd742a10f39266c67df0d9fe40b4c693912e4962b47601446b61 |
-| Authoritative result SHA-256 | 61a109fd903067a217c5df427908d3877a0bf54605af405f9226a31dab9fdbb3 |
-| Scientific output SHA-256 | 4e3b819118be9fc4e011a74d2a1f58d1a6526b9f31c25758f7ea7605b6d56cfb |
+| Authoritative result SHA-256 | 41331679871e04b98f543759d9da85a6d889b178f70662234926acd165e38078 |
+| Scientific output SHA-256 | 56494d49b134ece77fbada2b8c818a665124e12a2bb95d48a3163b0ccf43110b |
 
 The result hash above was added by this post-run report build for traceability only. It is not presented as a prospective MAP element; design assumptions, methods, criteria, scenario identities, and seeds are governed by the frozen protocol.
 
@@ -182,9 +182,9 @@ Artificial separated-time and zero-event cases are retained only as software ver
 
 | Component | Recorded identity |
 | --- | --- |
-| Python | 3.11.15 |
-| NumPy | 2.2.6 |
-| PyYAML | 6.0.3 |
+| Python | 3.12.13 |
+| NumPy | 1.26.4 |
+| PyYAML | 6.0.2 |
 | Floating-point dtype | float64 |
 | Random-number generator | numpy.random.PCG64 |
 | Dependency lock | requirements-ci.lock |
@@ -196,10 +196,10 @@ The environment above is a post-run traceability record, not a prospective desig
 | Artifact | Identity |
 | --- | --- |
 | Governed protocol | config/simulation_protocol.yaml — SHA-256 `09798cd52adedd742a10f39266c67df0d9fe40b4c693912e4962b47601446b61` |
-| Authoritative scientific results | platform/simulation_operating_characteristics/simulation_oc_status.json — SHA-256 `61a109fd903067a217c5df427908d3877a0bf54605af405f9226a31dab9fdbb3` |
+| Authoritative scientific results | platform/simulation_operating_characteristics/simulation_oc_status.json — SHA-256 `41331679871e04b98f543759d9da85a6d889b178f70662234926acd165e38078` |
 | Scenario registry | da115050f9d3fb69202b7154814c0eb204852efbe99f9b6107e548419f3f7768 |
-| Simulation code | 3f5de78d6b174def4a8b92e77d4cde7064f25477f4cb18be76a295cbe17cc3ac |
-| Scientific output | 4e3b819118be9fc4e011a74d2a1f58d1a6526b9f31c25758f7ea7605b6d56cfb |
+| Simulation code | a99d519af6b8b4117e89424ce209e53908efb9ae32680715ebc696c3e4ec891b |
+| Scientific output | 56494d49b134ece77fbada2b8c818a665124e12a2bb95d48a3163b0ccf43110b |
 
 Reproduce with `python3 platform/simulation_precision.py`, then run `python3 platform/build_simulation_report.py`. Identical governed inputs and seeds must reproduce identical scientific JSON and reports.
 

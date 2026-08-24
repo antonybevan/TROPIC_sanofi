@@ -2,11 +2,12 @@
 
 ## Decision
 
-The remediated candidate is **not yet promoted** in this source-control cut. The
-implementation and preflight audits are complete; promotion additionally requires a
-fresh genuine SAS/ODA 41-stage DAG, regenerated evidence, a clean release seal,
-clean-checkout replay, and green pull-request checks. Exact completion evidence is
-recorded in this document before the final seal is built.
+The remediated candidate is **not promoted** in this source-control cut. The
+implementation and preflight audits are complete, but the fresh genuine SAS/ODA run
+was blocked by a sustained external encryption-handshake failure. The pipeline
+recorded a partial RED run and rolled back clinical outputs. Promotion still requires
+a fresh genuine SAS/ODA 41-stage DAG, clean release seal, clean-checkout replay, and
+green pull-request checks.
 
 This is a professional engineering and clinical-programming demonstration. It is not
 an FDA submission, sponsor approval, medical approval, independent statistical QC,
@@ -68,18 +69,41 @@ qualification, validator, and submission-operations evidence exists.
 | Official-source inventory | **PASS; 50 entries** |
 | Submission-readiness profile | **BLOCKED as designed; 4 named blockers** |
 | Gitleaks v8.30.1, pinned archive checksum, full Git history | **322 commits scanned; no leaks found** |
+| Regenerated simulation bundle and independent verifier | **PASS; 400,000/400,000 completed, 0 failed; qualification remains NOT_QUALIFIED** |
+| Draft eCTD materialization | **PASS; 99/99 leaves, 0 unexpected files** |
+| Generated PDF review | **PASS; 6 PDFs / 62 pages, all fonts embedded, no visual or bounds defect; 6/6 byte-identical on rebuild** |
+| Integrated Python collection after regeneration | **258 passed; 2 deliberate current-baseline failures while run status is RED** |
 
-The preflight full Python collection intentionally reports stale simulation/package
-hashes after the mathematical source hardening. Those mismatches are not waived: the
-fresh full DAG must regenerate and independently reverify the evidence before this
-audit can record a final PASS.
+The mathematical source change initially made the checked-in simulation/package
+hashes stale. Those mismatches were not waived: the 400,000-replicate bundle, reports,
+program copy, PDFs, and eCTD indexes were regenerated and independently reverified.
+That data-free work does not substitute for the missing genuine SAS run.
 
-## Final controlled execution evidence
+## Controlled execution evidence and blocker
 
-Pending the fresh genuine SAS/ODA run and final release-seal build. This section is
-replaced with the exact run timestamp, SAS version, stage count, test counts,
-reconciliation tolerances, package result, seal result, clean-checkout result, commit,
-and pull-request checks before promotion.
+- Reviewed source/control commit: `dca97dd0c659bf1fab781c7f073ea1a7397ff884`.
+- Run terminal timestamp: `2026-08-24T09:50:24.291968+00:00`.
+- ODA preflight: **PASS**, including Java, SASPy, stable owner-only configuration,
+  auth-file presence/mode, and complete regional failover host configuration.
+- ODA connection result: **44 attempts across the 3,600-second budget; 0 live probe
+  successes**. Every SAS process terminated during the encryption-key exchange before
+  program upload or submit.
+- Regression diagnosis: a separate one-shot launch using the untouched original
+  `sascfg_personal.py` failed with the same exchange error. The verified private-copy
+  hardening did not cause the outage.
+- DAG result: stages 1-16 passed. Stage 17 truthfully labelled the exhausted path as a
+  simulated fallback; Stage 18 rejected the resulting `F042_PAIN_RESPONSE` mismatch.
+  Final state is **RED, partial_dag, 18/41 recorded, 23 not run**.
+- Rollback: **PASS** for controlled ADaM XPT, TFL-output, and sequence surfaces covered
+  by the run backup. No simulated result was accepted as double programming.
+- Release verifier: **24/43 checks passed; FAIL**. No new release manifest, candidate
+  checklist, governance reseal, tag, or promotion was created.
+- Recommended retry window from the existing successful-connect ledger:
+  **19:00-22:00 local**. This is an operational hint, not a service guarantee.
+
+The correct disposition is **external blocker, retry required**. Skipping the SAS gate,
+using cached output, or rebinding the 2026-08-23 genuine run would contradict the
+current source identity and is prohibited by the new release policy.
 
 ## Residual boundaries
 

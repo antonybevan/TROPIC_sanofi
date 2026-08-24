@@ -135,3 +135,20 @@ custom CORE rule set is independently hash locked. These source changes require 
 genuine-SAS full-DAG run, clean seal, clean-checkout verification, and green PR checks
 before promotion. They do not alter the non-submission, non-Part-11, non-FDA-approved
 product boundary.
+
+### 2026-08-24 controlled execution update
+
+The first fresh run against the reviewed source commit passed stages 1-16, then
+exhausted the one-hour ODA connection budget after 44 encryption-key-exchange
+terminations. An original-config diagnostic reproduced the failure, excluding the
+new verified-copy hardening as the cause. The orchestrator labelled its fallback as
+simulated, reconciliation rejected it, emitted RED `partial_dag` telemetry (18/41),
+and rolled controlled clinical outputs back. No current SAS seal was built.
+
+The work that does not depend on SAS was completed without weakening that blocker:
+the 400,000-replicate simulation bundle and independent verifier pass; the draft
+Module 5/eCTD tree validates 99/99 leaves; and all 62 pages across six generated PDFs
+pass visual, bounds, header/footer, outline, font-embedding, and Fast-Web-View checks.
+The package pass also found and fixed a macOS portability defect where the no-follow
+layer correctly rejected the default `/var` temporary-directory symlink; renderer
+scratch now stays under controlled ignored `tmp/pdf-render/` with mode `0700`.

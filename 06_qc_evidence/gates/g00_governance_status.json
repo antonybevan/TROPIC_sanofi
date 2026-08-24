@@ -2,7 +2,7 @@
   "gate": "G00",
   "name": "governance_scope_lock",
   "status": "PASS",
-  "generated_at": "2026-08-23T17:41:51Z",
+  "generated_at": "2026-08-24T08:49:11Z",
   "checks": [
     {
       "name": "exists:docs/PRODUCT_CLAIM.md",
@@ -82,7 +82,7 @@
     {
       "name": "findings.csv_schema",
       "ok": true,
-      "detail": "50 rows; exact 11-column schema"
+      "detail": "56 rows; exact 11-column schema"
     },
     {
       "name": "findings.unique_ids_and_required_fields",

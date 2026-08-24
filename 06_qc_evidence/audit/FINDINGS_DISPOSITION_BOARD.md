@@ -94,6 +94,7 @@
 |---|---|
 | **F-024** | **RESOLVED 2026-08-23** — current register has 23 classified rows, 0 confirmed cleanup findings, 0 unindexed XPTs, no false listing, and no stale NDJSON; the dead local archive was removed recoverably. |
 | **F-043** | **RESOLVED** — abort telemetry now binds the complete manifest stage map in serial and parallel failure paths; historical truncated-run evidence is retained and future failures must report `partial_dag` with `stages_not_run`. |
+| **F-057** | **RESOLVED 2026-08-24** — macOS maps its default temporary directory through `/var`, a symlink correctly rejected by the package no-follow boundary. PDF/Ghostscript staging now uses controlled ignored `tmp/pdf-render/` at mode `0700`; 19 focused filesystem tests and the 62-page render review pass. |
 
 ## Release-candidate implication
 

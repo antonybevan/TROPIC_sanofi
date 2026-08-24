@@ -37,6 +37,7 @@ from safe_filesystem import (
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_ROOT = ROOT / "08_submission_package"
 M5_ROOT = PACKAGE_ROOT / "m5"
+PDF_RENDER_ROOT = ROOT / "tmp" / "pdf-render"
 
 # Fixed submission-surface remediation date keeps the rendered reviewer guides
 # and CSR byte-reproducible while accurately post-dating their 2026-08-05 content.
@@ -393,7 +394,15 @@ def md_to_pdf(md_path, pdf_path, *, source_root, destination_root):
     # Render in a private directory, then promote the verified regular file with
     # the descriptor-relative destination primitive.  This keeps a racing swap
     # of a package ancestor from redirecting either renderer outside the package.
-    with tempfile.TemporaryDirectory(prefix="tropic-pdf-render-") as temporary:
+    # macOS exposes its default temporary directory through ``/var``, which is a
+    # symlink to ``/private/var``.  The release filesystem deliberately rejects
+    # symlinked ancestors, so keep renderer scratch space inside a controlled,
+    # ignored repository directory instead of weakening that invariant.
+    render_temp_parent = safe_makedirs(PDF_RENDER_ROOT, ROOT, mode=0o700)
+    safe_chmod(render_temp_parent, 0o700, ROOT, directory=True)
+    with tempfile.TemporaryDirectory(
+        prefix="tropic-pdf-render-", dir=render_temp_parent
+    ) as temporary:
         temporary_root = Path(temporary)
         raw_path = temporary_root / "document.raw.pdf"
         optimized_path = temporary_root / "document.optimized.pdf"
