@@ -23,6 +23,7 @@ import sys
 import json
 import glob
 import hashlib
+import re
 import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -35,10 +36,47 @@ SDTM_ODA = os.environ.get(
     os.environ.get("TROPIC_ODA_PROJ_ROOT", "~/TROPIC") + "/01_source_data/real_sdtm")
 MANIFEST_NAME = "_tropic_sdtm_manifest.json"
 
+_REMOTE_SEGMENT = re.compile(r"^[A-Za-z0-9._-]+$")
+_DATASET_FILE = re.compile(r"^[A-Za-z0-9._-]+\.sas7bdat$")
+
+
+def validate_remote_path(path):
+    """Validate and normalize a path that will be interpolated into SAS code.
+
+    ODA paths are supplied through environment variables and eventually become SAS string
+    literals.  Restricting them to a small POSIX-like grammar prevents quotes, statement
+    terminators, macro triggers, and traversal segments from crossing that boundary.  The
+    connected account's home directory is represented by a leading ``~`` and is expanded only
+    after this validation has passed.
+    """
+    if not isinstance(path, str) or not path.strip():
+        raise ValueError("ODA path must be a non-empty string")
+    value = path.strip()
+    if "\n" in value or "\r" in value or "\x00" in value:
+        raise ValueError("ODA path must not contain control characters")
+    if value == "~":
+        return value
+    if value.startswith("~/"):
+        body = value[2:]
+        prefix = "~/"
+    elif value.startswith("/"):
+        body = value[1:]
+        prefix = "/"
+    else:
+        raise ValueError("ODA path must be absolute or begin with '~/'")
+    if not body:
+        return prefix
+    segments = body.split("/")
+    if any(not segment or segment in {".", ".."} or not _REMOTE_SEGMENT.fullmatch(segment)
+           for segment in segments):
+        raise ValueError("ODA path contains an invalid, empty, or traversal segment")
+    return prefix + "/".join(segments)
+
 
 def _resolve_oda_home(sas, path):
     """Expand a leading '~' against the connected ODA account's $HOME so no per-user absolute
     path is committed. Returns path unchanged if already absolute or $HOME cannot be read."""
+    path = validate_remote_path(path)
     if "~" not in path:
         return path
     try:
@@ -47,10 +85,34 @@ def _resolve_oda_home(sas, path):
             if "TROPIC_ODA_HOME=" in line and "%put" not in line and "%sysget" not in line:
                 home = line.split("TROPIC_ODA_HOME=", 1)[1].strip()
                 if home:
-                    return path.replace("~", home, 1)
+                    return validate_remote_path(path.replace("~", home, 1))
+    except ValueError:
+        raise
     except Exception:
         pass
     return path
+
+
+def resolve_sdtm_remote_dir(sas, project_root):
+    """Bind SDTM verification to the same validated project root used by Stage 10.
+
+    A separately configured ``TROPIC_ODA_SDTM_DIR`` is accepted only when it resolves to the
+    canonical SDTM directory beneath ``TROPIC_ODA_PROJ_ROOT``.  This prevents a matching manifest
+    in a decoy directory from being mistaken for the library that SAS later reads.
+    """
+    project_root = validate_remote_path(project_root)
+    base = project_root.rstrip("/") or "/"
+    canonical = validate_remote_path(f"{base.rstrip('/')}/01_source_data/real_sdtm")
+    configured = os.environ.get("TROPIC_ODA_SDTM_DIR")
+    if configured is None:
+        return canonical
+    configured = _resolve_oda_home(sas, configured)
+    if configured != canonical:
+        raise ValueError(
+            "TROPIC_ODA_SDTM_DIR must resolve to the canonical project-root SDTM directory "
+            f"({canonical})"
+        )
+    return canonical
 
 
 def _ensure_remote_dir(sas, remote_dir):
@@ -58,6 +120,7 @@ def _ensure_remote_dir(sas, remote_dir):
     remote directory spins on CPU indefinitely instead of erroring — and the dir genuinely is
     absent on a fresh account / after an ODA home-region change. ODA blocks the shell (X / CALL
     SYSTEM), so we build the tree level-by-level with the DCREATE function. Returns True on done."""
+    remote_dir = validate_remote_path(remote_dir)
     segs = [s for s in remote_dir.split("/") if s]
     lines = ["options notes source;", "data _null_;"]
     parent = ""
@@ -100,7 +163,11 @@ def compute_local_manifest(sdtm_dir=SDTM_LOCAL):
     """{'datasets': {name: {sha256, nrows}}, 'manifest_sha': <sha over dataset hashes>}."""
     datasets = {}
     for p in sorted(glob.glob(os.path.join(sdtm_dir, "*.sas7bdat"))):
+        if os.path.islink(p) or not os.path.isfile(p):
+            raise ValueError(f"refusing non-regular SDTM input: {p}")
         name = os.path.basename(p)
+        if not _DATASET_FILE.fullmatch(name):
+            raise ValueError(f"invalid SDTM dataset filename: {name!r}")
         datasets[name] = {"sha256": _sha256(p), "nrows": _local_nrows(p)}
     return {"version": 1, "datasets": datasets, "manifest_sha": manifest_sha(datasets)}
 
@@ -142,6 +209,7 @@ def read_remote_manifest(sas, remote_dir=SDTM_ODA):
 
 def verify_resident(sas, sdtm_dir=SDTM_LOCAL, remote_dir=SDTM_ODA, local=None):
     """(ok, local_manifest_sha, reason). ok only if the ODA manifest matches the local source."""
+    remote_dir = validate_remote_path(remote_dir)
     local = local or compute_local_manifest(sdtm_dir)
     if not local["datasets"]:
         return False, local["manifest_sha"], "no local SDTM found"

@@ -2,6 +2,12 @@
 
 **Report date:** 2026-08-14
 
+> **Historical snapshot / supersession notice (2026-08-23):** Sections 8–9 record
+> the ODA outage and promotion state that existed on 2026-08-14. That technical
+> blocker was most recently reconfirmed closed by the genuine 41/41 ODA run on
+> 2026-08-23. The scientific qualification limits below remain in force; this
+> simulation is still informative and `NOT_QUALIFIED`.
+
 **Workstream:** data-free simulation methods evaluation
 
 **Decision:** computational evidence accepted; clinical/filing qualification not accepted
@@ -70,7 +76,7 @@ The resulting controls are:
 | Human MAP/MAR | `07_reviewer_explanation/simulation_model_analysis_plan.md`; `simulation_report.md` |
 | Submission PDFs | `08_submission_package/m5/53-clin-stud-rep/535-rep-effic-safety-stud/mcrpc/5351-stud-rep-contr/tropic/` |
 | Packaged executable sources | `08_submission_package/m5/datasets/tropic/analysis/adam/programs/` |
-| Orchestration | Stages 29–31 of the manifest-driven 40-stage DAG |
+| Orchestration | Stages 29–31 of the manifest-driven 41-stage DAG |
 
 The human reports are generated from the frozen YAML and authoritative JSON;
 result numbers are not manually transcribed. Program and protocol sources in
@@ -158,7 +164,7 @@ The pinned rerun reproduced all four bindings exactly. The JSON file hash is
 reported separately from the scientific-content hash so self-seal fields do not
 create a circular identity.
 
-## 8. Fresh-SAS execution limitation
+## 8. Historical fresh-SAS execution limitation — closed and reconfirmed 2026-08-23
 
 A fresh 40-stage `--real-sas` run passed stages 1–16 and then failed repeatedly
 while opening the SAS OnDemand session at stage 17. Nine orchestrated attempts
@@ -173,6 +179,12 @@ while this report and the draft pull request disclose that a new release seal
 must wait for ODA recovery and a clean full-DAG rerun. `--demo` smoke tests also
 passed, but are not represented as a full-DAG execution.
 
+ODA subsequently recovered. The latest clean genuine SAS 9.04.01M8 full pipeline
+completed 41/41 stages on 2026-08-23, including the three simulation stages,
+package rebuild, release binding, and the fail-closed metadata traceability/drift
+refresh. This closes only the technical execution blocker; it does not qualify the
+model for clinical or filing use.
+
 ## 9. Residual limitations and next promotion actions
 
 - The design uses public 377/378 randomized-count calibration, not the available
@@ -184,8 +196,34 @@ passed, but are not represented as a full-DAG execution.
 - No sponsor-approved MCID, power target, external model validation,
   independent organizational statistical/medical approval, regulator alignment,
   validated-system controls, or Part 11 controls exist.
-- Promotion requires ODA recovery, a clean fresh 40-stage real-SAS run, a new
-  hash seal, clean-checkout release verification, and green GitHub CI.
+- The 2026-08-14 promotion checklist required ODA recovery, a clean real-SAS run,
+  a new hash seal, clean-checkout verification, and green CI. The execution
+  prerequisite is reconfirmed by the 41-stage 2026-08-23 run; repository sealing
+  and CI are separate change-control evidence and do not alter qualification.
 
-Until those actions complete, the correct delivery state is **tested draft
-submission project; not promotion-ready**.
+At the report date the correct delivery state was **tested draft submission
+project; not promotion-ready**. The later technical closure does not remove the
+scientific, sponsor, independent-review, Enterprise, Part 11, or filing boundaries.
+
+## 10. 2026-08-24 mathematics and logic re-audit
+
+The survival and simulation mathematics were independently traced again from the
+protocol inputs through the engine, machine evidence, independent checker, and
+reviewer outputs. The log-rank statistic orientation, one-sided tail probability,
+null rejection rule, inverse-CDF event-time generation, piecewise-hazard integration
+and inversion, dropout handling, Monte Carlo accounting, MCSE, and Wilson interval
+calculations were consistent with their stated contracts. The independent checker
+continues to recompute decision and uncertainty fields without importing the engine.
+
+New boundary regressions exercise exact piecewise-hazard change points and
+hazard/inverse round trips; annual event probabilities of 0, 0.04, 0.25, 0.75, and
+0.999 through the annual-probability → monthly-hazard → probability transform; and
+Kaplan–Meier median behavior with tied events and with a not-reached median. These
+augment, rather than replace, the pinned 400,000-replicate evidence and malformed
+evidence-path tests.
+
+No new mathematical defect was identified. This conclusion is software and
+numerical verification for the declared model only: it is not model qualification,
+clinical validation, a sponsor-approved operating-characteristic target, or evidence
+of FDA acceptability. The current source-changing security/provenance remediations
+still require a fresh full run and seal before candidate promotion.

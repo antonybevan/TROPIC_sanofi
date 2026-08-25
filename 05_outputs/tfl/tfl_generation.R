@@ -296,6 +296,8 @@ render_km <- function(data, stats, x_max, title, subtitle_endpoint, y_lab, outfi
 
   active_trts <- c("CbzP", "MP")
   pal <- c("CbzP" = "#005A9C", "MP" = "#A6192E")
+  line_types <- c("CbzP" = 1, "MP" = 2)
+  censor_symbols <- c("CbzP" = 3, "MP" = 4)
 
   # Explicit journal-style page layout.  The KM body, disclosure, and risk table
   # are drawn in fixed regions so no risk-table label can push the curve panel
@@ -333,15 +335,18 @@ render_km <- function(data, stats, x_max, title, subtitle_endpoint, y_lab, outfi
   abline(h = y_ticks, col = "#e5e7eb", lwd = 0.8)
   for (trt in active_trts) {
     d <- plot_data[plot_data$TRT01P == trt, ]
-    lines(d$time, d$surv * 100, type = "s", lwd = 2.6, col = pal[trt])
+    lines(d$time, d$surv * 100, type = "s", lwd = 2.6,
+          lty = line_types[trt], col = pal[trt])
     cd <- censor_data[censor_data$TRT01P == trt, ]
-    if (nrow(cd)) points(cd$time, cd$surv * 100, pch = 3, cex = 0.65, lwd = 1.0,
+    if (nrow(cd)) points(cd$time, cd$surv * 100,
+                         pch = censor_symbols[trt], cex = 0.65, lwd = 1.0,
                          col = pal[trt])
   }
   legend("topright",
          title = "Treatment Group:",
          legend = c("CbzP (Synthetic)", "MP (Real)"),
-         col = pal[active_trts], lwd = 2.6, bty = "o", bg = "white", box.col = "white",
+         col = pal[active_trts], lwd = 2.6, lty = line_types[active_trts],
+         pch = censor_symbols[active_trts], bty = "o", bg = "white", box.col = "white",
          cex = 0.62, title.adj = 0)
   plot_plt <- par("plt")
   axis_left <- plot_fig[1] + plot_plt[1] * (plot_fig[2] - plot_fig[1])
@@ -416,26 +421,40 @@ er_data <- rdi_data |>
 
 er_plot <- ggplot(er_data, aes(x = RDI, y = ANC, color = TRT01P)) +
   # Styled points with white fill, transparency, and clinical palette borders
-  geom_point(alpha = 0.5, size = 2.0, shape = 21, stroke = 0.6, fill = "white", aes(color = TRT01P)) + # nolint
+  geom_point(aes(shape = TRT01P), alpha = 0.5, size = 2.0,
+             stroke = 0.6, fill = "white") +
   # Descriptive smoother only.  A pointwise LOESS ribbon is not shown because
   # the sparse low-RDI tail makes it explode and imply unsupported precision.
   # Formal exposure-response inference belongs in a pre-specified model/table.
-  geom_smooth(method = "loess", span = 1.0, se = FALSE, linewidth = 1.2,
-    aes(color = TRT01P)) + # nolint
+  geom_smooth(aes(linetype = TRT01P), method = "loess", span = 1.0,
+              se = FALSE, linewidth = 1.2) +
   scale_color_manual(values = c("CbzP" = "#005A9C", "MP" = "#A6192E"),
     labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")) + # nolint
+  scale_shape_manual(
+    values = c("CbzP" = 21, "MP" = 24),
+    labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")
+  ) +
+  scale_linetype_manual(
+    values = c("CbzP" = "solid", "MP" = "dashed"),
+    labels = c("CbzP" = "CbzP (Synthetic)", "MP" = "MP (Real)")
+  ) +
   labs(
     title = "F-17-1: Project Optimus Exposure-Response Analysis",
     subtitle = "Continuous ANC Nadir (Cycle 1) vs Relative Dose Intensity (RDI) by Arm\nDescriptive LOESS curves fitted on the log10 ANC scale", # nolint
     x = "Relative Dose Intensity (%)",
-    y = "ANC Nadir Value (x10^3/uL; log scale)",
+    y = "ANC Nadir Value (10³ cells/µL; log scale)",
     color = "Treatment Group:",
+    shape = "Treatment Group:",
+    linetype = "Treatment Group:",
     caption = synth_cap
   ) +
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "#e74c3c", linewidth = 0.8) + # nolint
-  annotate("text", x = 43, y = 0.72, label = "Grade 4 Neutropenia Limit (< 0.5 x 10^3/uL)", # nolint
+  annotate(
+    "text", x = 43, y = 0.72,
+    label = "Grade 4 neutropenia threshold\n(below 0.5 × 10³ cells/µL)",
     color = "#e74c3c", # nolint
-    size = 3.2, fontface = "bold", family = "serif", hjust = 0) +
+    size = 3.2, fontface = "bold", family = "serif", hjust = 0
+  ) +
   scale_y_log10(
     limits = c(0.05, 100),
     breaks = c(0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100),
@@ -472,6 +491,13 @@ os_sub_data <- adtte |>
 # Use the dual-arm subgroup data directly from ADaM
 
 # Helper to run subgroup Cox models of CbzP vs MP
+nonestimable_subgroup <- function(display_label, n_total) {
+  data.frame(
+    Subgroup = display_label, N = n_total,
+    HR = NA_real_, LCL = NA_real_, UCL = NA_real_
+  )
+}
+
 run_subgroup_cox <- function(factor_name, level_val, display_label) {
   df <- os_sub_data |>
     filter(get(factor_name) == level_val) |>
@@ -479,16 +505,24 @@ run_subgroup_cox <- function(factor_name, level_val, display_label) {
 
   n_total <- nrow(df)
 
-  if (n_total < 5) {
-    return(data.frame(Subgroup = display_label, N = n_total, HR = 1.0, LCL = 1.0, UCL = 1.0)) # nolint
+  if (n_total < 5 || length(unique(df$TREAT)) < 2 || sum(1 - df$CNSR) == 0) {
+    return(nonestimable_subgroup(display_label, n_total))
   }
 
-  fit <- coxph(Surv(AVAL, 1 - CNSR) ~ TREAT, data = df)
-  s <- summary(fit)
+  fit <- tryCatch(
+    coxph(Surv(AVAL, 1 - CNSR) ~ TREAT, data = df),
+    error = function(e) NULL
+  )
+  if (is.null(fit)) return(nonestimable_subgroup(display_label, n_total))
+  s <- suppressWarnings(summary(fit))
 
   hr <- s$conf.int[1]
   lcl <- s$conf.int[3]
   ucl <- s$conf.int[4]
+
+  if (!all(is.finite(c(hr, lcl, ucl))) || any(c(hr, lcl, ucl) <= 0)) {
+    return(nonestimable_subgroup(display_label, n_total))
+  }
 
   data.frame(
     Subgroup = display_label,
@@ -504,14 +538,14 @@ s_overall <- summary(fit_overall)
 
 subgroups <- rbind(
   data.frame(
-    Subgroup = "All Treated Patients",
+    Subgroup = "Intent-to-Treat Population",
     N = nrow(os_sub_data),
     HR = s_overall$conf.int[1],
     LCL = s_overall$conf.int[3],
     UCL = s_overall$conf.int[4]
   ),
   run_subgroup_cox("AGEGR1", "<65", "Age < 65"),
-  run_subgroup_cox("AGEGR1", ">=65", "Age >= 65"),
+  run_subgroup_cox("AGEGR1", ">=65", "Age 65 or older"),
   run_subgroup_cox("ECOGBLGRP", "0-1", "ECOG Performance Status 0-1"),
   run_subgroup_cox("ECOGBLGRP", "2", "ECOG Performance Status 2"),
   run_subgroup_cox("MEASDISF", "N", "Measurable Disease: No"),
@@ -525,6 +559,11 @@ subgroups <- rbind(
 )
 
 subgroups$Subgroup <- factor(subgroups$Subgroup, levels = rev(subgroups$Subgroup)) # nolint
+subgroups$HR_TEXT <- ifelse(
+  is.finite(subgroups$HR) & is.finite(subgroups$LCL) & is.finite(subgroups$UCL),
+  sprintf("%.2f (95%% CI: %.2f-%.2f)", subgroups$HR, subgroups$LCL, subgroups$UCL),
+  "NE"
+)
 
 # Setup background banding data
 bg_rects <- data.frame(
@@ -543,8 +582,11 @@ forest_left <- ggplot(subgroups) +
   scale_x_log10(limits = c(0.2, 4), breaks = c(0.2, 0.5, 1, 2, 4)) +
   labs(
     title = "F-12-1: Treatment Effect Subgroup Forest Plot for Overall Survival",
-    subtitle = "Unadjusted within-subgroup Cox hazard ratios (CbzP (Synthetic) vs MP (Real)) and 95% Wald CIs", # nolint
-    x = "Hazard Ratio (Favors CbzP (Synthetic) <- 1 -> Favors MP (Real); log scale)",
+    subtitle = paste0(
+      "Unadjusted within-subgroup Cox hazard ratios (CbzP (Synthetic) vs MP (Real)) and 95% Wald CIs.\n",
+      "No treatment-by-subgroup interaction tests; do not infer heterogeneity from within-level CIs."
+    ),
+    x = "Hazard Ratio (lower favors CbzP (Synthetic); higher favors MP (Real); log scale)",
     y = "",
     caption = synth_cap
   ) +
@@ -563,7 +605,7 @@ table_right <- ggplot(subgroups, aes(y = Subgroup)) +
     inherit.aes = FALSE) + # nolint
   geom_text(aes(x = 0, label = N),
     size = 3, fontface = "bold", color = "#333333", family = "serif") + # nolint
-  geom_text(aes(x = 1.4, label = sprintf("%.2f (95%% CI: %.2f-%.2f)", HR, LCL, UCL)), # nolint
+  geom_text(aes(x = 1.4, label = HR_TEXT),
     size = 3, fontface = "bold", color = "#333333", family = "serif") + # nolint
   # Text Headers
   annotate("text", x = 0, y = nrow(subgroups) + 0.8, label = "N",
@@ -1006,7 +1048,7 @@ render_km(
 cat("  [TFL] Rendering PSA Waterfall Plot...\n")
 
 # Best PSA % change from baseline per subject.  The controlled catalog places
-# this display under SAP v4.0 §5.2, so it uses the same baseline PSA >=20 ug/L
+# this display under SAP v4.0 §5.2, so it uses the same baseline PSA threshold
 # eligibility as the PSA response endpoint.
 psa_response_eligible <- adsl |>
   filter(!is.na(PSABL), PSABL >= 20) |>
@@ -1027,7 +1069,7 @@ psa_lb <- psa_lb |>
     subj_rank = row_number(),
     TRT_LABEL = if_else(TRT01P == "CbzP", "CbzP (Synthetic)", "MP (Real)"),
     response_color = case_when(
-      best_pchg <= -50 ~ "PSA Response (>=50% decrease)",
+      best_pchg <= -50 ~ "PSA Response (at least 50% decrease)",
       best_pchg < 0 ~ "PSA Decrease (<50%)",
       TRUE ~ "PSA Increase"
     )
@@ -1043,11 +1085,11 @@ waterfall_plot <- ggplot(psa_lb, aes(
   ) +
   geom_hline(yintercept = 0, color = "#333333", linewidth = 0.4) +
   scale_fill_manual(values = c(
-    "PSA Response (>=50% decrease)" = "#005A9C",
+    "PSA Response (at least 50% decrease)" = "#005A9C",
     "PSA Decrease (<50%)"           = "#7fb3d3",
     "PSA Increase"                  = "#A6192E"
   ), breaks = c(
-    "PSA Response (>=50% decrease)",
+    "PSA Response (at least 50% decrease)",
     "PSA Decrease (<50%)",
     "PSA Increase"
   )) +
@@ -1058,10 +1100,13 @@ waterfall_plot <- ggplot(psa_lb, aes(
   ) +
   facet_wrap(~TRT_LABEL, scales = "free_x", ncol = 2) +
   labs(
-    title = "F-13-1: PSA Best Percentage Change from Baseline - Waterfall Plot (Baseline PSA >=20 ug/L)",
+    title = paste0(
+      "F-13-1: PSA Best Percentage Change from Baseline - Waterfall Plot ",
+      "(Baseline PSA 20 micrograms/L or higher)"
+    ),
     subtitle = paste0(
       "Each bar represents one subject's maximum PSA decrease (or increase), sorted within arm.\n",
-      "Population: baseline PSA >=20 ug/L; dashed line denotes the 50% decrease response threshold."
+      "Population: baseline PSA 20 micrograms/L or higher; dashed line denotes the 50% decrease response threshold."
     ),
     x = "Subjects (ranked by PSA response within arm)",
     y = "Best PSA % Change from Baseline",
@@ -1374,6 +1419,7 @@ n_total <- nrow(adsl)
 n_demo <- nrow(adsl |> filter(ITTFL == "Y"))
 saf <- adsl |> filter(SAFFL == "Y")
 n_safety <- nrow(saf)
+n_not_safety <- n_demo - n_safety
 n_deaths <- nrow(saf |> filter(DTHFL == "Y"))
 n_cbzp_safety <- nrow(saf |> filter(TRT01P == "CbzP"))
 n_mp_safety <- nrow(saf |> filter(TRT01P == "MP"))
@@ -1406,10 +1452,15 @@ consort <- ggplot() +
   annotate("text",
     x = 0.5, y = 0.735,
     label = sprintf(
-      "Demonstration Analysis Cohort: N = %d\nSafety Population: N = %d (100%%)",
-      n_demo, n_safety
+      paste0(
+        "Demonstration ITT Population: N = %d\n",
+        "Safety Population: N = %d (%.1f%% of ITT)\n",
+        "Not in Safety Population: N = %d (%.1f%% of ITT)"
+      ),
+      n_demo, n_safety, 100 * n_safety / n_demo,
+      n_not_safety, 100 * n_not_safety / n_demo
     ),
-    size = 3.2, fontface = "bold", color = "#065f46", family = "serif"
+    size = 2.8, fontface = "bold", color = "#065f46", family = "serif"
   ) +
   # Arrow down to branches
   annotate("segment",
@@ -1431,8 +1482,8 @@ consort <- ggplot() +
   ) +
   annotate("text",
     x = 0.25, y = 0.532,
-    label = sprintf("CbzP Safety Arm (Synthetic)\nn = %d; deaths = %d (%d%%)",
-                    n_cbzp_safety, n_cbzp_deaths,
+    label = sprintf("CbzP Safety Arm (Synthetic)\nn = %d; deaths = %d/%d (%d%%)",
+                    n_cbzp_safety, n_cbzp_deaths, n_cbzp_safety,
                     round(100 * n_cbzp_deaths / n_cbzp_safety)),
     size = 3, color = "#15803d", family = "serif"
   ) +
@@ -1450,8 +1501,8 @@ consort <- ggplot() +
   ) +
   annotate("text",
     x = 0.75, y = 0.532,
-    label = sprintf("MP Safety Arm (Real)\nn = %d; deaths = %d (%d%%)",
-                    n_mp_safety, n_mp_deaths,
+    label = sprintf("MP Safety Arm (Real)\nn = %d; deaths = %d/%d (%d%%)",
+                    n_mp_safety, n_mp_deaths, n_mp_safety,
                     round(100 * n_mp_deaths / n_mp_safety)),
     size = 3, color = "#b91c1c", family = "serif"
   ) +
@@ -1474,7 +1525,7 @@ consort <- ggplot() +
   annotate("text",
     x = 0.5, y = 0.372,
     label = sprintf(
-      "Deaths during study\nN = %d (%d%%)", n_deaths,
+      "Deaths during study\nN = %d/%d (%d%%)", n_deaths, n_safety,
       round(100 * n_deaths / n_safety)
     ),
     size = 3.2, fontface = "bold", color = "#854d0e", family = "serif"
@@ -1492,7 +1543,10 @@ consort <- ggplot() +
     x = 0.5, y = 0.24,
     label = paste0(
       "Source: ADSL (N=", n_total, "). \n",
-      "All percentages are relative to Safety Population.\n",
+      paste0(
+        "Safety/non-safety percentages use the ITT denominator; death percentages use ",
+        "the corresponding total or arm-specific Safety Population.\n"
+      ),
       paste0(
         "SYNTHETIC illustrative Cabazitaxel (CbzP) arm integrated ",
         "alongside the REAL Mitoxantrone (MP) arm; \n",

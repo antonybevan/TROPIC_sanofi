@@ -12,6 +12,7 @@ on a missing/malformed manifest should catch ManifestError and fall back to thei
 legacy hardcoded list (see cibuild.py).
 """
 import os
+import re
 
 try:
     import yaml
@@ -19,6 +20,7 @@ except ImportError:  # surfaced as ManifestError at load time, not import time
     yaml = None
 
 DEFAULT_MANIFEST_NAME = "config/study_manifest.yaml"
+_DATASET_NAME = re.compile(r"^[A-Za-z][A-Za-z0-9_-]{0,31}$")
 
 
 class ManifestError(Exception):
@@ -56,7 +58,15 @@ def load_manifest(path=None, study=None, root="."):
 
 def dataset_names(manifest):
     """Ordered list of reconciled dataset member names (e.g. adsl, ..., clinsite)."""
-    return [d["name"] for d in manifest["datasets"]]
+    names = []
+    for dataset in manifest["datasets"]:
+        name = dataset.get("name") if isinstance(dataset, dict) else None
+        if not isinstance(name, str) or not _DATASET_NAME.fullmatch(name):
+            raise ManifestError(f"invalid dataset name in study manifest: {name!r}")
+        names.append(name)
+    if len(names) != len(set(names)):
+        raise ManifestError("duplicate dataset name in study manifest")
+    return names
 
 
 def business_keys(manifest):

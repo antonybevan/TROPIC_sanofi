@@ -1,7 +1,7 @@
 # TROPIC Clinical Programming Pipeline — End-to-End Audit
 
 **Audit date:** 25 June 2026
-**Repository:** `/Users/apple/Desktop/TROPIC`
+**Repository:** TROPIC workspace (machine-local path intentionally omitted)
 **Auditor role:** independent clinical data programming audit
 **Evidence commit at audit start:** `90d7403` (`style(ci): satisfy zero-warning R lint gate`)
 **Scope:** FDA-oriented eCTD sequence plus SDTM, ADaM, Define-XML, ARM, CT, Dataset-JSON, ARS, USDM, SAS/R production and QC, TLFs, documentation, logs, CI, and runtime/vendor material.
@@ -58,7 +58,11 @@ The frozen pre-audit snapshot excludes only the repository's administrative root
 
 Every entry was opened and read in full for SHA-256, size and signature classification. Clinical source/text was decoded and statically inspected. The 33-page SAP was structurally read and rendered page-by-page; all 13 unique TFL figures were visually inspected. All 15 PDFs were hashed, duplicate-grouped and fully text-extracted; the 525-page CRF and 108-page protocol were sampled visually after full extraction. The 10-sheet ADaM workbook was read cell-by-cell; visual workbook rendering is **UNVERIFIED** because the bundled artifact renderer failed macOS code-signature validation, so OOXML structure plus `readxl`/`openpyxl` inspection was used. All 147 SAS/XPORT datasets were metadata-read; clinical source/output datasets received first/last five-record readability checks without reproducing subject values. All 56 inventoried RDS files were fully deserialized. All 43 Dataset-JSON files were validated against the bundled schema.
 
-The complete immutable ledger is [file_inventory.csv](file_inventory.csv), with category, purpose, inputs/outputs, dependencies/consumers, SHA-256 and audit method for every entry. Structural dataset evidence is in [dataset_metadata.csv](dataset_metadata.csv) and [rds_metadata.csv](rds_metadata.csv).
+The historical local ledger was named `file_inventory.csv`, with category, purpose,
+inputs/outputs, dependencies/consumers, SHA-256, and audit method for every entry.
+Historical structural snapshots were named `dataset_metadata.csv` and
+`rds_metadata.csv`. These ignored/local snapshots are not current clean-clone evidence;
+their disposition is recorded in the 2026-08-23 repository cleanup audit.
 
 ## 3. Phase 1 — inventory and dependency graph
 
@@ -119,7 +123,8 @@ flowchart LR
   USDM -. "no submission consumer" .-> ORPHAN
 ```
 
-The complete 57-edge adjacency list, including broken and absent edges, is [dependency_edges.csv](dependency_edges.csv).
+The historical 57-edge local adjacency snapshot was named `dependency_edges.csv`;
+it was never a clean-clone release artifact.
 
 ### 3.3 Orphans, dangling references and dead/unorchestrated code
 
@@ -141,7 +146,9 @@ No third-party/runtime component was labeled an orphan merely because no clinica
 
 ### 4.1 ADaM dataset and variable traceability
 
-The exhaustive 159-row matrix is [adam_variable_traceability.csv](adam_variable_traceability.csv). For each variable it records origin, predecessor, MethodOID/description, SAS producer, R producer, physical XPT presence, Define presence and forward TFL consumers.
+The historical 159-row local matrix was named `adam_variable_traceability.csv`. For
+each variable it recorded origin, predecessor, MethodOID/description, SAS producer,
+R producer, physical XPT presence, Define presence, and forward TFL consumers.
 
 Results:
 
@@ -154,7 +161,7 @@ Results:
 
 ### 4.2 Define-XML versus data
 
-Detailed results are in [metadata_data_drift.csv](metadata_data_drift.csv).
+The historical local detail snapshot was named `metadata_data_drift.csv`.
 
 **ADaM:** ADEX and ADRS variable order matches Define. ADAE, ADCM, ADLB, ADSL and ADTTE do not. Five current labels are absent (`ADCM.ASTDT/AENDT/ASTDY`, `ADEX.PARAMN/AVISITN`). The label macro still names pre-rename `CMSTDT/CMENDT/CMSTDY` variables; the SAS log confirms those variables are uninitialized.
 
@@ -188,7 +195,7 @@ The current `ct_cross_validation.json` uses the 2026-03-27 offline cache and pas
 
 ### 4.5 Dual programming
 
-All eight SAS/R pairs have the same row count and variable set. After column alignment, seven pairs are record-concordant under the current comparison conventions. ADEX has 1,746 real `AVALC` differences (`blank` in SAS versus literal `"NA"` in R). The production reconciliation hides them by normalizing both empty and `"NA"` to missing. The current PASS is therefore invalid. The independent full-record evidence is [dual_language_comparison.csv](dual_language_comparison.csv).
+All eight SAS/R pairs have the same row count and variable set. After column alignment, seven pairs are record-concordant under the current comparison conventions. ADEX has 1,746 real `AVALC` differences (`blank` in SAS versus literal `"NA"` in R). The production reconciliation hides them by normalizing both empty and `"NA"` to missing. The current PASS is therefore invalid. The historical local full-record snapshot was named `dual_language_comparison.csv`; current reconciliation evidence supersedes it.
 
 The declared keys are nonunique for ADCM (15,169 records implicated), ADLB (1,497) and ADRS (737). The multiset implementation can compare repeated records, but it weakens row-level explainability and should be supplemented with stable record identifiers where the model permits. The third admiral track is standalone and not run by the release DAG.
 
@@ -246,7 +253,7 @@ The index, US regional XML and STF are DTD-valid; all indexed hrefs resolve and 
 ### 5.5 Reproducibility, logs and Part 11
 
 - Git provenance exists and the worktree was clean before auditor outputs were added.
-- Current production outputs are not bound to the committed ODA evidence manifest; all eight hashes differ ([output_hash_binding.csv](output_hash_binding.csv)).
+- Current production outputs are not bound to the committed ODA evidence manifest; all eight hashes differ (historical local snapshot `output_hash_binding.csv`).
 - USDM identifiers and timestamps in several generated JSON/status artifacts are nondeterministic.
 - SAS log: invalid INPUT note, 39 event/censor-date flooring warnings, and three uninitialized variables. R ADEX log: coercion warning. The final SAS log nevertheless claims zero errors.
 - Credential-bearing local files are present but gitignored. Their contents were not reproduced in this audit.

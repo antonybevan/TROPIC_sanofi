@@ -136,5 +136,8 @@ infrastructure_stages:
     # ran outside the DAG/CI and drifted from the Module 5 package (audit M-5); now gated by their own exit codes.
     - { name: "eCTD Backbone + STF (sequence 0000)",         script: "platform/build_ectd_backbone.py",      runner: python }
     - { name: "Materialize eCTD Sequence",                   script: "platform/materialize_ectd.py",         runner: python }
+    # Refresh ignored/local metadata traceability and drift inputs from the just-built
+    # data/package, then fail closed if either evidence set is absent, malformed, or non-PASS.
+    - { name: "Metadata Control Evidence Refresh",           script: "platform/build_metadata_control_report.py", runner: python }
     - { name: "Log Cleanliness Gate",                        script: "platform/check_log_cleanliness.py",   runner: python }
     - { name: "Release Run Manifest Binding",                script: "platform/build_release_run_manifest.py", runner: python }

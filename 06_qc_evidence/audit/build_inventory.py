@@ -20,7 +20,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 AUDIT = ROOT / "06_qc_evidence/audit"
 EXCLUDED_ROOTS = {ROOT / ".git", AUDIT}
-SENSITIVE_NAMES = {"_authinfo", "sascfg_personal.py", ".env"}
+SENSITIVE_NAMES = {"_authinfo", ".authinfo", "sascfg_personal.py", ".env"}
 TEXT_EXT = {
     ".c", ".cfg", ".conf", ".css", ".csv", ".dtd", ".gitignore", ".h",
     ".html", ".ini", ".js", ".json", ".lock", ".log", ".md", ".py",
@@ -31,6 +31,10 @@ TEXT_EXT = {
 
 def excluded(path: Path) -> bool:
     return any(path == root or root in path.parents for root in EXCLUDED_ROOTS)
+
+
+def is_sensitive(path: Path) -> bool:
+    return path.name in SENSITIVE_NAMES or path.suffix.lower() == ".env"
 
 
 def classify(rel: str, suffix: str) -> tuple[str, str]:
@@ -106,9 +110,9 @@ def content_kind(path: Path, prefix: bytes) -> str:
 
 
 def audit_method(path: Path, kind: str, sensitive: bool) -> str:
-    base = "Full-byte read; SHA-256; size and signature/MIME inspection"
     if sensitive:
-        return base + "; content intentionally not reproduced because it is credential-bearing"
+        return "Path classified as a local credential; bytes, size, signature, and hash excluded"
+    base = "Full-byte read; SHA-256; size and signature/MIME inspection"
     if kind == "PDF":
         return base + "; duplicate-aware full-text extraction; page-count inspection; representative visual render"
     if kind == "ZIP/OOXML":
@@ -132,6 +136,27 @@ def main() -> None:
             if excluded(path):
                 continue
             rel = path.relative_to(ROOT).as_posix()
+            sensitive = is_sensitive(path)
+            suffix = path.suffix.lower()
+            category, purpose = classify(rel, suffix)
+            if sensitive:
+                rows.append({
+                    "path": rel,
+                    "bytes": 0,
+                    "sha256": "EXCLUDED",
+                    "content_kind": "credential/excluded",
+                    "classification": category,
+                    "purpose": purpose,
+                    "inputs_consumed": "Excluded local credential",
+                    "outputs_produced": "No repository artifact",
+                    "upstream_dependencies": "Local operator configuration",
+                    "downstream_consumers": "Authorized local runtime only",
+                    "content_evidence": "Credential bytes intentionally not read",
+                    "explicit_references": "",
+                    "audit_method": audit_method(path, "credential/excluded", True),
+                    "visited": "EXCLUDED",
+                })
+                continue
             digest = hashlib.sha256()
             size = 0
             prefix = b""
@@ -144,9 +169,6 @@ def main() -> None:
                         prefix = chunk[:128]
                     digest.update(chunk)
                     size += len(chunk)
-            suffix = path.suffix.lower()
-            category, purpose = classify(rel, suffix)
-            sensitive = name in SENSITIVE_NAMES or (name == ".env")
             kind = content_kind(path, prefix)
             rows.append({
                 "path": rel,
@@ -174,7 +196,7 @@ def main() -> None:
         if row["classification"] == "third-party/runtime" or row["content_kind"] not in {"text", "XML/HTML text"}:
             continue
         path = ROOT / rel
-        if path.name in SENSITIVE_NAMES or path.name == ".env":
+        if is_sensitive(path):
             row["content_evidence"] = "Credential-bearing text inspected by full-byte hash only; content not reproduced"
             continue
         try:
@@ -236,17 +258,20 @@ def main() -> None:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
         writer.writeheader()
         writer.writerows(rows)
+    os.chmod(out, 0o600)
     totals: dict[str, tuple[int, int]] = {}
     for row in rows:
         key = str(row["classification"])
         count, size = totals.get(key, (0, 0))
         totals[key] = (count + 1, size + int(row["bytes"]))
-    with (AUDIT / "inventory_summary.csv").open("w", newline="", encoding="utf-8") as handle:
+    summary = AUDIT / "inventory_summary.csv"
+    with summary.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.writer(handle)
         writer.writerow(["classification", "files", "bytes"])
         for key in sorted(totals):
             writer.writerow([key, *totals[key]])
         writer.writerow(["TOTAL", len(rows), sum(int(row["bytes"]) for row in rows)])
+    os.chmod(summary, 0o600)
     print(f"Inventoried {len(rows):,} files / {sum(int(r['bytes']) for r in rows):,} bytes")
 
 

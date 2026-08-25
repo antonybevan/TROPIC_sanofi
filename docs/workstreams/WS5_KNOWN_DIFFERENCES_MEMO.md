@@ -4,7 +4,7 @@
 **Audience:** Reviewer, hiring manager, audit challenge
 **Product claim:** Path A — controlled non-submission demo (`docs/PRODUCT_CLAIM.md`)
 **Source of truth for IDs:** `06_qc_evidence/audit/findings_register.csv` · `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md`
-**As of:** 2026-08-12
+**As of:** 2026-08-23
 **Machine QC grade at seal:** validation_strategy PASS · recon PASS (non-sim) · admiral PASS · log cleanliness PASS · RC PASS
 
 ---
@@ -115,7 +115,7 @@ Machine gates can be green while **residual risks** remain. This memo is the hum
 | **Difference** | The pre-Phase-2 sealed pain derivation used median AS, `PPI >=2`, absolute `AS >=10`, combined-component/terminal confirmation, minimum diary date, no author-adopted cancer-related qualification and no CM+PR RT consumption. Those labels remain historical baseline evidence; the adopted replacement is implemented separately in SAS and R. |
 | **Impact if ignored** | TTPAIN/PFS event dates and event sets can be wrong in both directions; numerical SAS/R/admiral parity would only reproduce the same clinical-rule error. |
 | **Why Path A holds** | Antony Bevan adopted ED-01–ED-07 on 2026-08-04. The later statistical-governance review found and corrected `GOV-STAT-01`: SAS T-11-5 tested only the initial response visit; replaying that defective logic yields 65 instead of the correct 43. The current control now requires exact subject-level SAS/R pain-response parity in addition to the corrected CM+PR pain derivation, TTUMOR ITT, SAP-native T-11 remap and aggregate lineage evidence. No independent, sponsor, medical or regulated approval is claimed. |
-| **Close condition** | **Path A only:** the current source tree must pass the full 37-stage real-SAS DAG, `endpoint_controls.F042_PAIN_RESPONSE=PASS`, release reseal and CI verification. External qualified statistical/medical review and sponsor governance remain required before regulated reuse. |
+| **Close condition** | **Controlled non-submission scope only:** the current source tree must pass the complete manifest-defined genuine-SAS DAG, `endpoint_controls.F042_PAIN_RESPONSE=PASS`, release reseal, and CI verification. External qualified statistical/medical review and sponsor governance remain required before regulated reuse. |
 
 ---
 

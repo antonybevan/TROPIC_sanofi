@@ -1,6 +1,6 @@
 # TROPIC Simulation Model Analysis Report
 
-**Current sealed controlled release:** `v0.3.0-clinical-simulation` · [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md)
+**Current controlled release candidate:** `v0.3.0-clinical-simulation` (unreleased) · [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md)
 
 > **Informative annex boundary.** These deterministic simulation results are a data-free methods evaluation layered on the historical sealed clinical-simulation release. They are not MIDD evidence, a filing artifact, confirmatory efficacy evidence, sponsor approval, or evidence of regulator acceptance.
 
@@ -208,8 +208,8 @@ These deliberately artificial separated-time and zero-event fixtures verify sign
 | Component | Recorded identity |
 | --- | --- |
 | Python | 3.12.13 |
-| NumPy | 2.2.6 |
-| PyYAML | 6.0.3 |
+| NumPy | 1.26.4 |
+| PyYAML | 6.0.2 |
 | Floating-point dtype | float64 |
 | Random-number generator | numpy.random.PCG64 |
 | Dependency lock | requirements-ci.lock |
@@ -234,11 +234,11 @@ These deliberately artificial separated-time and zero-event fixtures verify sign
 | Artifact | SHA-256 |
 | --- | --- |
 | Governed protocol | 09798cd52adedd742a10f39266c67df0d9fe40b4c693912e4962b47601446b61 |
-| Authoritative result file | 768d969176ff611e6f581516772272a77af23151efb05d747a9a5ccecbb42c5b |
+| Authoritative result file | 41331679871e04b98f543759d9da85a6d889b178f70662234926acd165e38078 |
 | Protocol recorded by result | 09798cd52adedd742a10f39266c67df0d9fe40b4c693912e4962b47601446b61 |
 | Scenario registry | da115050f9d3fb69202b7154814c0eb204852efbe99f9b6107e548419f3f7768 |
-| Simulation code | 3fb535efdfea04955795619e0d209723aa35f88d70ce9429ae4667adc4ec0da2 |
-| Scientific output | bad4514234456f7749160ea56888867d63fbf60825716783c77a55817fa11c2b |
+| Simulation code | a99d519af6b8b4117e89424ce209e53908efb9ae32680715ebc696c3e4ec891b |
+| Scientific output | 56494d49b134ece77fbada2b8c818a665124e12a2bb95d48a3163b0ccf43110b |
 
 Reproduce the scientific JSON with `python3 platform/simulation_precision.py`; rebuild both reviewer documents with `python3 platform/build_simulation_report.py`. Identical governed inputs and seeds must reproduce byte-identical scientific content and reviewer reports.
 

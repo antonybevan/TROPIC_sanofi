@@ -30,7 +30,15 @@ ARM = "http://www.cdisc.org/ns/arm/v1.0"
 def validate(path):
     problems, checks = [], 0
     try:
-        root = etree.parse(path).getroot()
+        # Define-XML is a local control artifact.  Keep the validator safe if a future caller
+        # points it at an untrusted file: no external entities, DTD fetches, or network access.
+        parser = etree.XMLParser(
+            resolve_entities=False,
+            load_dtd=False,
+            no_network=True,
+            huge_tree=False,
+        )
+        root = etree.parse(path, parser).getroot()
     except (OSError, etree.XMLSyntaxError) as e:
         return [f"not well-formed: {e}"], 0
 

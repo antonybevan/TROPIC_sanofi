@@ -19,13 +19,16 @@ This is **reproducible factory + honest sealed evidence + clean review face.**
 | 3 | `08_submission_package/m5/` | Module 5–style **review package** (data-free preview) |
 | 4 | `07_reviewer_explanation/guides/` | ADRG · cSDRG source · BDRG |
 | 5 | `docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md` | Current controlled release narrative |
-| 6 | `python3 scripts/verify_release.py` | Re-check seals without SAS |
-| 7 | `docs/SCRIPT_MAP.md` · `platform/README.md` | If they want the factory |
+| 6 | `docs/FDA_READINESS_RESEARCH_2026-08-15.md` | FDA/ICH pre-shipment controls and honest blockers |
+| 7 | `python3 scripts/verify_release.py` | Re-check seals without SAS |
+| 8 | `docs/SCRIPT_MAP.md` · `platform/README.md` | If they want the factory |
 
 **Interview line:**  
 Package under `m5/`. Factory is programs, orchestration, and evidence. Patient data are not in Git. CbzP is synthetic/reconstructed and TFL-only. This is not a filing.
 
-Full walk: [`INTERVIEWER_GUIDE.md`](INTERVIEWER_GUIDE.md).
+Full walk: [`INTERVIEWER_GUIDE.md`](INTERVIEWER_GUIDE.md). The current branch
+is a controlled simulation and intentionally does not advertise a green filing
+seal; the readiness checker records the remaining owner actions.
 
 ---
 
@@ -58,6 +61,7 @@ Full walk: [`INTERVIEWER_GUIDE.md`](INTERVIEWER_GUIDE.md).
 - `07_reviewer_explanation/guides/`  
 - `07_reviewer_explanation/simulation_model_analysis_plan.md` · `simulation_report.md`
 - Findings disposition board + findings register  
+- Historical audit baselines and closure records under `06_qc_evidence/audit/run_records/`
 
 ### D. Sealed run evidence
 
@@ -65,7 +69,7 @@ Minimal machine evidence so a **bare clone** can recheck the controlled release 
 
 | Artifact | Role |
 |---|---|
-| `platform/pipeline_health.json` | Run identity (mode, full_dag, GREEN) |
+| `platform/pipeline_health.json` | Run identity and current truth (including RED/partial no-go evidence) |
 | `platform/reconciliation_status.json` | SAS↔R dataset recon |
 | `platform/results_reconciliation_status.json` | Results recon |
 | `platform/admiral_reconciliation_status.json` | Third engine |
@@ -76,6 +80,8 @@ Minimal machine evidence so a **bare clone** can recheck the controlled release 
 | `platform/release_candidate/release_candidate_status.json` | RC checklist |
 | `platform/simulation_operating_characteristics/simulation_oc_status.json` + checked CSV/trial sidecars | Data-free aggregate simulation OC authority plus clean-checkout parity views; no subject rows |
 | `platform/evidence/` | Frozen genuine ODA snapshot (byte-distinct proof) |
+| `platform/conformance/core_cache_manifest.json` | Non-content SHA-256 inventory for the retained/downloaded CORE cache |
+| `platform/conformance/CORE*_RUN_RECORD.md` | Aggregate CORE execution and limitation record; detailed issue JSON stays local |
 
 Everything else regenerable is **local only**.
 
@@ -90,7 +96,7 @@ Everything else regenerable is **local only**.
 | Build outputs | `04_analysis_datasets/adam/*`, Dataset-JSON bodies | Rebuild from programs |
 | Factory telemetry piles | Most `platform/**/*_status.json`, inventory CSVs | Regenerable noise |
 | Generated control reports | `docs/*_REPORT.md`, dashboards, gate-map dumps | `build_delivery_controls.py` |
-| Dead / one-off code | `tools/archive/**` | Not portfolio face |
+| Dead / one-off code | Removed from the working repository; blocked from reintroduction by `.gitignore` | Recoverable from Git history and the dated cleanup audit only |
 | Tool installs | `.core_engine/`, `.p21/`, `renv/library/` | Re-downloadable |
 | Runtime caches | `stage_cache.json`, ODA locks, logs | Ephemeral |
 
@@ -102,7 +108,7 @@ Version **code, controlled documents, and sealed evidence**, not transient runti
 
 | Who | What they can do |
 |---|---|
-| **Any interviewer (bare clone)** | Read `m5/` + guides; run `scripts/verify_release.py`; run `python3 platform/cibuild.py --demo` |
+| **Any interviewer (bare clone)** | Read `m5/` + guides; run `scripts/verify_release.py`; after controlled bootstrap, run `python3 platform/cibuild.py --demo` |
 | **GitHub Actions** | Job `Path A seal verify (verify_release)` reruns `scripts/verify_release.py` on push/PR (no SAS/data) |
 | **You with SDTM + ODA/local SAS** | Full dual-language DAG; re-seal; refresh package |
 | **Nobody from public git alone** | Re-derive real MP patient-level ADaM without licensed source |
@@ -114,7 +120,7 @@ Details: [`00_governance/REPRODUCIBILITY.md`](../00_governance/REPRODUCIBILITY.m
 1. **Environment** pinned (`renv.lock`).  
 2. **Pipeline structure** declared (`study_manifest.yaml`).  
 3. **Code** complete for dual-language + package.  
-4. **Demo path** works without data.  
+4. **Demo path** works without data after the documented locked bootstrap.
 5. **Seal re-check** works without re-running ODA.  
 6. **Real path** documented when data/credentials exist.
 
@@ -123,6 +129,9 @@ It does **not** mean “every intermediate JSON is in GitHub.”
 ---
 
 ## 5. How to refresh the sealed surface (operators)
+
+This section is only the repository-surface rule. The required end-to-end
+operator sequence is [`runbooks/RELEASE_PROMOTION.md`](runbooks/RELEASE_PROMOTION.md).
 
 After a genuine full run you intend to show:
 

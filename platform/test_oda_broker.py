@@ -5,6 +5,7 @@ Covers acceptance criteria §7: earned-mode (probe), teardown on failed spawn, f
 backoff-not-blind-loop, idempotent seed, unverified-library detection.
 """
 import os
+import pickle
 import sys
 import json
 import glob
@@ -488,12 +489,32 @@ class TestCtCrossValidation(unittest.TestCase):
         self.assertEqual(results[0]["missing_decodes"], ["Y"])
         self.assertEqual(results[0]["decode_mismatches"], ["N"])
 
+    def test_offline_cache_path_rejects_traversal_and_symlink(self):
+        with self.assertRaises(ValueError):
+            CTV._validated_cache_path("../outside", "2026-03-27")
+        with self.assertRaises(ValueError):
+            CTV._validated_cache_path("adamct", "../../outside")
+        with tempfile.TemporaryDirectory() as td:
+            original_cache = CTV.CACHE
+            CTV.CACHE = td
+            try:
+                target = os.path.join(td, "adamct-2026-03-27.pkl")
+                link = os.path.join(td, "sdtmct-2026-03-27.pkl")
+                with open(target, "wb") as handle:
+                    handle.write(b"not a pickle")
+                os.symlink(target, link)
+                with self.assertRaises(ValueError):
+                    CTV._validated_cache_path("sdtmct", "2026-03-27")
+            finally:
+                CTV.CACHE = original_cache
+
 
 class TestFailoverStatus(unittest.TestCase):
     def _cfg(self, text):
         path = os.path.join(tempfile.mkdtemp(), "sascfg_personal.py")
         with open(path, "w", encoding="utf-8") as f:
             f.write(text)
+        os.chmod(path, 0o600)
         return path
 
     def test_single_host_reports_missing_regional_failover_hosts(self):
@@ -526,24 +547,120 @@ class TestPreflight(unittest.TestCase):
         path = os.path.join(tempfile.mkdtemp(), "sascfg_personal.py")
         with open(path, "w", encoding="utf-8") as f:
             f.write(text)
+        os.chmod(path, 0o600)
         return path
+
+    @staticmethod
+    def _ready_preflight(cfg):
+        stat_obj = type("S", (), {"st_mode": 0o100600})()
+        run_obj = type("R", (), {"stderr": 'openjdk version "26.0.1"', "stdout": ""})()
+        saspy_mod = type("Saspy", (), {"__version__": "test"})()
+        return B.preflight(
+            cfg_file=cfg, authinfo_path="/tmp/.authinfo", which_fn=lambda x: "/bin/java",
+            exists_fn=lambda p: True, stat_fn=lambda p: stat_obj, run_fn=lambda *a, **k: run_obj,
+            saspy_importer=lambda: saspy_mod)
 
     def test_preflight_ok_is_credential_safe(self):
         cfg = self._cfg(
             "oda = {'java': 'java', 'iomhost': ['odaws01-apse1-2.oda.sas.com', "
             "'odaws02-apse1-2.oda.sas.com'], 'iomport': 8591, 'authkey': 'oda'}\n"
         )
-        stat_obj = type("S", (), {"st_mode": 0o100600})()
-        run_obj = type("R", (), {"stderr": 'openjdk version "26.0.1"', "stdout": ""})()
-        saspy_mod = type("Saspy", (), {"__version__": "test"})()
-        status = B.preflight(
-            cfg_file=cfg, authinfo_path="/tmp/.authinfo", which_fn=lambda x: "/bin/java",
-            exists_fn=lambda p: True, stat_fn=lambda p: stat_obj, run_fn=lambda *a, **k: run_obj,
-            saspy_importer=lambda: saspy_mod)
+        status = self._ready_preflight(cfg)
         self.assertTrue(status["oda_preflight_ok"])
         self.assertEqual(status["oda_preflight_missing"], [])
         self.assertTrue(status["oda_failover_configured"])
+        for key in B._CFG_SECURITY_KEYS:
+            self.assertTrue(status["oda_preflight_required"][key])
         self.assertNotIn("password", json.dumps(status).lower())
+
+    def test_default_session_factory_preserves_secure_config_behavior(self):
+        source = (
+            "oda = {'iomhost': ['odaws01-euw1.oda.sas.com', "
+            "'odaws02-euw1.oda.sas.com'], 'authkey': 'oda'}\n"
+        )
+        cfg = self._cfg(source)
+        captured = {}
+        sentinel = object()
+
+        def sas_session(**kwargs):
+            private_cfg = kwargs["cfgfile"]
+            captured["path"] = private_cfg
+            captured["mode"] = os.stat(private_cfg).st_mode & 0o777
+            with open(private_cfg, "r", encoding="utf-8") as handle:
+                captured["source"] = handle.read()
+            return sentinel
+
+        saspy_mod = type("Saspy", (), {"SASsession": staticmethod(sas_session)})()
+        with mock.patch.object(B, "CFG_FILE", cfg), mock.patch.dict(
+                sys.modules, {"saspy": saspy_mod}):
+            sas, host = B._default_session_factory(5)
+
+        self.assertIs(sas, sentinel)
+        self.assertEqual(host, "odaws01-euw1.oda.sas.com")
+        self.assertEqual(captured["source"], source)
+        self.assertEqual(captured["mode"], 0o600)
+        self.assertNotEqual(captured["path"], cfg)
+        self.assertFalse(os.path.exists(captured["path"]))
+
+    def test_noncompliant_mode_payload_is_never_executed(self):
+        with tempfile.TemporaryDirectory() as td:
+            marker = os.path.join(td, "executed")
+            cfg = os.path.join(td, "sascfg_personal.py")
+            with open(cfg, "w", encoding="utf-8") as handle:
+                handle.write(
+                    f"open({marker!r}, 'w').write('executed')\n"
+                    "oda = {'iomhost': 'odaws01-apse1.oda.sas.com', 'authkey': 'oda'}\n"
+                )
+            # Owner-read-only is deliberately not the broker's exact 0600
+            # credential contract, while avoiding any group/world exposure in
+            # this negative test fixture.
+            os.chmod(cfg, 0o400)
+
+            self.assertEqual(B._read_oda_cfg(cfg), {})
+            status = self._ready_preflight(cfg)
+            self.assertFalse(status["oda_preflight_ok"])
+            self.assertIn("cfg_file_mode_600", status["oda_preflight_missing"])
+            with mock.patch.object(B, "CFG_FILE", cfg):
+                with self.assertRaises(B.OdaFatal):
+                    B._default_session_factory(1)
+            self.assertFalse(os.path.exists(marker))
+
+    def test_symlink_payload_is_never_executed(self):
+        with tempfile.TemporaryDirectory() as td:
+            marker = os.path.join(td, "executed")
+            target = os.path.join(td, "payload.py")
+            cfg = os.path.join(td, "sascfg_personal.py")
+            with open(target, "w", encoding="utf-8") as handle:
+                handle.write(
+                    f"open({marker!r}, 'w').write('executed')\n"
+                    "oda = {'iomhost': 'odaws01-apse1.oda.sas.com', 'authkey': 'oda'}\n"
+                )
+            os.chmod(target, 0o600)
+            os.symlink(target, cfg)
+
+            self.assertEqual(B._read_oda_cfg(cfg), {})
+            status = self._ready_preflight(cfg)
+            self.assertFalse(status["oda_preflight_ok"])
+            self.assertIn("cfg_file_not_symlink", status["oda_preflight_missing"])
+            with mock.patch.object(B, "CFG_FILE", cfg):
+                with self.assertRaises(B.OdaFatal):
+                    B._default_session_factory(1)
+            self.assertFalse(os.path.exists(marker))
+
+    def test_oversized_payload_is_bounded_and_never_executed(self):
+        with tempfile.TemporaryDirectory() as td:
+            marker = os.path.join(td, "executed")
+            cfg = os.path.join(td, "sascfg_personal.py")
+            with open(cfg, "w", encoding="utf-8") as handle:
+                handle.write(f"open({marker!r}, 'w').write('executed')\n")
+                handle.write("#" + ("x" * B._MAX_CFG_BYTES))
+            os.chmod(cfg, 0o600)
+
+            parsed, checks, advisory = B._load_oda_cfg(cfg)
+            self.assertEqual(parsed, {})
+            self.assertFalse(checks["cfg_file_bounded"])
+            self.assertIn("size limit", advisory["cfg_file_error"])
+            self.assertFalse(os.path.exists(marker))
 
     def test_preflight_reports_missing_required_local_prereqs(self):
         cfg = self._cfg("oda = {'iomhost': 'odaws01-apse1.oda.sas.com'}\n")
@@ -887,6 +1004,58 @@ class TestSeedIdempotent(unittest.TestCase):
         self.assertIn("VERIFY_SKIPPED", res["mismatches"][0])
         self.assertNotEqual(sas.uploaded[-1], S.MANIFEST_NAME)
 
+    def test_remote_paths_are_restricted_before_sas_interpolation(self):
+        for path in ("~/TROPIC", "/home/test/TROPIC", "/home/test/a_b-1.2", "/"):
+            self.assertEqual(S.validate_remote_path(path), path)
+        for path in ("relative/path", "/home/test/../escape", "/home/test/with space",
+                     '/home/test/";run;/*', "/home/test/$MACRO", "/home/test//nested",
+                     "~other/TROPIC", ""):
+            with self.assertRaises(ValueError, msg=path):
+                S.validate_remote_path(path)
+
+    def test_malicious_remote_path_never_reaches_sas_submit(self):
+        calls = []
+        sas = type("Sas", (), {
+            "submit": lambda self, code: calls.append(code) or {"LOG": ""},
+        })()
+        with self.assertRaises(ValueError):
+            S._ensure_remote_dir(sas, '/home/test/"; %include "/tmp/evil.sas"; /*')
+        self.assertEqual(calls, [])
+
+    def test_malicious_remote_home_is_rejected(self):
+        sas = type("Sas", (), {
+            "submit": lambda self, code: {
+                "LOG": 'TROPIC_ODA_HOME=/home/test"; %include "/tmp/evil.sas"; /*\n'
+            },
+        })()
+        with self.assertRaises(ValueError):
+            S._resolve_oda_home(sas, "~/TROPIC")
+
+    def test_stage10_sdtm_path_is_bound_to_project_root(self):
+        sas = type("Sas", (), {
+            "submit": lambda self, code: {"LOG": "TROPIC_ODA_HOME=/home/test\n"},
+        })()
+        with mock.patch.dict(os.environ, {"TROPIC_ODA_SDTM_DIR": "/home/test/decoy"}):
+            with self.assertRaisesRegex(ValueError, "canonical project-root"):
+                S.resolve_sdtm_remote_dir(sas, "/home/test/TROPIC")
+        with mock.patch.dict(os.environ, {
+            "TROPIC_ODA_SDTM_DIR": "/home/test/TROPIC/01_source_data/real_sdtm",
+        }):
+            self.assertEqual(
+                S.resolve_sdtm_remote_dir(sas, "/home/test/TROPIC"),
+                "/home/test/TROPIC/01_source_data/real_sdtm",
+            )
+
+    def test_local_sdtm_manifest_rejects_symlink_inputs(self):
+        with tempfile.TemporaryDirectory() as td:
+            target = os.path.join(td, "real.sas7bdat")
+            link = os.path.join(td, "dm.sas7bdat")
+            with open(target, "wb") as handle:
+                handle.write(b"not a dataset")
+            os.symlink(target, link)
+            with self.assertRaisesRegex(ValueError, "non-regular SDTM"):
+                S.compute_local_manifest(td)
+
 
 class TestOdaRenderTflHelpers(unittest.TestCase):
     def setUp(self):
@@ -899,6 +1068,23 @@ class TestOdaRenderTflHelpers(unittest.TestCase):
             import _oda_render_tfl as R
             importlib.reload(R)
             connect.assert_not_called()
+
+    def test_offline_ct_pickle_loader_allows_data_and_blocks_globals(self):
+        with tempfile.TemporaryDirectory() as td:
+            safe_path = os.path.join(td, "safe.pkl")
+            with open(safe_path, "wb") as handle:
+                pickle.dump({"codelists": [{"terms": [], "extensible": False}]}, handle)
+            self.assertEqual(CTV._safe_pickle_load(safe_path)["codelists"][0]["terms"], [])
+
+            class Evil:
+                def __reduce__(self):
+                    return (eval, ("1 + 1",))
+
+            evil_path = os.path.join(td, "evil.pkl")
+            with open(evil_path, "wb") as handle:
+                pickle.dump(Evil(), handle)
+            with self.assertRaises(pickle.UnpicklingError):
+                CTV._safe_pickle_load(evil_path)
 
     def test_errors_in_detects_sas_error_signatures(self):
         log = "\n".join([
@@ -948,6 +1134,35 @@ class TestOdaRenderTflHelpers(unittest.TestCase):
 
 
 class TestCibuildOdaStage(unittest.TestCase):
+    def test_stage10_rejects_invalid_root_before_sas_code(self):
+        class Sas:
+            def __init__(self):
+                self.submits = []
+                self.ended = False
+
+            def submit(self, code):
+                self.submits.append(code)
+                return {"LOG": ""}
+
+            def endsas(self):
+                self.ended = True
+
+        sas = Sas()
+        conn = type("Conn", (), {"sas": sas, "endpoint": "fake-oda"})()
+        original_root = C.PROJ_ROOT_ODA
+        C.PROJ_ROOT_ODA = '/home/test/"; %include "/tmp/evil.sas"; /*'
+        try:
+            with mock.patch.object(B, "preflight", return_value={"oda_preflight_ok": True}), \
+                 mock.patch.object(B, "connect", return_value=conn):
+                rc, _, stderr, meta = C._run_saspy_stage10()
+        finally:
+            C.PROJ_ROOT_ODA = original_root
+        self.assertEqual(rc, 2)
+        self.assertIn("Invalid TROPIC_ODA_PROJ_ROOT", stderr)
+        self.assertEqual(meta["oda_last_error_class"], "INVALID_REMOTE_PATH")
+        self.assertEqual(sas.submits, [])
+        self.assertTrue(sas.ended)
+
     def test_stage10_fails_before_program_upload_when_remote_pgmdir_missing(self):
         class Sas:
             def __init__(self):

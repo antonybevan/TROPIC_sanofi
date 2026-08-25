@@ -40,9 +40,9 @@ dir.create("platform", showWarnings = FALSE)
 # (a relabelled or dropped SAS subgroup surfaces as a mismatch, by design).
 # var=NA => overall (all patients). Levels are matched as character.
 subgroup_defs <- list(
-  list(label = "All Patients",            var = NA,         level = NA),
+  list(label = "Intent-to-Treat Population", var = NA,      level = NA),
   list(label = "Age < 65",                var = "AGEGR1",   level = "<65"),
-  list(label = "Age >= 65",               var = "AGEGR1",   level = ">=65"),
+  list(label = "Age 65 or older",         var = "AGEGR1",   level = ">=65"),
   list(label = "ECOG 0-1",                var = "ECOGBLGRP", level = "0-1"),
   list(label = "ECOG 2",                  var = "ECOGBLGRP", level = "2"),
   list(label = "Measurable Disease: Yes", var = "MEASDISF", level = "Y"),

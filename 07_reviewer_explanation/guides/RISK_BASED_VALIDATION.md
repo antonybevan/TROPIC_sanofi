@@ -47,7 +47,7 @@ human re-derivation.
 | ADAE / ADCM / ADEX / ADLB | T3 | `cross_lang_audit` using unique governed keys (including source `AESEQ`/`CMSEQ`/`LBSEQ` where applicable) · `spec_data_checks` |
 | define.xml (SDTM + ADaM) | T4 | XSD 2.1 + ARM valid (`validate_xsd.sh`) · referential integrity (`validate_define.py`) · CORE parse |
 | SDTM conformance | T4 | CDISC CORE run (`CORE_SDTM34_RUN_RECORD.md`) |
-| ADaM conformance | T4 | Authored CORE ADaM rules via `--local-rules` (`CORE_RUN_RECORD.md`); Pinnacle 21 = authoritative for a full submission run |
+| ADaM conformance | T4 | Authored CORE ADaM rules via `--local-rules` (`CORE_RUN_RECORD.md`); Community 4.1.0 / FDA 2508.1 informative run (30 open groups / 2,373 occurrences); licensed Enterprise not executed |
 
 Every reconciliation step writes a machine-readable status JSON and **gates the build**
 (`cibuild.py`) — validation-as-code, not a manual checklist.
@@ -84,7 +84,8 @@ single-author portfolio and are named, not papered over.
 
 A production engagement would add: a second, independent programmer for T1/T2 outputs;
 an SDTM `DV` (protocol-deviation) domain to derive a discriminating per-protocol flag;
-and a Pinnacle 21 submission run for the authoritative ADaM business-rule layer. None
+and a qualified licensed Pinnacle 21 Enterprise run with independent disposition
+approval for the authoritative ADaM business-rule layer. None
 of these change the *tiering*; they raise the independence of the highest tiers from
 *methodological* to *organizational*.
 

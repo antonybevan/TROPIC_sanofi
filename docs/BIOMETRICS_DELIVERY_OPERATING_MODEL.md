@@ -369,50 +369,38 @@ environment record, one output manifest, and one reviewer-facing limitation set.
 | Reviewer package lock | Reviewer documentation | Release control | ADRG/SDRG/BDRG, limitation disclosures, concordance narrative |
 | Release candidate | Platform/release control | Final reviewer | Run record, hashes, package manifest, evidence verification |
 
-## 6. Current Gap Register
+## 6. Implemented Control Disposition (2026-08-24)
 
-This is not a full audit replacement. It is the operating-model gap list that
-should guide the next build steps.
+The original gap list has been implemented and is retained here as an auditable
+disposition, not a future-work list.
 
-| Gap | Why it matters | Next control |
-|---|---|---|
-| Evidence layers now exist, but workstream ownership is not machine-readable. | The chain is visible, but the team/function handoffs are still prose. | Add `config/delivery_workstreams.yaml` and validate it against `config/evidence_layers.yaml`. |
-| Source profiling now has an initial aggregate report, but it is not yet wired as an orchestrator gate. | Source intake should be a distinct gate before ADaM build. | Promote `docs/SOURCE_PROFILING_REPORT.md` / `source_profile_status.json` into the DAG or CI once the report scope is stable. |
-| Specification lock exists, but executable spec references are not uniformly enforced per output. | Outputs can drift from SAP/spec without a clear broken link. | Add output-to-spec references to a structured output index. |
-| Metadata now has a generated control report, but the report currently records unresolved major findings. | Reviewers need a single metadata control story with honest gaps. | Resolve or explicitly disposition findings in `docs/METADATA_CONTROL_REPORT.md`, especially skipped CT cross-validation, ADaM label errors, and predecessor traceability gaps. |
-| TFL completion now has a structured generated index, but it is not yet an orchestrator gate. | Rendered files alone do not prove result traceability. | Promote `docs/TFL_OUTPUT_INDEX.md` / `tfl_output_index_status.json` into the DAG or CI once the report scope is stable. |
-| QC evidence is extensive but not yet tied to every handoff gate. | A reviewer should see which gate each QC artifact satisfies. | Extend evidence index with gate ids and workstream ids. |
-| Release readiness is intentionally not claimed. | That honesty is good, but the next readiness criteria should be explicit. | Add a release-candidate checklist with blocking vs nonblocking criteria. |
+| Original control objective | Current implementation |
+|---|---|
+| Machine-readable workstream ownership | `config/delivery_workstreams.yaml` is validated against `config/evidence_layers.yaml` and rendered by the delivery-control builder. |
+| Source intake gate | Source profiling is a named orchestrator/control surface under G01. |
+| Executable specification references | The controlled TFL catalog, ARS layer, metadata lineage, and spec-to-Define/spec-to-data checks carry the implemented links. |
+| Metadata control and finding disposition | Generated metadata controls, the findings register, and the disposition board retain unresolved or accepted limitations without converting them to clearance. |
+| TFL completion gate | The catalog-controlled TFL index is rebuilt before release binding and is checked by the DAG/CI controls. |
+| Evidence-to-gate/workstream mapping | The evidence-layer and delivery-workstream contracts plus the orchestrator gate map provide this mapping. |
+| Release go/no-go | The release-run manifest, release-candidate checklist, regulatory qualification job, and independent verifier are fail-closed. |
 
-## 7. Implementation Roadmap
+## 7. Remaining Boundaries and Maintenance
 
-### Step 1: Make workstreams executable as metadata
+The active gaps are now evidence and organizational boundaries, not missing
+architecture scaffolding:
 
-Create `config/delivery_workstreams.yaml` with functions, required inputs, outputs,
-handoff gates, and evidence-layer references.
-
-### Step 2: Build an evidence dashboard
-
-Generate a Markdown or HTML dashboard from `config/evidence_layers.yaml` and
-`config/delivery_workstreams.yaml`, showing what is present, generated, external,
-optional, planned, or missing.
-
-### Step 3: Add gate ids to the orchestrator
-
-Map each `config/study_manifest.yaml` stage to one or more operating-model gates:
-source, spec, metadata, ADaM, output, QC, reviewer, package, release.
-
-### Step 4: Decide CI and orchestrator integration
-
-Add the remaining high-value reports before doing any folder migration:
-
-- CI integration decision record.
-- Orchestrator integration plan for architecture reports.
-
-### Step 5: Migrate physical layout only after reports pass
-
-Move files only after compatibility checks exist. The first real migration should
-separate code from evidence, not rename folders for appearance.
+- The current live SAS/ODA attempt is RED, simulated fallback, and partial; it
+  cannot promote the candidate. Historical ODA GREEN evidence remains historical.
+- Licensed validator clearance, accountable sponsor review, organizationally
+  independent QC, Part 11 controls, data-rights/legal approval, and gateway
+  evidence remain external.
+- The CDISC CORE engine, local rules, dependencies, and downloaded 214-file cache
+  inventory are pinned/hash-bound. Any cache refresh requires review, a new CORE
+  run, and updated run records.
+- The physical code/evidence folder split remains deliberately deferred because
+  it would create high path churn without improving the current evidence model.
+- Release operators follow `docs/runbooks/RELEASE_PROMOTION.md`; a failed external
+  handshake is recorded as a no-go, never papered over by cached evidence.
 
 ## 8. References
 

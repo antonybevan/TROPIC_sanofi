@@ -31,7 +31,7 @@
 %set_pgmdir;
 %include "&PGMDIR./00_config.sas";
 
-/* 1. RECIST v1.0 Visit-level calculations (trial-era standard per SAP v3.0 §5.3) */
+/* 1. RECIST v1.0 Visit-level calculations (current remediation authority: SAP v4.0 §5.3) */
 /* Baseline Target Sum of Diameters */
 proc sql;
     create table work.base_sod as

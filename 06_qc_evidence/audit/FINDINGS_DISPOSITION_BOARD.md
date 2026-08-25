@@ -1,6 +1,6 @@
 # TROPIC Findings Disposition Board
 
-**Date:** 2026-08-10
+**Date:** 2026-08-24
 **Product claim:** Controlled **non-submission demonstration** programming pipeline  
 **Authority:** SAP v4.0 locked for remediation (`06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md`); not sponsor-approved for filing  
 
@@ -10,7 +10,7 @@
 
 > **2026-08-05 control update:** F-042’s register row is synchronized with the implemented/sealed Path A state and the GOV-STAT-01 closure. F-043 records and remediates the abort-path telemetry defect that could label a truncated RED run as `full_dag`; the historical run record remains unchanged as evidence.
 
-> **2026-08-10 forensic closure update:** The expanded live-ODA pipeline completed
+> **Historical 2026-08-10 forensic closure update:** The expanded live-ODA pipeline completed
 > 37/37 stages GREEN after source/staging isolation, endpoint, date, source-sequence,
 > metadata-key, reconciliation, narrative-consistency, and log-cleanliness repairs.
 > Technical Path A implementation is ready for review; the working tree remains
@@ -22,6 +22,30 @@
 > retains 30 open issue groups / 2,373 occurrences and an incompatible-CLI caveat.
 > F-016 remains ACCEPTED because licensed, qualified Enterprise execution and
 > independent disposition approval were not performed.
+
+> **2026-08-23 repository-hygiene update:** F-024 is RESOLVED. The living orphan
+> register is now generated from the current manifest, catalog, eCTD index, and
+> filesystem and contains 0 confirmed cleanup findings. The abandoned local code
+> archive and tracked empty listing placeholder were removed; no stale NDJSON or
+> unindexed Module 5 XPT remains. Intentional package materialization copies are
+> retained and hash-controlled.
+
+> **2026-08-23 candidate-control update:** The governed manifest now defines 41
+> stages, including a fail-closed metadata-control evidence refresh. Promotion of the
+> unreleased v0.3.0 candidate requires all 41 stages under genuine SAS, a clean release
+> seal, complete tests, and CI; moving run status is authoritative only in the machine
+> health/manifest/checklist evidence.
+
+> **2026-08-24 security and supply-chain update:** Codex Security scan
+> `81056d45-0e9b-4bb9-854e-efb3a93ffc38` reported one High and five Medium
+> findings (F-051–F-056). The repository implementation now uses a shared,
+> downstream-enforced governance-reseal policy; immutable Git-object source identity;
+> descriptor-relative no-follow package/eCTD operations; pre-execution validation of
+> the personal ODA configuration; hash-pinned CI/CORE build inputs; least-privilege
+> CDISC key scoping; and an independently checked custom-CORE-rule lock. These are
+> source-changing remediations, so the 2026-08-23 genuine run is historical evidence,
+> not the seal for the current candidate. Promotion remains blocked until a new genuine
+> full-DAG run, clean seal, clean-checkout verification, and green PR checks complete.
 
 ## Disposition classes
 
@@ -42,7 +66,7 @@
 | **F-027** | Minor | `scope_out_with_disclosure` | **ACCEPTED** | ALB/LDH not on Sanofi CRF LABH/LABB panels and not in PDS LB — Class C; ADSL placeholders remain Assigned (not “PDS stripped collected labs”). |
 | **F-028** | Major | `scope_out_with_disclosure` | **ACCEPTED** | One subject has EXTRT=XRP6258 (10 cycles) while DM.ARM is MITOXANTRONE for all 371. Arm authority = DM/ADSL; do not re-code EX. SDTM E2E 2026-07-09. |
 | **F-011** | Major | `resolve_now` | **RESOLVED** | T-11-8 now uses observed baseline PSA >=20 (excluding `PSABLIF='Y'` fallback values; CbzP 145/361; MP 61/329); the set is shared by the R output, SAS companion, and regression contract. |
-| **F-039** | Major | `resolve_now` | **RESOLVED** | Stage-14 SAS companions are current-run evidence: UTC health timestamps plus bounded same-run mtime ordering produce a PASS index with zero stale/missing companions. |
+| **F-039** | Major | `resolve_now` | **RESOLVED** | SAS Production-stage companions are current-run evidence: UTC health timestamps plus bounded same-run mtime ordering produce a PASS index with zero stale/missing companions. |
 | **F-012** | Major | `non_submission_demo_limit` | **ACCEPTED** | N=749 = real MP 371 + synthetic CbzP 378; protocol ITT 755 needs full two-arm IPD. Figures must not be read as original-trial ITT. |
 | **F-014** | Major | `resolve_now` | **RESOLVED 2026-08-04** | ARM now has 10 ResultDisplays / 18 AnalysisResults covering every controlled analysis output except the non-analysis F-01-1 flow diagram. OS/PFS declare ADSL covariates, display names bind to controlled TFL IDs, TTUMOR is ITT-primary, and TTPAIN/response/Optimus results are represented. `platform/define_arm_contract.py` makes these claims executable. Deferred SAP outputs remain outside the controlled catalog and are not an F-014 defect. |
 | **F-015** | Major | `external_dependency` + `scope_out_with_disclosure` | **ACCEPTED** | Full CORE breadth on every SDTM domain + residual issue disposition is a conformance program beyond current targeted SDTMIG 3.4 run. Known residuals stay in CORE run records/SDRG. |
@@ -57,13 +81,20 @@
 | **F-040** | Major | `resolve_now` | **RESOLVED** | ADTTE TTUMOR censoring now excludes DS death milestones and baseline-only records; final output has zero death-date TTUMOR censors. Evidence: `SECTION_03_ADAM_DERIVATION_AUDIT_2026-08-03.md`. |
 | **F-041** | Major | `resolve_now` | **RESOLVED** | PFS now uses the latest valid post-baseline RECIST/PSA/evaluable-pain assessment, or randomization when none exists; NACT remains priority. SAS/R/admiral agree after the final 34-stage run. |
 | **F-042** | Major | `scope_out_with_disclosure` | **IMPLEMENTED FOR PATH A; EXTERNAL REVIEW REQUIRED** | Antony Bevan adopted ED-01–ED-07 on 2026-08-04. Separate SAS/R implementations now apply the corrected component-specific pain rule, CM+PR union, diary/RT sensitivities, TTUMOR ITT primary and SAP-native T-11 mapping; the exact subject-level `F042_PAIN_RESPONSE` gate passes 43 records/43 subjects on the current sealed run, with GOV-STAT-01 remediated. Full 34-stage rerun/reseal is complete; external qualified statistical/medical review remains required. This is not sponsor, medical, independent, or regulated approval. |
+| **F-051** | High | `resolve_now` | **RESOLVED** | Governance resealing is now authorized by one narrow shared policy in the rebind tool and all three downstream gates. The base must be an authenticated committed predecessor; self-authorizing control changes, malformed/hidden legacy chains, timestamp drift, and chain discontinuity fail closed. |
+| **F-052** | Medium | `resolve_now` | **RESOLVED** | The reseal hashes immutable blobs from one captured HEAD, requires a clean tree, and rechecks HEAD before atomic evidence replacement; mutable-worktree substitution is no longer a source of seal identity. |
+| **F-053** | Medium | `resolve_now` | **RESOLVED** | Module 5/package inputs are opened descriptor-relatively without following symlinks and must remain stable regular files inside their governed roots. |
+| **F-054** | Medium | `resolve_now` | **RESOLVED** | eCTD copy, replace, mode, cleanup, and enumeration operations use the shared fd-relative containment layer and reject unsafe roots, source/destination symlinks, parent swaps, and unreadable descendants. |
+| **F-055** | Medium | `resolve_now` | **RESOLVED** | The personal ODA Python configuration is checked for type, owner, exact `0600` mode, and stable identity before any interpretation; only a private copy of the verified bytes is executed. CDISC credentials are removed from unrelated subprocess environments. |
+| **F-056** | Medium | `resolve_now` | **RESOLVED** | CI/CORE runtime and build dependencies are artifact-hash locked, build isolation is disabled, lock files/workflows are sealed, the custom CORE rules have an independent hash lock, and dependency review plus Python/Actions CodeQL are part of CI. |
 
 ## Minor (not RC Crit/Major gate)
 
 | ID | Decision |
 |---|---|
-| **F-024** | Keep CONFIRMED as living orphan register hygiene; not a G06 Crit/Major blocker. |
+| **F-024** | **RESOLVED 2026-08-23** — current register has 23 classified rows, 0 confirmed cleanup findings, 0 unindexed XPTs, no false listing, and no stale NDJSON; the dead local archive was removed recoverably. |
 | **F-043** | **RESOLVED** — abort telemetry now binds the complete manifest stage map in serial and parallel failure paths; historical truncated-run evidence is retained and future failures must report `partial_dag` with `stages_not_run`. |
+| **F-057** | **RESOLVED 2026-08-24** — macOS maps its default temporary directory through `/var`, a symlink correctly rejected by the package no-follow boundary. PDF/Ghostscript staging now uses controlled ignored `tmp/pdf-render/` at mode `0700`; 19 focused filesystem tests and the 62-page render review pass. |
 
 ## Release-candidate implication
 
@@ -71,7 +102,7 @@ After this board:
 
 - **No active `CONFIRMED` Critical/Major** remain for the RC findings gate (they are `RESOLVED` or `ACCEPTED`).
 - **ACCEPTED ≠ fixed for filing** — they are formal scope decisions for the demo product.
-- Full ODA DAG may proceed as a **proof run** of the orchestrator against this frozen disposition, not as discovery of open Crit/Major science.
+- A fresh full ODA DAG may proceed as a **proof run** of the orchestrator against this frozen disposition, not as discovery of open Crit/Major science. The previous run cannot authorize these source-changing fixes.
 
 ## Required on-record disclosures (must remain true)
 
@@ -85,4 +116,4 @@ After this board:
 
 1. Keep register and board synchronized with every remediation cut.
 2. Preserve the explicit non-submission disclosures (especially F-003/F-005/F-012/F-025).
-3. Rebuild the RC checklist and release-run manifest after the clean commit; a dirty worktree remains the only current seal blocker.
+3. Rebuild the RC checklist and release-run manifest after every approved change; promote only a clean sealed commit with green CI.

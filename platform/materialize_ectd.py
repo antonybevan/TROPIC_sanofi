@@ -14,52 +14,71 @@ The materialized payload (datasets + report binaries) is a reproducible copy and
 
 Usage:  python3 platform/materialize_ectd.py
 """
-import os, re, sys, json, hashlib, shutil
+import os, re, sys, json
+from pathlib import Path
 
 from build_ectd_backbone import SUPPORT_FILES
+from safe_filesystem import (
+    UnsafePathError,
+    atomic_write_json,
+    canonical_posix_relative,
+    contained_path,
+    digest_file,
+    read_text as safe_read_text,
+    regular_file_exists,
+    require_directory,
+    require_regular_file,
+    require_tree_no_symlinks,
+    safe_chmod,
+    safe_copy_file,
+    safe_makedirs,
+    safe_stat,
+    safe_unlink,
+    walk_regular_files,
+)
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.abspath(os.path.join(HERE, ".."))
-SEQ = os.path.join(ROOT, "08_submission_package/ectd", "0000")
-PACKAGE_ROOT = os.path.join(ROOT, "08_submission_package")
-INDEX = os.path.join(SEQ, "index.xml")
-CACHE_FILE = os.path.join(HERE, ".materialize_ectd_cache.json")
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent
+PACKAGE_ROOT = ROOT / "08_submission_package"
+M5_ROOT = PACKAGE_ROOT / "m5"
+ECTD_ROOT = PACKAGE_ROOT / "ectd"
+SEQ = ECTD_ROOT / "0000"
+INDEX = SEQ / "index.xml"
+CACHE_FILE = HERE / ".materialize_ectd_cache.json"
 
-def md5(path):
-    h = hashlib.md5()
-    with open(path, "rb") as f:
-        for chunk in iter(lambda: f.read(1 << 20), b""):
-            h.update(chunk)
-    return h.hexdigest()
+def md5(path, root=SEQ):
+    return digest_file(path, root, "md5")
 
 def _require_contained(base, path, href):
-    """Refuse to touch a path that resolves outside `base` (roadmap: path-containment guard).
-    index.xml is self-generated today, not external input, so this is defense against a future
-    bug/hand-edit/merge artifact rather than a live threat -- but os.path.join happily returns an
-    absolute href as-is (ignoring `base` entirely) or leaves a '../' traversal unresolved in the
-    joined string, and both the copy step and purge_unindexed_sequence_files's os.remove() loop
-    would otherwise trust that silently. os.path.commonpath does NOT resolve '..' components on
-    its own -- on the raw os.path.join() result it compares path strings lexically, so
-    '<base>/../../etc/hosts' lexically still starts with `base` and a naive commonpath check
-    would wrongly pass it; os.path.normpath must run first to actually collapse '..' against the
-    real preceding components before the comparison means anything. An explicit check (not a bare
-    `assert`, which -O strips) turns a hypothetical traversal into an immediate, loud failure."""
-    resolved = os.path.normpath(path)
-    if os.path.commonpath([base, resolved]) != base:
-        sys.exit(f"REFUSING to materialize href outside its tree (path-traversal guard): {href!r}")
-
-def _load_cache(path=CACHE_FILE):
+    """Refuse lexical escapes and any linked root, ancestor, or leaf before use."""
     try:
-        with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except (OSError, json.JSONDecodeError):
+        base_path = require_directory(base, base)
+        candidate = Path(os.path.abspath(os.fspath(path)))
+        relative = candidate.relative_to(base_path).as_posix()
+        canonical_posix_relative(relative)
+        contained_path(base_path, relative, allow_missing=True)
+    except (UnsafePathError, ValueError) as exc:
+        sys.exit(
+            "REFUSING to materialize href outside its tree or through a link "
+            f"(path-containment guard): {href!r}: {exc}"
+        )
+
+def _load_cache(path=None, root=None):
+    path = Path(path) if path is not None else Path(CACHE_FILE)
+    root = Path(root) if root is not None else Path(HERE)
+    try:
+        if not regular_file_exists(path, root):
+            return {}
+        return json.loads(safe_read_text(path, root))
+    except (json.JSONDecodeError, UnicodeDecodeError):
         return {}
 
-def _save_cache(cache, path=CACHE_FILE):
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(cache, f, indent=2, sort_keys=True)
+def _save_cache(cache, path=None, root=None):
+    path = Path(path) if path is not None else Path(CACHE_FILE)
+    root = Path(root) if root is not None else Path(HERE)
+    atomic_write_json(path, cache, root, mode=0o600)
 
-def _verify_dest(dest, href, recorded, cache):
+def _verify_dest(dest, href, recorded, cache, root=SEQ):
     """MD5 of `dest`, using a (size, mtime, recorded-checksum) sidecar cache to skip a full
     re-hash when nothing that could change the answer has changed since the last time this exact
     href/recorded pair was verified (roadmap: fast-path re-verification). A change to EITHER the
@@ -67,12 +86,12 @@ def _verify_dest(dest, href, recorded, cache):
     index.xml with a different value for this href) always falls through to a real re-hash -- the
     cache can only ever save work on a provably-unchanged file verified against the SAME checksum,
     never skip verification on genuine uncertainty."""
-    st = os.stat(dest)
+    st = safe_stat(dest, root)
     entry = cache.get(href)
     if (entry and entry.get("recorded") == recorded.lower()
             and entry.get("size") == st.st_size and entry.get("mtime_ns") == st.st_mtime_ns):
         return entry["verified_md5"]
-    actual = md5(dest)
+    actual = md5(dest, root)
     cache[href] = {"size": st.st_size, "mtime_ns": st.st_mtime_ns,
                     "recorded": recorded.lower(), "verified_md5": actual}
     return actual
@@ -84,28 +103,29 @@ def purge_unindexed_sequence_files(leaves):
     status cannot see. Purging the complete sequence surface, rather than only m5,
     prevents those files and stale UTIL notes from reaching handoff media.
     """
+    require_directory(SEQ, ECTD_ROOT)
+    # Reject the root, ancestor, file, and directory link cases before the first
+    # destructive operation.  os.walk(followlinks=False) alone is insufficient
+    # when its starting path or an ancestor is linked.
+    require_tree_no_symlinks(SEQ, ECTD_ROOT)
     indexed = {
-        os.path.normpath(os.path.join(SEQ, href))
+        contained_path(SEQ, canonical_posix_relative(href), allow_missing=True)
         for href, _recorded in leaves
     }
     infrastructure = {
-        os.path.normpath(os.path.join(SEQ, rel))
+        contained_path(SEQ, rel, allow_missing=True)
         for rel in ("index.xml", "index-md5.txt", *SUPPORT_FILES.keys())
     }
     allowed = indexed | infrastructure
-    if not os.path.isdir(SEQ):
-        return []
     purged = []
-    for root, _dirs, files in os.walk(SEQ):
-        for name in files:
-            path = os.path.normpath(os.path.join(root, name))
-            _require_contained(SEQ, path, os.path.relpath(path, SEQ))
-            if path not in allowed:
-                os.remove(path)
-                purged.append(os.path.relpath(path, SEQ))
-    parent_finder_file = os.path.join(os.path.dirname(SEQ), ".DS_Store")
-    if os.path.isfile(parent_finder_file):
-        os.remove(parent_finder_file)
+    for path in walk_regular_files(SEQ):
+        _require_contained(SEQ, path, path.relative_to(SEQ).as_posix())
+        if path not in allowed:
+            safe_unlink(path, SEQ)
+            purged.append(path.relative_to(SEQ).as_posix())
+    parent_finder_file = ECTD_ROOT / ".DS_Store"
+    if regular_file_exists(parent_finder_file, ECTD_ROOT):
+        safe_unlink(parent_finder_file, ECTD_ROOT)
         purged.append("../.DS_Store")
     return sorted(purged)
 
@@ -128,11 +148,21 @@ def indexed_leaves(index_xml):
 
 
 def main():
-    with open(INDEX, encoding="utf-8") as f:
-        idx = f.read()
+    require_regular_file(INDEX, SEQ)
+    idx = safe_read_text(INDEX, SEQ)
     leaves = indexed_leaves(idx)
     if not leaves:
         sys.exit("No leaves with checksums found in index.xml")
+    normalized_leaves = []
+    for href, recorded in leaves:
+        try:
+            href = canonical_posix_relative(href)
+        except UnsafePathError as exc:
+            sys.exit(f"REFUSING non-canonical eCTD leaf href {href!r}: {exc}")
+        if not re.fullmatch(r"[0-9a-fA-F]{32}", recorded):
+            sys.exit(f"REFUSING invalid MD5 declaration for eCTD leaf {href!r}")
+        normalized_leaves.append((href, recorded))
+    leaves = normalized_leaves
     purged = purge_unindexed_sequence_files(leaves)
     if purged:
         print("REMOVED UNINDEXED SEQUENCE FILES:", *purged, sep="\n  ")
@@ -140,27 +170,47 @@ def main():
     copied = verified = in_place = 0
     missing, mismatch = [], []
     for href, recorded in leaves:
-        dest = os.path.join(SEQ, href)
-        src = os.path.join(PACKAGE_ROOT, href) if href.startswith("m5/") else os.path.join(SEQ, href)
+        dest = contained_path(SEQ, href, allow_missing=True)
+        if href.startswith("m5/"):
+            src = contained_path(M5_ROOT, href[len("m5/"):], allow_missing=True)
+            source_root = M5_ROOT
+        else:
+            src = dest
+            source_root = SEQ
         _require_contained(SEQ, dest, href)
-        _require_contained(PACKAGE_ROOT if href.startswith("m5/") else SEQ, src, href)
+        _require_contained(source_root, src, href)
         # A dest that already matches the just-recorded checksum stays in place (backbone XML
         # authored in-sequence has no repo source and lands here). Otherwise (missing, or stale
         # from an earlier build whose XPT timestamps differ) re-copy from the repo source; the
         # previous logic trusted any existing dest and so failed verification on every re-run.
-        if os.path.exists(dest) and _verify_dest(dest, href, recorded, cache) == recorded.lower():
+        destination_exists = regular_file_exists(dest, SEQ)
+        if destination_exists and _verify_dest(dest, href, recorded, cache, SEQ) == recorded.lower():
+            if dest.suffix.lower() in {".xpt", ".sas7bdat"}:
+                safe_chmod(dest.parent, 0o700, SEQ, directory=True)
+                safe_chmod(dest, 0o600, SEQ)
             in_place += 1
             verified += 1
             continue
-        if not os.path.exists(src):
-            (mismatch if os.path.exists(dest) else missing).append(href)
+        if not regular_file_exists(src, source_root):
+            (mismatch if destination_exists else missing).append(href)
             continue
-        os.makedirs(os.path.dirname(dest), exist_ok=True)
-        shutil.copy2(src, dest); copied += 1
+        safe_makedirs(dest.parent, SEQ)
+        safe_copy_file(
+            src,
+            dest,
+            source_root=source_root,
+            destination_root=SEQ,
+        )
+        copied += 1
+        if dest.suffix.lower() in {".xpt", ".sas7bdat"}:
+            # Materialized patient-level transport files are local controlled artifacts, not a
+            # public review surface.  Keep both the file and its dataset directory least-privilege.
+            safe_chmod(dest.parent, 0o700, SEQ, directory=True)
+            safe_chmod(dest, 0o600, SEQ)
         # Always a genuine re-hash here (never routed through the cache lookup): dest was just
         # written, so this is the one place correctness must not lean on a cached value at all.
-        actual = md5(dest)
-        st = os.stat(dest)
+        actual = md5(dest, SEQ)
+        st = safe_stat(dest, SEQ)
         cache[href] = {"size": st.st_size, "mtime_ns": st.st_mtime_ns,
                         "recorded": recorded.lower(), "verified_md5": actual}
         if actual == recorded.lower():
@@ -187,4 +237,7 @@ def main():
     print("OK — complete sequence inventory/support/XML/run-record validation passed (G08)")
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except UnsafePathError as exc:
+        raise SystemExit(f"REFUSING unsafe eCTD materialization path: {exc}") from exc

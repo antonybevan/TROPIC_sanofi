@@ -16,7 +16,12 @@
 | 4 | [`../08_submission_package/README.md`](../08_submission_package/README.md) | Review package tour |
 | 5 | [`RELEASE_NOTE_v0.3.0-clinical-simulation.md`](RELEASE_NOTE_v0.3.0-clinical-simulation.md) | Current controlled release narrative |
 | 6 | [`SCRIPT_MAP.md`](SCRIPT_MAP.md) | What runs vs ignore |
-| 7 | `python3 scripts/verify_release.py` | Machine re-check |
+| 7 | [`FDA_READINESS_RESEARCH_2026-08-15.md`](FDA_READINESS_RESEARCH_2026-08-15.md) | FDA/ICH pre-shipment evidence map and blockers |
+| 8 | [`../config/regulatory_source_inventory.yaml`](../config/regulatory_source_inventory.yaml) | Machine-checked scoped FDA/ICH/CDISC/eCFR source classifications |
+| 9 | `python3 scripts/verify_release.py` | Machine re-check |
+
+Repository operating controls: [`../CONTRIBUTING.md`](../CONTRIBUTING.md) ·
+[`../SECURITY.md`](../SECURITY.md) · [`LICENSING.md`](LICENSING.md)
 
 ---
 
@@ -66,11 +71,14 @@
 |---|---|
 | [`../platform/README.md`](../platform/README.md) | Factory tiers (what to ignore) |
 | [`../platform/cibuild.py`](../platform/cibuild.py) | Orchestrator |
-| [`../tools/archive/README.md`](../tools/archive/README.md) | Dead/one-off code (not spine) |
+| [`../06_qc_evidence/audit/REPOSITORY_CLEANUP_AUDIT_2026-08-23.md`](../06_qc_evidence/audit/REPOSITORY_CLEANUP_AUDIT_2026-08-23.md) | Dead/orphan cleanup decisions and retained-surface rationale |
 | [`../platform/package_ectd.py`](../platform/package_ectd.py) | Module 5 packager |
 | [`../scripts/verify_release.py`](../scripts/verify_release.py) | Seal re-check |
 | [`runbooks/ODA_GUIDE.md`](runbooks/ODA_GUIDE.md) | Real SAS / ODA operator path |
+| [`runbooks/ENVIRONMENT_BOOTSTRAP.md`](runbooks/ENVIRONMENT_BOOTSTRAP.md) | Hash-verified reviewer setup and Ubuntu CI replay |
+| [`runbooks/RELEASE_PROMOTION.md`](runbooks/RELEASE_PROMOTION.md) | Fail-closed promotion, tag verification, and rollback |
 | [`runbooks/OFFLINE_LAYER_RUNBOOK.md`](runbooks/OFFLINE_LAYER_RUNBOOK.md) | Dataset-JSON / ARS / USDM offline |
+| [`workstreams/decisions/PYTHON_RUNTIME_MIGRATION_2026-08-24.md`](workstreams/decisions/PYTHON_RUNTIME_MIGRATION_2026-08-24.md) | Controlled Python lifecycle and artifact-lock decision |
 
 ### B3 — Analysis programs & specs
 
@@ -83,7 +91,7 @@
 | `03_metadata/define/` | Define-XML + validation tools |
 | [`PIPELINE_ARCHITECTURE_REDESIGN.md`](PIPELINE_ARCHITECTURE_REDESIGN.md) | Evidence-chain architecture |
 | [`BIOMETRICS_DELIVERY_OPERATING_MODEL.md`](BIOMETRICS_DELIVERY_OPERATING_MODEL.md) | Department operating model |
-| [`ORCHESTRATOR_GATE_MAP.md`](ORCHESTRATOR_GATE_MAP.md) | Stage ↔ gate mapping |
+| `ORCHESTRATOR_GATE_MAP.md` (generated locally by [`build_orchestrator_gate_map.py`](../platform/build_orchestrator_gate_map.py)) | Stage ↔ gate mapping |
 
 ### B4 — Multi-study / tests
 
@@ -108,16 +116,18 @@
 | 2 | [`../06_qc_evidence/reconciliation/`](../06_qc_evidence/reconciliation/) | SAS↔R · admiral · figure · forest |
 | 3 | [`../06_qc_evidence/reconciliation/ADMIRAL_RECONCILIATION.md`](../06_qc_evidence/reconciliation/ADMIRAL_RECONCILIATION.md) | Third-engine core |
 | 4 | [`../06_qc_evidence/gates/`](../06_qc_evidence/gates/) | G00 / G02 / G07 status |
-| 5 | [`../06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md`](../06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md) | Crit/Major disposition |
-| 6 | [`../06_qc_evidence/audit/findings_register.csv`](../06_qc_evidence/audit/findings_register.csv) | Machine register |
-| 7 | [`workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md) | Known residual differences |
-| 8 | [`RELEASE_CANDIDATE_CHECKLIST.md`](RELEASE_CANDIDATE_CHECKLIST.md) | RC go/no-go human view |
-| 9 | [`RELEASE_RUN_MANIFEST.md`](RELEASE_RUN_MANIFEST.md) | Hash seal human view |
-| 10 | `platform/pipeline_health.json` | Live run telemetry (`sas_execution_mode`, scope) |
-| 11 | [`../platform/evidence/`](../platform/evidence/) | Frozen genuine ODA snapshot |
+| 5 | [`../06_qc_evidence/audit/FIGURE_AUDIT_2026-08-23.md`](../06_qc_evidence/audit/FIGURE_AUDIT_2026-08-23.md) | Figure mathematics, provenance, PDF, and browser acceptance |
+| 6 | [`../06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md`](../06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md) | Crit/Major disposition |
+| 7 | [`../06_qc_evidence/audit/findings_register.csv`](../06_qc_evidence/audit/findings_register.csv) | Machine register |
+| 8 | [`workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md) | Known residual differences |
+| 9 | [`RELEASE_CANDIDATE_CHECKLIST.md`](RELEASE_CANDIDATE_CHECKLIST.md) | RC go/no-go human view |
+| 10 | [`RELEASE_RUN_MANIFEST.md`](RELEASE_RUN_MANIFEST.md) | Hash seal human view |
+| 11 | `platform/pipeline_health.json` | Live run telemetry (`sas_execution_mode`, scope) |
+| 12 | [`../platform/evidence/`](../platform/evidence/) | Frozen genuine ODA snapshot |
 
-**Validation strategy control:**  
-[`VALIDATION_STRATEGY_CONTROL_REPORT.md`](VALIDATION_STRATEGY_CONTROL_REPORT.md) · [`../config/validation_strategy.yaml`](../config/validation_strategy.yaml)
+**Validation strategy control:** generated by [`build_validation_strategy_report.py`](../platform/build_validation_strategy_report.py)
+from [`../config/validation_strategy.yaml`](../config/validation_strategy.yaml). The generated report
+is intentionally excluded from the public clone and is rebuilt by the delivery controls.
 
 **Say in interview:**  
 “QC is a warehouse with disposition, not a pile of green badges. Findings are RESOLVED or ACCEPTED with reason before release narrative.”
@@ -170,6 +180,8 @@ Typical local outputs (not portfolio face):
 | [`SUBMISSION_REPO_PRESENTATION_RESEARCH.md`](SUBMISSION_REPO_PRESENTATION_RESEARCH.md) | Why dual surface; noise diagnosis |
 | [`REGULATORY_WORKFLOW_RESEARCH.md`](REGULATORY_WORKFLOW_RESEARCH.md) | Industry workflow grounding |
 | [`SIMULATION_PRECISION_RESEARCH.md`](SIMULATION_PRECISION_RESEARCH.md) | Current ICH M15/E9, FDA, ADEMP, and OCTAVE basis for the data-free simulation methods evaluation |
+| [`FDA_READINESS_RESEARCH_2026-08-15.md`](FDA_READINESS_RESEARCH_2026-08-15.md) | FDA/ICH and big-pharma pre-shipment controls mapped to this repository |
+| [`../config/regulatory_source_inventory.yaml`](../config/regulatory_source_inventory.yaml) | Scoped official-source classifications and owner actions |
 | [`../06_qc_evidence/audit/SIMULATION_PRECISION_IMPLEMENTATION_REPORT_2026-08-14.md`](../06_qc_evidence/audit/SIMULATION_PRECISION_IMPLEMENTATION_REPORT_2026-08-14.md) | Implementation, adversarial findings, exact results, verification, and fresh-SAS limitation |
 | [`I_J_generalisation_plan.md`](I_J_generalisation_plan.md) | Multi-study generalisation notes |
 

@@ -13,11 +13,13 @@ from check_gate_g07_reviewer_package import (  # noqa: E402
     CURRENT_RELEASE_NOTE,
     RELEASE_ID_SOURCES,
     SECONDARY_TTE_ROWS,
+    _pdf_identifies_unreleased_candidate,
     _report_secondary_metrics,
     _tfl_secondary_metrics,
 )
 from package_ectd import split_markdown_table_row  # noqa: E402
 from build_ectd_backbone import classify  # noqa: E402
+from build_release_run_manifest import REVIEW_SURFACE_FILES  # noqa: E402
 from validate_ectd_sequence import validate_sequence  # noqa: E402
 
 
@@ -38,6 +40,34 @@ def test_current_release_identity_is_bound_across_reviewer_sources():
         assert len(lines) == 1, (rel, lines)
         assert CURRENT_RELEASE in lines[0]
         assert CURRENT_RELEASE_NOTE in lines[0]
+
+
+def test_current_audit_and_navigation_surfaces_are_release_sealed():
+    required = {
+        "docs/INDEX.md",
+        "06_qc_evidence/audit/DASHBOARD_VISUAL_QC.md",
+        "06_qc_evidence/audit/FIGURE_AUDIT_2026-08-23.md",
+        "06_qc_evidence/audit/PROFESSIONAL_RELEASE_AUDIT_2026-08-24.md",
+        "06_qc_evidence/audit/REPO_PROFESSIONAL_BUILD_AUDIT_2026-08-14.md",
+        "06_qc_evidence/audit/REPOSITORY_CLEANUP_AUDIT_2026-08-23.md",
+        "06_qc_evidence/audit/SIMULATION_PRECISION_IMPLEMENTATION_REPORT_2026-08-14.md",
+    }
+    assert required <= set(REVIEW_SURFACE_FILES)
+    assert all((ROOT / path).is_file() for path in required)
+
+
+def test_pdf_release_identity_rejects_tagged_or_sealed_candidate_language():
+    good = (
+        "Current controlled release candidate: v0.3.0-clinical-simulation "
+        "(unreleased; tag gated by the conditional note)"
+    )
+    assert _pdf_identifies_unreleased_candidate(good)
+    assert not _pdf_identifies_unreleased_candidate(
+        "Current controlled release: tag v0.3.0-clinical-simulation"
+    )
+    assert not _pdf_identifies_unreleased_candidate(
+        "Current sealed controlled release: v0.3.0-clinical-simulation"
+    )
 
 
 def test_committed_ectd_surface_has_no_extras_or_broken_support_references():
@@ -120,6 +150,12 @@ def test_tfl_gallery_matches_controlled_tables_and_is_keyboard_accessible():
         encoding="utf-8"
     )
 
+    # The gallery must remain a portable offline review artifact. Loading a web
+    # font leaks an otherwise local review session and makes rendering depend on
+    # network availability.
+    assert "fonts.googleapis.com" not in gallery
+    assert not re.search(r'<(?:link|script)\b[^>]+(?:href|src)="https?://', gallery)
+
     # The gallery is a committed reviewer surface, so its endpoint and shift cells
     # must remain synchronized with the generated, controlled text outputs.
     assert "Median Survival Time (Months)             4.9" in t11
@@ -147,3 +183,18 @@ def test_tfl_gallery_matches_controlled_tables_and_is_keyboard_accessible():
     assert gallery.count('tabindex="0"') == 7
     assert 'aria-modal="true"' in gallery
     assert 'aria-label="Close figure preview"' in gallery
+    figure_alts = re.findall(r'<img class="fig-thumb"[^>]+alt="([^"]+)"', gallery)
+    assert len(figure_alts) == 7
+    assert all(len(alt.split()) >= 12 for alt in figure_alts)
+    assert "function openLightbox(src, altText, trigger)" in gallery
+    assert "image.alt = altText" in gallery
+    assert gallery.count(", this); }") == 7
+    assert "document.getElementById('lightbox-close').focus()" in gallery
+    assert "lightboxTrigger.focus()" in gallery
+    assert "lightbox.setAttribute('aria-hidden', 'false')" in gallery
+    assert "lightbox.setAttribute('aria-hidden', 'true')" in gallery
+    assert "document.body.style.overflow = 'hidden'" in gallery
+    assert "completed/discontinued" not in gallery
+    assert "prior docetaxel response" not in gallery
+    assert "red = progressors" not in gallery.lower()
+    assert "does not by itself establish clinical progression" in gallery

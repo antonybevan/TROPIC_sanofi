@@ -223,6 +223,6 @@ sas_companion_figures:
   generation_scope: in_dag_real_sas_companion
   policy: |
     SAS companion PNGs under 05_outputs/tfl/output/figures/sas/ are rendered by the real-SAS
-    Stage 14 session, with figure-driving CSVs reconciled against the R track before release
+    SAS Production stage, with figure-driving CSVs reconciled against the R track before release
     sealing. platform/_oda_render_tfl.py remains a manual diagnostic renderer only.
   linked_primary_ids: [F-11-1, F-11-2, F-12-1, F-13-1, F-14-1, F-17-1]

@@ -67,7 +67,7 @@ def test_accessible_heading_hierarchy_and_release_identity(path):
     assert all(current <= previous + 1 for (previous, _), (current, _) in zip(headings, headings[1:]))
     identity_lines = [
         line for line in text.splitlines()
-        if line.startswith("**Current sealed controlled release:**")
+        if line.startswith("**Current controlled release candidate:**")
     ]
     assert len(identity_lines) == 1
     assert "v0.3.0-clinical-simulation" in identity_lines[0]

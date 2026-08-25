@@ -293,10 +293,15 @@ adsl <- dm |>
 adsl <- adsl |> arrange(USUBJID)
 dir.create("04_analysis_datasets/adam", showWarnings = FALSE)
 
-# Assertions and Error Guards (QC-03)
-if (nrow(adsl) < 371) {
+# Assertions and Error Guards (QC-03).  ADSL is the subject-level authority:
+# expansion, duplicate identifiers, or missing identifiers must stop before any
+# downstream ADaM population can be materialized.
+if (nrow(adsl) != nrow(dm) || anyNA(adsl$USUBJID) || anyDuplicated(adsl$USUBJID) > 0) {
   stop(
-    "ERROR: [VALIDATION] ADSL output dataset is incomplete (expected N=371)!"
+    sprintf(
+      "ERROR: [VALIDATION] ADSL must have exactly one nonmissing USUBJID per DM subject (ADSL N=%d, DM N=%d).",
+      nrow(adsl), nrow(dm)
+    )
   )
 }
 
@@ -311,9 +316,6 @@ write_xpt_v(adsl, "04_analysis_datasets/adam/adsl_v.xpt", domain = "ADSL")
 
 cat("NOTE: [VALIDATION] Wrote validation ADSL: 04_analysis_datasets/adam/adsl_v.xpt\n")
 cat(sprintf("NOTE: [ADSL-QC] ADSL n=%d DM n=%d\n", nrow(adsl), nrow(dm)))
-if (nrow(adsl) != nrow(dm)) {
-  warning("ADSL-QC: ADSL row count differs from DM")
-}
 trt_tab <- table(adsl$TRT01P, adsl$TRT01A, useNA = "ifany")
 cat("NOTE: [ADSL-QC] planned-by-actual treatment:\n")
 print(trt_tab)

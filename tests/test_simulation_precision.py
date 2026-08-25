@@ -168,6 +168,46 @@ def test_logrank_matches_independent_reference_and_direction() -> None:
     assert z_reversed[0] > 0.0
 
 
+def test_piecewise_hazard_inverse_round_trip_including_segment_boundaries() -> None:
+    """The DGM inversion must reproduce its cumulative-hazard target exactly."""
+    starts = np.array([0.0, 2.5, 7.0], dtype=float)
+    hazard_ratios = np.array([1.0, 0.65, 0.9], dtype=float)
+    baseline_hazard = math.log(2.0) / 12.7
+    boundary_one = baseline_hazard * 2.5
+    boundary_two = boundary_one + baseline_hazard * 0.65 * (7.0 - 2.5)
+    targets = np.array(
+        [0.0, boundary_one, boundary_one + 1e-12, boundary_two, boundary_two + 0.5, 4.0],
+        dtype=float,
+    )
+
+    times = SIM._inverse_piecewise_hazard(
+        targets, starts, hazard_ratios, baseline_hazard
+    )
+    recovered = SIM._piecewise_cumulative_hazard(
+        times, starts, hazard_ratios, baseline_hazard
+    )
+
+    assert np.all(np.diff(times) >= 0.0)
+    assert recovered == pytest.approx(targets, rel=0.0, abs=2e-15)
+    assert times[1] == pytest.approx(2.5, abs=1e-14)
+    assert times[3] == pytest.approx(7.0, abs=1e-14)
+
+
+@pytest.mark.parametrize("probability", [0.0, 0.04, 0.25, 0.75, 0.999])
+def test_annual_probability_to_monthly_hazard_round_trip(probability: float) -> None:
+    hazard = SIM._annual_probability_to_monthly_hazard(probability)
+    recovered = 1.0 - math.exp(-12.0 * hazard)
+    assert recovered == pytest.approx(probability, rel=0.0, abs=2e-15)
+
+
+@pytest.mark.parametrize("probability", [-0.01, 1.0, math.nan, math.inf, True])
+def test_annual_probability_to_monthly_hazard_rejects_invalid_inputs(
+    probability: float,
+) -> None:
+    with pytest.raises(SIM.ProtocolError, match=r"annual probability.*\[0, 1\)"):
+        SIM._annual_probability_to_monthly_hazard(probability)
+
+
 def test_reduced_null_behavior_contains_analytic_alpha() -> None:
     config = governed_config()
     scenario = copy.deepcopy(config["scenarios"][0])

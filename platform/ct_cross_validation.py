@@ -26,9 +26,11 @@ Usage:
                                               [--allow-skip]
 """
 import argparse
+import builtins
 import json
 import os
 import pickle
+import re
 import sys
 import time
 import urllib.error
@@ -45,6 +47,54 @@ LIBRARY = "https://api.library.cdisc.org/mdr/ct/packages"
 DEFAULT_VERSION = "2026-03-27"
 DEFAULT_PACKAGES = ["sdtmct", "adamct"]
 SKIP_EXIT = 2
+
+
+class _RestrictedUnpickler(pickle.Unpickler):
+    """Load the offline CT cache without importing executable Python objects.
+
+    The cache is generated locally by CORE and ignored by Git, but it still crosses a
+    filesystem trust boundary.  A normal ``pickle.load`` can invoke arbitrary globals during
+    deserialization.  CT packages only need ordinary JSON-like containers and scalar values,
+    so reject every non-builtin class and function.
+    """
+
+    _ALLOWED_BUILTINS = frozenset({
+        "bool", "bytearray", "bytes", "dict", "float", "frozenset", "int", "list", "set",
+        "str", "tuple",
+    })
+
+    def find_class(self, module, name):
+        if module == "builtins" and name in self._ALLOWED_BUILTINS:
+            return getattr(builtins, name)
+        raise pickle.UnpicklingError(f"blocked pickle global: {module}.{name}")
+
+
+def _safe_pickle_load(path):
+    """Read a CORE CT cache while preventing arbitrary-global pickle execution."""
+    with open(path, "rb") as handle:
+        return _RestrictedUnpickler(handle).load()
+
+
+_CACHE_PACKAGE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
+_CACHE_VERSION = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def _validated_cache_path(package, version):
+    """Return a regular cache file path contained beneath the offline cache root."""
+    if not isinstance(package, str) or not _CACHE_PACKAGE.fullmatch(package):
+        raise ValueError(f"invalid CT package name: {package!r}")
+    if not isinstance(version, str) or not _CACHE_VERSION.fullmatch(version):
+        raise ValueError(f"invalid CT package version: {version!r}")
+    path = os.path.join(CACHE, f"{package}-{version}.pkl")
+    cache_root = os.path.realpath(CACHE)
+    resolved = os.path.realpath(path)
+    try:
+        contained = os.path.commonpath([cache_root, resolved]) == cache_root
+    except ValueError:
+        contained = False
+    if not contained or os.path.islink(path):
+        raise ValueError(f"CT cache path escapes the offline cache root: {path}")
+    return path
 
 
 # --------------------------------------------------------------------------- CT source
@@ -74,15 +124,14 @@ def load_ct(packages, version):
                 raise RuntimeError(f"CDISC Library fetch failed for {pkg}-{version}: {last_err}")
         return codelists, f"cdisc_library_api ({LIBRARY})"
     for pkg in packages:
-        path = os.path.join(CACHE, f"{pkg}-{version}.pkl")
+        path = _validated_cache_path(pkg, version)
         if not os.path.exists(path):
             # No CT source available (e.g. a bare CI checkout with no API key and no seeded cache).
             # Return a sentinel so main() can emit a classified SKIPPED report and a distinct
             # exit code unless --allow-skip is explicitly set.
             return None, (f"unavailable: no CDISC_LIBRARY_API_KEY and no offline cache at {path} "
                           f"(set the key or run platform/run_core_conformance.sh once to seed it)")
-        with open(path, "rb") as f:
-            codelists += pickle.load(f).get("codelists", [])
+        codelists += _safe_pickle_load(path).get("codelists", [])
     return codelists, f"core_offline_cache ({os.path.relpath(CACHE, ROOT)})"
 
 

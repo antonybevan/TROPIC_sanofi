@@ -30,8 +30,10 @@ import time
 import signal
 import random
 import datetime
+import stat
 import shutil
 import subprocess
+import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(HERE, ".."))
@@ -57,14 +59,15 @@ REGION_HOSTS = {
 _DOMAIN = ".oda.sas.com"
 
 # Error taxonomy (brief §3.2). FAIL_FAST classes never consume the retry budget.
-FAIL_FAST = {"AUTH", "CONFIG_ENCRYPTION"}
+FAIL_FAST = {"AUTH", "CONFIG_ENCRYPTION", "CONFIG_SECURITY"}
 # Extra cooldown (seconds) applied BEFORE normal backoff for these classes.
 COOLDOWN = {"SESSION_LIMIT": 90, "SPAWN_FAILED": 30}
 KILL_SIGNAL = getattr(signal, "SIGKILL", signal.SIGTERM)
+_MAX_CFG_BYTES = 1 << 20
 
 
 class OdaFatal(Exception):
-    """Non-retryable failure (auth / encryption config). Caller must fix and re-run."""
+    """Non-retryable auth, encryption, or local-config trust failure."""
     def __init__(self, error_class, detail=""):
         self.error_class = error_class
         super().__init__(f"{error_class}: {detail}".strip(": "))
@@ -115,19 +118,145 @@ class OdaConnection:
 
 
 # --------------------------------------------------------------------------- region / config
-def _read_oda_cfg(cfg_file=CFG_FILE):
-    """Return the oda/ODA config dict from sascfg_personal.py, or {}. Never prints secrets."""
+_CFG_SECURITY_KEYS = (
+    "cfg_file_regular",
+    "cfg_file_not_symlink",
+    "cfg_file_owner",
+    "cfg_file_mode_600",
+    "cfg_file_bounded",
+    "cfg_file_stable",
+)
+
+
+def _secure_cfg_source(cfg_file=CFG_FILE):
+    """Return a verified config source plus credential-safe check details.
+
+    The descriptor is opened without following a final symlink where the platform supports it,
+    then compared with ``lstat`` and checked with ``fstat`` before a single byte is read. Keeping
+    the checks on the open descriptor prevents a path replacement from redirecting the read.
+    """
+    cfg_file = os.fspath(cfg_file)
+    checks = {key: False for key in _CFG_SECURITY_KEYS}
+    advisory = {"cfg_file_path": cfg_file}
+    flags = os.O_RDONLY
+    for flag_name in ("O_CLOEXEC", "O_NOFOLLOW", "O_NONBLOCK"):
+        flags |= getattr(os, flag_name, 0)
+
+    fd = None
+    try:
+        fd = os.open(cfg_file, flags)
+    except OSError as exc:
+        # lstat is metadata-only and lets preflight distinguish a refused symlink from a missing
+        # file without ever opening or reading the symlink target.
+        try:
+            path_stat = os.lstat(cfg_file)
+        except OSError:
+            path_stat = None
+        if path_stat is not None:
+            checks["cfg_file_regular"] = stat.S_ISREG(path_stat.st_mode)
+            checks["cfg_file_not_symlink"] = not stat.S_ISLNK(path_stat.st_mode)
+            getuid = getattr(os, "getuid", None)
+            checks["cfg_file_owner"] = bool(getuid and path_stat.st_uid == getuid())
+            checks["cfg_file_mode_600"] = stat.S_IMODE(path_stat.st_mode) == 0o600
+            advisory["cfg_file_mode"] = oct(stat.S_IMODE(path_stat.st_mode))
+        advisory["cfg_file_error"] = (
+            f"{type(exc).__name__}" +
+            (f" (errno={exc.errno})" if exc.errno is not None else "")
+        )
+        return None, checks, advisory
+
+    try:
+        descriptor_stat = os.fstat(fd)
+        try:
+            path_stat = os.lstat(cfg_file)
+        except OSError as exc:
+            advisory["cfg_file_error"] = (
+                f"{type(exc).__name__}" +
+                (f" (errno={exc.errno})" if exc.errno is not None else "")
+            )
+            return None, checks, advisory
+
+        checks["cfg_file_regular"] = (
+            stat.S_ISREG(descriptor_stat.st_mode) and stat.S_ISREG(path_stat.st_mode)
+        )
+        checks["cfg_file_not_symlink"] = not stat.S_ISLNK(path_stat.st_mode)
+        getuid = getattr(os, "getuid", None)
+        checks["cfg_file_owner"] = bool(getuid and descriptor_stat.st_uid == getuid())
+        checks["cfg_file_mode_600"] = stat.S_IMODE(descriptor_stat.st_mode) == 0o600
+        checks["cfg_file_bounded"] = descriptor_stat.st_size <= _MAX_CFG_BYTES
+        checks["cfg_file_stable"] = (
+            descriptor_stat.st_dev == path_stat.st_dev and
+            descriptor_stat.st_ino == path_stat.st_ino and
+            descriptor_stat.st_size == path_stat.st_size and
+            descriptor_stat.st_mtime_ns == path_stat.st_mtime_ns and
+            descriptor_stat.st_ctime_ns == path_stat.st_ctime_ns
+        )
+        advisory["cfg_file_mode"] = oct(stat.S_IMODE(descriptor_stat.st_mode))
+
+        if not all(checks.values()):
+            advisory["cfg_file_error"] = (
+                "config file exceeds size limit"
+                if not checks["cfg_file_bounded"]
+                else "config file failed security checks"
+            )
+            return None, checks, advisory
+
+        handle = os.fdopen(fd, "rb")
+        fd = None  # ownership transferred to handle
+        with handle:
+            source_bytes = handle.read(_MAX_CFG_BYTES + 1)
+            final_stat = os.fstat(handle.fileno())
+        if len(source_bytes) > _MAX_CFG_BYTES:
+            checks["cfg_file_bounded"] = False
+            advisory["cfg_file_error"] = "config file exceeds size limit"
+            return None, checks, advisory
+        if (
+            final_stat.st_dev != descriptor_stat.st_dev or
+            final_stat.st_ino != descriptor_stat.st_ino or
+            final_stat.st_size != descriptor_stat.st_size or
+            final_stat.st_mtime_ns != descriptor_stat.st_mtime_ns or
+            final_stat.st_ctime_ns != descriptor_stat.st_ctime_ns
+        ):
+            checks["cfg_file_stable"] = False
+            advisory["cfg_file_error"] = "config file changed while being read"
+            return None, checks, advisory
+        return source_bytes.decode("utf-8"), checks, advisory
+    except (OSError, UnicodeError) as exc:
+        advisory["cfg_file_error"] = f"{type(exc).__name__}"
+        return None, checks, advisory
+    finally:
+        if fd is not None:
+            os.close(fd)
+
+
+def _parse_oda_cfg(source, cfg_file, checks, advisory):
+    """Parse a config source that has already crossed the descriptor trust boundary."""
     ns = {}
     try:
-        with open(cfg_file, "r", encoding="utf-8") as f:
-            exec(compile(f.read(), cfg_file, "exec"), ns)  # user's own trusted config
-    except (OSError, SyntaxError):
-        return {}
+        exec(compile(source, os.fspath(cfg_file), "exec"), ns)  # verified user-owned config
+    except Exception as exc:
+        advisory["cfg_file_error"] = f"invalid config ({type(exc).__name__})"
+        return {}, checks, advisory
     for key in ("oda", "ODA"):
         cfg = ns.get(key)
         if isinstance(cfg, dict):
-            return cfg
-    return {}
+            return cfg, checks, advisory
+    advisory["cfg_file_error"] = "config does not define an oda/ODA dictionary"
+    return {}, checks, advisory
+
+
+def _load_oda_cfg(cfg_file=CFG_FILE):
+    """Load the oda/ODA dictionary only after the config source passes every trust check."""
+    source, checks, advisory = _secure_cfg_source(cfg_file)
+    if source is None:
+        return {}, checks, advisory
+    return _parse_oda_cfg(source, cfg_file, checks, advisory)
+
+
+def _read_oda_cfg(cfg_file=CFG_FILE):
+    """Return the oda/ODA config dict from sascfg_personal.py, or {}. Never prints secrets."""
+    cfg, _, _ = _load_oda_cfg(cfg_file)
+    return cfg
 
 
 def _read_iomhost(cfg_file=CFG_FILE):
@@ -136,9 +265,9 @@ def _read_iomhost(cfg_file=CFG_FILE):
     return _read_oda_cfg(cfg_file).get("iomhost")
 
 
-def _configured_hosts(cfg_file=CFG_FILE):
-    """Return configured iomhost values as fully-qualified hosts. Secrets are never read/returned."""
-    iomhost = _read_iomhost(cfg_file)
+def _configured_hosts_from_cfg(cfg):
+    """Return configured iomhost values as fully-qualified hosts."""
+    iomhost = cfg.get("iomhost")
     hosts = iomhost if isinstance(iomhost, list) else ([iomhost] if iomhost else [])
     out = []
     for h in hosts:
@@ -148,11 +277,14 @@ def _configured_hosts(cfg_file=CFG_FILE):
     return out
 
 
-def detect_region_hosts(cfg_file=CFG_FILE):
-    """Detect the ODA region from the configured iomhost and return (region, [fqdn,...]) — the
-    FULL spawner set for that region so SASPy can fail over. Falls back to (None, configured)."""
+def _configured_hosts(cfg_file=CFG_FILE):
+    """Return configured iomhost values as fully-qualified hosts. Secrets are never returned."""
+    return _configured_hosts_from_cfg(_read_oda_cfg(cfg_file))
+
+
+def _detect_region_hosts_from_cfg(cfg):
     import re
-    iomhost = _read_iomhost(cfg_file)
+    iomhost = cfg.get("iomhost")
     hosts = iomhost if isinstance(iomhost, list) else ([iomhost] if iomhost else [])
     region = None
     for h in hosts:
@@ -163,7 +295,26 @@ def detect_region_hosts(cfg_file=CFG_FILE):
     if region:
         return region, [f"{h}{_DOMAIN}" for h in REGION_HOSTS[region]]
     # Unknown region: keep whatever was configured (fully-qualified).
-    return None, _configured_hosts(cfg_file)
+    return None, _configured_hosts_from_cfg(cfg)
+
+
+def detect_region_hosts(cfg_file=CFG_FILE):
+    """Detect the ODA region from the configured iomhost and return (region, [fqdn,...]) — the
+    FULL spawner set for that region so SASPy can fail over. Falls back to (None, configured)."""
+    return _detect_region_hosts_from_cfg(_read_oda_cfg(cfg_file))
+
+
+def _failover_status_from_cfg(cfg):
+    configured = _configured_hosts_from_cfg(cfg)
+    region, recommended = _detect_region_hosts_from_cfg(cfg)
+    missing = [h for h in recommended if h not in configured]
+    return {
+        "oda_region": region,
+        "oda_configured_hosts": configured,
+        "oda_recommended_hosts": recommended,
+        "oda_missing_failover_hosts": missing,
+        "oda_failover_configured": bool(region and recommended and not missing),
+    }
 
 
 def failover_status(cfg_file=CFG_FILE):
@@ -173,16 +324,7 @@ def failover_status(cfg_file=CFG_FILE):
     when the user's cfg file contains every host for the detected region. This returns a
     telemetry-safe status only: hostnames and booleans, never credentials.
     """
-    configured = _configured_hosts(cfg_file)
-    region, recommended = detect_region_hosts(cfg_file)
-    missing = [h for h in recommended if h not in configured]
-    return {
-        "oda_region": region,
-        "oda_configured_hosts": configured,
-        "oda_recommended_hosts": recommended,
-        "oda_missing_failover_hosts": missing,
-        "oda_failover_configured": bool(region and recommended and not missing),
-    }
+    return _failover_status_from_cfg(_read_oda_cfg(cfg_file))
 
 
 def preflight(cfg_file=CFG_FILE, authinfo_path=None, java_cmd=None, port_check=False,
@@ -195,11 +337,11 @@ def preflight(cfg_file=CFG_FILE, authinfo_path=None, java_cmd=None, port_check=F
     Optional port checks are advisory because VPN/firewall state can change between preflight and
     connect; the broker's retry state machine remains the authority for transient availability.
     """
-    cfg = _read_oda_cfg(cfg_file)
+    cfg, cfg_security, cfg_advisory = _load_oda_cfg(cfg_file)
     authinfo_path = authinfo_path or os.path.join(os.path.expanduser("~"), ".authinfo")
     java_candidate = java_cmd or cfg.get("java") or which_fn("java")
     required = {}
-    advisory = {}
+    advisory = dict(cfg_advisory)
 
     java_path = which_fn(java_candidate) if java_candidate else None
     if not java_path and java_candidate and exists_fn(str(java_candidate)):
@@ -227,6 +369,7 @@ def preflight(cfg_file=CFG_FILE, authinfo_path=None, java_cmd=None, port_check=F
         advisory["saspy_error"] = f"{type(e).__name__}: {str(e)[:120]}"
 
     required["cfg_file"] = bool(cfg)
+    required.update(cfg_security)
     required["iomhost"] = bool(cfg.get("iomhost"))
     required["authkey"] = bool(cfg.get("authkey"))
 
@@ -242,7 +385,7 @@ def preflight(cfg_file=CFG_FILE, authinfo_path=None, java_cmd=None, port_check=F
         required["authinfo_mode_600"] = False
         advisory["authinfo_path"] = authinfo_path
 
-    failover = failover_status(cfg_file)
+    failover = _failover_status_from_cfg(cfg)
     if port_check:
         import socket
         reach = {}
@@ -549,9 +692,26 @@ def _default_session_factory(timeout):
     `'iomhost': ['odaws01-apse1.oda.sas.com', 'odaws02-apse1.oda.sas.com']`, so saspy itself
     fails over across the region's workspace servers. We rely on the cfg file and only derive
     a region label here for telemetry; `detect_region_hosts()` reports the configured set."""
+    source, checks, advisory = _secure_cfg_source(CFG_FILE)
+    cfg = {}
+    if source is not None:
+        cfg, checks, advisory = _parse_oda_cfg(source, CFG_FILE, checks, advisory)
+    failed_checks = [key for key, value in checks.items() if not value]
+    if not cfg or failed_checks:
+        detail = ", ".join(failed_checks or ["cfg_file"])
+        raise OdaFatal("CONFIG_SECURITY", f"sascfg_personal.py refused: {detail}")
     import saspy
-    region, hosts = detect_region_hosts()
-    sas = saspy.SASsession(cfgname="oda", cfgfile=CFG_FILE, timeout=timeout)
+    region, hosts = _detect_region_hosts_from_cfg(cfg)
+    # SASPy copies and imports cfgfile itself. Give it a private copy of the exact bytes verified
+    # above so a path replacement between our fstat and SASPy's open cannot redirect that import.
+    with tempfile.TemporaryDirectory(prefix="tropic-oda-cfg-") as cfg_dir:
+        os.chmod(cfg_dir, 0o700)
+        cfg_copy = os.path.join(cfg_dir, "sascfg_personal.py")
+        fd = os.open(cfg_copy, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            handle.write(source)
+        os.chmod(cfg_copy, 0o600)
+        sas = saspy.SASsession(cfgname="oda", cfgfile=cfg_copy, timeout=timeout)
     return sas, (hosts[0] if hosts else "oda")
 
 
@@ -646,6 +806,9 @@ def connect(max_wait_s=3600, base=5, cap=120, *,
                 last_class = "SPAWN_FAILED"
                 log_attempt({"error_class": "SPAWN_FAILED", "detail": "probe failed",
                              "latency_s": round(clock() - t0, 1), "status_state": state})
+            except OdaFatal:
+                teardown(sas); sas = None
+                raise
             except Exception as e:
                 last_class = classify(str(e))
                 # Keep cleanup serialized with spawn attempts for slot hygiene; teardown itself

@@ -33,7 +33,7 @@ DEFAULT_REPORT = ROOT / "07_reviewer_explanation/simulation_report.md"
 NOT_REPORTED = "Not reported"
 NOT_APPLICABLE = "Not applicable"
 RELEASE_IDENTITY = (
-    "**Current sealed controlled release:** `v0.3.0-clinical-simulation` · "
+    "**Current controlled release candidate:** `v0.3.0-clinical-simulation` (unreleased) · "
     "[`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`]"
     "(../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md)"
 )

@@ -16,6 +16,8 @@ from pathlib import Path
 
 import yaml
 
+from governance_reseal_policy import governance_chain_policy_problems
+
 
 ROOT = Path(__file__).resolve().parents[1]
 BASELINE = ROOT / "config/regulatory_baseline.yaml"
@@ -29,6 +31,33 @@ REQUIRED_ASSERTIONS = {
     "REGULATORY_GATEWAY_ACCEPTANCE=NOT_EXECUTED",
     "ANNOTATED_CRF=NOT_AVAILABLE",
 }
+
+
+def _manifest_stage_names(manifest: dict) -> list[str]:
+    """Return the exact executor stage contract represented by the study manifest."""
+    if not isinstance(manifest, dict):
+        return []
+    infrastructure = manifest.get("infrastructure_stages")
+    datasets = manifest.get("datasets")
+    if not isinstance(infrastructure, dict) or not isinstance(datasets, list):
+        return []
+    pre = infrastructure.get("pre")
+    pre_sas = infrastructure.get("pre_sas")
+    post = infrastructure.get("post")
+    if not all(isinstance(section, list) for section in (pre, pre_sas, post)):
+        return []
+    try:
+        names = [str(row["name"]) for row in pre]
+        names.extend(
+            str(row.get("val_stage") or f"R {str(row['name']).upper()} Validation")
+            for row in datasets
+        )
+        names.extend(str(row["name"]) for row in pre_sas)
+        names.append("SAS Production (ODA/Real/Simulated)")
+        names.extend(str(row["name"]) for row in post)
+    except (AttributeError, KeyError, TypeError):
+        return []
+    return names
 
 
 def _sha256_file(path: Path) -> str:
@@ -46,36 +75,26 @@ def _valid_reseal_chain(pipeline_health: dict) -> tuple[bool, list[str], str]:
     retains an append-only ``governance_reseal_chain``. Every hop must be PASS,
     disclose that clinical execution was not repeated, and link prior -> rebound.
     """
+    policy_problems = governance_chain_policy_problems(pipeline_health)
+    if policy_problems:
+        return False, [], "; ".join(policy_problems)
+
     current = str(pipeline_health.get("source_tree_sha256") or "")
     chain = pipeline_health.get("governance_reseal_chain")
     if chain is None:
         legacy = pipeline_health.get("governance_only_reseal")
         chain = [legacy] if isinstance(legacy, dict) else []
-    if not isinstance(chain, list) or not all(isinstance(row, dict) for row in chain):
-        return False, [], "malformed governance reseal chain"
 
     accepted: list[str] = []
-    expected_prior = ""
-    for index, row in enumerate(chain):
+    for row in chain:
         prior = str(row.get("prior_source_tree_sha256") or "")
         rebound = str(row.get("rebound_source_tree_sha256") or "")
-        if (
-            row.get("status") != "PASS"
-            or row.get("clinical_run_was_not_reexecuted") is not True
-            or not prior
-            or not rebound
-            or (index and prior != expected_prior)
-        ):
-            return False, accepted, f"invalid governance reseal hop {index + 1}"
         if not accepted:
             accepted.append(prior)
         accepted.append(rebound)
-        expected_prior = rebound
-    if chain and expected_prior != current:
-        return False, accepted, "governance reseal chain does not end at current health digest"
     if not chain and current:
         accepted.append(current)
-    return bool(current), accepted, f"validated_hops={len(chain)}"
+    return True, accepted, f"validated_hops={len(chain)}"
 
 
 def evaluate(root: Path = ROOT) -> dict:
@@ -325,12 +344,56 @@ def evaluate(root: Path = ROOT) -> dict:
             True,
             str(pipeline_health_path.relative_to(root)),
         )
+    manifest_path = root / "config/study_manifest.yaml"
+    try:
+        study_manifest = yaml.safe_load(manifest_path.read_text(encoding="utf-8")) or {}
+    except (OSError, yaml.YAMLError) as exc:
+        study_manifest = {}
+        add("p21.pipeline_binding.manifest_readable", False, str(exc))
+    else:
+        add(
+            "p21.pipeline_binding.manifest_readable",
+            True,
+            str(manifest_path.relative_to(root)),
+        )
+    manifest_stage_names = _manifest_stage_names(study_manifest)
+    manifest_stage_count = len(manifest_stage_names)
+    health_stages_expected = pipeline_health.get("stages_expected")
+    health_stages_recorded = pipeline_health.get("stages_recorded")
+    health_stages = pipeline_health.get("stages")
+    health_stage_names = set(health_stages) if isinstance(health_stages, dict) else set()
+    manifest_stage_name_set = set(manifest_stage_names)
+    health_pass_count = (
+        sum(status == "PASS" for status in health_stages.values())
+        if isinstance(health_stages, dict)
+        else 0
+    )
+    health_stage_contract_ok = (
+        manifest_stage_count > 0
+        and len(manifest_stage_name_set) == manifest_stage_count
+        and isinstance(health_stages_expected, int)
+        and not isinstance(health_stages_expected, bool)
+        and isinstance(health_stages_recorded, int)
+        and not isinstance(health_stages_recorded, bool)
+        and health_stages_expected == manifest_stage_count
+        and health_stages_recorded == manifest_stage_count
+        and health_stage_names == manifest_stage_name_set
+        and health_pass_count == manifest_stage_count
+    )
+    add(
+        "p21.pipeline_binding.health_stage_contract",
+        health_stage_contract_ok,
+        (
+            f"manifest={manifest_stage_count}; expected={health_stages_expected}; "
+            f"recorded={health_stages_recorded}; pass={health_pass_count}"
+        ),
+    )
     binding_expectations = {
         "pipeline_health_status": "GREEN",
         "sas_execution_mode": "oda",
         "run_scope": "full_dag",
-        "stages_expected": 37,
-        "stages_recorded": 37,
+        "stages_expected": health_stages_expected,
+        "stages_recorded": health_stages_recorded,
     }
     for key, expected in binding_expectations.items():
         actual = pipeline_binding.get(key)

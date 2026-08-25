@@ -77,14 +77,21 @@ Factory triage: [`../platform/README.md`](../platform/README.md)
 
 ```bash
 python3 scripts/verify_release.py
+python3 platform/check_submission_readiness.py
 ```
 
-Expected: **VERIFY_RELEASE: PASS** on the committed seal set (no ODA required).
+These commands answer different questions. On a clean, hash-sealed release-candidate
+commit, `verify_release.py` must pass the controlled technical evidence. The broader
+readiness profile remains intentionally **BLOCKED / NOT_QUALIFIED** because sponsor
+authority, independent approval, Enterprise validation, aCRF/application identifiers,
+Part 11 controls, and gateway acceptance are absent. A green technical seal must never
+be presented as FDA readiness or a green filing release.
 
 Also open:
 
 - [`RELEASE_NOTE_v0.3.0-clinical-simulation.md`](RELEASE_NOTE_v0.3.0-clinical-simulation.md)
 - [`QUALITY_SYSTEM_BOUNDARY.md`](QUALITY_SYSTEM_BOUNDARY.md)
+- [`FDA_READINESS_RESEARCH_2026-08-15.md`](FDA_READINESS_RESEARCH_2026-08-15.md)
 - [`workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)
 - Frozen ODA snapshot: `platform/evidence/`
 

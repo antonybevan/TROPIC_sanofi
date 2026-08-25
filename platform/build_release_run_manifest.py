@@ -15,10 +15,15 @@ import hashlib
 import json
 import os
 import platform
+import stat
 import subprocess
 import sys
+from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
+from pathlib import Path, PurePosixPath
+from typing import Iterator
+
+from governance_reseal_policy import governance_chain_policy_problems
 
 try:
     import yaml
@@ -51,6 +56,8 @@ QC_FILES = {
 
 CONTROL_FILES = [
     "00_governance/REPRODUCIBILITY.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
     "config/study_manifest.yaml",
     "config/study_config.yaml",
     "config/tfl_output_catalog.yaml",
@@ -61,12 +68,22 @@ CONTROL_FILES = [
     "config/metadata_lineage.yaml",
     "config/log_cleanliness.yaml",
     "config/regulatory_baseline.yaml",
+    "config/fda_readiness_profile.yaml",
+    "config/regulatory_source_inventory.yaml",
     "config/simulation_protocol.yaml",
     "docs/PRODUCT_CLAIM.md",
     "docs/QUALITY_SYSTEM_BOUNDARY.md",
+    "docs/FDA_READINESS_RESEARCH_2026-08-15.md",
     "docs/SIMULATION_PRECISION_RESEARCH.md",
+    "docs/runbooks/ENVIRONMENT_BOOTSTRAP.md",
+    "docs/runbooks/RELEASE_PROMOTION.md",
+    "docs/workstreams/decisions/PYTHON_RUNTIME_MIGRATION_2026-08-24.md",
     "06_qc_evidence/conformance/p21_adam_runrecord.md",
     "06_qc_evidence/conformance/p21_adam_summary.json",
+    "platform/conformance_rules/adam/RULES.lock",
+    "platform/conformance/core_cache_manifest.json",
+    "platform/conformance/CORE_RUN_RECORD.md",
+    "platform/conformance/CORE_SDTM34_RUN_RECORD.md",
     "03_metadata/adam/ADaM_spec.xlsx",
     "03_metadata/define/define.xml",
     "03_metadata/define/define_sdtm.xml",
@@ -79,6 +96,12 @@ CONTROL_FILES = [
     "06_qc_evidence/reconciliation/results_reconcile.R",
     "06_qc_evidence/reconciliation/forest_reconcile.R",
     "06_qc_evidence/reconciliation/figure_data_reconcile.R",
+    "06_qc_evidence/audit/build_variable_traceability.py",
+    "06_qc_evidence/audit/build_metadata_drift.py",
+    "06_qc_evidence/audit/build_orphan_register.py",
+    "06_qc_evidence/audit/findings_register.csv",
+    "06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md",
+    "06_qc_evidence/audit/orphans_dangling_deadcode.csv",
     "platform/cibuild.py",
     "platform/check_log_cleanliness.py",
     "platform/package_ectd.py",
@@ -90,17 +113,32 @@ CONTROL_FILES = [
     "05_outputs/tfl/tfl_stats.R",
 ]
 
-# Pipeline controls are sealed separately from the clinical source-tree digest.
-# They govern how CI executes and verifies the release, but are not inputs to the
-# already-completed data-bearing run represented by pipeline_health.json.
+# Pipeline controls have their own integrity digest and are also part of the
+# genuine-run source-tree digest.  A runtime, dependency, cache-authority, or
+# release-control change therefore requires a fresh genuine run even when that
+# file is not otherwise included in the control/program inventories.
 PIPELINE_CONTROL_FILES = [
+    ".gitignore",
+    ".python-version",
     ".github/CODEOWNERS",
+    ".github/dependabot.yml",
     ".github/workflows/ci.yml",
     ".gitleaks.toml",
     ".pre-commit-config.yaml",
+    "requirements-core-build.lock",
+    "requirements-core.txt",
+    "requirements-core.lock",
+    "requirements-ci-build.lock",
     "requirements-ci.txt",
     "requirements-ci.lock",
     "renv.lock",
+    "platform/conformance_rules/adam/RULES.lock",
+    "platform/conformance/core_cache_manifest.json",
+    "platform/run_core_conformance.sh",
+    "platform/run_core_update_cache.py",
+    "platform/verify_core_cache.py",
+    "platform/verify_core_source.py",
+    "platform/governance_reseal_policy.py",
     "scripts/rebind_governance_seal.py",
     "scripts/verify_release.py",
 ]
@@ -109,20 +147,30 @@ PIPELINE_CONTROL_FILES = [
 # them in a dedicated artifact group so a corrected table, claim, or acceptance
 # screenshot cannot drift after the clinical run while the seal still passes.
 REVIEW_SURFACE_FILES = [
+    "CHANGELOG.md",
     "README.md",
+    "08_submission_package/README.md",
+    "docs/INDEX.md",
+    "docs/BIOMETRICS_DELIVERY_OPERATING_MODEL.md",
+    "docs/PIPELINE_ARCHITECTURE_REDESIGN.md",
     "docs/REPO_SURFACE_POLICY.md",
+    "docs/WORKSTREAM_EXECUTION_BOARD.md",
     "docs/INTERVIEWER_GUIDE.md",
     "docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md",
     "05_outputs/tfl/TFL_Gallery.html",
     "06_qc_evidence/audit/DASHBOARD_VISUAL_QC.md",
+    "06_qc_evidence/audit/FIGURE_AUDIT_2026-08-23.md",
+    "06_qc_evidence/audit/PROFESSIONAL_RELEASE_AUDIT_2026-08-24.md",
+    "06_qc_evidence/audit/REPO_PROFESSIONAL_BUILD_AUDIT_2026-08-14.md",
     "06_qc_evidence/audit/SIMULATION_PRECISION_IMPLEMENTATION_REPORT_2026-08-14.md",
+    "06_qc_evidence/audit/REPOSITORY_CLEANUP_AUDIT_2026-08-23.md",
     "07_reviewer_explanation/simulation_model_analysis_plan.md",
     "07_reviewer_explanation/simulation_report.md",
     "platform/simulation_operating_characteristics/scenario_results.csv",
     "platform/simulation_operating_characteristics/representative_trials.json",
 ]
 REVIEW_SURFACE_GLOBS = [
-    "06_qc_evidence/audit/dashboard_evidence/*.jpg",
+    "06_qc_evidence/audit/dashboard_evidence/*.[jJ][pP][gG]",
 ]
 
 # Keep the source inventory in one place.  The same digest is written into
@@ -141,6 +189,16 @@ PROGRAM_GLOBS = [
     "07_reviewer_explanation/tools/shiny/**/*.R",
 ]
 
+# These Git-tracked governing surfaces are intentionally discovered instead of
+# maintained as a hand-written file list.  Tests, conformance rules, and
+# workflows enter the clinical source digest, so adding one requires a fresh
+# genuine run. Workflows are also bound as pipeline controls.
+TRACKED_INVENTORY_ROOTS = (
+    "tests",
+    ".github/workflows",
+    "platform/conformance_rules/adam",
+)
+
 # Generated configuration is consumed by the local/ODA run but is intentionally
 # ignored by Git. It must not enter a release source seal that a clean checkout
 # cannot reproduce; the authoritative YAML/config generator is sealed instead.
@@ -151,6 +209,165 @@ GENERATED_SOURCE_EXCLUDES = {
 
 def _rel(path: Path) -> str:
     return path.relative_to(ROOT).as_posix()
+
+
+class UnsafeReleaseFileError(RuntimeError):
+    """A release input was not a stable repository-contained regular file."""
+
+
+def _release_path_parts(rel_path: str) -> tuple[str, ...]:
+    """Validate a repository-relative POSIX path without resolving symlinks."""
+    candidate = PurePosixPath(rel_path)
+    if (
+        not rel_path
+        or candidate.is_absolute()
+        or not candidate.parts
+        or any(part in {"", ".", ".."} for part in candidate.parts)
+    ):
+        raise UnsafeReleaseFileError(f"unsafe release path: {rel_path!r}")
+    return candidate.parts
+
+
+def _stable_metadata(st: os.stat_result) -> tuple[int, int, int, int, int, int]:
+    return (
+        st.st_dev,
+        st.st_ino,
+        st.st_mode,
+        st.st_size,
+        st.st_mtime_ns,
+        st.st_ctime_ns,
+    )
+
+
+@contextmanager
+def _open_stable_regular(rel_path: str) -> Iterator[tuple[int, os.stat_result]]:
+    """Open a stable regular file through a pinned, no-follow directory chain.
+
+    Every path component is checked with the descriptor-relative equivalent of
+    lstat and then opened with O_NOFOLLOW.  Keeping all ancestor descriptors
+    open and rechecking their identities after the read prevents an ancestor or
+    leaf rename/symlink swap from changing which object is sealed.
+    """
+    parts = _release_path_parts(rel_path)
+    nofollow = getattr(os, "O_NOFOLLOW", 0)
+    directory = getattr(os, "O_DIRECTORY", 0)
+    if not nofollow or not directory:
+        raise UnsafeReleaseFileError(
+            "release hashing requires O_NOFOLLOW and O_DIRECTORY support"
+        )
+
+    descriptors: list[int] = []
+    directory_checks: list[tuple[int, str, tuple[int, int]]] = []
+    leaf_fd: int | None = None
+    try:
+        root_before = os.stat(ROOT, follow_symlinks=False)
+        if not stat.S_ISDIR(root_before.st_mode):
+            raise UnsafeReleaseFileError("release repository root is not a directory")
+        root_fd = os.open(ROOT, os.O_RDONLY | directory | nofollow)
+        root_opened = os.fstat(root_fd)
+        if (
+            not stat.S_ISDIR(root_opened.st_mode)
+            or (root_before.st_dev, root_before.st_ino)
+            != (root_opened.st_dev, root_opened.st_ino)
+        ):
+            os.close(root_fd)
+            raise UnsafeReleaseFileError("release repository root changed during open")
+        descriptors.append(root_fd)
+        parent_fd = root_fd
+        for component in parts[:-1]:
+            before = os.stat(component, dir_fd=parent_fd, follow_symlinks=False)
+            if not stat.S_ISDIR(before.st_mode):
+                raise UnsafeReleaseFileError(
+                    f"release path ancestor is not a directory: {rel_path}"
+                )
+            child_fd = os.open(
+                component,
+                os.O_RDONLY | directory | nofollow,
+                dir_fd=parent_fd,
+            )
+            opened = os.fstat(child_fd)
+            if (
+                not stat.S_ISDIR(opened.st_mode)
+                or (before.st_dev, before.st_ino) != (opened.st_dev, opened.st_ino)
+            ):
+                os.close(child_fd)
+                raise UnsafeReleaseFileError(
+                    f"release path ancestor changed during open: {rel_path}"
+                )
+            directory_checks.append(
+                (parent_fd, component, (opened.st_dev, opened.st_ino))
+            )
+            descriptors.append(child_fd)
+            parent_fd = child_fd
+
+        leaf = parts[-1]
+        before = os.stat(leaf, dir_fd=parent_fd, follow_symlinks=False)
+        if not stat.S_ISREG(before.st_mode):
+            raise UnsafeReleaseFileError(
+                f"release input is not a regular file: {rel_path}"
+            )
+        leaf_fd = os.open(leaf, os.O_RDONLY | nofollow, dir_fd=parent_fd)
+        opened = os.fstat(leaf_fd)
+        if (
+            not stat.S_ISREG(opened.st_mode)
+            or (before.st_dev, before.st_ino) != (opened.st_dev, opened.st_ino)
+        ):
+            raise UnsafeReleaseFileError(
+                f"release input changed during open: {rel_path}"
+            )
+
+        yield leaf_fd, opened
+
+        after = os.fstat(leaf_fd)
+        try:
+            current = os.stat(leaf, dir_fd=parent_fd, follow_symlinks=False)
+        except OSError as exc:
+            raise UnsafeReleaseFileError(
+                f"release input changed during hashing: {rel_path}"
+            ) from exc
+        if (
+            not stat.S_ISREG(current.st_mode)
+            or _stable_metadata(opened) != _stable_metadata(after)
+            or (opened.st_dev, opened.st_ino) != (current.st_dev, current.st_ino)
+        ):
+            raise UnsafeReleaseFileError(
+                f"release input changed during hashing: {rel_path}"
+            )
+        try:
+            root_current = os.stat(ROOT, follow_symlinks=False)
+        except OSError as exc:
+            raise UnsafeReleaseFileError(
+                "release repository root changed during hashing"
+            ) from exc
+        if (
+            not stat.S_ISDIR(root_current.st_mode)
+            or (root_opened.st_dev, root_opened.st_ino)
+            != (root_current.st_dev, root_current.st_ino)
+        ):
+            raise UnsafeReleaseFileError(
+                "release repository root changed during hashing"
+            )
+        for ancestor_fd, component, identity in directory_checks:
+            try:
+                current_dir = os.stat(
+                    component, dir_fd=ancestor_fd, follow_symlinks=False
+                )
+            except OSError as exc:
+                raise UnsafeReleaseFileError(
+                    f"release path ancestor changed during hashing: {rel_path}"
+                ) from exc
+            if (
+                not stat.S_ISDIR(current_dir.st_mode)
+                or (current_dir.st_dev, current_dir.st_ino) != identity
+            ):
+                raise UnsafeReleaseFileError(
+                    f"release path ancestor changed during hashing: {rel_path}"
+                )
+    finally:
+        if leaf_fd is not None:
+            os.close(leaf_fd)
+        for descriptor in reversed(descriptors):
+            os.close(descriptor)
 
 
 def _run_git(args: list[str]) -> str:
@@ -165,68 +382,145 @@ def _run_git(args: list[str]) -> str:
         return ""
 
 
+def _tracked_governing_inventory() -> tuple[list[str], list[str]]:
+    """Return tracked fresh-run programs/rules and pipeline workflows."""
+    try:
+        raw = subprocess.check_output(
+            ["git", "ls-files", "-z", "--", *TRACKED_INVENTORY_ROOTS],
+            cwd=ROOT,
+            stderr=subprocess.DEVNULL,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise RuntimeError("cannot derive tracked release-control inventory") from exc
+    paths = [
+        item.decode("utf-8")
+        for item in raw.split(b"\0")
+        if item
+    ]
+    programs = sorted(
+        path
+        for path in paths
+        if (
+            path.startswith("tests/")
+            and (path.endswith(".py") or path.endswith(".R"))
+        )
+        or (
+            path.startswith("platform/conformance_rules/adam/")
+            and (path.endswith(".yml") or path.endswith(".yaml"))
+        )
+        or (
+            path.startswith(".github/workflows/")
+            and (path.endswith(".yml") or path.endswith(".yaml"))
+        )
+    )
+    workflows = sorted(
+        path
+        for path in paths
+        if path.startswith(".github/workflows/")
+        and (path.endswith(".yml") or path.endswith(".yaml"))
+    )
+    return programs, workflows
+
+
 def _sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def _source_tree_sha256(controls: list, programs: list) -> str:
-    """Digest of sealed material source (controls + programs), seal-output-free.
+def _source_tree_sha256(*row_groups: list) -> str:
+    """Digest of all run-affecting sealed source, without seal outputs.
 
     Replaces HEAD-based staleness binding: committing the tracked seal advances
     HEAD past the recorded head, so a committed manifest can never satisfy a
     current_HEAD equality check (audit CRITICAL). The source-tree digest attests
-    to the exact source/config/program tree the seal was built from, is stable
-    across the seal commit (seal outputs are in neither group), and is
-    recomputable in a bare clone.
+    to the exact source/config/program/pipeline-control tree the seal was built
+    from, is stable across the seal commit (seal outputs are in no input group),
+    and is recomputable in a bare clone. Identical paths shared by inventories
+    are intentionally deduplicated.
     """
     rows = sorted(
-        (r["path"], r["sha256"]) for r in (controls + programs)
-        if r.get("sha256")
+        {
+            (row["path"], row["sha256"])
+            for group in row_groups
+            for row in group
+            if row.get("sha256")
+        }
     )
     return _sha256_bytes(b"\n".join(f"{p}\0{s}".encode("utf-8") for p, s in rows))
 
 
 def _current_source_tree_sha256() -> str:
-    """Recompute the run-binding digest from the current source/control tree."""
-    controls = _hash_existing(CONTROL_FILES)
-    programs = _hash_globs(PROGRAM_GLOBS, exclude_paths=GENERATED_SOURCE_EXCLUDES)
-    return _source_tree_sha256(controls, programs)
+    """Recompute the run binding from all current run-affecting controls."""
+    controls = _hash_existing(CONTROL_FILES, required=True)
+    tracked_programs, tracked_workflows = _tracked_governing_inventory()
+    programs = _merge_hash_rows(
+        _hash_globs(PROGRAM_GLOBS, exclude_paths=GENERATED_SOURCE_EXCLUDES),
+        _hash_existing(tracked_programs, required=True),
+    )
+    pipeline_controls = _merge_hash_rows(
+        _hash_existing(PIPELINE_CONTROL_FILES, required=True),
+        _hash_existing(tracked_workflows, required=True),
+    )
+    return _source_tree_sha256(controls, programs, pipeline_controls)
 
 
 def _hash_file(path: Path) -> dict:
-    if not path.exists():
-        return {"path": _rel(path), "present": False, "size_bytes": None, "sha256": "", "md5": ""}
+    rel_path = _rel(path)
     h256 = hashlib.sha256()
     hmd5 = hashlib.md5()  # identity checksum for SAS/XPT parity, not a security use
-    with path.open("rb") as f:
-        for chunk in iter(lambda: f.read(1024 * 1024), b""):
-            h256.update(chunk)
-            hmd5.update(chunk)
+    try:
+        with _open_stable_regular(rel_path) as (fd, opened):
+            while True:
+                chunk = os.read(fd, 1024 * 1024)
+                if not chunk:
+                    break
+                h256.update(chunk)
+                hmd5.update(chunk)
+    except FileNotFoundError:
+        return {
+            "path": rel_path,
+            "present": False,
+            "size_bytes": None,
+            "sha256": "",
+            "md5": "",
+        }
     return {
-        "path": _rel(path),
+        "path": rel_path,
         "present": True,
-        "size_bytes": path.stat().st_size,
+        "size_bytes": opened.st_size,
         "sha256": h256.hexdigest(),
         "md5": hmd5.hexdigest(),
     }
 
 
+def _read_regular_bytes(rel_path: str) -> bytes:
+    chunks: list[bytes] = []
+    with _open_stable_regular(rel_path) as (fd, _):
+        while True:
+            chunk = os.read(fd, 1024 * 1024)
+            if not chunk:
+                return b"".join(chunks)
+            chunks.append(chunk)
+
+
 def _load_json(rel_path: str) -> dict:
-    path = ROOT / rel_path
-    if not path.exists():
+    try:
+        raw = _read_regular_bytes(rel_path)
+    except FileNotFoundError:
         return {}
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
+        return json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
         return {}
 
 
 def _load_manifest() -> dict:
-    path = ROOT / "config/study_manifest.yaml"
-    if yaml is None or not path.exists():
+    if yaml is None:
         return {}
-    with path.open("r", encoding="utf-8") as f:
-        data = yaml.safe_load(f)
+    try:
+        raw = _read_regular_bytes("config/study_manifest.yaml")
+    except FileNotFoundError:
+        return {}
+    data = yaml.safe_load(raw.decode("utf-8"))
     return data if isinstance(data, dict) else {}
 
 
@@ -303,7 +597,7 @@ def _sas_companion_freshness(health: dict) -> dict:
         "stale_paths": stale,
         "all_current_with_pipeline_health": bool(files) and not stale,
         "note": (
-            "SAS companion figures are rendered by the real-SAS Stage 14 session and "
+            "SAS companion figures are rendered by the manifest-named SAS Production stage and "
             "their figure-driving CSVs are reconciled before release sealing."
         ),
     }
@@ -387,25 +681,103 @@ def _git_state() -> dict:
     }
 
 
-def _hash_existing(paths: list[str]) -> list[dict]:
+def _hash_existing(paths: list[str], *, required: bool = False) -> list[dict]:
+    """Hash a fixed path list, optionally failing closed on missing paths.
+
+    Review surfaces are intentionally optional in a data-free checkout, but the
+    fixed control and pipeline-control registries are part of the release
+    identity. Silently dropping one of those files would make the source-tree
+    digest incomplete and could allow an unsealed control change.
+    """
     rows = []
+    missing = []
     for rel_path in paths:
-        path = ROOT / rel_path
-        if path.exists():
-            rows.append(_hash_file(path))
+        row = _hash_file(ROOT / rel_path)
+        if row["present"]:
+            rows.append(row)
+        else:
+            missing.append(rel_path)
+    if required and missing:
+        raise RuntimeError(
+            "required release-control file(s) missing: " + ", ".join(missing)
+        )
     return rows
 
 
 def _hash_globs(patterns: list[str], exclude_paths: set[str] | None = None) -> list[dict]:
     rows = []
-    seen = set()
+    seen: set[str] = set()
     exclude_paths = exclude_paths or set()
     for pattern in patterns:
         for path in sorted(ROOT.glob(pattern)):
-            if path.is_file() and path not in seen and _rel(path) not in exclude_paths:
-                seen.add(path)
-                rows.append(_hash_file(path))
+            rel_path = _rel(path)
+            if rel_path in seen or rel_path in exclude_paths:
+                continue
+            # Recursive globs naturally yield real directory containers.  They
+            # are not file leaves; every other matching type is passed to the
+            # secure hasher, which rejects symlinks, FIFOs, devices, and sockets.
+            try:
+                leaf_lstat = path.lstat()
+            except FileNotFoundError as exc:
+                raise UnsafeReleaseFileError(
+                    f"release glob entry changed during enumeration: {rel_path}"
+                ) from exc
+            if stat.S_ISDIR(leaf_lstat.st_mode):
+                continue
+            seen.add(rel_path)
+            row = _hash_file(path)
+            if not row["present"]:
+                raise UnsafeReleaseFileError(
+                    f"release glob entry disappeared during hashing: {rel_path}"
+                )
+            rows.append(row)
     return rows
+
+
+def _merge_hash_rows(*groups: list[dict]) -> list[dict]:
+    """Merge independently derived inventories without duplicate seal rows."""
+    rows: dict[str, dict] = {}
+    for group in groups:
+        for row in group:
+            rel_path = row.get("path")
+            if not rel_path:
+                raise RuntimeError(f"release inventory contains an invalid row: {row!r}")
+            prior = rows.get(rel_path)
+            if prior is not None and prior != row:
+                raise RuntimeError(f"release inventory changed while merging: {rel_path}")
+            rows[rel_path] = row
+    return [rows[path] for path in sorted(rows)]
+
+
+def _expected_program_paths(tracked_programs: list[str]) -> set[str]:
+    """Derive the exact current program/source membership used by the builder."""
+    static_rows = _hash_globs(
+        PROGRAM_GLOBS, exclude_paths=GENERATED_SOURCE_EXCLUDES
+    )
+    return {row["path"] for row in static_rows} | set(tracked_programs)
+
+
+def _inventory_membership_problems(
+    group: str, rows: object, expected: set[str]
+) -> list[str]:
+    if not isinstance(rows, list):
+        return [f"{group}: seal inventory is not a list"]
+    raw_paths = [row.get("path") if isinstance(row, dict) else None for row in rows]
+    paths = [path for path in raw_paths if isinstance(path, str) and path]
+    actual = set(paths)
+    duplicates = sorted(path for path in actual if paths.count(path) > 1)
+    missing = sorted(expected - actual)
+    unexpected = sorted(actual - expected)
+    problems: list[str] = []
+    if duplicates:
+        problems.append(f"{group}: duplicate entries: " + ", ".join(duplicates))
+    if missing:
+        problems.append(f"{group}: seal incomplete: " + ", ".join(missing))
+    if unexpected:
+        problems.append(f"{group}: unexpected entries: " + ", ".join(unexpected))
+    if len(paths) != len(raw_paths):
+        problems.append(f"{group}: seal contains entries without valid paths")
+    return problems
 
 
 def _dataset_hashes(datasets: list[str]) -> tuple[list[dict], list[dict]]:
@@ -484,10 +856,14 @@ def _qc_statuses() -> tuple[dict, list[dict]]:
                 "provenance_guard_passed": (data.get("provenance_guard") or {}).get("passed"),
             },
         }
-        path = ROOT / rel_path
-        if path.exists():
-            hashes.append(_hash_file(path))
+        row = _hash_file(ROOT / rel_path)
+        if row["present"]:
+            hashes.append(row)
     return statuses, hashes
+
+
+def _metadata_control_pass(status: dict) -> bool:
+    return str(status.get("status", "")).lower() == "pass"
 
 
 def _binding_problems(payload: dict) -> list[str]:
@@ -513,6 +889,7 @@ def _binding_problems(payload: dict) -> list[str]:
     figure_data = _load_json(QC_FILES["figure_data_reconciliation"])
     spec_define = _load_json(QC_FILES["spec_define"])
     spec_data = _load_json(QC_FILES["spec_data"])
+    metadata_control = _load_json(QC_FILES["metadata_control"])
     log_cleanliness = _load_json(QC_FILES["log_cleanliness"])
     regulatory_baseline = _load_json(QC_FILES["regulatory_baseline"])
     simulation = _load_json(QC_FILES["simulation_operating_characteristics"])
@@ -537,6 +914,8 @@ def _binding_problems(payload: dict) -> list[str]:
         problems.append("spec-to-Define conformance is not PASS")
     if spec_data.get("status") != "PASS":
         problems.append("spec-to-data conformance is not PASS")
+    if not _metadata_control_pass(metadata_control):
+        problems.append("metadata control evidence refresh is not PASS")
     if log_cleanliness.get("status") != "PASS":
         problems.append("log cleanliness gate is not PASS")
     if regulatory_baseline.get("status") != "PASS":
@@ -548,24 +927,29 @@ def _binding_problems(payload: dict) -> list[str]:
     if (simulation_statuses.get("evidence_qualification") or {}).get("status") != "NOT_QUALIFIED":
         problems.append("simulation evidence qualification boundary is not NOT_QUALIFIED")
 
-    governance_reseal = health.get("governance_only_reseal") or {}
-    if governance_reseal:
-        if governance_reseal.get("status") != "PASS":
-            problems.append("governance-only seal rebind is not PASS")
-        if governance_reseal.get("rebound_source_tree_sha256") != expected_source_tree:
-            problems.append("governance-only seal rebind does not match current source tree")
-        if governance_reseal.get("clinical_run_was_not_reexecuted") is not True:
-            problems.append("governance-only seal rebind lacks its non-rerun disclosure")
+    governance_problems = governance_chain_policy_problems(health)
+    problems.extend(
+        f"governance reseal policy: {problem}"
+        for problem in governance_problems
+    )
 
     pipeline_controls = payload.get("artifacts", {}).get("pipeline_controls") or []
-    missing_pipeline_controls = [
-        path for path in PIPELINE_CONTROL_FILES
-        if not any(row.get("path") == path and row.get("present") for row in pipeline_controls)
-    ]
-    if missing_pipeline_controls:
-        problems.append(
-            "pipeline control seal is incomplete: " + ", ".join(missing_pipeline_controls)
+    tracked_programs, tracked_workflows = _tracked_governing_inventory()
+    expected_programs = _expected_program_paths(tracked_programs)
+    problems.extend(
+        _inventory_membership_problems(
+            "programs",
+            (payload.get("artifacts") or {}).get("programs"),
+            expected_programs,
         )
+    )
+    problems.extend(
+        _inventory_membership_problems(
+            "pipeline_controls",
+            pipeline_controls,
+            set(PIPELINE_CONTROL_FILES) | set(tracked_workflows),
+        )
+    )
 
     for row in payload["datasets"]:
         ds = row["dataset"]
@@ -766,19 +1150,28 @@ def build_release_run_manifest(out_dir: Path = OUT_DIR) -> dict:
         "05_outputs/ars/**/*.json",
         "05_outputs/ars/**/*.ndjson",
     ])
-    review_surface = _hash_existing(REVIEW_SURFACE_FILES) + _hash_globs(
+    review_surface = _hash_existing(REVIEW_SURFACE_FILES, required=True) + _hash_globs(
         REVIEW_SURFACE_GLOBS
     )
-    programs = _hash_globs(PROGRAM_GLOBS, exclude_paths=GENERATED_SOURCE_EXCLUDES)
-    controls = _hash_existing(CONTROL_FILES)
-    pipeline_controls = _hash_existing(PIPELINE_CONTROL_FILES)
+    tracked_programs, tracked_workflows = _tracked_governing_inventory()
+    programs = _merge_hash_rows(
+        _hash_globs(PROGRAM_GLOBS, exclude_paths=GENERATED_SOURCE_EXCLUDES),
+        _hash_existing(tracked_programs, required=True),
+    )
+    controls = _hash_existing(CONTROL_FILES, required=True)
+    pipeline_controls = _merge_hash_rows(
+        _hash_existing(PIPELINE_CONTROL_FILES, required=True),
+        _hash_existing(tracked_workflows, required=True),
+    )
 
     expected_stages = _expected_stage_names(manifest)
     run_completeness = _run_completeness(health, expected_stages)
     sas_companion_figures = _sas_companion_freshness(health)
 
     git_state = _git_state()
-    git_state["source_tree_sha256"] = _source_tree_sha256(controls, programs)
+    git_state["source_tree_sha256"] = _source_tree_sha256(
+        controls, programs, pipeline_controls
+    )
     git_state["pipeline_control_sha256"] = _source_tree_sha256(pipeline_controls, [])
 
     payload = {

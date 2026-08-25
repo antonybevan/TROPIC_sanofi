@@ -4,14 +4,18 @@
 
 version: 1
 study: TROPIC-NCT00417079
-as_of: "2026-08-10"
-product_claim_in_force: controlled_non_submission_demo
-pipeline_seal_tag: v0.2.1-portfolio
-historical_tag_note: "v0.1.0-demo-rc.1 and v0.2.0-portfolio are immutable historical evidence; v0.2.1-portfolio is the current Path A portfolio release."
-audit_baseline_commit: "v0.2.1-portfolio^{commit}"
-latest_sealed_run_source_head: "v0.2.1-portfolio^{commit}"
-latest_pipeline_health: "oda/full_dag/GREEN, 37 of 37 stages"
-latest_release_verification: "31 of 35 checks; REMEDIATION until the audited worktree is reviewed, committed, and tagged"
+as_of: "2026-08-23"
+product_claim_in_force: controlled_clinical_submission_simulation_non_submission
+candidate_id: v0.3.0-clinical-simulation
+candidate_status: unreleased
+latest_tagged_release: v0.2.2-portfolio
+pipeline_seal_tag: "UNRELEASED — candidate tag gated by the conditional release note"
+historical_tag_note: "v0.1.0-demo-rc.1, v0.2.0-portfolio, v0.2.1-portfolio, and v0.2.2-portfolio are immutable historical evidence; none identifies the current candidate."
+legacy_path_a_term_note: "Historical Path A labels mean the controlled non-submission portfolio boundary; docs/PRODUCT_CLAIM.md is the current authority."
+audit_baseline_commit: "current candidate branch; exact commit is recorded by the release manifest"
+latest_sealed_run_source_head: "See platform/release_run_manifest/release_run_manifest.json"
+latest_pipeline_health: "See platform/pipeline_health.json; the current manifest requires a complete 41-stage genuine-SAS DAG"
+latest_release_verification: "See platform/release_candidate/release_candidate_status.json and scripts/verify_release.py"
 board_doc: docs/WORKSTREAM_EXECUTION_BOARD.md
 product_claim_doc: docs/PRODUCT_CLAIM.md
 disposition_board: 06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md
@@ -26,7 +30,7 @@ workstreams:
       - 06_qc_evidence/audit/SAP_LOCK_REVIEW_MEMO.md
       - 06_qc_evidence/audit/findings_register.csv
       - 06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md
-      - docs/RELEASE_NOTE_v0.2.1-portfolio.md
+      - docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md
       - docs/PRODUCT_CLAIM.md
       - README.md
       - 00_governance/REPRODUCIBILITY.md
@@ -42,7 +46,7 @@ workstreams:
     name: Clinical data management / source intake
     gates: [G01]
     status: GREEN
-    note: "Path A source handoff is GREEN with disclosed residuals; AMBER reflects broader CORE/P21 industry depth. Section 1 audit passed 2026-08-03."
+    note: "Controlled-scope source handoff is GREEN with disclosed residuals; AMBER reflects broader CORE/P21 industry depth. Section 1 audit passed 2026-08-03."
     owned_artifacts:
       - 01_source_data
       - 04_analysis_datasets/programs/r/v_staging_ingest.R
@@ -72,7 +76,7 @@ workstreams:
       - config/ctq_traceability.yaml
       - 07_reviewer_explanation/analysis_report.md
       - 07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md
-    note: "Conditional GREEN for Path A. The statistical-governance review found and corrected GOV-STAT-01 in SAS T-11-5; current-head promotion now requires exact subject-level F042_PAIN_RESPONSE SAS/R parity plus the full real-SAS DAG and reseal. External qualified review remains required before regulated reuse."
+    note: "Conditional GREEN for the controlled scope. The statistical-governance review found and corrected GOV-STAT-01 in SAS T-11-5; current-head promotion requires exact subject-level F042_PAIN_RESPONSE SAS/R parity plus the full genuine-SAS DAG and reseal. External qualified review remains required before regulated reuse."
     open_risks:
       - external_statistical_medical_review
       - F-012_combined_n749_is_not_protocol_itt
@@ -94,7 +98,7 @@ workstreams:
     name: Standards and metadata governance
     gates: [G03]
     status: GREEN
-    note: "GREEN for Path A; AMBER for broader commercial-validator depth. F-014 is resolved with 10 ResultDisplays / 18 AnalysisResults and an executable Define/ARM contract."
+    note: "GREEN for the controlled scope; AMBER for broader commercial-validator depth. F-014 is resolved with 10 ResultDisplays / 18 AnalysisResults and an executable Define/ARM contract."
     owned_artifacts:
       - 03_metadata/adam/ADaM_spec.xlsx
       - 03_metadata/define/define.xml
@@ -142,7 +146,7 @@ workstreams:
     name: Risk-based QC and validation
     gates: [G06]
     status: GREEN
-    note: "Path A residual memo filed; machine gates PASS; co-own CORE residual matrix with WS-1 for industry depth"
+    note: "Controlled-scope residual memo filed; machine gates PASS; co-own CORE residual matrix with WS-1 for industry depth"
     owned_artifacts:
       - config/validation_strategy.yaml
       - 07_reviewer_explanation/guides/RISK_BASED_VALIDATION.md
@@ -171,7 +175,7 @@ workstreams:
       - 07_reviewer_explanation/guides/SDRG.md
       - 07_reviewer_explanation/guides/BDRG.md
       - 07_reviewer_explanation/guides/TRACEABILITY_MATRIX.md
-      - docs/RELEASE_NOTE_v0.2.1-portfolio.md
+      - docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md
       - 07_reviewer_explanation/analysis_report.md
     open_risks:
       - optional_pdf_repackage_lag
@@ -179,7 +183,7 @@ workstreams:
     required_evidence:
       - hardened_adrg_sdrg_bdrg
       - guide_signoff_checklist
-    next_action: "Maintain guide claim language and regenerated PDFs; preserve Path A limitations"
+    next_action: "Maintain guide claim language and regenerated PDFs; preserve the controlled non-submission limitations"
     residual_findings: [F-003, F-005, F-019]
     packs:
       - docs/workstreams/WS6_REVIEWER_GUIDE_HARDENING_CHECKLIST.md

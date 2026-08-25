@@ -5,7 +5,7 @@
 - **Branch:** `codex/pipeline-audit-closure-2026-08-05`
 - **Base HEAD:** `f704b7a721b5c0723e7356addfada7b3cd44ad67`
 - **Study:** TROPIC / EFC6193 / XRP6258 / NCT00417079
-- **Audit baseline:** `TROPIC_END_TO_END_CONTEXT_AUDIT.md`
+- **Audit baseline:** `TROPIC_END_TO_END_CONTEXT_AUDIT.md` (same run-record directory)
 - **Execution evidence:** live SAS ODA plus independent local R validation
 
 ## 1. Final decision
@@ -303,7 +303,8 @@ are explicitly classified and justified as sponsor-defined in
   forest, and figure reconciliation all pass.
 - The current authoritative ADaM workbook is
   `03_metadata/adam/ADaM_spec.xlsx`; the delivery copy is under
-  `outputs/pipeline_audit_20260809/` and has the same SHA-256.
+  `06_qc_evidence/audit/run_records/2026-08-09-pipeline-audit/ADaM_spec.xlsx`
+  and has the same SHA-256.
 - Do not report the synthetic CbzP arm as real trial IPD or the mixed-source PFS
   comparison as publication reproduction.
 - Do not claim regulatory submission readiness. The technical portfolio is ready

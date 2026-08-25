@@ -1,5 +1,5 @@
 {
-  "overall": "PASS",
+  "overall": "FAIL",
   "simulated": false,
   "execution_mode": "oda",
   "domains": {
@@ -13,7 +13,7 @@
     "CLINSITE": "PASS"
   },
   "endpoint_controls": {
-    "F042_PAIN_RESPONSE": "PASS"
+    "F042_PAIN_RESPONSE": "FAIL"
   }
 }
 

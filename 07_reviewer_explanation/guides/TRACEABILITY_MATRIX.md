@@ -175,7 +175,22 @@ Stage numbers are **manifest-derived** (not hard-coded). Optional local gate map
 
 | Stage | Control | Evidence artifact |
 |---|---|---|
-| 14–16 (synthetic reconstruction/validation/export) | `reconstruct_cbzp_arm.R`, `guyot_validation_report.R`, `export_cbzp_xpt.R` | regenerated comparator RDS/XPT and validation report |
+| 1 (governance lock) | `check_gate_g00_governance.py` | G00 product/scope/findings schema and active-board consistency status |
+| 2 (specification lock) | `check_gate_g02_specification.py` | G02 SAP/specification/ARM contract status |
+| 3 (ADaM labels/order) | `gen_adam_labels.R` | shared SAS/R label and order artifacts derived from the specification |
+| 4 (source staging) | `v_staging_ingest.R` | controlled real-source SDTM staging and dependency status |
+| 5 (SDTM validation) | `v_sdtm_validation.R` | structural/source SDTM validation log |
+| 6 (R ADSL validation) | `v_adsl_validation.R` | validation ADSL XPT/log |
+| 7 (R ADEX validation) | `v_adex_validation.R` | validation ADEX XPT/log |
+| 8 (R ADCM validation) | `v_adcm_validation.R` | validation ADCM XPT/log |
+| 9 (R ADAE validation) | `v_adae_io_validation.R` | validation ADAE XPT/log |
+| 10 (R ADLB validation) | `v_adlb_validation.R` | validation ADLB XPT/log |
+| 11 (R ADRS validation) | `v_adrs_validation.R` | validation ADRS XPT/log |
+| 12 (R ADTTE validation) | `v_adtte_validation.R` | validation ADTTE XPT/log |
+| 13 (R BIMO validation) | `v_bimo_validation.R` | validation CLINSITE XPT/log |
+| 14 (synthetic reconstruction) | `reconstruct_cbzp_arm.R` | regenerated comparator RDS inputs |
+| 15 (Guyot validation) | `guyot_validation_report.R` | reconstruction validation report |
+| 16 (synthetic XPT export) | `export_cbzp_xpt.R` | deterministic comparator XPT bridge |
 | 17 (real SAS production) | `00_master_driver.sas` through the ODA broker | production XPTs, SAS logs, companion TFL evidence |
 | 18 (cross-language audit) | `cross_lang_audit.R` | `reconciliation_status.json`, reconciliation report |
 | 19 (admiral ADSL) | `admiral_adsl.R` | third-engine ADSL derivation evidence |
@@ -188,15 +203,19 @@ Stage numbers are **manifest-derived** (not hard-coded). Optional local gate map
 | 26 (figure-data reconciliation) | `figure_data_reconcile.R` | figure-driving SAS/R data parity status |
 | 27 (spec → define conformance) | `03_metadata/define/check_define_conformance.R` — `define.xml` checked against `ADaM_spec.xlsx` (C-4 inversion; `--self-test` proves drift detection) | `platform/conformance/spec_define_conformance.json` |
 | 28 (spec → data conformance) | `04_analysis_datasets/programs/r/spec_data_checks.R` — metacore/metatools/xportr vs `04_analysis_datasets/adam/*_prod.xpt` | `platform/conformance/spec_data_conformance.json` |
-| 29 (reviewer package lock) | `check_gate_g07_reviewer_package.py` | G07 reviewer-package status |
-| 30 (Dataset-JSON v1.1 export) | `export_datasetjson.py` | `04_analysis_datasets/datasetjson/**/*.json` (ephemeral) |
-| 31 (Analysis Results Standard v1.0) | `build_ars.py` | `05_outputs/ars/` (ephemeral) |
-| 32 (USDM v3.0 study definition) | `build_usdm.py` | `03_metadata/usdm/tropic_usdm.json` (also a data-free CI gate) |
-| 33 (eCTD Module 5 packaging) | `package_ectd.py` | `08_submission_package/m5/` |
-| 34 (eCTD backbone + STF, sequence 0000) | `build_ectd_backbone.py` | `08_submission_package/ectd/0000/index.xml`, `index-md5.txt`, `stf-tropic.xml` |
-| 35 (materialize eCTD sequence + MD5 re-verify) | `materialize_ectd.py` | `08_submission_package/ectd/0000/` leaves (every leaf MD5-verified) |
-| 36 (log cleanliness) | `check_log_cleanliness.py` | configured persisted log cleanliness status |
-| 37 (release manifest binding) | `build_release_run_manifest.py` | `release_run_manifest.json`, release grade |
+| 29 (simulation operating characteristics) | `simulation_precision.py` | governed aggregate operating-characteristic JSON and parity views |
+| 30 (simulation MAP and report) | `build_simulation_report.py` | generated MAP/MAR Markdown and Module 5 PDFs |
+| 31 (simulation evidence verification) | `check_simulation_evidence.py` | independent hash, accounting, metric, and package verification |
+| 32 (reviewer package lock) | `check_gate_g07_reviewer_package.py` | G07 reviewer-package status |
+| 33 (Dataset-JSON v1.1 export) | `export_datasetjson.py` | `04_analysis_datasets/datasetjson/**/*.json` (ephemeral) |
+| 34 (Analysis Results Standard v1.0) | `build_ars.py` | `05_outputs/ars/` (ephemeral) |
+| 35 (USDM v3.0 study definition) | `build_usdm.py` | `03_metadata/usdm/tropic_usdm.json` (also a data-free CI gate) |
+| 36 (eCTD Module 5 packaging) | `package_ectd.py` | `08_submission_package/m5/` |
+| 37 (eCTD backbone + STF, sequence 0000) | `build_ectd_backbone.py` | `08_submission_package/ectd/0000/index.xml`, `index-md5.txt`, `stf-tropic.xml` |
+| 38 (materialize eCTD sequence + MD5 re-verify) | `materialize_ectd.py` | `08_submission_package/ectd/0000/` leaves (every leaf MD5-verified) |
+| 39 (metadata-control evidence refresh) | `build_metadata_control_report.py` → `build_variable_traceability.py` + `build_metadata_drift.py` | regenerated variable traceability, metadata/data drift, and fail-closed metadata-control status |
+| 40 (log cleanliness) | `check_log_cleanliness.py` | configured persisted log cleanliness status |
+| 41 (release manifest binding) | `build_release_run_manifest.py` | `release_run_manifest.json`, release grade |
 | *(offline)* CDISC CORE conformance | `platform/run_core_conformance.sh` — SDTMIG **3.4** rules on the uplifted layer (authoritative) + SDTMIG 3.2 baseline on the pristine 3.1.1 source + executable ADaM rules (`conformance_rules/adam/`, `--local-rules`) | `platform/conformance/core_sdtm34_report.json` + `core_{sdtm,adam}_report.json`; `CORE_SDTM34_RUN_RECORD.md`, `CORE_RUN_RECORD.md` |
 
 Run reproducibility: R toolchain pinned by `renv.lock`; self-contained demo

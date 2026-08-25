@@ -222,8 +222,21 @@ def _reader_pdf_controls(path: Path) -> dict:
     }
 
 
+def _pdf_identifies_unreleased_candidate(text: str) -> bool:
+    """Require the PDF to preserve the candidate/non-tagged release boundary."""
+    normalized = re.sub(r"\s+", " ", text).lower()
+    return (
+        CURRENT_RELEASE.lower() in normalized
+        and "current controlled release candidate" in normalized
+        and "unreleased" in normalized
+        and "current controlled release: tag" not in normalized
+        and "current sealed controlled release" not in normalized
+    )
+
+
 def main() -> int:
     check_only = "--check-only" in sys.argv[1:]
+    require_current_pdf = check_only or "--require-current-pdf" in sys.argv[1:]
     checks = []
     problems = []
 
@@ -355,6 +368,12 @@ def main() -> int:
                 CURRENT_RELEASE in normalized,
                 f"rendered PDF does not identify current release {CURRENT_RELEASE}",
             )
+            if require_current_pdf:
+                add(
+                    f"reviewer_pdf.unreleased_candidate_boundary:{rel}",
+                    _pdf_identifies_unreleased_candidate(text),
+                    "rendered PDF must identify the current controlled release candidate as unreleased and must not call it tagged/sealed",
+                )
             if rel.endswith("/bdrg.pdf"):
                 add(
                     "reviewer_pdf.bdrg_investigator_expression",

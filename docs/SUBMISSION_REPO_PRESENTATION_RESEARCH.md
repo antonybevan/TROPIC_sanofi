@@ -6,6 +6,14 @@
 **Product claim in force:** Path A controlled non-submission demo (`docs/PRODUCT_CLAIM.md`)  
 **Sources:** FDA Study Data Technical Conformance Guide (sdTCG); eCTD Module 5 study-data layout; R Consortium Submissions Pilots; PHUSE industry practice; sponsor-style biometrics program trees.
 
+> **Implementation status — 2026-08-23.** This research note preserves the July
+> diagnosis and measurements. Its recommended dual-surface presentation, README/package
+> tours, generated-status policy, archive removal, and reviewer-path cleanup are now
+> implemented. The current candidate is `v0.3.0-clinical-simulation` and is unreleased;
+> `v0.2.2-portfolio` is historical. A physical `platform/` directory split remains an
+> intentionally deferred refactor because it would add migration risk without improving
+> the reviewer-facing Module 5 surface.
+
 ---
 
 ## 0. Direct answer
@@ -289,7 +297,7 @@ Serious repos lead with **≤15 lines** of orientation:
 1. Product claim → docs/PRODUCT_CLAIM.md
 2. Submission-style package → 08_submission_package/m5/
 3. Reviewer guides → 07_reviewer_explanation/guides/
-4. Current release seal → docs/RELEASE_NOTE_v0.2.2-portfolio.md
+4. Current candidate rule → docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md (unreleased)
 5. Verify machine grades → python3 scripts/verify_release.py
 
 ## Factory (engineers)
@@ -401,9 +409,9 @@ Do these in order; stop when the 30-second test passes (“stranger finds packag
 1. **README above-the-fold rewrite** (Layer 0). — **DONE 2026-07-09** (root `README.md` dual-surface + Open first).  
 2. **`08_submission_package/README.md`** package tour + Path A limitations. — **DONE 2026-07-09**.  
 3. **`docs/INDEX.md`** with Reviewer / Engineer / QC tours. — **DONE 2026-07-09**.  
-4. **Park generated reports** under `06_qc_evidence/reports/` (or stop committing non-seal reports). — pending (do not migrate folders until 30s test is accepted).  
-5. **Subfolder `platform/`** by responsibility (orchestrator / packaging / reports). — pending (factory hygiene only after face is stable).  
-6. Only then: full ODA re-run if package face is stable.
+4. **Demote volatile generated reports and status piles from the review path.** — **DONE 2026-08-23** through explicit surface policy, ignored volatile outputs, and retained sealed evidence rather than a risky bulk folder move.
+5. **Subfolder `platform/`** by responsibility (orchestrator / packaging / reports). — **DEFERRED BY DESIGN**; the tiered `platform/README.md` supplies the professional navigation contract without a high-churn import/path migration.
+6. **Full genuine-SAS regeneration and reseal.** — required by the candidate promotion rule and recorded by machine evidence, never inferred from this research note.
 
 **30-second test (self-check):** stranger opens root README → finds PRODUCT_CLAIM → finds `08_submission_package/m5/` → finds three tours in `docs/INDEX.md` without help.
 

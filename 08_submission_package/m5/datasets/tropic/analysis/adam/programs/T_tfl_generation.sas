@@ -1,7 +1,7 @@
 *';*";*/;QUIT;RUN;
 /* ==============================================================================
    Program: T_tfl_generation.sas
-   Version: 1.2.0
+   Version: 1.3.0
    Author:  Antony Bevan, Clinical Programming
    Standard: ICH E3 TFL Catalogue / NEJM & Lancet publication style
    Description: SAS production-track statistical figures, rendered natively via ODS
@@ -158,9 +158,11 @@ quit;
     title2 j=l h=9.5pt c=cx444444 "Cabazitaxel+Prednisone (CbzP, synthetic) vs Mitoxantrone+Prednisone (MP, real)   |   Stratified HR = &_hr. (95% CI &_lcl. - &_ucl.)";
     footnote j=l h=7.5pt c=&LRED. "&SYNTHFN.";
     proc sgplot data=_plot noautolegend nocycleattrs;
-        styleattrs datacontrastcolors=(cx005A9C cxA6192E);
+        styleattrs datacontrastcolors=(cx005A9C cxA6192E)
+                   datalinepatterns=(solid shortdash)
+                   datasymbols=(plus x);
         step x=avalm y=sp / group=trt01p lineattrs=(thickness=2) name='km';
-        scatter x=avalm y=cens / group=trt01p markerattrs=(symbol=plus size=7);
+        scatter x=avalm y=cens / group=trt01p markerattrs=(size=7);
         xaxistable nrisk / x=avalm class=trt01p colorgroup=trt01p location=outside
             valueattrs=(size=8pt) classdisplay=cluster title="Number at risk:";
         keylegend 'km' / location=inside position=topright;
@@ -205,6 +207,14 @@ quit;
 
 proc datasets lib=work nolist; delete forest; quit;
 %macro sgcox(var, lvl, lbl, ord, num=0);
+    %local _nsg _nhr;
+    proc sql noprint;
+        select count(*) into :_nsg trimmed from _ossub
+        %if &num. = 1 %then %do; where &var. = &lvl.; %end;
+        %else %do; where &var. = "&lvl."; %end;
+        ;
+    quit;
+    proc datasets lib=work nolist; delete _h _h2; quit;
     proc phreg data=_ossub;
         %if &num. = 1 %then %do; where &var. = &lvl.; %end;
         %else %do; where &var. = "&lvl."; %end;
@@ -213,11 +223,24 @@ proc datasets lib=work nolist; delete forest; quit;
         hazardratio 'h' trt01p / cl=wald;
         ods output HazardRatios=_h;
     run;
-    data _h2;
-        set _h;
-        length subgroup $34; subgroup = "&lbl."; ord = &ord.;
-        keep subgroup ord hazardratio waldlower waldupper;
-    run;
+    %let _nhr = 0;
+    %if %sysfunc(exist(work._h)) %then %do;
+        proc sql noprint; select count(*) into :_nhr trimmed from _h; quit;
+    %end;
+    %if &_nhr. > 0 %then %do;
+        data _h2;
+            set _h(obs=1);
+            length subgroup $34; subgroup = "&lbl."; ord = &ord.; n = &_nsg.;
+            keep subgroup ord n hazardratio waldlower waldupper;
+        run;
+    %end;
+    %else %do;
+        data _h2;
+            length subgroup $34;
+            subgroup = "&lbl."; ord = &ord.; n = &_nsg.;
+            hazardratio = .; waldlower = .; waldupper = .;
+        run;
+    %end;
     proc append base=forest data=_h2 force; run;
 %mend sgcox;
 
@@ -226,13 +249,16 @@ proc phreg data=_os;
     hazardratio 'h' trt01p / cl=wald;
     ods output HazardRatios=_hov;
 run;
+proc sql noprint;
+    select count(*) into :_nov trimmed from _os;
+quit;
 data forest;
-    set _hov; length subgroup $34; subgroup='All Patients'; ord=1;
-    keep subgroup ord hazardratio waldlower waldupper;
+    set _hov; length subgroup $34; subgroup='Intent-to-Treat Population'; ord=1; n=&_nov.;
+    keep subgroup ord n hazardratio waldlower waldupper;
 run;
 
 %sgcox(agegr1,  <65,  %str(Age < 65),                2)
-%sgcox(agegr1,  >=65, %str(Age >= 65),               3)
+%sgcox(agegr1,  >=65, %str(Age 65 or older),         3)
 %sgcox(ecogblgrp, %str(0-1), %str(ECOG 0-1),          4)
 %sgcox(ecogblgrp, %str(2),   %str(ECOG 2),            5)
 %sgcox(measdisf, Y,   %str(Measurable Disease: Yes), 6)
@@ -246,8 +272,10 @@ run;
 
 proc sort data=forest; by descending ord; run;
 data forest;
-    set forest; length hrtext $24;
-    hrtext = catx(' ', put(hazardratio,4.2), cats('(',put(waldlower,4.2),'-',put(waldupper,4.2),')'));
+    set forest; length hrtext $24 ntext $8;
+    ntext = strip(put(n, 8.));
+    if nmiss(hazardratio, waldlower, waldupper) then hrtext = 'NE';
+    else hrtext = catx(' ', put(hazardratio,4.2), cats('(',put(waldlower,4.2),'-',put(waldupper,4.2),')'));
 run;
 
 /* Export the figure's own forest HRs for numerical SAS<->R reconciliation
@@ -261,17 +289,20 @@ run;
 ods graphics on / reset=index imagename="F-12-1_Subgroup_Forest_SAS";
 title  j=l h=12pt c=cx111111 "F-12-1: OS Treatment Effect Subgroup Forest Plot - SAS Production Track";
 title2 j=l h=9pt  c=cx444444 "Unadjusted within-subgroup Cox hazard ratios (CbzP vs MP) with 95% Wald CIs";
+title3 j=l h=7.5pt c=cx444444 "No treatment-by-subgroup interaction tests; do not infer heterogeneity from within-level CIs.";
 footnote j=l h=7pt c=&LRED. "&SYNTHFN.";
 proc sgplot data=forest noautolegend nocycleattrs;
     refline 1 / axis=x lineattrs=(pattern=shortdash color=gray55);
     highlow y=subgroup low=waldlower high=waldupper / type=line lineattrs=(color=cx1A5276 thickness=2);
     scatter y=subgroup x=hazardratio / markerattrs=(symbol=squarefilled size=10 color=cx1A5276);
+    yaxistable ntext / location=outside position=right valueattrs=(size=8pt)
+        labelattrs=(size=8.5pt weight=bold) title="N" nolabel;
     yaxistable hrtext / location=outside position=right valueattrs=(size=8pt)
         labelattrs=(size=8.5pt weight=bold) title="HR (95% CI)" nolabel;
-    xaxis type=log logbase=2 label="Hazard Ratio (Favors CbzP <-- | --> Favors MP)" values=(0.2 0.5 1 2 4) min=0.15 max=4.5;
+    xaxis type=log logbase=2 label="Hazard Ratio (lower favors CbzP; higher favors MP)" values=(0.2 0.5 1 2 4) min=0.15 max=4.5;
     yaxis display=(noline noticks) label=' ';
 run;
-title; title2; footnote;
+title; title2; title3; footnote;
 
 /* ============================================================================
    FIGURE F-13-1 : PSA Waterfall (best % change from baseline, by arm)
@@ -297,8 +328,8 @@ data _psab;
     set _psab; by trt01p;
     if first.trt01p then rank=0;
     rank+1;
-    length respcat $26;
-    if best <= -50 then respcat='PSA Response (>=50% dec)';
+    length respcat $40;
+    if best <= -50 then respcat='PSA Response (at least 50% decrease)';
     else if best < 0 then respcat='PSA Decrease (<50%)';
     else respcat='PSA Increase';
 run;
@@ -310,16 +341,16 @@ run;
 
 /* Explicit category->color binding (alphabetical styleattrs would scramble it) */
 data _psamap;
-    length id $5 value $26 fillcolor $9 linecolor $9;
+    length id $5 value $40 fillcolor $9 linecolor $9;
     id='psa';
-    value='PSA Response (>=50% dec)'; fillcolor='cx005A9C'; linecolor='cx005A9C'; output;
+    value='PSA Response (at least 50% decrease)'; fillcolor='cx005A9C'; linecolor='cx005A9C'; output;
     value='PSA Decrease (<50%)';      fillcolor='cx7FB3D3'; linecolor='cx7FB3D3'; output;
     value='PSA Increase';             fillcolor='cxA6192E'; linecolor='cxA6192E'; output;
 run;
 
 ods graphics on / reset=index imagename="F-13-1_PSA_Waterfall_SAS";
 title  j=l h=12pt c=cx111111 "F-13-1: PSA Best % Change from Baseline (Waterfall) - SAS Production Track";
-title2 j=l h=9pt  c=cx444444 "Baseline PSA >=20 ug/L; each bar = one subject's best PSA change; dashed line = 50% decrease threshold";
+title2 j=l h=9pt  c=cx444444 "Baseline PSA 20 micrograms/L or higher; each bar = one subject's best PSA change; dashed line = 50% decrease threshold";
 footnote j=l h=7pt c=&LRED. "&SYNTHFN.";
 proc sgpanel data=_psab dattrmap=_psamap;
     format trt01p $trtlbl.;
@@ -366,7 +397,7 @@ proc export data=_swim30(keep=usubjid trt01p row durm death)
 run;
 
 ods graphics on / reset=index imagename="F-14-1_Swimmer_Plot_SAS";
-title  j=l h=12pt c=cx111111 "F-14-1: Treatment Exposure Duration - Swimmer Plot (30 Longest Exposures per Arm)";
+title  j=l h=12pt c=cx111111 "F-14-1: Treatment Exposure Duration - Swimmer Plot (30 Longest Exposures per Arm) - SAS Production Track";
 title2 j=l h=9pt  c=cx444444 "Bar = months on treatment; X = death on study. Subjects selected by descending exposure duration.";
 footnote j=l h=7pt c=&LRED. "&SYNTHFN.";
 proc sgpanel data=_swim30;
@@ -428,15 +459,19 @@ title  j=l h=12pt c=cx111111 "F-17-1: Project Optimus Exposure-Response - SAS Pr
 title2 j=l h=9pt  c=cx444444 "Continuous ANC nadir vs RDI; descriptive LOESS fit on the log10 ANC scale";
 footnote j=l h=7pt c=&LRED. "&SYNTHFN.";
 proc sgplot data=_er nocycleattrs;
-    styleattrs datacontrastcolors=(cx005A9C cxA6192E);
-    scatter x=rdi y=loganc / group=trt01p markerattrs=(symbol=circlefilled size=5) transparency=0.65;
+    styleattrs datacontrastcolors=(cx005A9C cxA6192E)
+               datalinepatterns=(solid shortdash)
+               datasymbols=(circlefilled trianglefilled);
+    /* Do not set SYMBOL= here: it would override DATASYMBOLS and collapse both
+       treatment groups to the same marker, defeating the non-colour cue. */
+    scatter x=rdi y=loganc / group=trt01p markerattrs=(size=5) transparency=0.65;
     /* degree=2 + smooth=1.0 mirrors R's loess(span=1.0, degree=2). No CLM: the
        sparse low-RDI MP tail makes confidence bands imply unsupported precision. */
     loess x=rdi y=loganc / group=trt01p nomarkers lineattrs=(thickness=3.5) smooth=1.0 degree=2;
     refline -0.30103 / axis=y lineattrs=(pattern=shortdash color=cxE74C3C)
         label="Grade 4 Neutropenia (< 0.5)" labelloc=inside labelpos=min;
-    xaxis label="Relative Dose Intensity (%)" grid max=105;
-    yaxis label="ANC Nadir Value (x10^3/uL; log scale)" grid
+    xaxis label="Relative Dose Intensity (%)" grid;
+    yaxis label="ANC Nadir Value (10^3 cells/microliter; log scale)" grid
         values=(-1.30103 -1 -0.69897 -0.30103 0 0.30103 0.69897 1 1.30103 1.69897 2)
         valuesformat=loganc.;
     keylegend / position=top title='Treatment Group:';

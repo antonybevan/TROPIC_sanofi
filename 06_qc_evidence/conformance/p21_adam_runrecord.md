@@ -1,7 +1,7 @@
 # Pinnacle 21 Community ADaM Validation Run Record
 
-**Record ID:** TROPIC-P21-ADAM-2026-08-12-04
-**Execution date:** 2026-08-12
+**Record ID:** TROPIC-P21-ADAM-2026-08-23-06
+**Execution date:** 2026-08-23
 **Status:** `EXECUTED_WITH_OPEN_FINDINGS_AND_COMPATIBILITY_CAVEAT`
 **Use:** `INFORMATIVE_ONLY`
 **Licensed Enterprise execution:** `NOT_EXECUTED`
@@ -24,13 +24,13 @@
 | Rule catalog | 388 distinct rules listed in the workbook |
 | Result | 30 issue-summary groups; 2,373 aggregate occurrences |
 | Process result | Report generated and client logged `Validation: Process completed`; shell exit code `5` retained with the installation-compatibility condition |
-| Raw report | `pinnacle21-report-2026-08-12T16-58-controlled-exact-byte-final.xlsx`; SHA-256 `8184a5ccedca45ccd25c444cc3aca350798085a26d03153dfbb122da9c217024` |
-| Aggregate QC | Workbook ZIP integrity passed; independent artifact-tool and openpyxl reads reconciled 7 datasets, 121,320 records, 0 rejects, 388 rules, 30 issue groups, and 2,373 occurrences |
-| Pipeline binding | GREEN full DAG; 37/37 stages PASS; SAS execution mode `oda`; health timestamp `2026-08-12T10:28:13.216075+00:00`; source-tree SHA-256 `25eea11519389347cf943ecdb2c57c55733c32f781241f158d91acca35eb6fa5` |
+| Raw report | `pinnacle21-report-2026-08-23-professional-build.xlsx`; SHA-256 `05cf6f82c46ba958fdd659f9f60f41fa5e9fd2bf7f59eba443b83fd428d89cb5` |
+| Aggregate QC | Workbook ZIP integrity passed; independent workbook XML and openpyxl reads reconciled 7 datasets, 121,320 records, 0 rejects, 388 rules, 30 issue groups, and 2,373 occurrences; the Details sheet contains 1,685 issue-detail rows, of which 1,624 have a populated Record cell |
+| Pipeline binding | GREEN full DAG; 41/41 stages PASS; SAS execution mode `oda`; health timestamp `2026-08-23T17:47:35.766117+00:00`; source-tree SHA-256 `6b2e272130b0936f4f2156bf8f4352f4c3428a9c01eb772e29614c14ce970e91` |
 
-The raw workbook is retained outside Git as vendor-licensed runtime output under the repository's controlled-artifact policy; it also embeds local execution paths. The `Details` sheet in this aggregate-only run is header-only. This record and `p21_adam_summary.json` retain the run identity, cryptographic bindings, aggregate counts, and dispositions needed for repository review.
+The raw workbook is retained outside Git as vendor-licensed runtime output under the repository's controlled-artifact policy and restricted locally to owner-only mode `0600`; it embeds local execution paths and 1,685 record-level issue-detail rows. This record and `p21_adam_summary.json` retain the run identity, cryptographic bindings, aggregate counts, and dispositions needed for repository review without committing the detailed workbook.
 
-This superseding run validates the exact seven XPT byte sequences produced by the bound GREEN run at `2026-08-12T10:28:13.216075+00:00`. No header-only equivalence inference is used. The standard-named validator inputs were byte-identical staging copies of the current `_prod.xpt` artifacts, and their SHA-256 values were checked before and after staging.
+This superseding run validates the exact seven XPT byte sequences produced by the bound GREEN run at `2026-08-23T17:47:35.766117+00:00`. No header-only equivalence inference is used. The standard-named validator inputs were byte-identical staging copies of the current `_prod.xpt` artifacts, and their SHA-256 values were checked before and after staging.
 
 An exploratory invocation supplied the local engineering filenames (`*_prod.xpt`) directly and caused Community to classify the sources as nonstandard domains such as `ADAE_PROD`, producing a misleading global reject and missing-dataset messages. It is not the controlled result. The final invocation used standard submission filenames, matching the Module 5 delivery contract. `platform/stage_p21_adam_inputs.py` now makes that filename-only staging step explicit, byte-verifies it, checks each internal XPT member name, and fails closed on a reused destination.
 
@@ -38,13 +38,13 @@ An exploratory invocation supplied the local engineering filenames (`*_prod.xpt`
 
 | Dataset | Records | SHA-256 |
 |---|---:|---|
-| ADAE | 5,428 | `fcad58d6706ecfc8cd4508f874fcdd343a1f42588686edc4932ca8edaaab2a93` |
-| ADCM | 24,534 | `87a5c0c51f139c9fc18eeb01612bf413d159c9d71b638233155944d06637a6d0` |
-| ADEX | 7,820 | `88f48e9a46775ef5b9e8d40395c277badde3ebdc83fee153fea6e7793c28240d` |
-| ADLB | 78,619 | `e2e11cfc900be0129ef5e6d6dfeeabbd36b04bec57be5353eaa1165fb7bf10cd` |
-| ADRS | 2,322 | `2355507061b1c37743cd0d543ff2bb129ddbbc33d48e74f755dad711bbd4ab4f` |
-| ADSL | 371 | `b4f465cc39e4a90706c72bde69cc21b56f5aab11506f25af1190d0e9b96459ad` |
-| ADTTE | 2,226 | `377e13bf3b34524692b48ed77f56df1beec8b5b972c7015cf09220c530173840` |
+| ADAE | 5,428 | `dd3bf9eeb204a7d54e63e2f4c0545e353ee943774be1620071bfe5ded9b33a67` |
+| ADCM | 24,534 | `506f7eee97c9fd52df10c9b254b976f0759c32932a54cfb53a783c07b731bbdb` |
+| ADEX | 7,820 | `6b6c974ba4fb85c543806fa47502f3f4b0c4d0a4bb88580cbc1f86f1a96889eb` |
+| ADLB | 78,619 | `92f2404520923f89f9e680b66f76b078af77098500d6856f00ba9b754d698c02` |
+| ADRS | 2,322 | `2a6d97e8add31ffc69b9adebab08a9d69cebb38957cf2488281da495b69a21e1` |
+| ADSL | 371 | `9a2d00b02e00c0be0f1785df4797a1bc988371f400e9c6114cb0e3e7811ab2d9` |
+| ADTTE | 2,226 | `665dd7eeca6854633124764f82f3e8a0f4b880169f92c02a7d19a1bbd0bb53ff` |
 
 ## Before/after remediation
 

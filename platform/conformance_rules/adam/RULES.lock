@@ -1,0 +1,34 @@
+{
+  "schema": "tropic-core-custom-rule-lock/v1",
+  "algorithm": "sha256",
+  "rules": [
+    {
+      "path": "TROPIC-ADAM-101.yml",
+      "sha256": "c2e38b5a97caeb4c5e026ff85892be1f026fc5fc9011d4df7fd5b9255cd118c2"
+    },
+    {
+      "path": "TROPIC-ADAM-102.yml",
+      "sha256": "ffa86da6e4b38b52d439f81030abaf18ae3d5157228c58eba3d825bfcfcd3921"
+    },
+    {
+      "path": "TROPIC-ADAM-103.yml",
+      "sha256": "053979c70a6da61c27897183dbada9f28594ff79309b4662822b206769577e38"
+    },
+    {
+      "path": "TROPIC-ADAM-104.yml",
+      "sha256": "9e66dbb2c605b2f98e8cf198be2d9cb82925905ba31155d26b09ae41942f4b66"
+    },
+    {
+      "path": "TROPIC-ADAM-105.yml",
+      "sha256": "b18aa89c3e77bc948a2719b6f99c9c0dd6f082e0c3325dfe2c439afdf812c3e9"
+    },
+    {
+      "path": "TROPIC-ADAM-106.yml",
+      "sha256": "f29c0a070b2100100c155c7dc54ad09a5c224c3bb33cb63bf39f2178b088e560"
+    },
+    {
+      "path": "TROPIC-ADAM-107.yml",
+      "sha256": "27cffea61771693528dc8b1dbdb67359181f9b7f5d6e93a5d53d42cc8a144dc4"
+    }
+  ]
+}

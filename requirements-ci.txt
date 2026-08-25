@@ -1,3 +1,8 @@
-# Reproducible Python 3.10 CI environment. Keep this small entrypoint so local
-# and GitHub Actions installs use the same fully resolved dependency set.
+# Hash-locked CPython 3.12.13 / Ubuntu x86_64 CI environment. Binary packages are
+# restricted to the exact wheels recorded in the lock; the two projects that do
+# not publish wheels are restricted to their exact, hashed source archives.
+--require-hashes
+--only-binary=:all:
+--no-binary=stringcase
+--no-binary=yattag
 -r requirements-ci.lock

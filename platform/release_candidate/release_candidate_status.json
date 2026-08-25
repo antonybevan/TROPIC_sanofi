@@ -1,13 +1,13 @@
 {
-  "status": "PASS",
-  "generated_at": "2026-08-12 12:18:53 UTC",
-  "checks": 18,
-  "pass": 18,
+  "status": "BLOCKED",
+  "generated_at": "2026-08-24 18:28:17 UTC",
+  "checks": 19,
+  "pass": 14,
   "warning": 0,
-  "blocker": 0,
+  "blocker": 5,
   "active_audit_findings": 0,
   "confirmed_critical_major_findings": 0,
-  "live_sas_execution_mode": "oda",
+  "live_sas_execution_mode": "sim",
   "items": [
     {
       "gate": "G01 source_intake_lock",
@@ -32,6 +32,13 @@
     },
     {
       "gate": "G06 qc_signoff",
+      "check": "Simulation methods evidence is precise, verified, and remains non-qualified",
+      "status": "PASS",
+      "evidence": "platform/simulation_operating_characteristics/simulation_oc_status.json execution=PASS; precision=PASS; design=PASS; qualification=NOT_QUALIFIED",
+      "required_action": ""
+    },
+    {
+      "gate": "G06 qc_signoff",
       "check": "Execution logs have no unapproved warnings, errors, invalid-input notes, or uninitialized-variable findings",
       "status": "PASS",
       "evidence": "platform/log_cleanliness/log_cleanliness_status.json status=PASS; unapproved=0; reviewed_exceptions=1",
@@ -40,23 +47,23 @@
     {
       "gate": "G04 analysis_dataset_promotion",
       "check": "Current live run uses real independent SAS engine",
-      "status": "PASS",
-      "evidence": "platform/pipeline_health.json sas_execution_mode=oda; pipeline=GREEN",
-      "required_action": ""
+      "status": "BLOCKER",
+      "evidence": "platform/pipeline_health.json sas_execution_mode=sim; pipeline=RED",
+      "required_action": "Run `python3 platform/cibuild.py --real-sas` with ODA/local SAS and bind outputs to that run."
     },
     {
       "gate": "G04 analysis_dataset_promotion",
       "check": "Dataset reconciliation is non-simulated",
-      "status": "PASS",
-      "evidence": "platform/reconciliation_status.json overall=PASS; simulated=False",
-      "required_action": ""
+      "status": "BLOCKER",
+      "evidence": "platform/reconciliation_status.json overall=FAIL; simulated=False",
+      "required_action": "Re-run reconciliation from a real SAS production track; simulated zero-diff is tautological."
     },
     {
       "gate": "G06 qc_signoff",
       "check": "F-042 pain-response subject-level SAS/R reconciliation passes",
-      "status": "PASS",
-      "evidence": "platform/reconciliation_status.json endpoint_controls.F042_PAIN_RESPONSE=PASS",
-      "required_action": ""
+      "status": "BLOCKER",
+      "evidence": "platform/reconciliation_status.json endpoint_controls.F042_PAIN_RESPONSE=FAIL",
+      "required_action": "Run the real-SAS F-042 response extract and reconcile every subject/event date, confirmation date, component, and date source against the R derivation."
     },
     {
       "gate": "G04 analysis_dataset_promotion",
@@ -69,7 +76,7 @@
       "gate": "G04 analysis_dataset_promotion",
       "check": "Third-engine admiral reconciliation passes for critical core on current run",
       "status": "PASS",
-      "evidence": "platform/admiral_reconciliation_status.json overall=PASS; dag_stage=PASS; current_with_run=True",
+      "evidence": "platform/admiral_reconciliation_status.json overall=PASS; dag_stage=missing; current_with_run=True",
       "required_action": ""
     },
     {
@@ -110,16 +117,16 @@
     {
       "gate": "G09 release_candidate_lock",
       "check": "Current release-run manifest is release-candidate grade (full DAG, clean tree)",
-      "status": "PASS",
-      "evidence": "platform/release_run_manifest/release_run_manifest.json status=PASS; evidence_grade=release_candidate; run_scope=full_dag; seal=6810b9f6506f8605eb35675f048776afc6c1be6db26ef477cddf2f060bc9f5fd",
-      "required_action": ""
+      "status": "BLOCKER",
+      "evidence": "platform/release_run_manifest/release_run_manifest.json status=FAIL; evidence_grade=failed_binding; run_scope=partial_dag; seal=5cfe39b98f1a440fcb977e7b179e284157800eaa1280d3c80f584e2c4d8c6950",
+      "required_action": "Release manifest must be status=PASS (not REMEDIATION/FAIL): full current DAG, clean worktree, and current-run binding. REMEDIATION is valid development evidence only."
     },
     {
       "gate": "G09 release_candidate_lock",
       "check": "Pipeline health records a full current DAG run",
-      "status": "PASS",
-      "evidence": "platform/pipeline_health.json run_scope=full_dag; stages_recorded=37; stages_expected=37; stages_not_run=0",
-      "required_action": ""
+      "status": "BLOCKER",
+      "evidence": "platform/pipeline_health.json run_scope=partial_dag; stages_recorded=18; stages_expected=41; stages_not_run=23",
+      "required_action": "Run the full DAG from stage 1 (no --from-stage) under --real-sas so pipeline_health covers every study_manifest stage."
     },
     {
       "gate": "G06 qc_signoff",
@@ -132,7 +139,7 @@
       "gate": "G08 submission_package_materialization",
       "check": "Complete eCTD sequence inventory, checksums, support files, XML references, and run record validate",
       "status": "PASS",
-      "evidence": "platform/validate_ectd_sequence.py status=PASS; leaves=93/93; unexpected=0; problems=[]",
+      "evidence": "platform/validate_ectd_sequence.py status=PASS; leaves=99/99; unexpected=0; problems=[]",
       "required_action": ""
     }
   ]

@@ -29,7 +29,7 @@
 **Source intake pack (WS-1):** [`docs/workstreams/WS1_SOURCE_INTAKE_PACK.md`](../../docs/workstreams/WS1_SOURCE_INTAKE_PACK.md)
 **Residual risks:** [`docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md`](../../docs/workstreams/WS5_KNOWN_DIFFERENCES_MEMO.md)
 **External validation slots:** [`docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md`](../../docs/workstreams/WS3_EXTERNAL_VALIDATION_EVIDENCE_INDEX.md)
-**Current controlled release:** tag `v0.3.0-clinical-simulation` · [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) · `python3 scripts/verify_release.py`
+**Current controlled release candidate:** `v0.3.0-clinical-simulation` (unreleased; tag gated by the conditional note) · [`docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md`](../../docs/RELEASE_NOTE_v0.3.0-clinical-simulation.md) · `python3 scripts/verify_release.py`
 **Review package face:** [`08_submission_package/m5/datasets/tropic/tabulations/sdtm/`](../../08_submission_package/m5/datasets/tropic/tabulations/sdtm/)
 **Analysis narrative:** [`ADRG.md`](ADRG.md)
 **Findings disposition:** `06_qc_evidence/audit/FINDINGS_DISPOSITION_BOARD.md`
