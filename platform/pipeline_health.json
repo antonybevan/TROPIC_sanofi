@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-24T09:50:24.291968+00:00",
+  "timestamp": "2026-08-25T19:34:52.548992+00:00",
   "runner": "apple (System Agent)",
   "pipeline_health_status": "RED",
   "sas_execution_mode": "sim",
@@ -54,9 +54,9 @@
   },
   "r_version": "R version 4.6.0 (2026-04-24)",
   "renv_lock_sha256": "ec520f9529dc971910491dfb06ac2ad81feae9f303d362842a7bbd27bc1a0778",
-  "source_tree_sha256": "136c348bb6c627db2f20462ada1093fb9bfd54074467c8e1a192f01ff7e68e2a",
+  "source_tree_sha256": "b7ddcd7157eff20eeb562df15cfb40884c1c32d79a91b3bfc1ef574c8500ce32",
   "oda_last_error_class": "SPAWN_FAILED",
-  "oda_attempts": 44,
+  "oda_attempts": 2,
   "next_recommended_window": "19:00-22:00 (local)",
   "reconciliation": "sim_only",
   "oda_preflight_ok": true,
